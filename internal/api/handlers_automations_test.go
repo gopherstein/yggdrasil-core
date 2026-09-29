@@ -58,9 +58,10 @@ func TestAutomationHTTP(t *testing.T) {
 			"kind": "daily", "time_zone": "UTC", "hour": 8,
 		},
 		"profile_id":   "general-assistant",
+		"model_id":     "gemma-4-e4b",
 		"notification": map[string]any{"mode": "none"},
 	}, &created)
-	if created.Name != "Morning price" || !created.Enabled || created.NextRunAt == nil {
+	if created.Name != "Morning price" || !created.Enabled || created.NextRunAt == nil || created.ModelID != "gemma-4-e4b" {
 		t.Fatalf("created = %+v", created)
 	}
 

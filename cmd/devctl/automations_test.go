@@ -54,7 +54,7 @@ func TestYggctlAutomations(t *testing.T) {
 	var created bytes.Buffer
 	err = runAutomations([]string{
 		"create", "--name", "Morning price", "--prompt", "Check the price",
-		"--profile", "general-assistant", "--schedule", "daily", "--at", "08:00",
+		"--profile", "general-assistant", "--model", "gemma-4-e4b", "--schedule", "daily", "--at", "08:00",
 		"--zone", "UTC", "--notify", "none",
 	}, client, &created)
 	if err != nil {
@@ -64,7 +64,7 @@ func TestYggctlAutomations(t *testing.T) {
 	if err := json.Unmarshal(created.Bytes(), &automation); err != nil {
 		t.Fatal(err)
 	}
-	if automation.Name != "Morning price" || !automation.Enabled || automation.Schedule.Hour != 8 {
+	if automation.Name != "Morning price" || !automation.Enabled || automation.Schedule.Hour != 8 || automation.ModelID != "gemma-4-e4b" {
 		t.Fatalf("created = %+v", automation)
 	}
 

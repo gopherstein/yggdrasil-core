@@ -19,6 +19,7 @@ func TestRunnerExecutesDueOccurrenceOnce(t *testing.T) {
 	ctx := context.Background()
 	now := time.Date(2026, 9, 24, 8, 30, 0, 0, time.UTC)
 	created, err := repo.Create(ctx, automations.CreateInput{
+		ModelID: "model-a",
 		Name:      "Morning check",
 		Prompt:    "Check the price",
 		ProfileID: "general-assistant",
@@ -82,6 +83,7 @@ func TestRunnerRecordsFailureWithoutRetry(t *testing.T) {
 	now := time.Date(2026, 9, 24, 9, 0, 0, 0, time.UTC)
 	at := now.Add(-time.Minute)
 	created, err := repo.Create(ctx, automations.CreateInput{
+		ModelID: "model-a",
 		Name:   "Once",
 		Prompt: "Research this",
 		Schedule: automations.Schedule{
@@ -122,6 +124,7 @@ func TestRunnerLeavesALiveLeaseAlone(t *testing.T) {
 	now := time.Date(2026, 9, 24, 9, 0, 0, 0, time.UTC)
 	at := now.Add(-time.Minute)
 	created, err := repo.Create(ctx, automations.CreateInput{
+		ModelID: "model-a",
 		Name:   "Held",
 		Prompt: "Wait",
 		Schedule: automations.Schedule{
@@ -151,6 +154,7 @@ func TestRunnerReclaimsExpiredLease(t *testing.T) {
 	now := time.Date(2026, 9, 24, 9, 0, 0, 0, time.UTC)
 	at := now.Add(-time.Minute)
 	created, err := repo.Create(ctx, automations.CreateInput{
+		ModelID: "model-a",
 		Name:   "Crashed",
 		Prompt: "Try again",
 		Schedule: automations.Schedule{
@@ -191,6 +195,7 @@ func TestClaimAllowsOneWinner(t *testing.T) {
 	now := time.Date(2026, 9, 24, 9, 0, 0, 0, time.UTC)
 	at := now.Add(-time.Minute)
 	created, err := repo.Create(ctx, automations.CreateInput{
+		ModelID: "model-a",
 		Name:   "Race",
 		Prompt: "Once",
 		Schedule: automations.Schedule{
@@ -233,6 +238,7 @@ func TestAbandonExpiredLeavesTheReclaimedRun(t *testing.T) {
 	ctx := context.Background()
 	now := time.Date(2026, 9, 24, 9, 0, 0, 0, time.UTC)
 	created, err := repo.Create(ctx, automations.CreateInput{
+		ModelID: "model-a",
 		Name:   "Daily",
 		Prompt: "Check",
 		Schedule: automations.Schedule{
@@ -280,6 +286,7 @@ func TestRunNowWhilePausedKeepsTheSchedule(t *testing.T) {
 	now := time.Date(2026, 9, 24, 8, 30, 0, 0, time.UTC)
 	off := false
 	created, err := repo.Create(ctx, automations.CreateInput{
+		ModelID: "model-a",
 		Name:      "Morning check",
 		Prompt:    "Check the price",
 		Enabled:   &off,

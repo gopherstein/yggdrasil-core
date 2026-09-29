@@ -16,6 +16,7 @@ vi.mock('@/lib/api', async () => {
       getAutomation: vi.fn(),
       getProfiles: vi.fn(),
       listTools: vi.fn(),
+      getModels: vi.fn(),
       createAutomation: vi.fn(),
       updateAutomation: vi.fn(),
       pauseAutomation: vi.fn(),
@@ -81,6 +82,14 @@ describe('AutomationsPage', () => {
     vi.mocked(api.getProfiles).mockResolvedValue([
       { id: 'general-assistant', name: 'General', purpose: 'general', orchestrator_id: 'simple', roles: [], node_policy: { mode: 'automatic' } },
     ])
+    vi.mocked(api.getModels).mockResolvedValue([
+      {
+        id: 'gemma-4-e4b',
+        display_name: 'Gemma 4 E4B',
+        capabilities: { tool_calling: true, vision: false, coding: true },
+        installed: true,
+      },
+    ])
     vi.mocked(api.listTools).mockResolvedValue([
       {
         id: 'internet.search',
@@ -116,14 +125,16 @@ describe('AutomationsPage', () => {
     fireEvent.change(screen.getByPlaceholderText(/Every morning at 8:00 AM/), {
       target: { value: 'Every morning at 8:00 AM, check this product and tell me if the price is below $500.' },
     })
-    fireEvent.click(screen.getByRole('button', { name: 'Apply description' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Set up automation' }))
     expect(screen.getByDisplayValue('Price below $500')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    expect(await screen.findByRole('option', { name: 'Gemma 4 E4B' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Create automation' }))
     await waitFor(() => expect(api.createAutomation).toHaveBeenCalled())
     const body = vi.mocked(api.createAutomation).mock.calls[0][0]
     expect(body.schedule).toMatchObject({ kind: 'daily', hour: 8, minute: 0 })
     expect(body.notification).toEqual({ mode: 'condition', condition: { kind: 'threshold', op: 'below', value: 500 } })
     expect(body.prompt).toContain('{"price": 420}')
     expect(body.profile_id).toBe('general-assistant')
+    expect(body.model_id).toBe('gemma-4-e4b')
   })
 })

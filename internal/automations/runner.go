@@ -27,7 +27,7 @@ type Store interface {
 	FailRun(ctx context.Context, runID string, message string, result Execution, finished time.Time) error
 	ScheduleRetry(ctx context.Context, runID, message string, result Execution, finished, retryAt time.Time) error
 	AbandonExpired(ctx context.Context, now time.Time) ([]Run, error)
-	PreviousResult(ctx context.Context, automationID string, before time.Time) (string, bool, error)
+	PreviousResult(ctx context.Context, automationID string, before time.Time) (text string, notified bool, ok bool, err error)
 	SetNotificationSent(ctx context.Context, runID string, sent bool) error
 	RunFor(ctx context.Context, automationID string, occurrence time.Time) (Run, error)
 }
@@ -238,15 +238,15 @@ func (r *Runner) notifyRepeated(ctx context.Context, automation Automation, run 
 }
 
 func (r *Runner) deliver(ctx context.Context, automation Automation, run Run, result Execution) (bool, error) {
-	var previous *string
-	text, ok, err := r.Store.PreviousResult(ctx, automation.ID, run.OccurrenceAt)
+	text, notified, ok, err := r.Store.PreviousResult(ctx, automation.ID, run.OccurrenceAt)
 	if err != nil {
 		return false, err
 	}
+	var previous *string
 	if ok {
 		previous = &text
 	}
-	decision := Decide(automation.Notification, result.Text, previous)
+	decision := Decide(automation.Notification, result.Text, previous, notified)
 	if !decision.Notify {
 		return false, nil
 	}

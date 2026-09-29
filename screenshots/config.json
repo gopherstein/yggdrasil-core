@@ -105,7 +105,7 @@
     {
       "id": "automations-create",
       "path": "/automations",
-      "query": "compose=1",
+      "query": "compose=1&simple=1",
       "filename": "08-automations-create.png",
       "headline": "Describe a Scheduled Task",
       "readyText": "Notify when the price is below $500"

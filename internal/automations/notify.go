@@ -46,9 +46,11 @@ type signalJSON struct {
 
 // Decide reports whether a successful result should notify.
 // previous is the prior successful result. It is nil when this is the first success.
-// A threshold notifies whenever the comparison holds. Availability notifies only when
-// it becomes true. Change mode uses the first success as a baseline and notifies when later text differs.
-func Decide(n Notification, result string, previous *string) Decision {
+// previousNotified is true when that earlier success already produced a notice.
+// A threshold notifies whenever the comparison holds. Availability notifies when the item
+// is in stock and the previous notice did not already say so. Change mode uses the first
+// success as a baseline and notifies when later text differs.
+func Decide(n Notification, result string, previous *string, previousNotified bool) Decision {
 	switch n.Mode {
 	case NotifyNone:
 		return Decision{Reason: "notifications are off for this automation"}
@@ -63,13 +65,13 @@ func Decide(n Notification, result string, previous *string) Decision {
 		}
 		return Decision{Notify: true, Notice: noticeFor(n, result), Reason: "result changed"}
 	case NotifyOnCondition:
-		return decideCondition(n, result, previous)
+		return decideCondition(n, result, previous, previousNotified)
 	default:
 		return Decision{Reason: "unknown notification mode"}
 	}
 }
 
-func decideCondition(n Notification, result string, previous *string) Decision {
+func decideCondition(n Notification, result string, previous *string, previousNotified bool) Decision {
 	if n.Condition == nil {
 		return Decision{Reason: "notification condition is missing"}
 	}
@@ -86,13 +88,14 @@ func decideCondition(n Notification, result string, previous *string) Decision {
 		}
 		return Decision{Notify: true, Notice: noticeFor(n, result), Reason: "price is " + n.Condition.Op + " the threshold"}
 	case ConditionAvailable:
-		if !ok || signal.Available == nil || !*signal.Available {
+		available, known := itemAvailable(result)
+		if !known || !available {
 			return Decision{Reason: "item is not available"}
 		}
-		if previouslyAvailable(previous) {
+		if previousNotified && previouslyAvailable(previous) {
 			return Decision{Reason: "item was already available"}
 		}
-		return Decision{Notify: true, Notice: noticeFor(n, result), Reason: "item became available"}
+		return Decision{Notify: true, Notice: noticeFor(n, result), Reason: "item is in stock"}
 	case ConditionSignificant:
 		if !ok || signal.Significant == nil || !*signal.Significant {
 			return Decision{Reason: "result is not significant"}
@@ -107,8 +110,72 @@ func previouslyAvailable(previous *string) bool {
 	if previous == nil {
 		return false
 	}
-	signal, ok := parseSignal(*previous)
-	return ok && signal.Available != nil && *signal.Available
+	available, known := itemAvailable(*previous)
+	return known && available
+}
+
+// itemAvailable reads an availability flag from the result. A JSON available
+// field wins. Otherwise a plain statement that the item is in stock counts.
+func itemAvailable(result string) (available bool, known bool) {
+	signal, ok := parseSignal(result)
+	if ok && signal.Available != nil {
+		return *signal.Available, true
+	}
+	return inferAvailable(result)
+}
+
+func inferAvailable(text string) (available bool, known bool) {
+	positive, negative := false, false
+	for _, sentence := range strings.FieldsFunc(text, func(r rune) bool {
+		return r == '.' || r == '!' || r == '?' || r == '\n'
+	}) {
+		line := strings.ToLower(strings.TrimSpace(sentence))
+		if line == "" {
+			continue
+		}
+		if availabilityDenied(line) {
+			negative = true
+			continue
+		}
+		if availabilityStated(line) {
+			positive = true
+		}
+	}
+	if positive && !negative {
+		return true, true
+	}
+	if negative && !positive {
+		return false, true
+	}
+	return false, false
+}
+
+func availabilityDenied(line string) bool {
+	phrases := []string{
+		"out of stock",
+		"not in stock",
+		"isn't in stock",
+		"is not in stock",
+		"sold out",
+		"unavailable",
+		"not available",
+		"isn't available",
+		"is not available",
+		"no longer available",
+	}
+	for _, phrase := range phrases {
+		if strings.Contains(line, phrase) {
+			return true
+		}
+	}
+	return false
+}
+
+func availabilityStated(line string) bool {
+	if strings.Contains(line, "if ") || strings.Contains(line, "whether ") || strings.Contains(line, "unable") || strings.Contains(line, "cannot") || strings.Contains(line, "could not") || strings.Contains(line, "can't") {
+		return false
+	}
+	return strings.Contains(line, "in stock") || strings.Contains(line, "back in stock") || strings.Contains(line, "now available") || strings.Contains(line, "is available") || strings.Contains(line, "are available")
 }
 
 func noticeFor(n Notification, result string) Notice {

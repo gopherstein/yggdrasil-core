@@ -87,6 +87,24 @@ func (s *Server) handleDeleteAutomation(w http.ResponseWriter, r *http.Request) 
 	w.WriteHeader(http.StatusNoContent)
 }
 
+func (s *Server) handlePreviewAutomation(w http.ResponseWriter, r *http.Request) {
+	if s.deps.PreviewAutomation == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Automations are not available.", nil)
+		return
+	}
+	var in automations.CreateInput
+	if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
+		writeErr(w, http.StatusBadRequest, "BAD_REQUEST", "invalid automation", nil)
+		return
+	}
+	preview, err := s.deps.PreviewAutomation(r.Context(), in)
+	if err != nil {
+		writeAutomationErr(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, preview)
+}
+
 func (s *Server) handleRunAutomation(w http.ResponseWriter, r *http.Request) {
 	if s.deps.RunAutomation == nil {
 		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Automations are not available.", nil)

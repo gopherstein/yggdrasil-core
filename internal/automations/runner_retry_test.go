@@ -16,6 +16,7 @@ func TestRunnerRetriesTransientFailureAfterBackoff(t *testing.T) {
 	clock := time.Date(2026, 9, 24, 9, 0, 0, 0, time.UTC)
 	at := clock.Add(-time.Minute)
 	created, err := repo.Create(ctx, automations.CreateInput{
+		ModelID: "model-a",
 		Name:         "Morning check",
 		Prompt:       "Check the page",
 		Notification: automations.Notification{Mode: automations.NotifyNone},
@@ -93,6 +94,7 @@ func TestRunnerStopsTransientRetriesAtTheBound(t *testing.T) {
 	clock := time.Date(2026, 9, 24, 9, 0, 0, 0, time.UTC)
 	at := clock.Add(-time.Minute)
 	created, err := repo.Create(ctx, automations.CreateInput{
+		ModelID: "model-a",
 		Name:         "Morning check",
 		Prompt:       "Check the page",
 		Notification: automations.Notification{Mode: automations.NotifyNone},
@@ -148,6 +150,7 @@ func TestPermanentFailureIsNotRetried(t *testing.T) {
 	clock := time.Date(2026, 9, 24, 9, 0, 0, 0, time.UTC)
 	at := clock.Add(-time.Minute)
 	created, err := repo.Create(ctx, automations.CreateInput{
+		ModelID: "model-a",
 		Name:     "Load model",
 		Prompt:   "Summarize",
 		Schedule: automations.Schedule{Kind: automations.KindOnce, TimeZone: "UTC", At: &at},
@@ -187,6 +190,7 @@ func TestRepeatedPermanentFailuresNotify(t *testing.T) {
 	createdAt := time.Date(2026, 9, 24, 7, 0, 0, 0, time.UTC)
 	clock := createdAt.Add(90 * time.Minute)
 	if _, err := repo.Create(ctx, automations.CreateInput{
+		ModelID: "model-a",
 		Name:         "Stock check",
 		Prompt:       "Check stock",
 		Notification: automations.Notification{Mode: automations.NotifyNone},

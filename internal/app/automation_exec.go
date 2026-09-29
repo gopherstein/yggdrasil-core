@@ -25,10 +25,14 @@ func (e automationExecutor) Execute(ctx context.Context, automation automations.
 	if strings.TrimSpace(automation.ProfileID) == "" {
 		return automations.Execution{}, fmt.Errorf("profile is required")
 	}
+	if strings.TrimSpace(automation.ModelID) == "" {
+		return automations.Execution{}, fmt.Errorf("model is required")
+	}
 	profile, err := e.app.Profiles.Get(ctx, automation.ProfileID)
 	if err != nil {
 		return automations.Execution{}, err
 	}
+	profile = withChatModel(profile, automation.ModelID)
 	orch, err := e.app.OrchRegistry.Get(profile.OrchestratorID)
 	if err != nil {
 		return automations.Execution{}, err
@@ -43,10 +47,11 @@ func (e automationExecutor) Execute(ctx context.Context, automation automations.
 	}
 	env := &automationEnv{
 		base: &chatExecEnv{
-			app:     e.app,
-			ctx:     ctx,
-			profile: profile,
-			taskID:  automation.ID,
+			app:           e.app,
+			ctx:           ctx,
+			profile:       profile,
+			modelOverride: automation.ModelID,
+			taskID:        automation.ID,
 		},
 		granted: automation.Tools,
 	}

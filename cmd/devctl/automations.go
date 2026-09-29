@@ -18,8 +18,8 @@ import (
 const automationsUsage = `usage: yggctl automations <list|get|create|update|delete|run|pause|resume>
   list
   get <id>
-  create --name <name> --prompt <text> --profile <id> --schedule <once|daily|weekly|interval> [--at <time>] [--every <duration>] [--weekday <0-6>] [--zone <tz>] [--tool <id>] [--notify <mode>] [--disabled]
-  update <id> [--name <name>] [--prompt <text>] [--profile <id>] [--schedule ...] [--notify <mode>]
+  create --name <name> --prompt <text> --profile <id> --model <id> --schedule <once|daily|weekly|interval> [--at <time>] [--every <duration>] [--weekday <0-6>] [--zone <tz>] [--tool <id>] [--notify <mode>] [--disabled]
+  update <id> [--name <name>] [--prompt <text>] [--profile <id>] [--model <id>] [--schedule ...] [--notify <mode>]
   delete <id>
   run <id>
   pause <id>
@@ -137,6 +137,7 @@ func automationBody(args []string, create bool) (any, error) {
 	name := fs.String("name", "", "automation name")
 	prompt := fs.String("prompt", "", "prompt to run")
 	profile := fs.String("profile", "", "profile id")
+	model := fs.String("model", "", "installed model id")
 	schedule := fs.String("schedule", "", "once, daily, weekly, or interval")
 	at := fs.String("at", "", "HH:MM or RFC3339")
 	every := fs.String("every", "", "interval duration, such as 6h")
@@ -156,8 +157,8 @@ func automationBody(args []string, create bool) (any, error) {
 	fs.Visit(func(f *flag.Flag) { seen[f.Name] = true })
 
 	if create {
-		if strings.TrimSpace(*name) == "" || strings.TrimSpace(*prompt) == "" || strings.TrimSpace(*profile) == "" {
-			return nil, fmt.Errorf("create requires --name, --prompt, and --profile")
+		if strings.TrimSpace(*name) == "" || strings.TrimSpace(*prompt) == "" || strings.TrimSpace(*profile) == "" || strings.TrimSpace(*model) == "" {
+			return nil, fmt.Errorf("create requires --name, --prompt, --profile, and --model")
 		}
 		sched, err := buildSchedule(*schedule, *at, *every, *zone, weekday, seen["weekday"])
 		if err != nil {
@@ -171,6 +172,7 @@ func automationBody(args []string, create bool) (any, error) {
 			Name:         *name,
 			Prompt:       *prompt,
 			ProfileID:    *profile,
+			ModelID:      *model,
 			Schedule:     sched,
 			Tools:        []string(tools),
 			Notification: note,
@@ -191,6 +193,9 @@ func automationBody(args []string, create bool) (any, error) {
 	}
 	if seen["profile"] {
 		patch.ProfileID = profile
+	}
+	if seen["model"] {
+		patch.ModelID = model
 	}
 	if seen["tool"] {
 		copied := []string(tools)

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { civilToISO, parseAutomationRequest } from './parseRequest'
+import { civilToISO, parseAutomationRequest, visibleTask } from './parseRequest'
 
 const zone = 'America/Los_Angeles'
 const morning = new Date('2026-09-28T15:00:00Z')
@@ -18,6 +18,7 @@ describe('parseAutomationRequest', () => {
       condition: { kind: 'threshold', op: 'below', value: 500 },
     })
     expect(parsed.prompt).toContain('{"price": 420}')
+    expect(visibleTask(parsed.prompt)).toBe('Check this product. Report the current price.')
     expect(parsed.notes).toEqual([])
   })
 

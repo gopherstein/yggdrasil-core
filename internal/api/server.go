@@ -78,6 +78,7 @@ type Dependencies struct {
 	UpdateAutomation       func(ctx context.Context, id string, patch automations.Patch) (automations.Automation, error)
 	DeleteAutomation       func(ctx context.Context, id string) error
 	RunAutomation          func(ctx context.Context, id string) (automations.Run, error)
+	PreviewAutomation      func(ctx context.Context, in automations.CreateInput) (automations.Preview, error)
 	PauseAutomation        func(ctx context.Context, id string) (automations.Automation, error)
 	ResumeAutomation       func(ctx context.Context, id string) (automations.Automation, error)
 	DecideTool             func(requestID string, allow, allowSession bool) error
@@ -161,6 +162,7 @@ func (s *Server) routes() {
 	api.HandleFunc("/tasks/{id}", s.handleGetTask).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/automations", s.handleListAutomations).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/automations", s.handleCreateAutomation).Methods(http.MethodPost)
+	api.HandleFunc("/automations/preview", s.handlePreviewAutomation).Methods(http.MethodPost)
 	api.HandleFunc("/automations/{id}/run", s.handleRunAutomation).Methods(http.MethodPost)
 	api.HandleFunc("/automations/{id}/pause", s.handlePauseAutomation).Methods(http.MethodPost)
 	api.HandleFunc("/automations/{id}/resume", s.handleResumeAutomation).Methods(http.MethodPost)
@@ -245,6 +247,7 @@ func (s *Server) BindAutomations(d Dependencies) {
 	s.deps.UpdateAutomation = d.UpdateAutomation
 	s.deps.DeleteAutomation = d.DeleteAutomation
 	s.deps.RunAutomation = d.RunAutomation
+	s.deps.PreviewAutomation = d.PreviewAutomation
 	s.deps.PauseAutomation = d.PauseAutomation
 	s.deps.ResumeAutomation = d.ResumeAutomation
 }

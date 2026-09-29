@@ -439,20 +439,21 @@ func (r *AutomationRepo) History(ctx context.Context, automationID string) (auto
 }
 
 // PreviousResult returns the latest successful result scheduled before an occurrence.
-func (r *AutomationRepo) PreviousResult(ctx context.Context, automationID string, before time.Time) (string, bool, error) {
+func (r *AutomationRepo) PreviousResult(ctx context.Context, automationID string, before time.Time) (string, bool, bool, error) {
 	var text string
+	var notified int
 	err := r.db.QueryRowContext(ctx, `
-		SELECT COALESCE(result, '') FROM automation_runs
+		SELECT COALESCE(result, ''), notification_sent FROM automation_runs
 		WHERE automation_id = ? AND status = ? AND occurrence_at < ?
 		ORDER BY occurrence_at DESC
-		LIMIT 1`, automationID, automations.RunSucceeded, formatTime(clock(before))).Scan(&text)
+		LIMIT 1`, automationID, automations.RunSucceeded, formatTime(clock(before))).Scan(&text, &notified)
 	if err == sql.ErrNoRows {
-		return "", false, nil
+		return "", false, false, nil
 	}
 	if err != nil {
-		return "", false, err
+		return "", false, false, err
 	}
-	return text, true, nil
+	return text, notified != 0, true, nil
 }
 
 // SetNotificationSent records whether the user was notified for this occurrence.

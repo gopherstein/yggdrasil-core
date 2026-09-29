@@ -4,9 +4,10 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { api, ApiError } from '@/lib/api'
 import { subscribeEvents } from '@/lib/events'
 import { readScreenshotLaunch } from '@/lib/screenshotMode'
-import type { Automation, AutomationDetail, AutomationInput, AutomationRun } from '@/types/api'
+import type { Automation, AutomationDetail, AutomationInput, AutomationRun, Model } from '@/types/api'
 import { AutomationForm } from './AutomationForm'
-import { formatWhen, notificationLabel, scheduleLabel } from './parseRequest'
+import { clockDetail, compactWhen, explainRun, runTiming } from './display'
+import { notificationLabel, resultProse, scheduleLabel, visibleTask } from './parseRequest'
 
 const screenshotSentence =
   'Every morning at 8:00 AM, check this product and tell me if the price is below $500.'
@@ -17,6 +18,8 @@ export function AutomationsPage() {
   const [creating, setCreating] = useState(false)
   const [editing, setEditing] = useState(false)
   const [formError, setFormError] = useState('')
+  const [query, setQuery] = useState('')
+  const [filter, setFilter] = useState<'all' | 'active' | 'paused' | 'attention'>('all')
 
   const listQuery = useQuery({
     queryKey: ['automations'],
@@ -29,6 +32,10 @@ export function AutomationsPage() {
   const toolsQuery = useQuery({
     queryKey: ['tools'],
     queryFn: () => api.listTools(),
+  })
+  const modelsQuery = useQuery({
+    queryKey: ['models'],
+    queryFn: () => api.getModels(),
   })
   const detailQuery = useQuery({
     queryKey: ['automation', selectedID],
@@ -46,10 +53,11 @@ export function AutomationsPage() {
     })
   }, [queryClient])
 
-  const items = listQuery.data ?? []
+  const items = (listQuery.data ?? []).filter((item) => matchesAutomation(item, query, filter))
   const detail = detailQuery.data
   const profiles = profilesQuery.data ?? []
   const tools = toolsQuery.data ?? []
+  const models = modelsQuery.data ?? []
 
   useEffect(() => {
     if (!readScreenshotLaunch()?.enabled) return
@@ -104,7 +112,7 @@ export function AutomationsPage() {
         <div>
           <h1 className="font-display text-2xl font-semibold text-ink">Automations</h1>
           <p className="mt-1 max-w-2xl text-sm text-ink-muted">
-            Scheduled prompts run in the background while this window is closed. The daemon starts a model when one is needed and lets it unload afterward.
+            Automations run in the background, even when this window is closed. Schedule a recurring task, or have Yggdrasil tell you when something changes.
           </p>
         </div>
         <button
@@ -121,21 +129,46 @@ export function AutomationsPage() {
         </button>
       </div>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,32rem)]">
-        <section>
+        <section className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              className="field min-w-40 flex-1"
+              value={query}
+              placeholder="Search"
+              aria-label="Search automations"
+              onChange={(event) => setQuery(event.target.value)}
+            />
+            {(['all', 'active', 'paused', 'attention'] as const).map((key) => (
+              <button
+                key={key}
+                type="button"
+                className={filter === key ? 'btn-primary px-3 py-1.5 text-xs' : 'btn-secondary px-3 py-1.5 text-xs'}
+                onClick={() => setFilter(key)}
+              >
+                {key === 'all' ? 'All' : key === 'active' ? 'Active' : key === 'paused' ? 'Paused' : 'Needs attention'}
+              </button>
+            ))}
+          </div>
           {listQuery.isLoading && <p className="text-sm text-ink-muted">Loading automations…</p>}
           {listQuery.isError && <p className="text-sm text-danger">Automations could not be loaded.</p>}
-          {!listQuery.isLoading && items.length === 0 && !creating && (
+          {!listQuery.isLoading && (listQuery.data ?? []).length === 0 && !creating && (
             <EmptyState
               title="No automations yet"
               description="Describe a recurring check, such as a morning price or a Friday release summary, and Yggdrasil will run it on that schedule."
             />
+          )}
+          {!listQuery.isLoading && (listQuery.data ?? []).length > 0 && items.length === 0 && (
+            <p className="text-sm text-ink-muted">No automations match.</p>
           )}
           <ul className="space-y-2">
             {items.map((item) => (
               <li key={item.id}>
                 <button
                   type="button"
-                  className={['card w-full text-left', selectedID === item.id ? 'selectable-active' : ''].filter(Boolean).join(' ')}
+                  className={[
+                    'selectable w-full',
+                    selectedID === item.id ? 'shadow-[inset_0_0_0_1.5px_rgb(var(--rgb-primary))]' : '',
+                  ].filter(Boolean).join(' ')}
                   onClick={() => {
                     setSelectedID(item.id)
                     setCreating(false)
@@ -145,18 +178,15 @@ export function AutomationsPage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <p className="font-medium text-ink">{item.name}</p>
-                    <span className={item.enabled ? 'text-xs text-success' : 'text-xs text-ink-faint'}>
-                      {item.enabled ? 'Enabled' : 'Paused'}
-                    </span>
+                    <StatusPill item={item} />
                   </div>
                   <p className="mt-1 text-xs text-ink-muted">{scheduleLabel(item.schedule)}</p>
                   <p className="mt-2 text-xs text-ink-faint">
-                    {statusLabel(item.last_status)}
-                    {item.last_run_at ? ` · ${formatWhen(item.last_run_at, item.schedule.time_zone)}` : ''}
+                    Last {compactWhen(item.last_run_at, item.schedule.time_zone)}
                     {' · Next '}
-                    {formatWhen(item.next_run_at, item.schedule.time_zone)}
+                    {compactWhen(item.next_run_at, item.schedule.time_zone)}
                   </p>
-                  {item.last_result && <p className="mt-2 line-clamp-2 text-sm text-ink-muted">{item.last_result}</p>}
+                  {resultProse(item.last_result) && <p className="mt-2 line-clamp-2 text-sm text-ink-muted">{resultProse(item.last_result)}</p>}
                 </button>
               </li>
             ))}
@@ -167,6 +197,7 @@ export function AutomationsPage() {
             <AutomationForm
               key={editing ? selectedID ?? 'edit' : 'new'}
               profiles={profiles}
+              models={models}
               tools={tools}
               initial={editing ? detail : null}
               seedDescription={
@@ -186,6 +217,7 @@ export function AutomationsPage() {
           ) : detail ? (
             <Detail
               detail={detail}
+              models={models}
               running={runNow.isPending}
               runError={runNow.error instanceof Error ? runNow.error.message : ''}
               onRun={() => runNow.mutate(detail.id)}
@@ -211,6 +243,7 @@ export function AutomationsPage() {
 
 function Detail({
   detail,
+  models,
   running,
   runError,
   onRun,
@@ -219,6 +252,7 @@ function Detail({
   onDelete,
 }: {
   detail: AutomationDetail
+  models: Model[]
   running: boolean
   runError: string
   onRun: () => void
@@ -232,18 +266,26 @@ function Detail({
       <div>
         <div className="flex items-start justify-between gap-3">
           <h2 className="font-display text-lg font-semibold text-ink">{detail.name}</h2>
-          <span className={detail.enabled ? 'text-xs text-success' : 'text-xs text-ink-faint'}>
-            {detail.enabled ? 'Enabled' : 'Paused'}
-          </span>
+          <StatusPill item={detail} />
         </div>
-        <p className="mt-1 text-sm text-ink-muted">{scheduleLabel(detail.schedule)}</p>
-        <p className="text-sm text-ink-muted">{notificationLabel(detail.notification)}</p>
-        <p className="mt-2 text-xs text-ink-faint">
-          Next {formatWhen(detail.next_run_at, zone)}
-          {detail.last_error ? ` · ${detail.last_error}` : ''}
-        </p>
+        <div className="mt-4 space-y-3 text-sm">
+          <div>
+            <p className="text-xs tracking-wide text-ink-faint">Schedule</p>
+            <p className="text-ink">{scheduleLabel(detail.schedule)}</p>
+            <p className="text-ink-muted">Next {compactWhen(detail.next_run_at, zone)}</p>
+          </div>
+          <div>
+            <p className="text-xs tracking-wide text-ink-faint">Task</p>
+            <p className="whitespace-pre-wrap text-ink">{visibleTask(detail.prompt)}</p>
+          </div>
+          <div>
+            <p className="text-xs tracking-wide text-ink-faint">Notification</p>
+            <p className="text-ink">{notificationLabel(detail.notification)}</p>
+            <p className="text-ink-muted">{detail.notification.mode === 'none' ? 'Stored on this computer' : 'On this computer'}</p>
+          </div>
+        </div>
+        {detail.last_error && <p className="mt-3 text-sm text-danger">{detail.last_error}</p>}
       </div>
-      <p className="whitespace-pre-wrap text-sm text-ink">{detail.prompt}</p>
       <div className="flex flex-wrap gap-2">
         <button type="button" className="btn-primary px-3 py-1.5 text-xs" disabled={running} onClick={onRun}>
           {running ? 'Running…' : 'Run now'}
@@ -265,8 +307,16 @@ function Detail({
           <p className="mt-2 text-sm text-ink-muted">This automation has not run yet.</p>
         ) : (
           <ul className="mt-2 space-y-3">
-            {detail.history.map((run) => (
-              <HistoryRow key={run.id} run={run} zone={zone} />
+            {detail.history.map((run, index) => (
+              <HistoryRow
+                key={run.id}
+                run={run}
+                zone={zone}
+                notification={detail.notification}
+                previous={detail.history.slice(index + 1).find((item) => item.status === 'succeeded')?.result}
+                previousNotified={detail.history.slice(index + 1).find((item) => item.status === 'succeeded')?.notification_sent ?? false}
+                models={models}
+              />
             ))}
           </ul>
         )}
@@ -275,28 +325,67 @@ function Detail({
   )
 }
 
-function HistoryRow({ run, zone }: { run: AutomationRun; zone: string }) {
+function HistoryRow({
+  run,
+  zone,
+  notification,
+  previous,
+  previousNotified = false,
+  models,
+}: {
+  run: AutomationRun
+  zone: string
+  notification: AutomationDetail['notification']
+  previous?: string
+  previousNotified?: boolean
+  models: Model[]
+}) {
+  const notice = explainRun(notification, run, previous, previousNotified)
+  const prose = resultProse(run.result)
+  const modelName = models.find((model) => model.id === run.model_id)?.display_name || run.model_id
   return (
     <li className="rounded-lg bg-raised/50 p-3">
       <div className="flex items-start justify-between gap-3">
         <p className="text-sm font-medium text-ink">{statusLabel(run.status)}</p>
-        <p className="text-xs text-ink-faint">{run.notification_sent ? 'Notified' : 'Not notified'}</p>
+        <p className="text-xs text-ink-faint">{notice.title}</p>
       </div>
-      <p className="mt-1 text-xs text-ink-faint">
-        Scheduled {formatWhen(run.occurrence_at, zone)}
-        {run.started_at ? ` · Started ${formatWhen(run.started_at, zone)}` : ''}
-        {run.finished_at ? ` · Finished ${formatWhen(run.finished_at, zone)}` : ''}
-      </p>
-      {(run.model_id || run.node_id) && (
-        <p className="mt-1 text-xs text-ink-faint">
-          {[run.model_id, run.node_id].filter(Boolean).join(' · ')}
-          {run.attempt > 1 ? ` · Attempt ${run.attempt}` : ''}
-        </p>
-      )}
-      {run.result && <p className="mt-2 whitespace-pre-wrap text-sm text-ink-muted">{run.result}</p>}
+      <p className="mt-1 text-xs text-ink-faint">{runTiming(run, zone)}</p>
+      {prose && <p className="mt-2 whitespace-pre-wrap text-sm text-ink-muted">{prose}</p>}
+      {notice.detail && <p className="mt-1 text-sm text-ink-muted">{notice.detail}</p>}
       {run.error && <p className="mt-2 text-sm text-danger">{run.error}</p>}
+      <details className="mt-2">
+        <summary className="cursor-pointer text-xs text-ink-faint">Details</summary>
+        <div className="mt-2 space-y-1 text-xs text-ink-faint">
+          <p>Scheduled {clockDetail(run.occurrence_at, zone)}</p>
+          {run.started_at && <p>Started {clockDetail(run.started_at, zone)}</p>}
+          {run.finished_at && <p>Finished {clockDetail(run.finished_at, zone)}</p>}
+          {modelName && <p>Model {modelName}</p>}
+          {run.node_id && <p>Computer {run.node_id}</p>}
+          {run.attempt > 1 && <p>Attempt {run.attempt}</p>}
+        </div>
+      </details>
     </li>
   )
+}
+
+function StatusPill({ item }: { item: Pick<Automation, 'enabled' | 'last_status' | 'consecutive_failures'> }) {
+  const failed = item.last_status === 'failed' || item.consecutive_failures > 0
+  const label = !item.enabled ? 'Paused' : failed ? 'Failed' : 'Enabled'
+  const mark = !item.enabled ? 'Ⅱ' : failed ? '!' : '●'
+  return (
+    <span className={failed ? 'text-xs text-danger' : item.enabled ? 'text-xs text-success' : 'text-xs text-ink-faint'}>
+      {mark} {label}
+    </span>
+  )
+}
+
+function matchesAutomation(item: Automation, query: string, filter: 'all' | 'active' | 'paused' | 'attention'): boolean {
+  const needle = query.trim().toLowerCase()
+  if (needle && !`${item.name} ${item.prompt} ${item.last_result ?? ''}`.toLowerCase().includes(needle)) return false
+  if (filter === 'active') return item.enabled
+  if (filter === 'paused') return !item.enabled
+  if (filter === 'attention') return item.last_status === 'failed' || item.consecutive_failures > 0
+  return true
 }
 
 function statusLabel(status: string | undefined): string {

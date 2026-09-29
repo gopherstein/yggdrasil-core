@@ -30,6 +30,7 @@ func TestDecide(t *testing.T) {
 		note     automations.Notification
 		result   string
 		previous *string
+		told     bool
 		notify   bool
 		body     string
 	}{
@@ -42,15 +43,19 @@ func TestDecide(t *testing.T) {
 		{name: "price equal", note: below, result: "{\"price\": 500}", notify: false},
 		{name: "price above the below-threshold", note: below, result: "{\"price\": 640}", notify: false},
 		{name: "missing price", note: below, result: "about five hundred", notify: false},
-		{name: "becomes available", note: available, result: inStock, previous: &out, notify: true, body: "Back in stock."},
-		{name: "already available", note: available, result: inStock, previous: strPtr("{\"available\": true}"), notify: false},
+		{name: "becomes available", note: available, result: inStock, previous: &out, told: true, notify: true, body: "Back in stock."},
+		{name: "already available", note: available, result: inStock, previous: strPtr("{\"available\": true}"), told: true, notify: false},
+		{name: "in stock was never announced", note: available, result: "It is in stock.", previous: strPtr("It is in stock."), notify: true, body: "It is in stock."},
+		{name: "in stock in prose", note: available, result: "Based on the information available, it seems that Nintendo Switch 2 is in stock at Costco. You can find specific models and bundles available on their website, or check in-store.", notify: true, body: "Nintendo Switch 2 is in stock"},
+		{name: "question is not a stock confirmation", note: available, result: "Check whether it is in stock. Based on the information available, visit the website.", notify: false},
+		{name: "json false wins", note: available, result: "It is in stock.\n{\"available\": false}", notify: false},
 		{name: "not available", note: available, result: out, notify: false},
 		{name: "significant", note: significant, result: "Worth a look.\n{\"significant\": true}", notify: true, body: "Worth a look."},
 		{name: "not significant", note: significant, result: "{\"significant\": false}", notify: false},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := automations.Decide(tc.note, tc.result, tc.previous)
+			got := automations.Decide(tc.note, tc.result, tc.previous, tc.told)
 			if got.Notify != tc.notify {
 				t.Fatalf("notify = %v, want %v (%s)", got.Notify, tc.notify, got.Reason)
 			}

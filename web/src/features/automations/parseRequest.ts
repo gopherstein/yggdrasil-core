@@ -59,7 +59,7 @@ export function parseAutomationRequest(text: string, now: Date, timeZone: string
   const notification = parseNotification(normalized)
   return {
     name: automationName(original, notification),
-    prompt: withSignalInstruction(original, notification),
+    prompt: withSignalInstruction(readableTask(original, notification), notification),
     schedule: schedule.schedule,
     notification,
     notes: schedule.notes,
@@ -270,6 +270,20 @@ function parseNotification(text: string): AutomationNotification {
   return { mode: 'always' }
 }
 
+function readableTask(original: string, notification: AutomationNotification): string {
+  let text = original.trim().replace(/[.]+$/, '')
+  text = text.replace(/^(?:every|each)\s+[^,]+,\s+/i, '')
+  text = text.replace(/\s+(?:and\s+)?tell me if the price is (?:below|under|above|over|less than|more than)\s+[$€£]?\s*\d[\d,]*(?:\.\d+)?$/i, '')
+  text = text.replace(/\s+notify me only when it becomes available$/i, '')
+  text = text.replace(/\s+/g, ' ').trim()
+  if (!text) text = original.trim()
+  if (notification.condition?.kind === 'threshold' && !/\bprice\b/i.test(text)) {
+    text = `${text}. Report the current price`
+  }
+  const sentence = text.charAt(0).toUpperCase() + text.slice(1)
+  return /[.!?]$/.test(sentence) ? sentence : `${sentence}.`
+}
+
 function automationName(original: string, notification: AutomationNotification): string {
   const condition = notification.condition
   if (notification.mode === 'condition' && condition?.kind === 'threshold') {
@@ -286,6 +300,30 @@ function automationName(original: string, notification: AutomationNotification):
   if (!cleaned) return 'Scheduled task'
   const short = cleaned.length > 48 ? `${cleaned.slice(0, 48).trim()}…` : cleaned
   return short.charAt(0).toUpperCase() + short.slice(1)
+}
+
+// visibleTask removes the machine-readable result instruction from a stored prompt.
+export function visibleTask(prompt: string): string {
+  let text = prompt.trim()
+  for (const line of [PRICE_INSTRUCTION, AVAILABLE_INSTRUCTION, SIGNIFICANT_INSTRUCTION]) {
+    text = text.split(line).join('')
+  }
+  return text.replace(/\n{3,}/g, '\n\n').trim()
+}
+
+// composePrompt stores the task the user wrote and, when needed, the result instruction.
+export function composePrompt(task: string, notification: AutomationNotification): string {
+  return withSignalInstruction(visibleTask(task), notification)
+}
+
+export function resultProse(result: string | undefined): string {
+  if (!result) return ''
+  const withoutInstruction = visibleTask(result)
+  return withoutInstruction
+    .replace(/```json[\s\S]*?```/g, '')
+    .replace(/\{[^{}]*"(?:price|available|significant)"[^{}]*\}/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
 }
 
 function withSignalInstruction(text: string, notification: AutomationNotification): string {

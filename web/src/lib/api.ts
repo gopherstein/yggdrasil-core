@@ -33,6 +33,7 @@ import type {
   Automation,
   AutomationDetail,
   AutomationInput,
+  AutomationPreview,
   AutomationRun,
   UpdateConversationRequest,
   VersionResponse,
@@ -488,6 +489,12 @@ export const api = {
   listAutomations: () => request<Automation[]>('/api/v1/automations'),
 
   getAutomation: (id: string) => request<AutomationDetail>(`/api/v1/automations/${id}`),
+
+  previewAutomation: (body: AutomationInput) =>
+    request<AutomationPreview>('/api/v1/automations/preview', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
 
   createAutomation: (body: AutomationInput) =>
     request<Automation>('/api/v1/automations', {

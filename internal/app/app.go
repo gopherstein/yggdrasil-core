@@ -475,7 +475,8 @@ func New(opts Options) (*App, error) {
 			return a.Automations.Update(ctx, id, patch, time.Now())
 		},
 		DeleteAutomation: a.Automations.Delete,
-		RunAutomation:    a.AutomationRunner.RunNow,
+		RunAutomation:     a.AutomationRunner.RunNow,
+		PreviewAutomation: a.AutomationRunner.Preview,
 		PauseAutomation: func(ctx context.Context, id string) (automations.Automation, error) {
 			enabled := false
 			return a.Automations.Update(ctx, id, automations.Patch{Enabled: &enabled}, time.Now())

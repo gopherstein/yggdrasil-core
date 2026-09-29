@@ -3,6 +3,7 @@ package repositories_test
 import (
 	"context"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -32,8 +33,9 @@ func TestAutomationPersistence(t *testing.T) {
 	friday := int(time.Friday)
 
 	created, err := repo.Create(ctx, automations.CreateInput{
-		Name:   " Morning price ",
-		Prompt: " Check the price ",
+		ModelID: "model-a",
+		Name:    " Morning price ",
+		Prompt:  " Check the price ",
 		Schedule: automations.Schedule{
 			Kind: automations.KindDaily, TimeZone: "America/Los_Angeles", Hour: 8,
 		},
@@ -116,8 +118,9 @@ func TestAutomationPersistence(t *testing.T) {
 	}
 
 	weekly, err := repo.Create(ctx, automations.CreateInput{
-		Name:   "Friday release",
-		Prompt: "Summarize the release",
+		ModelID: "model-a",
+		Name:    "Friday release",
+		Prompt:  "Summarize the release",
 		Schedule: automations.Schedule{
 			Kind: automations.KindWeekly, TimeZone: "UTC", Hour: 9, Weekday: &friday,
 		},
@@ -165,8 +168,9 @@ func TestOneTimeCompletionClearsNextRun(t *testing.T) {
 	createdAt := time.Date(2026, 9, 21, 16, 0, 0, 0, time.UTC)
 	at := time.Date(2026, 9, 22, 16, 0, 0, 0, time.UTC)
 	created, err := repo.Create(ctx, automations.CreateInput{
-		Name:   "Tomorrow morning",
-		Prompt: "Run the research prompt",
+		ModelID: "model-a",
+		Name:    "Tomorrow morning",
+		Prompt:  "Run the research prompt",
 		Schedule: automations.Schedule{
 			Kind: automations.KindOnce, TimeZone: "UTC", At: &at,
 		},
@@ -202,11 +206,29 @@ func TestAutomationCreateRejectsEmptyPrompt(t *testing.T) {
 	defer db.Close()
 	repo := repositories.NewAutomationRepo(db.SQL)
 	_, err = repo.Create(context.Background(), automations.CreateInput{
+		ModelID:  "model-a",
 		Name:     "Nameless work",
 		Schedule: automations.Schedule{Kind: automations.KindOnce, TimeZone: "UTC", At: timePtr(time.Date(2026, 9, 22, 16, 0, 0, 0, time.UTC))},
 	}, time.Date(2026, 9, 21, 16, 0, 0, 0, time.UTC))
 	if err == nil {
 		t.Fatal("expected missing prompt to fail")
+	}
+}
+
+func TestAutomationCreateRejectsMissingModel(t *testing.T) {
+	db, err := store.Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	repo := repositories.NewAutomationRepo(db.SQL)
+	_, err = repo.Create(context.Background(), automations.CreateInput{
+		Name:     "Morning price",
+		Prompt:   "Check the price",
+		Schedule: automations.Schedule{Kind: automations.KindDaily, TimeZone: "UTC", Hour: 8},
+	}, time.Date(2026, 9, 21, 16, 0, 0, 0, time.UTC))
+	if err == nil || !strings.Contains(err.Error(), "model") {
+		t.Fatalf("expected missing model to fail, got %v", err)
 	}
 }
 

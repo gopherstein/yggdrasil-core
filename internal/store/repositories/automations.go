@@ -23,7 +23,7 @@ func NewAutomationRepo(db *sql.DB) *AutomationRepo {
 
 const automationSelect = `
 	SELECT id, name, enabled, schedule_json, time_zone, prompt,
-		COALESCE(profile_id, ''), tools_json, notification_json,
+		COALESCE(profile_id, ''), COALESCE(model_id, ''), tools_json, notification_json,
 		created_at, updated_at, next_run_at, last_run_at,
 		consecutive_failures, COALESCE(last_error, '')
 	FROM automations`
@@ -43,6 +43,7 @@ func (r *AutomationRepo) Create(ctx context.Context, in automations.CreateInput,
 		Schedule:     in.Schedule,
 		Prompt:       in.Prompt,
 		ProfileID:    in.ProfileID,
+		ModelID:      in.ModelID,
 		Tools:        in.Tools,
 		Notification: in.Notification,
 		CreatedAt:    now,
@@ -120,6 +121,9 @@ func (r *AutomationRepo) Update(ctx context.Context, id string, patch automation
 	}
 	if patch.ProfileID != nil {
 		existing.ProfileID = *patch.ProfileID
+	}
+	if patch.ModelID != nil {
+		existing.ModelID = *patch.ModelID
 	}
 	if patch.Tools != nil {
 		existing.Tools = *patch.Tools
@@ -209,11 +213,11 @@ func (r *AutomationRepo) insert(ctx context.Context, a automations.Automation) e
 	}
 	_, err = r.db.ExecContext(ctx, `
 		INSERT INTO automations (
-			id, name, enabled, schedule_json, time_zone, prompt, profile_id,
+			id, name, enabled, schedule_json, time_zone, prompt, profile_id, model_id,
 			tools_json, notification_json, created_at, updated_at, next_run_at, last_run_at,
 			consecutive_failures, last_error
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		a.ID, a.Name, boolInt(a.Enabled), sched, a.Schedule.TimeZone, a.Prompt, nullIfEmpty(a.ProfileID),
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		a.ID, a.Name, boolInt(a.Enabled), sched, a.Schedule.TimeZone, a.Prompt, nullIfEmpty(a.ProfileID), nullIfEmpty(a.ModelID),
 		tools, note, formatTime(a.CreatedAt), formatTime(a.UpdatedAt), formatTimePtr(a.NextRunAt), formatTimePtr(a.LastRunAt),
 		a.ConsecutiveFailures, nullIfEmpty(a.LastError))
 	return err
@@ -234,11 +238,11 @@ func updateAutomation(ctx context.Context, db execer, a automations.Automation) 
 	}
 	res, err := db.ExecContext(ctx, `
 		UPDATE automations SET
-			name = ?, enabled = ?, schedule_json = ?, time_zone = ?, prompt = ?, profile_id = ?,
+			name = ?, enabled = ?, schedule_json = ?, time_zone = ?, prompt = ?, profile_id = ?, model_id = ?,
 			tools_json = ?, notification_json = ?, updated_at = ?, next_run_at = ?, last_run_at = ?,
 			consecutive_failures = ?, last_error = ?
 		WHERE id = ?`,
-		a.Name, boolInt(a.Enabled), sched, a.Schedule.TimeZone, a.Prompt, nullIfEmpty(a.ProfileID),
+		a.Name, boolInt(a.Enabled), sched, a.Schedule.TimeZone, a.Prompt, nullIfEmpty(a.ProfileID), nullIfEmpty(a.ModelID),
 		tools, note, formatTime(a.UpdatedAt), formatTimePtr(a.NextRunAt), formatTimePtr(a.LastRunAt),
 		a.ConsecutiveFailures, nullIfEmpty(a.LastError), a.ID)
 	if err != nil {
@@ -255,6 +259,7 @@ func prepareAutomation(a *automations.Automation) error {
 	a.Name = strings.TrimSpace(a.Name)
 	a.Prompt = strings.TrimSpace(a.Prompt)
 	a.ProfileID = strings.TrimSpace(a.ProfileID)
+	a.ModelID = strings.TrimSpace(a.ModelID)
 	if a.Tools == nil {
 		a.Tools = []string{}
 	}
@@ -264,7 +269,7 @@ func prepareAutomation(a *automations.Automation) error {
 	}
 	a.Tools = cleaned
 	a.Notification.Normalize()
-	return automations.ValidateDraft(a.Name, a.Prompt, a.Tools, a.Notification, a.Schedule)
+	return automations.ValidateDraft(a.Name, a.Prompt, a.ModelID, a.Tools, a.Notification, a.Schedule)
 }
 
 func marshalAutomation(a automations.Automation) (schedule, tools, notification string, err error) {
@@ -296,7 +301,7 @@ func scanAutomation(s automationScanner) (automations.Automation, error) {
 	var sched, zone, tools, note, created, updated string
 	var next, last sql.NullString
 	if err := s.Scan(
-		&a.ID, &a.Name, &enabled, &sched, &zone, &a.Prompt, &a.ProfileID, &tools, &note,
+		&a.ID, &a.Name, &enabled, &sched, &zone, &a.Prompt, &a.ProfileID, &a.ModelID, &tools, &note,
 		&created, &updated, &next, &last, &a.ConsecutiveFailures, &a.LastError,
 	); err != nil {
 		return automations.Automation{}, err

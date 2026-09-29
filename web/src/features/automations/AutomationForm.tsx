@@ -1,18 +1,32 @@
-import { useEffect, useState } from 'react'
-import type { AIProfile, Automation, AutomationInput, AutomationSchedule, ToolRecord } from '@/types/api'
+import { useEffect, useRef, useState } from 'react'
+import type { AIProfile, Automation, AutomationInput, AutomationSchedule, Model, ToolRecord } from '@/types/api'
+import { api } from '@/lib/api'
+import type { AutomationPreview } from '@/types/api'
+import { useUIStore } from '@/stores/uiStore'
 import {
   civilInputValue,
   civilToISO,
+  composePrompt,
   localTimeZone,
   notificationLabel,
   parseAutomationRequest,
+  resultProse,
   scheduleLabel,
+  visibleTask,
 } from './parseRequest'
 
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
+const NOTIFY_CHOICES: { mode: AutomationInput['notification']['mode']; label: string }[] = [
+  { mode: 'condition', label: 'When the condition is true' },
+  { mode: 'change', label: 'When the result changes' },
+  { mode: 'always', label: 'Every time it runs' },
+  { mode: 'none', label: "Don't notify me" },
+]
+
 interface AutomationFormProps {
   profiles: AIProfile[]
+  models: Model[]
   tools: ToolRecord[]
   initial?: Automation | null
   seedDescription?: string
@@ -22,14 +36,21 @@ interface AutomationFormProps {
   onSubmit: (input: AutomationInput) => void
 }
 
-export function AutomationForm({ profiles, tools, initial, seedDescription = '', pending, error, onCancel, onSubmit }: AutomationFormProps) {
+export function AutomationForm({ profiles, models, tools, initial, seedDescription = '', pending, error, onCancel, onSubmit }: AutomationFormProps) {
+  const advanced = useUIStore((state) => state.advancedMode) && new URLSearchParams(window.location.search).get('simple') !== '1'
+  const advancedRef = useRef<HTMLDetailsElement>(null)
   const zone = initial?.schedule.time_zone || localTimeZone()
   const [description, setDescription] = useState('')
   const [notes, setNotes] = useState<string[]>([])
   const [parseError, setParseError] = useState('')
   const [name, setName] = useState(initial?.name ?? '')
-  const [prompt, setPrompt] = useState(initial?.prompt ?? '')
+  const [task, setTask] = useState(visibleTask(initial?.prompt ?? ''))
+  const [preview, setPreview] = useState<AutomationPreview | null>(null)
+  const [previewError, setPreviewError] = useState('')
+  const [testing, setTesting] = useState(false)
+  const installed = models.filter((model) => model.installed)
   const [profileID, setProfileID] = useState(initial?.profile_id || profiles.find((p) => p.id === 'general-assistant')?.id || profiles[0]?.id || '')
+  const [modelID, setModelID] = useState(initial?.model_id || installed[0]?.id || '')
   const [schedule, setSchedule] = useState<AutomationSchedule>(initial?.schedule ?? { kind: 'daily', time_zone: zone, hour: 8, minute: 0 })
   const [mode, setMode] = useState(initial?.notification.mode ?? 'always')
   const [conditionKind, setConditionKind] = useState(initial?.notification.condition?.kind ?? 'threshold')
@@ -43,7 +64,7 @@ export function AutomationForm({ profiles, tools, initial, seedDescription = '',
     try {
       const parsed = parseAutomationRequest(seedDescription, new Date(), zone)
       setName(parsed.name)
-      setPrompt(parsed.prompt)
+      setTask(visibleTask(parsed.prompt))
       setSchedule(parsed.schedule)
       setMode(parsed.notification.mode)
       setConditionKind(parsed.notification.condition?.kind ?? 'threshold')
@@ -56,13 +77,29 @@ export function AutomationForm({ profiles, tools, initial, seedDescription = '',
     }
   }, [seedDescription, zone])
 
+  useEffect(() => {
+    if (profileID && profiles.some((profile) => profile.id === profileID)) return
+    const next = profiles.find((profile) => profile.id === 'general-assistant')?.id || profiles[0]?.id
+    if (next) setProfileID(next)
+  }, [profiles, profileID])
+
+  useEffect(() => {
+    if (modelID) return
+    const first = models.find((model) => model.installed)
+    if (first) setModelID(first.id)
+  }, [models, modelID])
+
+  useEffect(() => {
+    if (advancedRef.current) advancedRef.current.open = advanced
+  }, [advanced])
+
   const readTools = tools.filter((tool) => tool.risk === 'read' && tool.enabled)
 
   function applyDescription() {
     try {
       const parsed = parseAutomationRequest(description, new Date(), schedule.time_zone || zone)
       setName(parsed.name)
-      setPrompt(parsed.prompt)
+      setTask(visibleTask(parsed.prompt))
       setSchedule(parsed.schedule)
       setMode(parsed.notification.mode)
       setConditionKind(parsed.notification.condition?.kind ?? 'threshold')
@@ -75,34 +112,47 @@ export function AutomationForm({ profiles, tools, initial, seedDescription = '',
     }
   }
 
-  function submit() {
-    const notification =
-      mode === 'condition'
-        ? {
-            mode,
-            condition:
-              conditionKind === 'threshold'
-                ? { kind: conditionKind, op, value: Number(value) }
-                : { kind: conditionKind },
-          }
-        : { mode }
-    onSubmit({
-      name: name.trim(),
-      prompt: prompt.trim(),
+  function draft(notification = currentNotification()): AutomationInput {
+    return {
+      name: name.trim() || 'Automation',
+      prompt: composePrompt(task, notification),
       profile_id: profileID,
+      model_id: modelID,
       schedule,
       notification,
       tools: selectedTools,
-    })
+    }
   }
 
-  const preview: AutomationInput = {
-    name,
-    prompt,
-    profile_id: profileID,
-    schedule,
-    notification: { mode },
+  function currentNotification(): AutomationInput['notification'] {
+    if (mode !== 'condition') return { mode }
+    if (conditionKind === 'threshold') {
+      return { mode, condition: { kind: 'threshold', op, value: Number(value) } }
+    }
+    return { mode, condition: { kind: conditionKind } }
   }
+
+  function submit() {
+    if (!modelID || !task.trim()) return
+    const notification = currentNotification()
+    onSubmit({ ...draft(notification), name: name.trim() })
+  }
+
+  async function testDraft() {
+    if (!modelID || !task.trim()) return
+    setTesting(true)
+    setPreview(null)
+    setPreviewError('')
+    try {
+      setPreview(await api.previewAutomation(draft()))
+    } catch (err) {
+      setPreviewError(err instanceof Error ? err.message : 'The test could not run.')
+    } finally {
+      setTesting(false)
+    }
+  }
+
+  const summary = scheduleLabel(schedule)
 
   return (
     <form
@@ -114,12 +164,10 @@ export function AutomationForm({ profiles, tools, initial, seedDescription = '',
     >
       <div>
         <h2 className="font-display text-lg font-semibold text-ink">{initial ? 'Edit automation' : 'New automation'}</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          Describe the task in ordinary language, then adjust the schedule before saving.
-        </p>
+        <p className="mt-1 text-sm text-ink-muted">Tell Yggdrasil what you want it to do.</p>
       </div>
       <label className="block space-y-1 text-sm">
-        <span className="text-ink-muted">Describe the task</span>
+        <span className="text-ink-muted">Describe what you want</span>
         <textarea
           className="field min-h-24 w-full"
           value={description}
@@ -128,7 +176,7 @@ export function AutomationForm({ profiles, tools, initial, seedDescription = '',
         />
       </label>
       <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={applyDescription}>
-        Apply description
+        Set up automation
       </button>
       {parseError && <p className="text-sm text-danger">{parseError}</p>}
       {notes.map((note) => (
@@ -141,23 +189,16 @@ export function AutomationForm({ profiles, tools, initial, seedDescription = '',
         <input className="field w-full" value={name} onChange={(event) => setName(event.target.value)} required />
       </label>
       <label className="block space-y-1 text-sm">
-        <span className="text-ink-muted">Prompt</span>
-        <textarea className="field min-h-28 w-full" value={prompt} onChange={(event) => setPrompt(event.target.value)} required />
+        <span className="text-ink-muted">Task</span>
+        <textarea className="field min-h-28 w-full" value={task} onChange={(event) => setTask(event.target.value)} required />
       </label>
-      <label className="block space-y-1 text-sm">
-        <span className="text-ink-muted">Profile</span>
-        <select className="field w-full" value={profileID} onChange={(event) => setProfileID(event.target.value)} required>
-          {profiles.length === 0 && <option value="">No profiles yet</option>}
-          {profiles.map((profile) => (
-            <option key={profile.id} value={profile.id}>
-              {profile.name}
-            </option>
-          ))}
-        </select>
-      </label>
+      <div>
+        <p className="text-sm text-ink-muted">Schedule</p>
+        <p className="mt-1 text-sm text-ink">{summary}</p>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block space-y-1 text-sm">
-          <span className="text-ink-muted">Schedule</span>
+          <span className="text-ink-muted">Repeats</span>
           <select
             className="field w-full"
             value={schedule.kind}
@@ -169,29 +210,25 @@ export function AutomationForm({ profiles, tools, initial, seedDescription = '',
             <option value="once">Once</option>
           </select>
         </label>
-        <label className="block space-y-1 text-sm">
-          <span className="text-ink-muted">Time zone</span>
-          <input
-            className="field w-full"
-            value={schedule.time_zone}
-            onChange={(event) => setSchedule({ ...schedule, time_zone: event.target.value })}
-            required
-          />
-        </label>
+        <ScheduleFields schedule={schedule} onChange={setSchedule} />
       </div>
-      <ScheduleFields schedule={schedule} onChange={setSchedule} />
-      <p className="text-sm text-ink">{scheduleLabel(preview.schedule)} · {notificationLabel(previewNotification(mode, conditionKind, op, value))}</p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="block space-y-1 text-sm">
-          <span className="text-ink-muted">Notification</span>
-          <select className="field w-full" value={mode} onChange={(event) => setMode(event.target.value as AutomationInput['notification']['mode'])}>
-            <option value="always">Notify every time</option>
-            <option value="condition">Notify on a condition</option>
-            <option value="change">Notify when the result changes</option>
-            <option value="none">Store the result only</option>
-          </select>
-        </label>
-        {mode === 'condition' && (
+      <fieldset className="space-y-2">
+        <legend className="text-sm text-ink-muted">Notify me</legend>
+        {NOTIFY_CHOICES.map((choice) => (
+          <label key={choice.mode} className="flex items-center gap-2 text-sm text-ink">
+            <input
+              type="radio"
+              name="notify"
+              checked={mode === choice.mode}
+              onChange={() => setMode(choice.mode)}
+            />
+            {choice.label}
+          </label>
+        ))}
+        <p className="text-xs text-ink-faint">Notices appear on this computer.</p>
+      </fieldset>
+      {mode === 'condition' && (
+        <div className="grid gap-3 sm:grid-cols-2">
           <label className="block space-y-1 text-sm">
             <span className="text-ink-muted">Condition</span>
             <select
@@ -204,53 +241,106 @@ export function AutomationForm({ profiles, tools, initial, seedDescription = '',
               <option value="significant">Significant result</option>
             </select>
           </label>
-        )}
-      </div>
-      {mode === 'condition' && conditionKind === 'threshold' && (
-        <div className="grid gap-3 sm:grid-cols-2">
-          <label className="block space-y-1 text-sm">
-            <span className="text-ink-muted">Price is</span>
-            <select className="field w-full" value={op} onChange={(event) => setOp(event.target.value as 'below' | 'above')}>
-              <option value="below">below</option>
-              <option value="above">above</option>
-            </select>
-          </label>
-          <label className="block space-y-1 text-sm">
-            <span className="text-ink-muted">Amount</span>
-            <input className="field w-full" inputMode="decimal" value={value} onChange={(event) => setValue(event.target.value)} required />
-          </label>
+          {conditionKind === 'threshold' && (
+            <>
+              <label className="block space-y-1 text-sm">
+                <span className="text-ink-muted">Price is</span>
+                <select className="field w-full" value={op} onChange={(event) => setOp(event.target.value as 'below' | 'above')}>
+                  <option value="below">below</option>
+                  <option value="above">above</option>
+                </select>
+              </label>
+              <label className="block space-y-1 text-sm sm:col-span-2">
+                <span className="text-ink-muted">Amount</span>
+                <input className="field w-full" inputMode="decimal" value={value} onChange={(event) => setValue(event.target.value)} required />
+              </label>
+            </>
+          )}
         </div>
       )}
-      <fieldset className="space-y-2">
-        <legend className="text-sm text-ink-muted">Read-only tools</legend>
-        <p className="text-xs text-ink-faint">
-          Leave these empty to use every read-only tool the profile already allows. Write tools stay off for scheduled runs.
-        </p>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {readTools.map((tool) => (
-            <label key={tool.id} className="flex items-start gap-2 text-sm text-ink">
-              <input
-                type="checkbox"
-                className="mt-1"
-                checked={selectedTools.includes(tool.id)}
-                onChange={(event) => {
-                  setSelectedTools((current) =>
-                    event.target.checked ? [...current, tool.id] : current.filter((id) => id !== tool.id),
-                  )
-                }}
-              />
-              <span>
-                {tool.name}
-                <span className="block text-xs text-ink-faint">{tool.description}</span>
-              </span>
-            </label>
-          ))}
+      <p className="text-sm text-ink">{notificationLabel(previewNotification(mode, conditionKind, op, value))}</p>
+      {installed.length === 0 && <p className="text-sm text-danger">Install a model before creating an automation.</p>}
+      <details ref={advancedRef} className="space-y-3">
+        <summary className="cursor-pointer text-sm text-ink-muted">Advanced</summary>
+        <label className="block space-y-1 text-sm">
+          <span className="text-ink-muted">Profile</span>
+          <select className="field w-full" value={profileID} onChange={(event) => setProfileID(event.target.value)}>
+            {profiles.length === 0 && <option value="">No profiles yet</option>}
+            {profiles.map((profile) => (
+              <option key={profile.id} value={profile.id}>
+                {profile.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block space-y-1 text-sm">
+          <span className="text-ink-muted">Model</span>
+          <select className="field w-full" value={modelID} onChange={(event) => setModelID(event.target.value)} required>
+            {installed.length === 0 && <option value="">Install a model first</option>}
+            {installed.map((model) => (
+              <option key={model.id} value={model.id}>
+                {model.display_name || model.id}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block space-y-1 text-sm">
+          <span className="text-ink-muted">Time zone</span>
+          <input
+            className="field w-full"
+            value={schedule.time_zone}
+            onChange={(event) => setSchedule({ ...schedule, time_zone: event.target.value })}
+            required
+          />
+        </label>
+        {mode === 'condition' && (
+          <p className="text-xs text-ink-faint">
+            Yggdrasil checks the result against this condition. The task itself stays in ordinary language.
+          </p>
+        )}
+        <fieldset className="space-y-2">
+          <legend className="text-sm text-ink-muted">Read-only tools</legend>
+          <p className="text-xs text-ink-faint">
+            Leave these empty to use every read-only tool the profile already allows. Write tools stay off for scheduled runs.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {readTools.map((tool) => (
+              <label key={tool.id} className="flex items-start gap-2 text-sm text-ink">
+                <input
+                  type="checkbox"
+                  className="mt-1"
+                  checked={selectedTools.includes(tool.id)}
+                  onChange={(event) => {
+                    setSelectedTools((current) =>
+                      event.target.checked ? [...current, tool.id] : current.filter((id) => id !== tool.id),
+                    )
+                  }}
+                />
+                <span>
+                  {tool.name}
+                  <span className="block text-xs text-ink-faint">{tool.description}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      </details>
+      {previewError && <p className="text-sm text-danger">{previewError}</p>}
+      {preview && (
+        <div className="rounded-lg bg-raised/50 p-3 text-sm">
+          <p className="font-medium text-ink">{testing ? 'Testing automation…' : preview.error ? 'The test did not finish' : preview.would_notify ? 'A notice would be sent' : 'A notice would not be sent'}</p>
+          {resultProse(preview.result) && <p className="mt-2 whitespace-pre-wrap text-ink-muted">{resultProse(preview.result)}</p>}
+          {preview.error && <p className="mt-2 text-danger">{preview.error}</p>}
         </div>
-      </fieldset>
+      )}
+      {testing && !preview && <p className="text-sm text-ink-muted">Testing automation…</p>}
       {error && <p className="text-sm text-danger">{error}</p>}
-      <div className="flex gap-2">
-        <button type="submit" className="btn-primary px-3 py-1.5 text-xs" disabled={pending || profiles.length === 0}>
-          {pending ? 'Saving…' : 'Save'}
+      <div className="flex flex-wrap gap-2">
+        <button type="button" className="btn-secondary px-3 py-1.5 text-xs" disabled={testing || pending || !modelID || !task.trim()} onClick={() => void testDraft()}>
+          {testing ? 'Testing…' : 'Test run'}
+        </button>
+        <button type="submit" className="btn-primary px-3 py-1.5 text-xs" disabled={pending || testing || profiles.length === 0 || !modelID || !task.trim()}>
+          {pending ? 'Saving…' : initial ? 'Save changes' : 'Create automation'}
         </button>
         <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={onCancel}>
           Cancel

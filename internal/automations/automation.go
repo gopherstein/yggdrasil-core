@@ -81,12 +81,14 @@ func (c Condition) Validate() error {
 
 // Automation is a scheduled prompt owned by the daemon.
 type Automation struct {
-	ID           string       `json:"id"`
-	Name         string       `json:"name"`
-	Enabled      bool         `json:"enabled"`
-	Schedule     Schedule     `json:"schedule"`
-	Prompt       string       `json:"prompt"`
-	ProfileID    string       `json:"profile_id,omitempty"`
+	ID        string   `json:"id"`
+	Name      string   `json:"name"`
+	Enabled   bool     `json:"enabled"`
+	Schedule  Schedule `json:"schedule"`
+	Prompt    string   `json:"prompt"`
+	ProfileID string   `json:"profile_id,omitempty"`
+	// ModelID is the installed model this scheduled prompt runs.
+	ModelID      string       `json:"model_id,omitempty"`
 	Tools        []string     `json:"tools"`
 	Notification Notification `json:"notification"`
 	CreatedAt    time.Time    `json:"created_at"`
@@ -131,6 +133,7 @@ type CreateInput struct {
 	Schedule     Schedule     `json:"schedule"`
 	Prompt       string       `json:"prompt"`
 	ProfileID    string       `json:"profile_id,omitempty"`
+	ModelID      string       `json:"model_id,omitempty"`
 	Tools        []string     `json:"tools,omitempty"`
 	Notification Notification `json:"notification"`
 }
@@ -142,24 +145,28 @@ type Patch struct {
 	Schedule     *Schedule     `json:"schedule,omitempty"`
 	Prompt       *string       `json:"prompt,omitempty"`
 	ProfileID    *string       `json:"profile_id,omitempty"`
+	ModelID      *string       `json:"model_id,omitempty"`
 	Tools        *[]string     `json:"tools,omitempty"`
 	Notification *Notification `json:"notification,omitempty"`
 }
 
 // ValidateDraft checks the fields required to store an automation.
-func ValidateDraft(name, prompt string, tools []string, notification Notification, schedule Schedule) error {
-	if err := validateIdentity(name, prompt, tools, notification); err != nil {
+func ValidateDraft(name, prompt, modelID string, tools []string, notification Notification, schedule Schedule) error {
+	if err := validateIdentity(name, prompt, modelID, tools, notification); err != nil {
 		return err
 	}
 	return schedule.Validate()
 }
 
-func validateIdentity(name, prompt string, tools []string, notification Notification) error {
+func validateIdentity(name, prompt, modelID string, tools []string, notification Notification) error {
 	if strings.TrimSpace(name) == "" {
 		return fmt.Errorf("name is required")
 	}
 	if strings.TrimSpace(prompt) == "" {
 		return fmt.Errorf("prompt is required")
+	}
+	if strings.TrimSpace(modelID) == "" {
+		return fmt.Errorf("model is required")
 	}
 	for _, id := range tools {
 		if strings.TrimSpace(id) == "" {

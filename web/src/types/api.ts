@@ -620,6 +620,7 @@ export interface Automation {
   schedule: AutomationSchedule
   prompt: string
   profile_id?: string
+  model_id?: string
   tools: string[]
   notification: AutomationNotification
   created_at: string
@@ -652,10 +653,20 @@ export interface AutomationDetail extends Automation {
   history: AutomationRun[]
 }
 
+export interface AutomationPreview {
+  result?: string
+  error?: string
+  model_id?: string
+  node_id?: string
+  would_notify: boolean
+  reason: string
+}
+
 export interface AutomationInput {
   name: string
   prompt: string
   profile_id?: string
+  model_id?: string
   schedule: AutomationSchedule
   notification: AutomationNotification
   tools?: string[]
