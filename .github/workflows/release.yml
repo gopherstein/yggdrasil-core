@@ -53,7 +53,6 @@ jobs:
             dist/*.tar.gz
             dist/SHA256SUMS.txt
       - name: Open the Homebrew formula pull request
-        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -80,8 +79,10 @@ jobs:
                 --title "Publish the Homebrew formula for ${GITHUB_REF_NAME#v}" \
                 --body "Updates Formula/yggdrasil.rb from the ${GITHUB_REF_NAME} release."
             fi
-            # main requires a pull request. Merge it in this job so the formula is on the default branch Homebrew taps.
-            gh pr merge formula --squash --admin
+            # The actions token opens the pull request but cannot approve it. A required review must not fail the release.
+            if ! gh pr merge formula --squash --admin; then
+              echo "::warning::The Homebrew formula pull request is open and still needs an approving review."
+            fi
           fi
       - name: Publish the apt repository
         env:
@@ -133,7 +134,10 @@ jobs:
               --title "Publish the documentation for ${version}" \
               --body "Freezes docs/${version}.json from the ${GITHUB_REF_NAME} release."
           fi
-          gh pr merge documentation --squash --admin
+          # The actions token opens the pull request but cannot approve it. A required review must not fail the release.
+          if ! gh pr merge documentation --squash --admin; then
+            echo "::warning::The documentation pull request is open and still needs an approving review."
+          fi
 
   start-desktop:
     needs: release
