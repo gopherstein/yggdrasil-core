@@ -10,6 +10,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 
 - Targeted for 1.3.0: scheduled automations. The daemon runs a saved prompt on a one-time, daily, weekly, or interval schedule, keeps a history of each occurrence, retries timeouts and connection failures, and can post an operating-system notice when the result matches the notification rule. Read-only tools can run while the window is closed. Automations are available in the desktop UI and through `yggctl automations`. `GET /api/v1/automations` is new. This is a minor release because the API, CLI, and database migration are backward-compatible.
 
+### Fixed
+
+- Targeted for 1.3.1: a saved schedule turns on “Keep running in background,” so closing the window does not stop the daemon that runs it.
+
 ## [1.2.1] - 2026-09-28
 
 Patch release. The API is unchanged. Binaries and the apt repository are not signed.

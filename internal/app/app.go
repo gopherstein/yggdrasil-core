@@ -468,7 +468,14 @@ func New(opts Options) (*App, error) {
 	a.API.BindAutomations(api.Dependencies{
 		ListAutomations: a.Automations.List,
 		CreateAutomation: func(ctx context.Context, in automations.CreateInput) (automations.Automation, error) {
-			return a.Automations.Create(ctx, in, time.Now())
+			created, err := a.Automations.Create(ctx, in, time.Now())
+			if err != nil {
+				return automations.Automation{}, err
+			}
+			if err := a.enableBackgroundWhenScheduled(ctx); err != nil && a.Logger != nil {
+				a.Logger.Warn("could not keep the daemon running for schedules", "error", err)
+			}
+			return created, nil
 		},
 		GetAutomation: a.Automations.History,
 		UpdateAutomation: func(ctx context.Context, id string, patch automations.Patch) (automations.Automation, error) {
@@ -563,6 +570,9 @@ func (a *App) Start(ctx context.Context) error {
 	cfg := a.Config.Get()
 	if err := a.requireKeyForRemoteBind(ctx); err != nil {
 		return err
+	}
+	if err := a.enableBackgroundWhenScheduled(ctx); err != nil && a.Logger != nil {
+		a.Logger.Warn("could not keep the daemon running for schedules", "error", err)
 	}
 	if cfg.DiscoveryEnabled && (cfg.InternalHost == "" || cfg.InternalHost == "127.0.0.1" || cfg.InternalHost == "localhost") {
 		_ = a.Config.Update(func(c *config.Config) { c.InternalHost = "0.0.0.0" })
@@ -901,6 +911,23 @@ func (a *App) reloadDiscovery() {
 			_ = a.Nodes.RefreshDiscovery(ctx)
 		}()
 	}
+}
+
+// enableBackgroundWhenScheduled turns on keep_running_in_background when a schedule
+// exists. The desktop shell quits the daemon on window close unless that flag is set.
+func (a *App) enableBackgroundWhenScheduled(ctx context.Context) error {
+	if a.Automations == nil || a.Settings == nil {
+		return nil
+	}
+	items, err := a.Automations.List(ctx)
+	if err != nil || len(items) == 0 {
+		return err
+	}
+	on, err := a.Settings.GetBool(ctx, "keep_running_in_background", false)
+	if err != nil || on {
+		return err
+	}
+	return a.Settings.SetBool(ctx, "keep_running_in_background", true)
 }
 
 // ResetApp restores first-run defaults: settings, profiles, chats, tasks, and API keys.

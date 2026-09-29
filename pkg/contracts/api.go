@@ -497,7 +497,8 @@ type SettingsView struct {
 	ModelLifecycle    string `json:"model_lifecycle"`     // automatic | manual
 	IdleUnloadMinutes int    `json:"idle_unload_minutes"` // 0 = never
 	// KeepRunningInBackground keeps the local daemon (and desktop tray) alive
-	// when the main window is closed. Default false: quitting the app stops the daemon.
+	// when the main window is closed. Default false. A saved schedule turns it on,
+	// because the scheduler stops when the daemon stops.
 	KeepRunningInBackground bool `json:"keep_running_in_background"`
 
 	// DefaultProfileID is the preferred Chat profile when starting a new conversation.

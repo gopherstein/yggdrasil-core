@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState, type ReactNode } from 'react'
+import { ScheduleBackgroundSync } from '@/components/ScheduleBackgroundSync'
 import { ApiError, api, rememberApiKey } from '@/lib/api'
 import { readScreenshotLaunch } from '@/lib/screenshotMode'
 
@@ -116,7 +117,12 @@ function DaemonBootGate({ children }: { children: ReactNode }) {
   }, [ready, deadline])
 
   if (ready) {
-    return <div className="h-full min-h-0 min-w-0 overflow-hidden">{children}</div>
+    return (
+      <div className="h-full min-h-0 min-w-0 overflow-hidden">
+        <ScheduleBackgroundSync />
+        {children}
+      </div>
+    )
   }
 
   if (askForKey) {
