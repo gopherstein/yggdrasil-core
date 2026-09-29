@@ -586,3 +586,79 @@ export interface Task {
   created_at: string
 }
 
+export type AutomationScheduleKind = 'once' | 'daily' | 'weekly' | 'interval'
+export type AutomationNotifyMode = 'always' | 'condition' | 'change' | 'none'
+export type AutomationConditionKind = 'threshold' | 'available' | 'significant'
+export type AutomationThresholdOp = 'below' | 'above'
+export type AutomationRunStatus = 'claimed' | 'running' | 'retrying' | 'succeeded' | 'failed'
+
+export interface AutomationSchedule {
+  kind: AutomationScheduleKind
+  time_zone: string
+  at?: string
+  hour?: number
+  minute?: number
+  weekday?: number
+  every_seconds?: number
+}
+
+export interface AutomationCondition {
+  kind: AutomationConditionKind
+  op?: AutomationThresholdOp
+  value?: number
+}
+
+export interface AutomationNotification {
+  mode: AutomationNotifyMode
+  condition?: AutomationCondition
+}
+
+export interface Automation {
+  id: string
+  name: string
+  enabled: boolean
+  schedule: AutomationSchedule
+  prompt: string
+  profile_id?: string
+  tools: string[]
+  notification: AutomationNotification
+  created_at: string
+  updated_at: string
+  next_run_at?: string
+  last_run_at?: string
+  consecutive_failures: number
+  last_error?: string
+  last_status?: AutomationRunStatus
+  last_result?: string
+}
+
+export interface AutomationRun {
+  id: string
+  automation_id: string
+  occurrence_at: string
+  status: AutomationRunStatus
+  started_at?: string
+  finished_at?: string
+  result?: string
+  error?: string
+  notification_sent: boolean
+  model_id?: string
+  node_id?: string
+  attempt: number
+  retry_at?: string
+}
+
+export interface AutomationDetail extends Automation {
+  history: AutomationRun[]
+}
+
+export interface AutomationInput {
+  name: string
+  prompt: string
+  profile_id?: string
+  schedule: AutomationSchedule
+  notification: AutomationNotification
+  tools?: string[]
+  enabled?: boolean
+}
+

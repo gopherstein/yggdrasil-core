@@ -10,6 +10,11 @@ const wanted = (process.env.SCREENSHOT_FORMS || '')
   .split(',')
   .map((id) => id.trim())
   .filter(Boolean)
+const wantedScreens = (process.env.SCREENSHOT_SCREENS || '')
+  .split(',')
+  .map((id) => id.trim())
+  .filter(Boolean)
+const screens = config.screens.filter((screen) => wantedScreens.length === 0 || wantedScreens.includes(screen.id))
 const forms = (config.forms?.length
   ? config.forms
   : [
@@ -89,7 +94,7 @@ try {
     const page = await context.newPage()
     const outDir = form.readme ? readmeDir : path.join(root, 'screenshots/raw', form.id)
     await mkdir(outDir, { recursive: true })
-    for (const screen of config.screens) {
+    for (const screen of screens) {
       console.log(`Capturing ${form.id} ${screen.id}`)
       await openScreen(page, screen)
       await page.evaluate((name) => {

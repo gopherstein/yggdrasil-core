@@ -23,6 +23,11 @@ func main() {
 		fmt.Printf("runtimes: %s\n", cfg.RuntimesDir)
 		fmt.Printf("logs:     %s\n", cfg.LogsDir)
 		fmt.Printf("db:       %s\n", cfg.DBPath)
+	case "automations":
+		if err := automationsCommand(os.Args[2:], os.Stdout); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 	default:
 		usage()
 		os.Exit(2)
@@ -30,5 +35,5 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "usage: yggctl <version|about|paths>\n")
+	fmt.Fprintf(os.Stderr, "usage: yggctl <version|about|paths|automations>\n")
 }

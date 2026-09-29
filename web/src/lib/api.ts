@@ -30,6 +30,10 @@ import type {
   SettingsPatch,
   SettingsView,
   Task,
+  Automation,
+  AutomationDetail,
+  AutomationInput,
+  AutomationRun,
   UpdateConversationRequest,
   VersionResponse,
 } from '@/types/api'
@@ -480,6 +484,34 @@ export const api = {
   },
 
   listTasks: () => request<Task[]>('/api/v1/tasks'),
+
+  listAutomations: () => request<Automation[]>('/api/v1/automations'),
+
+  getAutomation: (id: string) => request<AutomationDetail>(`/api/v1/automations/${id}`),
+
+  createAutomation: (body: AutomationInput) =>
+    request<Automation>('/api/v1/automations', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  updateAutomation: (id: string, body: Partial<AutomationInput>) =>
+    request<Automation>(`/api/v1/automations/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+
+  deleteAutomation: (id: string) =>
+    request<null>(`/api/v1/automations/${id}`, { method: 'DELETE' }),
+
+  runAutomation: (id: string) =>
+    request<AutomationRun>(`/api/v1/automations/${id}/run`, { method: 'POST' }),
+
+  pauseAutomation: (id: string) =>
+    request<Automation>(`/api/v1/automations/${id}/pause`, { method: 'POST' }),
+
+  resumeAutomation: (id: string) =>
+    request<Automation>(`/api/v1/automations/${id}/resume`, { method: 'POST' }),
 
   listBenchmarkWorkloads: () =>
     request<BenchmarkWorkload[]>('/api/v1/benchmarks/workloads'),

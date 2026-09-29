@@ -24,6 +24,10 @@ const (
 	TaskCompleted = "task.completed"
 	TaskFailed    = "task.failed"
 
+	AutomationStarted   = "automation.started"
+	AutomationCompleted = "automation.completed"
+	AutomationFailed    = "automation.failed"
+
 	AgentStarted   = "agent.started"
 	AgentMessage   = "agent.message"
 	AgentCompleted = "agent.completed"

@@ -6,6 +6,7 @@ import { useUIStore } from '@/stores/uiStore'
 
 const mainNav = [
   { to: '/chat', label: 'Chat' },
+  { to: '/automations', label: 'Automations' },
   { to: '/models', label: 'Models' },
   { to: '/nodes', label: 'Computers' },
 ] as const

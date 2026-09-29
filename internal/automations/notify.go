@@ -1,0 +1,249 @@
+package automations
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"strconv"
+	"strings"
+	"unicode/utf8"
+)
+
+// ErrNotifyDisabled means the user turned notifications off. The run still succeeded.
+var ErrNotifyDisabled = errors.New("notifications are disabled")
+
+// Notice is a native notification.
+type Notice struct {
+	Title string
+	Body  string
+}
+
+// Notifier delivers a notice. The OS sender and tests both implement it.
+type Notifier interface {
+	Notify(ctx context.Context, notice Notice) error
+}
+
+// Decision is the result of comparing a stored run with its notification rule.
+type Decision struct {
+	Notify bool
+	Notice Notice
+	Reason string
+}
+
+type parsedSignal struct {
+	Price       *float64
+	Available   *bool
+	Significant *bool
+	// prose is the result with the machine-readable object removed.
+	prose string
+}
+
+type signalJSON struct {
+	Price       *float64 `json:"price"`
+	Available   *bool    `json:"available"`
+	Significant *bool    `json:"significant"`
+}
+
+// Decide reports whether a successful result should notify.
+// previous is the prior successful result. It is nil when this is the first success.
+// A threshold notifies whenever the comparison holds. Availability notifies only when
+// it becomes true. Change mode uses the first success as a baseline and notifies when later text differs.
+func Decide(n Notification, result string, previous *string) Decision {
+	switch n.Mode {
+	case NotifyNone:
+		return Decision{Reason: "notifications are off for this automation"}
+	case NotifyAlways:
+		return Decision{Notify: true, Notice: noticeFor(n, result), Reason: "always"}
+	case NotifyOnChange:
+		if previous == nil {
+			return Decision{Reason: "waiting for a baseline result"}
+		}
+		if normalizeResult(result) == normalizeResult(*previous) {
+			return Decision{Reason: "result is unchanged"}
+		}
+		return Decision{Notify: true, Notice: noticeFor(n, result), Reason: "result changed"}
+	case NotifyOnCondition:
+		return decideCondition(n, result, previous)
+	default:
+		return Decision{Reason: "unknown notification mode"}
+	}
+}
+
+func decideCondition(n Notification, result string, previous *string) Decision {
+	if n.Condition == nil {
+		return Decision{Reason: "notification condition is missing"}
+	}
+	signal, ok := parseSignal(result)
+	switch n.Condition.Kind {
+	case ConditionThreshold:
+		if !ok || signal.Price == nil {
+			return Decision{Reason: "result did not include a price"}
+		}
+		price := *signal.Price
+		matched := n.Condition.Op == OpAbove && price > n.Condition.Value || n.Condition.Op == OpBelow && price < n.Condition.Value
+		if !matched {
+			return Decision{Reason: "price is not " + n.Condition.Op + " the threshold"}
+		}
+		return Decision{Notify: true, Notice: noticeFor(n, result), Reason: "price is " + n.Condition.Op + " the threshold"}
+	case ConditionAvailable:
+		if !ok || signal.Available == nil || !*signal.Available {
+			return Decision{Reason: "item is not available"}
+		}
+		if previouslyAvailable(previous) {
+			return Decision{Reason: "item was already available"}
+		}
+		return Decision{Notify: true, Notice: noticeFor(n, result), Reason: "item became available"}
+	case ConditionSignificant:
+		if !ok || signal.Significant == nil || !*signal.Significant {
+			return Decision{Reason: "result is not significant"}
+		}
+		return Decision{Notify: true, Notice: noticeFor(n, result), Reason: "result is significant"}
+	default:
+		return Decision{Reason: "unknown notification condition"}
+	}
+}
+
+func previouslyAvailable(previous *string) bool {
+	if previous == nil {
+		return false
+	}
+	signal, ok := parseSignal(*previous)
+	return ok && signal.Available != nil && *signal.Available
+}
+
+func noticeFor(n Notification, result string) Notice {
+	title := "Yggdrasil"
+	body := "Finished."
+	signal, ok := parseSignal(result)
+	if ok && strings.TrimSpace(signal.prose) != "" {
+		body = signal.prose
+	} else if prose := strings.TrimSpace(result); prose != "" && !ok {
+		body = prose
+	} else if ok {
+		body = signal.sentence()
+	}
+	return Notice{Title: oneLine(title, 80), Body: oneLine(body, 180)}
+}
+
+// noticeTitle replaces the generic title once the caller knows the automation name.
+func noticeTitle(name string, notice Notice) Notice {
+	title := strings.TrimSpace(name)
+	if title == "" {
+		title = notice.Title
+	}
+	if title == "" {
+		title = "Yggdrasil"
+	}
+	notice.Title = oneLine(title, 80)
+	if notice.Body == "" {
+		notice.Body = "Finished."
+	}
+	return notice
+}
+
+func (s parsedSignal) sentence() string {
+	var parts []string
+	if s.Price != nil {
+		parts = append(parts, "Price is "+strconv.FormatFloat(*s.Price, 'f', -1, 64)+".")
+	}
+	if s.Available != nil {
+		if *s.Available {
+			parts = append(parts, "It is available.")
+		} else {
+			parts = append(parts, "It is not available.")
+		}
+	}
+	if s.Significant != nil && *s.Significant {
+		parts = append(parts, "This result is significant.")
+	}
+	if len(parts) == 0 {
+		return "Finished."
+	}
+	return strings.Join(parts, " ")
+}
+
+func parseSignal(result string) (parsedSignal, bool) {
+	var found parsedSignal
+	var matched bool
+	for i := 0; i < len(result); i++ {
+		if result[i] != '{' {
+			continue
+		}
+		end, ok := matchObject(result, i)
+		if !ok {
+			continue
+		}
+		var body signalJSON
+		if err := json.Unmarshal([]byte(result[i:end]), &body); err != nil {
+			continue
+		}
+		if body.Price == nil && body.Available == nil && body.Significant == nil {
+			continue
+		}
+		found = parsedSignal{Price: body.Price, Available: body.Available, Significant: body.Significant, prose: visibleProse(result, i, end)}
+		matched = true
+		i = end - 1
+	}
+	return found, matched
+}
+
+func visibleProse(result string, start, end int) string {
+	prose := result[:start] + result[end:]
+	prose = strings.ReplaceAll(prose, "```json", "")
+	prose = strings.ReplaceAll(prose, "```", "")
+	return strings.TrimSpace(prose)
+}
+
+func matchObject(s string, start int) (int, bool) {
+	depth := 0
+	inString := false
+	escaped := false
+	for i := start; i < len(s); i++ {
+		c := s[i]
+		if inString {
+			if escaped {
+				escaped = false
+				continue
+			}
+			if c == '\\' {
+				escaped = true
+				continue
+			}
+			if c == '"' {
+				inString = false
+			}
+			continue
+		}
+		switch c {
+		case '"':
+			inString = true
+		case '{':
+			depth++
+		case '}':
+			depth--
+			if depth == 0 {
+				return i + 1, true
+			}
+		}
+	}
+	return 0, false
+}
+
+func normalizeResult(s string) string {
+	return strings.TrimSpace(s)
+}
+
+func oneLine(s string, max int) string {
+	s = strings.Join(strings.Fields(s), " ")
+	if s == "" {
+		return ""
+	}
+	if utf8.RuneCountInString(s) <= max {
+		return s
+	}
+	runes := []rune(s)
+	if max < 4 {
+		return string(runes[:max])
+	}
+	return string(runes[:max-3]) + "..."
+}

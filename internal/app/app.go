@@ -17,6 +17,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/api"
 	"github.com/yeixio/yggdrasil-core/internal/api/openai"
 	"github.com/yeixio/yggdrasil-core/internal/auth"
+	"github.com/yeixio/yggdrasil-core/internal/automations"
 	"github.com/yeixio/yggdrasil-core/internal/benchmark"
 	"github.com/yeixio/yggdrasil-core/internal/config"
 	"github.com/yeixio/yggdrasil-core/internal/diagnostics"
@@ -58,21 +59,23 @@ type App struct {
 	Settings      *repositories.SettingsRepo
 	Metrics       *repositories.MetricsRepo
 
-	Models       *models.Manager
-	Runtimes     *runtimes.Manager
-	Profiles     *profiles.Manager
-	OrchRegistry *orchestrator.Registry
-	Tasks        *tasks.Manager
-	Scheduler    *scheduler.Scheduler
-	Tools        *tools.Registry
-	Nodes        *nodes.Manager
-	APIKeys      *auth.APIKeyManager
-	Pairing      *auth.PairingManager
-	Identity     *auth.NodeIdentity
-	Benchmarks   *benchmark.Runner
-	HF           *hfclient.Client
-	Lifecycle    *lifecycle.Sweeper
-	Health       *modelhealth.Monitor
+	Models           *models.Manager
+	Runtimes         *runtimes.Manager
+	Profiles         *profiles.Manager
+	OrchRegistry     *orchestrator.Registry
+	Tasks            *tasks.Manager
+	Automations      *repositories.AutomationRepo
+	AutomationRunner *automations.Runner
+	Scheduler        *scheduler.Scheduler
+	Tools            *tools.Registry
+	Nodes            *nodes.Manager
+	APIKeys          *auth.APIKeyManager
+	Pairing          *auth.PairingManager
+	Identity         *auth.NodeIdentity
+	Benchmarks       *benchmark.Runner
+	HF               *hfclient.Client
+	Lifecycle        *lifecycle.Sweeper
+	Health           *modelhealth.Monitor
 
 	hw         *hardware.Detector
 	advertiser *discovery.Advertiser
@@ -453,6 +456,36 @@ func New(opts Options) (*App, error) {
 		},
 	}
 
+	autoRepo := repositories.NewAutomationRepo(db.SQL)
+	a.Automations = autoRepo
+	a.AutomationRunner = &automations.Runner{
+		Store:  autoRepo,
+		Exec:   automationExecutor{app: a},
+		Notify: automationNotifier{settings: settingsRepo, send: automations.OSSender{}},
+		Bus:    bus,
+		Logger: logger,
+	}
+	a.API.BindAutomations(api.Dependencies{
+		ListAutomations: a.Automations.List,
+		CreateAutomation: func(ctx context.Context, in automations.CreateInput) (automations.Automation, error) {
+			return a.Automations.Create(ctx, in, time.Now())
+		},
+		GetAutomation: a.Automations.History,
+		UpdateAutomation: func(ctx context.Context, id string, patch automations.Patch) (automations.Automation, error) {
+			return a.Automations.Update(ctx, id, patch, time.Now())
+		},
+		DeleteAutomation: a.Automations.Delete,
+		RunAutomation:    a.AutomationRunner.RunNow,
+		PauseAutomation: func(ctx context.Context, id string) (automations.Automation, error) {
+			enabled := false
+			return a.Automations.Update(ctx, id, automations.Patch{Enabled: &enabled}, time.Now())
+		},
+		ResumeAutomation: func(ctx context.Context, id string) (automations.Automation, error) {
+			enabled := true
+			return a.Automations.Update(ctx, id, automations.Patch{Enabled: &enabled}, time.Now())
+		},
+	})
+
 	a.internal = nodes.NewInternalServer(nodes.InternalDeps{
 		Config:          a.Config.Get(),
 		Logger:          logger,
@@ -584,6 +617,13 @@ func (a *App) Start(ctx context.Context) error {
 
 	if a.Lifecycle != nil {
 		a.Lifecycle.Start(ctx)
+	}
+	if a.AutomationRunner != nil {
+		a.wg.Add(1)
+		go func() {
+			defer a.wg.Done()
+			a.AutomationRunner.Start(ctx)
+		}()
 	}
 	if a.Health != nil {
 		a.wg.Add(1)

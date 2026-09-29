@@ -9,6 +9,8 @@ describe('screenshotPath', () => {
     expect(screenshotPath('performance')).toBe('/performance')
     expect(screenshotPath('diagnostics')).toBe('/diagnostics')
     expect(screenshotPath('api-manager')).toBe('/api-access')
+    expect(screenshotPath('automations')).toBe('/automations')
+    expect(screenshotPath('automations-create')).toBe('/automations')
     expect(screenshotPath('unknown')).toBe('/chat')
   })
 })

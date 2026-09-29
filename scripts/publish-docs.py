@@ -29,6 +29,21 @@ def publish(source, destination, version, commit):
                 raise ValueError(f'Invalid {key}')
         if 'code' in section and not isinstance(section['code'], str):
             raise ValueError('Code must be text')
+        images = section.get('images', [])
+        if not isinstance(images, list):
+            raise ValueError('Images must be a list')
+        for image in images:
+            if not isinstance(image, dict):
+                raise ValueError('Image must be an object')
+            for key in ('src', 'alt', 'caption'):
+                value = image.get(key, '')
+                if not isinstance(value, str) or not value.strip():
+                    raise ValueError(f'Image {key} is required')
+            src = image['src']
+            if src.startswith(('/', '\\')) or '://' in src or '..' in src.split('/'):
+                raise ValueError('Image path must stay inside the repository docs')
+            if not src.startswith('docs/user-guide/images/') or not src.endswith('.png'):
+                raise ValueError('Image path must be a PNG under docs/user-guide/images')
     snapshot = dict(guide, version=version, sourceTag='v' + version, sourceCommit=commit)
     encoded = json.dumps(snapshot, indent=2) + '\n'
     if '{{' in encoded:

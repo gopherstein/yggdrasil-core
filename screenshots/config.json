@@ -94,6 +94,21 @@
       "filename": "06-api-manager.png",
       "headline": "Manage Local AI APIs",
       "readyText": "Running"
+    },
+    {
+      "id": "automations",
+      "path": "/automations",
+      "filename": "07-automations.png",
+      "headline": "Schedule AI Tasks",
+      "readyText": "Morning price"
+    },
+    {
+      "id": "automations-create",
+      "path": "/automations",
+      "query": "compose=1",
+      "filename": "08-automations-create.png",
+      "headline": "Describe a Scheduled Task",
+      "readyText": "Notify when the price is below $500"
     }
   ]
 }

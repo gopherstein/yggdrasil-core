@@ -61,7 +61,7 @@ Discovery is on by default. When it is on and the internal bind address is still
 
 ## Norn
 
-Norn is a deterministic placer. Given the nodes the daemon knows about, which models they have, and a role, it picks a node and records a `scheduler.placement` event. It does not split one model across computers. Cross-machine work that exists today is placement of whole roles, as in the Team pipeline.
+Norn is a deterministic placer. Given the nodes the daemon knows about, which models they have, and a role, it picks a node and records a `scheduler.placement` event. It does not split one model across computers. Cross-machine work that exists today is placement of whole roles, as in the Team pipeline. User schedules are a separate daemon loop in `internal/automations`. Norn places the model for a due automation the same way it places a chat role.
 
 ## Orchestrators
 
@@ -83,7 +83,6 @@ Runtime adapters implement `pkg/pluginapi.Runtime`: detect, install, start, stop
 ## What is not in this process
 
 - Yggdrasil Desktop and Yggdrasil Mobile
-- a general cron scheduler for user jobs
 - retrieval-augmented generation
 - training
 - splitting a single model across machines
