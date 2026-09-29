@@ -17,8 +17,8 @@ func TestRunnerRecordsThresholdNotification(t *testing.T) {
 	createdAt := time.Date(2026, 9, 24, 7, 0, 0, 0, time.UTC)
 	created, err := repo.Create(ctx, automations.CreateInput{
 		ModelID: "model-a",
-		Name:   "Morning price",
-		Prompt: "Check the price and end with a JSON object {\"price\": number}",
+		Name:    "Morning price",
+		Prompt:  "Check the price and end with a JSON object {\"price\": number}",
 		Notification: automations.Notification{
 			Mode: automations.NotifyOnCondition,
 			Condition: &automations.Condition{
@@ -83,7 +83,7 @@ func TestRunnerChangeUsesTheFirstResultAsBaseline(t *testing.T) {
 	ctx := context.Background()
 	createdAt := time.Date(2026, 9, 24, 7, 0, 0, 0, time.UTC)
 	if _, err := repo.Create(ctx, automations.CreateInput{
-		ModelID: "model-a",
+		ModelID:      "model-a",
 		Name:         "Page watch",
 		Prompt:       "Summarize the page",
 		Notification: automations.Notification{Mode: automations.NotifyOnChange},

@@ -31,8 +31,8 @@ func TestAutomationHistory(t *testing.T) {
 	createdAt := time.Date(2026, 9, 21, 16, 0, 0, 0, time.UTC)
 	created, err := repo.Create(ctx, automations.CreateInput{
 		ModelID: "model-a",
-		Name:   "Morning price",
-		Prompt: "Check the price",
+		Name:    "Morning price",
+		Prompt:  "Check the price",
 		Schedule: automations.Schedule{
 			Kind: automations.KindDaily, TimeZone: "UTC", Hour: 8,
 		},
@@ -52,8 +52,8 @@ func TestAutomationHistory(t *testing.T) {
 
 	other, err := repo.Create(ctx, automations.CreateInput{
 		ModelID: "model-a",
-		Name:   "Other",
-		Prompt: "Do not mix me in",
+		Name:    "Other",
+		Prompt:  "Do not mix me in",
 		Schedule: automations.Schedule{
 			Kind: automations.KindOnce, TimeZone: "UTC", At: timePtr(createdAt.Add(time.Hour)),
 		},

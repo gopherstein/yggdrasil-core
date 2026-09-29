@@ -474,7 +474,7 @@ func New(opts Options) (*App, error) {
 		UpdateAutomation: func(ctx context.Context, id string, patch automations.Patch) (automations.Automation, error) {
 			return a.Automations.Update(ctx, id, patch, time.Now())
 		},
-		DeleteAutomation: a.Automations.Delete,
+		DeleteAutomation:  a.Automations.Delete,
 		RunAutomation:     a.AutomationRunner.RunNow,
 		PreviewAutomation: a.AutomationRunner.Preview,
 		PauseAutomation: func(ctx context.Context, id string) (automations.Automation, error) {
