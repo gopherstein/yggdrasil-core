@@ -19,6 +19,7 @@ type KnowledgeService interface {
 	Delete(ctx context.Context, id string) error
 	Refresh(ctx context.Context, id string) error
 	Search(ctx context.Context, in mimir.SearchInput) ([]mimir.Hit, error)
+	Content(ctx context.Context, id string) (string, error)
 }
 
 // BindKnowledge attaches the connected-knowledge routes.
@@ -28,6 +29,7 @@ func (s *Server) knowledgeRoutes(api *mux.Router) {
 	api.HandleFunc("/knowledge/sources", s.handleListKnowledge).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/knowledge/sources", s.handleCreateKnowledge).Methods(http.MethodPost)
 	api.HandleFunc("/knowledge/search", s.handleSearchKnowledge).Methods(http.MethodPost, http.MethodOptions)
+	api.HandleFunc("/knowledge/sources/{id}/content", s.handleKnowledgeContent).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/knowledge/sources/{id}/refresh", s.handleRefreshKnowledge).Methods(http.MethodPost)
 	api.HandleFunc("/knowledge/sources/{id}", s.handleGetKnowledge).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/knowledge/sources/{id}", s.handleUpdateKnowledge).Methods(http.MethodPatch)
@@ -137,6 +139,18 @@ func (s *Server) handleRefreshKnowledge(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	writeJSON(w, http.StatusOK, src)
+}
+
+func (s *Server) handleKnowledgeContent(w http.ResponseWriter, r *http.Request) {
+	if !s.knowledgeReady(w) {
+		return
+	}
+	text, err := s.knowledge.Content(r.Context(), mux.Vars(r)["id"])
+	if err != nil {
+		writeKnowledgeErr(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"text": text})
 }
 
 func (s *Server) handleSearchKnowledge(w http.ResponseWriter, r *http.Request) {

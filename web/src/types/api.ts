@@ -904,8 +904,16 @@ export interface SpecializedAI {
   advanced?: TrainingHyper
   knowledge_sources: string[]
   deployed_revision: number
+  example?: boolean
   created_at: string
   updated_at: string
+}
+
+export interface SampleFile {
+  filename: string
+  name: string
+  description: string
+  content: string
 }
 
 export interface SpecializedAIView extends SpecializedAI {

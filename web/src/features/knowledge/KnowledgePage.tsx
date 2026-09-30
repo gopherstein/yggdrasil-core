@@ -48,6 +48,18 @@ export function KnowledgePage() {
 }
 
 function SourceRow({ source, onChanged }: { source: KnowledgeSource; onChanged: () => void }) {
+  const [draft, setDraft] = useState<string | null>(null)
+  const open = useMutation({
+    mutationFn: () => api.knowledgeContent(source.id),
+    onSuccess: (res) => setDraft(res?.text ?? ''),
+  })
+  const save = useMutation({
+    mutationFn: (text: string) => api.updateKnowledge(source.id, { text }),
+    onSuccess: () => {
+      setDraft(null)
+      onChanged()
+    },
+  })
   const reindex = useMutation({ mutationFn: () => api.refreshKnowledge(source.id), onSuccess: onChanged })
   const remove = useMutation({ mutationFn: () => api.deleteKnowledge(source.id), onSuccess: onChanged })
   return (
@@ -69,6 +81,11 @@ function SourceRow({ source, onChanged }: { source: KnowledgeSource; onChanged: 
           {source.error && <p className="mt-1 text-xs text-danger">{source.error}</p>}
         </div>
         <div className="flex shrink-0 gap-1.5">
+          {source.kind === 'text' && draft == null && (
+            <button type="button" className="btn-secondary px-2 py-1 text-xs" disabled={open.isPending} onClick={() => open.mutate()}>
+              Edit
+            </button>
+          )}
           <button type="button" className="btn-secondary px-2 py-1 text-xs" disabled={reindex.isPending} onClick={() => reindex.mutate()}>
             {reindex.isPending ? 'Indexing…' : 'Reindex'}
           </button>
@@ -84,7 +101,23 @@ function SourceRow({ source, onChanged }: { source: KnowledgeSource; onChanged: 
           </button>
         </div>
       </div>
-      {(reindex.error || remove.error) && <p className="mt-2 text-xs text-danger">{errorText(reindex.error ?? remove.error)}</p>}
+      {draft != null && (
+        <div className="mt-3 space-y-2">
+          <textarea className="field min-h-48 w-full font-mono text-xs" value={draft} onChange={(e) => setDraft(e.target.value)} aria-label={`Edit ${source.name}`} />
+          <p className="text-xs text-ink-faint">Saving reindexes the source. Chats and specialized AIs see the change on their next question.</p>
+          <div className="flex gap-1.5">
+            <button type="button" className="btn-primary px-3 py-1 text-xs" disabled={save.isPending} onClick={() => save.mutate(draft)}>
+              {save.isPending ? 'Saving…' : 'Save'}
+            </button>
+            <button type="button" className="btn-secondary px-3 py-1 text-xs" onClick={() => setDraft(null)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+      {(reindex.error || remove.error || open.error || save.error) && (
+        <p className="mt-2 text-xs text-danger">{errorText(reindex.error ?? remove.error ?? open.error ?? save.error)}</p>
+      )}
     </li>
   )
 }

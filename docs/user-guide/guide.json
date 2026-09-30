@@ -81,6 +81,7 @@
         "Training runs on this computer. It needs a Mac with Apple Silicon. The first run downloads the trainer (about 450 MB) and the base model's training weights. The base model is not changed, and it stays available on its own."
       ],
       "steps": [
+        "To see how it works first, choose Try an example. It sets up a sample tire shop assistant with example chats, an inventory, and a policy document, and explains each step. Nothing trains until you press Train.",
         "Open Train and choose Build a new AI. Describe the job in a sentence or two.",
         "Choose a base model. Yggdrasil recommends one for the job and shows its license, the memory training needs, and how long it takes.",
         "Add material. For each file or paste, Yggdrasil recommends Training, Knowledge, or Both and explains why. Review the recommendation before you add it.",

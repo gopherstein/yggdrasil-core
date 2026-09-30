@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import type { ClassifyResult, MaterialUse, SpecializedAIView, TrainingMaterial } from '@/types/api'
 import { ConceptCards } from '../ConceptCards'
+import { SampleFiles } from '../SampleFiles'
 import { errorText, useDescriptions, useLabels } from '../display'
 
 const ACCEPT = '.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm'
@@ -35,6 +36,7 @@ export function MaterialStep({ view, onNext }: { view: SpecializedAIView; onNext
           </div>
         </div>
         {mode === 'file' ? <AddFile aiID={view.id} /> : <AddChats aiID={view.id} />}
+        <SampleFiles open={Boolean(view.example)} />
       </div>
       <MaterialList view={view} />
       <button type="button" className="btn-primary px-3 py-1.5 text-sm" disabled={view.materials.length === 0} onClick={onNext}>

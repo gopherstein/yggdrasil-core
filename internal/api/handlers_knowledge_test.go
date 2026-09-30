@@ -42,6 +42,9 @@ func TestKnowledgeRoutes(t *testing.T) {
 		t.Fatalf("created %+v", src)
 	}
 
+	if rec = do(http.MethodGet, "/api/v1/knowledge/sources/"+src.ID+"/content", ""); !strings.Contains(rec.Body.String(), "Open 9 to 5") {
+		t.Fatalf("content: %d %s", rec.Code, rec.Body)
+	}
 	rec = do(http.MethodPost, "/api/v1/knowledge/search", `{"query":"weekday hours"}`)
 	var hits []mimir.Hit
 	_ = json.Unmarshal(rec.Body.Bytes(), &hits)

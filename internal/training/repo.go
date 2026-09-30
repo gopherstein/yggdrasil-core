@@ -93,10 +93,10 @@ func (r *Repo) CreateAI(ctx context.Context, ai SpecializedAI) (SpecializedAI, e
 	}
 	now := r.now()
 	_, err = r.db.ExecContext(ctx, `
-		INSERT INTO specialized_ais (id, slug, name, goal, instructions, base_model_id, preset, advanced_json, knowledge_json, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		INSERT INTO specialized_ais (id, slug, name, goal, instructions, base_model_id, preset, advanced_json, knowledge_json, is_example, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		ai.ID, ai.Slug, ai.Name, ai.Goal, ai.Instructions, ai.BaseModelID, string(ai.Preset),
-		jsonOrNull(ai.Advanced), jsonOrNull(ai.Knowledge), ts(now), ts(now))
+		jsonOrNull(ai.Advanced), jsonOrNull(ai.Knowledge), boolInt(ai.Example), ts(now), ts(now))
 	if err != nil {
 		return SpecializedAI{}, err
 	}
@@ -124,16 +124,18 @@ func (r *Repo) UpdateAI(ctx context.Context, ai SpecializedAI) (SpecializedAI, e
 }
 
 const aiColumns = `id, slug, name, goal, instructions, base_model_id, preset, COALESCE(advanced_json, ''),
-	COALESCE(knowledge_json, ''), deployed_revision, created_at, updated_at`
+	COALESCE(knowledge_json, ''), deployed_revision, is_example, created_at, updated_at`
 
 func scanAI(row interface{ Scan(...any) error }) (SpecializedAI, error) {
 	var ai SpecializedAI
 	var preset, adv, know, created, updated string
+	var example int
 	if err := row.Scan(&ai.ID, &ai.Slug, &ai.Name, &ai.Goal, &ai.Instructions, &ai.BaseModelID, &preset, &adv, &know,
-		&ai.DeployedRevision, &created, &updated); err != nil {
+		&ai.DeployedRevision, &example, &created, &updated); err != nil {
 		return SpecializedAI{}, err
 	}
 	ai.Preset = Preset(preset)
+	ai.Example = example != 0
 	if adv != "" {
 		ai.Advanced = &Hyper{}
 		_ = json.Unmarshal([]byte(adv), ai.Advanced)

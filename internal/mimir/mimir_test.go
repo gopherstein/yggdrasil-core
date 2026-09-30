@@ -137,6 +137,9 @@ func TestUpdateAndDeleteTextSource(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if got, err := s.Content(ctx, src.ID); err != nil || got != "Store hours are 9 to 5." {
+		t.Fatalf("content = %q %v", got, err)
+	}
 	text := "Store hours are 8 to 6."
 	if _, err := s.Update(ctx, src.ID, UpdateInput{Text: &text}); err != nil {
 		t.Fatal(err)

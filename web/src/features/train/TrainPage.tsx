@@ -6,6 +6,7 @@ import { api } from '@/lib/api'
 import { subscribeEvents } from '@/lib/events'
 import type { SpecializedAI, SpecializedAIView } from '@/types/api'
 import { ConceptCards } from './ConceptCards'
+import { ExampleNote } from './ExampleNote'
 import { BaseModelStep } from './steps/BaseModelStep'
 import { DeployStep } from './steps/DeployStep'
 import { DescribeStep } from './steps/DescribeStep'
@@ -43,6 +44,18 @@ export function TrainPage() {
     setCreating(false)
     setParams(id ? { ai: id } : {}, { replace: false })
   }
+  const example = useMutation({
+    mutationFn: () => api.createExampleAI(),
+    onSuccess: (ai) => {
+      void queryClient.invalidateQueries({ queryKey: ['training'] })
+      if (ai) select(ai.id)
+    },
+  })
+  const exampleButton = (className: string) => (
+    <button type="button" className={className} disabled={example.isPending} onClick={() => example.mutate()}>
+      {example.isPending ? 'Setting up the example…' : 'Try an example'}
+    </button>
+  )
 
   return (
     <div className="page-fill gap-4 overflow-y-auto p-4">
@@ -54,10 +67,14 @@ export function TrainPage() {
             information it needs. You do not need to know how models are trained.
           </p>
         </div>
-        <button type="button" className="btn-primary px-3 py-1.5 text-xs" onClick={() => { select(null); setCreating(true) }}>
-          Build a new AI
-        </button>
+        <div className="flex gap-2">
+          {exampleButton('btn-secondary px-3 py-1.5 text-xs')}
+          <button type="button" className="btn-primary px-3 py-1.5 text-xs" onClick={() => { select(null); setCreating(true) }}>
+            Build a new AI
+          </button>
+        </div>
       </div>
+      {example.error && <p className="text-sm text-danger">{errorText(example.error)}</p>}
 
       <div className="grid gap-4 xl:grid-cols-[16rem_minmax(0,1fr)]">
         <aside className="space-y-2">
@@ -89,9 +106,13 @@ export function TrainPage() {
                 title="Build a specialized AI"
                 description="Describe the job, add examples of good answers, and connect the data it should look up. Yggdrasil recommends a base model, trains it on this computer, and lets you compare it with the original before you use it."
                 action={
-                  <button type="button" className="btn-primary px-3 py-1.5 text-sm" onClick={() => setCreating(true)}>
-                    Build a new AI
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button type="button" className="btn-primary px-3 py-1.5 text-sm" onClick={() => setCreating(true)}>
+                      Build a new AI
+                    </button>
+                    {exampleButton('btn-secondary px-3 py-1.5 text-sm')}
+                    <span className="text-xs text-ink-faint">The example uses a sample tire shop, so you can see real data first.</span>
+                  </div>
                 }
               />
               <ConceptCards />
@@ -112,7 +133,10 @@ function AIListItem({ ai, active, onSelect }: { ai: SpecializedAI; active: boole
         .join(' ')}
       onClick={onSelect}
     >
-      <p className="font-medium text-ink">{ai.name}</p>
+      <p className="font-medium text-ink">
+        {ai.name}
+        {ai.example && <span className="status-chip ml-2 bg-info/15 text-info">Example</span>}
+      </p>
       <p className="mt-1 text-xs text-ink-muted">
         {ai.deployed_revision > 0 ? `Deployed · revision ${ai.deployed_revision}` : 'Not deployed'}
       </p>
@@ -168,7 +192,8 @@ function NewAIForm({ onCancel, onCreated }: { onCancel: () => void; onCreated: (
 }
 
 function Workspace({ view, onDeleted }: { view: SpecializedAIView; onDeleted: () => void }) {
-  const [step, setStep] = useState<StepID>(() => nextStep(view))
+  // The example starts at the beginning so each step's note can be read in order.
+  const [step, setStep] = useState<StepID>(() => (view.example && view.jobs.length === 0 ? 'describe' : nextStep(view)))
   const done = completedSteps(view)
   const active = view.jobs.find((j) => !isTerminal(j.state))
   const goNext = () => {
@@ -223,6 +248,7 @@ function Workspace({ view, onDeleted }: { view: SpecializedAIView; onDeleted: ()
         </ol>
       </div>
 
+      <ExampleNote view={view} step={step} />
       {step === 'describe' && <DescribeStep view={view} onNext={goNext} onDeleted={onDeleted} />}
       {step === 'base' && <BaseModelStep view={view} onNext={goNext} />}
       {step === 'material' && <MaterialStep view={view} onNext={goNext} />}

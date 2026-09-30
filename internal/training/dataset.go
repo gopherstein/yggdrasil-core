@@ -391,7 +391,7 @@ func Stats(examples []Example) DatasetStats {
 		st.Warnings = append(st.Warnings, fmt.Sprintf("%d examples can teach a format or tone. About %d or more teach a workflow reliably.", st.Usable, RecommendedExamples))
 	}
 	if volatile > 0 {
-		st.Warnings = append(st.Warnings, fmt.Sprintf("%d answers state prices, stock, or SKUs. The model may memorize values that later change. Keep that data in connected knowledge and write answers that show how to use it.", volatile))
+		st.Warnings = append(st.Warnings, answersStating(volatile)+". The model may memorize values that later change. Keep that data in connected knowledge and write answers that show how to use it.")
 	}
 	return st
 }

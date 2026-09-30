@@ -83,9 +83,9 @@ func Classify(filename, text string) Recommendation {
 	rec.Reasons = append(rec.Reasons, fmt.Sprintf("Found %d example conversations. Examples teach the AI how to respond.", len(examples)))
 	if volatileAnswers*5 >= len(examples) && volatileAnswers > 0 {
 		rec.Use = UseBoth
-		rec.Signals = append(rec.Signals, Signal{Kind: "changing_facts", Detail: fmt.Sprintf("%d answers state prices, stock, or SKUs", volatileAnswers)})
+		rec.Signals = append(rec.Signals, Signal{Kind: "changing_facts", Detail: answersStating(volatileAnswers)})
 		rec.Reasons = append(rec.Reasons,
-			fmt.Sprintf("%d answers state prices, stock, or SKUs. Train on the pattern, and keep the facts connected so they stay current.", volatileAnswers))
+			answersStating(volatileAnswers)+". Train on the pattern, and keep the facts connected so they stay current.")
 		return rec
 	}
 	rec.Use = UseTraining
@@ -140,4 +140,12 @@ func tableShape(filename, text string) ([]string, int) {
 		return nil, 0
 	}
 	return rows[0], len(rows) - 1
+}
+
+// answersStating reads "1 answer states" or "3 answers state".
+func answersStating(n int) string {
+	if n == 1 {
+		return "1 answer states prices, stock, or SKUs"
+	}
+	return fmt.Sprintf("%d answers state prices, stock, or SKUs", n)
 }

@@ -164,6 +164,8 @@ type SpecializedAI struct {
 	Preset       Preset   `json:"preset"`
 	Advanced     *Hyper   `json:"advanced,omitempty"`
 	Knowledge    []string `json:"knowledge_sources"`
+	// Example marks the built-in example AI.
+	Example bool `json:"example,omitempty"`
 	// DeployedRevision is 0 until a revision is deployed.
 	DeployedRevision int       `json:"deployed_revision"`
 	CreatedAt        time.Time `json:"created_at"`

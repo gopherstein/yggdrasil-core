@@ -1,0 +1,16 @@
+sku,brand,model,size,season,price,in_stock,updated
+MP-22545,Michelin,Pilot Sport 4,225/45R17,summer,189.99,12,2026-09-28
+MD-21555,Michelin,Defender2,215/55R17,all-season,176.50,20,2026-09-28
+MX-23565,Michelin,CrossClimate2,235/65R17,all-weather,211.00,8,2026-09-27
+BW-20555,Bridgestone,Blizzak WS90,205/55R16,winter,142.50,0,2026-09-28
+BT-21560,Bridgestone,Turanza QuietTrack,215/60R16,all-season,158.00,16,2026-09-26
+BD-26570,Bridgestone,Dueler A/T RH-S,265/70R17,all-terrain,229.00,6,2026-09-28
+GA-21560,Goodyear,Assurance WeatherReady,215/60R16,all-weather,156.00,7,2026-09-28
+GE-22545,Goodyear,Eagle F1 Asymmetric 6,225/45R17,summer,198.00,4,2026-09-25
+GW-27565,Goodyear,Wrangler DuraTrac,275/65R18,all-terrain,264.00,2,2026-09-28
+CT-20560,Continental,TrueContact Tour,205/60R16,all-season,139.00,24,2026-09-27
+CE-23540,Continental,ExtremeContact DWS06 Plus,235/40R19,all-season,219.00,10,2026-09-28
+CV-22565,Continental,VikingContact 7,225/65R17,winter,187.00,9,2026-09-28
+PS-24545,Pirelli,P Zero,245/45R18,summer,248.00,3,2026-09-24
+YA-22560,Yokohama,Avid Ascend GT,225/60R16,all-season,129.00,18,2026-09-28
+HK-23545,Hankook,Kinergy PT,235/45R18,all-season,141.00,14,2026-09-28

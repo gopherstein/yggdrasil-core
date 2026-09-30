@@ -72,6 +72,7 @@ Prefix: `/api/v1`
 | GET, POST | `/benchmarks` | List or start a benchmark |
 | GET, POST | `/knowledge/sources` | Connected knowledge (Mimir). Also `GET/PATCH/DELETE /knowledge/sources/{id}` and `POST /knowledge/sources/{id}/refresh` |
 | POST | `/knowledge/search` | Passages that match a question |
+| GET | `/knowledge/sources/{id}/content` | The copy kept for a pasted or uploaded source |
 | GET, POST | `/training/ais` | Specialized AIs. Also `GET/PATCH/DELETE /training/ais/{id}` |
 | POST | `/training/classify` | Recommend Training, Knowledge, or Both for material, before it is added |
 | GET | `/training/base-models?goal=` | Trainable base models ranked for a job, with training fit |
@@ -82,6 +83,7 @@ Prefix: `/api/v1`
 | PUT | `/training/ais/{id}/test-prompts` | Replace the test set. `POST /training/ais/{id}/revisions/{n}/evaluate` compares base and specialized answers |
 | POST | `/training/ais/{id}/revisions/{n}/deploy` | Deploy an evaluated revision. `POST /training/ais/{id}/undeploy` |
 | GET | `/training/deployed` | Deployed specialized AIs as models |
+| POST | `/training/example` | Set up the example AI from the sample material, or return it if it exists. `GET /training/samples` returns the sample files |
 
 A profile's `knowledge_sources` lists Mimir source ids. Chat searches them on every turn and adds the matching passages before the system prompt.
 

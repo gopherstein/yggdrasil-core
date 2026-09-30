@@ -54,6 +54,7 @@ import type {
   TrainingMessage,
   TrainingPlan,
   TrainingPreset,
+  SampleFile,
 } from '@/types/api'
 
 export class ApiError extends Error {
@@ -566,6 +567,8 @@ export const api = {
   updateKnowledge: (id: string, body: { name?: string; text?: string }) =>
     request<KnowledgeSource>(`/api/v1/knowledge/sources/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
 
+  knowledgeContent: (id: string) => request<{ text: string }>(`/api/v1/knowledge/sources/${id}/content`),
+
   refreshKnowledge: (id: string) =>
     request<KnowledgeSource>(`/api/v1/knowledge/sources/${id}/refresh`, { method: 'POST' }),
 
@@ -589,6 +592,10 @@ export const api = {
     }),
 
   listAIs: () => request<SpecializedAI[]>('/api/v1/training/ais'),
+
+  trainingSamples: () => request<SampleFile[]>('/api/v1/training/samples'),
+
+  createExampleAI: () => request<SpecializedAI>('/api/v1/training/example', { method: 'POST' }),
 
   listDeployedAIs: () => request<Model[]>('/api/v1/training/deployed'),
 

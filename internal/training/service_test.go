@@ -438,3 +438,7 @@ func TestAddConversations(t *testing.T) {
 		t.Fatalf("flags = %v", examples[1].Flags)
 	}
 }
+
+func searchInput(q string, ids []string) mimir.SearchInput {
+	return mimir.SearchInput{Query: q, SourceIDs: ids}
+}

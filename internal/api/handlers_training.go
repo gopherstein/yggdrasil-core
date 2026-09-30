@@ -24,6 +24,8 @@ func (s *Server) trainingRoutes(api *mux.Router) {
 	t.HandleFunc("/backends", s.trainingHandler(s.handleTrainingBackends)).Methods(http.MethodGet, http.MethodOptions)
 	t.HandleFunc("/base-models", s.trainingHandler(s.handleBaseModels)).Methods(http.MethodGet, http.MethodOptions)
 	t.HandleFunc("/classify", s.trainingHandler(s.handleClassifyMaterial)).Methods(http.MethodPost, http.MethodOptions)
+	t.HandleFunc("/samples", s.trainingHandler(s.handleSamples)).Methods(http.MethodGet, http.MethodOptions)
+	t.HandleFunc("/example", s.trainingHandler(s.handleCreateExample)).Methods(http.MethodPost)
 	t.HandleFunc("/deployed", s.trainingHandler(s.handleDeployedAIs)).Methods(http.MethodGet, http.MethodOptions)
 	t.HandleFunc("/ais", s.trainingHandler(s.handleListAIs)).Methods(http.MethodGet, http.MethodOptions)
 	t.HandleFunc("/ais", s.trainingHandler(s.handleCreateAI)).Methods(http.MethodPost)
@@ -117,6 +119,28 @@ func (s *Server) handleClassifyMaterial(w http.ResponseWriter, r *http.Request) 
 		out["error"] = err.Error()
 	}
 	writeJSON(w, http.StatusOK, out)
+}
+
+func (s *Server) handleSamples(w http.ResponseWriter, r *http.Request) {
+	files, err := training.Samples()
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
+		return
+	}
+	writeJSON(w, http.StatusOK, files)
+}
+
+func (s *Server) handleCreateExample(w http.ResponseWriter, r *http.Request) {
+	var catalog []models.CatalogEntry
+	if s.trainingCatalog != nil {
+		catalog = s.trainingCatalog()
+	}
+	ai, err := s.training.CreateExample(r.Context(), catalog)
+	if err != nil {
+		writeTrainingErr(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, ai)
 }
 
 func (s *Server) handleDeployedAIs(w http.ResponseWriter, r *http.Request) {

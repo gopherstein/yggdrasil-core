@@ -195,6 +195,19 @@ func (s *Store) Update(ctx context.Context, id string, in UpdateInput) (Source, 
 	return s.Get(ctx, id)
 }
 
+// Content returns the copy Mimir keeps of a pasted or uploaded source.
+func (s *Store) Content(ctx context.Context, id string) (string, error) {
+	src, err := s.Get(ctx, id)
+	if err != nil {
+		return "", err
+	}
+	if src.Kind != KindText {
+		return "", fmt.Errorf("this source is read from %s; edit the files there", src.Path)
+	}
+	b, err := os.ReadFile(src.file)
+	return string(b), err
+}
+
 // Delete removes a source, its index, and any copy Mimir kept.
 func (s *Store) Delete(ctx context.Context, id string) error {
 	src, err := s.Get(ctx, id)

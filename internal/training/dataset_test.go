@@ -199,3 +199,10 @@ func TestChoiceWarning(t *testing.T) {
 		t.Fatalf("warning = %q", w)
 	}
 }
+
+func TestVolatileWarningPlural(t *testing.T) {
+	one := Stats(ValidateExamples([]Example{ex("price?", "It is $5.00 today.")}, 0))
+	if !strings.Contains(strings.Join(one.Warnings, " "), "1 answer states prices") {
+		t.Fatalf("warnings = %v", one.Warnings)
+	}
+}
