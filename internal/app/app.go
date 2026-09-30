@@ -25,6 +25,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/events"
 	"github.com/yeixio/yggdrasil-core/internal/hardware"
 	"github.com/yeixio/yggdrasil-core/internal/logs"
+	"github.com/yeixio/yggdrasil-core/internal/mimir"
 	"github.com/yeixio/yggdrasil-core/internal/models"
 	modelhealth "github.com/yeixio/yggdrasil-core/internal/models/health"
 	"github.com/yeixio/yggdrasil-core/internal/models/hfclient"
@@ -76,6 +77,7 @@ type App struct {
 	HF               *hfclient.Client
 	Lifecycle        *lifecycle.Sweeper
 	Health           *modelhealth.Monitor
+	Mimir            *mimir.Store
 
 	hw         *hardware.Detector
 	advertiser *discovery.Advertiser
@@ -493,6 +495,9 @@ func New(opts Options) (*App, error) {
 			return a.Automations.Update(ctx, id, automations.Patch{Enabled: &enabled}, time.Now())
 		},
 	})
+
+	a.Mimir = mimir.NewStore(db.SQL, filepath.Join(cfg.DataDir, "knowledge"))
+	a.API.BindKnowledge(a.Mimir)
 
 	a.internal = nodes.NewInternalServer(nodes.InternalDeps{
 		Config:          a.Config.Get(),

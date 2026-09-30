@@ -1,0 +1,61 @@
+package api
+
+import (
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"path/filepath"
+	"strings"
+	"testing"
+
+	"github.com/yeixio/yggdrasil-core/internal/mimir"
+	"github.com/yeixio/yggdrasil-core/internal/store"
+)
+
+func TestKnowledgeRoutes(t *testing.T) {
+	srv := NewServer(Dependencies{})
+	rec := httptest.NewRecorder()
+	srv.Handler().ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/api/v1/knowledge/sources", nil))
+	if rec.Code != http.StatusNotImplemented {
+		t.Fatalf("unbound knowledge: got %d", rec.Code)
+	}
+
+	db, err := store.Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	srv.BindKnowledge(mimir.NewStore(db.SQL, t.TempDir()))
+
+	do := func(method, path, body string) *httptest.ResponseRecorder {
+		rec := httptest.NewRecorder()
+		srv.Handler().ServeHTTP(rec, httptest.NewRequest(method, path, strings.NewReader(body)))
+		return rec
+	}
+	rec = do(http.MethodPost, "/api/v1/knowledge/sources", `{"kind":"text","filename":"hours.md","text":"Open 9 to 5 on weekdays."}`)
+	if rec.Code != http.StatusCreated {
+		t.Fatalf("create: %d %s", rec.Code, rec.Body)
+	}
+	var src mimir.Source
+	_ = json.Unmarshal(rec.Body.Bytes(), &src)
+	if src.Status != mimir.StatusReady || src.Path != "" || src.Filename != "hours.md" {
+		t.Fatalf("created %+v", src)
+	}
+
+	rec = do(http.MethodPost, "/api/v1/knowledge/search", `{"query":"weekday hours"}`)
+	var hits []mimir.Hit
+	_ = json.Unmarshal(rec.Body.Bytes(), &hits)
+	if rec.Code != http.StatusOK || len(hits) != 1 || hits[0].SourceName != "hours.md" {
+		t.Fatalf("search: %d %s", rec.Code, rec.Body)
+	}
+
+	if rec = do(http.MethodPost, "/api/v1/knowledge/sources", `{"kind":"path","path":"/definitely/not/here"}`); rec.Code != http.StatusBadRequest {
+		t.Fatalf("missing path: %d", rec.Code)
+	}
+	if rec = do(http.MethodGet, "/api/v1/knowledge/sources/nope", ""); rec.Code != http.StatusNotFound {
+		t.Fatalf("unknown id: %d", rec.Code)
+	}
+	if rec = do(http.MethodDelete, "/api/v1/knowledge/sources/"+src.ID, ""); rec.Code != http.StatusNoContent {
+		t.Fatalf("delete: %d", rec.Code)
+	}
+}

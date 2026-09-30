@@ -287,6 +287,8 @@ type AIProfile struct {
 	Roles          []ModelRole  `json:"roles"`
 	Tools          []ToolPolicy `json:"tools,omitempty"`
 	NodePolicy     NodePolicy   `json:"node_policy"`
+	// KnowledgeSources are Mimir source ids searched on every turn.
+	KnowledgeSources []string `json:"knowledge_sources,omitempty"`
 }
 
 // Conversation is a chat thread.

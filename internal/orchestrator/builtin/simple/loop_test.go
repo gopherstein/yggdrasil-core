@@ -284,3 +284,32 @@ func TestOlderMessagesStayInThePromptUntilTheyDoNotFit(t *testing.T) {
 		t.Fatalf("context=%v", usage)
 	}
 }
+
+type guidedEnv struct {
+	scriptedEnv
+	gotPrompt string
+}
+
+func (e *guidedEnv) TurnInstructions(ctx context.Context, prompt string) string {
+	e.gotPrompt = prompt
+	return "You are Tire Bot.\nConnected knowledge.\n[1] inventory.csv row 1\nsku: MP-22545"
+}
+
+func TestTurnInstructionsLeadTheSystemPrompt(t *testing.T) {
+	env := &guidedEnv{scriptedEnv: scriptedEnv{replies: []string{"We have MP-22545 in stock."}}}
+	events, err := New().Run(context.Background(), contracts.Task{Prompt: "Do you have 225/45R17?"}, contracts.AIProfile{
+		Roles: []contracts.ModelRole{{Role: "assistant", ModelID: "m"}},
+	}, env)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for range events {
+	}
+	if env.gotPrompt != "Do you have 225/45R17?" {
+		t.Fatalf("instructions got prompt %q", env.gotPrompt)
+	}
+	sys := env.seen[0][0]
+	if sys.Role != "system" || !strings.HasPrefix(sys.Content, "You are Tire Bot.") || !strings.Contains(sys.Content, "sku: MP-22545") {
+		t.Fatalf("system message = %q", sys.Content)
+	}
+}

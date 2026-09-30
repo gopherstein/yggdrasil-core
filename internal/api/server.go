@@ -113,6 +113,8 @@ type Server struct {
 	deps   Dependencies
 	router *mux.Router
 	http   *http.Server
+
+	knowledge KnowledgeService
 }
 
 // NewServer builds the API server.
@@ -204,6 +206,7 @@ func (s *Server) routes() {
 	api.HandleFunc("/conversations/{id}", s.handleUpdateConversation).Methods(http.MethodPatch)
 	api.HandleFunc("/conversations/{id}", s.handleDeleteConversation).Methods(http.MethodDelete)
 	api.HandleFunc("/events", s.handleSSE).Methods(http.MethodGet, http.MethodOptions)
+	s.knowledgeRoutes(api)
 
 	if s.deps.OpenAI != nil {
 		s.router.HandleFunc("/v1/models", s.deps.OpenAI.HandleModels).Methods(http.MethodGet, http.MethodOptions)

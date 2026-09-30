@@ -67,6 +67,9 @@ func (o *Orchestrator) Run(
 		if toolPrompt != "" {
 			sys += "\n" + toolPrompt
 		}
+		if extra := turnGuidance(ctx, env, task.Prompt); extra != "" {
+			sys = extra + "\n\n" + sys
+		}
 		messages := []pluginapi.ChatMessage{{Role: "system", Content: sys}}
 		if prior := priorMessages(ctx, env, task.Prompt, sys); len(prior) > 0 {
 			messages = append(messages, prior...)
@@ -200,6 +203,20 @@ func streamText(ch chan<- pluginapi.OrchestrationEvent, role, nodeID, content st
 		Payload: map[string]any{"context": usage.Map()},
 		Done:    true,
 	}
+}
+
+// turnInstructions is implemented by environments that add instructions for
+// one turn: a specialized AI's system instructions and connected knowledge.
+type turnInstructions interface {
+	TurnInstructions(ctx context.Context, prompt string) string
+}
+
+func turnGuidance(ctx context.Context, env pluginapi.ExecutionEnvironment, prompt string) string {
+	src, ok := env.(turnInstructions)
+	if !ok {
+		return ""
+	}
+	return strings.TrimSpace(src.TurnInstructions(ctx, prompt))
 }
 
 type conversationMemory interface {

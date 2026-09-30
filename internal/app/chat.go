@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/contextusage"
 	"github.com/yeixio/yggdrasil-core/internal/events"
+	"github.com/yeixio/yggdrasil-core/internal/mimir"
 	"github.com/yeixio/yggdrasil-core/internal/models"
 	modelhealth "github.com/yeixio/yggdrasil-core/internal/models/health"
 	"github.com/yeixio/yggdrasil-core/internal/profiles"
@@ -615,6 +617,9 @@ type chatExecEnv struct {
 	conversationID string
 	taskID         string
 	turnPrompt     string
+	// instructions and knowledge come from a specialized AI, on top of the profile.
+	instructions string
+	knowledge    []string
 
 	mu         sync.Mutex
 	lastModel  string
@@ -809,6 +814,41 @@ func (e *chatExecEnv) modelForRole(role string) string {
 		}
 	}
 	return ""
+}
+
+// TurnInstructions adds connected knowledge for this turn. The simple
+// orchestrator places it ahead of its own system instructions.
+func (e *chatExecEnv) TurnInstructions(ctx context.Context, prompt string) string {
+	var parts []string
+	if strings.TrimSpace(e.instructions) != "" {
+		parts = append(parts, strings.TrimSpace(e.instructions))
+	}
+	if block := e.knowledgeBlock(ctx, prompt); block != "" {
+		parts = append(parts, block)
+	}
+	return strings.Join(parts, "\n\n")
+}
+
+func (e *chatExecEnv) knowledgeBlock(ctx context.Context, prompt string) string {
+	ids := append(append([]string(nil), e.profile.KnowledgeSources...), e.knowledge...)
+	if len(ids) == 0 || e.app == nil || e.app.Mimir == nil {
+		return ""
+	}
+	hits, err := e.app.Mimir.Search(ctx, mimir.SearchInput{Query: prompt, SourceIDs: ids})
+	if err != nil {
+		e.Emit("knowledge.failed", map[string]any{"error": err.Error()})
+		return ""
+	}
+	names := []string{}
+	seen := map[string]bool{}
+	for _, h := range hits {
+		if !seen[h.SourceName] {
+			seen[h.SourceName] = true
+			names = append(names, h.SourceName)
+		}
+	}
+	e.Emit("knowledge.retrieved", map[string]any{"passages": len(hits), "sources": names})
+	return mimir.ContextBlock(hits, 0)
 }
 
 // ListNodesAdapter for task manager.
