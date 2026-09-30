@@ -305,7 +305,14 @@ func (s *Server) handlePlan(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) handleStartTraining(w http.ResponseWriter, r *http.Request) {
-	job, err := s.training.StartTraining(r.Context(), mux.Vars(r)["id"])
+	// An optional body picks the computer: {"node_id": "..."}.
+	var in struct {
+		NodeID string `json:"node_id"`
+	}
+	if r.ContentLength > 0 && !decodeBody(w, r, &in) {
+		return
+	}
+	job, err := s.training.StartTraining(r.Context(), mux.Vars(r)["id"], in.NodeID)
 	if err != nil {
 		writeTrainingErr(w, err)
 		return

@@ -9,11 +9,11 @@ Implemented for Apple Silicon. This document is the V1 specification; the notes 
 - **Trainer** is `training.Trainer`. The MLX backend runs mlx-lm in a Python environment the daemon installs with uv (`internal/pyenv`), then writes the adapter as a GGUF LoRA. The PEFT backend is registered but reports that NVIDIA training is not available yet.
 - **Serving**: llama-server loads each deployed adapter for a base model at scale 0, and every request sets the scales, so the base model and each specialized AI share one process. llama-server applies a loaded adapter when a request omits the scale, so the client always sends it.
 - **Training fit** estimates memory from weights, adapter and optimizer state, activations, and logits, calibrated against MLX runs; downloads; disk; and time. When a preset does not fit it tries QLoRA, then a batch of one with gradient checkpointing, then fewer layers.
+- **Placement**: Norn estimates the fit on this computer and on each online paired computer (asking the peer over Bifrost whether its trainer environment and weights are already there) and picks the one with the most memory headroom, staying local on a near tie. The Review step can send the job to another eligible computer instead. A remote run receives the examples, trains in that computer's single training slot, reports progress, and hands back the adapter, which is evaluated and served on the computer that owns the AI. Cancel reaches the remote process; a computer that stops answering for 90 seconds fails the job.
 - **Evaluation** runs the test prompts through the base model and the specialized AI with the same instructions and knowledge. Default prompts are questions held out of training. A revision must be evaluated before it can be deployed.
 
 Open items:
 
-- Training runs on the computer running Yggdrasil. Other computers are listed with their fit, but Norn does not send training to them yet.
 - NVIDIA training (PEFT) is not implemented.
 - Mimir has no embedding search yet. PDFs with a text layer are read with the pure-Go `github.com/ledongthuc/pdf` (BSD-3); scanned PDFs need OCR first. Excel workbooks (`.xlsx`) are read without a new dependency: each sheet is a table, and training reads the first sheet as a Q&A table when it has question and answer columns.
 - Merging an adapter into a standalone GGUF is not offered.

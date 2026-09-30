@@ -35,6 +35,7 @@ Traffic is sent only when a feature that talks to the network is used:
 | Search or install a Hugging Face model | Hugging Face Hub |
 | First training run | The `astral-sh/uv` GitHub release, Python builds that uv fetches, and pinned packages from PyPI |
 | Training a base model the first time | Hugging Face Hub, for the base model's training weights. Your examples are not uploaded. |
+| Training on a paired computer | That computer receives the training examples (with the AI's instructions) over Bifrost and returns the adapter. It deletes its copy when the job ends. |
 | Install a model from a URL | The host in that URL |
 | Internet tools (`internet.search`, `internet.open`) | DuckDuckGo's public HTML search, then the page URL the tool opens. These tools run only when the profile allows them. |
 | External OpenAI runtime | The base URL configured for `external-openai`, with the API key configured for that runtime if one is set |

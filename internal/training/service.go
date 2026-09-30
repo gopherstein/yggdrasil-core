@@ -69,6 +69,10 @@ type Deps struct {
 	Generate          GenerateFunc
 	Conversation      func(ctx context.Context, id string) ([]contracts.Message, error)
 	Logger            *slog.Logger
+	// LocalNodeID identifies this computer among training nodes.
+	LocalNodeID string
+	// Peer returns a client for a paired computer, for remote training.
+	Peer func(ctx context.Context, nodeID string) (Peer, error)
 }
 
 // Service builds, trains, evaluates, and deploys specialized AIs.
@@ -83,7 +87,9 @@ type Service struct {
 	// evaluating holds revisions whose adapters must stay loaded while an
 	// evaluation runs, keyed by base model.
 	evaluating map[string][]Revision
-	wg         sync.WaitGroup
+	// remote holds runs this computer executes for a paired coordinator.
+	remote map[string]*remoteRun
+	wg     sync.WaitGroup
 }
 
 // NewService returns a service. Call Recover once at startup.
@@ -94,7 +100,7 @@ func NewService(d Deps) *Service {
 	if d.Publish == nil {
 		d.Publish = func(string, map[string]any) {}
 	}
-	return &Service{d: d, slot: make(chan struct{}, 1), cancels: map[string]context.CancelFunc{}, evaluating: map[string][]Revision{}}
+	return &Service{d: d, slot: make(chan struct{}, 1), cancels: map[string]context.CancelFunc{}, evaluating: map[string][]Revision{}, remote: map[string]*remoteRun{}}
 }
 
 // Wait blocks until running jobs and evaluations return. Used in tests and at shutdown.
@@ -608,6 +614,13 @@ func (s *Service) RecommendBases(ctx context.Context, goal string, catalog []mod
 	reasoning := containsAny(goalLower, "reason", "math", "logic", "analy")
 	st := DatasetStats{Usable: RecommendedExamples, P95Tokens: 384, Tokens: RecommendedExamples * 200}
 
+	var infos []models.TrainingInfo
+	for _, e := range catalog {
+		if e.Training != nil {
+			infos = append(infos, *e.Training)
+		}
+	}
+	caps := s.capsFor(ctx, nodes, trainingRepos(infos...))
 	var out []BaseChoice
 	for _, e := range catalog {
 		if e.Training == nil {
@@ -619,7 +632,7 @@ func (s *Service) RecommendBases(ctx context.Context, goal string, catalog []mod
 		if s.d.Installed != nil {
 			c.Installed = s.d.Installed(ctx, e.ID)
 		}
-		c.Fit = s.bestFit(nodes, *e.Training, h, st)
+		c.Fit = s.bestFit(nodes, caps, *e.Training, h, st)
 		out = append(out, c)
 	}
 	score := func(c BaseChoice) float64 {
@@ -718,29 +731,82 @@ func (s *Service) onlineNodes(ctx context.Context) ([]Node, error) {
 	return out, nil
 }
 
-func (s *Service) fitFor(n Node, info models.TrainingInfo, h Hyper, st DatasetStats, pinned bool) NodeFit {
+// peerCaps is a paired computer's answer to a capabilities request.
+type peerCaps struct {
+	caps RemoteCapabilities
+	err  error
+}
+
+// capsFor asks each online paired computer whether it can train, once.
+func (s *Service) capsFor(ctx context.Context, nodes []Node, repos []string) map[string]peerCaps {
+	out := map[string]peerCaps{}
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	for _, n := range nodes {
+		if n.Local {
+			continue
+		}
+		wg.Add(1)
+		go func(n Node) {
+			defer wg.Done()
+			caps, err := s.remoteCapabilities(ctx, n.ID, repos)
+			mu.Lock()
+			out[n.ID] = peerCaps{caps: caps, err: err}
+			mu.Unlock()
+		}(n)
+	}
+	wg.Wait()
+	return out
+}
+
+func trainingRepos(infos ...models.TrainingInfo) []string {
+	var repos []string
+	for _, i := range infos {
+		repos = append(repos, i.BaseRepo)
+		if i.QuantizedRepo != "" {
+			repos = append(repos, i.QuantizedRepo)
+		}
+	}
+	return repos
+}
+
+func (s *Service) fitFor(n Node, caps map[string]peerCaps, info models.TrainingInfo, h Hyper, st DatasetStats, pinned bool) NodeFit {
 	trainer := TrainerFor(s.d.Trainers, n.Hardware)
 	in := FitInput{NodeID: n.ID, NodeName: n.Name, Local: n.Local, Hardware: n.Hardware, Info: info, Hyper: h, Stats: st,
 		Trainer: trainer, Pinned: pinned}
+	var busy bool
 	if n.Local {
 		in.Cached = s.cached
 		if trainer != nil {
 			in.EnvInstalled = s.d.Python.Status(trainer.Environment()).Installed
 		}
+	} else {
+		pc, ok := caps[n.ID]
+		switch {
+		case !ok:
+			return NodeFit{NodeID: n.ID, NodeName: n.Name, Label: FitUnsupported, Reason: "Yggdrasil did not ask " + n.Name + " about training."}
+		case errors.Is(pc.err, errOldPeer):
+			return NodeFit{NodeID: n.ID, NodeName: n.Name, Label: FitUnsupported, Reason: "Update Yggdrasil on " + n.Name + " to train there."}
+		case pc.err != nil:
+			return NodeFit{NodeID: n.ID, NodeName: n.Name, Label: FitUnsupported, Reason: "Could not reach " + n.Name + "."}
+		}
+		in.Cached = func(repo string) bool { return pc.caps.Cached[repo] }
+		if trainer != nil {
+			in.EnvInstalled = pc.caps.Installed[trainer.ID()]
+		}
+		busy = pc.caps.Busy
 	}
 	fit := EstimateFit(in)
-	if !n.Local && fit.Eligible {
-		fit.Eligible = false
-		fit.Label = FitUnsupported
-		fit.Reason = "Training runs on this computer in this version. Open Yggdrasil on " + n.Name + " to train there."
+	if busy && fit.Eligible {
+		fit.Notes = append(fit.Notes, n.Name+" is training something else. This run starts when that one ends.")
 	}
 	return fit
 }
 
-func (s *Service) bestFit(nodes []Node, info models.TrainingInfo, h Hyper, st DatasetStats) NodeFit {
+func (s *Service) bestFit(nodes []Node, caps map[string]peerCaps, info models.TrainingInfo, h Hyper, st DatasetStats) NodeFit {
 	var fits []NodeFit
 	for _, n := range nodes {
-		fits = append(fits, s.fitFor(n, info, h, st, false))
+		fits = append(fits, s.fitFor(n, caps, info, h, st, false))
 	}
 	if best, err := PickNode(fits); err == nil {
 		return best
@@ -830,8 +896,9 @@ func (s *Service) Plan(ctx context.Context, aiID string) (Plan, error) {
 	if err != nil {
 		return Plan{}, err
 	}
+	caps := s.capsFor(ctx, nodes, trainingRepos(*entry.Training))
 	for _, n := range nodes {
-		p.Fits = append(p.Fits, s.fitFor(n, *entry.Training, h, st, ai.Advanced != nil && ai.Advanced.Method != ""))
+		p.Fits = append(p.Fits, s.fitFor(n, caps, *entry.Training, h, st, ai.Advanced != nil && ai.Advanced.Method != ""))
 	}
 	best, err := PickNode(p.Fits)
 	if err != nil {
@@ -847,11 +914,36 @@ func (s *Service) Plan(ctx context.Context, aiID string) (Plan, error) {
 	return p, nil
 }
 
-// StartTraining queues a training job for the AI.
-func (s *Service) StartTraining(ctx context.Context, aiID string) (Job, error) {
+// StartTraining queues a training job for the AI on the computer Norn
+// picks, or on nodeID when the person chose one.
+func (s *Service) StartTraining(ctx context.Context, aiID, nodeID string) (Job, error) {
 	plan, err := s.Plan(ctx, aiID)
 	if err != nil {
 		return Job{}, err
+	}
+	if nodeID != "" {
+		var picked *NodeFit
+		for i := range plan.Fits {
+			if plan.Fits[i].NodeID == nodeID {
+				picked = &plan.Fits[i]
+			}
+		}
+		switch {
+		case picked == nil:
+			return Job{}, fmt.Errorf("computer %s is not online: %w", nodeID, ErrConflict)
+		case !picked.Eligible:
+			return Job{}, fmt.Errorf("%s cannot train this model: %s: %w", picked.NodeName, picked.Reason, ErrConflict)
+		}
+		plan.Chosen, plan.Hyper = picked, picked.Hyper
+		// Only the choice of computer was blocking; train on the one picked.
+		kept := plan.Blockers[:0]
+		for _, b := range plan.Blockers {
+			if !strings.HasPrefix(b, "no computer can train") {
+				kept = append(kept, b)
+			}
+		}
+		plan.Blockers = kept
+		plan.Ready = len(kept) == 0
 	}
 	if !plan.Ready {
 		return Job{}, fmt.Errorf("%s: %w", strings.Join(plan.Blockers, " "), ErrConflict)
@@ -932,6 +1024,66 @@ func (s *Service) publishJob(j Job) {
 }
 
 // runJob carries a job from queued to a terminal state.
+// execSpec is one trainer run on this computer.
+type execSpec struct {
+	trainer                      Trainer
+	repo, architecture           string
+	hyper                        Hyper
+	workDir, dataDir, adapterOut string
+	logPath                      string
+}
+
+// execute installs the trainer environment when needed, frees memory, and
+// runs the trainer. Local jobs and runs sent by a paired computer use it.
+func (s *Service) execute(ctx context.Context, spec execSpec, setState func(State, string), progress func(Progress)) (RunResult, error) {
+	env := spec.trainer.Environment()
+	if !s.d.Python.Status(env).Installed {
+		setState(StatePreparing, "Installing the trainer (one time, about 450 MB)")
+	}
+	python, err := s.d.Python.Ensure(ctx, env, func(step, detail string) {
+		switch step {
+		case "uv", "python":
+			setState(StatePreparing, "Installing Python for the trainer (one time)")
+		case "packages":
+			setState(StatePreparing, "Installing the trainer (one time, about 450 MB)")
+		}
+	})
+	if ctx.Err() != nil {
+		return RunResult{}, ErrCancelled
+	}
+	if err != nil {
+		return RunResult{}, fmt.Errorf("install the trainer: %w", err)
+	}
+	if s.d.UnloadLocalModels != nil {
+		if n := s.d.UnloadLocalModels(ctx); n > 0 {
+			setState(StatePreparing, fmt.Sprintf("Unloaded %d running model(s) to free memory", n))
+		}
+	}
+	setState(StateLoading, "Loading the base model")
+	return spec.trainer.Run(ctx, RunSpec{
+		Python:       python,
+		Env:          append(s.d.Python.Env(), "HF_HOME="+s.d.HFHome, "HF_HUB_DISABLE_TELEMETRY=1", "TOKENIZERS_PARALLELISM=false"),
+		WorkDir:      spec.workDir,
+		Repo:         spec.repo,
+		Architecture: spec.architecture,
+		Hyper:        spec.hyper,
+		DataDir:      spec.dataDir,
+		AdapterOut:   spec.adapterOut,
+		LogPath:      spec.logPath,
+	}, func(u Update) {
+		p := u.Progress
+		p.Detail = u.Detail
+		progress(p)
+		setState(u.State, u.Detail)
+	})
+}
+
+// isLocal reports whether a job runs on this computer. Without a local node
+// id, remote training is off and every job is local.
+func (s *Service) isLocal(nodeID string) bool {
+	return s.d.LocalNodeID == "" || nodeID == "" || nodeID == s.d.LocalNodeID
+}
+
 func (s *Service) runJob(ctx context.Context, job Job, ai SpecializedAI, info models.TrainingInfo, examples []Example, trainer Trainer) {
 	bg := context.Background()
 	var lastSave time.Time
@@ -971,56 +1123,19 @@ func (s *Service) runJob(ctx context.Context, job Job, ai SpecializedAI, info mo
 		s.d.Logger.Info("training job finished", "job_id", job.ID, "ai_id", job.AIID, "revision", job.Revision, "state", st)
 	}
 
-	// Wait for the training slot.
-	select {
-	case s.slot <- struct{}{}:
-		defer func() { <-s.slot }()
-	case <-ctx.Done():
-		finish(StateCancelled, nil)
-		return
-	}
-	now := time.Now()
-	job.StartedAt = &now
-
-	setState(StatePreparing, "Preparing examples")
 	train, valid := Split(examples)
 	dataDir := filepath.Join(work, "data")
 	if err := os.MkdirAll(dataDir, 0o755); err != nil {
 		finish(StateFailed, err)
 		return
 	}
-	for name, set := range map[string][]Example{"train.jsonl": train, "valid.jsonl": valid} {
-		if err := os.WriteFile(filepath.Join(dataDir, name), WriteJSONL(set, ai.Instructions), 0o644); err != nil {
+	trainJSONL, validJSONL := WriteJSONL(train, ai.Instructions), WriteJSONL(valid, ai.Instructions)
+	for name, body := range map[string][]byte{"train.jsonl": trainJSONL, "valid.jsonl": validJSONL} {
+		if err := os.WriteFile(filepath.Join(dataDir, name), body, 0o644); err != nil {
 			finish(StateFailed, err)
 			return
 		}
 	}
-	env := trainer.Environment()
-	if !s.d.Python.Status(env).Installed {
-		setState(StatePreparing, "Installing the trainer (one time, about 450 MB)")
-	}
-	python, err := s.d.Python.Ensure(ctx, env, func(step, detail string) {
-		switch step {
-		case "uv", "python":
-			setState(StatePreparing, "Installing Python for the trainer (one time)")
-		case "packages":
-			setState(StatePreparing, "Installing the trainer (one time, about 450 MB)")
-		}
-	})
-	if ctx.Err() != nil {
-		finish(StateCancelled, nil)
-		return
-	}
-	if err != nil {
-		finish(StateFailed, fmt.Errorf("install the trainer: %w", err))
-		return
-	}
-	if s.d.UnloadLocalModels != nil {
-		if n := s.d.UnloadLocalModels(ctx); n > 0 {
-			setState(StatePreparing, fmt.Sprintf("Unloaded %d running model(s) to free memory", n))
-		}
-	}
-
 	repo := info.BaseRepo
 	if job.Hyper.Method == MethodQLoRA && info.QuantizedRepo != "" {
 		repo = info.QuantizedRepo
@@ -1031,27 +1146,39 @@ func (s *Service) runJob(ctx context.Context, job Job, ai SpecializedAI, info mo
 		return
 	}
 	adapterPath := filepath.Join(adapterDir, fmt.Sprintf("rev-%d.gguf", job.Revision))
-	logPath := filepath.Join(s.d.LogsDir, "training-"+job.ID+".log")
-	setState(StateLoading, "Loading the base model")
-	res, err := trainer.Run(ctx, RunSpec{
-		Python:       python,
-		Env:          append(s.d.Python.Env(), "HF_HOME="+s.d.HFHome, "HF_HUB_DISABLE_TELEMETRY=1", "TOKENIZERS_PARALLELISM=false"),
-		WorkDir:      work,
-		Repo:         repo,
-		Architecture: info.Architecture,
-		Hyper:        job.Hyper,
-		DataDir:      dataDir,
-		AdapterOut:   adapterPath,
-		LogPath:      logPath,
-	}, func(u Update) {
-		p := u.Progress
-		p.Detail = u.Detail
+	progress := func(p Progress) {
 		if p.Iters == 0 {
 			p.Iters, p.Epochs = job.Progress.Iters, job.Progress.Epochs
 		}
 		job.Progress = p
-		setState(u.State, u.Detail)
-	})
+	}
+
+	var res RunResult
+	var err error
+	if s.isLocal(job.NodeID) {
+		select {
+		case s.slot <- struct{}{}:
+		case <-ctx.Done():
+			finish(StateCancelled, nil)
+			return
+		}
+		now := time.Now()
+		job.StartedAt = &now
+		setState(StatePreparing, "Preparing examples")
+		res, err = s.execute(ctx, execSpec{
+			trainer: trainer, repo: repo, architecture: info.Architecture, hyper: job.Hyper,
+			workDir: work, dataDir: dataDir, adapterOut: adapterPath,
+			logPath: filepath.Join(s.d.LogsDir, "training-"+job.ID+".log"),
+		}, setState, progress)
+		<-s.slot
+	} else {
+		now := time.Now()
+		job.StartedAt = &now
+		res, err = s.runOnPeer(ctx, job, RemoteRunRequest{
+			ID: job.ID, Repo: repo, Architecture: info.Architecture, Hyper: job.Hyper,
+			TrainJSONL: string(trainJSONL), ValidJSONL: string(validJSONL),
+		}, adapterPath, setState, progress)
+	}
 	if errors.Is(err, ErrCancelled) || ctx.Err() != nil {
 		_ = os.Remove(adapterPath)
 		finish(StateCancelled, nil)

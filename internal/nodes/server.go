@@ -47,6 +47,10 @@ type InternalDeps struct {
 	ListIncoming    func() []auth.PairingSession
 	LookupOutbound  func(code string) (*auth.PairingSession, bool)
 	AdvertiseAddr   func() string
+
+	// Training serves /internal/v1/training/ for paired computers that send
+	// training runs here.
+	Training http.Handler
 }
 
 func NewInternalServer(deps InternalDeps) *InternalServer {
@@ -74,6 +78,9 @@ func NewInternalServer(deps InternalDeps) *InternalServer {
 	api.HandleFunc("/pairing/complete", s.handlePairingComplete).Methods(http.MethodPost)
 	api.HandleFunc("/pairing/pending", s.handlePairingPending).Methods(http.MethodGet)
 	api.HandleFunc("/pairing/outbound/{code}", s.handlePairingOutbound).Methods(http.MethodGet)
+	if deps.Training != nil {
+		api.PathPrefix("/training/").Handler(http.StripPrefix("/internal/v1", deps.Training))
+	}
 
 	s.http = &http.Server{
 		Handler:           r,

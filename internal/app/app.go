@@ -526,6 +526,7 @@ func New(opts Options) (*App, error) {
 		ListIncoming:    a.Nodes.ListIncomingOffers,
 		LookupOutbound:  a.Nodes.LookupOutbound,
 		AdvertiseAddr:   a.bifrostAdvertiseAddr,
+		Training:        a.Training.RemoteHandler(),
 	})
 
 	return a, nil

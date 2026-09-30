@@ -17,7 +17,7 @@ export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStart
   })
   const setPreset = useMutation({ mutationFn: (preset: TrainingPreset) => api.updateAI(view.id, { preset }), onSuccess: refresh })
   const start = useMutation({
-    mutationFn: () => api.startTraining(view.id),
+    mutationFn: (nodeId?: string) => api.startTraining(view.id, nodeId),
     onSuccess: () => {
       refresh()
       onStarted()
@@ -67,7 +67,13 @@ export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStart
         {plan.isLoading && <p className="text-sm text-ink-muted">Estimating…</p>}
         <ul className="space-y-2">
           {(p?.fits ?? []).map((f) => (
-            <FitRow key={f.node_id || f.node_name} fit={f} chosen={p?.chosen?.node_id === f.node_id} />
+            <FitRow
+              key={f.node_id || f.node_name}
+              fit={f}
+              chosen={p?.chosen?.node_id === f.node_id}
+              canStart={Boolean(p?.ready) && !start.isPending}
+              onStart={() => start.mutate(f.node_id)}
+            />
           ))}
         </ul>
       </div>
@@ -87,14 +93,24 @@ export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStart
         </div>
       )}
       {start.error && <p className="text-sm text-danger">{errorText(start.error)}</p>}
-      <button type="button" className="btn-primary px-4 py-2 text-sm" disabled={!p?.ready || start.isPending} onClick={() => start.mutate()}>
+      <button type="button" className="btn-primary px-4 py-2 text-sm" disabled={!p?.ready || start.isPending} onClick={() => start.mutate(undefined)}>
         {start.isPending ? 'Starting…' : `Train revision ${p?.next_revision ?? 1}`}
       </button>
     </div>
   )
 }
 
-function FitRow({ fit, chosen }: { fit: NodeTrainingFit; chosen: boolean }) {
+function FitRow({
+  fit,
+  chosen,
+  canStart,
+  onStart,
+}: {
+  fit: NodeTrainingFit
+  chosen: boolean
+  canStart: boolean
+  onStart: () => void
+}) {
   return (
     <li className={['rounded-lg bg-raised p-3 text-sm', chosen ? 'shadow-[inset_0_0_0_1.5px_rgb(var(--rgb-primary))]' : ''].join(' ')}>
       <div className="flex flex-wrap items-center gap-2">
@@ -102,6 +118,11 @@ function FitRow({ fit, chosen }: { fit: NodeTrainingFit; chosen: boolean }) {
         {fit.local && <span className="text-xs text-ink-faint">this computer</span>}
         <span className={['status-chip', fitTone(fit)].join(' ')}>{fitLabels[fit.label]}</span>
         {chosen && <span className="status-chip bg-norn/15 text-norn">Norn picked this</span>}
+        {!chosen && fit.eligible && (
+          <button type="button" className="btn-secondary ml-auto px-2 py-0.5 text-xs" disabled={!canStart} onClick={onStart}>
+            Train here instead
+          </button>
+        )}
       </div>
       <p className="mt-1 text-ink-muted">{fit.reason}</p>
       {fit.eligible && (

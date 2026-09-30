@@ -36,6 +36,14 @@ func (a *App) newTrainingService() *training.Service {
 		Generate:          a.generateOnce,
 		Conversation:      a.Conversations.ListMessages,
 		Logger:            a.Logger,
+		LocalNodeID:       cfg.NodeID,
+		Peer: func(ctx context.Context, nodeID string) (training.Peer, error) {
+			n, err := a.findPairedNode(ctx, nodeID)
+			if err != nil {
+				return nil, err
+			}
+			return a.peerClient(n), nil
+		},
 	})
 }
 

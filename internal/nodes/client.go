@@ -282,6 +282,24 @@ func (c *Client) postJSON(ctx context.Context, path string, body []byte, out any
 	return json.NewDecoder(resp.Body).Decode(out)
 }
 
+// Do sends an authenticated request to path, such as
+// "/internal/v1/training/runs", and returns the raw response. The caller
+// closes the body. A long-running transfer should use a context deadline;
+// the client timeout is lifted for it.
+func (c *Client) Do(ctx context.Context, method, path string, body io.Reader) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, method, c.baseURL+path, body)
+	if err != nil {
+		return nil, err
+	}
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
+	}
+	c.applyAuth(req)
+	hc := *c.http
+	hc.Timeout = 0
+	return hc.Do(req)
+}
+
 func (c *Client) applyAuth(req *http.Request) {
 	if c.identity != nil {
 		req.Header.Set("Authorization", "Bearer "+c.identity.AuthToken())

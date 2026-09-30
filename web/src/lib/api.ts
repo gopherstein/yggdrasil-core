@@ -642,7 +642,11 @@ export const api = {
 
   trainingPlan: (id: string) => request<TrainingPlan>(`/api/v1/training/ais/${id}/plan`),
 
-  startTraining: (id: string) => request<TrainingJob>(`/api/v1/training/ais/${id}/train`, { method: 'POST' }),
+  startTraining: (id: string, nodeId?: string) =>
+    request<TrainingJob>(`/api/v1/training/ais/${id}/train`, {
+      method: 'POST',
+      ...(nodeId ? { body: JSON.stringify({ node_id: nodeId }) } : {}),
+    }),
 
   cancelTraining: (jobId: string) => request<TrainingJob>(`/api/v1/training/jobs/${jobId}/cancel`, { method: 'POST' }),
 

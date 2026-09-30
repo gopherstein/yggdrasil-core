@@ -80,7 +80,7 @@ Prefix: `/api/v1`
 | POST | `/training/ais/{id}/materials` | Add material. Also `DELETE /training/ais/{id}/materials/{mid}` and `POST /training/ais/{id}/conversations` |
 | GET, POST | `/training/ais/{id}/examples` | Review examples with their flags. Also `PATCH/DELETE /training/ais/{id}/examples/{eid}` |
 | GET | `/training/ais/{id}/plan` | What trains, what stays connected, and the training fit per computer |
-| POST | `/training/ais/{id}/train` | Start a training job. `GET /training/jobs/{id}`, `POST /training/jobs/{id}/cancel` |
+| POST | `/training/ais/{id}/train` | Start a training job; an optional `{"node_id": "..."}` picks the computer. `GET /training/jobs/{id}`, `POST /training/jobs/{id}/cancel` |
 | PUT | `/training/ais/{id}/test-prompts` | Replace the test set. `POST /training/ais/{id}/revisions/{n}/evaluate` compares base and specialized answers |
 | POST | `/training/ais/{id}/revisions/{n}/deploy` | Deploy an evaluated revision. `POST /training/ais/{id}/undeploy` |
 | GET | `/training/deployed` | Deployed specialized AIs as models |

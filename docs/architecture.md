@@ -79,7 +79,7 @@ The event bus publishes structured events for tasks, models, tools, nodes, place
 
 ## Specialized AIs
 
-`internal/training` builds a specialized AI from a base model, a LoRA adapter trained on the user's examples, system instructions, and Mimir knowledge sources. Trainers implement `training.Trainer`. The MLX trainer runs on Apple Silicon in a Python environment the daemon manages under `runtimes/python` (`internal/pyenv`), and exports the adapter as a GGUF LoRA. One training job runs at a time on the computer that holds the adapter.
+`internal/training` builds a specialized AI from a base model, a LoRA adapter trained on the user's examples, system instructions, and Mimir knowledge sources. Trainers implement `training.Trainer`. The MLX trainer runs on Apple Silicon in a Python environment the daemon manages under `runtimes/python` (`internal/pyenv`), and exports the adapter as a GGUF LoRA. Each computer runs one training job at a time. Norn can place a job on a paired computer: the examples go over Bifrost (`/internal/v1/training/`), and the adapter comes back to the computer that owns the AI, which evaluates and serves it.
 
 llama-server loads every deployed adapter for a base model at scale 0. Each request names the adapter to apply, or none for the base model, so one process serves the base model and each specialized AI built on it. A `sai:<slug>` model id in chat or `/v1/chat/completions` adds the AI's instructions and knowledge and applies its adapter. See [features/train-your-own-ai.md](features/train-your-own-ai.md).
 
@@ -91,5 +91,5 @@ Runtime adapters implement `pkg/pluginapi.Runtime`: detect, install, start, stop
 
 - Yggdrasil Desktop and Yggdrasil Mobile
 - semantic (embedding) retrieval; Mimir searches by keyword
-- training on NVIDIA GPUs, or on a paired computer
+- training on NVIDIA GPUs
 - splitting a single model across machines

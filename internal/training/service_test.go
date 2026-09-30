@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -20,11 +21,13 @@ import (
 	"github.com/yeixio/yggdrasil-core/pkg/pluginapi"
 )
 
-type fakePython struct{ ensured int }
+type fakePython struct{ ensured atomic.Int32 }
 
-func (f *fakePython) Status(pyenv.Spec) pyenv.Status { return pyenv.Status{Installed: f.ensured > 0} }
+func (f *fakePython) Status(pyenv.Spec) pyenv.Status {
+	return pyenv.Status{Installed: f.ensured.Load() > 0}
+}
 func (f *fakePython) Ensure(ctx context.Context, spec pyenv.Spec, p pyenv.Progress) (string, error) {
-	f.ensured++
+	f.ensured.Add(1)
 	return "/fake/python", nil
 }
 func (f *fakePython) Env() []string { return nil }
@@ -123,12 +126,13 @@ func newHarness(t *testing.T, mode string) *harness {
 		Nodes: func(ctx context.Context) ([]Node, error) {
 			return []Node{{ID: "local", Name: "this Mac", Local: true, Online: true, Hardware: mac(64)}}, nil
 		},
-		Python:   h.py,
-		Trainers: []Trainer{h.trainer},
-		DataDir:  filepath.Join(dir, "training"),
-		HFHome:   filepath.Join(dir, "hf"),
-		LogsDir:  logs,
-		Generate: h.gen.fn,
+		Python:      h.py,
+		Trainers:    []Trainer{h.trainer},
+		DataDir:     filepath.Join(dir, "training"),
+		HFHome:      filepath.Join(dir, "hf"),
+		LogsDir:     logs,
+		Generate:    h.gen.fn,
+		LocalNodeID: "local",
 	})
 	return h
 }
@@ -198,11 +202,11 @@ func TestBuildTrainEvaluateDeploy(t *testing.T) {
 		t.Fatalf("ready plan = %+v", plan)
 	}
 
-	job, err := h.svc.StartTraining(ctx, ai.ID)
+	job, err := h.svc.StartTraining(ctx, ai.ID, "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := h.svc.StartTraining(ctx, ai.ID); !errors.Is(err, ErrConflict) {
+	if _, err := h.svc.StartTraining(ctx, ai.ID, ""); !errors.Is(err, ErrConflict) {
 		t.Fatalf("second start while training: %v", err)
 	}
 	job = waitJob(t, h, job.ID)
@@ -268,7 +272,7 @@ func TestBuildTrainEvaluateDeploy(t *testing.T) {
 	}
 
 	// Retraining creates revision 2; revision 1 stays deployed until 2 is.
-	job2, err := h.svc.StartTraining(ctx, ai.ID)
+	job2, err := h.svc.StartTraining(ctx, ai.ID, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -299,7 +303,7 @@ func TestDeployRequiresEvaluation(t *testing.T) {
 	if _, err := h.svc.AddMaterial(ctx, ai.ID, MaterialInput{Filename: "c.jsonl", Text: tireExamples(12)}); err != nil {
 		t.Fatal(err)
 	}
-	job, err := h.svc.StartTraining(ctx, ai.ID)
+	job, err := h.svc.StartTraining(ctx, ai.ID, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -322,7 +326,7 @@ func TestCancelCleansUp(t *testing.T) {
 	if _, err := h.svc.AddMaterial(ctx, ai.ID, MaterialInput{Filename: "c.jsonl", Text: tireExamples(12)}); err != nil {
 		t.Fatal(err)
 	}
-	job, err := h.svc.StartTraining(ctx, ai.ID)
+	job, err := h.svc.StartTraining(ctx, ai.ID, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -349,7 +353,7 @@ func TestCancelCleansUp(t *testing.T) {
 	}
 	// Training can start again.
 	h.trainer.mode = "ok"
-	if _, err := h.svc.StartTraining(ctx, ai.ID); err != nil {
+	if _, err := h.svc.StartTraining(ctx, ai.ID, ""); err != nil {
 		t.Fatalf("restart after cancel: %v", err)
 	}
 	h.svc.Wait()
@@ -362,7 +366,7 @@ func TestFailureIsReportedAndCleanedUp(t *testing.T) {
 	if _, err := h.svc.AddMaterial(ctx, ai.ID, MaterialInput{Filename: "c.jsonl", Text: tireExamples(12)}); err != nil {
 		t.Fatal(err)
 	}
-	job, _ := h.svc.StartTraining(ctx, ai.ID)
+	job, _ := h.svc.StartTraining(ctx, ai.ID, "")
 	job = waitJob(t, h, job.ID)
 	if job.State != StateFailed || !strings.Contains(job.Error, "out of memory") {
 		t.Fatalf("job = %+v", job)
