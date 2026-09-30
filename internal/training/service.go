@@ -30,6 +30,7 @@ type Node struct {
 
 // Knowledge is the part of Mimir the service uses.
 type Knowledge interface {
+	Get(ctx context.Context, id string) (mimir.Source, error)
 	Create(ctx context.Context, in mimir.CreateInput) (mimir.Source, error)
 	Delete(ctx context.Context, id string) error
 	Search(ctx context.Context, in mimir.SearchInput) ([]mimir.Hit, error)
@@ -234,7 +235,14 @@ func (s *Service) UpdateAI(ctx context.Context, id string, p Patch) (Specialized
 		ai.Advanced = nil
 	}
 	if p.Knowledge != nil {
-		ai.Knowledge = *p.Knowledge
+		ids := []string{}
+		for _, id := range *p.Knowledge {
+			if _, err := s.d.Knowledge.Get(ctx, id); err != nil {
+				return SpecializedAI{}, fmt.Errorf("knowledge source %s: %w", id, err)
+			}
+			ids = appendUnique(ids, id)
+		}
+		ai.Knowledge = ids
 	}
 	return s.d.Repo.UpdateAI(ctx, ai)
 }

@@ -442,3 +442,22 @@ func TestAddConversations(t *testing.T) {
 func searchInput(q string, ids []string) mimir.SearchInput {
 	return mimir.SearchInput{Query: q, SourceIDs: ids}
 }
+
+func TestAttachExistingKnowledge(t *testing.T) {
+	h := newHarness(t, "ok")
+	ctx := context.Background()
+	ai, _ := h.svc.CreateAI(ctx, CreateInput{Name: "Bot"})
+	src, err := h.kb.Create(ctx, mimir.CreateInput{Kind: mimir.KindText, Filename: "faq.md", Text: "Open 9 to 5."})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ids := []string{src.ID, src.ID}
+	got, err := h.svc.UpdateAI(ctx, ai.ID, Patch{Knowledge: &ids})
+	if err != nil || len(got.Knowledge) != 1 || got.Knowledge[0] != src.ID {
+		t.Fatalf("attach: %+v %v", got.Knowledge, err)
+	}
+	bad := []string{"missing"}
+	if _, err := h.svc.UpdateAI(ctx, ai.ID, Patch{Knowledge: &bad}); !errors.Is(err, mimir.ErrNotFound) {
+		t.Fatalf("unknown source: %v", err)
+	}
+}

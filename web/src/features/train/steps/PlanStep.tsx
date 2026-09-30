@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { api } from '@/lib/api'
+import { KnowledgePicker } from '@/features/knowledge/KnowledgePicker'
 import { formatBytes } from '@/lib/format'
 import type { NodeTrainingFit, SpecializedAIView, TrainingHyper, TrainingPreset } from '@/types/api'
 import { errorText, fitLabels, fitTone, formatDuration, presetInfo } from '../display'
@@ -8,9 +9,12 @@ import { errorText, fitLabels, fitTone, formatDuration, presetInfo } from '../di
 export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStarted: () => void }) {
   const queryClient = useQueryClient()
   const plan = useQuery({ queryKey: ['training', 'plan', view.id], queryFn: () => api.trainingPlan(view.id) })
-  const knowledge = useQuery({ queryKey: ['knowledge'], queryFn: () => api.listKnowledge() })
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ['training'] })
 
+  const setKnowledge = useMutation({
+    mutationFn: (ids: string[]) => api.updateAI(view.id, { knowledge_sources: ids }),
+    onSuccess: refresh,
+  })
   const setPreset = useMutation({ mutationFn: (preset: TrainingPreset) => api.updateAI(view.id, { preset }), onSuccess: refresh })
   const start = useMutation({
     mutationFn: () => api.startTraining(view.id),
@@ -21,7 +25,6 @@ export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStart
   })
 
   const p = plan.data
-  const sources = (knowledge.data ?? []).filter((s) => view.knowledge_sources.includes(s.id))
   return (
     <div className="space-y-4">
       <div className="grid gap-3 md:grid-cols-2">
@@ -35,17 +38,8 @@ export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStart
         </div>
         <div className="card-outline space-y-2 border-l-4 !border-l-mimir p-4">
           <p className="label-caps text-mimir">Stays connected</p>
-          {sources.length === 0 ? (
-            <p className="text-sm text-ink-muted">No knowledge connected.</p>
-          ) : (
-            <ul className="space-y-0.5 text-sm text-ink">
-              {sources.map((s) => (
-                <li key={s.id}>
-                  {s.name} <span className="text-xs text-ink-faint">· {s.chunk_count} passages</span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <KnowledgePicker selected={view.knowledge_sources} disabled={setKnowledge.isPending} onChange={(ids) => setKnowledge.mutate(ids)} />
+          {setKnowledge.error && <p className="text-xs text-danger">{errorText(setKnowledge.error)}</p>}
           <p className="text-xs text-ink-muted">Looked up on every question. Edit it later without retraining.</p>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { api } from '@/lib/api'
 import { blankProfileTemplate, profileTemplateFromPurpose } from '@/lib/profilePresets'
 import { useUIStore } from '@/stores/uiStore'
 import type { AIProfile, ModelRole, ToolPolicy } from '@/types/api'
+import { KnowledgePicker } from '@/features/knowledge/KnowledgePicker'
 import { CAPABILITIES, capabilityEnabled, setCapability } from './capabilities'
 import {
   computerSelectionLabel,
@@ -760,6 +761,7 @@ function AdvancedEditor({
       : [{ role: 'assistant', model_id: '', required: true }],
   )
   const [tools, setTools] = useState<ToolPolicy[]>(defaultToolsFrom(profile))
+  const [knowledge, setKnowledge] = useState<string[]>(profile.knowledge_sources ?? [])
   const advancedMode = useUIStore((s) => s.advancedMode)
   const profileIdRef = useRef(profile.id)
 
@@ -775,6 +777,7 @@ function AdvancedEditor({
         : [{ role: 'assistant', model_id: '', required: true }],
     )
     setTools(defaultToolsFrom(profile))
+    setKnowledge(profile.knowledge_sources ?? [])
   }, [profile])
 
   const updateRole = (index: number, patch: Partial<ModelRole>) => {
@@ -928,6 +931,16 @@ function AdvancedEditor({
         </ul>
       </section>
 
+      <section className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+          Connected knowledge
+        </h3>
+        <p className="text-xs text-ink-muted">
+          Chats with this profile search these sources on every question and use the matching passages.
+        </p>
+        <KnowledgePicker selected={knowledge} onChange={setKnowledge} disabled={saving} />
+      </section>
+
       {advancedMode && (
       <section className="space-y-3">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
@@ -982,6 +995,7 @@ function AdvancedEditor({
               node_policy: { mode: nodeMode },
               roles,
               tools,
+              knowledge_sources: knowledge,
             })
           }
         >
