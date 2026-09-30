@@ -37,6 +37,23 @@ import type {
   AutomationRun,
   UpdateConversationRequest,
   VersionResponse,
+  BaseModelChoice,
+  ClassifyResult,
+  DatasetStats,
+  EvalPrompt,
+  KnowledgeHit,
+  KnowledgeSource,
+  MaterialUse,
+  SpecializedAI,
+  SpecializedAIPatch,
+  SpecializedAIView,
+  TrainingBackend,
+  TrainingExample,
+  TrainingJob,
+  TrainingMaterial,
+  TrainingMessage,
+  TrainingPlan,
+  TrainingPreset,
 } from '@/types/api'
 
 export class ApiError extends Error {
@@ -540,6 +557,91 @@ export const api = {
     request<LogContent>(
       `/api/v1/logs/${encodeURIComponent(name)}?tail_bytes=${tailBytes}`,
     ),
+
+  listKnowledge: () => request<KnowledgeSource[]>('/api/v1/knowledge/sources'),
+
+  createKnowledge: (body: { name?: string; kind: 'path' | 'text'; path?: string; filename?: string; text?: string }) =>
+    request<KnowledgeSource>('/api/v1/knowledge/sources', { method: 'POST', body: JSON.stringify(body) }),
+
+  updateKnowledge: (id: string, body: { name?: string; text?: string }) =>
+    request<KnowledgeSource>(`/api/v1/knowledge/sources/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+
+  refreshKnowledge: (id: string) =>
+    request<KnowledgeSource>(`/api/v1/knowledge/sources/${id}/refresh`, { method: 'POST' }),
+
+  deleteKnowledge: (id: string) => request<null>(`/api/v1/knowledge/sources/${id}`, { method: 'DELETE' }),
+
+  searchKnowledge: (query: string, sourceIds?: string[]) =>
+    request<KnowledgeHit[]>('/api/v1/knowledge/search', {
+      method: 'POST',
+      body: JSON.stringify({ query, source_ids: sourceIds }),
+    }),
+
+  trainingBackends: () => request<TrainingBackend[]>('/api/v1/training/backends'),
+
+  baseModels: (goal: string) =>
+    request<BaseModelChoice[]>(`/api/v1/training/base-models?goal=${encodeURIComponent(goal)}`),
+
+  classifyMaterial: (filename: string, text: string, use?: MaterialUse) =>
+    request<ClassifyResult>('/api/v1/training/classify', {
+      method: 'POST',
+      body: JSON.stringify({ filename, text, use }),
+    }),
+
+  listAIs: () => request<SpecializedAI[]>('/api/v1/training/ais'),
+
+  listDeployedAIs: () => request<Model[]>('/api/v1/training/deployed'),
+
+  createAI: (body: { name: string; goal: string; instructions?: string; base_model_id?: string; preset?: TrainingPreset }) =>
+    request<SpecializedAI>('/api/v1/training/ais', { method: 'POST', body: JSON.stringify(body) }),
+
+  getAI: (id: string) => request<SpecializedAIView>(`/api/v1/training/ais/${id}`),
+
+  updateAI: (id: string, body: SpecializedAIPatch) =>
+    request<SpecializedAI>(`/api/v1/training/ais/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+
+  deleteAI: (id: string) => request<null>(`/api/v1/training/ais/${id}`, { method: 'DELETE' }),
+
+  addMaterial: (id: string, body: { name?: string; filename: string; text: string; use?: MaterialUse }) =>
+    request<TrainingMaterial>(`/api/v1/training/ais/${id}/materials`, { method: 'POST', body: JSON.stringify(body) }),
+
+  deleteMaterial: (id: string, materialId: string) =>
+    request<null>(`/api/v1/training/ais/${id}/materials/${materialId}`, { method: 'DELETE' }),
+
+  addConversations: (id: string, conversationIds: string[]) =>
+    request<TrainingMaterial>(`/api/v1/training/ais/${id}/conversations`, {
+      method: 'POST',
+      body: JSON.stringify({ conversation_ids: conversationIds }),
+    }),
+
+  listExamples: (id: string) =>
+    request<{ examples: TrainingExample[]; stats: DatasetStats }>(`/api/v1/training/ais/${id}/examples`),
+
+  addExample: (id: string, messages: TrainingMessage[]) =>
+    request<null>(`/api/v1/training/ais/${id}/examples`, { method: 'POST', body: JSON.stringify({ messages }) }),
+
+  updateExample: (id: string, exampleId: string, body: { messages?: TrainingMessage[]; excluded?: boolean }) =>
+    request<null>(`/api/v1/training/ais/${id}/examples/${exampleId}`, { method: 'PATCH', body: JSON.stringify(body) }),
+
+  deleteExample: (id: string, exampleId: string) =>
+    request<null>(`/api/v1/training/ais/${id}/examples/${exampleId}`, { method: 'DELETE' }),
+
+  trainingPlan: (id: string) => request<TrainingPlan>(`/api/v1/training/ais/${id}/plan`),
+
+  startTraining: (id: string) => request<TrainingJob>(`/api/v1/training/ais/${id}/train`, { method: 'POST' }),
+
+  cancelTraining: (jobId: string) => request<TrainingJob>(`/api/v1/training/jobs/${jobId}/cancel`, { method: 'POST' }),
+
+  setTestPrompts: (id: string, prompts: string[]) =>
+    request<EvalPrompt[]>(`/api/v1/training/ais/${id}/test-prompts`, { method: 'PUT', body: JSON.stringify({ prompts }) }),
+
+  evaluateRevision: (id: string, revision: number) =>
+    request<{ status: string }>(`/api/v1/training/ais/${id}/revisions/${revision}/evaluate`, { method: 'POST' }),
+
+  deployRevision: (id: string, revision: number) =>
+    request<SpecializedAI>(`/api/v1/training/ais/${id}/revisions/${revision}/deploy`, { method: 'POST' }),
+
+  undeployAI: (id: string) => request<SpecializedAI>(`/api/v1/training/ais/${id}/undeploy`, { method: 'POST' }),
 
   exportDiagnostics: (includeConversations = false) =>
     request<DiagnosticsExportResult>('/api/v1/diagnostics', {

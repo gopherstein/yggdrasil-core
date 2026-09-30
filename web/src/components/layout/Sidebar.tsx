@@ -8,6 +8,8 @@ const mainNav = [
   { to: '/chat', label: 'Chat' },
   { to: '/automations', label: 'Automations' },
   { to: '/models', label: 'Models' },
+  { to: '/train', label: 'Train' },
+  { to: '/knowledge', label: 'Knowledge' },
   { to: '/nodes', label: 'Computers' },
 ] as const
 

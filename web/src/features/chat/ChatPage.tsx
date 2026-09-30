@@ -200,6 +200,12 @@ export function ChatPage() {
     retry: false,
   })
 
+  const specializedQuery = useQuery({
+    queryKey: ['training', 'deployed'],
+    queryFn: () => api.listDeployedAIs(),
+    retry: false,
+  })
+
   const nodesQuery = useQuery({
     queryKey: ['nodes'],
     queryFn: () => api.getNodes(),
@@ -251,6 +257,8 @@ export function ChatPage() {
   const installedModels = (modelsQuery.data ?? []).filter(
     (m) => m.installed || (m.installed_on?.length ?? 0) > 0,
   )
+  // Deployed specialized AIs answer through their base model, on this computer.
+  const specializedModels = (specializedQuery.data ?? []).filter((m) => m.installed)
   const sortedProfiles = useMemo(
     () => sortProfiles(profilesQuery.data ?? []),
     [profilesQuery.data],
@@ -298,7 +306,8 @@ export function ChatPage() {
   const modelLocations =
     installedModels.find((m) => m.id === modelIdForChat)?.installed_on ?? []
 
-  const chatModel = (modelsQuery.data ?? []).find((model) => model.id === modelIdForChat) ?? null
+  const chatModel =
+    [...(modelsQuery.data ?? []), ...specializedModels].find((model) => model.id === modelIdForChat) ?? null
   const activeProfile =
     sortedProfiles.find((p) => p.id === profileIdForChat) ?? null
   const terminalAllowed = activeProfile?.tools?.find((tool) => tool.tool_id === 'terminal')?.policy !== 'deny'
@@ -1003,12 +1012,29 @@ export function ChatPage() {
             >
               {installedModels.length === 0 ? (
                 <option value="">No model installed</option>
-              ) : (
+              ) : specializedModels.length === 0 ? (
                 installedModels.map((model) => (
                   <option key={model.id} value={model.id}>
                     {model.display_name || model.id}
                   </option>
                 ))
+              ) : (
+                <>
+                  <optgroup label="Models">
+                    {installedModels.map((model) => (
+                      <option key={model.id} value={model.id}>
+                        {model.display_name || model.id}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Specialized AIs">
+                    {specializedModels.map((model) => (
+                      <option key={model.id} value={model.id}>
+                        {model.display_name}
+                      </option>
+                    ))}
+                  </optgroup>
+                </>
               )}
             </select>
           </label>

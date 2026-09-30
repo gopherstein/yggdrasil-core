@@ -99,11 +99,24 @@ func (s *Server) handleClassifyMaterial(w http.ResponseWriter, r *http.Request) 
 	var in struct {
 		Filename string `json:"filename"`
 		Text     string `json:"text"`
+		// Use, when set, previews the warning for that choice.
+		Use training.Use `json:"use,omitempty"`
 	}
 	if !decodeBody(w, r, &in) {
 		return
 	}
-	writeJSON(w, http.StatusOK, s.training.Classify(in.Filename, in.Text))
+	rec := s.training.Classify(in.Filename, in.Text)
+	out := map[string]any{"recommendation": rec}
+	use := in.Use
+	if use == "" {
+		use = rec.Use
+	}
+	warning, err := training.ChoiceWarning(rec, use)
+	out["use"], out["warning"] = use, warning
+	if err != nil {
+		out["error"] = err.Error()
+	}
+	writeJSON(w, http.StatusOK, out)
 }
 
 func (s *Server) handleDeployedAIs(w http.ResponseWriter, r *http.Request) {

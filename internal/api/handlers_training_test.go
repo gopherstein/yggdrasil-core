@@ -48,6 +48,10 @@ func TestTrainingRoutes(t *testing.T) {
 	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"use":"knowledge"`) {
 		t.Fatalf("classify: %d %s", rec.Code, rec.Body)
 	}
+	rec = do(http.MethodPost, "/api/v1/training/classify", `{"filename":"stock.csv","text":"sku,price\nA1,9.99\n","use":"training"}`)
+	if !strings.Contains(rec.Body.String(), `"error":"no training examples`) {
+		t.Fatalf("classify: %d %s", rec.Code, rec.Body)
+	}
 	rec = do(http.MethodPost, "/api/v1/training/ais", `{"name":"Tire Bot","base_model_id":"small-q4"}`)
 	if rec.Code != http.StatusCreated {
 		t.Fatalf("create: %d %s", rec.Code, rec.Body)

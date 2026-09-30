@@ -20,6 +20,8 @@ import { PerformancePage } from '@/features/performance/PerformancePage'
 import { ProfilesPage } from '@/features/profiles/ProfilesPage'
 import { SettingsPage } from '@/features/settings/SettingsPage'
 import { ToolsPage } from '@/features/tools/ToolsPage'
+import { KnowledgePage } from '@/features/knowledge/KnowledgePage'
+import { TrainPage } from '@/features/train/TrainPage'
 import { useUIStore } from '@/stores/uiStore'
 
 const queryClient = new QueryClient({
@@ -61,6 +63,8 @@ export function App() {
                 <Route path="chat" element={<ChatPage />} />
                 <Route path="automations" element={<AutomationsPage />} />
                 <Route path="models" element={<ModelsPage />} />
+                <Route path="train" element={<TrainPage />} />
+                <Route path="knowledge" element={<KnowledgePage />} />
                 <Route path="profiles" element={<ProfilesPage />} />
                 <Route path="tools" element={<ToolsPage />} />
                 <Route path="nodes" element={<NodesPage />} />

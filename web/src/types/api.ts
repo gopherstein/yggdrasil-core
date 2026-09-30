@@ -228,6 +228,7 @@ export interface AIProfile {
   roles: ModelRole[]
   tools?: ToolPolicy[]
   node_policy: NodePolicy
+  knowledge_sources?: string[]
 }
 
 export type NodeStatus = 'online' | 'offline' | 'unknown'
@@ -673,3 +674,279 @@ export interface AutomationInput {
   enabled?: boolean
 }
 
+
+// Mimir: connected knowledge.
+export interface KnowledgeSource {
+  id: string
+  name: string
+  kind: 'path' | 'text'
+  path?: string
+  filename?: string
+  status: 'ready' | 'failed' | 'indexing'
+  error?: string
+  chunk_count: number
+  created_at: string
+  updated_at: string
+  refreshed_at?: string
+}
+
+export interface KnowledgeHit {
+  source_id: string
+  source_name: string
+  title: string
+  body: string
+  score: number
+}
+
+// Train Your Own AI.
+export type MaterialUse = 'training' | 'knowledge' | 'both'
+export type TrainingPreset = 'quick' | 'balanced' | 'quality'
+export type TrainingState =
+  | 'queued'
+  | 'preparing_dataset'
+  | 'loading_model'
+  | 'training'
+  | 'exporting'
+  | 'evaluating'
+  | 'complete'
+  | 'failed'
+  | 'cancelled'
+
+export interface TrainingHyper {
+  method?: 'lora' | 'qlora'
+  epochs?: number
+  rank?: number
+  scale?: number
+  layers?: number
+  learning_rate?: number
+  batch_size?: number
+  max_seq_length?: number
+  iters?: number
+  grad_checkpoint?: boolean
+}
+
+export interface MaterialSignal {
+  kind: string
+  detail: string
+}
+
+export interface MaterialRecommendation {
+  use: MaterialUse
+  reasons: string[]
+  signals?: MaterialSignal[]
+  example_count: number
+  can_train: boolean
+}
+
+export interface ClassifyResult {
+  recommendation: MaterialRecommendation
+  use: MaterialUse
+  warning?: string
+  error?: string
+}
+
+export interface TrainingMaterial {
+  id: string
+  ai_id: string
+  name: string
+  filename?: string
+  use: MaterialUse
+  recommended: MaterialRecommendation
+  warning?: string
+  knowledge_source_id?: string
+  example_count: number
+  created_at: string
+}
+
+export interface TrainingMessage {
+  role: 'system' | 'user' | 'assistant' | string
+  content: string
+}
+
+export type ExampleFlag = 'empty' | 'no_answer' | 'duplicate' | 'too_long' | 'short_answer' | 'volatile_facts'
+
+export interface TrainingExample {
+  id: string
+  ai_id: string
+  material_id?: string
+  messages: TrainingMessage[]
+  flags?: ExampleFlag[]
+  excluded: boolean
+  created_at: string
+}
+
+export interface DatasetStats {
+  total: number
+  usable: number
+  excluded: number
+  flagged: Partial<Record<ExampleFlag, number>>
+  tokens: number
+  p95_tokens: number
+  warnings?: string[]
+}
+
+export interface NodeTrainingFit {
+  node_id: string
+  node_name: string
+  local: boolean
+  backend?: string
+  label: 'comfortable' | 'tight' | 'too_large' | 'unsupported'
+  eligible: boolean
+  reason: string
+  hyper: TrainingHyper
+  memory_needed_bytes: number
+  memory_available_bytes: number
+  download_bytes: number
+  storage_needed_bytes: number
+  storage_available_bytes: number
+  duration_sec: number
+  notes?: string[]
+}
+
+export interface TrainingPlan {
+  ready: boolean
+  blockers: string[]
+  warnings: string[]
+  examples: number
+  preset: TrainingPreset
+  hyper: TrainingHyper
+  knowledge_sources: string[]
+  fits?: NodeTrainingFit[]
+  chosen?: NodeTrainingFit
+  next_revision: number
+}
+
+export interface TrainingProgress {
+  iter?: number
+  iters?: number
+  epoch?: number
+  epochs?: number
+  train_loss?: number
+  val_loss?: number
+  tokens_per_sec?: number
+  peak_memory_gb?: number
+  download_bytes?: number
+  download_total?: number
+  remaining_sec?: number
+  detail?: string
+}
+
+export interface TrainingJob {
+  id: string
+  ai_id: string
+  revision: number
+  node_id: string
+  node_name?: string
+  backend: string
+  state: TrainingState
+  progress: TrainingProgress
+  hyper: TrainingHyper
+  error?: string
+  created_at: string
+  started_at?: string
+  finished_at?: string
+}
+
+export interface TrainingRevision {
+  ai_id: string
+  revision: number
+  job_id: string
+  base_model_id: string
+  backend: string
+  hyper: TrainingHyper
+  example_count: number
+  final_train_loss?: number
+  final_val_loss?: number
+  evaluated: boolean
+  created_at: string
+}
+
+export interface EvalResult {
+  prompt: string
+  base: string
+  specialized: string
+  error?: string
+}
+
+export interface EvalRun {
+  id: string
+  ai_id: string
+  revision: number
+  status: 'running' | 'complete' | 'failed' | 'cancelled'
+  results: EvalResult[] | null
+  error?: string
+  created_at: string
+  finished_at?: string
+}
+
+export interface EvalPrompt {
+  id: string
+  prompt: string
+}
+
+export interface BaseModelRef {
+  id: string
+  display_name: string
+  parameters: string
+  license: string
+  license_note?: string
+  installed: boolean
+}
+
+export interface SpecializedAI {
+  id: string
+  slug: string
+  name: string
+  goal: string
+  instructions: string
+  base_model_id: string
+  preset: TrainingPreset
+  advanced?: TrainingHyper
+  knowledge_sources: string[]
+  deployed_revision: number
+  created_at: string
+  updated_at: string
+}
+
+export interface SpecializedAIView extends SpecializedAI {
+  model_id: string
+  materials: TrainingMaterial[]
+  dataset: DatasetStats
+  revisions: TrainingRevision[]
+  jobs: TrainingJob[]
+  eval_runs: EvalRun[]
+  test_prompts: EvalPrompt[]
+  base_model?: BaseModelRef
+  deployable_revisions: number[]
+}
+
+export interface BaseModelChoice {
+  model_id: string
+  display_name: string
+  parameters: string
+  license: string
+  license_note?: string
+  installed: boolean
+  recommended: boolean
+  reasons: string[]
+  fit: NodeTrainingFit
+}
+
+export interface TrainingBackend {
+  id: string
+  name: string
+  supported: boolean
+  reason: string
+  installed: boolean
+}
+
+export interface SpecializedAIPatch {
+  name?: string
+  goal?: string
+  instructions?: string
+  base_model_id?: string
+  preset?: TrainingPreset
+  advanced?: TrainingHyper
+  clear_advanced?: boolean
+  knowledge_sources?: string[]
+}

@@ -47,6 +47,10 @@ const KNOWN_EVENT_TYPES = [
   'node.paired',
   'node.online',
   'node.offline',
+  'training.job',
+  'training.eval',
+  'training.deployed',
+  'knowledge.retrieved',
 ] as const
 
 export function subscribeEvents({
