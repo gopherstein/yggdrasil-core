@@ -181,8 +181,13 @@ func (a *App) placeRoleAvoiding(ctx context.Context, profile profiles.Profile, r
 	return decision.NodeID, nil
 }
 
-func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role string, messages []pluginapi.ChatMessage) (<-chan pluginapi.ChatChunk, error) {
+// generateOnNode streams a turn from modelID on a node. adapter applies a
+// specialized AI's LoRA adapter; adapters exist only on this computer.
+func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role, adapter string, messages []pluginapi.ChatMessage) (<-chan pluginapi.ChatChunk, error) {
 	cfg := a.Config.Get()
+	if adapter != "" && nodeID != "" && nodeID != cfg.NodeID {
+		return nil, fmt.Errorf("specialized AIs run on the computer that trained them")
+	}
 	if nodeID == "" || nodeID == cfg.NodeID {
 		if a.stubInference {
 			return a.stubGenerate(modelID), nil
@@ -195,6 +200,7 @@ func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role string, 
 			ModelEndpoint: endpoint,
 			Messages:      messages,
 			Stream:        true,
+			Adapter:       adapter,
 		})
 		if err != nil {
 			return nil, err
@@ -299,6 +305,11 @@ func wrapRemoteChat(in <-chan pluginapi.ChatChunk, n contracts.Node) <-chan plug
 }
 
 func (a *App) ensureLocalModel(ctx context.Context, modelID string) (string, error) {
+	return a.ensureLocalModelWith(ctx, modelID, a.localAdapters(ctx, modelID))
+}
+
+// ensureLocalModelWith starts modelID with the given LoRA adapters loaded.
+func (a *App) ensureLocalModelWith(ctx context.Context, modelID string, adapters []pluginapi.Adapter) (string, error) {
 	if a.stubInference {
 		return "stub://" + a.Config.Get().NodeID, nil
 	}
@@ -310,7 +321,7 @@ func (a *App) ensureLocalModel(ctx context.Context, modelID string) (string, err
 		return "", err
 	}
 	running, err := a.Runtimes.StartModel(ctx, "llamacpp", pluginapi.ModelStartConfig{
-		ModelID: modelID, ModelPath: path,
+		ModelID: modelID, ModelPath: path, Adapters: adapters,
 	})
 	if err != nil {
 		return "", err

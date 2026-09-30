@@ -43,6 +43,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/store/repositories"
 	"github.com/yeixio/yggdrasil-core/internal/tasks"
 	"github.com/yeixio/yggdrasil-core/internal/tools"
+	"github.com/yeixio/yggdrasil-core/internal/training"
 	"github.com/yeixio/yggdrasil-core/internal/version"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 	"github.com/yeixio/yggdrasil-core/pkg/pluginapi"
@@ -78,6 +79,7 @@ type App struct {
 	Lifecycle        *lifecycle.Sweeper
 	Health           *modelhealth.Monitor
 	Mimir            *mimir.Store
+	Training         *training.Service
 
 	hw         *hardware.Detector
 	advertiser *discovery.Advertiser
@@ -231,7 +233,7 @@ func New(opts Options) (*App, error) {
 	bench.ModelPath = modelMgr.Path
 	bench.StartModel = func(ctx context.Context, modelID, modelPath string) (pluginapi.RunningModel, error) {
 		return rtMgr.StartModel(ctx, "llamacpp", pluginapi.ModelStartConfig{
-			ModelID: modelID, ModelPath: modelPath,
+			ModelID: modelID, ModelPath: modelPath, Adapters: a.localAdapters(ctx, modelID),
 		})
 	}
 	bench.StopModel = func(ctx context.Context, instanceID string) error {
@@ -250,7 +252,7 @@ func New(opts Options) (*App, error) {
 
 	a.Tasks = tasks.NewManager(db.SQL, bus, profileMgr, orchReg, rtMgr, sched, toolReg, a.listNodes, modelMgr.Path)
 	a.Tasks.SetClusterHooks(a.placeRole, func(ctx context.Context, nodeID, modelID string, messages []pluginapi.ChatMessage) (<-chan pluginapi.ChatChunk, error) {
-		return a.generateOnNode(ctx, nodeID, modelID, "", messages)
+		return a.generateOnNode(ctx, nodeID, modelID, "", "", messages)
 	})
 
 	openaiHandler := &openai.Handler{
@@ -498,6 +500,12 @@ func New(opts Options) (*App, error) {
 
 	a.Mimir = mimir.NewStore(db.SQL, filepath.Join(cfg.DataDir, "knowledge"))
 	a.API.BindKnowledge(a.Mimir)
+	a.Training = a.newTrainingService()
+	if err := a.Training.Recover(context.Background()); err != nil {
+		return nil, fmt.Errorf("training: %w", err)
+	}
+	a.API.BindTraining(a.Training, modelMgr.Catalog().List)
+	openaiHandler.Specialized = a.Training.DeployedModels
 
 	a.internal = nodes.NewInternalServer(nodes.InternalDeps{
 		Config:          a.Config.Get(),

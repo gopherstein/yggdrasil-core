@@ -20,6 +20,25 @@ type CatalogEntry struct {
 	Runtime           []string                    `json:"runtime,omitempty"`
 	RecommendedRoles  []string                    `json:"recommended_roles,omitempty"`
 	Dynamic           bool                        `json:"dynamic,omitempty"`
+	// Training is set when the model can be specialized with LoRA training.
+	Training *TrainingInfo `json:"training,omitempty"`
+}
+
+// TrainingInfo describes the trainable weights behind a catalog GGUF.
+type TrainingInfo struct {
+	// BaseRepo is the Hugging Face repository the GGUF was converted from.
+	// LoRA training reads these weights; the adapter then applies to the GGUF.
+	BaseRepo string `json:"base_repo"`
+	// QuantizedRepo is a 4-bit MLX copy of the same weights, used for QLoRA.
+	QuantizedRepo  string `json:"quantized_repo,omitempty"`
+	Architecture   string `json:"architecture"`
+	License        string `json:"license"`
+	LicenseNote    string `json:"license_note,omitempty"`
+	HiddenSize     int    `json:"hidden_size"`
+	Layers         int    `json:"layers"`
+	VocabSize      int    `json:"vocab_size"`
+	BaseBytes      uint64 `json:"base_bytes"`
+	QuantizedBytes uint64 `json:"quantized_bytes,omitempty"`
 }
 
 // PurposePreset describes a use-case preset.

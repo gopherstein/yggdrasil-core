@@ -30,6 +30,15 @@ type ModelStartConfig struct {
 	Context   int    `json:"context,omitempty"`
 	GPULayers int    `json:"gpu_layers,omitempty"`
 	Port      int    `json:"port,omitempty"`
+	// Adapters are LoRA adapters loaded next to the base weights. They are
+	// inactive unless a request names one.
+	Adapters []Adapter `json:"adapters,omitempty"`
+}
+
+// Adapter is a LoRA adapter file for a base model.
+type Adapter struct {
+	ID   string `json:"id"`
+	Path string `json:"path"`
 }
 
 // RunningModel is a loaded model instance.
@@ -39,6 +48,8 @@ type RunningModel struct {
 	Endpoint  string `json:"endpoint"`
 	Status    string `json:"status"`
 	RuntimeID string `json:"runtime_id"`
+	// Adapters are the ids of the loaded LoRA adapters, in load order.
+	Adapters []string `json:"adapters,omitempty"`
 }
 
 // Runtime is the replaceable inference runtime adapter.
@@ -67,6 +78,8 @@ type ChatRequest struct {
 	MaxTokens     int              `json:"max_tokens,omitempty"`
 	Stream        bool             `json:"stream"`
 	Tools         []map[string]any `json:"tools,omitempty"`
+	// Adapter applies one loaded LoRA adapter. Empty means the base model.
+	Adapter string `json:"adapter,omitempty"`
 }
 
 // ChatMessage is a single chat turn.

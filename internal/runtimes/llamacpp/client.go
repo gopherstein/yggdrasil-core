@@ -42,6 +42,13 @@ func (c *Client) Chat(ctx context.Context, req pluginapi.ChatRequest) (<-chan pl
 	if len(req.Tools) > 0 {
 		body["tools"] = req.Tools
 	}
+	lora, err := loraScales(req.ModelEndpoint, req.Adapter)
+	if err != nil {
+		return nil, err
+	}
+	if lora != nil {
+		body["lora"] = lora
+	}
 	payload, err := json.Marshal(body)
 	if err != nil {
 		return nil, err

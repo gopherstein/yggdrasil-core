@@ -64,10 +64,23 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		}
 		modelID = mid
 	}
+	special, err := a.resolveSpecialized(ctx, modelID)
+	if err != nil {
+		return nil, err
+	}
+	if special != nil {
+		modelID = special.baseModelID
+	}
 	if modelID != "" {
 		profile = withChatModel(profile, modelID)
 	}
 	profile = applyExecutionPolicy(profile, execution)
+	if special != nil {
+		// A specialized AI answers in the style it was trained on, without the
+		// tool protocol, on the computer that holds its adapter.
+		profile = withoutTools(profile)
+		execution = "local"
+	}
 	if execution == "automatic" && a.Models != nil {
 		installed, listErr := a.Models.List(ctx)
 		if listErr == nil {
@@ -125,6 +138,11 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			conversationID: conversationID,
 			taskID:         task.ID,
 			turnPrompt:     message,
+		}
+		if special != nil {
+			env.adapter = special.adapter
+			env.instructions = special.instructions
+			env.knowledge = special.knowledge
 		}
 		eventsCh, err := orch.Run(ctx, task, profile, env)
 		if err != nil {
@@ -617,7 +635,9 @@ type chatExecEnv struct {
 	conversationID string
 	taskID         string
 	turnPrompt     string
-	// instructions and knowledge come from a specialized AI, on top of the profile.
+	// adapter, instructions, and knowledge come from a specialized AI, on top
+	// of the profile.
+	adapter      string
 	instructions string
 	knowledge    []string
 
@@ -686,7 +706,7 @@ func (e *chatExecEnv) Generate(ctx context.Context, role string, messages []plug
 		"model_id": modelID, "node_id": nodeID, "role": role,
 		"node_name": e.app.nodeDisplayName(nodeID),
 	}))
-	ch, err := e.app.generateOnNode(ctx, nodeID, modelID, role, messages)
+	ch, err := e.app.generateOnNode(ctx, nodeID, modelID, role, e.adapter, messages)
 	if err != nil {
 		return nil, err
 	}
@@ -771,6 +791,13 @@ func (e *chatExecEnv) NodeForRole(role string) (string, error) {
 	if id, ok := e.roleNodes[role]; ok && id != "" {
 		e.mu.Unlock()
 		return id, nil
+	}
+	if e.adapter != "" && e.app.Config != nil {
+		// The adapter file lives here, so a specialized AI never leaves this computer.
+		local := e.app.Config.Get().NodeID
+		e.roleNodes[role] = local
+		e.mu.Unlock()
+		return local, nil
 	}
 	avoid := append([]string(nil), e.usedNodes...)
 	e.mu.Unlock()

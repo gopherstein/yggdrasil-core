@@ -19,7 +19,18 @@
       "purpose": ["coding", "assistant", "general"],
       "tags": ["coding", "fast"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["worker", "coordinator", "reviewer"]
+      "recommended_roles": ["worker", "coordinator", "reviewer"],
+      "training": {
+        "base_repo": "Qwen/Qwen2.5-Coder-1.5B-Instruct",
+        "quantized_repo": "mlx-community/Qwen2.5-Coder-1.5B-Instruct-4bit",
+        "architecture": "qwen2",
+        "license": "Apache-2.0",
+        "hidden_size": 1536,
+        "layers": 28,
+        "vocab_size": 151936,
+        "base_bytes": 3087467144,
+        "quantized_bytes": 868628559
+      }
     },
     {
       "id": "qwen2.5-coder-7b-q4",
@@ -39,7 +50,18 @@
       "purpose": ["coding"],
       "tags": ["coding"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["worker", "reviewer"]
+      "recommended_roles": ["worker", "reviewer"],
+      "training": {
+        "base_repo": "Qwen/Qwen2.5-Coder-7B-Instruct",
+        "quantized_repo": "mlx-community/Qwen2.5-Coder-7B-Instruct-4bit",
+        "architecture": "qwen2",
+        "license": "Apache-2.0",
+        "hidden_size": 3584,
+        "layers": 28,
+        "vocab_size": 152064,
+        "base_bytes": 15231271864,
+        "quantized_bytes": 4284346255
+      }
     },
     {
       "id": "qwen2.5-coder-14b-q4",
@@ -59,7 +81,18 @@
       "purpose": ["coding"],
       "tags": ["coding", "large"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["worker", "reviewer"]
+      "recommended_roles": ["worker", "reviewer"],
+      "training": {
+        "base_repo": "Qwen/Qwen2.5-Coder-14B-Instruct",
+        "quantized_repo": "mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+        "architecture": "qwen2",
+        "license": "Apache-2.0",
+        "hidden_size": 5120,
+        "layers": 48,
+        "vocab_size": 152064,
+        "base_bytes": 29540133960,
+        "quantized_bytes": 8309494233
+      }
     },
     {
       "id": "llama-3.2-1b-q4",
@@ -79,7 +112,19 @@
       "purpose": ["assistant", "general"],
       "tags": ["general", "fast"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["assistant"]
+      "recommended_roles": ["assistant"],
+      "training": {
+        "base_repo": "unsloth/Llama-3.2-1B-Instruct",
+        "quantized_repo": "mlx-community/Llama-3.2-1B-Instruct-4bit",
+        "architecture": "llama",
+        "license": "Llama 3.2 Community License",
+        "license_note": "Commercial use is allowed under Meta's terms, including its acceptable use policy.",
+        "hidden_size": 2048,
+        "layers": 16,
+        "vocab_size": 128256,
+        "base_bytes": 2471645608,
+        "quantized_bytes": 695283921
+      }
     },
     {
       "id": "llama-3.2-3b-q4",
@@ -99,7 +144,19 @@
       "purpose": ["assistant", "general", "research"],
       "tags": ["general"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["coordinator", "worker", "reviewer"]
+      "recommended_roles": ["coordinator", "worker", "reviewer"],
+      "training": {
+        "base_repo": "unsloth/Llama-3.2-3B-Instruct",
+        "quantized_repo": "mlx-community/Llama-3.2-3B-Instruct-4bit",
+        "architecture": "llama",
+        "license": "Llama 3.2 Community License",
+        "license_note": "Commercial use is allowed under Meta's terms, including its acceptable use policy.",
+        "hidden_size": 3072,
+        "layers": 28,
+        "vocab_size": 128256,
+        "base_bytes": 6425529048,
+        "quantized_bytes": 1807496278
+      }
     },
     {
       "id": "phi-3.5-mini-q4",
@@ -179,7 +236,19 @@
       "purpose": ["assistant", "general"],
       "tags": ["general"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["assistant"]
+      "recommended_roles": ["assistant"],
+      "training": {
+        "base_repo": "Qwen/Qwen2.5-3B-Instruct",
+        "quantized_repo": "mlx-community/Qwen2.5-3B-Instruct-4bit",
+        "architecture": "qwen2",
+        "license": "Qwen Research License",
+        "license_note": "Non-commercial use only. Pick an Apache-2.0 model for a business assistant.",
+        "hidden_size": 2048,
+        "layers": 36,
+        "vocab_size": 151936,
+        "base_bytes": 6171926992,
+        "quantized_bytes": 1736293090
+      }
     },
     {
       "id": "qwen2.5-7b-q4",
@@ -199,7 +268,18 @@
       "purpose": ["assistant", "general"],
       "tags": ["general"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["assistant", "coordinator"]
+      "recommended_roles": ["assistant", "coordinator"],
+      "training": {
+        "base_repo": "Qwen/Qwen2.5-7B-Instruct",
+        "quantized_repo": "mlx-community/Qwen2.5-7B-Instruct-4bit",
+        "architecture": "qwen2",
+        "license": "Apache-2.0",
+        "hidden_size": 3584,
+        "layers": 28,
+        "vocab_size": 152064,
+        "base_bytes": 15231271888,
+        "quantized_bytes": 4284346255
+      }
     },
     {
       "id": "qwen2.5-14b-q4",
@@ -219,7 +299,18 @@
       "purpose": ["assistant", "general", "research"],
       "tags": ["general", "large", "reasoning"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["assistant", "coordinator"]
+      "recommended_roles": ["assistant", "coordinator"],
+      "training": {
+        "base_repo": "Qwen/Qwen2.5-14B-Instruct",
+        "quantized_repo": "mlx-community/Qwen2.5-14B-Instruct-4bit",
+        "architecture": "qwen2",
+        "license": "Apache-2.0",
+        "hidden_size": 5120,
+        "layers": 48,
+        "vocab_size": 152064,
+        "base_bytes": 29540134000,
+        "quantized_bytes": 8309494233
+      }
     },
     {
       "id": "deepseek-r1-distill-1.5b-q4",
@@ -239,7 +330,18 @@
       "purpose": ["research", "general"],
       "tags": ["reasoning", "fast"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["researcher"]
+      "recommended_roles": ["researcher"],
+      "training": {
+        "base_repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B",
+        "quantized_repo": "mlx-community/DeepSeek-R1-Distill-Qwen-1.5B-4bit",
+        "architecture": "qwen2",
+        "license": "MIT",
+        "hidden_size": 1536,
+        "layers": 28,
+        "vocab_size": 151936,
+        "base_bytes": 3554214621,
+        "quantized_bytes": 999901724
+      }
     },
     {
       "id": "deepseek-r1-distill-7b-q4",
@@ -259,7 +361,18 @@
       "purpose": ["research"],
       "tags": ["reasoning"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["researcher"]
+      "recommended_roles": ["researcher"],
+      "training": {
+        "base_repo": "deepseek-ai/DeepSeek-R1-Distill-Qwen-7B",
+        "quantized_repo": "mlx-community/DeepSeek-R1-Distill-Qwen-7B-4bit",
+        "architecture": "qwen2",
+        "license": "MIT",
+        "hidden_size": 3584,
+        "layers": 28,
+        "vocab_size": 152064,
+        "base_bytes": 15231271850,
+        "quantized_bytes": 4284346255
+      }
     },
     {
       "id": "mistral-7b-instruct-q4",
@@ -279,7 +392,18 @@
       "purpose": ["assistant", "general"],
       "tags": ["general"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["assistant"]
+      "recommended_roles": ["assistant"],
+      "training": {
+        "base_repo": "unsloth/mistral-7b-instruct-v0.3",
+        "quantized_repo": "mlx-community/Mistral-7B-Instruct-v0.3-4bit",
+        "architecture": "llama",
+        "license": "Apache-2.0",
+        "hidden_size": 4096,
+        "layers": 32,
+        "vocab_size": 32768,
+        "base_bytes": 14496080928,
+        "quantized_bytes": 4077480215
+      }
     },
     {
       "id": "llava-1.6-mistral-7b-q4",
@@ -319,7 +443,18 @@
       "purpose": ["assistant", "general", "research"],
       "tags": ["general", "large", "reasoning"],
       "runtime": ["llamacpp"],
-      "recommended_roles": ["assistant"]
+      "recommended_roles": ["assistant"],
+      "training": {
+        "base_repo": "Qwen/Qwen2.5-32B-Instruct",
+        "quantized_repo": "mlx-community/Qwen2.5-32B-Instruct-4bit",
+        "architecture": "qwen2",
+        "license": "Apache-2.0",
+        "hidden_size": 5120,
+        "layers": 64,
+        "vocab_size": 152064,
+        "base_bytes": 65527841856,
+        "quantized_bytes": 18431478459
+      }
     }
   ]
 }

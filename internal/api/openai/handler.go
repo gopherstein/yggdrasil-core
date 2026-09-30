@@ -27,6 +27,8 @@ type Handler struct {
 	Chat     ChatService
 	Bus      *events.Bus
 	Auth     func(r *http.Request) error
+	// Specialized lists deployed specialized AIs (sai: ids) for /v1/models.
+	Specialized func(ctx context.Context) ([]contracts.Model, error)
 }
 
 type chatCompletionRequest struct {
@@ -57,6 +59,13 @@ func (h *Handler) HandleModels(w http.ResponseWriter, r *http.Request) {
 			"object":   "model",
 			"owned_by": "yggdrasil",
 		})
+	}
+	if h.Specialized != nil {
+		if deployed, err := h.Specialized(r.Context()); err == nil {
+			for _, m := range deployed {
+				data = append(data, map[string]any{"id": m.ID, "object": "model", "owned_by": "yggdrasil"})
+			}
+		}
 	}
 	writeJSON(w, map[string]any{"object": "list", "data": data})
 }

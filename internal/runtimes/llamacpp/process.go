@@ -30,6 +30,7 @@ type managedProcess struct {
 	cmd         *exec.Cmd
 	endpoint    string
 	modelID     string
+	adapters    []string
 	logFile     *os.File
 	logPath     string
 	intentional bool
@@ -69,12 +70,24 @@ func (r *Runtime) StartModel(ctx context.Context, cfg pluginapi.ModelStartConfig
 		return pluginapi.RunningModel{}, fmt.Errorf("model path required")
 	}
 
-	// Reuse an already-running instance for the same model.
+	// Reuse an already-running instance for the same model. LoRA adapters are
+	// fixed when llama-server starts, so an instance without the requested
+	// adapters is replaced.
+	wantAdapters := adapterIDs(cfg.Adapters)
 	if running, err := r.ListRunning(ctx); err == nil {
 		for _, m := range running {
-			if m.ModelID == cfg.ModelID && m.Status == "running" {
+			if m.ModelID != cfg.ModelID || m.Status != "running" {
+				continue
+			}
+			if sameAdapters(m.Adapters, wantAdapters) {
 				return m, nil
 			}
+			_ = r.StopModel(ctx, m.ID)
+		}
+	}
+	for _, a := range cfg.Adapters {
+		if _, err := os.Stat(a.Path); err != nil {
+			return pluginapi.RunningModel{}, fmt.Errorf("adapter %s: %w", a.ID, err)
 		}
 	}
 
@@ -102,6 +115,12 @@ func (r *Runtime) StartModel(ctx context.Context, cfg pluginapi.ModelStartConfig
 	if gpuLayers > 0 {
 		args = append(args, "-ngl", fmt.Sprintf("%d", gpuLayers))
 	}
+	for _, a := range cfg.Adapters {
+		args = append(args, "--lora", a.Path)
+	}
+	if len(cfg.Adapters) > 0 {
+		args = append(args, "--lora-init-without-apply")
+	}
 
 	cmd := exec.Command(det.Path, args...)
 	cmd.Dir = filepath.Dir(det.Path)
@@ -120,10 +139,12 @@ func (r *Runtime) StartModel(ctx context.Context, cfg pluginapi.ModelStartConfig
 		cmd:      cmd,
 		endpoint: endpoint,
 		modelID:  cfg.ModelID,
+		adapters: wantAdapters,
 		logFile:  logFile,
 		logPath:  logPath,
 	}
 	r.sup.mu.Unlock()
+	registerAdapters(endpoint, wantAdapters)
 
 	go r.sup.watch(instanceID)
 
@@ -138,6 +159,7 @@ func (r *Runtime) StartModel(ctx context.Context, cfg pluginapi.ModelStartConfig
 		Endpoint:  endpoint,
 		Status:    "running",
 		RuntimeID: runtimeID,
+		Adapters:  wantAdapters,
 	}, nil
 }
 
@@ -154,6 +176,7 @@ func (r *Runtime) StopModel(ctx context.Context, id string) error {
 		return fmt.Errorf("instance %q not found", id)
 	}
 	stopLlamaProcess(p.cmd, 1500*time.Millisecond)
+	registerAdapters(p.endpoint, nil)
 	if p.logFile != nil {
 		_ = p.logFile.Close()
 	}
@@ -176,6 +199,7 @@ func (r *Runtime) ListRunning(ctx context.Context) ([]pluginapi.RunningModel, er
 			Endpoint:  p.endpoint,
 			Status:    status,
 			RuntimeID: runtimeID,
+			Adapters:  append([]string(nil), p.adapters...),
 		})
 	}
 	return out, nil
@@ -213,6 +237,7 @@ func (ps *ProcessSupervisor) watch(instanceID string) {
 		delete(ps.procs, instanceID)
 	}
 	ps.mu.Unlock()
+	registerAdapters(p.endpoint, nil)
 	if p.logFile != nil {
 		_ = p.logFile.Close()
 	}

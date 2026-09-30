@@ -163,7 +163,7 @@ func (a *App) startModelLocal(ctx context.Context, modelID string) (contracts.Ru
 		return contracts.RunningModelView{}, err
 	}
 	running, err := a.Runtimes.StartModel(ctx, "llamacpp", pluginapi.ModelStartConfig{
-		ModelID: modelID, ModelPath: path,
+		ModelID: modelID, ModelPath: path, Adapters: a.localAdapters(ctx, modelID),
 	})
 	if err != nil {
 		return contracts.RunningModelView{}, err
