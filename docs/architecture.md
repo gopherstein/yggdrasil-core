@@ -10,6 +10,7 @@ client (web UI, curl, another program, desktop, mobile)
   yggdrasil-daemon
         |
         +-- profiles, tasks, tools
+        +-- Mimir knowledge, training (specialized AIs)
         +-- model catalog and downloads
         +-- Norn placement
         |
@@ -35,7 +36,7 @@ Some Norse names appear in comments and logs. Others are not packages in this re
 | Heimdall | Health and diagnostics | `internal/events` calls its bus a Heimdall event stream. Diagnostics and model health live in `internal/diagnostics` and `internal/models/health`. | Partial |
 | Huginn | Agent execution | No package uses this name. Chat and tasks run through the `simple` and `team` orchestrators. | Planned as a named subsystem. Orchestrators are implemented. |
 | Muninn | Persistent memory and context | No package uses this name. Conversations, messages, tasks, and settings are rows in SQLite. | Planned as a named subsystem. Conversation storage is implemented. |
-| Mimir | Knowledge and retrieval | No retrieval or document-index code. | Planned |
+| Mimir | Knowledge and retrieval | `internal/mimir`: file, folder, and pasted sources, SQLite FTS5 search, retrieval into chat. Sources reindex when their files change. | Implemented (keyword search; no embeddings yet) |
 | Gungnir | Tool and task execution | No package uses this name. Tools are implemented in `internal/tools` (internet, filesystem, terminal, git). Tasks are implemented in `internal/tasks`. | Planned as a named subsystem. Tools and tasks are implemented. |
 
 ## Request path
@@ -76,6 +77,12 @@ Team can place those roles on different paired computers. A manual script for th
 
 The event bus publishes structured events for tasks, models, tools, nodes, placement, and chat tokens. `GET /api/v1/events` is a server-sent stream of that bus. `GET /api/v1/diagnostics` builds a zip that omits secrets. A model health monitor can stop a model that stops responding. There is no separate telemetry pipeline.
 
+## Specialized AIs
+
+`internal/training` builds a specialized AI from a base model, a LoRA adapter trained on the user's examples, system instructions, and Mimir knowledge sources. Trainers implement `training.Trainer`. The MLX trainer runs on Apple Silicon in a Python environment the daemon manages under `runtimes/python` (`internal/pyenv`), and exports the adapter as a GGUF LoRA. One training job runs at a time on the computer that holds the adapter.
+
+llama-server loads every deployed adapter for a base model at scale 0. Each request names the adapter to apply, or none for the base model, so one process serves the base model and each specialized AI built on it. A `sai:<slug>` model id in chat or `/v1/chat/completions` adds the AI's instructions and knowledge and applies its adapter. See [features/train-your-own-ai.md](features/train-your-own-ai.md).
+
 ## Runtimes
 
 Runtime adapters implement `pkg/pluginapi.Runtime`: detect, install, start, stop, and health. The process that actually generates tokens is outside the daemon (`llama-server`, or an HTTP server you already run). See [runtimes.md](runtimes.md).
@@ -83,6 +90,6 @@ Runtime adapters implement `pkg/pluginapi.Runtime`: detect, install, start, stop
 ## What is not in this process
 
 - Yggdrasil Desktop and Yggdrasil Mobile
-- retrieval-augmented generation
-- training
+- semantic (embedding) retrieval; Mimir searches by keyword
+- training on NVIDIA GPUs, or on a paired computer
 - splitting a single model across machines

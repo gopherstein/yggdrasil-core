@@ -54,7 +54,7 @@ func TestPresetsScaleWithEffort(t *testing.T) {
 	q := PresetSettings(PresetQuick, qwen7, st)
 	b := PresetSettings(PresetBalanced, qwen7, st)
 	hq := PresetSettings(PresetQuality, qwen7, st)
-	if !(q.Rank < b.Rank && b.Rank < hq.Rank && q.Iters < b.Iters && b.Iters < hq.Iters) {
+	if q.Rank >= b.Rank || b.Rank >= hq.Rank || q.Iters >= b.Iters || b.Iters >= hq.Iters {
 		t.Fatalf("quick %+v balanced %+v quality %+v", q, b, hq)
 	}
 	if q.Method != MethodQLoRA || b.Method != MethodLoRA {

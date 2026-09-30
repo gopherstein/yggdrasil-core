@@ -23,6 +23,9 @@ This list is directional. It is not a commitment and it has no dates. Shipped be
 - Windows llama.cpp install that can select a GPU build when one exists
 - more hardware reports so [docs/compatibility.md](docs/compatibility.md) can move cells off Untested
 - a short demo of startup, discovery, a model, an API call, and Norn placement
+- training on NVIDIA GPUs through the PEFT trainer, and on a paired computer that Norn selects
+- embedding search in Mimir alongside keyword search, and PDF and spreadsheet sources
+- connected knowledge in the Profiles page (the API accepts `knowledge_sources` today)
 
 ## Research
 

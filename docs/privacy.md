@@ -15,7 +15,9 @@ The data directory (see [Configuration](../README.md#configuration)) holds:
 | `config.json` | Bind addresses, node name, node id, discovery, static peers. Written with mode `0600`. |
 | `yggdrasil.db` | Models, profiles, conversations, messages, tasks, settings, API key hashes, paired-node records. Chat history and task history are saved unless those settings are turned off. Both default to on. |
 | `models/` | GGUF files you install. |
-| `runtimes/` | Runtime binaries, including `llama-server` after you install llama.cpp. |
+| `knowledge/` | Copies of content you pasted or uploaded as connected knowledge. Linked files and folders stay where they are. The search index is in `yggdrasil.db`. |
+| `training/` | Trained adapters (`adapters/`), temporary job files (`jobs/`, removed when a job ends), and downloaded training weights (`hf-cache/`). Examples are in `yggdrasil.db`. |
+| `runtimes/` | Runtime binaries, including `llama-server` after you install llama.cpp, and `python/` with the trainer environment after the first training run. |
 | `logs/daemon.log` | JSON logs, also written to standard output. |
 | `secrets/` | Node identity material. Directory mode `0700`, files mode `0600`. API keys are stored as hashes in `yggdrasil.db`, not as plaintext files. |
 
@@ -31,6 +33,8 @@ Traffic is sent only when a feature that talks to the network is used:
 | --- | --- |
 | Install or update llama.cpp | `api.github.com` and the GitHub release download for `ggml-org/llama.cpp` |
 | Search or install a Hugging Face model | Hugging Face Hub |
+| First training run | The `astral-sh/uv` GitHub release, Python builds that uv fetches, and pinned packages from PyPI |
+| Training a base model the first time | Hugging Face Hub, for the base model's training weights. Your examples are not uploaded. |
 | Install a model from a URL | The host in that URL |
 | Internet tools (`internet.search`, `internet.open`) | DuckDuckGo's public HTML search, then the page URL the tool opens. These tools run only when the profile allows them. |
 | External OpenAI runtime | The base URL configured for `external-openai`, with the API key configured for that runtime if one is set |

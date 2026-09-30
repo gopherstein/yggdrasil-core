@@ -70,6 +70,20 @@ Prefix: `/api/v1`
 | GET | `/diagnostics` | Diagnostic bundle |
 | GET | `/events` | Server-sent event stream |
 | GET, POST | `/benchmarks` | List or start a benchmark |
+| GET, POST | `/knowledge/sources` | Connected knowledge (Mimir). Also `GET/PATCH/DELETE /knowledge/sources/{id}` and `POST /knowledge/sources/{id}/refresh` |
+| POST | `/knowledge/search` | Passages that match a question |
+| GET, POST | `/training/ais` | Specialized AIs. Also `GET/PATCH/DELETE /training/ais/{id}` |
+| POST | `/training/classify` | Recommend Training, Knowledge, or Both for material, before it is added |
+| GET | `/training/base-models?goal=` | Trainable base models ranked for a job, with training fit |
+| POST | `/training/ais/{id}/materials` | Add material. Also `DELETE /training/ais/{id}/materials/{mid}` and `POST /training/ais/{id}/conversations` |
+| GET, POST | `/training/ais/{id}/examples` | Review examples with their flags. Also `PATCH/DELETE /training/ais/{id}/examples/{eid}` |
+| GET | `/training/ais/{id}/plan` | What trains, what stays connected, and the training fit per computer |
+| POST | `/training/ais/{id}/train` | Start a training job. `GET /training/jobs/{id}`, `POST /training/jobs/{id}/cancel` |
+| PUT | `/training/ais/{id}/test-prompts` | Replace the test set. `POST /training/ais/{id}/revisions/{n}/evaluate` compares base and specialized answers |
+| POST | `/training/ais/{id}/revisions/{n}/deploy` | Deploy an evaluated revision. `POST /training/ais/{id}/undeploy` |
+| GET | `/training/deployed` | Deployed specialized AIs as models |
+
+A profile's `knowledge_sources` lists Mimir source ids. Chat searches them on every turn and adds the matching passages before the system prompt.
 
 Model, node, tool, conversation, and log routes follow the same prefix. The OpenAPI file is the route list to diff when a handler changes.
 

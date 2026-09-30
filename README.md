@@ -134,6 +134,8 @@ These exist in this repository today:
 - benchmarks against a running local model
 - OpenAI-compatible `GET /v1/models` and `POST /v1/chat/completions`
 - tools for web search, files, shell, and Git, with explicit per-profile permission policies
+- Mimir connected knowledge: files, folders, and pasted content (CSV, JSON, Markdown, text, HTML) searched on every chat turn, and reindexed when the files change
+- Train your own AI: a guided build of a specialized assistant from a base model, LoRA training on your examples (MLX on Apple Silicon), and connected knowledge, with base-versus-specialized testing before deployment. See [docs/features/train-your-own-ai.md](docs/features/train-your-own-ai.md).
 
 Background work is idle model unload, model health checks, periodic peer refresh, and scheduled automations. A scheduled prompt runs in the daemon, including while the desktop window is closed when the app is set to keep running. How to use it is in the user guide. The v1 specification is [docs/features/completed/scheduler-and-automations.md](docs/features/completed/scheduler-and-automations.md).
 
@@ -294,7 +296,6 @@ The public site is [yggdrasil.yeix.io](https://yggdrasil.yeix.io). It reads the 
 These are specifications. They are not implemented in this repository.
 
 - [Persistent memory and cross-model context](docs/features/persistent-memory-and-cross-model-context.md)
-- [Train your own AI](docs/features/train-your-own-ai.md)
 - [Kubernetes-native model deployment](docs/features/kubernetes-native-model-deployment.md)
 - [Community model ratings](docs/features/community-model-ratings.md)
 - [Expanded tool platform](docs/features/expanded-tool-platform.md)

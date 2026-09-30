@@ -89,7 +89,7 @@ func examplesFromJSON(text string) ([][]Message, error) {
 func chatRecord(rec map[string]any) ([]Message, bool) {
 	raw, ok := rec["messages"]
 	if !ok {
-		raw, ok = rec["conversations"]
+		raw = rec["conversations"]
 	}
 	list, ok := raw.([]any)
 	if !ok {
