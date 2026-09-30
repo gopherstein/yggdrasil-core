@@ -2,6 +2,7 @@ package training
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"os"
@@ -459,5 +460,39 @@ func TestAttachExistingKnowledge(t *testing.T) {
 	bad := []string{"missing"}
 	if _, err := h.svc.UpdateAI(ctx, ai.ID, Patch{Knowledge: &bad}); !errors.Is(err, mimir.ErrNotFound) {
 		t.Fatalf("unknown source: %v", err)
+	}
+}
+
+func TestSpreadsheetMaterial(t *testing.T) {
+	h := newHarness(t, "ok")
+	ctx := context.Background()
+	ai, _ := h.svc.CreateAI(ctx, CreateInput{Name: "Bot"})
+	load := func(name string) string {
+		raw, err := os.ReadFile(filepath.Join("testdata", name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		return base64.StdEncoding.EncodeToString(raw)
+	}
+	faq, err := h.svc.AddMaterial(ctx, ai.ID, MaterialInput{Filename: "faq.xlsx", ContentBase64: load("faq.xlsx")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if faq.Use != UseTraining || faq.ExampleCount != 12 {
+		t.Fatalf("faq material = %+v", faq)
+	}
+	inv, err := h.svc.AddMaterial(ctx, ai.ID, MaterialInput{Filename: "inventory.xlsx", ContentBase64: load("inventory.xlsx")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if inv.Use != UseKnowledge || inv.KnowledgeSourceID == "" {
+		t.Fatalf("inventory material = %+v", inv)
+	}
+	hits, err := h.kb.Search(ctx, searchInput("price for 225/45R17", []string{inv.KnowledgeSourceID}))
+	if err != nil || len(hits) == 0 || !strings.Contains(hits[0].Body, "Price: 189.99") {
+		t.Fatalf("hits = %+v %v", hits, err)
+	}
+	if _, err := h.kb.Content(ctx, inv.KnowledgeSourceID); err == nil {
+		t.Fatal("a workbook copy must not be editable as text")
 	}
 }

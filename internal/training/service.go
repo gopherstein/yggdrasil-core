@@ -2,6 +2,7 @@ package training
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -374,8 +375,40 @@ type MaterialInput struct {
 	Name     string `json:"name"`
 	Filename string `json:"filename"`
 	Text     string `json:"text"`
+	// ContentBase64 carries binary files such as .xlsx, in place of Text.
+	ContentBase64 string `json:"content_base64,omitempty"`
 	// Use overrides the recommendation. Empty accepts it.
 	Use Use `json:"use,omitempty"`
+}
+
+// MaterialText returns what the classifier and example parser read for a
+// piece of material. A spreadsheet is read as CSV from its first sheet.
+func MaterialText(filename, text, contentBase64 string) (string, string, error) {
+	if contentBase64 == "" {
+		if strings.TrimSpace(text) == "" {
+			return "", "", fmt.Errorf("the material is empty")
+		}
+		if len(text) > mimir.MaxTextBytes {
+			return "", "", fmt.Errorf("the material is larger than %d MB", mimir.MaxTextBytes>>20)
+		}
+		return filename, text, nil
+	}
+	if base64.StdEncoding.DecodedLen(len(contentBase64)) > mimir.MaxTextBytes {
+		return "", "", fmt.Errorf("the file is larger than %d MB", mimir.MaxTextBytes>>20)
+	}
+	raw, err := base64.StdEncoding.DecodeString(contentBase64)
+	if err != nil {
+		return "", "", fmt.Errorf("the upload is not valid base64")
+	}
+	switch strings.ToLower(filepath.Ext(filename)) {
+	case ".xlsx":
+		csvText, err := mimir.FirstSheetAsCSV(filename, raw)
+		if err != nil {
+			return "", "", err
+		}
+		return strings.TrimSuffix(filename, filepath.Ext(filename)) + ".csv", csvText, nil
+	}
+	return filename, string(raw), nil
 }
 
 // AddMaterial classifies material, then stores its examples and connects it
@@ -385,12 +418,6 @@ func (s *Service) AddMaterial(ctx context.Context, aiID string, in MaterialInput
 	if err != nil {
 		return Material{}, err
 	}
-	if strings.TrimSpace(in.Text) == "" {
-		return Material{}, fmt.Errorf("the material is empty")
-	}
-	if len(in.Text) > mimir.MaxTextBytes {
-		return Material{}, fmt.Errorf("the material is larger than %d MB", mimir.MaxTextBytes>>20)
-	}
 	in.Filename = filepath.Base(strings.TrimSpace(in.Filename))
 	if in.Filename == "" || in.Filename == "." {
 		in.Filename = "pasted.txt"
@@ -398,7 +425,11 @@ func (s *Service) AddMaterial(ctx context.Context, aiID string, in MaterialInput
 	if strings.TrimSpace(in.Name) == "" {
 		in.Name = in.Filename
 	}
-	rec := Classify(in.Filename, in.Text)
+	readName, readText, err := MaterialText(in.Filename, in.Text, in.ContentBase64)
+	if err != nil {
+		return Material{}, err
+	}
+	rec := Classify(readName, readText)
 	use := in.Use
 	if use == "" {
 		use = rec.Use
@@ -409,13 +440,14 @@ func (s *Service) AddMaterial(ctx context.Context, aiID string, in MaterialInput
 	}
 	var examples [][]Message
 	if use.trains() {
-		if examples, err = ParseExamples(in.Filename, in.Text); err != nil {
+		if examples, err = ParseExamples(readName, readText); err != nil {
 			return Material{}, err
 		}
 	}
 	m := Material{AIID: aiID, Name: in.Name, Filename: in.Filename, Use: use, Recommended: rec, Warning: warning}
 	if use.connects() {
-		src, err := s.d.Knowledge.Create(ctx, mimir.CreateInput{Name: ai.Name + ": " + in.Name, Kind: mimir.KindText, Filename: in.Filename, Text: in.Text})
+		src, err := s.d.Knowledge.Create(ctx, mimir.CreateInput{Name: ai.Name + ": " + in.Name, Kind: mimir.KindText,
+			Filename: in.Filename, Text: in.Text, ContentBase64: in.ContentBase64})
 		if err != nil {
 			return Material{}, err
 		}

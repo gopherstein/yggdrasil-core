@@ -561,7 +561,14 @@ export const api = {
 
   listKnowledge: () => request<KnowledgeSource[]>('/api/v1/knowledge/sources'),
 
-  createKnowledge: (body: { name?: string; kind: 'path' | 'text'; path?: string; filename?: string; text?: string }) =>
+  createKnowledge: (body: {
+    name?: string
+    kind: 'path' | 'text'
+    path?: string
+    filename?: string
+    text?: string
+    content_base64?: string
+  }) =>
     request<KnowledgeSource>('/api/v1/knowledge/sources', { method: 'POST', body: JSON.stringify(body) }),
 
   updateKnowledge: (id: string, body: { name?: string; text?: string }) =>
@@ -585,10 +592,10 @@ export const api = {
   baseModels: (goal: string) =>
     request<BaseModelChoice[]>(`/api/v1/training/base-models?goal=${encodeURIComponent(goal)}`),
 
-  classifyMaterial: (filename: string, text: string, use?: MaterialUse) =>
+  classifyMaterial: (filename: string, text: string, use?: MaterialUse, contentBase64?: string) =>
     request<ClassifyResult>('/api/v1/training/classify', {
       method: 'POST',
-      body: JSON.stringify({ filename, text, use }),
+      body: JSON.stringify({ filename, text, use, content_base64: contentBase64 }),
     }),
 
   listAIs: () => request<SpecializedAI[]>('/api/v1/training/ais'),
@@ -609,7 +616,7 @@ export const api = {
 
   deleteAI: (id: string) => request<null>(`/api/v1/training/ais/${id}`, { method: 'DELETE' }),
 
-  addMaterial: (id: string, body: { name?: string; filename: string; text: string; use?: MaterialUse }) =>
+  addMaterial: (id: string, body: { name?: string; filename: string; text: string; use?: MaterialUse; content_base64?: string }) =>
     request<TrainingMaterial>(`/api/v1/training/ais/${id}/materials`, { method: 'POST', body: JSON.stringify(body) }),
 
   deleteMaterial: (id: string, materialId: string) =>

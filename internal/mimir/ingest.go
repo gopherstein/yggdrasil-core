@@ -26,7 +26,39 @@ const (
 )
 
 // SupportedExtensions are the file types Mimir reads.
-var SupportedExtensions = []string{".txt", ".md", ".markdown", ".csv", ".tsv", ".json", ".jsonl", ".html", ".htm"}
+var SupportedExtensions = []string{".txt", ".md", ".markdown", ".csv", ".tsv", ".json", ".jsonl", ".html", ".htm", ".xlsx"}
+
+// Editable reports whether a source file is text that can be edited in place.
+func Editable(filename string) bool {
+	switch strings.ToLower(filepath.Ext(filename)) {
+	case ".xlsx":
+		return false
+	}
+	return true
+}
+
+// FirstSheetAsCSV renders the first sheet with data in an .xlsx workbook as
+// CSV text, so the training classifier reads spreadsheets like CSV exports.
+func FirstSheetAsCSV(name string, raw []byte) (string, error) {
+	docs, err := parseXLSX(name, raw)
+	if err != nil {
+		return "", err
+	}
+	var b strings.Builder
+	w := csv.NewWriter(&b)
+	for _, d := range docs {
+		if d.Header == nil {
+			continue
+		}
+		_ = w.Write(d.Header)
+		for _, r := range d.Rows {
+			_ = w.Write(r)
+		}
+		break
+	}
+	w.Flush()
+	return b.String(), w.Error()
+}
 
 func supported(path string) bool {
 	ext := strings.ToLower(filepath.Ext(path))
@@ -135,6 +167,14 @@ func readSource(path string) ([]document, error) {
 			return nil, err
 		}
 		name, _ := filepath.Rel(root, f)
+		if strings.EqualFold(filepath.Ext(name), ".xlsx") {
+			sheets, err := parseXLSX(name, raw)
+			if err != nil {
+				return nil, fmt.Errorf("%s: %w", name, err)
+			}
+			docs = append(docs, sheets...)
+			continue
+		}
 		doc, err := parseDocument(name, raw)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", name, err)

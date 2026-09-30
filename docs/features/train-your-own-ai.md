@@ -4,7 +4,7 @@
 
 Implemented for Apple Silicon. This document is the V1 specification; the notes below record how it was built and what is still open.
 
-- **Knowledge** is Mimir (`internal/mimir`), a new subsystem shared with profiles. It indexes files, folders, and pasted content with SQLite FTS5 keyword search. A table row is one passage labelled with its columns, so a lookup by SKU or size finds that row. File and folder sources reindex when their files change.
+- **Knowledge** is Mimir (`internal/mimir`), a new subsystem shared with profiles. The Train page and the Profiles editor attach existing sources, files, or folders. It indexes files, folders, and pasted content with SQLite FTS5 keyword search. A table row is one passage labelled with its columns, so a lookup by SKU or size finds that row. File and folder sources reindex when their files change.
 - **Base models** are the catalog GGUFs with a `training` block: the Hugging Face weights the GGUF was converted from, a 4-bit MLX copy for QLoRA, license, and shape. Twelve Qwen 2.5, Llama 3.2, DeepSeek R1 distill, and Mistral models are trainable.
 - **Trainer** is `training.Trainer`. The MLX backend runs mlx-lm in a Python environment the daemon installs with uv (`internal/pyenv`), then writes the adapter as a GGUF LoRA. The PEFT backend is registered but reports that NVIDIA training is not available yet.
 - **Serving**: llama-server loads each deployed adapter for a base model at scale 0, and every request sets the scales, so the base model and each specialized AI share one process. llama-server applies a loaded adapter when a request omits the scale, so the client always sends it.
@@ -15,7 +15,7 @@ Open items:
 
 - Training runs on the computer running Yggdrasil. Other computers are listed with their fit, but Norn does not send training to them yet.
 - NVIDIA training (PEFT) is not implemented.
-- Mimir has no embedding search, PDF, or spreadsheet (`.xlsx`) reader yet.
+- Mimir has no embedding search or PDF reader yet. Excel workbooks (`.xlsx`) are read without a new dependency: each sheet is a table, and training reads the first sheet as a Q&A table when it has question and answer columns.
 - Merging an adapter into a standalone GGUF is not offered.
 - Store builds of the desktop app cannot run a downloaded Python, so training needs the Core daemon.
 

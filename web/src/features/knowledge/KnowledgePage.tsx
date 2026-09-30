@@ -2,10 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { api } from '@/lib/api'
+import { isBinaryUpload, readUpload, UPLOAD_ACCEPT } from '@/lib/upload'
 import type { KnowledgeSource } from '@/types/api'
 import { errorText } from '@/features/train/display'
 
-const ACCEPT = '.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm'
 
 export function KnowledgePage() {
   const queryClient = useQueryClient()
@@ -29,7 +29,7 @@ export function KnowledgePage() {
           {!sources.isLoading && list.length === 0 && (
             <EmptyState
               title="No knowledge connected"
-              description="Connect a file or folder on this computer, or paste content. CSV, TSV, JSON, JSONL, Markdown, text, and HTML files work."
+              description="Connect a file or folder on this computer, or paste content. Excel, CSV, TSV, JSON, JSONL, Markdown, text, and HTML files work."
             />
           )}
           <ul className="space-y-2">
@@ -81,7 +81,7 @@ function SourceRow({ source, onChanged }: { source: KnowledgeSource; onChanged: 
           {source.error && <p className="mt-1 text-xs text-danger">{source.error}</p>}
         </div>
         <div className="flex shrink-0 gap-1.5">
-          {source.kind === 'text' && draft == null && (
+          {source.kind === 'text' && draft == null && !isBinaryUpload(source.filename ?? '') && (
             <button type="button" className="btn-secondary px-2 py-1 text-xs" disabled={open.isPending} onClick={() => open.mutate()}>
               Edit
             </button>
@@ -128,16 +128,24 @@ function AddSource({ onAdded }: { onAdded: () => void }) {
   const [name, setName] = useState('')
   const [filename, setFilename] = useState('')
   const [text, setText] = useState('')
+  const [binary, setBinary] = useState<string | null>(null)
   const add = useMutation({
     mutationFn: () =>
       mode === 'path'
         ? api.createKnowledge({ kind: 'path', path, name: name || undefined })
-        : api.createKnowledge({ kind: 'text', filename: filename || 'pasted.txt', text, name: name || undefined }),
+        : api.createKnowledge({
+            kind: 'text',
+            filename: filename || 'pasted.txt',
+            text,
+            content_base64: binary ?? undefined,
+            name: name || undefined,
+          }),
     onSuccess: () => {
       setPath('')
       setName('')
       setFilename('')
       setText('')
+      setBinary(null)
       onAdded()
     },
   })
@@ -164,13 +172,15 @@ function AddSource({ onAdded }: { onAdded: () => void }) {
             Choose a file
             <input
               type="file"
-              accept={ACCEPT}
+              accept={UPLOAD_ACCEPT}
               className="sr-only"
               onChange={async (e) => {
                 const f = e.target.files?.[0]
                 if (!f) return
-                setFilename(f.name)
-                setText(await f.text())
+                const upload = await readUpload(f)
+                setFilename(upload.filename)
+                setText(upload.text ?? '')
+                setBinary(upload.contentBase64 ?? null)
               }}
             />
           </label>
@@ -187,7 +197,7 @@ function AddSource({ onAdded }: { onAdded: () => void }) {
       <button
         type="button"
         className="btn-primary px-3 py-1.5 text-sm"
-        disabled={add.isPending || (mode === 'path' ? !path.trim() : !text.trim())}
+        disabled={add.isPending || (mode === 'path' ? !path.trim() : !text.trim() && !binary)}
         onClick={() => add.mutate()}
       >
         {add.isPending ? 'Indexing…' : 'Connect'}

@@ -102,12 +102,18 @@ func (s *Server) handleClassifyMaterial(w http.ResponseWriter, r *http.Request) 
 		Filename string `json:"filename"`
 		Text     string `json:"text"`
 		// Use, when set, previews the warning for that choice.
-		Use training.Use `json:"use,omitempty"`
+		Use           training.Use `json:"use,omitempty"`
+		ContentBase64 string       `json:"content_base64,omitempty"`
 	}
 	if !decodeBody(w, r, &in) {
 		return
 	}
-	rec := s.training.Classify(in.Filename, in.Text)
+	name, text, err := training.MaterialText(in.Filename, in.Text, in.ContentBase64)
+	if err != nil {
+		writeTrainingErr(w, err)
+		return
+	}
+	rec := s.training.Classify(name, text)
 	out := map[string]any{"recommendation": rec}
 	use := in.Use
 	if use == "" {

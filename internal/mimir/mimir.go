@@ -7,6 +7,7 @@ package mimir
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"os"
@@ -68,6 +69,23 @@ type CreateInput struct {
 	// extension of Filename picks the reader (for example .csv).
 	Filename string `json:"filename,omitempty"`
 	Text     string `json:"text,omitempty"`
+	// ContentBase64 carries binary uploads such as .xlsx, in place of Text.
+	ContentBase64 string `json:"content_base64,omitempty"`
+}
+
+// uploadBytes returns an upload's content, decoding base64 when set.
+func (in CreateInput) uploadBytes() ([]byte, error) {
+	if in.ContentBase64 == "" {
+		return []byte(in.Text), nil
+	}
+	if base64.StdEncoding.DecodedLen(len(in.ContentBase64)) > MaxTextBytes {
+		return nil, fmt.Errorf("the file is larger than %d MB; connect it from disk instead", MaxTextBytes>>20)
+	}
+	b, err := base64.StdEncoding.DecodeString(in.ContentBase64)
+	if err != nil {
+		return nil, fmt.Errorf("the upload is not valid base64")
+	}
+	return b, nil
 }
 
 // Store indexes and searches knowledge sources.
@@ -110,7 +128,7 @@ func (s *Store) Create(ctx context.Context, in CreateInput) (Source, error) {
 			in.Name = filepath.Base(abs)
 		}
 	case KindText:
-		if strings.TrimSpace(in.Text) == "" {
+		if strings.TrimSpace(in.Text) == "" && in.ContentBase64 == "" {
 			return Source{}, fmt.Errorf("the content is empty")
 		}
 		if len(in.Text) > MaxTextBytes {
@@ -135,7 +153,14 @@ func (s *Store) Create(ctx context.Context, in CreateInput) (Source, error) {
 		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 			return Source{}, err
 		}
-		if err := os.WriteFile(path, []byte(in.Text), 0o600); err != nil {
+		content, err := in.uploadBytes()
+		if err != nil {
+			return Source{}, err
+		}
+		if len(content) == 0 {
+			return Source{}, fmt.Errorf("the content is empty")
+		}
+		if err := os.WriteFile(path, content, 0o600); err != nil {
 			return Source{}, err
 		}
 	}
@@ -182,6 +207,9 @@ func (s *Store) Update(ctx context.Context, id string, in UpdateInput) (Source, 
 		if src.Kind != KindText {
 			return Source{}, fmt.Errorf("edit the files on disk; this source refreshes from %s", src.Path)
 		}
+		if !Editable(src.Filename) {
+			return Source{}, fmt.Errorf("%s is not a text file; upload a new copy to change it", src.Filename)
+		}
 		if len(*in.Text) > MaxTextBytes {
 			return Source{}, fmt.Errorf("the content is larger than %d MB", MaxTextBytes>>20)
 		}
@@ -203,6 +231,9 @@ func (s *Store) Content(ctx context.Context, id string) (string, error) {
 	}
 	if src.Kind != KindText {
 		return "", fmt.Errorf("this source is read from %s; edit the files there", src.Path)
+	}
+	if !Editable(src.Filename) {
+		return "", fmt.Errorf("%s is not a text file; upload a new copy to change it", src.Filename)
 	}
 	b, err := os.ReadFile(src.file)
 	return string(b), err

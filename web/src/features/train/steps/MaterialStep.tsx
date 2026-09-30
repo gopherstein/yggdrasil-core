@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
+import { MAX_UPLOAD_BYTES, readUpload, UPLOAD_ACCEPT } from '@/lib/upload'
 import type { ClassifyResult, MaterialUse, SpecializedAIView, TrainingMaterial } from '@/types/api'
 import { ConceptCards } from '../ConceptCards'
 import { SampleFiles } from '../SampleFiles'
 import { errorText, useDescriptions, useLabels } from '../display'
 
-const ACCEPT = '.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm'
 
 export function UseBadge({ use }: { use: MaterialUse }) {
   const tone =
@@ -50,13 +50,15 @@ function AddFile({ aiID }: { aiID: string }) {
   const queryClient = useQueryClient()
   const [filename, setFilename] = useState('')
   const [text, setText] = useState('')
+  // A spreadsheet upload replaces the text box; its content is sent as base64.
+  const [binary, setBinary] = useState<string | null>(null)
   const [use, setUse] = useState<MaterialUse | null>(null)
   const [preview, setPreview] = useState<ClassifyResult | null>(null)
   const [readError, setReadError] = useState('')
 
   const effectiveName = filename || 'pasted.txt'
   const classify = useMutation({
-    mutationFn: (choice?: MaterialUse) => api.classifyMaterial(effectiveName, text, choice),
+    mutationFn: (choice?: MaterialUse) => api.classifyMaterial(effectiveName, text, choice, binary ?? undefined),
     onSuccess: (res) => {
       if (!res) return
       setPreview(res)
@@ -64,9 +66,11 @@ function AddFile({ aiID }: { aiID: string }) {
     },
   })
   const add = useMutation({
-    mutationFn: () => api.addMaterial(aiID, { filename: effectiveName, text, use: use ?? undefined }),
+    mutationFn: () =>
+      api.addMaterial(aiID, { filename: effectiveName, text, use: use ?? undefined, content_base64: binary ?? undefined }),
     onSuccess: () => {
       setText('')
+      setBinary(null)
       setFilename('')
       setPreview(null)
       setUse(null)
@@ -76,23 +80,25 @@ function AddFile({ aiID }: { aiID: string }) {
 
   // Re-check the recommendation after the content settles.
   useEffect(() => {
-    if (!text.trim()) {
+    if (!text.trim() && !binary) {
       setPreview(null)
       return
     }
     const t = setTimeout(() => classify.mutate(undefined), 400)
     return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, filename])
+  }, [text, filename, binary])
 
   async function readFile(file: File) {
     setReadError('')
-    if (file.size > 20 * 1024 * 1024) {
+    if (file.size > MAX_UPLOAD_BYTES) {
       setReadError('That file is larger than 20 MB. Connect it from Knowledge instead, which reads it from disk.')
       return
     }
-    setFilename(file.name)
-    setText(await file.text())
+    const upload = await readUpload(file)
+    setFilename(upload.filename)
+    setText(upload.text ?? '')
+    setBinary(upload.contentBase64 ?? null)
   }
 
   const rec = preview?.recommendation
@@ -101,12 +107,20 @@ function AddFile({ aiID }: { aiID: string }) {
       <div className="flex flex-wrap items-center gap-2">
         <label className="btn-secondary cursor-pointer px-3 py-1.5 text-xs">
           Choose a file
-          <input type="file" accept={ACCEPT} className="sr-only" onChange={(e) => e.target.files?.[0] && void readFile(e.target.files[0])} />
+          <input type="file" accept={UPLOAD_ACCEPT} className="sr-only" onChange={(e) => e.target.files?.[0] && void readFile(e.target.files[0])} />
         </label>
         <span className="text-xs text-ink-faint">
-          {filename ? filename : 'or paste below. JSONL chats, Q&A tables, CSV, Markdown, and text work.'}
+          {filename ? filename : 'or paste below. JSONL chats, Q&A tables, CSV, Excel, Markdown, and text work.'}
         </span>
       </div>
+      {binary ? (
+        <p className="rounded-lg bg-raised p-3 text-sm text-ink-muted">
+          Spreadsheet {filename} is ready. Yggdrasil reads the first sheet to classify it.{' '}
+          <button type="button" className="underline" onClick={() => { setBinary(null); setFilename('') }}>
+            Clear
+          </button>
+        </p>
+      ) : (
       <textarea
         className="field min-h-36 w-full font-mono text-xs"
         value={text}
@@ -114,6 +128,7 @@ function AddFile({ aiID }: { aiID: string }) {
         placeholder={'Q: A question your AI should handle\nA: The answer you want it to give\n\nQ: …'}
         aria-label="Material"
       />
+      )}
       {readError && <p className="text-sm text-danger">{readError}</p>}
       {rec && (
         <div className="rounded-lg bg-raised p-3 text-sm">
@@ -159,7 +174,7 @@ function AddFile({ aiID }: { aiID: string }) {
       <button
         type="button"
         className="btn-primary px-3 py-1.5 text-sm"
-        disabled={!text.trim() || !preview || Boolean(preview.error) || add.isPending}
+        disabled={(!text.trim() && !binary) || !preview || Boolean(preview.error) || add.isPending}
         onClick={() => add.mutate()}
       >
         {add.isPending ? 'Adding…' : 'Add material'}

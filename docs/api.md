@@ -72,6 +72,7 @@ Prefix: `/api/v1`
 | GET, POST | `/benchmarks` | List or start a benchmark |
 | GET, POST | `/knowledge/sources` | Connected knowledge (Mimir). Also `GET/PATCH/DELETE /knowledge/sources/{id}` and `POST /knowledge/sources/{id}/refresh` |
 | POST | `/knowledge/search` | Passages that match a question |
+| | | Uploads send `text`, or `content_base64` for binary files such as `.xlsx`. The same field works for `/training/classify` and `/training/ais/{id}/materials`. |
 | GET | `/knowledge/sources/{id}/content` | The copy kept for a pasted or uploaded source |
 | GET, POST | `/training/ais` | Specialized AIs. Also `GET/PATCH/DELETE /training/ais/{id}` |
 | POST | `/training/classify` | Recommend Training, Knowledge, or Both for material, before it is added |
