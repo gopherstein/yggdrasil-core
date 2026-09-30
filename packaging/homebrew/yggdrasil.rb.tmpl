@@ -18,6 +18,9 @@ class Yggdrasil < Formula
   def install
     bin.install "yggdrasil-daemon"
     bin.install "yggctl"
+    bash_completion.install "completions/yggctl.bash" => "yggctl"
+    zsh_completion.install "completions/_yggctl"
+    fish_completion.install "completions/yggctl.fish"
     (share/"yggdrasil").install "web"
   end
 

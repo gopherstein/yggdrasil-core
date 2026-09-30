@@ -1,0 +1,61 @@
+#compdef yggctl
+# zsh completion for yggctl
+
+_yggctl() {
+  local -a commands
+  commands=(
+    'version:print the version, license, and source URL'
+    'about:print the version, license, and source URL'
+    'paths:print the data, model, runtime, log, and database directories'
+    'automations:manage scheduled automations on the daemon'
+    'completion:print a shell completion script'
+  )
+
+  if (( CURRENT == 2 )); then
+    _describe -t commands 'yggctl command' commands
+    return
+  fi
+
+  case "${words[2]}" in
+    completion)
+      (( CURRENT == 3 )) && _values 'shell' bash zsh fish
+      ;;
+    automations)
+      if (( CURRENT == 3 )); then
+        _values 'automations command' list get create update delete run pause resume
+        return
+      fi
+      case "${words[3]}" in
+        create|update)
+          local -a id
+          [[ "${words[3]}" == update ]] && id=('1:automation id:')
+          # _arguments reads words[1] as the command, so start at create or update.
+          shift 2 words
+          (( CURRENT -= 2 ))
+          _arguments $id \
+            '--name[automation name]:name:' \
+            '--prompt[prompt to run]:prompt:' \
+            '--profile[profile id]:profile:' \
+            '--model[installed model id]:model:' \
+            '--schedule[schedule kind]:schedule:(once daily weekly interval)' \
+            '--at[HH:MM or RFC3339]:time:' \
+            '--every[interval duration, such as 6h]:duration:' \
+            '--weekday[0-6, Sunday is 0]:weekday:(0 1 2 3 4 5 6)' \
+            '--zone[IANA time zone]:zone:' \
+            '*--tool[tool id allowed for this automation]:tool:' \
+            '--notify[notification mode]:mode:(always condition change none)' \
+            '--condition-kind[condition kind]:kind:(threshold available significant)' \
+            '--condition-op[condition operator]:op:(below above)' \
+            '--condition-value[threshold value]:value:' \
+            '--disabled[create the automation paused]'
+          ;;
+      esac
+      ;;
+  esac
+}
+
+if [[ "${funcstack[1]}" == "_yggctl" ]]; then
+  _yggctl "$@"
+else
+  compdef _yggctl yggctl
+fi

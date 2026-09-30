@@ -35,6 +35,11 @@ GOOS="${GOOS}" GOARCH="${GOARCH}" go build -trimpath -ldflags "${LDFLAGS}" \
 
 cp -R web/dist/. "${OUT_DIR}/web/"
 
+if [[ "${GOOS}" != "windows" ]]; then
+  mkdir -p "${OUT_DIR}/completions"
+  cp cmd/devctl/completions/* "${OUT_DIR}/completions/"
+fi
+
 # Linux desktop integration assets (hicolor + .desktop)
 if [[ "${GOOS}" == "linux" ]]; then
   mkdir -p "${OUT_DIR}/share/applications"
@@ -60,6 +65,9 @@ Then open:
 Optional:
   YGGDRASIL_WEB_UI_DIR=./web ./yggdrasil-daemon${EXT}
   YGGDRASIL_API_HOST=0.0.0.0 ./yggdrasil-daemon${EXT}   # LAN bind (explicit)
+
+Shell completion for yggctl (bash, zsh, fish):
+  completions/   # or print one with: ./yggctl completion <bash|zsh|fish>
 
 Linux icon theme (if included):
   share/icons/hicolor/<size>/apps/yggdrasil.png

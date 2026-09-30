@@ -36,6 +36,8 @@ build_binaries() {
   CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" go build -trimpath -ldflags "$LDFLAGS" \
     -o "$dest/yggctl" ./cmd/devctl
   cp -R web/dist/. "$dest/web/"
+  mkdir -p "$dest/completions"
+  cp cmd/devctl/completions/* "$dest/completions/"
 }
 
 package_linux() {
@@ -69,6 +71,17 @@ contents:
   - src: ${ROOT}/${stage}/web
     dst: /usr/share/yggdrasil/web
     type: tree
+  - src: ${ROOT}/cmd/devctl/completions/yggctl.bash
+    dst: /usr/share/bash-completion/completions/yggctl
+  - src: ${ROOT}/cmd/devctl/completions/yggctl.fish
+    dst: /usr/share/fish/vendor_completions.d/yggctl.fish
+  # Debian and Fedora put packaged zsh completions in different fpath directories.
+  - src: ${ROOT}/cmd/devctl/completions/_yggctl
+    dst: /usr/share/zsh/vendor-completions/_yggctl
+    packager: deb
+  - src: ${ROOT}/cmd/devctl/completions/_yggctl
+    dst: /usr/share/zsh/site-functions/_yggctl
+    packager: rpm
   - src: ${ROOT}/packaging/linux/yggdrasil.service
     dst: /usr/lib/systemd/system/yggdrasil.service
 scripts:

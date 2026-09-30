@@ -222,9 +222,28 @@ yggdrasil-daemon -version
 yggctl version
 yggctl about
 yggctl paths
+yggctl automations list
 ```
 
 `yggctl version` and `yggctl about` print the version, the AGPL license, the source URL, and the commit. `yggdrasil-daemon -version` prints that notice and exits. `yggctl paths` prints the data, model, runtime, log, and database directories. Status, nodes, and models are HTTP routes under `/api/v1/`. A fuller CLI is on the [roadmap](ROADMAP.md). `yggdrasil-daemon -data-dir /path/to/dir` overrides the data directory.
+
+### Shell completion
+
+`yggctl` completes its commands in bash, zsh, and fish. Homebrew and the deb and rpm packages install the completion files, so a new shell picks them up. Bash needs the `bash-completion` package. The macOS and Linux archives carry the same files in `completions/`.
+
+A source build prints the script for your shell:
+
+```bash
+# bash, in ~/.bashrc
+eval "$(yggctl completion bash)"
+
+# zsh. Add fpath=(~/.zfunc $fpath) before compinit in ~/.zshrc, then start a new shell.
+mkdir -p ~/.zfunc
+yggctl completion zsh > ~/.zfunc/_yggctl
+
+# fish
+yggctl completion fish > ~/.config/fish/completions/yggctl.fish
+```
 
 ## Configuration
 

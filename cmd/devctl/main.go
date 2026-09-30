@@ -28,6 +28,11 @@ func main() {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
+	case "completion":
+		if err := completionCommand(os.Args[2:], os.Stdout); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(2)
+		}
 	default:
 		usage()
 		os.Exit(2)
@@ -35,5 +40,5 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "usage: yggctl <version|about|paths|automations>\n")
+	fmt.Fprintf(os.Stderr, "usage: yggctl <version|about|paths|automations|completion>\n")
 }

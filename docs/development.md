@@ -19,7 +19,7 @@ make start
 
 `make` with no target prints `make help`. `make start` installs web dependencies, writes `web/dist`, builds `bin/yggdrasil-daemon` and `bin/yggctl`, and runs the daemon with `YGGDRASIL_WEB_UI_DIR` set to `web/dist`. Open `http://127.0.0.1:7331`.
 
-`make daemon` stamps the current git commit into both binaries. A build from this tree reports `0.1.0-dev` unless `-ldflags` sets `internal/version.Version`. `yggctl version` and `yggdrasil-daemon -version` print the license and the corresponding-source URL. Release packaging sets the version as well, so a tagged build points at `tree/v<version>`.
+`make daemon` stamps the current git commit into both binaries. A build from this tree reports `0.1.0-dev` unless `-ldflags` sets `internal/version.Version`. `yggctl version` and `yggdrasil-daemon -version` print the license and the corresponding-source URL. `yggctl completion <bash|zsh|fish>` prints the completion scripts in `cmd/devctl/completions/`, which the packages also install. Update those scripts when you add a `yggctl` command. Release packaging sets the version as well, so a tagged build points at `tree/v<version>`.
 
 A fork that serves a modified daemon over the network sets its own source URL at build time:
 

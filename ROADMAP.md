@@ -18,7 +18,6 @@ This list is directional. It is not a commitment and it has no dates. Shipped be
 - try the Windows amd64 archive on a clean Windows machine
 - code signing for core release artifacts
 - a `yggctl` that can show status, nodes, and models (today it prints version and paths)
-- shell completion for `yggctl`
 - forward temperature, max token limits, and prior messages through `/v1/chat/completions`
 - TLS or mTLS for remote API access. A bearer token on plain HTTP does not encrypt traffic.
 - Windows llama.cpp install that can select a GPU build when one exists

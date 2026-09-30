@@ -12,6 +12,7 @@ Each package installs:
 
 - `/usr/bin/yggdrasil-daemon`
 - `/usr/bin/yggctl`
+- bash, zsh, and fish completion for `yggctl`
 - `/usr/share/yggdrasil/web`
 - a systemd service, `yggdrasil.service`
 
