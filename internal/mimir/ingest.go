@@ -26,12 +26,12 @@ const (
 )
 
 // SupportedExtensions are the file types Mimir reads.
-var SupportedExtensions = []string{".txt", ".md", ".markdown", ".csv", ".tsv", ".json", ".jsonl", ".html", ".htm", ".xlsx"}
+var SupportedExtensions = []string{".txt", ".md", ".markdown", ".csv", ".tsv", ".json", ".jsonl", ".html", ".htm", ".xlsx", ".pdf"}
 
 // Editable reports whether a source file is text that can be edited in place.
 func Editable(filename string) bool {
 	switch strings.ToLower(filepath.Ext(filename)) {
-	case ".xlsx":
+	case ".xlsx", ".pdf":
 		return false
 	}
 	return true
@@ -167,12 +167,19 @@ func readSource(path string) ([]document, error) {
 			return nil, err
 		}
 		name, _ := filepath.Rel(root, f)
-		if strings.EqualFold(filepath.Ext(name), ".xlsx") {
-			sheets, err := parseXLSX(name, raw)
+		var multi func(string, []byte) ([]document, error)
+		switch strings.ToLower(filepath.Ext(name)) {
+		case ".xlsx":
+			multi = parseXLSX
+		case ".pdf":
+			multi = parsePDF
+		}
+		if multi != nil {
+			parts, err := multi(name, raw)
 			if err != nil {
 				return nil, fmt.Errorf("%s: %w", name, err)
 			}
-			docs = append(docs, sheets...)
+			docs = append(docs, parts...)
 			continue
 		}
 		doc, err := parseDocument(name, raw)

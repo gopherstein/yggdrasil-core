@@ -29,7 +29,7 @@ export function KnowledgePage() {
           {!sources.isLoading && list.length === 0 && (
             <EmptyState
               title="No knowledge connected"
-              description="Connect a file or folder on this computer, or paste content. Excel, CSV, TSV, JSON, JSONL, Markdown, text, and HTML files work."
+              description="Connect a file or folder on this computer, or paste content. PDF, Excel, CSV, TSV, JSON, JSONL, Markdown, text, and HTML files work."
             />
           )}
           <ul className="space-y-2">

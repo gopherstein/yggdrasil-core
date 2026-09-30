@@ -15,7 +15,7 @@ Open items:
 
 - Training runs on the computer running Yggdrasil. Other computers are listed with their fit, but Norn does not send training to them yet.
 - NVIDIA training (PEFT) is not implemented.
-- Mimir has no embedding search or PDF reader yet. Excel workbooks (`.xlsx`) are read without a new dependency: each sheet is a table, and training reads the first sheet as a Q&A table when it has question and answer columns.
+- Mimir has no embedding search yet. PDFs with a text layer are read with the pure-Go `github.com/ledongthuc/pdf` (BSD-3); scanned PDFs need OCR first. Excel workbooks (`.xlsx`) are read without a new dependency: each sheet is a table, and training reads the first sheet as a Q&A table when it has question and answer columns.
 - Merging an adapter into a standalone GGUF is not offered.
 - Store builds of the desktop app cannot run a downloaded Python, so training needs the Core daemon.
 

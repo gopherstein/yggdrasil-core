@@ -110,12 +110,15 @@ function AddFile({ aiID }: { aiID: string }) {
           <input type="file" accept={UPLOAD_ACCEPT} className="sr-only" onChange={(e) => e.target.files?.[0] && void readFile(e.target.files[0])} />
         </label>
         <span className="text-xs text-ink-faint">
-          {filename ? filename : 'or paste below. JSONL chats, Q&A tables, CSV, Excel, Markdown, and text work.'}
+          {filename ? filename : 'or paste below. JSONL chats, Q&A tables, CSV, Excel, PDF, Markdown, and text work.'}
         </span>
       </div>
       {binary ? (
         <p className="rounded-lg bg-raised p-3 text-sm text-ink-muted">
-          Spreadsheet {filename} is ready. Yggdrasil reads the first sheet to classify it.{' '}
+          {filename} is ready.{' '}
+          {filename.toLowerCase().endsWith('.pdf')
+            ? 'Yggdrasil reads its text to classify it.'
+            : 'Yggdrasil reads the first sheet to classify it.'}{' '}
           <button type="button" className="underline" onClick={() => { setBinary(null); setFilename('') }}>
             Clear
           </button>

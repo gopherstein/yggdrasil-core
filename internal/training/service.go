@@ -407,6 +407,12 @@ func MaterialText(filename, text, contentBase64 string) (string, string, error) 
 			return "", "", err
 		}
 		return strings.TrimSuffix(filename, filepath.Ext(filename)) + ".csv", csvText, nil
+	case ".pdf":
+		text, err := mimir.PDFText(filename, raw)
+		if err != nil {
+			return "", "", err
+		}
+		return strings.TrimSuffix(filename, filepath.Ext(filename)) + ".txt", text, nil
 	}
 	return filename, string(raw), nil
 }

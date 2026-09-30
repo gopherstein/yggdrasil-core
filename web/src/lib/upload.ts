@@ -1,7 +1,7 @@
 /** File types knowledge and training material accept. */
-export const UPLOAD_ACCEPT = '.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm,.xlsx'
+export const UPLOAD_ACCEPT = '.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm,.xlsx,.pdf'
 
-const BINARY = ['.xlsx']
+const BINARY = ['.xlsx', '.pdf']
 
 export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 

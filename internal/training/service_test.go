@@ -495,4 +495,12 @@ func TestSpreadsheetMaterial(t *testing.T) {
 	if _, err := h.kb.Content(ctx, inv.KnowledgeSourceID); err == nil {
 		t.Fatal("a workbook copy must not be editable as text")
 	}
+	raw, err := os.ReadFile("../mimir/testdata/warranty.pdf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	doc, err := h.svc.AddMaterial(ctx, ai.ID, MaterialInput{Filename: "warranty.pdf", ContentBase64: base64.StdEncoding.EncodeToString(raw)})
+	if err != nil || doc.Use != UseKnowledge || doc.KnowledgeSourceID == "" {
+		t.Fatalf("pdf material = %+v %v", doc, err)
+	}
 }
