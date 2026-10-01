@@ -18,6 +18,8 @@ import {
   teamBestAt,
 } from './nodePresentation'
 import { RealmKicker } from '@/components/ui/Realm'
+import { Ratatoskr } from '@/components/ui/Ratatoskr'
+import { useMascotState } from '@/lib/ratatoskr/useMascotState'
 
 function errorMessage(err: unknown): string {
   if (err instanceof ApiError) return err.message
@@ -425,7 +427,18 @@ export function NodesPage() {
     },
   })
 
+  // Ratatoskr carries a deploy to the other computers until a download
+  // finishes or fails, and celebrates a pairing or a finished download.
+  const [delivering, setDelivering] = useState(false)
+  const eventMascot = useMascotState({ react: ['success', 'error'] })
+  useEffect(() => {
+    if (eventMascot === 'success' || eventMascot === 'error') setDelivering(false)
+  }, [eventMascot])
+  const headerMascot = delivering ? 'deliver' : eventMascot === 'success' ? 'success' : null
+
   const deployMutation = useMutation({
+    onMutate: () => setDelivering(true),
+    onError: () => setDelivering(false),
     mutationFn: async ({ modelId, nodeIds }: { modelId: string; nodeIds: string[] }) => {
       const errors: string[] = []
       for (const nodeId of nodeIds) {
@@ -521,6 +534,7 @@ export function NodesPage() {
         >
           {refreshMutation.isPending ? 'Scanning…' : 'Find computers'}
         </button>
+        {headerMascot ? <Ratatoskr state={headerMascot} size={96} className="order-first sm:order-none" /> : null}
       </header>
 
       {fleet.length > 0 && (

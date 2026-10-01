@@ -8,6 +8,7 @@ import { formatBytes } from '@/lib/format'
 import type { LogEntry, Node } from '@/types/api'
 import { useUIStore } from '@/stores/uiStore'
 import { RealmKicker } from '@/components/ui/Realm'
+import { Ratatoskr } from '@/components/ui/Ratatoskr'
 
 function kindLabel(kind: string, advanced: boolean): string {
   if (!advanced) {
@@ -468,12 +469,15 @@ export function DiagnosticsPage() {
   return (
     <div className="mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-6">
       <header className="page-header flex min-w-0 flex-wrap items-end justify-between gap-3">
-        <div className="min-w-0">
-          <RealmKicker />
-          <h1 className="page-title">
-            Yggdrasil health
-          </h1>
-          <p className="page-subtitle">{headline}</p>
+        <div className="flex min-w-0 items-center gap-4">
+          {!serviceOk ? <Ratatoskr state="error" size={96} /> : null}
+          <div className="min-w-0">
+            <RealmKicker />
+            <h1 className="page-title">
+              Yggdrasil health
+            </h1>
+            <p className="page-subtitle">{headline}</p>
+          </div>
         </div>
         <div className="shrink-0 text-right">
           <button

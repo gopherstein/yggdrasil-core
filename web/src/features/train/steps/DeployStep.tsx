@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { Ratatoskr } from '@/components/ui/Ratatoskr'
 import { api } from '@/lib/api'
+import { useMascotState } from '@/lib/ratatoskr/useMascotState'
 import type { SpecializedAIView } from '@/types/api'
 import { errorText } from '../display'
 
@@ -11,11 +13,16 @@ export function DeployStep({ view }: { view: SpecializedAIView }) {
   }
   const deploy = useMutation({ mutationFn: (rev: number) => api.deployRevision(view.id, rev), onSuccess: refresh })
   const undeploy = useMutation({ mutationFn: () => api.undeployAI(view.id), onSuccess: refresh })
+  // Ratatoskr celebrates a deploy once, then stays beside it.
+  const mascot = useMascotState({ react: [], celebrate: deploy.isSuccess ? deploy.submittedAt : undefined })
 
   return (
     <div className="space-y-4">
       <div className="card space-y-3">
-        <h3 className="section-title">Deploy</h3>
+        <div className="flex items-center gap-3">
+          {deploy.isSuccess ? <Ratatoskr state={mascot} size={64} /> : null}
+          <h3 className="section-title">Deploy</h3>
+        </div>
         <p className="text-sm text-ink-muted">
           A deployed AI appears in the Chat model menu and in the API. It keeps its base model, adapter revision,
           instructions, and connected knowledge together. The base model stays available on its own.

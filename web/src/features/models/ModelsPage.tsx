@@ -18,6 +18,8 @@ import { needsTightFitInstallWarning } from './modelPresentation'
 import { RunningTab } from './RunningTab'
 import { TightFitDialog } from './TightFitDialog'
 import { RealmKicker } from '@/components/ui/Realm'
+import { Ratatoskr } from '@/components/ui/Ratatoskr'
+import { useMascotState } from '@/lib/ratatoskr/useMascotState'
 
 type Tab = 'discover' | 'installed' | 'running'
 
@@ -40,6 +42,12 @@ export function ModelsPage() {
   const queryClient = useQueryClient()
   const advancedMode = useUIStore((s) => s.advancedMode)
   const [tab, setTab] = useState<Tab>('discover')
+  // The model that just finished downloading, for Ratatoskr's "ready" note.
+  const [justInstalled, setJustInstalled] = useState<string | null>(null)
+  const downloadMascot = useMascotState({
+    react: ['success'],
+    accept: (event) => event.type === 'model.download.completed',
+  })
   const [search, setSearch] = useState('')
   const [browseOpen, setBrowseOpen] = useState(false)
   const [target, setTarget] = useState<ModelsTarget>('local')
@@ -106,6 +114,8 @@ export function ModelsPage() {
           event.type === 'model.download.started'
         ) {
           const modelId = event.payload?.model_id as string | undefined
+          if (modelId && event.type === 'model.download.completed') setJustInstalled(modelId)
+          if (modelId && event.type === 'model.download.started') setJustInstalled(null)
           if (modelId && event.type !== 'model.download.started') {
             setDownloadProgress((current) => {
               const next = { ...current }
@@ -249,6 +259,18 @@ export function ModelsPage() {
           />
         )}
       </div>
+
+      {justInstalled && tab !== 'running' ? (
+        <div role="status" className="flex items-center gap-3 rounded-xl bg-success/10 px-4 py-2 text-sm text-ink animate-fade">
+          <Ratatoskr state={downloadMascot === 'success' ? 'success' : 'idle'} size={64} />
+          <span className="min-w-0 flex-1">
+            {models.find((m) => m.id === justInstalled)?.display_name ?? 'The model'} finished downloading and is ready to use.
+          </span>
+          <button type="button" className="text-xs text-ink-faint hover:text-ink" onClick={() => setJustInstalled(null)}>
+            Dismiss
+          </button>
+        </div>
+      ) : null}
 
       {modelsQuery.isLoading && <LoadingSpinner label="Loading model library…" />}
 
