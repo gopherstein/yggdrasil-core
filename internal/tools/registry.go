@@ -39,7 +39,17 @@ type Registry struct {
 	pending  map[string]*PendingCall
 	disabled map[string]struct{}
 	activity []Activity
-	mu       sync.Mutex
+	// observe, when set, hears each call just before it runs, such as to
+	// record what leaves this computer (§63).
+	observe func(ctx context.Context, toolID string, args map[string]any)
+	mu      sync.Mutex
+}
+
+// SetObserver sets a function that hears each call just before it runs.
+func (r *Registry) SetObserver(f func(ctx context.Context, toolID string, args map[string]any)) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.observe = f
 }
 
 // Activity is a short diagnostics record. It does not include file contents.
@@ -128,6 +138,16 @@ func (r *Registry) Execute(ctx context.Context, toolID string, args map[string]a
 		r.record(Activity{ToolID: toolID, Status: "disabled", Error: err.Error(), At: time.Now()})
 		return nil, err
 	}
+	if def, ok := Lookup(toolID); ok {
+		var argErr error
+		if args, argErr = CheckArgs(def, args); argErr != nil {
+			r.record(Activity{ToolID: toolID, Status: "malformed", Summary: activitySummary(args), Error: argErr.Error(), At: time.Now()})
+			r.bus.Publish(events.New(events.ToolFailed, mergeMeta(meta, map[string]any{
+				"tool_id": toolID, "error": argErr.Error(), "malformed": true, "kind": ErrKindInvalid,
+			})))
+			return nil, argErr
+		}
+	}
 	if err := implausibleCall(toolID, args); err != nil {
 		r.record(Activity{ToolID: toolID, Status: "malformed", Summary: activitySummary(args), Error: err.Error(), At: time.Now()})
 		r.bus.Publish(events.New(events.ToolFailed, mergeMeta(meta, map[string]any{
@@ -160,6 +180,12 @@ func (r *Registry) Execute(ctx context.Context, toolID string, args map[string]a
 	r.bus.Publish(events.New(events.ToolStarted, mergeMeta(meta, map[string]any{"tool_id": toolID, "summary": summary})))
 	// Every call has a time limit; cancelling the turn stops it sooner.
 	callCtx, cancel := context.WithTimeout(ctx, Timeout(toolID))
+	r.mu.Lock()
+	observe := r.observe
+	r.mu.Unlock()
+	if observe != nil {
+		observe(ctx, toolID, args)
+	}
 	result, err := t.Execute(callCtx, args)
 	cancel()
 	elapsed := time.Since(started).Milliseconds()

@@ -10,6 +10,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/events"
 	"github.com/yeixio/yggdrasil-core/internal/huginn"
 	"github.com/yeixio/yggdrasil-core/internal/mimir"
+	"github.com/yeixio/yggdrasil-core/internal/structured"
 	"github.com/yeixio/yggdrasil-core/internal/tools"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 	"github.com/yeixio/yggdrasil-core/pkg/pluginapi"
@@ -85,7 +86,15 @@ func (o *Orchestrator) Run(
 			// files or knowledge, is not a quick question.
 			kind = huginn.Research
 		}
-		budget := huginn.BudgetFor(huginn.EffortFrom(ctx), kind)
+		// The profile's own controls apply on top of the effort's budget (§40).
+		budget := huginn.BudgetFor(huginn.EffortFrom(ctx), kind).With(profile.Orchestration)
+		// An answer that must be JSON (§27) is one constrained reply: no
+		// plan, tool calls, file, or figure check, which would each need
+		// output of another shape. A web look-up still runs first.
+		jsonOnly := len(structured.SchemaFrom(ctx)) > 0
+		if jsonOnly {
+			budget.Plan, budget.Verify = false, false
+		}
 		env.Emit(EventEffort, map[string]any{"effort": string(budget.Effort), "chosen": string(huginn.EffortFrom(ctx))})
 		// Offer only the tools this request needs (spec §16). The profile
 		// still decides what is allowed; this decides what is shown.
@@ -94,6 +103,12 @@ func (o *Orchestrator) Run(
 		// otherwise a current question is looked up first.
 		planned := false
 		if hasParts && budget.Plan {
+			if budget.Sequential {
+				plan.Parallel = false
+			}
+			if budget.MaxWorkers > 0 && len(plan.Steps) > budget.MaxWorkers {
+				plan.Steps = plan.Steps[:budget.MaxWorkers]
+			}
 			notes := runPlan(ctx, env, profile, role, plan, task.Prompt, reference, budget.Pages)
 			if ctx.Err() != nil {
 				// Stopped while working through the parts: keep what is done (§67).
@@ -128,6 +143,9 @@ func (o *Orchestrator) Run(
 		// evidence is what the answer may draw figures from, for the check.
 		evidence := reference
 		toolPrompt := tools.PromptFor(profile)
+		if jsonOnly {
+			toolPrompt = ""
+		}
 		sys := instructions
 		if toolPrompt != "" {
 			sys += "\n" + toolPrompt
@@ -140,7 +158,7 @@ func (o *Orchestrator) Run(
 			plainSys = extra + "\n\n" + plainSys
 		}
 		messages := []pluginapi.ChatMessage{{Role: "system", Content: sys}}
-		if prior := priorMessages(ctx, env, task.Prompt, sys); len(prior) > 0 {
+		if prior := priorMessages(ctx, env, task.Prompt, sys, profile.Orchestration.ContextShare); len(prior) > 0 {
 			messages = append(messages, prior...)
 		}
 		messages = append(messages, pluginapi.ChatMessage{Role: "user", Content: withReference(task.Prompt, reference)})
@@ -150,6 +168,19 @@ func (o *Orchestrator) Run(
 		toolsOn := len(tools.Enabled(profile, nil)) > 0
 		nodeID, _ := env.NodeForRole(role)
 
+		if jsonOnly {
+			content, m, err := generateText(ctx, env, role, messages)
+			if err != nil {
+				ch <- pluginapi.OrchestrationEvent{Type: "agent.error", Role: role, Error: err.Error(), Done: true}
+				return
+			}
+			promptTokens := 0
+			if m != nil {
+				promptTokens = m.PromptTokens
+			}
+			streamText(ch, role, nodeID, content, m, contextusage.Measure(instructions, toolPrompt, messages, promptTokens))
+			return
+		}
 		if reply, m, made := makeFileFirst(ctx, env, profile, role, messages, task.Prompt); made {
 			promptTokens := 0
 			if m != nil {
@@ -160,6 +191,8 @@ func (o *Orchestrator) Run(
 		}
 		calls := 0
 		malformed := 0
+		// changed records that a tool that changes things ran.
+		changed := false
 		retriedPlain := false
 
 		for {
@@ -194,9 +227,10 @@ func (o *Orchestrator) Run(
 			if parsed.Call != nil {
 				parsed.Call.ID = tools.Canonical(parsed.Call.ID)
 			}
-			if parsed.Call != nil && toolsOn && !toolEnabled(profile, parsed.Call.ID) && malformed < 2 {
+			if parsed.Call != nil && !toolEnabled(profile, parsed.Call.ID) && malformed < 2 {
 				// A tool that was not offered is refused, whatever the profile
 				// allows: the model cannot widen its own tools (spec §17).
+				// That holds when no tools were offered at all.
 				malformed++
 				env.Emit(events.ToolFailed, map[string]any{"tool_id": parsed.Call.ID, "kind": tools.ErrKindNotOffered, "error": tools.ErrNotOffered.Error()})
 				messages = append(messages,
@@ -220,6 +254,11 @@ func (o *Orchestrator) Run(
 					ch <- pluginapi.OrchestrationEvent{Type: "agent.message", Role: role, NodeID: nodeID, Content: parsed.Text}
 				}
 				result, err := env.ExecuteTool(ctx, parsed.Call.ID, parsed.Call.Args)
+				if err == nil {
+					if def, ok := tools.Lookup(parsed.Call.ID); ok && def.Risk != tools.RiskRead {
+						changed = true
+					}
+				}
 				var resultNote string
 				if err != nil {
 					payload, _ := json.Marshal(map[string]any{"ok": false, "error": publicToolError(err)})
@@ -266,7 +305,15 @@ func (o *Orchestrator) Run(
 				messages[0] = pluginapi.ChatMessage{Role: "system", Content: plainSys}
 				continue
 			}
-			answer := verifyAnswer(ctx, env, role, messages, parsed.Text, evidence, task.Prompt, budget.Corrections)
+			answer := parsed.Text
+			if budget.Verify {
+				answer = verifyAnswer(ctx, env, role, messages, parsed.Text, evidence, task.Prompt, budget.Corrections)
+			}
+			// An answer that says it changed something, when nothing that
+			// changes things ran, is called out (§24; found by §64).
+			if !changed && huginn.ClaimsAction(answer) {
+				env.Emit(EventUnconfirmedAction, map[string]any{})
+			}
 			streamText(ch, role, nodeID, answer, metrics, usage)
 			return
 		}
@@ -357,7 +404,10 @@ type conversationMemory interface {
 	ContextLimit() int
 }
 
-func priorMessages(ctx context.Context, env pluginapi.ExecutionEnvironment, prompt, reserved string) []pluginapi.ChatMessage {
+// priorMessages fits earlier messages into the room the model's window
+// leaves. share, when set by the profile (§40), caps earlier messages at
+// that part of the window.
+func priorMessages(ctx context.Context, env pluginapi.ExecutionEnvironment, prompt, reserved string, share float64) []pluginapi.ChatMessage {
 	src, ok := env.(conversationMemory)
 	if !ok {
 		return nil
@@ -366,7 +416,11 @@ func priorMessages(ctx context.Context, env pluginapi.ExecutionEnvironment, prom
 	if limit <= 0 {
 		limit = contextusage.DefaultWindow
 	}
-	return contextusage.FitPrior(src.PriorMessages(ctx), contextusage.RoomRunes(limit, reserved, prompt))
+	room := contextusage.RoomRunes(limit, reserved, prompt)
+	if share > 0 {
+		room = min(room, int(share*float64(limit)*4))
+	}
+	return contextusage.FitPrior(src.PriorMessages(ctx), room)
 }
 
 func publicToolError(err error) string {

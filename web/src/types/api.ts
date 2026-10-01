@@ -231,6 +231,21 @@ export interface AIProfile {
   tools?: ToolPolicy[]
   node_policy: NodePolicy
   knowledge_sources?: string[]
+  /** How this profile works through a request (spec §40). Empty keeps defaults. */
+  orchestration?: OrchestrationPolicy
+}
+
+export interface OrchestrationPolicy {
+  effort?: '' | 'fast' | 'balanced' | 'thorough'
+  planning?: '' | 'on' | 'off'
+  max_workers?: number
+  parallel?: '' | 'on' | 'off'
+  verification?: '' | 'off' | 'check' | 'correct' | 'thorough'
+  max_tool_calls?: number
+  memory?: '' | 'off'
+  context_share?: number
+  fallback?: '' | 'off'
+  timeout_seconds?: number
 }
 
 export type NodeStatus = 'online' | 'offline' | 'unknown'
@@ -279,6 +294,8 @@ export interface MessageMeta {
   notice?: string
   /** Files attached to a question or produced with an answer. */
   files?: FileRef[]
+  /** The run trace behind the answer (spec §35), at /api/v1/runs/{id}. */
+  run_id?: string
 }
 
 /** A stored file: an attachment or a file the assistant produced. */
@@ -394,6 +411,8 @@ export interface MemoryItem {
   source_type: 'explicit' | 'manual' | string
   source_ref?: string
   enabled: boolean
+  /** Never sent to a paired computer (spec §63). */
+  local_only?: boolean
   created_at: string
   updated_at: string
 }
@@ -767,6 +786,8 @@ export interface KnowledgeSource {
   // made them. Zero until an embedding model is installed.
   embedded_count?: number
   embedding_model?: string
+  /** Never sent to a paired computer (spec §63). */
+  local_only?: boolean
   created_at: string
   updated_at: string
   refreshed_at?: string
@@ -1121,4 +1142,254 @@ export interface PersonalStyle {
   units?: '' | 'metric' | 'imperial'
   about_me?: string
   instructions?: string
+}
+
+export type EgressKind = 'web_search' | 'web_page' | 'paired_computer' | 'external_server' | 'connector'
+
+/** One time data left this computer (spec §63). */
+export interface EgressRecord {
+  id: string
+  at: string
+  kind: EgressKind
+  destination: string
+  detail?: string
+  source?: 'chat' | 'api' | 'automation' | 'training' | string
+  conversation_id?: string
+  task_id?: string
+}
+
+export interface PrivacyOverview {
+  /** Days run records are kept; 0 keeps them. */
+  retention_days: number
+  last_30_days: Partial<Record<EgressKind, number>>
+}
+
+export interface RunRecordCounts {
+  tasks: number
+  automation_runs: number
+  egress: number
+}
+
+/** A traced request (spec §35). */
+export interface RunTrace {
+  id: string
+  conversation_id?: string
+  profile_id?: string
+  source?: string
+  strategy: string[]
+  effort?: string
+  status: 'completed' | 'failed' | 'stopped'
+  error?: string
+  started_at: string
+  completed_at?: string
+  latency_ms?: number
+  pipeline_ms?: number
+  models: {
+    model_id: string
+    role?: string
+    node?: string
+    calls: number
+    load_ms?: number
+    first_token_ms?: number
+    ttft_ms?: number
+    prompt_tokens: number
+    completion_tokens: number
+    cached_tokens: number
+    tok_per_sec?: number
+  }[]
+  tools: { tool_id: string; calls: number; failures?: number; total_ms: number }[]
+  nodes: string[]
+  workers?: number
+  parallel?: boolean
+  verification_passes: number
+  verification_issues?: number
+  verification_fixed?: number
+  retries: number
+  context_tokens?: number
+  context_limit?: number
+}
+
+/** An environment variable or header of a tool source. Secret values show only their last four characters. */
+export interface MCPVariable {
+  key: string
+  value: string
+  secret: boolean
+}
+
+/** One tool a tool source provides. */
+export interface MCPTool {
+  id: string
+  name: string
+  remote_name: string
+  description: string
+  risk: string
+  /** allow or ask; changed is true when the person set it. */
+  policy: string
+  changed: boolean
+  enabled: boolean
+}
+
+/** An MCP tool source. Secret values are never returned. */
+export interface MCPServer {
+  id: string
+  name: string
+  description?: string
+  preset?: string
+  where: 'local' | 'remote'
+  command?: string
+  args?: string[]
+  url?: string
+  env: MCPVariable[]
+  headers: MCPVariable[]
+  enabled: boolean
+  allow_sampling: boolean
+  always_offer: boolean
+  keywords: string[]
+  status: 'ready' | 'sign_in' | 'error' | 'off'
+  running: boolean
+  error?: string
+  signed_in?: boolean
+  /** A program it needs that is not installed, such as Node.js. */
+  missing?: string
+  server_name?: string
+  server_version?: string
+  protocol?: string
+  instructions?: string
+  has_resources: boolean
+  has_prompts: boolean
+  tools: MCPTool[]
+  added_at: string
+  checked_at?: string
+  last_used?: string
+}
+
+export interface MCPField {
+  key: string
+  label: string
+  help?: string
+  secret?: boolean
+  optional?: boolean
+  placeholder?: string
+  default?: string
+  kind?: '' | 'text' | 'folder' | 'file' | 'folders'
+}
+
+/** A gallery entry: a well-known server set up with a few plain questions. */
+export interface MCPGalleryEntry {
+  id: string
+  name: string
+  description: string
+  category: string
+  homepage?: string
+  fields: MCPField[]
+  setup?: string
+  sign_in?: boolean
+  remote: boolean
+  missing?: string
+  /** The id of a source already added from this entry. */
+  added?: string
+}
+
+/** How to reach a server: a command on this computer, or a web address. */
+export interface MCPSpec {
+  name: string
+  preset?: string
+  command?: string
+  args?: string[]
+  env?: Record<string, string>
+  dir?: string
+  url?: string
+  headers?: Record<string, string>
+  client_id?: string
+  client_secret?: string
+  keywords?: string[]
+}
+
+/** A value a pasted server still needs, such as a token left as a placeholder. */
+export interface MCPNeed {
+  key: string
+  label: string
+  secret: boolean
+}
+
+export interface MCPParsed {
+  spec: MCPSpec
+  needs: MCPNeed[]
+  missing?: string
+}
+
+/** A server set up in another app on this computer. Secret values are hidden. */
+export interface MCPImportCandidate {
+  app: string
+  app_name: string
+  spec: MCPSpec
+  needs?: MCPNeed[]
+  missing?: string
+  added: boolean
+}
+
+export interface MCPAddRequest {
+  preset?: string
+  spec?: MCPSpec
+  import?: { app: string; name: string }
+  values?: Record<string, string>
+  redirect_base?: string
+}
+
+export interface MCPAdded {
+  server: MCPServer
+  /** Set when the service needs you to sign in: open it in the browser. */
+  sign_in_url?: string
+}
+
+export interface MCPUpdate {
+  name?: string
+  enabled?: boolean
+  allow_sampling?: boolean
+  always_offer?: boolean
+  keywords?: string[]
+  /** Tool name to allow, ask, or default. */
+  policies?: Record<string, string>
+}
+
+export interface MCPLogLine {
+  at: string
+  level: string
+  text: string
+}
+
+export interface MCPPrompt {
+  name: string
+  title?: string
+  description?: string
+  arguments?: { name: string; description?: string; required?: boolean }[]
+}
+
+/** How other apps reach Yggdrasil's own MCP server. */
+export interface MCPShare {
+  url: string
+  command: string
+  args: string[]
+  needs_key: boolean
+}
+
+/** Something Yggdrasil can or cannot do right now (spec §37). */
+export interface CapabilityAbility {
+  id: string
+  label: string
+  available: boolean
+  via?: string[]
+  note?: string
+}
+
+/** The capability inventory (spec §37). */
+export interface CapabilitySnapshot {
+  at: string
+  models: { id: string; name: string; running: boolean; on: string[]; support_role?: string }[]
+  nodes: { id: string; name: string; local: boolean; online: boolean; trainer?: string }[]
+  tools: { id: string; name: string; source: string; enabled: boolean }[]
+  connectors: { id: string; name: string; connected: boolean }[]
+  providers: { id: string; name: string; kind: string; status: string; healthy: boolean }[]
+  artifacts: { count: number; bytes: number }
+  abilities: CapabilityAbility[]
 }

@@ -24,6 +24,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/events"
 	"github.com/yeixio/yggdrasil-core/internal/gjallarhorn"
 	"github.com/yeixio/yggdrasil-core/internal/logs"
+	"github.com/yeixio/yggdrasil-core/internal/mcp"
 	"github.com/yeixio/yggdrasil-core/internal/models"
 	"github.com/yeixio/yggdrasil-core/internal/muninn"
 	"github.com/yeixio/yggdrasil-core/internal/runtimes"
@@ -128,7 +129,13 @@ type Server struct {
 	artifacts       *artifacts.Store
 	notifications   *gjallarhorn.Hub
 	connectors      *connectors.Manager
+	mcp             *mcp.Manager
+	mcpServer       *mcp.Server
+	yggctl          func() string
 	personal        PersonalStore
+	privacy         Privacy
+	runs            RunStore
+	capabilities    CapabilitySource
 	training        *training.Service
 	trainingCatalog func() []models.CatalogEntry
 }
@@ -229,8 +236,14 @@ func (s *Server) routes() {
 	s.artifactRoutes(api)
 	s.notificationRoutes(api)
 	s.connectorRoutes(api)
+	s.mcpRoutes(api)
 	s.personalRoutes(api)
+	s.privacyRoutes(api)
+	s.runRoutes(api)
+	s.capabilityRoutes(api)
 	s.trainingRoutes(api)
+
+	s.mcpRootRoutes(s.router)
 
 	if s.deps.OpenAI != nil {
 		s.router.HandleFunc("/v1/models", s.deps.OpenAI.HandleModels).Methods(http.MethodGet, http.MethodOptions)

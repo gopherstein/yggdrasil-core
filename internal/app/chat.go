@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/yeixio/yggdrasil-core/internal/artifacts"
 	"github.com/yeixio/yggdrasil-core/internal/contextusage"
+	"github.com/yeixio/yggdrasil-core/internal/egress"
 	"github.com/yeixio/yggdrasil-core/internal/events"
 	"github.com/yeixio/yggdrasil-core/internal/huginn"
 	"github.com/yeixio/yggdrasil-core/internal/mimir"
@@ -19,8 +21,10 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/muninn"
 	"github.com/yeixio/yggdrasil-core/internal/orchestrator/builtin/simple"
 	"github.com/yeixio/yggdrasil-core/internal/profiles"
+	"github.com/yeixio/yggdrasil-core/internal/runlog"
 	"github.com/yeixio/yggdrasil-core/internal/runtimes/llamacpp"
 	"github.com/yeixio/yggdrasil-core/internal/share"
+	"github.com/yeixio/yggdrasil-core/internal/structured"
 	"github.com/yeixio/yggdrasil-core/internal/tools"
 	"github.com/yeixio/yggdrasil-core/internal/turnopts"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
@@ -44,6 +48,13 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 	}
 	// Memory requests are answered by Yggdrasil, not the model.
 	opts := turnopts.From(ctx)
+	// A short question about what Yggdrasil can do is answered from its
+	// inventory, not by a model that may claim what it cannot do (§37).
+	if len(structured.SchemaFrom(ctx)) == 0 {
+		if ch, ok := a.answerCapabilityQuestion(ctx, conversationID, message); ok {
+			return ch, nil
+		}
+	}
 	// An API caller changes memories only when it opted into memory (§62).
 	if opts != nil && !opts.Memory {
 		// Fall through: "Remember …" is an ordinary message for this caller.
@@ -66,6 +77,10 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			OrchestratorID: "simple",
 			NodePolicy:     contracts.NodePolicy{Mode: "automatic"},
 		}
+	}
+	// A profile's own effort applies when the chat leaves effort on Auto (§40).
+	if pe := profile.Orchestration.Effort; pe != "" && huginn.EffortFrom(ctx) == huginn.EffortAuto {
+		ctx = huginn.WithEffort(ctx, huginn.ParseEffort(pe))
 	}
 	// An API request chooses its connected knowledge (§62).
 	if opts != nil {
@@ -198,6 +213,41 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		// with it every model call, tool, plan step, and paired computer.
 		ctx, _, endRun := a.startRun(ctx, conversationID)
 		defer endRun()
+		// A profile's time limit stops a turn that runs too long (§40).
+		if secs := profile.Orchestration.TimeoutSeconds; secs > 0 {
+			var cancel context.CancelFunc
+			ctx, cancel = context.WithTimeout(ctx, time.Duration(secs)*time.Second)
+			defer cancel()
+		}
+		// What leaves this computer is recorded against this turn (§63).
+		source := egress.SourceChat
+		if opts != nil {
+			source = egress.SourceAPI
+		}
+		ctx = egress.WithRun(ctx, egress.Run{Source: source, ConversationID: conversationID, TaskID: task.ID})
+		// Trace the run (§35): every layer adds what it used and how long it
+		// took, and the run is saved however the turn ends.
+		run := runlog.New(task.ID, conversationID, profile.ID, source)
+		ctx = runlog.With(ctx, run)
+		if profile.OrchestratorID == "team" {
+			run.Strategy("Team: planner, worker, and reviewer")
+		}
+		if special != nil {
+			run.Strategy("Specialized AI " + special.name + " answered on this computer")
+		}
+		if routeReason != "" {
+			run.Strategy(routeReason)
+		}
+		runStatus, runErr := runlog.StatusFailed, ""
+		defer func() {
+			status := runStatus
+			if ctx.Err() != nil && status != runlog.StatusCompleted {
+				status = runlog.StatusStopped
+			}
+			if err := a.RunLog.Save(context.WithoutCancel(ctx), run.Finish(status, runErr)); err != nil && a.Logger != nil {
+				a.Logger.Warn("save run", "run_id", task.ID, "error", err)
+			}
+		}()
 		// Chat comes first: automations, benchmarks, and training wait
 		// for it (§60). Chat itself never waits.
 		work, _ := a.enterWork(ctx, share.Interactive, "chat", nil)
@@ -210,7 +260,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			conversationID: conversationID,
 			taskID:         task.ID,
 			turnPrompt:     message,
-			trace:          &turnTrace{},
+			trace:          &turnTrace{runID: task.ID},
 			startedAt:      turnStart,
 			attachments:    attached,
 		}
@@ -221,10 +271,19 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			env.trace.sharing(busy + ", so this answer may be slower.")
 		}
 		env.opts = opts
-		if a.memoryOn(ctx, conversationID) && (opts == nil || opts.Memory) {
+		if facts := a.capabilityFacts(ctx, message); facts != "" {
+			env.capabilities = facts
+			env.trace.sharing("Checked what Yggdrasil can do right now")
+		}
+		if a.memoryOn(ctx, conversationID) && (opts == nil || opts.Memory) && profile.Orchestration.Memory != "off" {
 			if mems, err := a.Muninn.Relevant(ctx, message); err == nil {
 				env.memories = mems
 				env.trace.memories(mems)
+				for _, m := range mems {
+					if m.LocalOnly {
+						env.markLocalOnly()
+					}
+				}
 			}
 		}
 		if special != nil {
@@ -242,6 +301,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		for attempt := 0; ; attempt++ {
 			eventsCh, err := orch.Run(ctx, task, profile, env)
 			if err != nil {
+				runErr = err.Error()
 				ch <- pluginapi.ChatChunk{Error: a.explainWhileTraining(err.Error()), Done: true}
 				return
 			}
@@ -258,9 +318,11 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 						}(eventsCh)
 						return
 					}
-					if attempt == 0 && !teamMode && special == nil && recoverable(ctx, evt.Error, full, env) {
+					if attempt == 0 && !teamMode && special == nil && profile.Orchestration.Fallback != "off" && recoverable(ctx, evt.Error, full, env) {
 						failedID := firstNonEmpty(env.modelID(), modelID)
 						if next, step, notice, ok := a.fallback(ctx, failedID, evt.Error); ok {
+							run.Retried()
+							run.Strategy("Answered on another model after " + a.modelName(failedID) + " failed")
 							a.Logger.Warn("chat model failed; retrying on another model", "failed", failedID, "next", next.ID, "error", evt.Error)
 							a.noteModelFailed(failedID)
 							env.trace.recovered(step, notice)
@@ -292,6 +354,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 							}
 						}
 					}
+					runErr = evt.Error
 					ch <- pluginapi.ChatChunk{Error: a.explainWhileTraining(evt.Error), Done: true}
 					return
 				}
@@ -392,8 +455,13 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		} else if metrics != nil || len(roleSteps) > 0 {
 			a.recordGeneration(ctx, profile, conversationID, convTitle, "", env.modelID(), metrics, roleSteps)
 		}
+		runStatus = runlog.StatusCompleted
+		if metrics != nil {
+			run.Context(metrics.PromptTokens, env.ContextLimit())
+		}
 		payload := map[string]any{"conversation_id": conversationID}
 		if ms, ok := env.pipelineMS(); ok {
+			run.Pipeline(time.Duration(ms) * time.Millisecond)
 			payload["pipeline_ms"] = ms
 			a.Logger.Debug("chat pipeline overhead", "conversation_id", conversationID, "ms", ms)
 		}
@@ -805,6 +873,13 @@ type chatExecEnv struct {
 	memories []muninn.Memory
 	// opts are an API request's choices for this turn, or nil (§62).
 	opts *turnopts.Options
+	// capabilities are inventory facts for a question about what
+	// Yggdrasil can do (§37).
+	capabilities string
+	// localOnly is set once the turn uses a memory or knowledge source
+	// marked this computer only, so it is never sent elsewhere (§63).
+	localOnly   bool
+	keptLocally bool
 	// attachments are the files attached to this message.
 	attachments []artifacts.Artifact
 	// summarized counts saved messages replaced by a summary this turn.
@@ -919,10 +994,12 @@ func (e *chatExecEnv) Generate(ctx context.Context, role string, messages []plug
 	if err != nil {
 		return nil, err
 	}
+	nodeID = e.keepLocalIfNeeded(role, nodeID)
 	e.app.Bus.Publish(events.New(events.ModelLoadStarted, map[string]any{
 		"model_id": modelID, "node_id": nodeID, "role": role,
 		"node_name": e.app.nodeDisplayName(nodeID),
 	}))
+	started := time.Now()
 	ch, err := e.app.generateOnNode(ctx, nodeID, modelID, role, e.adapter, messages)
 	if err != nil {
 		return nil, err
@@ -931,7 +1008,7 @@ func (e *chatExecEnv) Generate(ctx context.Context, role string, messages []plug
 		"model_id": modelID, "node_id": nodeID, "role": role,
 		"node_name": e.app.nodeDisplayName(nodeID),
 	}))
-	return ch, nil
+	return traceGeneration(runlog.From(ctx), ch, modelID, role, e.app.nodeDisplayName(nodeID), started), nil
 }
 
 func (e *chatExecEnv) ExecuteTool(ctx context.Context, toolID string, args map[string]any) (map[string]any, error) {
@@ -945,7 +1022,9 @@ func (e *chatExecEnv) ExecuteTool(ctx context.Context, toolID string, args map[s
 	}
 	ctx = artifacts.WithConversation(ctx, e.conversationID)
 	e.progress(events.ToolStarted, map[string]any{"tool_id": toolID, "args": args})
+	toolStarted := time.Now()
 	result, err := e.app.Tools.Execute(ctx, toolID, args, policy, "chat requested tool", meta)
+	runlog.From(ctx).ToolCall(tools.Canonical(toolID), time.Since(toolStarted), err != nil)
 	if err == nil && e.trace != nil {
 		e.trace.tool(toolID, args, result)
 	}
@@ -978,6 +1057,7 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 		}
 	}
 	e.progress(eventType, payload)
+	traceEvent(runlog.From(e.ctx), eventType, payload)
 	if e.trace != nil {
 		switch eventType {
 		case simple.EventPlanCreated:
@@ -993,6 +1073,8 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 			fixed, _ := payload["fixed"].(int)
 			remaining, _ := payload["remaining"].(string)
 			e.trace.verified(issues, fixed, remaining)
+		case simple.EventUnconfirmedAction:
+			e.trace.unconfirmedAction()
 		}
 	}
 	if e.app.Tools != nil && (eventType == events.ToolParsed || eventType == events.ToolFailed) {
@@ -1103,6 +1185,10 @@ func (e *chatExecEnv) TurnInstructions(ctx context.Context, prompt string) strin
 			parts = append(parts, block)
 		}
 	}
+	// What Yggdrasil can do comes from its own inventory (§37).
+	if e.capabilities != "" {
+		parts = append(parts, e.capabilities)
+	}
 	// Memories come from the person, so they are trusted instructions.
 	if block := muninn.Block(e.memories); block != "" {
 		parts = append(parts, block)
@@ -1146,6 +1232,7 @@ func (e *chatExecEnv) knowledgeBlock(ctx context.Context, prompt string) string 
 			names = append(names, h.SourceName)
 		}
 	}
+	e.markLocalSources(ctx, hits)
 	e.Emit("knowledge.retrieved", map[string]any{"passages": len(hits), "sources": names})
 	if e.trace != nil {
 		e.trace.knowledge(hits)
@@ -1195,9 +1282,10 @@ func (a *App) modelName(modelID string) string {
 // the turn, marked as stopped, and tells every client the turn ended.
 func (a *App) keepStopped(ctx context.Context, env *chatExecEnv, conversationID, full string) {
 	// ctx is cancelled by now; the save must still happen.
+	timedOut := errors.Is(ctx.Err(), context.DeadlineExceeded)
 	ctx = context.WithoutCancel(ctx)
 	kept := strings.TrimSpace(full) != ""
-	env.trace.stopped(kept)
+	env.trace.stopped(kept, timedOut)
 	// Keep the answer so far; with none, keep a short note, so the stop is
 	// visible and the sources and steps already gathered are not lost.
 	content := full

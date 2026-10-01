@@ -84,6 +84,8 @@ type Deps struct {
 	ExportTool func(ctx context.Context) (string, error)
 	// FreeDisk reports the free space where path is, when known.
 	FreeDisk func(path string) (uint64, error)
+	// Sent, when set, records training data sent to a paired computer (§63).
+	Sent func(ctx context.Context, nodeName, detail string)
 }
 
 // Service builds, trains, evaluates, and deploys specialized AIs.
@@ -434,6 +436,11 @@ func MaterialText(filename, text, contentBase64 string) (string, string, error) 
 		return strings.TrimSuffix(filename, filepath.Ext(filename)) + ".csv", csvText, nil
 	case ".pdf":
 		text, err := mimir.PDFText(filename, raw)
+		if errors.Is(err, mimir.ErrNoText) {
+			// A scanned PDF has no examples to read, so it is classified as
+			// knowledge; connecting it reads its pages with text recognition.
+			text, err = "", nil
+		}
 		if err != nil {
 			return "", "", err
 		}

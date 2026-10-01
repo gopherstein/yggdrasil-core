@@ -4,13 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"slices"
 	"strings"
 	"sync"
 
 	"github.com/yeixio/yggdrasil-core/internal/automations"
+	"github.com/yeixio/yggdrasil-core/internal/egress"
 	"github.com/yeixio/yggdrasil-core/internal/gjallarhorn"
 	"github.com/yeixio/yggdrasil-core/internal/huginn"
+	"github.com/yeixio/yggdrasil-core/internal/runlog"
 	"github.com/yeixio/yggdrasil-core/internal/share"
 	"github.com/yeixio/yggdrasil-core/internal/tools"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
@@ -24,7 +27,27 @@ type automationExecutor struct {
 	app *App
 }
 
+// Execute runs an automation and traces the run (§35).
 func (e automationExecutor) Execute(ctx context.Context, automation automations.Automation) (automations.Execution, error) {
+	run := runlog.New(uuid.NewString(), "", automation.ProfileID, egress.SourceAutomation)
+	run.Strategy("Automation " + automation.Name)
+	result, err := e.execute(runlog.With(ctx, run), automation)
+	status, errText := runlog.StatusCompleted, ""
+	switch {
+	case ctx.Err() != nil:
+		status = runlog.StatusStopped
+	case err != nil:
+		status, errText = runlog.StatusFailed, err.Error()
+	}
+	if e.app != nil && e.app.RunLog != nil {
+		if saveErr := e.app.RunLog.Save(context.WithoutCancel(ctx), run.Finish(status, errText)); saveErr != nil && e.app.Logger != nil {
+			e.app.Logger.Warn("save automation run", "automation", automation.Name, "error", saveErr)
+		}
+	}
+	return result, err
+}
+
+func (e automationExecutor) execute(ctx context.Context, automation automations.Automation) (automations.Execution, error) {
 	if e.app == nil || e.app.Profiles == nil || e.app.OrchRegistry == nil {
 		return automations.Execution{}, fmt.Errorf("automation executor is not configured")
 	}
@@ -40,6 +63,7 @@ func (e automationExecutor) Execute(ctx context.Context, automation automations.
 	}
 	// A chat on this computer goes first; the run waits for it instead of
 	// loading a model alongside it (§60).
+	ctx = egress.WithRun(ctx, egress.Run{Source: egress.SourceAutomation, TaskID: "automation:" + automation.ID})
 	work, err := e.app.enterWork(ctx, share.Automation, automation.Name, nil)
 	if err != nil {
 		return automations.Execution{}, err
@@ -99,6 +123,9 @@ func (e automationExecutor) Execute(ctx context.Context, automation automations.
 		return env.execution(""), err
 	}
 	text, nodeID, runErr := collectAutomationEvents(stream)
+	if runErr == nil && ctx.Err() == nil {
+		text = e.ensureStructured(ctx, env, automation, text)
+	}
 	out := env.execution(text)
 	if nodeID != "" {
 		out.NodeID = nodeID

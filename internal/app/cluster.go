@@ -11,10 +11,13 @@ import (
 	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/config"
+	"github.com/yeixio/yggdrasil-core/internal/egress"
 	"github.com/yeixio/yggdrasil-core/internal/nodes"
 	"github.com/yeixio/yggdrasil-core/internal/profiles"
+	"github.com/yeixio/yggdrasil-core/internal/runlog"
 	"github.com/yeixio/yggdrasil-core/internal/scheduler"
 	"github.com/yeixio/yggdrasil-core/internal/share"
+	"github.com/yeixio/yggdrasil-core/internal/structured"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 	"github.com/yeixio/yggdrasil-core/pkg/pluginapi"
 )
@@ -192,17 +195,24 @@ func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role, adapter
 	}
 	if nodeID == "" || nodeID == cfg.NodeID {
 		if a.stubInference {
-			return a.stubGenerate(modelID), nil
+			return a.stubGenerate(modelID, messages), nil
 		}
+		loadStarted := time.Now()
 		endpoint, err := a.ensureLocalModel(ctx, modelID)
 		if err != nil {
 			return nil, err
 		}
+		// A model that was already running answers at once; count only a
+		// real start as load time (§35).
+		if d := time.Since(loadStarted); d >= minLoad {
+			runlog.From(ctx).Loaded(modelID, d)
+		}
 		ch, err := a.Runtimes.Chat(ctx, pluginapi.ChatRequest{
-			ModelEndpoint: endpoint,
-			Messages:      messages,
-			Stream:        true,
-			Adapter:       adapter,
+			ModelEndpoint:  endpoint,
+			Messages:       messages,
+			Stream:         true,
+			Adapter:        adapter,
+			ResponseSchema: structured.SchemaFrom(ctx),
 		})
 		if err != nil {
 			return nil, err
@@ -223,6 +233,7 @@ func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role, adapter
 	if _, err := client.StartModel(ctx, modelID); err != nil && isConnectivityErr(err) {
 		return nil, remoteUnreachableErr(n, err)
 	}
+	a.Egress.Add(ctx, egress.PairedComputer, nodeDisplayName(n), fmt.Sprintf("prompt and context for %s", modelID))
 	ch, err := client.Chat(ctx, nodes.RemoteChatRequest{
 		ModelID:           modelID,
 		Messages:          messages,
@@ -360,7 +371,7 @@ func (a *App) internalChatStream(ctx context.Context, req nodes.RemoteChatReques
 	var ch <-chan pluginapi.ChatChunk
 	var err error
 	if a.stubInference {
-		ch = a.stubGenerate(req.ModelID)
+		ch = a.stubGenerate(req.ModelID, req.Messages)
 	} else {
 		endpoint, err2 := a.ensureLocalModel(ctx, req.ModelID)
 		if err2 != nil {
@@ -453,12 +464,15 @@ func (a *App) recordClusterServe(req nodes.RemoteChatRequest, metrics *pluginapi
 }
 
 // stubGenerate returns a canned completion that names this node so e2e can verify placement.
-func (a *App) stubGenerate(modelID string) <-chan pluginapi.ChatChunk {
+func (a *App) stubGenerate(modelID string, messages []pluginapi.ChatMessage) <-chan pluginapi.ChatChunk {
 	cfg := a.Config.Get()
 	ch := make(chan pluginapi.ChatChunk, 2)
 	go func() {
 		defer close(ch)
 		content := fmt.Sprintf("stub reply from %s (%s) model=%s", cfg.NodeName, cfg.NodeID, modelID)
+		if a.StubReply != nil {
+			content = a.StubReply(modelID, messages)
+		}
 		ch <- pluginapi.ChatChunk{Content: content}
 		ch <- pluginapi.ChatChunk{
 			Done: true,

@@ -1,6 +1,9 @@
 package pluginapi
 
-import "context"
+import (
+	"context"
+	"encoding/json"
+)
 
 // RuntimeDetection reports what a runtime found on the host.
 type RuntimeDetection struct {
@@ -92,6 +95,9 @@ type ChatRequest struct {
 	Tools         []map[string]any `json:"tools,omitempty"`
 	// Adapter applies one loaded LoRA adapter. Empty means the base model.
 	Adapter string `json:"adapter,omitempty"`
+	// ResponseSchema, when set, constrains the reply to JSON matching this
+	// JSON Schema, where the runtime supports it.
+	ResponseSchema json.RawMessage `json:"response_schema,omitempty"`
 }
 
 // ChatMessage is a single chat turn.
@@ -119,6 +125,9 @@ type GenerationMetrics struct {
 	TotalMs          float64 `json:"total_ms"`
 	PromptTokPerSec  float64 `json:"prompt_tok_per_sec"`
 	EvalTokPerSec    float64 `json:"eval_tok_per_sec"`
+	// CachedTokens are prompt tokens reused from the model's cache instead
+	// of processed again, when the runtime reports them.
+	CachedTokens int `json:"cached_tokens,omitempty"`
 }
 
 // Generator can stream chat completions against a running model.

@@ -31,6 +31,8 @@ type turnTrace struct {
 	files     []contracts.FileRef
 	notice    string
 	untrusted bool
+	// runID links the answer to its run trace (§35).
+	runID string
 }
 
 func (t *turnTrace) addSource(c contracts.Citation) {
@@ -151,11 +153,26 @@ func (t *turnTrace) verified(issues, fixed int, remaining string) {
 	}
 }
 
-// stopped records that the user stopped the turn. kept says whether part
-// of the answer was written and saved.
-func (t *turnTrace) stopped(kept bool) {
+// unconfirmedAction records an answer that says it changed something when
+// nothing that changes things ran. The person is told plainly.
+func (t *turnTrace) unconfirmedAction() {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+	t.addStep("verify", "Checked the answer against what actually ran")
+	t.notice = "Nothing was changed: no tool ran to do this, whatever the answer says."
+}
+
+// stopped records that the user stopped the turn. kept says whether part
+// of the answer was written and saved.
+func (t *turnTrace) stopped(kept, timedOut bool) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if timedOut {
+		// The profile's time limit ran out (§40).
+		t.addStep("stop", "Stopped at this profile's time limit")
+		t.notice = "Stopped at this profile's time limit before the answer was finished."
+		return
+	}
 	t.addStep("stop", "Stopped by you")
 	if kept {
 		t.notice = "Stopped before the answer was finished."
@@ -292,9 +309,9 @@ func (t *turnTrace) tool(toolID string, args, result map[string]any) {
 			t.addStep("git", "Checked the Git repository ("+strings.TrimPrefix(toolID, "git.")+")")
 			return
 		}
-		if def, ok := tools.Lookup(toolID); ok && strings.HasPrefix(def.Source, "connector:") {
-			// What a connected service returns was written by other people,
-			// so it is data, not instructions (§58).
+		if def, ok := tools.Lookup(toolID); ok && (strings.HasPrefix(def.Source, "connector:") || strings.HasPrefix(def.Source, "mcp:")) {
+			// What a connected service or tool source returns was written by
+			// other people, so it is data, not instructions (§58).
 			t.untrusted = true
 			t.addStep("service", def.Name)
 			t.serviceSources(result)
@@ -346,7 +363,7 @@ func (t *turnTrace) sawUntrusted() bool {
 func (t *turnTrace) meta() *contracts.MessageMeta {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	if len(t.sources) == 0 && len(t.steps) == 0 && t.notice == "" && len(t.files) == 0 {
+	if len(t.sources) == 0 && len(t.steps) == 0 && t.notice == "" && len(t.files) == 0 && t.runID == "" {
 		return nil
 	}
 	return &contracts.MessageMeta{
@@ -354,6 +371,7 @@ func (t *turnTrace) meta() *contracts.MessageMeta {
 		Steps:   append([]contracts.ActivityStep(nil), t.steps...),
 		Notice:  t.notice,
 		Files:   append([]contracts.FileRef(nil), t.files...),
+		RunID:   t.runID,
 	}
 }
 

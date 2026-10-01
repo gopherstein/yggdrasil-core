@@ -66,6 +66,11 @@ Prefix: `/api/v1`
 | GET | `/notifications` | The notification center: `{"notifications": [...], "unread": n}`. `?unread=1` lists unread ones. Also `POST /notifications/read` (`{"ids": [...]}`, no ids marks all) and `POST /notifications/{id}/dismiss` |
 | GET | `/connectors` | Connected services and their status. Also `PUT /connectors/{id}` (`{"values": {...}}`), `POST /connectors/{id}/check`, and `DELETE /connectors/{id}` |
 | GET, PUT | `/personalization` | How the person likes answers: `length`, `tone`, `format`, `units`, `about_me`, `instructions` |
+| GET | `/capabilities` | The capability inventory. `?ask=` returns the abilities a question is about. Also `GET /capabilities/models/{id}`, which says which computers can run a model |
+| GET | `/runs/{id}` | A run trace. Also `GET /runs` (`?conversation_id=`, `?limit=`), newest first |
+| GET | `/egress` | What left this computer, newest first. `?conversation_id=` narrows to one chat |
+| GET, PUT | `/privacy` | `{"retention_days": n, "last_30_days": {...}}`; PUT sets `retention_days`. Also `POST /privacy/delete-runs` |
+| GET | `/mcp/servers` | MCP tool sources. Also `POST /mcp/servers` (add), `GET/PATCH/PUT/DELETE /mcp/servers/{id}`, `/check`, `/sign-in`, `/sign-out`, `/logs`, `/prompts`, `/resources`, and `GET /mcp/gallery`, `GET /mcp/import`, `POST /mcp/parse`, `GET /mcp/share`. See [MCP](mcp.md) |
 | GET | `/nodes` | This computer and peers |
 | POST | `/nodes/pair` | Start pairing |
 | POST | `/nodes/{id}/pair/approve` | Approve a pairing offer |
@@ -99,7 +104,7 @@ Memory is on unless the setting `memory_enabled` is `false` or a conversation ha
 
 When a conversation's history passes half of the model's window, a summary of the older messages is written after the reply and replaces them in later turns. The messages stay saved. The `chat.summarized` event follows. The `chat.complete` payload's `context.summarized_messages` counts the messages the summary covers, and `pipeline_ms` is the time from the request to the first model call.
 
-`POST /chat` takes `attachments`, a list of artifact ids. Chat reads documents, spreadsheets (`.csv`, `.tsv`, `.xlsx`), PDFs with a text layer, JSON, HTML, and code files. Images are not read yet. An attached file reaches the model as data in the user turn, the whole file when it fits and otherwise the parts that best match the question, and files attached or produced earlier in the chat add the passages that match later questions. The user message's `meta.files` lists its attachments.
+`POST /chat` takes `attachments`, a list of artifact ids. Chat reads documents, spreadsheets (`.csv`, `.tsv`, `.xlsx`), PDFs with a text layer, JSON, HTML, and code files. Images are not read yet. A scanned PDF attached to a chat is refused with a pointer to the Knowledge page, which reads scanned pages once with text recognition, instead of on every turn. An attached file reaches the model as data in the user turn, the whole file when it fits and otherwise the parts that best match the question, and files attached or produced earlier in the chat add the passages that match later questions. The user message's `meta.files` lists its attachments.
 
 The `files.create` tool, allowed by default in the built-in profiles, saves a file the user can download: a document, JSON, a spreadsheet (`.xlsx` is built from CSV text), or code. It writes only to Yggdrasil's file store. When a message asks for a file and the profile allows `files.create` without asking, Yggdrasil has the model write only the contents and saves the file itself, with a `chat.making_file` event. The answer's `meta.files` lists produced files. File content is served as an attachment with a sandboxing `Content-Security-Policy`, so HTML never runs on the API's origin.
 
@@ -136,6 +141,8 @@ If the model fails before it shows or changes anything, the turn runs once more 
 
 A profile's `knowledge_sources` lists Mimir source ids. Chat searches them on every turn and adds the matching passages before the system prompt.
 
+Knowledge sources read scanned PDFs with text recognition (OCR). Pages with a text layer are read as before, and only the pages without one are recognized, so a scanned appendix in a digital document is read too. Recognition runs RapidOCR in a private Python environment that is installed under `runtimes/python/envs/ocr` the first time a scanned page needs it. The install is about 110 MB to download and 290 MB on disk, and the recognition models come with it, so nothing else is downloaded. A page takes about a second on an M5 Pro. Recognized text is remembered by file content, so a folder source does not recognize its scanned PDFs again when another file changes. On the Train page, a scanned PDF has no examples to train on, so it is recommended as knowledge.
+
 Knowledge search matches words (BM25). When an embedding model is installed (one with `support_role` `embedding`, such as `nomic-embed-text-v1.5-q8` in the catalog), it also matches meaning, so "What warranty do you offer?" finds a passage about a five-year guarantee. The embedding model runs in its own `llama-server` started with `--embedding`, loaded when first needed and unloaded by the idle sweeper like any model; it appears in `GET /models/running` with `mode` `embedding`. Passages are embedded in the background after a source is added or reindexed, and the vectors are kept in the daemon database. A reindex keeps the vectors of passages whose text did not change, and installing a different embedding model embeds every passage again. A source with more than 20,000 passages is searched by words only. Search never waits for embedding: it uses the vectors that exist.
 
 Word and meaning matches are combined with reciprocal rank fusion. A passage found only by meaning must be similar enough to the question, and close to the best match. When words found something, it must also be at least as similar to the question as the best word match, so a question that names one product does not bring in every similar row. When a reranker model is installed (`support_role` `reranker`), it reorders the top 16 passages. Each hit from `POST /knowledge/search` has `match`: `keyword`, `semantic`, or `both`. `score` orders hits within one search only: BM25 for word-only search, the fused rank when meaning is used, and the reranker's score for passages it ordered. A knowledge source reports `embedded_count` and `embedding_model`. With no embedding model installed, if it cannot start, or while training is using the computer, search uses words only.
@@ -155,7 +162,65 @@ Connected services add tools. Today they are GitHub (`github.search`, `github.is
 - **Fetched first:** a read tool marked `prefetch` (Home Assistant's device list) is called before the model answers a message about its service, when the profile allows it without asking. Its data, written as plain lines, replaces the web look-up for that turn.
 - **Untrusted data:** what they return is treated as untrusted data (§58), and links in results become sources.
 
+MCP tool sources add tools the same way, with `source` `mcp:<source>`; secrets are kept in `secrets/mcp-<source>.json`. `/mcp` (outside `/api/v1`) is Yggdrasil's own MCP server for other apps, checked like `/v1`, and `/mcp/oauth/callback` is where a tool source's sign-in returns. See [MCP](mcp.md).
+
 Personalization shapes how answers look in every chat, automation, and API request. It has four choices: `length` (`brief`, `balanced`, `detailed`), `tone` (`friendly`, `neutral`, `direct`), `format` (`prose`, `lists`), and `units` (`metric`, `imperial`). It also has two short notes, `about_me` and `instructions`, of up to 1,500 characters each. It is stored as a setting and added to the model's instructions as style guidance, after a specialized AI's own instructions. It is kept apart from permissions: what a tool may do comes only from profiles and Settings. A personalization note or a memory that tries to grant a permission is refused with 400, for example "you can always push without asking" or "don't ask before running commands". The refusal says where permissions are set. A memory that states a preference, such as "I use the terminal a lot", is saved and changes no policy.
+
+Each run records what left this computer.
+- **Record kinds:** `web_search` (the query), `web_page` (the address), `paired_computer` (the prompt and context, or training examples), `external_server` (a chat sent to a server that is not on this computer), and `connector` (the service and what it was asked; long text such as a comment's body is left out).
+- **Record fields:** `source` (`chat`, `api`, `automation`, `training`), plus `conversation_id` and `task_id` when there are any.
+
+Memories and knowledge sources have `local_only`. Set it with `PATCH /memory/{id}` or the knowledge update, `{"local_only": true}`. A turn that uses a local-only memory or a passage from a local-only source runs on this computer, even when placement would have chosen a paired computer, and its steps say so.
+
+Run records hold prompts and tool results: tasks and their steps, automation run results, and the egress record.
+- **Retention:** they are kept for `retention_days` (30 by default; 0 keeps them) and removed daily.
+- **Delete now:** `POST /privacy/delete-runs` removes them now and returns how many.
+- **Exceptions:** each automation keeps its latest successful result, which the `change` notification mode compares against, and work that may still be running is never removed.
+- **Chats:** chats are not run records; the `save_chat_history` setting covers them.
+
+Every chat turn, API request, and automation run is traced. A chat or API run's id is the turn's task id, and the answer's `meta.run_id` names it. A run has:
+- `strategy`: how it was handled, such as "Looked up the web first" or "Worked through 3 parts side by side". It also includes the routing reason and a fallback, when there was one.
+- `effort`.
+- `models`: per model, role, and computer. Each entry has the calls, `load_ms` (a real model start of 150 ms or more), `first_token_ms`, `ttft_ms`, tokens in and out, `cached_tokens` (from llama.cpp's cache), and tokens per second.
+- `tools`: calls, failures, and total time.
+- `nodes`, `workers` and `parallel` for a plan, verification passes with issues and fixes, and `retries`.
+- `context_tokens` of `context_limit`, `latency_ms`, and `pipeline_ms`.
+- `status`: `completed`, `failed`, or `stopped`.
+
+In advanced mode, an answer has "Run details". Runs are run records, so the retention and delete action above apply to them.
+
+A profile's `orchestration` object holds its advanced controls. Every field is optional; empty keeps the default, which follows the chat's effort.
+
+| Field | Values | Effect |
+| --- | --- | --- |
+| `effort` | `fast`, `balanced`, `thorough` | The profile's effort when a chat leaves effort on Auto |
+| `planning` | `on`, `off` | Work through requests with several parts in parts, whatever the effort |
+| `max_workers` | 2–8 | Most parts in a plan |
+| `parallel` | `on`, `off` | `off` works through parts one at a time |
+| `verification` | `off`, `check`, `correct`, `thorough` | `off` skips the figure check; `check` reports only; `correct` and `thorough` allow one or two correction passes |
+| `max_tool_calls` | 1–50 | Most tool calls in one turn |
+| `memory` | `off` | Keeps persistent memory out of the profile's chats |
+| `context_share` | 0.1–0.9 | Most of the model's window earlier messages may use |
+| `fallback` | `off` | Shows a failure instead of answering on another model |
+| `timeout_seconds` | 10–3600 | Stops a turn that runs longer; the answer so far is kept and says it reached the time limit |
+
+Invalid values are refused with 400. In advanced mode, the profile editor has an Orchestration section, alongside model roles, tools, knowledge, and placement.
+
+Structured results are checked the same way elsewhere:
+- **Tool arguments:** they are checked against each tool's schema before the tool runs. Safe repairs are made, such as `"7"` for a whole number, or JSON data where text is expected. A call with an argument of the wrong type is refused with `kind` `invalid`, naming the argument, so the model can call again.
+- **Automations:** a condition automation's result must end with the JSON its condition reads: `{"price": number}` for a threshold, or `{"significant": boolean}`. That JSON is read with the same repairs. When it is missing or wrong, the model is asked once to supply it from its own answer. Notices show the prose, never the JSON.
+
+The capability inventory lists what exists right now:
+- `models` (with the computers they are on and whether they are running), `nodes` (online, memory, whether they can train), and `tools` from every source (built in, connected services, MCP), enabled or not;
+- `connectors`, `providers` (runtimes and MCP tool sources, with health), and stored `artifacts`;
+- `abilities`, each with `available`, the tools or models it comes `via`, and a `note` saying how it works or what would make it possible. Abilities are worked out from tools and models by what they do, so a new MCP tool that sends email counts as email without code.
+
+A chat question about what Yggdrasil can do, such as "Can you generate an image?", "Do you have access to my email?", or "Which computer can run Qwen 2.5 14B?", gets the matching facts as trusted instructions. The model answers from them instead of guessing, and the answer's steps say so. In the app, Diagnostics shows the same list.
+
+Three behaviors come from the quality test set (`tests/quality`):
+- **Plain questions:** a plain question is answered without tools; the message must ask for a search, a file, a command, and so on.
+- **Capability questions:** a short question about what Yggdrasil can do is answered straight from the capability inventory, without a model.
+- **False claims:** an answer that says it changed something, when no tool that changes things ran, gets the notice "Nothing was changed: no tool ran to do this, whatever the answer says."
 
 Model, node, tool, conversation, and log routes follow the same prefix. The OpenAPI file is the route list to diff when a handler changes.
 
@@ -228,6 +293,13 @@ The optional `yggdrasil` object holds the assistant's own controls:
 | `effort` | `auto`, `fast`, `balanced`, or `thorough`; it takes precedence over `reasoning_effort`. |
 | `placement` | `local` or `automatic`. |
 | `progress` | With `"stream": true`, progress and tool activity arrive as chunks with an empty `delta` and a `yggdrasil.event`, such as `{"type": "tool.started", "tool_id": "internet.search"}`. Before `[DONE]`, a last such chunk carries `yggdrasil.sources`, `steps`, `notice`, and `files`. Clients that ignore unknown fields see a plain OpenAI stream. |
+
+`response_format` asks for JSON:
+- **Types:** `{"type": "json_object"}`, or `{"type": "json_schema", "json_schema": {"schema": {...}}}` with a JSON Schema. Yggdrasil checks `type`, `properties`, `required`, `enum`, and `items`.
+- **Constrained output:** the model is told the shape. On this computer, llama.cpp also constrains the reply to the schema with a grammar. Such a turn is one reply: the web look-up still runs first, but there is no plan, tool call, file, or figure check.
+- **Repairs:** the answer's JSON is found (fenced or not) and safely repaired: trailing commas, curly quotes, `"$1,299"` for a number, `"yes"` for a boolean.
+- **Retry:** an answer that still does not fit is asked for once more, with the problems named.
+- **Result:** the response content is compact JSON. When nothing fits, the request fails with 422 and lists the problems. A streamed request gets the JSON as one chunk.
 
 A non-streaming response has a `yggdrasil` object with the answer's `sources`, `steps`, `notice`, and `files` when there are any.
 

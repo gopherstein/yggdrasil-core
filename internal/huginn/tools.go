@@ -21,7 +21,10 @@ var toolGroups = map[string][]string{
 
 // Groups each kind of request gets before cues in the message add more.
 var kindGroups = map[Kind][]string{
-	Chat:     {"web", "create"},
+	// A plain question is answered directly; small models offered tools
+	// for one reach for them (found by the quality set, §64). Cues in the
+	// message still add what it asks for.
+	Chat:     {},
 	Current:  {"web", "create"},
 	Research: {"web", "create", "read"},
 	Coding:   {"web", "create", "read", "write", "shell", "gitr"},
@@ -34,6 +37,7 @@ var (
 	cueShell = regexp.MustCompile(`(?i)\b(run|execute|install|build|compile|terminal|command|shell|script|npm|pnpm|pip|brew|make|go test|go build)\b`)
 	cueGit   = regexp.MustCompile(`(?i)\b(git|commit|branch|diff|merge|rebase|staged|push|pull request)\b`)
 	cueGitW  = regexp.MustCompile(`(?i)\b(commit|stage|push)\b`)
+	cueMake  = regexp.MustCompile(`(?i)\b(make|create|write|generate|export|save|build)\b.{0,40}\b(files?|spreadsheets?|documents?|docs?|csv|xlsx|pdf|tables?|reports?|lists?)\b`)
 	cueWeb   = regexp.MustCompile(`(?i)(\b(search|web|online|internet|look up|website|url|link|news|latest)\b|https?://)`)
 )
 
@@ -64,6 +68,9 @@ func ToolsFor(k Kind, message string, available []string) []string {
 	if cueWeb.MatchString(message) {
 		want["web"] = true
 	}
+	if cueMake.MatchString(message) {
+		want["create"] = true
+	}
 	var out []string
 	for _, id := range available {
 		for g, ids := range toolGroups {
@@ -72,12 +79,17 @@ func ToolsFor(k Kind, message string, available []string) []string {
 				break
 			}
 		}
-		// Tools outside the built-in groups, such as connected services,
-		// are offered when the message names the service or its subject.
+		// Tools outside the built-in groups, such as connected services
+		// and MCP tool sources, are offered when the message names the
+		// service or its subject, or always when the person said so.
 		// One that changes something also needs the message to ask for a
 		// change, so a question is never offered a way to act.
-		if !grouped(id) && aboutService(strings.SplitN(id, ".", 2)[0], message) {
-			if def, ok := tools.Lookup(id); ok && def.Risk == tools.RiskWrite && !cueAction.MatchString(message) {
+		if grouped(id) {
+			continue
+		}
+		def, known := tools.Lookup(id)
+		if (known && def.Always) || aboutService(strings.SplitN(id, ".", 2)[0], message) {
+			if known && def.Risk == tools.RiskWrite && !cueAction.MatchString(message) {
 				continue
 			}
 			out = append(out, id)
