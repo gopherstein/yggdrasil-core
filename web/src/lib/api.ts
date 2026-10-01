@@ -63,6 +63,8 @@ import type {
   EvalPrompt,
   ExportStatus,
   KnowledgeHit,
+  KnowledgeKind,
+  KnowledgeRemoteInput,
   KnowledgeSource,
   MaterialUse,
   SpecializedAI,
@@ -739,11 +741,12 @@ export const api = {
 
   createKnowledge: (body: {
     name?: string
-    kind: 'path' | 'text'
+    kind: KnowledgeKind
     path?: string
     filename?: string
     text?: string
     content_base64?: string
+    remote?: KnowledgeRemoteInput
   }) =>
     request<KnowledgeSource>('/api/v1/knowledge/sources', { method: 'POST', body: JSON.stringify(body) }),
 
