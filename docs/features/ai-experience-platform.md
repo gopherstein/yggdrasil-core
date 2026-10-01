@@ -1399,7 +1399,145 @@ The system should:
 
 ---
 
-# Part XXVIII — Product Outcome
+# Part XXVIII — Additional Requirements
+
+These requirements came out of building Mimir and Train Your Own AI (#48, #51) against this specification.
+
+## 58. Retrieved Content Is Data, Not Instructions
+
+Web pages, files, Mimir passages, tool results, memories, and connector data can contain text that reads like instructions. Context assembly must keep them from being treated as instructions.
+
+- Every Context Bundle item (§42) carries a trust level: **trusted** (Yggdrasil policy, profile and specialized-AI instructions, the user's own message) or **untrusted** (everything retrieved or returned by a tool).
+- Untrusted content is never placed in the system role. It is delimited, labelled with its source, and introduced as reference material.
+- A tool call that follows untrusted content is held to the stricter permission: an Allow tool that would act externally (send, write, execute, purchase) becomes Ask for that call.
+- Tool results that contain instructions are passed through as data; the model is told they are data.
+
+## 59. Permission Requests When Nobody Is Watching
+
+Background and scheduled runs have no person present to answer an **Ask** permission.
+
+- Automations record the permissions they need when created, and the person approves them then.
+- A run that reaches an unapproved Ask either pauses and sends an approval request through Gjallarhorn, or skips the action and reports it, according to the automation's policy. The default is to skip and report.
+- A run never widens its permissions because no one answered.
+
+## 60. Sharing the Computer
+
+Interactive chat, background automations, benchmarks, and training compete for the same memory.
+
+- Priority: interactive chat > scheduled automations > benchmarks > training.
+- Lower-priority work queues instead of evicting a model an interactive chat is using.
+- Training may unload models only when no interactive request is active; a chat that arrives during training is served (possibly on another computer) or told plainly that training is using this computer, with an estimate.
+- Repeated out-of-memory failures stop the retry loop (§57) and are explained.
+
+## 61. Specialized AIs and Supporting Models in Routing
+
+Model routing (§13) must understand:
+
+- **Specialized AIs** (`sai:<name>`): a base model plus a LoRA adapter that exists only on the computer that owns it, with tools off and its own instructions and knowledge. Routing must not place it where its adapter is missing or route tool-requiring tasks to it.
+- **Supporting roles**: `embedding` and `reranker` models used by Mimir, and the `classifier` model (if any) used by Huginn.
+- Adapter-aware placement: base model processes load the adapters of deployed AIs, so the base model and its specialized AIs share one process.
+
+## 62. The API Gets the Same Assistant
+
+`/v1/chat/completions` must pass through the standard request pipeline (§46):
+
+- The full message array is honored, not only the last user message.
+- Callers can opt into memory and connected knowledge per request or per API key.
+- Progress and tool activity are available to streaming clients (as OpenAI-compatible tool-call deltas or a Yggdrasil extension field).
+- Advanced controls (reasoning level, tools, placement) are settable per request within the key's permissions.
+
+## 63. What Left This Computer
+
+Yggdrasil is local-first, so each run records where its data went:
+
+- web searches and page fetches (queries and URLs),
+- paired computers that received prompts, context, or training examples,
+- external OpenAI-compatible servers,
+- connectors.
+
+Memories and knowledge sources can be marked **this computer only**; Norn must not place work that needs them elsewhere. Run records store prompts and tool results, so they need a retention period and a delete action.
+
+## 64. Quality Test Set
+
+Classification, routing, context assembly, verification, and reasoning budgets all change answers. A fixed set of representative requests with expected behavior (a simple question stays direct; a price question uses knowledge; a risky action asks first; a long conversation remembers an early fact) runs against the stub model in CI and against real models on a schedule, so defaults are changed with evidence (§54).
+
+## 65. Latency Targets
+
+The platform must not make the common case slower.
+
+- Pipeline overhead before the first token of a simple chat: at most 100 ms over a direct model call, measured on the quality test set.
+- Classification for simple chats uses rules or a cached decision, not an extra model call.
+- Visible progress appears within 300 ms of sending, even when the model is loading.
+
+## 66. Accurate Token Counting
+
+Context budgets (§7) use the running model's tokenizer (llama-server `/tokenize`) when available, falling back to estimates only when it is not.
+
+## 67. Stop Means Stop
+
+Cancelling a run stops every worker, tool call, and remote computer involved, releases their resources, and keeps the partial results already produced.
+
+## 68. Versioned Client Contract
+
+Desktop and mobile apps are separate clients. Run, progress, artifact, and citation events carry a contract version, and fields are added compatibly.
+
+## Additional Acceptance Criteria
+
+21. Retrieved content cannot change the assistant's instructions or widen a tool's permission.
+22. Background runs never wait silently for, or skip past, an Ask permission.
+23. Interactive chat is not evicted by background work or training.
+24. Specialized AIs are routed only where their adapter exists.
+25. API clients get conversation history, memory, and knowledge when they ask for them.
+26. Each run can show what data left the computer and where it went.
+27. Simple chats stay within the latency targets.
+
+---
+
+# Part XXIX — Implementation Priority
+
+All items, ordered by how much a person using chat will notice them. The standard request pipeline (§46) and Context Bundle (§42) are foundations built incrementally as these land, not a separate first step.
+
+**Every chat**
+
+1. Answers show their sources: web pages, knowledge passages, files, and memories, rendered by the product (§9, §29).
+2. Progress in plain language while working, and a "what I did" summary kept with each answer (§33).
+3. Errors in plain language with a next step and a retry; technical detail on request (§34).
+4. Simple chats stay fast (§65).
+5. Long conversations keep working: context budget, compression of older turns, accurate token counts (§6–8, §66).
+6. Memory that survives model changes: "Remember that…", Memory on/off, memory management (§10–11).
+7. "Auto" picks the right model and looks things up when needed: task classification, model routing, current information (§12–13, §21).
+8. Failures recover quietly: fallback routing, Heimdall health, graceful degradation, and a note when quality changes (§14, §25–26).
+
+**Powerful tasks**
+
+9. Retrieved content is data, not instructions (§58).
+10. Files in and out: attachments and generated documents, spreadsheets, and images in one artifact store (§28).
+11. Planning and parallel work for complex requests (§22–23).
+12. Checking important answers: selective verification (§24).
+13. Reasoning effort: Auto, Fast, Balanced, Thorough (§15).
+14. Stop means stop (§67).
+15. Relevant tools only, capability-first tool IDs, permissions enforced outside the model (§16–19).
+16. Background tasks use the same assistant and notify through Gjallarhorn; Ask with nobody watching (§30–31, §59).
+17. Sharing the computer fairly (§60).
+18. Specialized AIs and supporting models in routing (§61).
+19. Connected services with credentials kept out of model context (§32).
+20. Personalization of style and tools, separate from permissions (§38).
+
+**Inspection, integration, and foundations**
+
+21. The API gets the same assistant (§62).
+22. What left this computer (§63).
+23. Run details for advanced users (§35).
+24. Profiles & Orchestration controls (§40, §56).
+25. Structured output validation (§27).
+26. Capability inventory (§37).
+27. Quality test set (§64).
+28. Caching (§36).
+29. Versioned client contract (§68).
+
+---
+
+# Part XXX — Product Outcome
 
 The intended long-term experience is:
 
