@@ -1403,9 +1403,10 @@ export function ChatPage() {
                   : 'chat-landing-hero-exit',
               ].join(' ')}
               aria-hidden={!showLanding}
+              inert={!showLanding}
             >
               <Ratatoskr state={landingError ? 'error' : 'idle'} size={96} className="mb-3" />
-              <RealmKicker path="/chat" className="mx-auto" />
+              <RealmKicker path="/chat" className="justify-center" />
               <h1 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
                 What can I help you with?
               </h1>

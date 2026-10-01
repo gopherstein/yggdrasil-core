@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react'
+import { LoreButton } from '@/components/ui/LoreButton'
+import { MASCOT_LORE } from '@/lib/lore'
 import { animate } from '@/lib/ratatoskr/loop'
 import { Rig, type MascotState } from '@/lib/ratatoskr/rig'
 import { readScreenshotLaunch } from '@/lib/screenshotMode'
@@ -19,7 +21,18 @@ function wantsStill(): boolean {
  * With reduced motion, or in screenshot mode, he is a still frame so
  * captures stay deterministic.
  */
-export function Ratatoskr({ state = 'idle', size = 96, className = '' }: { state?: MascotState; size?: number; className?: string }) {
+export function Ratatoskr({
+  state = 'idle',
+  size = 96,
+  className = '',
+  lore = true,
+}: {
+  state?: MascotState
+  size?: number
+  className?: string
+  /** Clicking him opens a short lore entry. Off where he must not take focus. */
+  lore?: boolean
+}) {
   const ref = useRef<SVGSVGElement>(null)
   const rig = useRef<Rig | null>(null)
   const detail = size >= DETAIL_PX
@@ -43,7 +56,7 @@ export function Ratatoskr({ state = 'idle', size = 96, className = '' }: { state
     if (rig.current && rig.current.state !== state) rig.current.setState(state)
   }, [state])
 
-  return (
+  const svg = (
     <svg
       ref={ref}
       width={size}
@@ -51,7 +64,13 @@ export function Ratatoskr({ state = 'idle', size = 96, className = '' }: { state
       aria-hidden="true"
       focusable="false"
       data-mascot-state={state}
-      className={['ratatoskr shrink-0', className].filter(Boolean).join(' ')}
+      className={['ratatoskr shrink-0', lore ? '' : className].filter(Boolean).join(' ')}
     />
+  )
+  if (!lore) return svg
+  return (
+    <LoreButton lore={MASCOT_LORE} label="About Ratatoskr" className={['inline-flex shrink-0', className].filter(Boolean).join(' ')}>
+      {svg}
+    </LoreButton>
   )
 }

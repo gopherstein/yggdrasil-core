@@ -126,7 +126,7 @@ function DaemonBootGate({ children }: { children: ReactNode }) {
           void healthQuery.refetch()
         }}
       >
-        <YggdrasilMark size={64} />
+        <YggdrasilMark size={64} lore />
         <h1 className="mt-6 font-display text-2xl font-semibold tracking-tight text-ink">
           API key required
         </h1>

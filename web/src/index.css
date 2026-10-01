@@ -26,6 +26,8 @@
   --color-mimir: #c6a15b;
   --color-heimdall: #d8a657;
   --color-gungnir: #c57a5a;
+  /* Ratatoskr's copper fur. */
+  --color-ratatoskr: #c45e31;
 }
 
 @theme inline {
@@ -344,6 +346,47 @@
   /* The page's Norse name, set above its English title. */
   .realm-kicker {
     @apply mb-1.5 flex w-fit items-center gap-1.5 font-display text-xs font-semibold uppercase leading-none tracking-[0.28em];
+  }
+
+  /* Clicking a Norse name, the mascot, or the logo opens a lore bubble. */
+  .lore-button {
+    @apply cursor-pointer rounded-md border-0 bg-transparent p-0 focus-visible:outline-2 focus-visible:outline-offset-2;
+    outline-color: rgb(var(--rgb-primary));
+  }
+
+  .lore-button.realm-kicker:hover span,
+  .lore-button:hover > .realm-name {
+    @apply underline decoration-dotted underline-offset-4;
+  }
+
+  .lore-bubble {
+    @apply fixed z-[200] rounded-2xl border border-line/80 bg-surface p-4 text-left outline-none;
+    box-shadow: var(--shadow-panel);
+    animation: ygg-fade 150ms ease-out;
+  }
+
+  /* The tail points at what was clicked. */
+  .lore-bubble::before {
+    content: '';
+    position: absolute;
+    left: calc(var(--lore-tail) - 7px);
+    width: 14px;
+    height: 14px;
+    transform: rotate(45deg);
+    background: rgb(var(--rgb-surface));
+    border: 1px solid rgb(var(--rgb-line) / 0.8);
+  }
+
+  .lore-bubble[data-side='bottom']::before {
+    top: -8px;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  .lore-bubble[data-side='top']::before {
+    bottom: -8px;
+    border-left: 0;
+    border-top: 0;
   }
 
   /* The accents are tuned for dark surfaces; deepen them on light ones. */

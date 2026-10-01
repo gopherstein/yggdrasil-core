@@ -1,4 +1,6 @@
 import { useId } from 'react'
+import { LoreButton } from '@/components/ui/LoreButton'
+import { LOGO_LORE } from '@/lib/lore'
 
 /**
  * The Yggdrasil mark, drawn inline so it follows the theme. Geometry is copied
@@ -52,7 +54,18 @@ const SMALL_TRACES: [string, number][] = [
 /** At this size and below, the small mark is drawn. */
 export const SMALL_MARK_MAX_PX = 32
 
-export function YggdrasilMark({ size = 36, className = '', title }: { size?: number; className?: string; title?: string }) {
+export function YggdrasilMark({
+  size = 36,
+  className = '',
+  title,
+  lore = false,
+}: {
+  size?: number
+  className?: string
+  title?: string
+  /** Clicking the mark opens a short lore entry about the World Tree. */
+  lore?: boolean
+}) {
   // Several marks can be on screen at once; each needs its own mask and clip ids.
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const small = size <= SMALL_MARK_MAX_PX
@@ -60,7 +73,7 @@ export function YggdrasilMark({ size = 36, className = '', title }: { size?: num
   const traces = small ? SMALL_TRACES : FULL_TRACES
   const clip = `ygg-c-${id}`
   const mask = `ygg-k-${id}`
-  return (
+  const mark = (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 100 100"
@@ -106,5 +119,11 @@ export function YggdrasilMark({ size = 36, className = '', title }: { size?: num
         ))}
       </g>
     </svg>
+  )
+  if (!lore) return mark
+  return (
+    <LoreButton lore={LOGO_LORE} label="About the Yggdrasil mark" className="inline-flex shrink-0">
+      {mark}
+    </LoreButton>
   )
 }

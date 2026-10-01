@@ -691,7 +691,7 @@ export function SettingsPage() {
         <p className="settings-group-label">About</p>
         <section className="card space-y-4">
           <div className="flex items-center gap-4">
-            <YggdrasilMark size={72} />
+            <YggdrasilMark size={72} lore />
             <div className="min-w-0">
               <p className="font-display text-xl font-semibold tracking-tight text-ink">
                 Yggdrasil
