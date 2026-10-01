@@ -1,6 +1,6 @@
 # Trademark policy
 
-Copyright and trademark are different. The [GNU Affero General Public License](LICENSE) covers the source code in this repository. It does not grant permission to use Yggdrasil trademarks, logos, Rune-Y artwork, or other Yggdrasil branding.
+Copyright and trademark are different. The [GNU Affero General Public License](LICENSE) covers the source code in this repository. It does not grant permission to use Yggdrasil trademarks, logos, Rune-Y artwork, the Ratatoskr mascot, or other Yggdrasil branding.
 
 You may use the marks to refer to the project in ordinary speech, including:
 
@@ -10,6 +10,11 @@ You may use the marks to refer to the project in ordinary speech, including:
 
 A fork should use its own name, icon, and visual identity. Do not present an unofficial build as an official Yggdrasil release, and do not use the marks in a way that suggests YEIXIO LLC produced or endorses that build.
 
-Logos shipped with the web UI in this repository are for running Yggdrasil Core. They are not a general brand license.
+Brand assets in this repository:
+
+- The Yggdrasil logo and Rune-Y mark (`docs/brand/yggdrasil-logo.png`, `assets/brand/`, `web/public/`).
+- Ratatoskr, the Yggdrasil mascot: the squirrel character, his poses, and his artwork (`docs/brand/mascot/`, `web/src/lib/ratatoskr/`).
+
+Logos and the mascot shipped with the web UI in this repository are for running Yggdrasil Core. They are not a general brand license. A fork should not use Ratatoskr as its own mascot.
 
 TODO: Have trademark policy reviewed before commercial launch.
