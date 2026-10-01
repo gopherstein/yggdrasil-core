@@ -155,6 +155,7 @@ export function AutomationsPage() {
           {listQuery.isError && <p className="text-sm text-danger">Automations could not be loaded.</p>}
           {!listQuery.isLoading && (listQuery.data ?? []).length === 0 && !creating && (
             <EmptyState
+              mascot="idle"
               title="No automations yet"
               description="Describe a recurring check, such as a morning price or a Friday release summary, and Yggdrasil will run it on that schedule."
             />

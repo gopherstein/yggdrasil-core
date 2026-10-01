@@ -2,6 +2,8 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { Ratatoskr } from '@/components/ui/Ratatoskr'
+import { useMascotState } from '@/lib/ratatoskr/useMascotState'
 import { api } from '@/lib/api'
 import { subscribeEvents } from '@/lib/events'
 import { bytesToGb, formatBytes } from '@/lib/format'
@@ -157,6 +159,9 @@ export function OnboardingPage() {
     }
   }
 
+  // Ratatoskr waves through setup and celebrates once when it is ready.
+  const mascot = useMascotState({ base: step === 'ready' ? 'idle' : 'greet', react: [], celebrate: step === 'ready' })
+
   const hardware = hardwareQuery.data
   const acceleratorLabels =
     hardware?.accelerators?.map((a) => a.model).filter(Boolean) ?? []
@@ -188,14 +193,7 @@ export function OnboardingPage() {
   return (
     <div className="mx-auto flex h-full min-h-0 w-full max-w-3xl flex-col justify-center overflow-y-auto px-6 py-12">
       <header className="mb-10 text-center">
-        <img
-          src="/yggdrasil-mark.png"
-          alt=""
-          width={72}
-          height={72}
-          className="mx-auto mb-5 h-[72px] w-[72px] object-contain"
-          decoding="async"
-        />
+        <Ratatoskr state={mascot} size={160} className="mx-auto mb-3" />
         <p className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-accent">
           Welcome
         </p>

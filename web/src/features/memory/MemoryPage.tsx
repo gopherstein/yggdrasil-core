@@ -69,6 +69,7 @@ export function MemoryPage() {
       {memory.isLoading && <p className="text-sm text-ink-muted">Loading…</p>}
       {!memory.isLoading && items.length === 0 && (
         <EmptyState
+          mascot="idle"
           title="Nothing remembered yet"
           description="Tell Yggdrasil things worth keeping, such as “Remember that I prefer metric units” or “Remember that this project uses Go.”"
         />

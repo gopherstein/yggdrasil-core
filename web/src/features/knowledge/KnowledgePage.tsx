@@ -30,6 +30,7 @@ export function KnowledgePage() {
           {sources.isLoading && <p className="text-sm text-ink-muted">Loading…</p>}
           {!sources.isLoading && list.length === 0 && (
             <EmptyState
+              mascot="idle"
               title="No knowledge connected"
               description="Connect a file or folder on this computer, or paste content. PDF, Excel, CSV, TSV, JSON, JSONL, Markdown, text, and HTML files work."
             />

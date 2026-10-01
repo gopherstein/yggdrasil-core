@@ -105,6 +105,7 @@ export function TrainPage() {
           ) : (
             <>
               <EmptyState
+                mascot="idle"
                 title="Build a specialized AI"
                 description="Describe the job, add examples of good answers, and connect the data it should look up. Yggdrasil recommends a base model, trains it on this computer, and lets you compare it with the original before you use it."
                 action={

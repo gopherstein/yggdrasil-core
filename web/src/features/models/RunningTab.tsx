@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { formatBytes } from '@/lib/format'
 import type { AIProfile, HardwareInventory, RunningModelView } from '@/types/api'
+import { Ratatoskr } from '@/components/ui/Ratatoskr'
 
 export function RunningTab({
   running,
@@ -17,9 +18,12 @@ export function RunningTab({
 }) {
   if (running.length === 0) {
     return (
-      <p className="text-sm text-ink-muted">
-        No models are loaded right now. Chat will start one automatically when you need it.
-      </p>
+      <div className="flex items-center gap-4">
+        <Ratatoskr state="sleep" size={96} />
+        <p className="text-sm text-ink-muted">
+          No models are loaded right now. Chat will start one automatically when you need it.
+        </p>
+      </div>
     )
   }
 
