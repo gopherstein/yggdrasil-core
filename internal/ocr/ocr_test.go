@@ -89,6 +89,10 @@ func TestRecognizeReportsFailures(t *testing.T) {
 	if _, err := r.RecognizePDF(ctx, []byte("%PDF"), []int{1, 2}); err == nil {
 		t.Fatal("an unfinished run was accepted")
 	}
+	env.err = pyenv.ErrSandboxed
+	if _, err := r.RecognizePDF(ctx, []byte("%PDF"), []int{1}); !errors.Is(err, pyenv.ErrSandboxed) || !strings.Contains(err.Error(), "not included in this copy") {
+		t.Fatalf("got %v", err)
+	}
 	env.err = errors.New("uv: no network")
 	if _, err := r.RecognizePDF(ctx, []byte("%PDF"), []int{1}); err == nil || !strings.Contains(err.Error(), "could not be installed") {
 		t.Fatalf("got %v", err)

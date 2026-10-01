@@ -145,6 +145,9 @@ type FitInput struct {
 	EnvInstalled bool
 	// Pinned keeps the method and batch the user chose in Advanced mode.
 	Pinned bool
+	// Unavailable, when set, is why the trainer cannot run on this computer
+	// even though the hardware suits it.
+	Unavailable string
 }
 
 // Approximate size of the trainer environment download.
@@ -162,6 +165,10 @@ func EstimateFit(in FitInput) NodeFit {
 	fit.Backend = in.Trainer.ID()
 	if ok, why := in.Trainer.Supports(in.Hardware); !ok {
 		fit.Label, fit.Reason = FitUnsupported, why
+		return fit
+	}
+	if in.Unavailable != "" {
+		fit.Label, fit.Reason = FitUnsupported, in.Unavailable
 		return fit
 	}
 	capacity := trainingCapacity(in.Hardware)

@@ -10,6 +10,7 @@ import (
 	"context"
 	_ "embed"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -89,6 +90,9 @@ func (r *Recognizer) RecognizePDF(ctx context.Context, raw []byte, pages []int) 
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	py, err := r.Python.Ensure(ctx, Spec(), nil)
+	if errors.Is(err, pyenv.ErrSandboxed) {
+		return nil, errNotIncluded{}
+	}
 	if err != nil {
 		return nil, fmt.Errorf("text recognition could not be installed: %w", err)
 	}
@@ -164,6 +168,16 @@ func (r *Recognizer) RecognizePDF(ctx context.Context, raw []byte, pages []int) 
 	}
 	return texts, nil
 }
+
+// errNotIncluded is returned by a sandboxed app that does not bundle the
+// OCR environment. It unwraps to pyenv.ErrSandboxed.
+type errNotIncluded struct{}
+
+func (errNotIncluded) Error() string {
+	return "text recognition is not included in this copy of Yggdrasil, which runs in the macOS App Sandbox"
+}
+
+func (errNotIncluded) Unwrap() error { return pyenv.ErrSandboxed }
 
 // tail keeps the end of a process's stderr for error messages.
 type tail struct{ b bytes.Buffer }

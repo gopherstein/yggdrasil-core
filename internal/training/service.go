@@ -46,6 +46,9 @@ type PythonEnv interface {
 	Status(spec pyenv.Spec) pyenv.Status
 	Ensure(ctx context.Context, spec pyenv.Spec, progress pyenv.Progress) (string, error)
 	Env() []string
+	// Unavailable says why an environment cannot be used or installed on
+	// this computer, such as in a sandboxed app, or returns "".
+	Unavailable(spec pyenv.Spec) string
 }
 
 // Deps wires the service to the rest of the daemon.
@@ -160,7 +163,7 @@ func (s *Service) Backends(ctx context.Context) []map[string]any {
 	}
 	out := []map[string]any{}
 	for _, t := range s.d.Trainers {
-		ok, why := t.Supports(local)
+		ok, why := s.supportsHere(t, local)
 		st := s.d.Python.Status(t.Environment())
 		out = append(out, map[string]any{"id": t.ID(), "name": t.DisplayName(), "supported": ok, "reason": why, "installed": st.Installed})
 	}
@@ -796,6 +799,25 @@ func trainingRepos(infos ...models.TrainingInfo) []string {
 	return repos
 }
 
+// supportsHere reports whether t can train on this computer: the hardware
+// suits it, and its Python environment can be used here. A sandboxed app can
+// only use an environment bundled with it (#95).
+func (s *Service) supportsHere(t Trainer, hw contracts.HardwareInventory) (bool, string) {
+	if ok, why := t.Supports(hw); !ok {
+		return false, why
+	}
+	if why := s.d.Python.Unavailable(t.Environment()); why != "" {
+		return false, sandboxReason(why)
+	}
+	return true, ""
+}
+
+// sandboxReason explains an environment that cannot run here, with what to
+// do instead.
+func sandboxReason(why string) string {
+	return "Training can't run on this computer: " + why + ". Pair a computer running Yggdrasil Core to train there."
+}
+
 func (s *Service) fitFor(n Node, caps map[string]peerCaps, info models.TrainingInfo, h Hyper, st DatasetStats, pinned bool) NodeFit {
 	trainer := TrainerFor(s.d.Trainers, n.Hardware)
 	in := FitInput{NodeID: n.ID, NodeName: n.Name, Local: n.Local, Hardware: n.Hardware, Info: info, Hyper: h, Stats: st,
@@ -805,6 +827,9 @@ func (s *Service) fitFor(n Node, caps map[string]peerCaps, info models.TrainingI
 		in.Cached = s.cached
 		if trainer != nil {
 			in.EnvInstalled = s.d.Python.Status(trainer.Environment()).Installed
+			if why := s.d.Python.Unavailable(trainer.Environment()); why != "" {
+				in.Unavailable = sandboxReason(why)
+			}
 		}
 	} else {
 		pc, ok := caps[n.ID]
@@ -819,6 +844,12 @@ func (s *Service) fitFor(n Node, caps map[string]peerCaps, info models.TrainingI
 		in.Cached = func(repo string) bool { return pc.caps.Cached[repo] }
 		if trainer != nil {
 			in.EnvInstalled = pc.caps.Installed[trainer.ID()]
+			// The peer knows what it cannot run, such as a sandboxed app.
+			for _, b := range pc.caps.Backends {
+				if b.ID == trainer.ID() && !b.Supported && b.Reason != "" {
+					in.Unavailable = strings.Replace(b.Reason, "this computer", n.Name, 1)
+				}
+			}
 		}
 		busy = pc.caps.Busy
 	}

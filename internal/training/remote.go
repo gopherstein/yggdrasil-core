@@ -130,7 +130,7 @@ func (s *Service) handleCapabilities(w http.ResponseWriter, r *http.Request) {
 	}
 	caps := RemoteCapabilities{Protocol: RemoteProtocol, Cached: map[string]bool{}, Installed: map[string]bool{}}
 	for _, t := range s.d.Trainers {
-		ok, why := t.Supports(hw)
+		ok, why := s.supportsHere(t, hw)
 		caps.Backends = append(caps.Backends, RemoteBackend{ID: t.ID(), Supported: ok, Reason: why})
 		caps.Installed[t.ID()] = s.d.Python.Status(t.Environment()).Installed
 	}
@@ -236,7 +236,7 @@ func (s *Service) StartRemoteRun(req RemoteRunRequest) error {
 	if trainer == nil {
 		return fmt.Errorf("no trainer is available")
 	}
-	if ok, why := trainer.Supports(hw); !ok {
+	if ok, why := s.supportsHere(trainer, hw); !ok {
 		return fmt.Errorf("%s", why)
 	}
 	s.gcRemoteRuns()

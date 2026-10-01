@@ -21,7 +21,10 @@ import (
 	"github.com/yeixio/yggdrasil-core/pkg/pluginapi"
 )
 
-type fakePython struct{ ensured atomic.Int32 }
+type fakePython struct {
+	ensured   atomic.Int32
+	sandboxed bool
+}
 
 func (f *fakePython) Status(pyenv.Spec) pyenv.Status {
 	return pyenv.Status{Installed: f.ensured.Load() > 0}
@@ -31,6 +34,12 @@ func (f *fakePython) Ensure(ctx context.Context, spec pyenv.Spec, p pyenv.Progre
 	return "/fake/python", nil
 }
 func (f *fakePython) Env() []string { return nil }
+func (f *fakePython) Unavailable(pyenv.Spec) string {
+	if f.sandboxed {
+		return pyenv.ErrSandboxed.Error()
+	}
+	return ""
+}
 
 // fakeTrainer writes an adapter, or blocks until cancelled, or fails.
 type fakeTrainer struct {

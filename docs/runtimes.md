@@ -26,6 +26,24 @@ The binary is stored under the data directory `runtimes/llamacpp/` unless a macO
 
 On a Mac App Store build, the sandbox cannot `fork` a binary downloaded into the container. Those builds are expected to ship a signed `llama-server` next to the daemon. That packaging is outside this repository.
 
+## Python environments in sandboxed builds
+
+Training (MLX on Apple Silicon, PyTorch on NVIDIA GPUs) and text recognition for scanned PDFs run in Python environments. The daemon normally installs them under `runtimes/python` on first use: it downloads `uv`, a private Python, and pinned packages. A sandboxed app cannot run any of that.
+
+The daemon knows it is sandboxed when macOS sets `APP_SANDBOX_CONTAINER_ID`. `YGGDRASIL_SANDBOXED=1` simulates this for testing. When sandboxed:
+
+- **No downloads:** it never downloads or installs a Python environment.
+- **Bundled environments are used:** a current environment found in a `python` folder beside the daemon executable is used instead.
+- **Training without a bundle:** the trainer is reported as unavailable on this computer, with the reason, in `GET /training/backends`, the training plan, and the capabilities a paired computer sees. Norn chooses an eligible paired computer running Yggdrasil Core instead, and a paired computer that is sandboxed refuses runs it cannot do.
+- **Scanned PDFs without a bundle:** a scanned PDF fails with "text recognition is not included in this copy of Yggdrasil". PDFs with a text layer are read as usual.
+
+To bundle an environment, run `yggdrasil-daemon -python-envs`. It prints each environment as JSON: `name`, `python` version, `requirements`, `install_args`, `no_deps`, and `marker`. For each one you want to ship:
+
+1. Create `python/<name>/` beside the daemon, with a virtual environment of that Python version, for example `uv venv --python 3.12 python/<name>`.
+2. Install the `requirements` with the `install_args`, and with `--no-deps` when `no_deps` is true, for example `uv pip install --python python/<name>/bin/python …`.
+3. Write `marker` exactly, byte for byte, to `python/<name>/.yggdrasil-requirements`. The daemon uses the environment only when the marker matches what this daemon version expects, so a bundle built for another version is ignored.
+4. Sign every executable and native library in the folder with the app.
+
 ## external-openai
 
 | | |

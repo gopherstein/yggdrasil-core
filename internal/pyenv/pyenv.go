@@ -13,6 +13,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -52,6 +53,9 @@ type Status struct {
 	Name      string `json:"name"`
 	Installed bool   `json:"installed"`
 	Python    string `json:"python,omitempty"`
+	// Bundled is true when the environment ships with the app instead of
+	// being installed by the daemon.
+	Bundled bool `json:"bundled,omitempty"`
 	// Stale is true when the environment exists but was built from different
 	// requirements, for example after an upgrade.
 	Stale bool `json:"stale,omitempty"`
@@ -60,9 +64,27 @@ type Status struct {
 // Progress reports install steps.
 type Progress func(step, detail string)
 
+// ErrSandboxed means the daemon runs in the macOS App Sandbox, which refuses
+// to run programs downloaded into the app's container, so environments can
+// only come bundled with the app.
+var ErrSandboxed = errors.New("this copy of Yggdrasil runs in the macOS App Sandbox, which cannot run a Python environment it downloads")
+
+// Sandboxed reports whether the daemon runs in the macOS App Sandbox. macOS
+// sets APP_SANDBOX_CONTAINER_ID in every sandboxed process;
+// YGGDRASIL_SANDBOXED=1 simulates it for testing.
+func Sandboxed() bool {
+	return os.Getenv("APP_SANDBOX_CONTAINER_ID") != "" || os.Getenv("YGGDRASIL_SANDBOXED") == "1"
+}
+
 // Manager owns the uv binary and the environments under Root.
 type Manager struct {
 	Root string
+	// Bundled is a directory of environments shipped with the app, one
+	// folder per environment name, each with the requirements marker. A
+	// current bundled environment is used instead of installing one.
+	Bundled string
+	// Sandboxed refuses to download and install environments.
+	Sandboxed bool
 	// ReleaseBase is where uv release assets are downloaded. Tests replace it.
 	ReleaseBase string
 	HTTP        *http.Client
@@ -70,10 +92,14 @@ type Manager struct {
 	mu sync.Mutex
 }
 
-// New returns a manager rooted at dir (normally <runtimes>/python).
+// New returns a manager rooted at dir (normally <runtimes>/python). It uses
+// environments bundled in a "python" folder beside the daemon, and does not
+// install any when the daemon is sandboxed.
 func New(dir string) *Manager {
 	return &Manager{
 		Root:        dir,
+		Bundled:     bundledDir(),
+		Sandboxed:   Sandboxed(),
 		ReleaseBase: "https://github.com/astral-sh/uv/releases/download/" + UVVersion,
 		HTTP:        http.DefaultClient,
 	}
@@ -89,13 +115,28 @@ func (m *Manager) uvPath() string {
 
 func (m *Manager) envDir(name string) string { return filepath.Join(m.Root, "envs", name) }
 
-// PythonPath is the interpreter inside an environment.
-func (m *Manager) PythonPath(name string) string {
-	if runtime.GOOS == "windows" {
-		return filepath.Join(m.envDir(name), "Scripts", "python.exe")
+// bundledDir is the "python" folder beside the daemon executable, where a
+// packaged app (such as the Mac App Store build) places signed environments.
+func bundledDir() string {
+	exe, err := os.Executable()
+	if err != nil {
+		return ""
 	}
-	return filepath.Join(m.envDir(name), "bin", "python")
+	if resolved, err := filepath.EvalSymlinks(exe); err == nil {
+		exe = resolved
+	}
+	return filepath.Join(filepath.Dir(exe), "python")
 }
+
+func interpreter(env string) string {
+	if runtime.GOOS == "windows" {
+		return filepath.Join(env, "Scripts", "python.exe")
+	}
+	return filepath.Join(env, "bin", "python")
+}
+
+// PythonPath is the interpreter inside an environment the manager installs.
+func (m *Manager) PythonPath(name string) string { return interpreter(m.envDir(name)) }
 
 func (m *Manager) markerPath(name string) string {
 	return filepath.Join(m.envDir(name), ".yggdrasil-requirements")
@@ -114,14 +155,30 @@ func requirementsKey(spec Spec) string {
 	return key + strings.Join(reqs, "\n") + "\n"
 }
 
-// Status reports whether spec's environment is installed and current.
+// RequirementsKey is the content of an environment's requirements marker,
+// ".yggdrasil-requirements". A bundled environment must carry it, so the
+// daemon can tell it was built from the requirements it expects.
+func RequirementsKey(spec Spec) string { return requirementsKey(spec) }
+
+// Status reports whether spec's environment is installed and current. A
+// current bundled environment comes first.
 func (m *Manager) Status(spec Spec) Status {
+	if m.Bundled != "" {
+		if st := envStatus(spec, filepath.Join(m.Bundled, spec.Name)); st.Installed {
+			st.Bundled = true
+			return st
+		}
+	}
+	return envStatus(spec, m.envDir(spec.Name))
+}
+
+func envStatus(spec Spec, dir string) Status {
 	st := Status{Name: spec.Name}
-	py := m.PythonPath(spec.Name)
+	py := interpreter(dir)
 	if _, err := os.Stat(py); err != nil {
 		return st
 	}
-	marker, err := os.ReadFile(m.markerPath(spec.Name))
+	marker, err := os.ReadFile(filepath.Join(dir, ".yggdrasil-requirements"))
 	if err != nil || string(marker) != requirementsKey(spec) {
 		st.Stale = true
 		return st
@@ -129,6 +186,15 @@ func (m *Manager) Status(spec Spec) Status {
 	st.Installed = true
 	st.Python = py
 	return st
+}
+
+// Unavailable says why spec's environment cannot be used or installed here,
+// or returns "" when it can.
+func (m *Manager) Unavailable(spec Spec) string {
+	if m.Sandboxed && !m.Status(spec).Installed {
+		return ErrSandboxed.Error()
+	}
+	return ""
 }
 
 // Ensure installs uv, Python, and spec's packages when they are missing or
@@ -141,6 +207,9 @@ func (m *Manager) Ensure(ctx context.Context, spec Spec, progress Progress) (str
 	defer m.mu.Unlock()
 	if st := m.Status(spec); st.Installed {
 		return st.Python, nil
+	}
+	if m.Sandboxed {
+		return "", ErrSandboxed
 	}
 	uv, err := m.ensureUV(ctx, progress)
 	if err != nil {

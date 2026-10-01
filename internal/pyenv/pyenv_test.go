@@ -7,6 +7,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -195,5 +196,82 @@ func TestInstallArgsArePassedAndPartOfTheEnvironment(t *testing.T) {
 	spec.InstallArgs = nil
 	if st := m.Status(spec); st.Installed || !st.Stale {
 		t.Fatalf("status without the args = %+v", st)
+	}
+}
+
+// bundleEnv lays out an environment the way a packaged app ships it.
+func bundleEnv(t *testing.T, dir string, spec Spec, marker string) string {
+	t.Helper()
+	py := interpreter(filepath.Join(dir, spec.Name))
+	if err := os.MkdirAll(filepath.Dir(py), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(py, []byte("#!/bin/sh\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, spec.Name, ".yggdrasil-requirements"), []byte(marker), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return py
+}
+
+func TestSandboxedManagerNeverDownloads(t *testing.T) {
+	downloads := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { downloads++; http.NotFound(w, r) }))
+	defer srv.Close()
+	m := New(t.TempDir())
+	m.ReleaseBase, m.Bundled, m.Sandboxed = srv.URL, t.TempDir(), true
+	spec := Spec{Name: "trainer-mlx", Requirements: []string{"mlx-lm==0.31.3"}}
+	if _, err := m.Ensure(context.Background(), spec, nil); !errors.Is(err, ErrSandboxed) {
+		t.Fatalf("got %v", err)
+	}
+	if downloads != 0 {
+		t.Fatalf("a sandboxed daemon downloaded %d times", downloads)
+	}
+	if why := m.Unavailable(spec); !strings.Contains(why, "App Sandbox") {
+		t.Fatalf("unavailable = %q", why)
+	}
+}
+
+func TestBundledEnvironmentIsUsedEvenWhenSandboxed(t *testing.T) {
+	m := New(t.TempDir())
+	m.Bundled, m.Sandboxed = t.TempDir(), true
+	spec := Spec{Name: "ocr", Requirements: []string{"rapidocr==3.9.2"}, Pinned: true}
+	py := bundleEnv(t, m.Bundled, spec, RequirementsKey(spec))
+	st := m.Status(spec)
+	if !st.Installed || !st.Bundled || st.Python != py {
+		t.Fatalf("status = %+v", st)
+	}
+	got, err := m.Ensure(context.Background(), spec, nil)
+	if err != nil || got != py {
+		t.Fatalf("ensure = %q, %v", got, err)
+	}
+	if why := m.Unavailable(spec); why != "" {
+		t.Fatalf("unavailable = %q", why)
+	}
+}
+
+func TestOutdatedBundledEnvironmentIsNotUsed(t *testing.T) {
+	m := New(t.TempDir())
+	m.Bundled, m.Sandboxed = t.TempDir(), true
+	spec := Spec{Name: "trainer-mlx", Requirements: []string{"mlx-lm==0.32.0"}}
+	bundleEnv(t, m.Bundled, spec, RequirementsKey(Spec{Name: "trainer-mlx", Requirements: []string{"mlx-lm==0.31.3"}}))
+	if st := m.Status(spec); st.Installed || st.Bundled {
+		t.Fatalf("an environment built from other requirements was used: %+v", st)
+	}
+	if why := m.Unavailable(spec); why == "" {
+		t.Fatal("an outdated bundle should leave training unavailable in the sandbox")
+	}
+}
+
+func TestSandboxDetection(t *testing.T) {
+	t.Setenv("APP_SANDBOX_CONTAINER_ID", "")
+	t.Setenv("YGGDRASIL_SANDBOXED", "")
+	if Sandboxed() {
+		t.Fatal("sandboxed without the variables")
+	}
+	t.Setenv("APP_SANDBOX_CONTAINER_ID", "io.yeix.yggdrasil")
+	if !Sandboxed() || !New(t.TempDir()).Sandboxed {
+		t.Fatal("macOS sandbox not detected")
 	}
 }
