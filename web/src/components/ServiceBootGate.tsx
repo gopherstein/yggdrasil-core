@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { ScheduleBackgroundSync } from '@/components/ScheduleBackgroundSync'
 import { ApiError, api, rememberApiKey } from '@/lib/api'
 import { readScreenshotLaunch } from '@/lib/screenshotMode'
+import { Ratatoskr } from '@/components/ui/Ratatoskr'
 
 const BOOT_GIVE_UP_MS = 25_000
 
@@ -14,15 +15,8 @@ function BootSplash({ message }: { message: string }) {
       aria-live="polite"
       aria-busy="true"
     >
-      <img
-        src="/yggdrasil-mark.png"
-        alt=""
-        width={72}
-        height={72}
-        className="h-[72px] w-[72px] object-contain animate-boot-pulse"
-        decoding="async"
-      />
-      <p className="mt-6 font-display text-xl font-semibold tracking-tight text-ink">
+      <Ratatoskr state="idle" size={160} />
+      <p className="mt-4 font-display text-xl font-semibold tracking-tight text-ink">
         Starting Yggdrasil
       </p>
       <p className="mt-2 text-sm text-ink-muted">{message}</p>
@@ -37,15 +31,8 @@ function BootSplash({ message }: { message: string }) {
 function BootFailed({ onRetry, busy }: { onRetry: () => void; busy: boolean }) {
   return (
     <div className="flex h-full min-h-0 flex-col items-center justify-center bg-canvas px-6 text-center">
-      <img
-        src="/yggdrasil-mark.png"
-        alt=""
-        width={64}
-        height={64}
-        className="h-16 w-16 object-contain opacity-80"
-        decoding="async"
-      />
-      <h1 className="mt-6 font-display text-2xl font-semibold tracking-tight text-ink">
+      <Ratatoskr state="error" size={96} />
+      <h1 className="mt-4 font-display text-2xl font-semibold tracking-tight text-ink">
         Service unavailable
       </h1>
       <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">

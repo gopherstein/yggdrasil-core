@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { Ratatoskr } from '@/components/ui/Ratatoskr'
 import { onDesktopLifecycle, type DesktopLifecycleEvent } from '@/lib/desktopBridge'
 
 /**
@@ -20,15 +21,8 @@ export function LifecycleHost({ children }: { children: ReactNode }) {
           aria-live="assertive"
           aria-busy="true"
         >
-          <img
-            src="/yggdrasil-mark.png"
-            alt=""
-            width={56}
-            height={56}
-            className="h-14 w-14 object-contain animate-boot-pulse"
-            decoding="async"
-          />
-          <p className="mt-5 font-display text-xl font-semibold tracking-tight text-ink">
+          <Ratatoskr state="sleep" size={96} />
+          <p className="mt-4 font-display text-xl font-semibold tracking-tight text-ink">
             Closing Yggdrasil
           </p>
           <p className="mt-2 max-w-sm text-center text-sm text-ink-muted">
