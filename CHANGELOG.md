@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 
 ## [Unreleased]
 
+## [1.4.0-beta.1] - 2026-10-01
+
+Beta pre-release of 1.4.0. It adds the AI experience platform and the remaining Train Your Own AI items. Existing API routes, configuration, and data are compatible: the changes add routes, optional fields, and database tables, and migrations run automatically. NVIDIA (CUDA) training, PostgreSQL and MySQL knowledge sources, and the Mac App Store sandbox have not been tested on that hardware or in that build. Binaries and the apt repository are not signed.
+
 ### Added
 
 - Sandboxed Mac App Store builds can train on a paired computer. A sandboxed copy of Yggdrasil no longer tries to download Python; it says training can't run on this computer and chooses a paired computer running Yggdrasil Core. A store build can also ship the training and text-recognition environments beside the daemon, and `yggdrasil-daemon -python-envs` lists what to bundle.
@@ -50,7 +54,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 - Mimir connected knowledge. Connect a file, a folder, pasted content, an Excel workbook (each sheet is a table), or a PDF with a text layer (each page is cited); chat adds the passages that match each question. File and folder sources reindex when the files change. A profile lists `knowledge_sources`. Routes are under `/api/v1/knowledge`.
 - Train your own AI. The Train page builds a specialized AI from a base model, examples, instructions, and connected knowledge. Yggdrasil recommends Training, Knowledge, or Both for each piece of material, flags weak examples, estimates training fit separately from inference fit, trains a LoRA or QLoRA adapter with MLX on Apple Silicon, and compares base and specialized answers before deployment. A deployed AI is the model `sai:<name>` in chat and `/v1/chat/completions`. The first training run installs a private Python environment under `runtimes/python` and downloads the base model's training weights from Hugging Face. Norn can train on a paired computer that has more memory, and the Review step lets you pick the computer; the adapter returns to the computer that owns the AI. The Train page and the Profiles editor attach existing knowledge sources, files, and folders. "Try an example" sets up a sample tire shop assistant with notes on each step, and the Material step shows sample files in each format.
 - `yggctl completion <bash|zsh|fish>` prints a completion script for `yggctl` commands, `automations` subcommands, and their flags. Homebrew, the deb and rpm packages, and the macOS and Linux archives install or include the scripts.
-- Targeted for 1.3.0: scheduled automations. The daemon runs a saved prompt on a one-time, daily, weekly, or interval schedule, keeps a history of each occurrence, retries timeouts and connection failures, and can post an operating-system notice when the result matches the notification rule. Read-only tools can run while the window is closed. Automations are available in the desktop UI and through `yggctl automations`. `GET /api/v1/automations` is new. This is a minor release because the API, CLI, and database migration are backward-compatible.
 
 ### Changed
 
@@ -65,7 +68,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 - More current-information questions are recognized (news, scores, prices, exchange rates, "near me"), and cues match whole words only.
 - Chat starts faster when a paired computer is offline. Peer health is checked in the background every 10 seconds and reused for 20; a check that has to run during a turn waits at most 1.5 seconds. Before, each turn waited the full timeout for an offline peer.
 - A fast reply, such as a memory confirmation, no longer shows twice.
-- Targeted for 1.3.1: a saved schedule turns on “Keep running in background,” so closing the window does not stop the daemon that runs it.
+
+## [1.3.1] - 2026-09-29
+
+Patch release. The API is unchanged. Binaries and the apt repository are not signed.
+
+### Fixed
+
+- A saved schedule turns on “Keep running in background,” so closing the window does not stop the daemon that runs it.
+
+## [1.3.0] - 2026-09-29
+
+Minor release. The API, CLI, and database migration are backward-compatible. Binaries and the apt repository are not signed.
+
+### Added
+
+- Scheduled automations. The daemon runs a saved prompt on a one-time, daily, weekly, or interval schedule, keeps a history of each occurrence, retries timeouts and connection failures, and can post an operating-system notice when the result matches the notification rule. Read-only tools can run while the window is closed. Automations are available in the desktop UI and through `yggctl automations`. `GET /api/v1/automations` is new.
 
 ## [1.2.1] - 2026-09-28
 
