@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } fr
 import { Link, useSearchParams } from 'react-router-dom'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { RealmKicker } from '@/components/ui/Realm'
+import { Ratatoskr } from '@/components/ui/Ratatoskr'
+import { useMascotState } from '@/lib/ratatoskr/useMascotState'
 import { api, streamChat } from '@/lib/api'
 import { ATTACH_ACCEPT, MAX_ATTACH_BYTES, isAttachable, readUpload } from '@/lib/upload'
 import { subscribeEvents } from '@/lib/events'
@@ -1033,7 +1035,21 @@ export function ChatPage() {
   const messages = messagesQuery.data ?? []
   const streamingText = streamingContent == null ? '' : displayChatText(streamingContent)
   const replyInProgress = isSending && streamingText.length === 0
+  // Ratatoskr: thinking while a reply is written, delivering when it runs
+  // on a paired computer. Only events for this chat, or with no chat, count.
+  const replyMascot = useMascotState({
+    busy: isSending,
+    react: ['think', 'deliver'],
+    localNodeId: nodesQuery.data?.find((n) => n.is_local)?.id,
+    accept: (event) => {
+      const conv = event.payload?.conversation_id as string | undefined
+      return !conv || conv === selectedId || conv === streamingConvRef.current
+    },
+  })
   const showLanding = !selectedId && !draft.trim() && !isSending
+  // On the landing page the hero's mascot shows a problem, so the cards below
+  // it go without one (one mascot per view).
+  const landingError = showLanding && Boolean(modelFailure || sendError)
   const historyMode = chatHistoryPinned && canPinHistory ? 'pinned' : 'overlay'
   const showPinnedSidebar = historyOpen && historyMode === 'pinned'
 
@@ -1388,14 +1404,7 @@ export function ChatPage() {
               ].join(' ')}
               aria-hidden={!showLanding}
             >
-              <img
-                src="/yggdrasil-mark.png"
-                alt=""
-                width={56}
-                height={56}
-                className="mb-5 h-14 w-14 object-contain opacity-95"
-                decoding="async"
-              />
+              <Ratatoskr state={landingError ? 'error' : 'idle'} size={96} className="mb-3" />
               <RealmKicker path="/chat" className="mx-auto" />
               <h1 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
                 What can I help you with?
@@ -1553,6 +1562,7 @@ export function ChatPage() {
                 {sendError && (
                   <ChatErrorCard
                     raw={sendError}
+                    mascot={!modelFailure}
                     onRetry={() => {
                       setSendError(null)
                       void sendMessage(lastUserMessageRef.current)
@@ -1585,7 +1595,7 @@ export function ChatPage() {
             >
               {replyInProgress ? (
                 <div className="mb-3 px-1">
-                  <ChatActivity label={statusMessage} />
+                  <ChatActivity label={statusMessage} mascot={replyMascot} />
                 </div>
               ) : null}
               {composer}
@@ -1607,6 +1617,7 @@ export function ChatPage() {
                   <ModelFailureNotice
                     failure={modelFailure}
                     advanced={advancedMode}
+                    mascot={!showLanding}
                     onRetry={() => {
                       setModelFailure(null)
                       setResponseInterrupted(false)
@@ -1620,7 +1631,7 @@ export function ChatPage() {
               ) : null}
               {!selectedId && sendError ? (
                 <div className="mt-3 flex justify-center">
-                  <ChatErrorCard raw={sendError} />
+                  <ChatErrorCard raw={sendError} mascot={!showLanding && !modelFailure} />
                 </div>
               ) : null}
             </div>
