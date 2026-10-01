@@ -25,6 +25,7 @@ const KNOWN_EVENT_TYPES = [
   'model.download.failed',
   'model.load.started',
   'model.load.completed',
+  'model.unloaded',
   'orchestration.role',
   'orchestration.final',
   'scheduler.placement',

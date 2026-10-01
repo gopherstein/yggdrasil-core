@@ -31,6 +31,8 @@ type Sweeper struct {
 	Logger   *slog.Logger
 	Interval time.Duration
 	Now      func() time.Time
+	// OnUnload is called after an idle model is stopped.
+	OnUnload func(inst Instance)
 
 	mu     sync.Mutex
 	cancel context.CancelFunc
@@ -106,6 +108,9 @@ func (s *Sweeper) tick(ctx context.Context, now time.Time) {
 		}
 		if s.Logger != nil {
 			s.Logger.Info("unloaded idle model", "model", inst.ModelID, "instance", inst.InstanceID)
+		}
+		if s.OnUnload != nil {
+			s.OnUnload(inst)
 		}
 	}
 }

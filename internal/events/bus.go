@@ -38,11 +38,13 @@ const (
 	ModelDownloadFailed    = "model.download.failed"
 	ModelLoadStarted       = "model.load.started"
 	ModelLoadCompleted     = "model.load.completed"
-	ModelHealthDegraded    = "model.health.degraded"
-	ModelHealthFailed      = "model.health.failed"
-	ModelCleanupStarted    = "model.cleanup.started"
-	ModelCleanupCompleted  = "model.cleanup.completed"
-	ModelCleanupFailed     = "model.cleanup.failed"
+	// ModelUnloaded reports a model the idle sweeper stopped.
+	ModelUnloaded         = "model.unloaded"
+	ModelHealthDegraded   = "model.health.degraded"
+	ModelHealthFailed     = "model.health.failed"
+	ModelCleanupStarted   = "model.cleanup.started"
+	ModelCleanupCompleted = "model.cleanup.completed"
+	ModelCleanupFailed    = "model.cleanup.failed"
 
 	ToolRequested = "tool.requested"
 	ToolStarted   = "tool.started"

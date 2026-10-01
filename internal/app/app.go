@@ -450,6 +450,13 @@ func New(opts Options) (*App, error) {
 	a.HF = hfclient.New()
 	a.Lifecycle = &lifecycle.Sweeper{
 		Logger: logger,
+		OnUnload: func(inst lifecycle.Instance) {
+			a.Bus.Publish(events.New(events.ModelUnloaded, map[string]any{
+				"model_id":    inst.ModelID,
+				"instance_id": inst.InstanceID,
+				"reason":      "idle",
+			}))
+		},
 		List: func(ctx context.Context) ([]lifecycle.Instance, error) {
 			views, err := a.localRunningViews(ctx)
 			if err != nil {

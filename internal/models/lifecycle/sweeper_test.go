@@ -10,6 +10,7 @@ import (
 
 func TestSweeperUnloadsIdle(t *testing.T) {
 	stopped := []string{}
+	reported := []string{}
 	now := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
 	s := &lifecycle.Sweeper{
 		List: func(ctx context.Context) ([]lifecycle.Instance, error) {
@@ -26,10 +27,14 @@ func TestSweeperUnloadsIdle(t *testing.T) {
 		Settings: func(ctx context.Context) (string, int, error) {
 			return "automatic", 15, nil
 		},
+		OnUnload: func(inst lifecycle.Instance) { reported = append(reported, inst.ModelID) },
 	}
 	s.TickOnce(context.Background(), now)
 	if len(stopped) != 1 || stopped[0] != "inst-1" {
 		t.Fatalf("expected unload, got %v", stopped)
+	}
+	if len(reported) != 1 || reported[0] != "m1" {
+		t.Fatalf("the unload must be reported, got %v", reported)
 	}
 }
 

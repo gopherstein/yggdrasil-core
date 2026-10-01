@@ -108,6 +108,9 @@ export function ModelsPage() {
             }))
           }
         }
+        if (event.type === 'model.unloaded') {
+          queryClient.invalidateQueries({ queryKey: ['models-running'] })
+        }
         if (
           event.type === 'model.download.completed' ||
           event.type === 'model.download.failed' ||
