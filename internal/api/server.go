@@ -17,6 +17,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/yeixio/yggdrasil-core/internal/api/openai"
 	"github.com/yeixio/yggdrasil-core/internal/auth"
+	"github.com/yeixio/yggdrasil-core/internal/automations"
 	"github.com/yeixio/yggdrasil-core/internal/config"
 	"github.com/yeixio/yggdrasil-core/internal/events"
 	"github.com/yeixio/yggdrasil-core/internal/logs"
@@ -71,6 +72,15 @@ type Dependencies struct {
 	CreateTask             func(ctx context.Context, profileID, conversationID, prompt string) (contracts.Task, error)
 	GetTask                func(ctx context.Context, id string) (contracts.Task, error)
 	RunTask                func(ctx context.Context, id string) error
+	ListAutomations        func(ctx context.Context) ([]automations.Automation, error)
+	CreateAutomation       func(ctx context.Context, in automations.CreateInput) (automations.Automation, error)
+	GetAutomation          func(ctx context.Context, id string) (automations.Detail, error)
+	UpdateAutomation       func(ctx context.Context, id string, patch automations.Patch) (automations.Automation, error)
+	DeleteAutomation       func(ctx context.Context, id string) error
+	RunAutomation          func(ctx context.Context, id string) (automations.Run, error)
+	PreviewAutomation      func(ctx context.Context, in automations.CreateInput) (automations.Preview, error)
+	PauseAutomation        func(ctx context.Context, id string) (automations.Automation, error)
+	ResumeAutomation       func(ctx context.Context, id string) (automations.Automation, error)
 	DecideTool             func(requestID string, allow, allowSession bool) error
 	ListTools              func(ctx context.Context) (any, error)
 	SetToolEnabled         func(ctx context.Context, id string, enabled bool) error
@@ -150,6 +160,15 @@ func (s *Server) routes() {
 	api.HandleFunc("/tasks", s.handleListTasks).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/tasks", s.handleCreateTask).Methods(http.MethodPost)
 	api.HandleFunc("/tasks/{id}", s.handleGetTask).Methods(http.MethodGet, http.MethodOptions)
+	api.HandleFunc("/automations", s.handleListAutomations).Methods(http.MethodGet, http.MethodOptions)
+	api.HandleFunc("/automations", s.handleCreateAutomation).Methods(http.MethodPost)
+	api.HandleFunc("/automations/preview", s.handlePreviewAutomation).Methods(http.MethodPost)
+	api.HandleFunc("/automations/{id}/run", s.handleRunAutomation).Methods(http.MethodPost)
+	api.HandleFunc("/automations/{id}/pause", s.handlePauseAutomation).Methods(http.MethodPost)
+	api.HandleFunc("/automations/{id}/resume", s.handleResumeAutomation).Methods(http.MethodPost)
+	api.HandleFunc("/automations/{id}", s.handleGetAutomation).Methods(http.MethodGet, http.MethodOptions)
+	api.HandleFunc("/automations/{id}", s.handleUpdateAutomation).Methods(http.MethodPatch)
+	api.HandleFunc("/automations/{id}", s.handleDeleteAutomation).Methods(http.MethodDelete)
 	api.HandleFunc("/tools", s.handleListTools).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/tools/activity", s.handleToolActivity).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/tools/decide", s.handleToolDecide).Methods(http.MethodPost)
@@ -218,6 +237,19 @@ func (s *Server) ListenAndServe(addr string) error {
 	}
 	s.deps.Logger.Info("api listening", "addr", ln.Addr().String())
 	return s.http.Serve(ln)
+}
+
+// BindAutomations attaches the scheduler routes after the runner is constructed.
+func (s *Server) BindAutomations(d Dependencies) {
+	s.deps.ListAutomations = d.ListAutomations
+	s.deps.CreateAutomation = d.CreateAutomation
+	s.deps.GetAutomation = d.GetAutomation
+	s.deps.UpdateAutomation = d.UpdateAutomation
+	s.deps.DeleteAutomation = d.DeleteAutomation
+	s.deps.RunAutomation = d.RunAutomation
+	s.deps.PreviewAutomation = d.PreviewAutomation
+	s.deps.PauseAutomation = d.PauseAutomation
+	s.deps.ResumeAutomation = d.ResumeAutomation
 }
 
 // Shutdown gracefully stops the server.

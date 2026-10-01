@@ -2,8 +2,11 @@
 
 `guide.json` is the source for the public user documentation. Update it in the
 same change as user-facing behavior. Keep it limited to public information.
-It supports plain-text sections, ordered steps, and code blocks; no executable
-HTML or MDX. `{{version}}` is replaced with the version being released.
+It supports plain-text sections, ordered steps, code blocks, and screenshots.
+Screenshots are PNG files under `docs/user-guide/images/`. Each image in a
+section needs `src`, `alt`, and `caption`. `src` is a repository path such as
+`docs/user-guide/images/07-automations.png`. No executable HTML or MDX.
+`{{version}}` is replaced with the version being released.
 
 The website reads the frozen snapshots in this repository:
 

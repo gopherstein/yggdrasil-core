@@ -61,6 +61,7 @@ Prefix: `/api/v1`
 | GET, POST | `/profiles` | List or create profiles |
 | POST | `/chat` | Chat through a profile |
 | GET, POST | `/tasks` | Orchestration tasks |
+| GET, POST | `/automations` | Scheduled prompts. Also `POST /automations/preview`, `GET/PATCH/DELETE /automations/{id}`, and `POST /automations/{id}/run|pause|resume` |
 | GET | `/nodes` | This computer and peers |
 | POST | `/nodes/pair` | Start pairing |
 | POST | `/nodes/{id}/pair/approve` | Approve a pairing offer |

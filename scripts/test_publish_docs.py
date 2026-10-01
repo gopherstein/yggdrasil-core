@@ -54,5 +54,21 @@ class PublisherTests(unittest.TestCase):
             self.publish()
         self.assertFalse((self.dest / 'docs/index.json').exists())
 
+    def test_images_are_published_and_paths_stay_in_the_user_guide(self):
+        guide = json.loads(self.source.read_text())
+        guide['sections'][0]['images'] = [{
+            'src': 'docs/user-guide/images/07-automations.png',
+            'alt': 'Automations list',
+            'caption': 'The scheduled task and its last result.',
+        }]
+        self.source.write_text(json.dumps(guide))
+        self.publish()
+        snapshot = json.loads((self.dest / 'docs/1.0.0.json').read_text())
+        self.assertEqual(snapshot['sections'][0]['images'][0]['src'], 'docs/user-guide/images/07-automations.png')
+        guide['sections'][0]['images'][0]['src'] = 'docs/screenshots/07-automations.png'
+        self.source.write_text(json.dumps(guide))
+        with self.assertRaisesRegex(ValueError, 'docs/user-guide/images'):
+            publisher.publish(self.source, self.dest, '1.2.0', 'c' * 40)
+
 if __name__ == '__main__':
     unittest.main()

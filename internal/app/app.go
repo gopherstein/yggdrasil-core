@@ -17,6 +17,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/api"
 	"github.com/yeixio/yggdrasil-core/internal/api/openai"
 	"github.com/yeixio/yggdrasil-core/internal/auth"
+	"github.com/yeixio/yggdrasil-core/internal/automations"
 	"github.com/yeixio/yggdrasil-core/internal/benchmark"
 	"github.com/yeixio/yggdrasil-core/internal/config"
 	"github.com/yeixio/yggdrasil-core/internal/diagnostics"
@@ -58,21 +59,23 @@ type App struct {
 	Settings      *repositories.SettingsRepo
 	Metrics       *repositories.MetricsRepo
 
-	Models       *models.Manager
-	Runtimes     *runtimes.Manager
-	Profiles     *profiles.Manager
-	OrchRegistry *orchestrator.Registry
-	Tasks        *tasks.Manager
-	Scheduler    *scheduler.Scheduler
-	Tools        *tools.Registry
-	Nodes        *nodes.Manager
-	APIKeys      *auth.APIKeyManager
-	Pairing      *auth.PairingManager
-	Identity     *auth.NodeIdentity
-	Benchmarks   *benchmark.Runner
-	HF           *hfclient.Client
-	Lifecycle    *lifecycle.Sweeper
-	Health       *modelhealth.Monitor
+	Models           *models.Manager
+	Runtimes         *runtimes.Manager
+	Profiles         *profiles.Manager
+	OrchRegistry     *orchestrator.Registry
+	Tasks            *tasks.Manager
+	Automations      *repositories.AutomationRepo
+	AutomationRunner *automations.Runner
+	Scheduler        *scheduler.Scheduler
+	Tools            *tools.Registry
+	Nodes            *nodes.Manager
+	APIKeys          *auth.APIKeyManager
+	Pairing          *auth.PairingManager
+	Identity         *auth.NodeIdentity
+	Benchmarks       *benchmark.Runner
+	HF               *hfclient.Client
+	Lifecycle        *lifecycle.Sweeper
+	Health           *modelhealth.Monitor
 
 	hw         *hardware.Detector
 	advertiser *discovery.Advertiser
@@ -453,6 +456,44 @@ func New(opts Options) (*App, error) {
 		},
 	}
 
+	autoRepo := repositories.NewAutomationRepo(db.SQL)
+	a.Automations = autoRepo
+	a.AutomationRunner = &automations.Runner{
+		Store:  autoRepo,
+		Exec:   automationExecutor{app: a},
+		Notify: automationNotifier{settings: settingsRepo, send: automations.OSSender{}},
+		Bus:    bus,
+		Logger: logger,
+	}
+	a.API.BindAutomations(api.Dependencies{
+		ListAutomations: a.Automations.List,
+		CreateAutomation: func(ctx context.Context, in automations.CreateInput) (automations.Automation, error) {
+			created, err := a.Automations.Create(ctx, in, time.Now())
+			if err != nil {
+				return automations.Automation{}, err
+			}
+			if err := a.enableBackgroundWhenScheduled(ctx); err != nil && a.Logger != nil {
+				a.Logger.Warn("could not keep the daemon running for schedules", "error", err)
+			}
+			return created, nil
+		},
+		GetAutomation: a.Automations.History,
+		UpdateAutomation: func(ctx context.Context, id string, patch automations.Patch) (automations.Automation, error) {
+			return a.Automations.Update(ctx, id, patch, time.Now())
+		},
+		DeleteAutomation:  a.Automations.Delete,
+		RunAutomation:     a.AutomationRunner.RunNow,
+		PreviewAutomation: a.AutomationRunner.Preview,
+		PauseAutomation: func(ctx context.Context, id string) (automations.Automation, error) {
+			enabled := false
+			return a.Automations.Update(ctx, id, automations.Patch{Enabled: &enabled}, time.Now())
+		},
+		ResumeAutomation: func(ctx context.Context, id string) (automations.Automation, error) {
+			enabled := true
+			return a.Automations.Update(ctx, id, automations.Patch{Enabled: &enabled}, time.Now())
+		},
+	})
+
 	a.internal = nodes.NewInternalServer(nodes.InternalDeps{
 		Config:          a.Config.Get(),
 		Logger:          logger,
@@ -530,6 +571,9 @@ func (a *App) Start(ctx context.Context) error {
 	if err := a.requireKeyForRemoteBind(ctx); err != nil {
 		return err
 	}
+	if err := a.enableBackgroundWhenScheduled(ctx); err != nil && a.Logger != nil {
+		a.Logger.Warn("could not keep the daemon running for schedules", "error", err)
+	}
 	if cfg.DiscoveryEnabled && (cfg.InternalHost == "" || cfg.InternalHost == "127.0.0.1" || cfg.InternalHost == "localhost") {
 		_ = a.Config.Update(func(c *config.Config) { c.InternalHost = "0.0.0.0" })
 		cfg = a.Config.Get()
@@ -584,6 +628,13 @@ func (a *App) Start(ctx context.Context) error {
 
 	if a.Lifecycle != nil {
 		a.Lifecycle.Start(ctx)
+	}
+	if a.AutomationRunner != nil {
+		a.wg.Add(1)
+		go func() {
+			defer a.wg.Done()
+			a.AutomationRunner.Start(ctx)
+		}()
 	}
 	if a.Health != nil {
 		a.wg.Add(1)
@@ -860,6 +911,23 @@ func (a *App) reloadDiscovery() {
 			_ = a.Nodes.RefreshDiscovery(ctx)
 		}()
 	}
+}
+
+// enableBackgroundWhenScheduled turns on keep_running_in_background when a schedule
+// exists. The desktop shell quits the daemon on window close unless that flag is set.
+func (a *App) enableBackgroundWhenScheduled(ctx context.Context) error {
+	if a.Automations == nil || a.Settings == nil {
+		return nil
+	}
+	items, err := a.Automations.List(ctx)
+	if err != nil || len(items) == 0 {
+		return err
+	}
+	on, err := a.Settings.GetBool(ctx, "keep_running_in_background", false)
+	if err != nil || on {
+		return err
+	}
+	return a.Settings.SetBool(ctx, "keep_running_in_background", true)
 }
 
 // ResetApp restores first-run defaults: settings, profiles, chats, tasks, and API keys.

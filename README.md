@@ -135,7 +135,7 @@ These exist in this repository today:
 - OpenAI-compatible `GET /v1/models` and `POST /v1/chat/completions`
 - tools for web search, files, shell, and Git, with explicit per-profile permission policies
 
-Background work today is idle model unload, model health checks, and periodic peer refresh. A user-facing scheduler is a [planned design](docs/features/scheduler-and-automations.md).
+Background work is idle model unload, model health checks, periodic peer refresh, and scheduled automations. A scheduled prompt runs in the daemon, including while the desktop window is closed when the app is set to keep running. How to use it is in the user guide. The v1 specification is [docs/features/completed/scheduler-and-automations.md](docs/features/completed/scheduler-and-automations.md).
 
 ## The interface
 
@@ -275,7 +275,6 @@ The public site is [yggdrasil.yeix.io](https://yggdrasil.yeix.io). It reads the 
 These are specifications. They are not implemented in this repository.
 
 - [Persistent memory and cross-model context](docs/features/persistent-memory-and-cross-model-context.md)
-- [Scheduler and automations](docs/features/scheduler-and-automations.md)
 - [Train your own AI](docs/features/train-your-own-ai.md)
 - [Kubernetes-native model deployment](docs/features/kubernetes-native-model-deployment.md)
 - [Community model ratings](docs/features/community-model-ratings.md)

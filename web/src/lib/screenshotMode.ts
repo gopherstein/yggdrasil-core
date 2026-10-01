@@ -11,6 +11,8 @@ const routes: Record<string, string> = {
   performance: '/performance',
   diagnostics: '/diagnostics',
   'api-manager': '/api-access',
+  automations: '/automations',
+  'automations-create': '/automations',
 }
 
 export function screenshotPath(screen: string): string {

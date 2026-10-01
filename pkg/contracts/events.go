@@ -6,6 +6,10 @@ const (
 	EventTaskStarted   = "task.started"
 	EventTaskCompleted = "task.completed"
 	EventTaskFailed    = "task.failed"
-	EventChatToken     = "chat.token"
-	EventChatComplete  = "chat.complete"
+
+	EventAutomationStarted   = "automation.started"
+	EventAutomationCompleted = "automation.completed"
+	EventAutomationFailed    = "automation.failed"
+	EventChatToken           = "chat.token"
+	EventChatComplete        = "chat.complete"
 )

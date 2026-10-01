@@ -8,6 +8,7 @@ import { ThemeSync } from '@/components/ThemeSync'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { ScreenshotMode } from '@/app/ScreenshotMode'
 import { readScreenshotLaunch } from '@/lib/screenshotMode'
+import { AutomationsPage } from '@/features/automations/AutomationsPage'
 import { ApiAccessPage } from '@/features/api-access/ApiAccessPage'
 import { ChatPage } from '@/features/chat/ChatPage'
 import { DiagnosticsPage } from '@/features/diagnostics/DiagnosticsPage'
@@ -58,6 +59,7 @@ export function App() {
               >
                 <Route index element={<Navigate to="/chat" replace />} />
                 <Route path="chat" element={<ChatPage />} />
+                <Route path="automations" element={<AutomationsPage />} />
                 <Route path="models" element={<ModelsPage />} />
                 <Route path="profiles" element={<ProfilesPage />} />
                 <Route path="tools" element={<ToolsPage />} />

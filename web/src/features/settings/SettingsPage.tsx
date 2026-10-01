@@ -163,6 +163,12 @@ export function SettingsPage() {
     queryFn: () => api.getProfiles(),
     retry: false,
   })
+  const scheduleQuery = useQuery({
+    queryKey: ['automations'],
+    queryFn: () => api.listAutomations(),
+    retry: false,
+  })
+  const hasSchedule = (scheduleQuery.data?.length ?? 0) > 0
 
   useEffect(() => {
     if (settingsQuery.data?.advanced_mode != null) {
@@ -281,14 +287,14 @@ export function SettingsPage() {
             <div>
               <h2 className="section-title">Keep running in background</h2>
               <p className="mt-1 text-sm text-ink-muted">
-                When on, closing the window hides to the menu bar so Chat and the API keep
-                running.
+                Closing the window keeps Chat, the API, and your schedules running. This stays
+                on while a schedule exists.
               </p>
             </div>
             <Toggle
               label="Keep running in background"
-              checked={settings?.keep_running_in_background ?? false}
-              disabled={backgroundMutation.isPending || busy}
+              checked={(settings?.keep_running_in_background ?? false) || hasSchedule}
+              disabled={backgroundMutation.isPending || busy || hasSchedule}
               onChange={() =>
                 backgroundMutation.mutate(!(settings?.keep_running_in_background ?? false))
               }

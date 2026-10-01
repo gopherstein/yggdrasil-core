@@ -1,5 +1,7 @@
 # Yggdrasil Scheduler & Automations
 
+Implemented. Day-to-day use is in the user guide section “Schedule an automation.” This document is the v1 specification.
+
 ## Feature Specification — V1
 
 ### Goal

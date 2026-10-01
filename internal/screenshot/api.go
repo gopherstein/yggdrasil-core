@@ -86,6 +86,12 @@ func screenshotGET(path string) (string, bool) {
 		return screenshotPerformance, true
 	case path == "/api/v1/tasks":
 		return `[]`, true
+	case path == "/api/v1/automations":
+		return screenshotAutomations, true
+	case strings.HasPrefix(path, "/api/v1/automations/"):
+		return screenshotAutomationDetail, true
+	case path == "/api/v1/tools":
+		return screenshotTools, true
 	case path == "/api/v1/benchmarks":
 		return `[]`, true
 	case path == "/api/v1/benchmarks/workloads":
@@ -330,3 +336,108 @@ const screenshotPerformance = `[{
   "node_count": 1,
   "created_at": "2026-09-24T15:01:20Z"
 }]`
+
+const screenshotAutomations = `[
+  {
+    "id": "price-1",
+    "name": "Morning price",
+    "enabled": true,
+    "schedule": {"kind": "daily", "time_zone": "America/Los_Angeles", "hour": 8, "minute": 0},
+    "prompt": "Check this product and report the price.",
+    "profile_id": "general-assistant",
+    "tools": [],
+    "notification": {"mode": "condition", "condition": {"kind": "threshold", "op": "below", "value": 500}},
+    "created_at": "2026-09-21T16:00:00Z",
+    "updated_at": "2026-09-28T15:05:00Z",
+    "next_run_at": "2026-09-29T15:00:00Z",
+    "last_run_at": "2026-09-28T15:05:00Z",
+    "consecutive_failures": 0,
+    "last_status": "succeeded",
+    "last_result": "The listing is $420."
+  },
+  {
+    "id": "stock-1",
+    "name": "Stock check",
+    "enabled": false,
+    "schedule": {"kind": "interval", "time_zone": "America/Los_Angeles", "every_seconds": 21600},
+    "prompt": "Check whether this item is back in stock.",
+    "profile_id": "general-assistant",
+    "tools": [],
+    "notification": {"mode": "condition", "condition": {"kind": "available"}},
+    "created_at": "2026-09-22T16:00:00Z",
+    "updated_at": "2026-09-24T16:00:00Z",
+    "next_run_at": "2026-09-29T04:00:00Z",
+    "last_run_at": "2026-09-28T22:00:00Z",
+    "consecutive_failures": 0,
+    "last_status": "succeeded",
+    "last_result": "Still out of stock."
+  },
+  {
+    "id": "friday-1",
+    "name": "Friday releases",
+    "enabled": true,
+    "schedule": {"kind": "weekly", "time_zone": "America/Los_Angeles", "hour": 9, "minute": 0, "weekday": 5},
+    "prompt": "Summarize the new releases.",
+    "profile_id": "research",
+    "tools": [],
+    "notification": {"mode": "change"},
+    "created_at": "2026-09-18T16:00:00Z",
+    "updated_at": "2026-09-26T16:00:00Z",
+    "next_run_at": "2026-10-02T16:00:00Z",
+    "last_run_at": "2026-09-25T16:02:00Z",
+    "consecutive_failures": 0,
+    "last_status": "succeeded",
+    "last_result": "Two patch releases, no behavior change."
+  }
+]`
+
+const screenshotAutomationDetail = `{
+  "id": "price-1",
+  "name": "Morning price",
+  "enabled": true,
+  "schedule": {"kind": "daily", "time_zone": "America/Los_Angeles", "hour": 8, "minute": 0},
+  "prompt": "Check this product and report the price.\n\nInclude a JSON object in the result with the numeric price, for example {\"price\": 420}.",
+  "profile_id": "general-assistant",
+  "tools": [],
+  "notification": {"mode": "condition", "condition": {"kind": "threshold", "op": "below", "value": 500}},
+  "created_at": "2026-09-21T16:00:00Z",
+  "updated_at": "2026-09-28T15:05:00Z",
+  "next_run_at": "2026-09-29T15:00:00Z",
+  "last_run_at": "2026-09-28T15:05:00Z",
+  "consecutive_failures": 0,
+  "last_status": "succeeded",
+  "last_result": "The listing is $420.",
+  "history": [
+    {
+      "id": "run-2",
+      "automation_id": "price-1",
+      "occurrence_at": "2026-09-28T15:00:00Z",
+      "status": "succeeded",
+      "started_at": "2026-09-28T15:00:04Z",
+      "finished_at": "2026-09-28T15:05:00Z",
+      "result": "The listing is $420.\n{\"price\": 420}",
+      "notification_sent": true,
+      "model_id": "gemma-4-e4b",
+      "node_id": "This Mac",
+      "attempt": 1
+    },
+    {
+      "id": "run-1",
+      "automation_id": "price-1",
+      "occurrence_at": "2026-09-27T15:00:00Z",
+      "status": "succeeded",
+      "started_at": "2026-09-27T15:00:03Z",
+      "finished_at": "2026-09-27T15:04:00Z",
+      "result": "The listing is $640.\n{\"price\": 640}",
+      "notification_sent": false,
+      "model_id": "gemma-4-e4b",
+      "node_id": "This Mac",
+      "attempt": 1
+    }
+  ]
+}`
+
+const screenshotTools = `[
+  {"id": "internet.search", "name": "Web Search", "description": "Search the public internet and return titles, links, and snippets.", "capability": "internet", "source": "builtin", "schema": "{}", "default_policy": "allow", "risk": "read", "enabled": true, "profiles": ["general-assistant"]},
+  {"id": "internet.open", "name": "Open Web Page", "description": "Open a web page and return readable text.", "capability": "internet", "source": "builtin", "schema": "{}", "default_policy": "allow", "risk": "read", "enabled": true, "profiles": ["general-assistant"]}
+]`
