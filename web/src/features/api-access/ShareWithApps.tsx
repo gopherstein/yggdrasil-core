@@ -76,7 +76,9 @@ export function ShareWithApps() {
   const share = useQuery({ queryKey: ['mcp-share'], queryFn: () => api.mcpShare(), retry: false })
   const [app, setApp] = useState<AppID>('claude-desktop')
   const [copied, setCopied] = useState(false)
-  if (!share.data) return null
+  // A daemon without MCP sharing, or a malformed reply, hides the section
+  // instead of failing the whole page.
+  if (!share.data || typeof share.data.url !== 'string' || !Array.isArray(share.data.args)) return null
   const setup = setupFor(app, share.data)
   return (
     <section className="card space-y-4" aria-label="Use Yggdrasil in other AI apps">

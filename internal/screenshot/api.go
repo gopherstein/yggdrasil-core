@@ -96,6 +96,10 @@ func screenshotGET(path string) (string, bool) {
 		return `[]`, true
 	case path == "/api/v1/benchmarks/workloads":
 		return `[]`, true
+	case path == "/api/v1/mcp/share":
+		return `{"url":"http://127.0.0.1:7331/mcp","command":"yggctl","args":["mcp"],"needs_key":false}`, true
+	case path == "/api/v1/capabilities":
+		return screenshotCapabilities, true
 	case path == "/v1/models":
 		return `{"object":"list","data":[{"id":"gemma-4-e4b","object":"model"}]}`, true
 	default:
@@ -441,3 +445,27 @@ const screenshotTools = `[
   {"id": "internet.search", "name": "Web Search", "description": "Search the public internet and return titles, links, and snippets.", "capability": "internet", "source": "builtin", "schema": "{}", "default_policy": "allow", "risk": "read", "enabled": true, "profiles": ["general-assistant"]},
   {"id": "internet.open", "name": "Open Web Page", "description": "Open a web page and return readable text.", "capability": "internet", "source": "builtin", "schema": "{}", "default_policy": "allow", "risk": "read", "enabled": true, "profiles": ["general-assistant"]}
 ]`
+
+const screenshotCapabilities = `{
+  "at": "2026-09-24T12:00:00Z",
+  "models": [{"id": "gemma-4-e4b", "name": "Gemma 4 E4B", "running": true, "on": ["This Mac"]}],
+  "nodes": [
+    {"id": "local", "name": "This Mac", "local": true, "online": true, "trainer": "mlx"},
+    {"id": "studio", "name": "Studio", "local": false, "online": true, "trainer": "mlx"}
+  ],
+  "tools": [
+    {"id": "web.search", "name": "Web search", "source": "builtin", "enabled": true},
+    {"id": "files.read", "name": "Read files", "source": "builtin", "enabled": true},
+    {"id": "files.create", "name": "Create files", "source": "builtin", "enabled": true}
+  ],
+  "connectors": [],
+  "providers": [{"id": "llamacpp", "name": "llama.cpp", "kind": "runtime", "status": "installed", "healthy": true}],
+  "artifacts": {"count": 3, "bytes": 482304},
+  "abilities": [
+    {"id": "chat", "label": "Chat", "available": true, "via": ["Gemma 4 E4B"]},
+    {"id": "web", "label": "Look things up on the web", "available": true, "via": ["Web search"]},
+    {"id": "files", "label": "Read and create files", "available": true, "via": ["Read files", "Create files"]},
+    {"id": "train", "label": "Train specialized AIs", "available": true, "via": ["MLX on This Mac", "MLX on Studio"]},
+    {"id": "image", "label": "Generate images", "available": false, "note": "Install an image model to add this."}
+  ]
+}`

@@ -1,7 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { api } from '@/lib/api'
+import type { CapabilitySnapshot } from '@/types/api'
 import { CapabilityPanel } from './CapabilityPanel'
 
 vi.mock('@/lib/api', () => ({ api: { getCapabilities: vi.fn() } }))
@@ -30,5 +31,31 @@ describe('CapabilityPanel', () => {
     expect(screen.getByText(/Via Web Search/)).toBeInTheDocument()
     expect(screen.getByText(/No image model or image tool is installed/)).toBeInTheDocument()
     expect(screen.getByText(/1 models installed · 1 of 1 computers online · 1 tools/)).toBeInTheDocument()
+  })
+
+  // The release screenshots once served [] here, which blanked Diagnostics.
+  it('hides itself instead of crashing on a reply that is not an inventory', async () => {
+    vi.mocked(api.getCapabilities).mockResolvedValue([] as unknown as CapabilitySnapshot)
+    const { container } = render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <CapabilityPanel />
+      </QueryClientProvider>,
+    )
+    await waitFor(() => expect(api.getCapabilities).toHaveBeenCalled())
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('lists abilities even when some lists are missing', async () => {
+    vi.mocked(api.getCapabilities).mockResolvedValue({
+      at: '',
+      abilities: [{ id: 'chat', label: 'Chat', available: true, via: ['Gemma'] }],
+    } as unknown as CapabilitySnapshot)
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <CapabilityPanel />
+      </QueryClientProvider>,
+    )
+    expect(await screen.findByText('Chat')).toBeInTheDocument()
+    expect(screen.getByText(/0 models installed/)).toBeInTheDocument()
   })
 })

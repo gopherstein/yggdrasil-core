@@ -14,11 +14,17 @@ function bytesText(b: number): string {
 export function CapabilityPanel() {
   const query = useQuery({ queryKey: ['capabilities'], queryFn: () => api.getCapabilities(), retry: false, staleTime: 15_000 })
   const snap = query.data
-  if (!snap) return null
-  const online = snap.nodes.filter((n) => n.online).length
-  const tools = snap.tools.filter((t) => t.enabled).length
-  const connected = snap.connectors.filter((c) => c.connected).length
-  const healthy = snap.providers.filter((p) => p.healthy).length
+  // A daemon too old for the inventory, or a malformed reply, hides the
+  // panel instead of failing the whole Diagnostics page.
+  if (!snap || !Array.isArray(snap.abilities)) return null
+  const list = <T,>(v: T[] | undefined): T[] => (Array.isArray(v) ? v : [])
+  const models = list(snap.models)
+  const nodes = list(snap.nodes)
+  const online = nodes.filter((n) => n.online).length
+  const tools = list(snap.tools).filter((t) => t.enabled).length
+  const connected = list(snap.connectors).filter((c) => c.connected).length
+  const providers = list(snap.providers)
+  const healthy = providers.filter((p) => p.healthy).length
   return (
     <section className="card space-y-3">
       <div>
@@ -48,9 +54,9 @@ export function CapabilityPanel() {
         ))}
       </ul>
       <p className="text-xs text-ink-faint">
-        {snap.models.length} models installed · {online} of {snap.nodes.length} computers online · {tools} tools ·{' '}
-        {connected} connected services · {healthy} of {snap.providers.length} providers ready · {snap.artifacts.count} files (
-        {bytesText(snap.artifacts.bytes)})
+        {models.length} models installed · {online} of {nodes.length} computers online · {tools} tools ·{' '}
+        {connected} connected services · {healthy} of {providers.length} providers ready · {snap.artifacts?.count ?? 0} files (
+        {bytesText(snap.artifacts?.bytes ?? 0)})
       </p>
     </section>
   )

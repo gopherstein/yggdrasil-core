@@ -1,19 +1,41 @@
 name: CI
 
+# Changes that touch only prose, images, or issue templates build nothing,
+# so they do not run CI. The user guide (docs/user-guide/guide.json) is not
+# ignored: the go job validates it.
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+      - "NOTICE"
+      - "docs/screenshots/**"
+      - "docs/brand/**"
+      - "screenshots/**"
+      - "assets/**"
+      - ".github/ISSUE_TEMPLATE/**"
   pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+      - "NOTICE"
+      - "docs/screenshots/**"
+      - "docs/brand/**"
+      - "screenshots/**"
+      - "assets/**"
+      - ".github/ISSUE_TEMPLATE/**"
+
+# A new push to a pull request cancels its older run. Runs on main always
+# finish, so every merged commit is checked.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  documentation:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: python3 scripts/test_publish_docs.py
-      - name: Validate user guide
-        run: python3 scripts/publish-docs.py --destination "$RUNNER_TEMP/docs-validation" --version 0.0.0-test --commit "$GITHUB_SHA"
-
+  # Go checks, the user guide, and the cross-compile share one runner: the
+  # module and build caches are already warm, and each extra job would repeat
+  # checkout and Go setup.
   go:
     runs-on: ubuntu-latest
     steps:
@@ -21,6 +43,10 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+      - name: User guide
+        run: |
+          python3 scripts/test_publish_docs.py
+          python3 scripts/publish-docs.py --destination "$RUNNER_TEMP/docs-validation" --version 0.0.0-test --commit "$GITHUB_SHA"
       - name: Format check
         run: |
           unformatted=$(gofmt -l $(find . -name '*.go' \
@@ -41,6 +67,20 @@ jobs:
           version: v2.14.0
       - name: Test
         run: go test ./... -coverprofile=coverage.out
+      - name: Cross-compile daemon and yggctl
+        env:
+          CGO_ENABLED: "0"
+        run: |
+          set -euo pipefail
+          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64 windows/amd64; do
+            export GOOS="${target%/*}" GOARCH="${target#*/}"
+            ext=""
+            if [ "$GOOS" = "windows" ]; then ext=".exe"; fi
+            echo "::group::${target}"
+            go build -o "bin/${GOOS}-${GOARCH}/yggdrasil-daemon${ext}" ./cmd/daemon
+            go build -o "bin/${GOOS}-${GOARCH}/yggctl${ext}" ./cmd/devctl
+            echo "::endgroup::"
+          done
       - name: Upload coverage profile
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v7
@@ -76,41 +116,6 @@ jobs:
         run: |
           chmod +x scripts/publish-coverage-badge.sh
           ./scripts/publish-coverage-badge.sh coverage.out
-
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - goos: linux
-            goarch: amd64
-          - goos: linux
-            goarch: arm64
-          - goos: darwin
-            goarch: amd64
-          - goos: darwin
-            goarch: arm64
-          - goos: windows
-            goarch: amd64
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v7
-        with:
-          go-version: "1.26.x"
-      - name: Build daemon and yggctl
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-          CGO_ENABLED: "0"
-        run: |
-          ext=""
-          if [ "$GOOS" = "windows" ]; then
-            ext=".exe"
-          fi
-          mkdir -p bin
-          go build -o "bin/yggdrasil-daemon${ext}" ./cmd/daemon
-          go build -o "bin/yggctl${ext}" ./cmd/devctl
 
   frontend:
     runs-on: ubuntu-latest

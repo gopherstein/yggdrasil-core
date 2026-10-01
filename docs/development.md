@@ -88,16 +88,21 @@ The web check in CI is `pnpm lint`, `pnpm exec tsc -b --pretty false`, `pnpm tes
 
 ## CI
 
-[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on Ubuntu:
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on pull requests and on pushes to `main`, on Ubuntu, in two jobs:
 
-- user-guide publish checks
-- `gofmt`, `go vet`, golangci-lint, `go test ./...`
-- cross-compiles of `yggdrasil-daemon` and `yggctl` for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, and windows/amd64 (`CGO_ENABLED=0`)
-- web lint, typecheck, test, and build
+- **go:** user-guide publish checks; `gofmt`, `go vet`, golangci-lint, `go test ./...`; then cross-compiles of `yggdrasil-daemon` and `yggctl` for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, and windows/amd64 (`CGO_ENABLED=0`). These share one runner, so the module and build caches are reused.
+- **frontend:** web lint, typecheck, test, and build.
 
-[`.github/workflows/security.yml`](../.github/workflows/security.yml) runs `govulncheck ./...` and `pnpm audit --prod` in `web/`. The audit step does not fail the job (`|| true`).
+To keep runs short:
 
-[`.github/workflows/release.yml`](../.github/workflows/release.yml) runs on tags matching `v*`. It builds packages, writes `SHA256SUMS.txt`, publishes a GitHub Release, and freezes `docs/<version>.json` from `docs/user-guide/guide.json`. It does not sign binaries.
+- **Prose-only changes skip CI:** a change that touches only Markdown, `LICENSE`, `NOTICE`, screenshots, brand assets, or issue templates doesn't run it. The user guide JSON is still checked.
+- **Superseded runs are cancelled:** a new push to a pull request cancels its older run. Runs on `main` always finish.
+
+On `main`, a third job publishes the coverage badge.
+
+[`.github/workflows/security.yml`](../.github/workflows/security.yml) runs `govulncheck ./...` and `pnpm audit --prod` in `web/`. The audit step does not fail the job (`|| true`). It runs every Monday, and on pushes and pull requests that change `go.mod`, `go.sum`, `web/package.json`, or `web/pnpm-lock.yaml`.
+
+[`.github/workflows/release.yml`](../.github/workflows/release.yml) runs on tags matching `v*`. It builds packages, writes `SHA256SUMS.txt`, publishes a GitHub Release, and freezes `docs/<version>.json` from `docs/user-guide/guide.json`. Stable tags also update the Homebrew formula and the apt repository. It then tells `yggdrasil-desktop` about the release (see [the release checklist](release-checklist.md)). It does not sign binaries.
 
 [`.github/workflows/screenshots.yml`](../.github/workflows/screenshots.yml) recaptures `docs/screenshots` on a tag or when started by hand, then holds those stills into `demo.mp4` and `demo.gif`. The same run writes iPhone, iPad, and Google Play phone and tablet canvases under `screenshots/appstore/`.
 

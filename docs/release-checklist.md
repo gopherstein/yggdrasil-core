@@ -4,6 +4,8 @@ Use this before tagging `v*`. The tag push runs [`.github/workflows/release.yml`
 
 A tag with a pre-release suffix (`-alpha.N`, `-beta.N`, `-rc.N`) is published as a GitHub pre-release. It does not update the Homebrew formula or the apt repository, so their users stay on the latest stable release, and its release body says so. Its documentation snapshot and the desktop release still run.
 
+After a successful release, the workflow sends a `core-release` event to `yeixio/yggdrasil-desktop`, which builds the desktop, Mac App Store, and iOS apps from that core release. Sending it needs the repository secret `YGGDRASIL_DESKTOP_TOKEN`: a fine-grained personal access token (or GitHub App token) for `yeixio/yggdrasil-desktop` only, with the **Contents: Read and write** permission. Without the secret, the run shows a "Desktop not notified" warning, and the desktop repository picks the release up in its daily check, or when its Release workflow is started by hand.
+
 - [ ] Version passed into the release build matches the tag (`scripts/build/package-core-release.sh` strips a leading `v` in CI).
 - [ ] [CHANGELOG.md](../CHANGELOG.md) has an entry for the release, moved out of Unreleased.
 - [ ] CI is green on the commit being tagged, including `gofmt`, `go vet`, golangci-lint, `go test`, web lint, the web build, and the cross-compile job.

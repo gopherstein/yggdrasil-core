@@ -1,6 +1,7 @@
 package screenshot
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -45,5 +46,38 @@ func TestHandlerDemoAPIAndUI(t *testing.T) {
 	asset.Body.Close()
 	if string(assetBody) != "console.log(1)" {
 		t.Fatalf("asset: %s", assetBody)
+	}
+}
+
+// The Diagnostics page reads the capability inventory; an empty list in its
+// place blanked the page in the release screenshots.
+func TestCapabilitiesFixtureHasTheInventoryShape(t *testing.T) {
+	body, ok := screenshotGET("/api/v1/capabilities")
+	if !ok {
+		t.Fatal("no capabilities fixture")
+	}
+	var snap map[string]any
+	if err := json.Unmarshal([]byte(body), &snap); err != nil {
+		t.Fatal(err)
+	}
+	for _, key := range []string{"models", "nodes", "tools", "connectors", "providers", "abilities"} {
+		if _, isList := snap[key].([]any); !isList {
+			t.Errorf("%s is not a list", key)
+		}
+	}
+}
+
+func TestMCPShareFixtureHasTheShareShape(t *testing.T) {
+	body, ok := screenshotGET("/api/v1/mcp/share")
+	if !ok {
+		t.Fatal("no MCP share fixture")
+	}
+	var share struct {
+		URL     string   `json:"url"`
+		Command string   `json:"command"`
+		Args    []string `json:"args"`
+	}
+	if err := json.Unmarshal([]byte(body), &share); err != nil || share.URL == "" || share.Command == "" || len(share.Args) == 0 {
+		t.Fatalf("share = %+v, %v", share, err)
 	}
 }

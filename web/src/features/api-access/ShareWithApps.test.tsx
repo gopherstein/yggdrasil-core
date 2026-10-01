@@ -1,7 +1,8 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { api } from '@/lib/api'
+import type { MCPShare } from '@/types/api'
 import { ShareWithApps } from './ShareWithApps'
 
 vi.mock('@/lib/api', () => ({ api: { mcpShare: vi.fn() } }))
@@ -36,5 +37,13 @@ describe('ShareWithApps', () => {
     renderIt()
     const settings = await screen.findByLabelText('json settings')
     expect(settings.textContent).not.toContain('env')
+  })
+
+  // The release screenshots once served [] here, which blanked the page.
+  it('hides itself instead of crashing on a reply that is not a share', async () => {
+    vi.mocked(api.mcpShare).mockResolvedValue([] as unknown as MCPShare)
+    const { container } = renderIt()
+    await waitFor(() => expect(api.mcpShare).toHaveBeenCalled())
+    expect(container).toBeEmptyDOMElement()
   })
 })

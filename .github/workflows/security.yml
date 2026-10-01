@@ -1,11 +1,31 @@
 name: Security
 
+# The weekly run catches advisories published against dependencies that
+# have not changed. Pushes and pull requests scan only when a dependency
+# changes.
 on:
   schedule:
     - cron: "0 6 * * 1"
+  workflow_dispatch:
   push:
     branches: [main]
+    paths:
+      - "go.mod"
+      - "go.sum"
+      - "web/package.json"
+      - "web/pnpm-lock.yaml"
+      - ".github/workflows/security.yml"
   pull_request:
+    paths:
+      - "go.mod"
+      - "go.sum"
+      - "web/package.json"
+      - "web/pnpm-lock.yaml"
+      - ".github/workflows/security.yml"
+
+concurrency:
+  group: security-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   govulncheck:
