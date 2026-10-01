@@ -37,6 +37,10 @@ type Spec struct {
 	Name string
 	// Requirements are pinned pip requirement strings.
 	Requirements []string
+	// InstallArgs are extra uv pip install flags, such as
+	// --torch-backend=auto, which picks the PyTorch build for the computer's
+	// GPU driver.
+	InstallArgs []string
 }
 
 // Status reports whether an environment is ready.
@@ -96,7 +100,11 @@ func (m *Manager) markerPath(name string) string {
 func requirementsKey(spec Spec) string {
 	reqs := append([]string(nil), spec.Requirements...)
 	sort.Strings(reqs)
-	return "python " + PythonVersion + "\n" + strings.Join(reqs, "\n") + "\n"
+	key := "python " + PythonVersion + "\n"
+	if len(spec.InstallArgs) > 0 {
+		key += "args " + strings.Join(spec.InstallArgs, " ") + "\n"
+	}
+	return key + strings.Join(reqs, "\n") + "\n"
 }
 
 // Status reports whether spec's environment is installed and current.
@@ -145,7 +153,8 @@ func (m *Manager) Ensure(ctx context.Context, spec Spec, progress Progress) (str
 		return "", fmt.Errorf("create Python environment: %w", err)
 	}
 	progress("packages", "Installing "+strings.Join(spec.Requirements, ", "))
-	args := append([]string{"pip", "install", "--python", m.PythonPath(spec.Name)}, spec.Requirements...)
+	args := append([]string{"pip", "install", "--python", m.PythonPath(spec.Name)}, spec.InstallArgs...)
+	args = append(args, spec.Requirements...)
 	if err := m.runUV(ctx, uv, progress, args...); err != nil {
 		_ = os.RemoveAll(dir)
 		return "", fmt.Errorf("install packages: %w", err)
