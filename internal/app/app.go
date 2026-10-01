@@ -589,6 +589,7 @@ func New(opts Options) (*App, error) {
 	})
 
 	a.Mimir = mimir.NewStore(db.SQL, filepath.Join(cfg.DataDir, "knowledge"))
+	a.Mimir.SetSecrets(secrets)
 	a.Mimir.SetModels(newKnowledgeModels(a))
 	a.Muninn = muninn.NewStore(db.SQL)
 	a.summarizer = &muninn.Summarizer{Store: a.Muninn}

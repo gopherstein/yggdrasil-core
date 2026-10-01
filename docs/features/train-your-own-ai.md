@@ -16,6 +16,7 @@ Open items:
 
 - NVIDIA training (PEFT) is not implemented.
 - Mimir has no embedding search yet. PDFs with a text layer are read with the pure-Go `github.com/ledongthuc/pdf` (BSD-3); scanned PDFs need OCR first. Excel workbooks (`.xlsx`) are read without a new dependency: each sheet is a table, and training reads the first sheet as a Q&A table when it has question and answer columns.
+- Mimir sources can be a read-only SQL query (SQLite, PostgreSQL, or MySQL, with the pure-Go `jackc/pgx` (MIT) and `go-sql-driver/mysql` (MPL-2.0) drivers) or a web API returning JSON, CSV, or text. They are fetched again when a search uses data older than the source's refresh interval.
 - Merging an adapter into a standalone GGUF is not offered.
 - Store builds of the desktop app cannot run a downloaded Python, so training needs the Core daemon.
 
