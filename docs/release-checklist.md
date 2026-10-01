@@ -2,6 +2,8 @@
 
 Use this before tagging `v*`. The tag push runs [`.github/workflows/release.yml`](../.github/workflows/release.yml).
 
+A tag with a pre-release suffix (`-alpha.N`, `-beta.N`, `-rc.N`) is published as a GitHub pre-release. It does not update the Homebrew formula or the apt repository, so their users stay on the latest stable release, and its release body says so. Its documentation snapshot and the desktop release still run.
+
 - [ ] Version passed into the release build matches the tag (`scripts/build/package-core-release.sh` strips a leading `v` in CI).
 - [ ] [CHANGELOG.md](../CHANGELOG.md) has an entry for the release, moved out of Unreleased.
 - [ ] CI is green on the commit being tagged, including `gofmt`, `go vet`, golangci-lint, `go test`, web lint, the web build, and the cross-compile job.

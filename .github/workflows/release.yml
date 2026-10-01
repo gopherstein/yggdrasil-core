@@ -40,19 +40,35 @@ jobs:
           VERSION="$VERSION" ./scripts/build/package-core-release.sh
           VERSION="$VERSION" ./scripts/build/write-brew-formula.sh
           ./scripts/build/apt-index.sh
+      - name: Write the release body
+        env:
+          PRERELEASE: ${{ contains(github.ref_name, '-') }}
+        run: |
+          set -euo pipefail
+          {
+            if [ "$PRERELEASE" = "true" ]; then
+              # Homebrew and apt are not updated for a pre-release (see below),
+              # so their commands install the latest stable release.
+              printf '%s\n\n' "**Pre-release.** Homebrew and apt install the latest stable release, not this one. To try ${GITHUB_REF_NAME}, use the archives or packages attached below."
+            fi
+            cat packaging/release-install.md
+          } > /tmp/release-body.md
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v3
         with:
           name: Yggdrasil ${{ github.ref_name }}
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
-          body_path: packaging/release-install.md
+          body_path: /tmp/release-body.md
           files: |
             dist/*.deb
             dist/*.rpm
             dist/*.tar.gz
             dist/SHA256SUMS.txt
+      # Homebrew and apt serve stable releases. A pre-release (a tag with a
+      # suffix such as -beta.1) must not replace what their users install.
       - name: Open the Homebrew formula pull request
+        if: ${{ !contains(github.ref_name, '-') }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -85,6 +101,7 @@ jobs:
             fi
           fi
       - name: Publish the apt repository
+        if: ${{ !contains(github.ref_name, '-') }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
