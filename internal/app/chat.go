@@ -138,6 +138,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			conversationID: conversationID,
 			taskID:         task.ID,
 			turnPrompt:     message,
+			trace:          &turnTrace{},
 		}
 		if special != nil {
 			env.adapter = special.adapter
@@ -246,7 +247,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			saveChat, _ := a.Settings.GetBool(ctx, "save_chat_history", true)
 			msgID := ""
 			if saveChat {
-				msg, _ := a.Conversations.AddMessage(ctx, conversationID, "assistant", full)
+				msg, _ := a.Conversations.AddMessageWithMeta(ctx, conversationID, "assistant", full, env.trace.meta())
 				msgID = msg.ID
 			}
 			a.recordGeneration(ctx, profile, conversationID, convTitle, msgID, env.modelID(), metrics, roleSteps)
@@ -254,6 +255,9 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			a.recordGeneration(ctx, profile, conversationID, convTitle, "", env.modelID(), metrics, roleSteps)
 		}
 		payload := map[string]any{"conversation_id": conversationID}
+		if meta := env.trace.meta(); meta != nil {
+			payload["meta"] = meta
+		}
 		if metrics != nil {
 			payload["metrics"] = metrics
 			payload["model_id"] = env.modelID()
@@ -640,6 +644,8 @@ type chatExecEnv struct {
 	adapter      string
 	instructions string
 	knowledge    []string
+	// trace records sources and steps for the answer.
+	trace *turnTrace
 
 	mu         sync.Mutex
 	lastModel  string
@@ -718,7 +724,7 @@ func (e *chatExecEnv) Generate(ctx context.Context, role string, messages []plug
 }
 
 func (e *chatExecEnv) ExecuteTool(ctx context.Context, toolID string, args map[string]any) (map[string]any, error) {
-	policy := tools.PolicyForProfile(e.profile, toolID)
+	policy := effectivePolicy(tools.PolicyForProfile(e.profile, toolID), toolID, e.trace != nil && e.trace.sawUntrusted())
 	meta := map[string]any{}
 	if e.conversationID != "" {
 		meta["conversation_id"] = e.conversationID
@@ -726,7 +732,11 @@ func (e *chatExecEnv) ExecuteTool(ctx context.Context, toolID string, args map[s
 	if e.taskID != "" {
 		meta["task_id"] = e.taskID
 	}
-	return e.app.Tools.Execute(ctx, toolID, args, policy, "chat requested tool", meta)
+	result, err := e.app.Tools.Execute(ctx, toolID, args, policy, "chat requested tool", meta)
+	if err == nil && e.trace != nil {
+		e.trace.tool(toolID, args, result)
+	}
+	return result, err
 }
 
 func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
@@ -843,17 +853,18 @@ func (e *chatExecEnv) modelForRole(role string) string {
 	return ""
 }
 
-// TurnInstructions adds connected knowledge for this turn. The simple
-// orchestrator places it ahead of its own system instructions.
+// TurnInstructions returns trusted instructions for this turn: a specialized
+// AI's system instructions. The simple orchestrator places them ahead of its
+// own system prompt.
 func (e *chatExecEnv) TurnInstructions(ctx context.Context, prompt string) string {
-	var parts []string
-	if strings.TrimSpace(e.instructions) != "" {
-		parts = append(parts, strings.TrimSpace(e.instructions))
-	}
-	if block := e.knowledgeBlock(ctx, prompt); block != "" {
-		parts = append(parts, block)
-	}
-	return strings.Join(parts, "\n\n")
+	return strings.TrimSpace(e.instructions)
+}
+
+// ReferenceMaterial returns connected knowledge for this turn. It is
+// untrusted content (§58), so the orchestrator delivers it as labelled data
+// next to the question, never in the system prompt.
+func (e *chatExecEnv) ReferenceMaterial(ctx context.Context, prompt string) string {
+	return e.knowledgeBlock(ctx, prompt)
 }
 
 func (e *chatExecEnv) knowledgeBlock(ctx context.Context, prompt string) string {
@@ -875,6 +886,9 @@ func (e *chatExecEnv) knowledgeBlock(ctx context.Context, prompt string) string 
 		}
 	}
 	e.Emit("knowledge.retrieved", map[string]any{"passages": len(hits), "sources": names})
+	if e.trace != nil {
+		e.trace.knowledge(hits)
+	}
 	return mimir.ContextBlock(hits, 0)
 }
 

@@ -326,7 +326,8 @@ func chunkDocuments(docs []document) []chunk {
 					}
 					col := fmt.Sprintf("column %d", j+1)
 					if j < len(d.Header) && strings.TrimSpace(d.Header[j]) != "" {
-						col = strings.TrimSpace(d.Header[j])
+						// "in_stock" reads as "in stock", which small models understand.
+						col = strings.ReplaceAll(strings.TrimSpace(d.Header[j]), "_", " ")
 					}
 					if b.Len() > 0 {
 						b.WriteString("; ")

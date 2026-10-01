@@ -196,3 +196,28 @@ func TestContextBlockRespectsBudget(t *testing.T) {
 		t.Fatal("empty hits should add nothing")
 	}
 }
+
+func TestSearchDropsWeakMatches(t *testing.T) {
+	s := newTestStore(t)
+	ctx := context.Background()
+	text := "sku,brand,model,size,price\n" +
+		"MP-22545,Michelin,Pilot Sport 4,225/45R17,189.99\n" +
+		"MD-21555,Michelin,Defender2,215/55R17,176.50\n" +
+		"MX-23565,Michelin,CrossClimate2,235/65R17,211.00\n" +
+		"BW-20555,Bridgestone,Blizzak WS90,205/55R16,142.50\n"
+	if _, err := s.Create(ctx, CreateInput{Kind: KindText, Filename: "stock.csv", Text: text}); err != nil {
+		t.Fatal(err)
+	}
+	hits, err := s.Search(ctx, SearchInput{Query: "How much is the Michelin Pilot Sport 4 in 225/45R17?"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(hits) != 1 || !strings.Contains(hits[0].Body, "MP-22545") {
+		t.Fatalf("want only the Pilot Sport 4 row, got %d: %+v", len(hits), hits)
+	}
+	// A broad question still returns every match.
+	broad, _ := s.Search(ctx, SearchInput{Query: "Michelin"})
+	if len(broad) != 3 {
+		t.Fatalf("broad query = %d hits", len(broad))
+	}
+}

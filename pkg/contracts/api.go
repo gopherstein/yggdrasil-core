@@ -301,13 +301,39 @@ type Conversation struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// Citation is a source an answer drew on. The product renders citations;
+// the model is not asked to invent citation syntax.
+type Citation struct {
+	// Kind is web, knowledge, or file.
+	Kind  string `json:"kind"`
+	Title string `json:"title"`
+	URL   string `json:"url,omitempty"`
+	// Source is the knowledge source name or the file path.
+	Source  string `json:"source,omitempty"`
+	Snippet string `json:"snippet,omitempty"`
+}
+
+// ActivityStep is one thing the assistant did for an answer, in plain language.
+type ActivityStep struct {
+	// Kind is knowledge, search, read, file, write, command, or git.
+	Kind string `json:"kind"`
+	Text string `json:"text"`
+}
+
+// MessageMeta is what an assistant answer used and did.
+type MessageMeta struct {
+	Sources []Citation     `json:"sources,omitempty"`
+	Steps   []ActivityStep `json:"steps,omitempty"`
+}
+
 // Message is a chat message.
 type Message struct {
-	ID             string    `json:"id"`
-	ConversationID string    `json:"conversation_id"`
-	Role           string    `json:"role"`
-	Content        string    `json:"content"`
-	CreatedAt      time.Time `json:"created_at"`
+	ID             string       `json:"id"`
+	ConversationID string       `json:"conversation_id"`
+	Role           string       `json:"role"`
+	Content        string       `json:"content"`
+	CreatedAt      time.Time    `json:"created_at"`
+	Meta           *MessageMeta `json:"meta,omitempty"`
 }
 
 // GenerationMetrics is per-turn inference performance.

@@ -1,0 +1,119 @@
+import { useState } from 'react'
+import type { Citation, MessageMeta } from '@/types/api'
+
+function hostOf(url: string): string {
+  try {
+    return new URL(url).host.replace(/^www\./, '')
+  } catch {
+    return url
+  }
+}
+
+/** One chip: a web page, a file, or a knowledge source with its passages. */
+type SourceItem = { kind: string; label: string; url?: string; passages: Citation[] }
+
+function groupSources(sources: Citation[]): SourceItem[] {
+  const out: SourceItem[] = []
+  for (const s of sources) {
+    if (s.kind === 'knowledge') {
+      const name = s.source || s.title
+      const existing = out.find((i) => i.kind === 'knowledge' && i.label === name)
+      if (existing) {
+        existing.passages.push(s)
+        continue
+      }
+      out.push({ kind: 'knowledge', label: name, passages: [s] })
+    } else if (s.kind === 'web') {
+      out.push({ kind: 'web', label: s.title || hostOf(s.url ?? ''), url: s.url, passages: [s] })
+    } else {
+      out.push({ kind: s.kind, label: s.title, passages: [s] })
+    }
+  }
+  return out
+}
+
+const chipClass =
+  'inline-flex max-w-[16rem] items-center gap-1.5 rounded-full border border-line/70 bg-surface px-2.5 py-1 text-xs text-ink-muted transition hover:border-primary/50 hover:text-ink'
+
+function SourceChip({ item, index }: { item: SourceItem; index: number }) {
+  const [open, setOpen] = useState(false)
+  const badge = (
+    <span className="tabular-nums text-ink-faint" aria-hidden>
+      {index + 1}
+    </span>
+  )
+  if (item.kind === 'web' && item.url) {
+    return (
+      <a href={item.url} target="_blank" rel="noopener noreferrer" className={chipClass} title={item.passages[0]?.snippet || item.url}>
+        {badge}
+        <span className="truncate">{item.label}</span>
+        <span className="shrink-0 text-ink-faint">{hostOf(item.url)}</span>
+      </a>
+    )
+  }
+  const count = item.passages.length
+  const withText = item.passages.filter((p) => p.snippet)
+  return (
+    <span className="relative">
+      <button type="button" className={chipClass} aria-expanded={open} title={item.label} onClick={() => setOpen((v) => !v)}>
+        {badge}
+        {item.kind === 'knowledge' ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-mimir" aria-hidden /> : null}
+        <span className="truncate">{item.label}</span>
+        {count > 1 ? <span className="shrink-0 text-ink-faint">· {count}</span> : null}
+      </button>
+      {open && withText.length > 0 ? (
+        <span className="absolute left-0 top-full z-20 mt-1 block max-h-72 w-80 overflow-y-auto rounded-lg border border-line/70 bg-surface p-3 text-xs text-ink-muted shadow-panel">
+          {withText.map((p, i) => (
+            <span key={i} className={i > 0 ? 'mt-2 block border-t border-line/50 pt-2' : 'block'}>
+              <span className="mb-0.5 block font-medium text-ink">{p.title}</span>
+              {p.snippet}
+            </span>
+          ))}
+        </span>
+      ) : null}
+    </span>
+  )
+}
+
+/** Sources and a plain-language summary of the work behind an answer. */
+export function AnswerDetails({ meta }: { meta?: MessageMeta }) {
+  const [stepsOpen, setStepsOpen] = useState(false)
+  const sources = groupSources(meta?.sources ?? [])
+  const steps = meta?.steps ?? []
+  if (sources.length === 0 && steps.length === 0) return null
+  return (
+    <div className="mt-3 space-y-2 border-t border-line/50 pt-2.5">
+      {sources.length > 0 ? (
+        <div>
+          <p className="label-caps mb-1.5 text-[10px]">Sources</p>
+          <div className="flex flex-wrap gap-1.5">
+            {sources.map((item, i) => (
+              <SourceChip key={`${item.kind}-${item.url ?? item.label}`} item={item} index={i} />
+            ))}
+          </div>
+        </div>
+      ) : null}
+      {steps.length > 0 ? (
+        <div className="text-xs text-ink-muted">
+          <button
+            type="button"
+            className="underline-offset-2 hover:text-ink hover:underline"
+            aria-expanded={stepsOpen}
+            onClick={() => setStepsOpen((v) => !v)}
+          >
+            {stepsOpen ? '▾' : '▸'} What I did ({steps.length} {steps.length === 1 ? 'step' : 'steps'})
+          </button>
+          {stepsOpen ? (
+            <ol className="mt-1.5 space-y-1 pl-4">
+              {steps.map((s, i) => (
+                <li key={i} className="list-decimal">
+                  {s.text}
+                </li>
+              ))}
+            </ol>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  )
+}

@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -123,6 +124,11 @@ func (r *ConversationRepo) Delete(ctx context.Context, id string) error {
 }
 
 func (r *ConversationRepo) AddMessage(ctx context.Context, conversationID, role, content string) (contracts.Message, error) {
+	return r.AddMessageWithMeta(ctx, conversationID, role, content, nil)
+}
+
+// AddMessageWithMeta stores a message with the sources and steps behind it.
+func (r *ConversationRepo) AddMessageWithMeta(ctx context.Context, conversationID, role, content string, meta *contracts.MessageMeta) (contracts.Message, error) {
 	now := time.Now().UTC()
 	m := contracts.Message{
 		ID:             uuid.NewString(),
@@ -130,11 +136,17 @@ func (r *ConversationRepo) AddMessage(ctx context.Context, conversationID, role,
 		Role:           role,
 		Content:        content,
 		CreatedAt:      now,
+		Meta:           meta,
+	}
+	var metaJSON any
+	if meta != nil {
+		b, _ := json.Marshal(meta)
+		metaJSON = string(b)
 	}
 	_, err := r.db.ExecContext(ctx, `
-		INSERT INTO messages (id, conversation_id, role, content, created_at)
-		VALUES (?, ?, ?, ?, ?)`,
-		m.ID, m.ConversationID, m.Role, m.Content, m.CreatedAt.Format(time.RFC3339Nano))
+		INSERT INTO messages (id, conversation_id, role, content, meta_json, created_at)
+		VALUES (?, ?, ?, ?, ?, ?)`,
+		m.ID, m.ConversationID, m.Role, m.Content, metaJSON, m.CreatedAt.Format(time.RFC3339Nano))
 	if err != nil {
 		return m, err
 	}
@@ -153,7 +165,7 @@ func (r *ConversationRepo) DeleteAll(ctx context.Context) error {
 
 func (r *ConversationRepo) ListMessages(ctx context.Context, conversationID string) ([]contracts.Message, error) {
 	rows, err := r.db.QueryContext(ctx, `
-		SELECT id, conversation_id, role, content, created_at
+		SELECT id, conversation_id, role, content, COALESCE(meta_json, ''), created_at
 		FROM messages WHERE conversation_id = ? ORDER BY created_at ASC`, conversationID)
 	if err != nil {
 		return nil, err
@@ -162,11 +174,17 @@ func (r *ConversationRepo) ListMessages(ctx context.Context, conversationID stri
 	var out []contracts.Message
 	for rows.Next() {
 		var m contracts.Message
-		var created string
-		if err := rows.Scan(&m.ID, &m.ConversationID, &m.Role, &m.Content, &created); err != nil {
+		var created, meta string
+		if err := rows.Scan(&m.ID, &m.ConversationID, &m.Role, &m.Content, &meta, &created); err != nil {
 			return nil, err
 		}
 		m.CreatedAt = parseTime(created)
+		if meta != "" {
+			m.Meta = &contracts.MessageMeta{}
+			if json.Unmarshal([]byte(meta), m.Meta) != nil {
+				m.Meta = nil
+			}
+		}
 		out = append(out, m)
 	}
 	if out == nil {

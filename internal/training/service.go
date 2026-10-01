@@ -1346,19 +1346,17 @@ func (s *Service) EvaluateAsync(aiID string, revision int) {
 // turnMessages builds the messages both sides of an evaluation see: the
 // AI's instructions and its connected knowledge for the prompt.
 func (s *Service) turnMessages(ctx context.Context, ai SpecializedAI, prompt string) []pluginapi.ChatMessage {
-	sys := ai.Instructions
+	reference := ""
 	if len(ai.Knowledge) > 0 && s.d.Knowledge != nil {
 		if hits, err := s.d.Knowledge.Search(ctx, mimir.SearchInput{Query: prompt, SourceIDs: ai.Knowledge}); err == nil {
-			if block := mimir.ContextBlock(hits, 0); block != "" {
-				sys = strings.TrimSpace(sys + "\n\n" + block)
-			}
+			reference = mimir.ContextBlock(hits, 0)
 		}
 	}
 	var msgs []pluginapi.ChatMessage
-	if sys != "" {
-		msgs = append(msgs, pluginapi.ChatMessage{Role: "system", Content: sys})
+	if strings.TrimSpace(ai.Instructions) != "" {
+		msgs = append(msgs, pluginapi.ChatMessage{Role: "system", Content: ai.Instructions})
 	}
-	return append(msgs, pluginapi.ChatMessage{Role: "user", Content: prompt})
+	return append(msgs, pluginapi.ChatMessage{Role: "user", Content: mimir.WithReference(prompt, reference)})
 }
 
 // Deploy makes a revision the one chat and the API use. The revision must

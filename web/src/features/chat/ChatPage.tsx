@@ -19,6 +19,8 @@ import { modelToolAssessment } from '@/features/models/modelPresentation'
 import { CapabilityNotice } from './CapabilityNotice'
 import { ChatActivity } from './ChatActivity'
 import { ChatHistoryDrawer, useCanPinChatHistory } from './ChatHistoryDrawer'
+import { AnswerDetails } from './AnswerDetails'
+import { ChatErrorCard } from './ChatErrorCard'
 import { ChatMarkdown } from './ChatMarkdown'
 import { ContextUsageButton } from './ContextUsageButton'
 import { contextWindow, parseContextUsage, type ContextUsage } from './contextUsage'
@@ -405,6 +407,8 @@ export function ChatPage() {
         setIsSending(false)
         setStatusMessage(null)
         setPendingTool(null)
+        // The saved answer now carries its sources and steps.
+        setToolTraces([])
         abortRef.current = null
         queryClient.invalidateQueries({ queryKey: ['messages', conversationId] })
         queryClient.invalidateQueries({ queryKey: ['conversations'] })
@@ -594,6 +598,17 @@ export function ChatPage() {
             setContextUsage(nextUsage)
           }
           if (conversationId) handleChatComplete(conversationId)
+        }
+        if (event.type === 'knowledge.retrieved') {
+          const conversationId = event.payload?.conversation_id as string | undefined
+          if (conversationId && conversationId !== selectedId && conversationId !== streamingConvRef.current) return
+          const passages = Number(event.payload?.passages) || 0
+          const names = (event.payload?.sources as string[] | undefined) ?? []
+          setStatusMessage(
+            passages > 0
+              ? `Found ${passages === 1 ? '1 passage' : `${passages} passages`} in ${names[0] ?? 'your knowledge'}${names.length > 1 ? ` and ${names.length - 1} more` : ''}…`
+              : 'Checked your knowledge…',
+          )
         }
         if (event.type === 'chat.error') {
           setIsSending(false)
@@ -1209,7 +1224,10 @@ export function ChatPage() {
                     ].join(' ')}
                   >
                     {message.role === 'assistant' ? (
-                      <ChatMarkdown text={text} />
+                      <>
+                        <ChatMarkdown text={text} />
+                        <AnswerDetails meta={message.meta} />
+                      </>
                     ) : (
                       <span className="whitespace-pre-wrap">{text}</span>
                     )}
@@ -1308,9 +1326,14 @@ export function ChatPage() {
                   />
                 ) : null}
                 {sendError && (
-                  <div className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">
-                    {sendError}
-                  </div>
+                  <ChatErrorCard
+                    raw={sendError}
+                    onRetry={() => {
+                      setSendError(null)
+                      void sendMessage(lastUserMessageRef.current)
+                    }}
+                    onNewChat={startNewChat}
+                  />
                 )}
                   </div>
                 </div>
@@ -1371,7 +1394,9 @@ export function ChatPage() {
                 </div>
               ) : null}
               {!selectedId && sendError ? (
-                <p className="mt-3 text-center text-sm text-danger">{sendError}</p>
+                <div className="mt-3 flex justify-center">
+                  <ChatErrorCard raw={sendError} />
+                </div>
               ) : null}
             </div>
           </div>

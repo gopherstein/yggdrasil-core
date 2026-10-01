@@ -8,6 +8,7 @@ import (
 
 	"github.com/yeixio/yggdrasil-core/internal/contextusage"
 	"github.com/yeixio/yggdrasil-core/internal/events"
+	"github.com/yeixio/yggdrasil-core/internal/mimir"
 	"github.com/yeixio/yggdrasil-core/internal/tools"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 	"github.com/yeixio/yggdrasil-core/pkg/pluginapi"
@@ -74,7 +75,7 @@ func (o *Orchestrator) Run(
 		if prior := priorMessages(ctx, env, task.Prompt, sys); len(prior) > 0 {
 			messages = append(messages, prior...)
 		}
-		messages = append(messages, pluginapi.ChatMessage{Role: "user", Content: task.Prompt})
+		messages = append(messages, pluginapi.ChatMessage{Role: "user", Content: withReference(task.Prompt, referenceMaterial(ctx, env, task.Prompt))})
 
 		var metrics *pluginapi.GenerationMetrics
 		var usage contextusage.Usage
@@ -126,14 +127,14 @@ func (o *Orchestrator) Run(
 					resultNote = "The tool failed. Details for you, not for the user:\n" + string(payload)
 				} else {
 					raw, _ := json.Marshal(map[string]any{"ok": true, "result": result})
-					resultNote = "Tool result for you, not for the user:\n" + string(raw)
+					resultNote = "Tool result for you, not for the user. " + untrustedNote + "\n" + string(raw)
 				}
 				followUp := answerAfterTools
 				if err == nil && parsed.Call.ID == "internet.search" && calls < maxToolCalls {
 					if page, opened := followLiveSearch(ctx, env, profile, task.Prompt, parsed.Call.Args, result); opened {
 						calls++
 						raw, _ := json.Marshal(map[string]any{"ok": true, "result": page})
-						resultNote += "\n\nPage for you, not for the user:\n" + string(raw)
+						resultNote += "\n\nPage for you, not for the user. " + untrustedNote + "\n" + string(raw)
 						followUp = answerFromPage
 					}
 				}
@@ -204,6 +205,25 @@ func streamText(ch chan<- pluginapi.OrchestrationEvent, role, nodeID, content st
 		Done:    true,
 	}
 }
+
+// untrustedNote tells the model that retrieved content is data (§58).
+const untrustedNote = mimir.UntrustedNote
+
+// referenceSource is implemented by environments that retrieve reference
+// material, such as connected knowledge, for a turn.
+type referenceSource interface {
+	ReferenceMaterial(ctx context.Context, prompt string) string
+}
+
+func referenceMaterial(ctx context.Context, env pluginapi.ExecutionEnvironment, prompt string) string {
+	src, ok := env.(referenceSource)
+	if !ok {
+		return ""
+	}
+	return strings.TrimSpace(src.ReferenceMaterial(ctx, prompt))
+}
+
+func withReference(prompt, reference string) string { return mimir.WithReference(prompt, reference) }
 
 // turnInstructions is implemented by environments that add instructions for
 // one turn: a specialized AI's system instructions and connected knowledge.

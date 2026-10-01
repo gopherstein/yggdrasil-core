@@ -33,9 +33,13 @@ func TestTurnInstructionsRetrieveProfileKnowledge(t *testing.T) {
 	env := &chatExecEnv{app: a, ctx: ctx,
 		profile:      profiles.Profile{KnowledgeSources: []string{src.ID}},
 		instructions: "You are Tire Bot."}
-	got := env.TurnInstructions(ctx, "price for 225/45R17?")
-	if !strings.HasPrefix(got, "You are Tire Bot.") || !strings.Contains(got, "price: 189.99") {
+	// Trusted instructions and untrusted knowledge are kept apart (§58).
+	if got := env.TurnInstructions(ctx, "price for 225/45R17?"); got != "You are Tire Bot." {
 		t.Fatalf("instructions = %q", got)
+	}
+	ref := env.ReferenceMaterial(ctx, "price for 225/45R17?")
+	if !strings.Contains(ref, "price: 189.99") || strings.Contains(ref, "Tire Bot") {
+		t.Fatalf("reference = %q", ref)
 	}
 	evt := <-sub
 	if evt.Type != "knowledge.retrieved" || evt.Payload["passages"] != 1 {
@@ -43,7 +47,7 @@ func TestTurnInstructionsRetrieveProfileKnowledge(t *testing.T) {
 	}
 
 	none := &chatExecEnv{app: a, ctx: ctx}
-	if got := none.TurnInstructions(ctx, "price for 225/45R17?"); got != "" {
+	if got := none.ReferenceMaterial(ctx, "price for 225/45R17?"); got != "" {
 		t.Fatalf("a profile without knowledge got %q", got)
 	}
 }

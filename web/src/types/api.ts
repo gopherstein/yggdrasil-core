@@ -255,12 +255,32 @@ export interface Conversation {
   updated_at: string
 }
 
+export interface Citation {
+  kind: 'web' | 'knowledge' | 'file' | string
+  title: string
+  url?: string
+  source?: string
+  snippet?: string
+}
+
+export interface ActivityStep {
+  kind: string
+  text: string
+}
+
+export interface MessageMeta {
+  sources?: Citation[]
+  steps?: ActivityStep[]
+}
+
 export interface Message {
   id: string
   conversation_id: string
   role: string
   content: string
   created_at: string
+  /** What an assistant answer drew on and did. */
+  meta?: MessageMeta
 }
 
 export interface SettingsView {
