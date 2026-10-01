@@ -24,6 +24,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/runlog"
 	"github.com/yeixio/yggdrasil-core/internal/runtimes/llamacpp"
 	"github.com/yeixio/yggdrasil-core/internal/share"
+	"github.com/yeixio/yggdrasil-core/internal/structured"
 	"github.com/yeixio/yggdrasil-core/internal/tools"
 	"github.com/yeixio/yggdrasil-core/internal/turnopts"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
@@ -47,6 +48,13 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 	}
 	// Memory requests are answered by Yggdrasil, not the model.
 	opts := turnopts.From(ctx)
+	// A short question about what Yggdrasil can do is answered from its
+	// inventory, not by a model that may claim what it cannot do (§37).
+	if len(structured.SchemaFrom(ctx)) == 0 {
+		if ch, ok := a.answerCapabilityQuestion(ctx, conversationID, message); ok {
+			return ch, nil
+		}
+	}
 	// An API caller changes memories only when it opted into memory (§62).
 	if opts != nil && !opts.Memory {
 		// Fall through: "Remember …" is an ordinary message for this caller.
@@ -263,6 +271,10 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			env.trace.sharing(busy + ", so this answer may be slower.")
 		}
 		env.opts = opts
+		if facts := a.capabilityFacts(ctx, message); facts != "" {
+			env.capabilities = facts
+			env.trace.sharing("Checked what Yggdrasil can do right now")
+		}
 		if a.memoryOn(ctx, conversationID) && (opts == nil || opts.Memory) && profile.Orchestration.Memory != "off" {
 			if mems, err := a.Muninn.Relevant(ctx, message); err == nil {
 				env.memories = mems
@@ -861,6 +873,9 @@ type chatExecEnv struct {
 	memories []muninn.Memory
 	// opts are an API request's choices for this turn, or nil (§62).
 	opts *turnopts.Options
+	// capabilities are inventory facts for a question about what
+	// Yggdrasil can do (§37).
+	capabilities string
 	// localOnly is set once the turn uses a memory or knowledge source
 	// marked this computer only, so it is never sent elsewhere (§63).
 	localOnly   bool
@@ -1058,6 +1073,8 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 			fixed, _ := payload["fixed"].(int)
 			remaining, _ := payload["remaining"].(string)
 			e.trace.verified(issues, fixed, remaining)
+		case simple.EventUnconfirmedAction:
+			e.trace.unconfirmedAction()
 		}
 	}
 	if e.app.Tools != nil && (eventType == events.ToolParsed || eventType == events.ToolFailed) {
@@ -1167,6 +1184,10 @@ func (e *chatExecEnv) TurnInstructions(ctx context.Context, prompt string) strin
 		if block := e.app.personalBlock(ctx); block != "" {
 			parts = append(parts, block)
 		}
+	}
+	// What Yggdrasil can do comes from its own inventory (§37).
+	if e.capabilities != "" {
+		parts = append(parts, e.capabilities)
 	}
 	// Memories come from the person, so they are trusted instructions.
 	if block := muninn.Block(e.memories); block != "" {

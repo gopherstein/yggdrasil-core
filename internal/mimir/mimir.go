@@ -122,6 +122,8 @@ type Store struct {
 	// fetching holds database and API sources being fetched in the
 	// background, so a busy chat starts one fetch, not one per search.
 	fetching sync.Map
+	// recognizer reads scanned PDF pages, when text recognition is set up.
+	recognizer Recognizer
 }
 
 // MaxTextBytes limits pasted or uploaded content.
@@ -417,7 +419,7 @@ func (s *Store) refreshLocked(ctx context.Context, id string) error {
 		docs, readErr = s.fetchRemote(ctx, src)
 	} else {
 		sig, sigErr = signature(src.file)
-		docs, readErr = readSource(src.file)
+		docs, readErr = readSource(src.file, s.readPDF(ctx))
 	}
 	if sigErr != nil || readErr != nil {
 		msg := errors.Join(sigErr, readErr).Error()

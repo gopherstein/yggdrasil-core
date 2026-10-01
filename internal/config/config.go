@@ -104,10 +104,12 @@ func (m *Manager) load() error {
 	if err := json.Unmarshal(data, &cfg); err != nil {
 		return fmt.Errorf("parse config: %w", err)
 	}
-	// Preserve computed paths if empty in file.
+	// Preserve computed paths if empty in file. A file without data_dir
+	// belongs to the directory it was read from, not the default one, so
+	// --data-dir never falls back to the user's real data.
 	defaults := DefaultConfig()
 	if cfg.DataDir == "" {
-		cfg.DataDir = defaults.DataDir
+		cfg.DataDir = filepath.Dir(m.path)
 	}
 	if cfg.DBPath == "" {
 		cfg.DBPath = filepath.Join(cfg.DataDir, "yggdrasil.db")
