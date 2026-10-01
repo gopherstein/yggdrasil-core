@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Ratatoskr mascot prototype. Open in a browser. The rig is the Squirrel class in the script at the bottom. -->
+<title>Ratatoskr Mascot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: split hero (copy + live stage), then a sheet of every state, small-size proof, rationale.
+   Tokens mirror yggdrasil-core web/src/index.css — dark is the primary surface. */
+:root {
+  --canvas: #0E131A; --surface: #111821; --raised: #18222E; --line: #273341;
+  --ink: #EEF2F6; --muted: #9AA7B5; --faint: #687583;
+  --primary: #4FD1C5; --primary-soft: #12383A; --accent: #C6A15B;
+  --bifrost: #5BB8D4; --heimdall: #D8A657;
+  --shadow-c: #000000; --shadow-o: .38;
+  --aurora-a: rgba(79,209,197,.13); --aurora-b: rgba(198,161,91,.07);
+  --font-display: Outfit, system-ui, sans-serif;
+  --font-sans: Figtree, system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --canvas: #F0F4F8; --surface: #F8FBFD; --raised: #E2E9F0; --line: #C4D0DC;
+  --ink: #121C26; --muted: #586A7A; --faint: #687583;
+  --primary: #167C78; --primary-soft: #E6F4F2; --accent: #9A7433;
+  --bifrost: #2F7FA0; --heimdall: #9A6A1E;
+  --shadow-c: #284050; --shadow-o: .2;
+  --aurora-a: rgba(22,124,120,.10); --aurora-b: rgba(154,116,51,.06);
+  color-scheme: light;
+} }
+:root[data-theme="light"] {
+  --canvas: #F0F4F8; --surface: #F8FBFD; --raised: #E2E9F0; --line: #C4D0DC;
+  --ink: #121C26; --muted: #586A7A; --faint: #687583;
+  --primary: #167C78; --primary-soft: #E6F4F2; --accent: #9A7433;
+  --bifrost: #2F7FA0; --heimdall: #9A6A1E;
+  --shadow-c: #284050; --shadow-o: .2;
+  --aurora-a: rgba(22,124,120,.10); --aurora-b: rgba(154,116,51,.06);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--canvas); color: var(--ink);
+  font: 400 15px/1.6 var(--font-sans);
+  background-image:
+    radial-gradient(ellipse 70% 45% at 8% -8%, var(--aurora-a), transparent 60%),
+    radial-gradient(ellipse 50% 30% at 100% 0%, var(--aurora-b), transparent 50%);
+  background-repeat: no-repeat;
+}
+.wrap { max-width: 1100px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: grid; gap: 64px; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 40px; align-items: center; }
+.kicker { font: 600 12px/1 var(--font-display); letter-spacing: .28em; text-transform: uppercase; color: var(--primary); display: flex; gap: 10px; align-items: center; }
+.kicker .rune { font-size: 16px; letter-spacing: 0; }
+h1 { font: 700 clamp(2.6rem, 6vw, 4.2rem)/1 var(--font-display); letter-spacing: -.02em; margin: 14px 0 6px; text-wrap: balance; }
+.pron { font: 400 13px/1 var(--font-mono); color: var(--faint); margin: 0 0 18px; }
+.lead { color: var(--muted); font-size: 16.5px; max-width: 46ch; margin: 0 0 26px; }
+.lead b { color: var(--ink); font-weight: 600; }
+
+.states { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; }
+.states button {
+  font: 500 13px/1 var(--font-sans); color: var(--muted);
+  background: var(--raised); border: 1px solid transparent; border-radius: 999px;
+  padding: 8px 13px; cursor: pointer; transition: color .15s, background .15s, border-color .15s;
+}
+.states button:hover { color: var(--ink); border-color: var(--line); }
+.states button[aria-pressed="true"] { background: var(--primary-soft); color: var(--primary); border-color: color-mix(in srgb, var(--primary) 45%, transparent); font-weight: 600; }
+.states button:focus-visible, .tile:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+.moment { min-height: 64px; border-left: 2px solid var(--line); padding-left: 14px; }
+.moment .realm { font: 600 11px/1 var(--font-display); letter-spacing: .24em; text-transform: uppercase; color: var(--faint); margin-bottom: 6px; display: block; }
+.moment p { margin: 0; color: var(--ink); }
+.tour { margin-top: 18px; font: 400 12px/1.4 var(--font-mono); color: var(--faint); }
+
+.stage {
+  position: relative; aspect-ratio: 1 / 1; max-width: 100%;
+  border-radius: 20px; background: var(--surface);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--line) 70%, transparent);
+  overflow: hidden;
+}
+.stage::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 58%, var(--aurora-a), transparent 62%);
+}
+.stage svg { position: relative; width: 100%; height: 100%; display: block; }
+.stage .size { position: absolute; right: 14px; bottom: 12px; font: 400 11px/1 var(--font-mono); color: var(--faint); }
+
+h2 { font: 600 1.35rem/1.2 var(--font-display); margin: 0 0 6px; }
+.sub { color: var(--muted); margin: 0 0 22px; max-width: 62ch; }
+
+.sheet { display: grid; grid-template-columns: repeat(auto-fit, minmax(124px, 1fr)); gap: 12px; }
+.tile {
+  background: var(--surface); border: 1px solid color-mix(in srgb, var(--line) 60%, transparent); border-radius: 14px;
+  padding: 6px 12px 12px; text-align: left; cursor: pointer; color: inherit; font: inherit;
+  display: grid; gap: 2px; transition: border-color .15s;
+}
+.tile:hover { border-color: var(--line); }
+.tile.on { border-color: color-mix(in srgb, var(--primary) 55%, transparent); }
+.tile svg { width: 100%; aspect-ratio: 1 / 1; display: block; }
+.tile b { font: 600 14px/1.2 var(--font-display); }
+.tile span { font-size: 12.5px; color: var(--muted); line-height: 1.4; }
+
+.sizes { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+.chip { display: grid; justify-items: center; gap: 8px; }
+.chip .box { display: grid; place-items: center; border-radius: 12px; padding: 10px; }
+.chip .dark { background: #0B0F14; }
+.chip .light { background: #F3F6F9; }
+.chip label { font: 400 11px/1 var(--font-mono); color: var(--faint); }
+.pair { display: flex; gap: 8px; }
+
+.why { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 40px; }
+.why div { min-width: 0; }
+.why h3 { font: 600 1.02rem/1.3 var(--font-display); margin: 0 0 6px; display: flex; gap: 10px; align-items: baseline; }
+.why h3 i { font-style: normal; color: var(--primary); font-size: 15px; }
+.why p { margin: 0; color: var(--muted); max-width: 52ch; }
+
+.build { border-top: 1px solid var(--line); padding-top: 28px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; }
+.build p { margin: 0; color: var(--muted); }
+.build code { font: 400 12.5px var(--font-mono); color: var(--ink); background: var(--raised); padding: 1px 6px; border-radius: 5px; }
+.build ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font: 400 12.5px/1.5 var(--font-mono); color: var(--muted); }
+.build li span { color: var(--ink); }
+
+@media (max-width: 820px) {
+  .hero, .build { grid-template-columns: minmax(0, 1fr); }
+  .stage { order: -1; }
+  .why { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+<style>body{margin:0}</style>
+</head>
+<body>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <div class="kicker"><span class="rune">ᚨ</span> Mascot proposal · Yggdrasil</div>
+      <h1>Ratatoskr</h1>
+      <p class="pron">RAH-tah-tosk · "drill-tooth"</p>
+      <p class="lead">In the myth, a squirrel runs up and down the World Tree carrying messages between the eagle at the top and Níðhöggr at the roots. <b>Yggdrasil does the same job:</b> it carries requests between your apps and the models on your computers.</p>
+      <div class="states" id="stateBtns" role="group" aria-label="Animation state"></div>
+      <div class="moment" aria-live="polite"><span class="realm" id="realm"></span><p id="momentText"></p></div>
+      <p class="tour" id="tour">Touring every state. Pick one to stop.</p>
+    </div>
+    <div class="stage"><svg id="main" role="img" aria-label="Ratatoskr, an animated squirrel mascot"></svg><span class="size">512 px</span></div>
+  </section>
+
+  <section>
+    <h2>Every state, live</h2>
+    <p class="sub">Each state is a pose the same rig blends into, so switching between them is smooth. They're mapped to things the app already does.</p>
+    <div class="sheet" id="sheet"></div>
+  </section>
+
+  <section>
+    <h2>Small sizes</h2>
+    <p class="sub">The tufted ears and the curled tail keep the shape readable at icon size, on both your dark and light themes.</p>
+    <div class="sizes" id="sizes"></div>
+  </section>
+
+  <section class="why">
+    <div><h3><i>ᚨ</i>He lives on the tree</h3><p>A raven is Odin's bird and could front any Norse-themed product. Ratatoskr lives on Yggdrasil itself, and his whole job is carrying messages. The rune on his forehead is Ansuz, the rune of messages and speech.</p></div>
+    <div><h3><i>ᚱ</i>He stands out on your UI</h3><p>Your dark theme is near-black, so a black raven fades into it. Copper fur stands out against it and against the light theme. Teal is used only for his eyes and runes, so it still matches your primary color.</p></div>
+    <div><h3><i>ᛒ</i>He's built to animate</h3><p>The tail is 16 jointed segments, and the arms, ears, eyes and acorn each move on their own. A new animation is a new pose, so nobody has to draw new frames.</p></div>
+    <div><h3><i>ᛗ</i>He carries something</h3><p>The acorn is the message. It glows while he delivers, he nibbles it while a model thinks, and he drops it when something breaks. That gives each state a prop to act with.</p></div>
+  </section>
+
+  <section class="build">
+    <div>
+      <h2>How it's built</h2>
+      <p>He's one inline SVG driven by a small script, with no image files. Each state is a function that returns a pose, and the rig eases toward it every frame. This can be ported to a React component in <code>web/src/components</code> with a <code>state</code> prop. Reduced-motion settings freeze him in a still pose.</p>
+    </div>
+    <ul>
+      <li><span>idle</span> · daemon running, nothing queued</li>
+      <li><span>greet</span> · first run, onboarding</li>
+      <li><span>think</span> · chat completion streaming</li>
+      <li><span>deliver</span> · Bifrost: work placed on a paired computer</li>
+      <li><span>success</span> · download, install, training deployed</li>
+      <li><span>error</span> · Heimdall check failing, chat or task error</li>
+      <li><span>sleep</span> · model unloaded after idle</li>
+    </ul>
+  </section>
+</main>
+
+<script>
+(() => {
+const NS = 'http://www.w3.org/2000/svg';
+const DEG = Math.PI / 180;
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const C = { out:'#2A1710', fur:'#C45E31', furDk:'#8E3E1C', furLt:'#E89257', cream:'#F5E3C8', eye:'#13202A',
+  teal:'#4FD1C5', tealDk:'#13756E', gold:'#D1A962', cap:'#6A4325', capDk:'#4A2E19', strap:'#4B3022', blush:'#F07A62', drop:'#7FC6E8' };
+
+const STATES = {
+  idle:    { label:'Idle',       realm:'Boot and idle',   text:'The daemon is running and nothing is queued.' },
+  greet:   { label:'Hello',      realm:'Onboarding',  text:'First run. He waves while the setup page installs a runtime and a model.' },
+  think:   { label:'Thinking',   realm:'Huginn',    text:'A model is generating a reply. He nibbles the acorn and glances up between bites.' },
+  deliver: { label:'Delivering', realm:'Bifrost',  text:'Work is going to another computer you paired. He bounds along with the glowing acorn.' },
+  success: { label:'Done',       realm:'Ymir · Brokkr',  text:'A download, install or training run finished. He jumps and tosses the acorn.' },
+  error:   { label:'Problem',    realm:'Heimdall', text:'A health check failed. He drops the acorn and his ears droop.' },
+  sleep:   { label:'Asleep',     realm:'Idle unload', text:'The model unloaded after sitting idle. He curls under his tail.' },
+};
+const ORDER = Object.keys(STATES);
+
+const BASE = { bodyY:0, sx:1, sy:1, lean:0, headRot:0, headY:0, earL:0, earR:0, open:1, happy:0, closed:0, worry:0,
+  pupX:0, pupY:0, mouth:0, blush:.35, pLx:95, pLy:127, pRx:109, pRy:127, sRx:112, sRy:117, ax:102, ay:127, ar:0, glow:.2,
+  tailA:-164, curl0:5.6, curl1:36, swayAmp:2.2, swayF:1.5, dots:0, speed:0, sweat:0 };
+
+const POSE = {
+  idle: t => ({ bodyY:Math.sin(t*2.1)*.8, sy:1+Math.sin(t*2.1)*.012, headRot:Math.sin(t*.6)*3, pupX:Math.sin(t*.45)*1.4 }),
+  greet: t => { const w = Math.sin(t*9); const a = (-52 + w*14)*DEG;
+    return { headRot:7+Math.sin(t*2)*1.5, bodyY:-Math.abs(Math.sin(t*3))*1.6, sRx:118, sRy:110,
+      pRx:118+Math.cos(a)*29, pRy:110+Math.sin(a)*29, pLx:99, pLy:130, ax:99, ay:130, ar:-12,
+      mouth:.55, blush:.65, earR:4+w*3, pupX:1.6, pupY:-.5, swayAmp:4.5, swayF:3 }; },
+  think: t => { const c = t % 3.4, nib = c < 2.2, j = nib ? Math.sin(t*30) : 0;
+    return { ax:102+j*.3, ay:nib?100+j*.8:110, ar:nib?Math.sin(t*15)*5:-10,
+      pLx:95, pLy:nib?103:112, pRx:109, pRy:nib?103:112,
+      mouth:nib?(j>0?.7:.2):0, headRot:nib?-3:6, pupX:nib?0:2.2, pupY:nib?3:-3, earL:nib?0:-7, earR:nib?0:3,
+      dots:1, glow:.45, swayAmp:2, swayF:1.2, blush:.45 }; },
+  deliver: t => { const p = (t*2.2) % 1, h = Math.sin(p*Math.PI), g = Math.pow(1-h, 8);
+    return { bodyY:-h*13, sy:1+.07*h-.1*g, sx:1-.04*h+.07*g, lean:7, earL:-10-8*h, earR:6+8*h, headRot:4,
+      pupX:2.6, pupY:-.5, mouth:.25, speed:1, glow:.8+.2*Math.sin(t*9), tailA:-172, curl0:7, curl1:15,
+      swayAmp:6, swayF:8, ay:124 }; },
+  success: t => { const p = (t % 1.8) / 1.8; let bodyY=0, sx=1, sy=1, air=false, q=0;
+    if (p < .18) { sy=.9; sx=1.05; }
+    else if (p < .62) { q=(p-.18)/.44; bodyY=-26*Math.sin(Math.PI*q); sy=1.07; sx=.96; air=true; }
+    else if (p < .72) { sy=.92; sx=1.05; }
+    const o = { bodyY, sx, sy, happy:1, mouth:.8, blush:.7, glow:.9, tailA:-150, curl0:6, curl1:17, swayAmp:6, swayF:5 };
+    if (air) Object.assign(o, { pLx:80, pLy:98, pRx:124, pRy:98, ax:102, ay:124-82*Math.sin(Math.PI*q), ar:360*q, earL:-6, earR:6 });
+    else Object.assign(o, { ay:124, pLy:124, pRy:124, ar:0 });
+    return o; },
+  error: (t, s) => { const y0 = s.enter.ay, x0 = s.enter.ax, f = Math.min(t/.5, 1);
+    let ay = y0 + (171-y0)*f*f, ax = x0, ar = 0;
+    if (t > .5) { const r = Math.min((t-.5)/1.1, 1), e = 1-Math.pow(1-r, 3);
+      ax = x0 + (142-x0)*e; ar = e*320; ay = 171 - Math.abs(Math.sin(e*Math.PI*2))*7*(1-e); }
+    return { ax, ay, ar, sy:.97, headRot:-7+Math.sin(t*1.2)*1.2, headY:2, earL:-38, earR:38, worry:1,
+      pupX:2.6, pupY:3, pLx:92, pLy:132, pRx:112, pRy:132, blush:0, sweat:1, glow:0,
+      tailA:-174, curl0:5, curl1:14, swayAmp:.8, swayF:.8 }; },
+  sleep: t => ({ bodyY:2, sy:1+Math.sin(t*1.3)*.025, sx:1-Math.sin(t*1.3)*.01, headRot:9, headY:7, closed:1, open:0,
+    earL:-16, earR:12, blush:.55, tailA:-146, curl0:7, curl1:52, swayAmp:.6, swayF:.6,
+    ax:102, ay:131, pLx:96, pLy:131, pRx:108, pRy:131, glow:.1 }),
+};
+const RATE = { success:24, deliver:20, error:14 };
+const DIRECT = { error:['ax','ay','ar'], success:['ax','ay','ar','bodyY','sx','sy'] };
+
+const EAR = `<path d="M77 54 C70 41 68 27 72 14 C82 20 92 33 95 45 Z" fill="${C.fur}" stroke="${C.out}" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M80.5 47 C76.5 38 75.5 29 76.5 22 C82 27 87 35 89 43 Z" fill="${C.furDk}"/>
+  <path d="M72 16 C70 10 67 5 62 1 C67.5 2 71 4 73 7 C73 2.5 74.5 -.5 77.5 -3 C78.5 2.5 78.5 8.5 76.5 15 Z" fill="${C.furDk}" stroke="${C.out}" stroke-width="1.8" stroke-linejoin="round"/>`;
+
+function eye(cx, cy) {
+  return `<g class="eye" data-cx="${cx}" data-cy="${cy}">
+    <g class="eo"><ellipse cx="${cx}" cy="${cy}" rx="7.4" ry="8.8" fill="${C.eye}"/>
+      <g class="iris"><ellipse cx="${cx}" cy="${cy+2.2}" rx="5" ry="5.4" fill="${C.teal}" opacity=".9"/>
+      <ellipse cx="${cx}" cy="${cy+2.4}" rx="3" ry="3.5" fill="${C.eye}"/></g>
+      <circle cx="${cx-2.6}" cy="${cy-3.4}" r="2.7" fill="#fff"/><circle cx="${cx+2.6}" cy="${cy+4}" r="1.1" fill="#fff" opacity=".85"/></g>
+    <path class="eh" d="M${cx-6} ${cy+2.5} Q${cx} ${cy-6} ${cx+6} ${cy+2.5}" fill="none" stroke="${C.eye}" stroke-width="3" stroke-linecap="round" opacity="0"/>
+    <path class="ec" d="M${cx-6.2} ${cy+.5} Q${cx} ${cy+5.5} ${cx+6.2} ${cy+.5}" fill="none" stroke="${C.eye}" stroke-width="2.8" stroke-linecap="round" opacity="0"/>
+  </g>`;
+}
+
+const ANSUZ = 'M0 -6.5 V6.5 M0 -6.5 L5 -2.5 M0 -1.5 L5 2.5';
+
+let uid = 0;
+class Squirrel {
+  constructor(svg, state, opts = {}) {
+    this.svg = svg; this.id = 'r' + (uid++); this.fx = opts.fx !== false; this.blinks = opts.blinks !== false;
+    svg.setAttribute('viewBox', '-6 -34 212 222');
+    svg.innerHTML = this.markup();
+    const q = s => svg.querySelector(s);
+    this.el = { char:q('.char'), head:q('.head'), earL:q('.earL'), earR:q('.earR'), acorn:q('.acorn'), glow:q('.glow'),
+      shadow:q('.shadow'), limbs:svg.querySelectorAll('.limb'), paws:svg.querySelectorAll('.paw'),
+      eyes:[...svg.querySelectorAll('.eye')], brows:q('.brows'), mo:q('.mo'), blush:q('.blushes'),
+      dots:q('.dots'), speed:q('.speed'), sweat:q('.sweat'), fxg:q('.fx'),
+      tl:[...svg.querySelectorAll('.tail g')].map(g => [...g.children]) };
+    this.p = { ...BASE }; this.t = 0; this.phase = 0; this.parts = []; this.nextBlink = 1 + Math.random()*3; this.blinkT = -1;
+    this.twitch = { ear:0, t:-1 }; this.nextTwitch = 2 + Math.random()*4; this.spawnT = 0;
+    this.setState(state, true);
+  }
+  markup() {
+    const id = this.id, N = 18;
+    const circles = fill => Array.from({length:N}, () => `<circle fill="${fill}"/>`).join('');
+    return `<defs><radialGradient id="${id}g"><stop offset="0" stop-color="${C.teal}" stop-opacity=".75"/><stop offset="1" stop-color="${C.teal}" stop-opacity="0"/></radialGradient></defs>
+    <ellipse class="shadow" cx="100" cy="182" rx="42" ry="5.5" style="fill:var(--shadow-c);fill-opacity:var(--shadow-o)"/>
+    <g class="speed" opacity="0" stroke="${C.teal}" stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="14 30">
+      <path d="M8 112 H58"/><path d="M0 130 H50"/><path d="M12 148 H56"/></g>
+    <g class="char">
+      <g class="tail"><g>${circles(C.out)}</g><g>${circles(C.fur)}</g><g opacity=".5">${circles(C.furDk)}</g><g opacity=".8">${circles(C.furLt)}</g></g>
+      <path d="M100 96 C124 96 137 124 135 148 C133 168 119 177 100 177 C81 177 66 168 65 148 C63 124 76 96 100 96 Z" fill="${C.fur}" stroke="${C.out}" stroke-width="2.4"/>
+      <path d="M103 114 C116 114 123 132 122 149 C121 164 113 171 103 171 C93 171 85 164 84 149 C83 132 90 114 103 114 Z" fill="${C.cream}"/>
+      <path d="M70 156 C73 167 81 173 90 175 M134 154 C131 166 124 172 115 175" fill="none" stroke="${C.furDk}" stroke-width="2" stroke-linecap="round"/>
+      <path d="M79 107 C92 128 108 146 125 159" fill="none" stroke="${C.out}" stroke-width="6.6" stroke-linecap="round"/>
+      <path d="M79 107 C92 128 108 146 125 159" fill="none" stroke="${C.strap}" stroke-width="3.6" stroke-linecap="round"/>
+      <g transform="translate(126 160) rotate(-16)"><rect x="-9.5" y="-6.5" width="19" height="14.5" rx="4" fill="${C.strap}" stroke="${C.out}" stroke-width="2"/>
+        <path d="M-9.5 -1 Q0 4.5 9.5 -1" fill="none" stroke="${C.out}" stroke-width="1.6"/><circle cx="0" cy="2.6" r="2" fill="${C.teal}"/></g>
+      <ellipse cx="84" cy="177" rx="13.5" ry="6.5" fill="${C.furDk}" stroke="${C.out}" stroke-width="2.2"/>
+      <ellipse cx="119" cy="177" rx="13.5" ry="6.5" fill="${C.furDk}" stroke="${C.out}" stroke-width="2.2"/>
+      <g class="head">
+        <g class="earL">${EAR}</g>
+        <g class="earR"><g transform="translate(204 0) scale(-1 1)">${EAR}</g></g>
+        <path d="M102 38 C127 38 140 55 139 71 C144 75 145 83 139 86 C135 100 121 108 102 108 C83 108 69 100 65 86 C59 83 60 75 65 71 C64 55 77 38 102 38 Z" fill="${C.fur}" stroke="${C.out}" stroke-width="2.4" stroke-linejoin="round"/>
+        <path d="M95 40 C95 32 102 28 109 29 C104 32 102 35 103 39 Z" fill="${C.fur}" stroke="${C.out}" stroke-width="2" stroke-linejoin="round"/>
+        <ellipse cx="102" cy="92" rx="16" ry="11" fill="${C.cream}"/>
+        <path d="M74 68 C78 62 84 60 90 61 M114 61 C120 60 126 62 130 68" fill="none" stroke="${C.cream}" stroke-width="2.6" stroke-linecap="round" opacity=".55"/>
+        <g class="blushes"><ellipse cx="80" cy="88" rx="6" ry="3.4" fill="${C.blush}"/><ellipse cx="124" cy="88" rx="6" ry="3.4" fill="${C.blush}"/></g>
+        ${eye(88, 74)}${eye(116, 74)}
+        <g class="brows" opacity="0" stroke="${C.out}" stroke-width="2.4" stroke-linecap="round"><path d="M81 63 L93 58.5"/><path d="M111 58.5 L123 63"/></g>
+        <ellipse class="mo" cx="102" cy="96.5" rx="4" ry="3.4" fill="#5A1E1A"/>
+        <path d="M98.5 86 Q102 84.6 105.5 86 Q104.2 89.8 102 90.4 Q99.8 89.8 98.5 86 Z" fill="${C.out}"/>
+        <path d="M96.5 93.5 Q99.3 96.5 102 93.5 Q104.7 96.5 107.5 93.5" fill="none" stroke="${C.out}" stroke-width="1.8" stroke-linecap="round"/>
+        <rect x="99.7" y="94.4" width="2.2" height="3.2" rx=".6" fill="#fff" stroke="${C.out}" stroke-width=".8"/>
+        <rect x="102.1" y="94.4" width="2.2" height="3.2" rx=".6" fill="#fff" stroke="${C.out}" stroke-width=".8"/>
+        <g transform="translate(102 53)" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="${ANSUZ}" stroke="${C.teal}" stroke-width="5" opacity=".22"/><path d="${ANSUZ}" stroke="${C.teal}" stroke-width="2.1"/></g>
+        <path class="sweat" d="M142 52 C145 57 147 60 147 62.5 A4 4 0 0 1 139 62.5 C139 60 140 57 142 52 Z" fill="${C.drop}" stroke="${C.out}" stroke-width="1.4" opacity="0"/>
+      </g>
+      <g class="acorn"><circle class="glow" r="17" fill="url(#${id}g)"/>
+        <ellipse cx="0" cy="3" rx="6.6" ry="7.6" fill="${C.gold}" stroke="${C.out}" stroke-width="1.8"/>
+        <path d="M-1.4 .8 V7.6 M-1.4 .8 L2 3.4 M-1.4 3.8 L2 6.4" fill="none" stroke="${C.tealDk}" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M-7.9 -.4 C-7.9 -7.6 7.9 -7.6 7.9 -.4 C4 1.6 -4 1.6 -7.9 -.4 Z" fill="${C.cap}" stroke="${C.out}" stroke-width="1.8"/>
+        <path d="M-4 -4.2 L-2.2 -1.2 M0 -5.2 L0 -1 M4 -4.2 L2.2 -1.2" stroke="${C.capDk}" stroke-width="1"/>
+        <path d="M0 -5.6 Q.8 -8.6 2.6 -9.6" fill="none" stroke="${C.out}" stroke-width="2" stroke-linecap="round"/></g>
+      <path class="limb" fill="none" stroke="${C.out}" stroke-width="11" stroke-linecap="round"/>
+      <path class="limb" fill="none" stroke="${C.out}" stroke-width="11" stroke-linecap="round"/>
+      <path class="limb" fill="none" stroke="${C.fur}" stroke-width="6.6" stroke-linecap="round"/>
+      <path class="limb" fill="none" stroke="${C.fur}" stroke-width="6.6" stroke-linecap="round"/>
+      <circle class="paw" r="3.6" fill="${C.furLt}"/><circle class="paw" r="3.6" fill="${C.furLt}"/>
+    </g>
+    <g class="dots" opacity="0" fill="${C.teal}"><circle cx="134" cy="22" r="3.2"/><circle cx="144" cy="22" r="3.2"/><circle cx="154" cy="22" r="3.2"/></g>
+    <g class="fx"></g>`;
+  }
+  setState(s, instant) {
+    this.state = s; this.t = 0;
+    this.enter = { ax:this.p.ax, ay:this.p.ay };
+    this.parts.forEach(pt => pt.el.remove()); this.parts = [];
+    if (instant) { Object.assign(this.p, BASE, POSE[s](RM ? .4 : 0, this)); }
+  }
+  step(dt) {
+    this.t += dt; const t = RM ? .4 : this.t, s = this.state;
+    const target = { ...BASE, ...POSE[s](t, this) };
+    const k = 1 - Math.exp(-dt * (RATE[s] || 9)), direct = DIRECT[s] || [];
+    for (const key in target) this.p[key] = direct.includes(key) && this.t > .08 ? target[key] : this.p[key] + (target[key] - this.p[key]) * k;
+    this.phase += dt * this.p.swayF * (RM ? 0 : 1);
+    // blinking and ear twitches
+    if (!RM && this.blinks) {
+      this.nextBlink -= dt; if (this.nextBlink < 0) { this.blinkT = 0; this.nextBlink = 2.2 + Math.random()*3.5; }
+      this.nextTwitch -= dt; if (this.nextTwitch < 0) { this.twitch = { ear: Math.random()<.5 ? -1 : 1, t:0 }; this.nextTwitch = 3 + Math.random()*5; }
+    }
+    let blink = 1; if (this.blinkT >= 0) { this.blinkT += dt; const b = this.blinkT / .16; blink = b < 1 ? Math.abs(1 - 2*b) : 1; if (b >= 1) this.blinkT = -1; }
+    let tw = 0; if (this.twitch.t >= 0) { this.twitch.t += dt; const b = this.twitch.t / .22; tw = b < 1 ? Math.sin(b*Math.PI)*12 : 0; if (b >= 1) this.twitch.t = -1; }
+    if (s === 'sleep' || s === 'error') tw = 0;
+    this.blink = blink; this.tw = tw;
+    if (this.fx && !RM) this.particles(dt);
+    this.render();
+  }
+  particles(dt) {
+    const p = this.p, s = this.state; this.spawnT -= dt;
+    if (s === 'sleep' && this.spawnT < 0) { this.spawn('z', 132, 40, 6, -12); this.spawnT = 1.3; }
+    if (s === 'think' && this.spawnT < 0 && (this.t % 3.4) < 2.2) { this.spawn('crumb', 98 + Math.random()*8, 108, (Math.random()-.5)*20, -10); this.spawnT = .35; }
+    if (s === 'success') { const ph = (this.t % 1.8) / 1.8; if (ph > .38 && ph < .45 && this.spawnT < 0) {
+      for (let i = 0; i < 9; i++) { const a = -Math.PI/2 + (i-4)*.36; this.spawn('spark', 102, 28 + p.bodyY, Math.cos(a)*70, Math.sin(a)*70); }
+      this.spawnT = 1; } }
+    if (s === 'deliver' && this.spawnT < 0) { this.spawn('spark', 70, 100 + Math.random()*40 + p.bodyY, -60, 0, .6); this.spawnT = .28; }
+    for (const pt of this.parts) {
+      pt.life += dt; pt.x += pt.vx*dt; pt.y += pt.vy*dt;
+      if (pt.kind === 'crumb') { pt.vy += 260*dt; if (pt.y > 180) pt.life = 99; }
+      if (pt.kind === 'spark') { pt.vx *= .96; pt.vy *= .96; }
+      const a = 1 - pt.life / pt.max;
+      if (pt.kind === 'z') pt.el.setAttribute('transform', `translate(${pt.x + Math.sin(pt.life*3)*3} ${pt.y}) scale(${.6 + pt.life*.25})`);
+      else pt.el.setAttribute('transform', `translate(${pt.x} ${pt.y}) rotate(${pt.life*200}) scale(${pt.sc})`);
+      pt.el.setAttribute('opacity', Math.max(0, Math.min(1, a*1.6)).toFixed(3));
+    }
+    this.parts = this.parts.filter(pt => { if (pt.life >= pt.max) { pt.el.remove(); return false; } return true; });
+  }
+  spawn(kind, x, y, vx, vy, sc = 1) {
+    let el;
+    if (kind === 'z') { el = document.createElementNS(NS, 'text'); el.textContent = 'z';
+      el.setAttribute('fill', C.teal); el.setAttribute('font-family', 'Outfit, sans-serif'); el.setAttribute('font-weight', '700'); el.setAttribute('font-size', '16'); }
+    else if (kind === 'crumb') { el = document.createElementNS(NS, 'circle'); el.setAttribute('r', 1.3 + Math.random()); el.setAttribute('fill', C.gold); }
+    else { el = document.createElementNS(NS, 'path'); el.setAttribute('d', 'M0 -5 L1.3 -1.3 L5 0 L1.3 1.3 L0 5 L-1.3 1.3 L-5 0 L-1.3 -1.3 Z');
+      el.setAttribute('fill', Math.random() < .7 ? C.teal : C.gold); }
+    this.el.fxg.appendChild(el);
+    this.parts.push({ el, kind, x, y, vx, vy, sc: sc * (kind === 'spark' ? .7 + Math.random()*.6 : 1), life: 0, max: kind === 'z' ? 2.6 : kind === 'crumb' ? 1.5 : .9 });
+  }
+  render() {
+    const p = this.p, e = this.el, f = n => n.toFixed(2);
+    e.char.setAttribute('transform', `translate(0 ${f(p.bodyY)}) translate(100 182) rotate(${f(p.lean)}) scale(${f(p.sx)} ${f(p.sy)}) translate(-100 -182)`);
+    e.head.setAttribute('transform', `translate(0 ${f(p.headY)}) rotate(${f(p.headRot)} 102 104)`);
+    e.earL.setAttribute('transform', `rotate(${f(p.earL + (this.twitch.ear < 0 ? -this.tw : 0))} 85 50)`);
+    e.earR.setAttribute('transform', `rotate(${f(p.earR + (this.twitch.ear > 0 ? this.tw : 0))} 119 50)`);
+    const lift = Math.max(0, -p.bodyY);
+    e.shadow.setAttribute('rx', f(42 * (1 - lift/70))); e.shadow.setAttribute('opacity', f(1 - lift/45));
+    // eyes
+    const openS = Math.max(0, p.open * (1 - p.happy) * (1 - p.closed) * this.blink);
+    const closedO = Math.min(1, Math.max(p.closed, (1 - p.happy) * Math.max(0, (.45 - openS) * 3)));
+    for (const g of e.eyes) {
+      const cx = +g.dataset.cx, cy = +g.dataset.cy, [eo, eh, ec] = g.children;
+      eo.setAttribute('transform', `translate(${cx} ${cy}) scale(1 ${f(Math.max(.02, openS))}) translate(${-cx} ${-cy})`);
+      eo.setAttribute('opacity', openS < .08 ? 0 : 1);
+      eo.querySelector('.iris').setAttribute('transform', `translate(${f(p.pupX)} ${f(p.pupY*.6)})`);
+      eh.setAttribute('opacity', f(p.happy)); ec.setAttribute('opacity', f(closedO));
+    }
+    e.brows.setAttribute('opacity', f(p.worry));
+    e.mo.setAttribute('transform', `translate(102 94) scale(1 ${f(Math.max(.01, p.mouth))}) translate(-102 -94)`);
+    e.mo.setAttribute('opacity', p.mouth > .05 ? 1 : 0);
+    e.blush.setAttribute('opacity', f(p.blush));
+    e.sweat.setAttribute('opacity', f(p.sweat)); e.sweat.setAttribute('transform', `translate(0 ${f(Math.sin(this.t*3)*1.5)})`);
+    // acorn and arms
+    e.acorn.setAttribute('transform', `translate(${f(p.ax)} ${f(p.ay)}) rotate(${f(p.ar)})`);
+    e.glow.setAttribute('opacity', f(p.glow));
+    const sh = [[92, 117, p.pLx, p.pLy], [p.sRx, p.sRy, p.pRx, p.pRy]];
+    sh.forEach(([sx, sy, px, py], i) => {
+      const d = `M${f(sx)} ${f(sy)} L${f(px)} ${f(py)}`;
+      e.limbs[i].setAttribute('d', d); e.limbs[i+2].setAttribute('d', d);
+      e.paws[i].setAttribute('cx', f(px)); e.paws[i].setAttribute('cy', f(py));
+    });
+    // fx
+    e.dots.setAttribute('opacity', f(p.dots));
+    if (p.dots > .01) [...e.dots.children].forEach((c, i) => { const v = RM ? 0 : Math.sin(this.t*6 - i*.9);
+      c.setAttribute('transform', `translate(0 ${f(-Math.max(0, v)*4)})`); c.setAttribute('opacity', f(.35 + .65*Math.max(0, v))); });
+    e.speed.setAttribute('opacity', f(p.speed * .8)); e.speed.setAttribute('stroke-dashoffset', f(this.t * 160));
+    // tail
+    const N = 18, L = 8.6; let x = 86, y = 154, a = p.tailA * DEG;
+    const [out, main, dk, lt] = e.tl;
+    for (let i = 0; i < N; i++) {
+      const fr = i / (N - 1), r = 8 + 14 * Math.sin(Math.PI * (.08 + .82 * fr));
+      out[i].setAttribute('cx', f(x)); out[i].setAttribute('cy', f(y)); out[i].setAttribute('r', f(r + 2.4));
+      main[i].setAttribute('cx', f(x)); main[i].setAttribute('cy', f(y)); main[i].setAttribute('r', f(r));
+      dk[i].setAttribute('cx', f(x + r*.22)); dk[i].setAttribute('cy', f(y + r*.22)); dk[i].setAttribute('r', f(r*.72));
+      lt[i].setAttribute('cx', f(x - r*.26)); lt[i].setAttribute('cy', f(y - r*.3)); lt[i].setAttribute('r', f(r*.44));
+      const sway = p.swayAmp * DEG * Math.sin(this.phase * 2 * Math.PI / 2 - i * .5) * (.4 + .6 * fr);
+      a += (p.curl0 + p.curl1 * fr * fr * fr) * DEG + sway;
+      x += Math.cos(a) * L; y += Math.sin(a) * L;
+    }
+  }
+}
+
+// ---------- page wiring ----------
+const rigs = [];
+const main = new Squirrel(document.getElementById('main'), 'idle'); rigs.push(main);
+const btnWrap = document.getElementById('stateBtns'), sheet = document.getElementById('sheet');
+const realm = document.getElementById('realm'), momentText = document.getElementById('momentText'), tourEl = document.getElementById('tour');
+let touring = !RM, tourT = 0, tourI = 0;
+const tiles = {};
+function select(s, fromTour) {
+  if (!fromTour) { touring = false; tourEl.hidden = true; }
+  main.setState(s);
+  btnWrap.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.s === s));
+  Object.entries(tiles).forEach(([k, el]) => el.classList.toggle('on', k === s));
+  realm.textContent = STATES[s].realm; momentText.textContent = STATES[s].text;
+  realm.style.color = s === 'deliver' ? 'var(--bifrost)' : s === 'error' ? 'var(--heimdall)' : '';
+}
+ORDER.forEach(s => {
+  const b = document.createElement('button'); b.type = 'button'; b.dataset.s = s; b.id = 'st-' + s; b.textContent = STATES[s].label;
+  b.addEventListener('click', () => select(s)); btnWrap.appendChild(b);
+  const tile = document.createElement('button'); tile.type = 'button'; tile.className = 'tile'; tile.id = 'tile-' + s;
+  tile.innerHTML = `<svg aria-hidden="true"></svg><b>${STATES[s].label}</b><span>${STATES[s].realm}</span>`;
+  tile.addEventListener('click', () => { select(s); window.scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' }); });
+  sheet.appendChild(tile); tiles[s] = tile;
+  rigs.push(new Squirrel(tile.querySelector('svg'), s));
+});
+const sizes = document.getElementById('sizes');
+[96, 48, 32, 24].forEach(px => {
+  const c = document.createElement('div'); c.className = 'chip';
+  c.innerHTML = `<div class="pair"><div class="box dark"><svg width="${px}" height="${px}" aria-hidden="true"></svg></div><div class="box light"><svg width="${px}" height="${px}" aria-hidden="true"></svg></div></div><label>${px} px</label>`;
+  sizes.appendChild(c);
+  c.querySelectorAll('svg').forEach(svg => rigs.push(new Squirrel(svg, 'idle', { fx:false, blinks: px >= 48 })));
+});
+select('idle', true);
+
+const visible = new Set(rigs);
+if ('IntersectionObserver' in window) {
+  const io = new IntersectionObserver(es => es.forEach(en => { const r = rigs.find(r => r.svg === en.target); if (r) en.isIntersecting ? visible.add(r) : visible.delete(r); }));
+  rigs.forEach(r => io.observe(r.svg));
+}
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (touring) { tourT += dt; if (tourT > 4.2) { tourT = 0; tourI = (tourI + 1) % ORDER.length; select(ORDER[tourI], true); } }
+  visible.forEach(r => r.step(dt));
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -52,6 +52,9 @@
 
 :root,
 [data-theme='light'] {
+  /* Ratatoskr's ground shadow (docs/brand/mascot). */
+  --ratatoskr-shadow: #284050;
+  --ratatoskr-shadow-opacity: 0.2;
   /* Cool gray-blue daylight — same product as dark, not generic SaaS white */
   --rgb-canvas: 240 244 248; /* #F0F4F8 — slightly lighter work surface */
   --rgb-surface: 248 251 253; /* #F8FBFD */
@@ -80,6 +83,8 @@
 }
 
 [data-theme='dark'] {
+  --ratatoskr-shadow: #000000;
+  --ratatoskr-shadow-opacity: 0.38;
   --rgb-canvas: 14 19 26; /* #0E131A — hair lighter than chrome */
   --rgb-surface: 17 24 33; /* #111821 */
   --rgb-raised: 24 34 46; /* #18222E */
