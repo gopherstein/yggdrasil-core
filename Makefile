@@ -3,7 +3,7 @@
 COMMIT := $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
 LDFLAGS := -X github.com/yeixio/yggdrasil-core/internal/version.Commit=$(COMMIT)
 
-.PHONY: help start ui frontend daemon run-daemon run-web all tidy test vet fmt lint ci test-cluster package-headless screenshots appstore-screenshots
+.PHONY: help start ui frontend daemon run-daemon run-web all tidy test vet fmt lint ci test-cluster package-headless screenshots appstore-screenshots icons
 
 help: ## Show targets
 	@echo "Yggdrasil Core"
@@ -66,6 +66,9 @@ test-cluster: ## Run the Docker cluster check
 package-headless: ## Build a headless package for this machine
 	chmod +x scripts/build/package-headless.sh
 	./scripts/build/package-headless.sh
+
+icons: ## Render the Linux icon set from docs/brand/logo
+	./scripts/brand/render-icons.sh
 
 screenshots: ## Recapture README stills and the demo walkthrough from fake data
 	chmod +x scripts/capture-screenshots.sh
