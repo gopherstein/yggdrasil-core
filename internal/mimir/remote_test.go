@@ -109,8 +109,16 @@ func TestSQLiteQueryBecomesSearchableRows(t *testing.T) {
 		}
 		time.Sleep(20 * time.Millisecond)
 	}
-	s.refreshMu.Lock() // let the background fetch finish before cleanup
-	s.refreshMu.Unlock()
+	// Let the background fetch finish before the database is closed.
+	for deadline := time.Now().Add(5 * time.Second); fetchesRunning(s) && time.Now().Before(deadline); {
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+func fetchesRunning(s *Store) bool {
+	running := false
+	s.fetching.Range(func(any, any) bool { running = true; return false })
+	return running
 }
 
 func TestDatabaseSourcesCannotWrite(t *testing.T) {
