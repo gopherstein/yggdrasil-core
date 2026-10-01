@@ -37,6 +37,10 @@ type Spec struct {
 	Name string
 	// Requirements are pinned pip requirement strings.
 	Requirements []string
+	// Pinned installs exactly Requirements and nothing they depend on, so
+	// the list must be complete. It lets an environment swap a dependency,
+	// such as a headless build of a package for the full one.
+	Pinned bool
 	// InstallArgs are extra uv pip install flags, such as
 	// --torch-backend=auto, which picks the PyTorch build for the computer's
 	// GPU driver.
@@ -101,6 +105,9 @@ func requirementsKey(spec Spec) string {
 	reqs := append([]string(nil), spec.Requirements...)
 	sort.Strings(reqs)
 	key := "python " + PythonVersion + "\n"
+	if spec.Pinned {
+		key += "pinned\n"
+	}
 	if len(spec.InstallArgs) > 0 {
 		key += "args " + strings.Join(spec.InstallArgs, " ") + "\n"
 	}
@@ -153,7 +160,11 @@ func (m *Manager) Ensure(ctx context.Context, spec Spec, progress Progress) (str
 		return "", fmt.Errorf("create Python environment: %w", err)
 	}
 	progress("packages", "Installing "+strings.Join(spec.Requirements, ", "))
-	args := append([]string{"pip", "install", "--python", m.PythonPath(spec.Name)}, spec.InstallArgs...)
+	args := []string{"pip", "install", "--python", m.PythonPath(spec.Name)}
+	if spec.Pinned {
+		args = append(args, "--no-deps")
+	}
+	args = append(args, spec.InstallArgs...)
 	args = append(args, spec.Requirements...)
 	if err := m.runUV(ctx, uv, progress, args...); err != nil {
 		_ = os.RemoveAll(dir)
