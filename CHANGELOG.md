@@ -49,6 +49,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 
 ### Fixed
 
+- A daemon started with `--data-dir` stays in that directory when its `config.json` does not list `data_dir`. Before, it used the default data directory, so a second or test daemon could open your real database.
 - The database refuses to start with two migrations of the same number, instead of silently skipping one.
 - The chat page no longer reopens its event stream on almost every render, which dropped events such as a plan's checklist. The first message of a new chat no longer disappears while the reply is being written.
 - A model whose `llama-server` exits while loading, for example a damaged file, now fails at once instead of after a two-minute wait.
