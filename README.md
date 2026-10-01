@@ -1,7 +1,10 @@
 # Yggdrasil Core
 
 <p align="center">
-  <img src="docs/brand/yggdrasil-logo.png" alt="Yggdrasil" width="148">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/logo/yggdrasil-mark.svg">
+    <img src="docs/brand/logo/yggdrasil-mark-light.svg" alt="Yggdrasil" width="148">
+  </picture>
 </p>
 
 > **Local AI should be as easy to use as SaaS AI.**
