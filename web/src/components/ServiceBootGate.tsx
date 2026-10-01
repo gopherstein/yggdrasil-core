@@ -4,6 +4,7 @@ import { ScheduleBackgroundSync } from '@/components/ScheduleBackgroundSync'
 import { ApiError, api, rememberApiKey } from '@/lib/api'
 import { readScreenshotLaunch } from '@/lib/screenshotMode'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
+import { YggdrasilMark } from '@/components/ui/YggdrasilMark'
 
 const BOOT_GIVE_UP_MS = 25_000
 
@@ -125,14 +126,7 @@ function DaemonBootGate({ children }: { children: ReactNode }) {
           void healthQuery.refetch()
         }}
       >
-        <img
-          src="/yggdrasil-mark.png"
-          alt=""
-          width={64}
-          height={64}
-          className="h-16 w-16 object-contain"
-          decoding="async"
-        />
+        <YggdrasilMark size={64} />
         <h1 className="mt-6 font-display text-2xl font-semibold tracking-tight text-ink">
           API key required
         </h1>

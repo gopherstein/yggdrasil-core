@@ -14,6 +14,7 @@ import {
 import { useUIStore } from '@/stores/uiStore'
 import type { SettingsPatch } from '@/types/api'
 import { RealmKicker } from '@/components/ui/Realm'
+import { YggdrasilMark } from '@/components/ui/YggdrasilMark'
 
 function Toggle({
   checked,
@@ -690,14 +691,7 @@ export function SettingsPage() {
         <p className="settings-group-label">About</p>
         <section className="card space-y-4">
           <div className="flex items-center gap-4">
-            <img
-              src="/yggdrasil-mark.png"
-              alt=""
-              width={72}
-              height={72}
-              className="h-[72px] w-[72px] shrink-0 object-contain"
-              decoding="async"
-            />
+            <YggdrasilMark size={72} />
             <div className="min-w-0">
               <p className="font-display text-xl font-semibold tracking-tight text-ink">
                 Yggdrasil
