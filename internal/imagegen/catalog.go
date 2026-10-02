@@ -12,10 +12,16 @@ type File struct {
 	Path   string `json:"path"`
 	Size   int64  `json:"size_bytes"`
 	SHA256 string `json:"sha256"`
+	// Source, when set, is the file's full address, pinned to a commit,
+	// for a file that is not on Hugging Face.
+	Source string `json:"source,omitempty"`
 }
 
 // URL is where the file is downloaded from, pinned to a revision.
 func (f File) URL(revision string) string {
+	if f.Source != "" {
+		return f.Source
+	}
 	return "https://huggingface.co/" + f.Repo + "/resolve/" + revision + "/" + f.Path
 }
 
@@ -60,6 +66,7 @@ var revisions = map[string]string{
 	"QuantStack/Wan2.2-TI2V-5B-GGUF":         "57437632ddd08bdcbd1508c866aa22e126ed51d2",
 	"city96/umt5-xxl-encoder-gguf":           "b535255bee98c2b0a59ea7c0ae2dcd0c6657b3b7",
 	"Comfy-Org/Wan_2.2_ComfyUI_Repackaged":   "ee6f4a40737a995bf5818954cfce6d59443b0f04",
+	"madebyollin/taehv":                      "011dfc2112197741c540e0bdd5b7b67bcc930771",
 }
 
 var vae = File{Role: "vae", Repo: "black-forest-labs/FLUX.2-small-decoder", Path: "full_encoder_small_decoder.safetensors",
@@ -112,6 +119,11 @@ func VideoCatalog() []Model {
 				Size: 3655145312, SHA256: "17cf97a5bbbc60a646d6105b832b6f657ce904a8a1ad970e4b59df0c67584a40"},
 			{Role: "vae", Repo: "Comfy-Org/Wan_2.2_ComfyUI_Repackaged", Path: "split_files/vae/wan2.2_vae.safetensors",
 				Size: 1409400960, SHA256: "e40321bd36b9709991dae2530eb4ac303dd168276980d3e9bc4b6e2b75fed156"},
+			// TAEHV decodes the clip in seconds; the full VAE takes most of an
+			// hour on a 24 GB Mac. MIT licensed.
+			{Role: "tae", Repo: "madebyollin/taehv", Path: "safetensors/taew2_2.safetensors",
+				Size: 22848048, SHA256: "b84609b2a133d48434bd9636bfcb44bf05168dc436e2d3cecf26256faa1f5325",
+				Source: "https://raw.githubusercontent.com/madebyollin/taehv/011dfc2112197741c540e0bdd5b7b67bcc930771/safetensors/taew2_2.safetensors"},
 		},
 	}}
 }
