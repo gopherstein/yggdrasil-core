@@ -130,15 +130,19 @@ These exist in this repository today:
 - hardware detection on macOS, Windows, and Linux
 - GGUF model catalog, Hugging Face search, download, start, and stop
 - llama.cpp (`llama-server`) runtime adapter, plus an adapter for an external OpenAI-compatible server
-- profiles, a simple orchestrator, and a Team orchestrator (coordinator, worker, reviewer)
-- Bifrost discovery, pairing, and node-to-node calls
-- Norn workload placement across paired nodes
+- **Auto** model choice: each request goes to a model that suits it (quick, coding, current information, or detailed), with a retry on another model when one fails
+- profiles with orchestration controls (effort, planning, verification, tool budget, memory, fallback), a simple orchestrator, and a Team orchestrator (coordinator, worker, reviewer)
+- persistent memory across chats and models, which you can review, edit, and turn off per chat
+- Mimir connected knowledge: files, folders, uploads, scanned PDFs (text recognition), read-only SQL databases, and web APIs, searched by keyword and, with an embedding model, by meaning
+- tools for web search, files, shell, Git, and making files, with per-profile Allow, Ask, and Deny policies; connected services (GitHub, Home Assistant); and tools from MCP servers
+- Yggdrasil as an MCP server, so other AI apps can use it (`/mcp` and `yggctl mcp`)
+- scheduled automations with conditional notifications, and a notification center
+- Train your own AI: a guided build of a specialized assistant from a base model, LoRA training on your examples (MLX on Apple Silicon, PyTorch on NVIDIA GPUs), and connected knowledge, with base-versus-specialized testing before deployment, training on a paired computer, and export as a GGUF file. See [docs/features/train-your-own-ai.md](docs/features/train-your-own-ai.md).
+- Bifrost discovery, pairing, and node-to-node calls, and Norn workload placement across paired nodes
+- API keys with per-key permissions, a record of what left this computer, and run-record retention
 - health endpoint, model health checks, diagnostics bundle, and a local event stream
 - benchmarks against a running local model
 - OpenAI-compatible `GET /v1/models` and `POST /v1/chat/completions`
-- tools for web search, files, shell, and Git, with explicit per-profile permission policies
-- Mimir connected knowledge: files, folders, and pasted content (CSV, JSON, Markdown, text, HTML) searched on every chat turn, and reindexed when the files change
-- Train your own AI: a guided build of a specialized assistant from a base model, LoRA training on your examples (MLX on Apple Silicon, PyTorch on NVIDIA GPUs), and connected knowledge, with base-versus-specialized testing before deployment. See [docs/features/train-your-own-ai.md](docs/features/train-your-own-ai.md).
 
 Background work is idle model unload, model health checks, periodic peer refresh, and scheduled automations. A scheduled prompt runs in the daemon, including while the desktop window is closed when the app is set to keep running. How to use it is in the user guide. The v1 specification is [docs/features/completed/scheduler-and-automations.md](docs/features/completed/scheduler-and-automations.md).
 
@@ -194,7 +198,7 @@ curl http://127.0.0.1:7331/v1/chat/completions \
   -d '{"model":"profile:general-assistant","messages":[{"role":"user","content":"Hello"}]}'
 ```
 
-`/v1/models` lists profiles as `profile:<id>`. Chat accepts that id or a model id. Streaming uses server-sent events and ends with `data: [DONE]`. After a model is running, the examples under [examples/](examples/) call these routes. Compatibility limits are in [docs/api.md](docs/api.md).
+`/v1/models` lists `auto`, profiles as `profile:<id>`, and deployed specialized AIs as `sai:<slug>`. Chat accepts any of those or a model id. Streaming uses server-sent events and ends with `data: [DONE]`. After a model is running, the examples under [examples/](examples/) call these routes. Compatibility limits are in [docs/api.md](docs/api.md).
 
 ## Supported platforms
 
@@ -230,7 +234,7 @@ yggctl paths
 yggctl automations list
 ```
 
-`yggctl version` and `yggctl about` print the version, the AGPL license, the source URL, and the commit. `yggdrasil-daemon -version` prints that notice and exits. `yggctl paths` prints the data, model, runtime, log, and database directories. Status, nodes, and models are HTTP routes under `/api/v1/`. A fuller CLI is on the [roadmap](ROADMAP.md). `yggdrasil-daemon -data-dir /path/to/dir` overrides the data directory.
+`yggctl version` and `yggctl about` print the version, the AGPL license, the source URL, and the commit. `yggdrasil-daemon -version` prints that notice and exits. `yggctl paths` prints the data, model, runtime, log, and database directories. Status, nodes, and models are HTTP routes under `/api/v1/`. `yggdrasil-daemon -data-dir /path/to/dir` overrides the data directory. Every command and flag is in [docs/cli.md](docs/cli.md).
 
 ### Shell completion
 
@@ -268,7 +272,7 @@ On first start the daemon writes `config.json` in the data directory.
 | Windows | `%LOCALAPPDATA%\Yggdrasil` |
 | Linux | `$XDG_DATA_HOME/yggdrasil` or `~/.local/share/yggdrasil` |
 
-Models, runtimes, logs, `yggdrasil.db`, and `secrets/` live under that path. `YGGDRASIL_*` variables override bind addresses, node identity, static peers, and discovery. See [docs/privacy.md](docs/privacy.md) and [docs/api.md](docs/api.md).
+Models, runtimes, logs, `yggdrasil.db`, and `secrets/` live under that path. `YGGDRASIL_*` variables override bind addresses, node identity, static peers, and discovery. Every key, variable, and setting is in [docs/configuration.md](docs/configuration.md). See also [docs/privacy.md](docs/privacy.md).
 
 ## Security and privacy
 
@@ -282,11 +286,13 @@ The control API and the OpenAI-compatible API require a bearer token whenever th
 | --- | --- |
 | [User guide](docs/user-guide/README.md) | Source for the public guide |
 | [Troubleshooting](docs/troubleshooting.md) | First checks when something fails |
-| [Capabilities](docs/capabilities.md) | Internet, Files, Shell, and Git |
-| [Tools](docs/tools.md) | Tool registry and permissions |
+| [Configuration](docs/configuration.md) | Data directory, `config.json`, environment variables, settings |
+| [CLI](docs/cli.md) | `yggdrasil-daemon` and `yggctl` |
+| [Capabilities](docs/capabilities.md) | Internet, Files, Shell, Git, connected services, and MCP |
+| [Tools](docs/tools.md) | Tool registry, permissions, and which tools a turn is offered |
 | [MCP](docs/mcp.md) | Add tools from MCP servers, and use Yggdrasil from other AI apps |
 | [Architecture](docs/architecture.md) | Subsystems and process layout |
-| [API](docs/api.md) | Control plane and OpenAI-compatible routes |
+| [API](docs/api.md) | Every route, the event stream, and the OpenAI-compatible API |
 | [Runtimes](docs/runtimes.md) | llama.cpp and external servers |
 | [Clustering](docs/clustering.md) | Discovery, pairing, placement |
 | [Compatibility](docs/compatibility.md) | Hardware matrix |
@@ -295,16 +301,24 @@ The control API and the OpenAI-compatible API require a bearer token whenever th
 
 The public site is [yggdrasil.yeix.io](https://yggdrasil.yeix.io). It reads the version index, guide snapshots, the latest GitHub release, and [`site/content.json`](site/content.json) from this repository.
 
-### Planned designs
+### Feature specifications
 
-These are specifications. They are not implemented in this repository.
+Parts of these are built, as listed under [Features](#features). Each linked issue tracks what is still open.
 
-- [Persistent memory and cross-model context](docs/features/persistent-memory-and-cross-model-context.md)
+- [AI experience platform](docs/features/ai-experience-platform.md) (#50)
+- [Persistent memory and cross-model context](docs/features/persistent-memory-and-cross-model-context.md) (#23)
+- [Gjallarhorn notification system](docs/features/gjallarhorn-notification-system.md) (#39)
+- [Expanded tool platform](docs/features/expanded-tool-platform.md) (#38)
+- [Orchestration layer refactor](docs/features/orchestration-layer-refactor.md) (#41)
+
+These are not implemented yet:
+
 - [Kubernetes-native model deployment](docs/features/kubernetes-native-model-deployment.md)
 - [Community model ratings](docs/features/community-model-ratings.md)
-- [Expanded tool platform](docs/features/expanded-tool-platform.md)
 - [One-line node join](docs/features/one-line-node-join.md)
-- [AI experience platform](docs/features/ai-experience-platform.md)
+- [Multilingual localization and language routing](docs/features/multilingual-localization-and-language-routing.md)
+
+Completed: [Scheduler and automations](docs/features/completed/scheduler-and-automations.md), [Train your own AI](docs/features/train-your-own-ai.md).
 
 ### Research
 

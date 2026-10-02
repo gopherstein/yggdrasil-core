@@ -1,6 +1,6 @@
 # API
 
-The daemon listens on `http://127.0.0.1:7331` unless `config.json` or `YGGDRASIL_API_HOST` / `YGGDRASIL_API_PORT` say otherwise. A machine-readable description of the control-plane routes is [api/openapi.yaml](../api/openapi.yaml). This page records behavior that matters when you call the server.
+The daemon listens on `http://127.0.0.1:7331` unless `config.json` or `YGGDRASIL_API_HOST` / `YGGDRASIL_API_PORT` say otherwise. This page lists every route and records behavior that matters when you call the server. [api/openapi.yaml](../api/openapi.yaml) is a machine-readable description of part of the control plane; it does not yet cover every route below. [CLI](cli.md) and [Configuration](configuration.md) cover the command line and settings.
 
 ## Authentication
 
@@ -23,10 +23,10 @@ Bifrost, on port 7332, is a separate server. Its protected routes require a pair
 ```json
 {
   "name": "Yggdrasil Core",
-  "version": "1.2.1",
+  "version": "1.4.0",
   "commit": "abc1234",
   "license": "AGPL-3.0-or-later",
-  "source": "https://github.com/yeixio/yggdrasil-core/tree/v1.2.1"
+  "source": "https://github.com/yeixio/yggdrasil-core/tree/v1.4.0"
 }
 ```
 
@@ -42,69 +42,165 @@ If you distribute or operate a modified Yggdrasil Core over a network, set the s
 
 The same text is printed by `yggdrasil-daemon -version` and by `yggctl version` or `yggctl about`.
 
-## Control plane
+## Route reference
 
-Prefix: `/api/v1`
+Control-plane routes are under `/api/v1`. The OpenAI-compatible routes are under `/v1`, and Yggdrasil's MCP server is `/mcp` (see [MCP](mcp.md)). `GET /about` and `GET /source` are at the root.
+
+### System
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| GET | `/health` | Process is up |
-| GET | `/version` | Version, commit, license, and corresponding source |
-| GET | `/hardware` | Host inventory |
-| GET | `/models` | Catalog and installed models |
+| GET | `/health` | The process is up |
+| GET | `/version` | Version, commit, license, corresponding source, and client `contract` |
+| GET | `/hardware` | This computer's CPU, memory, disk, and accelerators |
+| GET, PATCH | `/settings` | Read or change settings (see [Configuration](configuration.md#settings)). `PUT` is accepted as `PATCH`. |
+| POST | `/settings/reset` | Clear application state; `delete_models=true` also removes model files |
+| GET, POST | `/diagnostics` | Build the diagnostic bundle, which omits secrets. `?include_conversations=true` adds chats. |
+| GET | `/logs` | Log files. `GET /logs/{name}` returns one; `?tail_bytes=` limits it to the end. |
+| GET | `/events` | Server-sent event stream (see [Events](#events)) |
+| GET | `/capabilities` | The capability inventory. `?ask=` returns the abilities a question is about. `GET /capabilities/models/{id}` says which computers can run a model. |
+| GET | `/caches` | Every cache with its policy and counts. `POST /caches/{name}/clear` clears one. |
+| GET | `/performance` | Recent generation runs with timings. `?sort=`, `?order=`, `?limit=` |
+
+### Chat
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| POST | `/chat` | Send a message through a profile. Takes `conversation_id`, `message`, `profile_id`, `model_id` (`auto` for Auto), `effort`, `attachments` (artifact ids), `execution` (where it runs), and `stream`. Progress arrives on `/events`. |
+| POST | `/chat/stop` | Stop a conversation's running turn: `{"conversation_id": "..."}` returns `{"stopped": true}` when one was running |
+| GET, POST | `/conversations` | List or create chats |
+| PATCH, DELETE | `/conversations/{id}` | Change a chat's `title`, `profile_id`, `model_id`, or `memory_off`, or delete it with its files |
+| GET | `/conversations/{id}/messages` | A chat's messages, with each answer's `meta` |
+| GET | `/conversations/{id}/artifacts` | Files attached to or made in a chat |
+| POST | `/artifacts` | Upload a file to attach: `name` plus `text`, or `content_base64` for binary files |
+| GET, DELETE | `/artifacts/{id}` | A file's details, or delete it. `GET /artifacts/{id}/content` returns the bytes as a download. |
+| GET, POST | `/memory` | Memories (Muninn). GET returns `memories` and `categories`. |
+| PATCH, DELETE | `/memory/{id}` | Change a memory's `content`, `category`, `enabled`, or `local_only`, or delete it |
+| GET, PUT | `/personalization` | How answers should look: `length`, `tone`, `format`, `units`, `about_me`, `instructions` |
+| GET | `/runs` | Run traces, newest first. `?conversation_id=`, `?limit=`. `GET /runs/{id}` returns one. |
+| GET, POST | `/tasks` | Orchestration tasks. `GET /tasks/{id}` returns one with its steps. |
+
+### Models and runtimes
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/models` | The catalog and installed models, with `support_role` and fit |
+| GET | `/models/fit` | How well each catalog model fits each computer |
+| GET | `/models/recommend` | A recommended setup. `?purpose=` (`general`, `coding`, `research`) |
+| GET | `/models/browse` | Search Hugging Face GGUF models. `?q=`, `?limit=` |
 | POST | `/models/{id}/install` | Install a catalog model |
 | POST | `/models/install-from-url` | Install a GGUF from a URL |
-| POST | `/models/{id}/start` | Load a model |
-| POST | `/models/{id}/stop` | Stop a model |
-| GET | `/runtimes` | Registered runtimes and detection |
+| DELETE | `/models/{id}` | Remove an installed model |
+| POST | `/models/{id}/start`, `/models/{id}/stop` | Load or unload a model |
+| GET | `/models/running` | Loaded models, with `mode` (`embedding` or `reranking` for supporting models) |
+| GET | `/runtimes` | Runtimes and their detection |
 | POST | `/runtimes/{id}/install` | Install a runtime (`llamacpp`) |
+
+### Profiles and tools
+
+| Method | Path | Purpose |
+| --- | --- | --- |
 | GET, POST | `/profiles` | List or create profiles |
-| POST | `/chat` | Chat through a profile |
-| POST | `/chat/stop` | Stop a conversation's running turn: `{"conversation_id": "..."}` returns `{"stopped": true}` when one was running |
-| GET, POST | `/tasks` | Orchestration tasks |
-| GET, POST | `/automations` | Scheduled prompts. Also `POST /automations/preview`, `GET/PATCH/DELETE /automations/{id}`, and `POST /automations/{id}/run|pause|resume` |
-| GET | `/notifications` | The notification center: `{"notifications": [...], "unread": n}`. `?unread=1` lists unread ones. Also `POST /notifications/read` (`{"ids": [...]}`, no ids marks all) and `POST /notifications/{id}/dismiss` |
-| GET | `/connectors` | Connected services and their status. Also `PUT /connectors/{id}` (`{"values": {...}}`), `POST /connectors/{id}/check`, and `DELETE /connectors/{id}` |
-| GET, PUT | `/personalization` | How the person likes answers: `length`, `tone`, `format`, `units`, `about_me`, `instructions` |
-| GET | `/caches` | Every cache with its policy and counts. Also `POST /caches/{name}/clear` |
-| GET | `/capabilities` | The capability inventory. `?ask=` returns the abilities a question is about. Also `GET /capabilities/models/{id}`, which says which computers can run a model |
-| GET | `/runs/{id}` | A run trace. Also `GET /runs` (`?conversation_id=`, `?limit=`), newest first |
-| GET | `/egress` | What left this computer, newest first. `?conversation_id=` narrows to one chat |
-| GET, PUT | `/privacy` | `{"retention_days": n, "last_30_days": {...}}`; PUT sets `retention_days`. Also `POST /privacy/delete-runs` |
-| GET | `/mcp/servers` | MCP tool sources. Also `POST /mcp/servers` (add), `GET/PATCH/PUT/DELETE /mcp/servers/{id}`, `/check`, `/sign-in`, `/sign-out`, `/logs`, `/prompts`, `/resources`, and `GET /mcp/gallery`, `GET /mcp/import`, `POST /mcp/parse`, `GET /mcp/share`. See [MCP](mcp.md) |
-| GET | `/nodes` | This computer and peers |
-| POST | `/nodes/pair` | Start pairing |
-| POST | `/nodes/{id}/pair/approve` | Approve a pairing offer |
-| GET, POST | `/api-keys` | List metadata or create a key |
-| GET, PATCH | `/settings` | Read or update settings |
-| GET | `/diagnostics` | Diagnostic bundle |
-| GET | `/events` | Server-sent event stream |
-| GET, POST | `/benchmarks` | List or start a benchmark |
-| GET, POST | `/knowledge/sources` | Connected knowledge (Mimir). Also `GET/PATCH/DELETE /knowledge/sources/{id}` and `POST /knowledge/sources/{id}/refresh` |
-| POST | `/knowledge/search` | Passages that match a question |
-| | | Uploads send `text`, or `content_base64` for binary files such as `.xlsx` and `.pdf`. The same field works for `/training/classify` and `/training/ais/{id}/materials`. |
-| | | `kind` `database` or `api` with `remote` connects a SQL query or a web API; see below. |
+| GET, PATCH, DELETE | `/profiles/{id}` | Read, change, or delete a profile, including its roles, tools, `knowledge_sources`, and `orchestration` |
+| GET | `/tools` | Every tool from every source, with its `source`, permission, and whether it is enabled |
+| POST | `/tools/{id}/enabled` | Turn a tool on or off everywhere |
+| POST | `/tools/{id}/test` | Run a tool with `args` and return its result |
+| POST | `/tools/decide` | Answer an Ask approval: `request_id`, `allow`, and `allow_session` |
+| GET | `/tools/activity` | Recent tool calls, kept in memory for this process |
+| GET | `/connectors` | Connected services and their status |
+| PUT, DELETE | `/connectors/{id}` | Connect a service (`{"values": {...}}`), or disconnect it. `POST /connectors/{id}/check` tests the stored credential. |
+| GET, POST | `/mcp/servers` | MCP tool sources, or add one |
+| GET, PATCH, PUT, DELETE | `/mcp/servers/{id}` | Read, change, replace, or remove a source |
+| POST | `/mcp/servers/{id}/check`, `/sign-in`, `/sign-out` | Test a source, or start or end its browser sign-in |
+| GET | `/mcp/servers/{id}/logs`, `/prompts`, `/resources` | A source's log, prompts, and resources. `POST /mcp/servers/{id}/prompts/{name}` fills in a prompt. |
+| GET | `/mcp/gallery` | Known MCP servers to add |
+| GET | `/mcp/import` | MCP servers set up in other apps on this computer, with secrets hidden |
+| POST | `/mcp/parse` | Read pasted MCP configuration into sources, and what each still needs |
+| GET | `/mcp/share` | What other apps need to use Yggdrasil over MCP: `url`, `command`, `args`, `needs_key` |
+
+### Knowledge
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET, POST | `/knowledge/sources` | Connected knowledge (Mimir), or add a source: `kind` `path`, `text`, `database`, or `api` |
+| GET, PATCH, DELETE | `/knowledge/sources/{id}` | Read, change (`name`, `text`, `local_only`, `remote`), or remove a source |
+| POST | `/knowledge/sources/{id}/refresh` | Reindex now |
 | GET | `/knowledge/sources/{id}/content` | The copy kept for a pasted or uploaded source |
-| GET, POST | `/training/ais` | Specialized AIs. Also `GET/PATCH/DELETE /training/ais/{id}` |
+| POST | `/knowledge/search` | Passages that match a question |
+
+Uploads send `text`, or `content_base64` for binary files such as `.xlsx` and `.pdf`. The same field works for `/training/classify` and `/training/ais/{id}/materials`.
+
+### Training
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/training/backends` | Trainers, and whether this computer can use each, with the reason |
+| GET | `/training/base-models` | Trainable base models ranked for a job. `?goal=` |
 | POST | `/training/classify` | Recommend Training, Knowledge, or Both for material, before it is added |
-| GET | `/training/base-models?goal=` | Trainable base models ranked for a job, with training fit |
-| POST | `/training/ais/{id}/materials` | Add material. Also `DELETE /training/ais/{id}/materials/{mid}` and `POST /training/ais/{id}/conversations` |
-| GET, POST | `/training/ais/{id}/examples` | Review examples with their flags. Also `PATCH/DELETE /training/ais/{id}/examples/{eid}` |
+| GET, POST | `/training/ais` | Specialized AIs, or create one |
+| GET, PATCH, DELETE | `/training/ais/{id}` | Read, change, or delete a specialized AI and its adapters and exports |
+| POST | `/training/ais/{id}/materials` | Add material. `DELETE /training/ais/{id}/materials/{mid}` removes it. |
+| POST | `/training/ais/{id}/conversations` | Add saved chats as material |
+| GET, POST | `/training/ais/{id}/examples` | Examples with their flags, or add one. `PATCH`/`DELETE /training/ais/{id}/examples/{eid}` |
 | GET | `/training/ais/{id}/plan` | What trains, what stays connected, and the training fit per computer |
-| POST | `/training/ais/{id}/train` | Start a training job; an optional `{"node_id": "..."}` picks the computer. `GET /training/jobs/{id}`, `POST /training/jobs/{id}/cancel` |
-| PUT | `/training/ais/{id}/test-prompts` | Replace the test set. `POST /training/ais/{id}/revisions/{n}/evaluate` compares base and specialized answers |
+| POST | `/training/ais/{id}/train` | Start a training job; an optional `{"node_id": "..."}` picks the computer |
+| GET | `/training/jobs` | Training jobs. `GET /training/jobs/{id}` returns one; `POST /training/jobs/{id}/cancel` cancels it. |
+| PUT | `/training/ais/{id}/test-prompts` | Replace the test set |
+| POST | `/training/ais/{id}/revisions/{n}/evaluate` | Compare base and specialized answers |
 | POST | `/training/ais/{id}/revisions/{n}/deploy` | Deploy an evaluated revision. `POST /training/ais/{id}/undeploy` |
-| GET, POST, DELETE | `/training/ais/{id}/revisions/{n}/export` | Merge a revision into one standalone GGUF, see its status, or delete the file. `GET /training/ais/{id}/revisions/{n}/export/file` downloads it |
-| POST | `/artifacts` | Upload a file to attach to a chat: `name` plus `text`, or `content_base64` for binary files. Also `GET/DELETE /artifacts/{id}`, `GET /artifacts/{id}/content` (the bytes, as a download), and `GET /conversations/{id}/artifacts` |
-| GET, POST | `/memory` | Memories (Muninn). GET returns `memories` and `categories`. Also `PATCH/DELETE /memory/{id}`; PATCH takes `content`, `category`, and `enabled` |
+| GET, POST, DELETE | `/training/ais/{id}/revisions/{n}/export` | Merge a revision into one standalone GGUF, see its status, or delete the file. `GET /training/ais/{id}/revisions/{n}/export/file` downloads it. |
 | GET | `/training/deployed` | Deployed specialized AIs as models |
-| POST | `/training/example` | Set up the example AI from the sample material, or return it if it exists. `GET /training/samples` returns the sample files |
+| POST | `/training/example` | Set up the example AI from the sample material, or return it. `GET /training/samples` returns the sample files. |
+
+### Automations and notifications
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET, POST | `/automations` | Scheduled prompts, or create one |
+| POST | `/automations/preview` | Run an automation once without saving it |
+| GET, PATCH, DELETE | `/automations/{id}` | An automation with its history, change it, or delete it |
+| POST | `/automations/{id}/run`, `/pause`, `/resume` | Run now, pause, or resume |
+| GET | `/notifications` | The notification center: `{"notifications": [...], "unread": n}`. `?unread=1` lists unread ones. |
+| POST | `/notifications/read` | Mark notifications read: `{"ids": [...]}`; no ids marks all |
+| POST | `/notifications/{id}/dismiss` | Dismiss one |
+
+### Privacy
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/egress` | What left this computer, newest first. `?conversation_id=` narrows to one chat. |
+| GET, PUT | `/privacy` | `{"retention_days": n, "last_30_days": {...}}`; PUT sets `retention_days` |
+| POST | `/privacy/delete-runs` | Remove run records now, and return how many |
+
+### Computers
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/nodes` | This computer and the others Yggdrasil knows |
+| POST | `/nodes/refresh` | Look for computers again |
+| POST | `/nodes/pair` | Ask a discovered computer to pair |
+| GET | `/nodes/pairing/pending` | Pairing requests waiting for approval on this computer |
+| POST | `/nodes/{id}/pair/approve` | Approve a pairing request |
+| POST | `/nodes/pair/claim` | Pair with a code shown on the other computer: `node_id` and `code` |
+| POST | `/nodes/pairing/offer` | Receive a pairing offer from another computer |
+| GET | `/nodes/pairing/outbound/{code}` | The status of a pairing this computer started |
+| POST | `/nodes/{id}/revoke` | Remove a paired computer |
+
+### API keys and benchmarks
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET, POST | `/api-keys` | List key metadata, or create a key (the secret is returned once) |
+| DELETE | `/api-keys/{id}` | Revoke a key |
+| POST | `/api-keys/{id}/rotate` | Replace a key's secret; its permissions are kept |
+| PUT | `/api-keys/{id}/permissions` | Set what requests with the key may use |
+| GET, POST | `/benchmarks` | Benchmark runs, or start one |
+| GET | `/benchmarks/workloads` | The workloads a benchmark can run |
+| GET | `/benchmarks/{id}` | One benchmark. `POST /benchmarks/{id}/cancel` stops it. |
+
+## Chat turns
 
 Assistant messages from `GET /conversations/{id}/messages` carry `meta`: the `sources` an answer drew on (`web`, `knowledge`, or `file`, with title, URL or source name, and a snippet) and plain-language `steps` describing what was done. The same `meta` is on the `chat.complete` event.
-
-Memory is on unless the setting `memory_enabled` is `false` or a conversation has `memory_off: true` (set with `PATCH /conversations/{id}`). A message that starts "Remember that…", "Forget…", or asks "What do you remember?" is answered without a model; the reply is saved as usual and the events `memory.saved` or `memory.deleted` follow. Other turns add the memories that fit the question to the instructions and list them as `memory` sources. A secret such as a password, key, or card number is not saved.
-
-Window budgets are counted in tokens with the answering model's tokenizer (llama-server's `/tokenize`) while that model runs on this computer, and estimated at about four characters per token otherwise; `context.estimated` is `true` only when the gauge used the estimate. `context.prompt_tokens` is the whole prompt, including tokens llama-server reused from its cache, and tokens no section accounts for, such as the chat template, count as `instructions`. When a conversation's history passes half of the model's window, a summary of the older messages is written after the reply and replaces them in later turns. The messages stay saved. The `chat.summarized` event follows. The `chat.complete` payload's `context.summarized_messages` counts the messages the summary covers, and `pipeline_ms` is the time from the request to the first model call.
 
 `POST /chat` takes `attachments`, a list of artifact ids. Chat reads documents, spreadsheets (`.csv`, `.tsv`, `.xlsx`), PDFs with a text layer, JSON, HTML, and code files. Images are not read yet. A scanned PDF attached to a chat is refused with a pointer to the Knowledge page, which reads scanned pages once with text recognition, instead of on every turn. An attached file reaches the model as data in the user turn, the whole file when it fits and otherwise the parts that best match the question, and files attached or produced earlier in the chat add the passages that match later questions. The user message's `meta.files` lists its attachments.
 
@@ -112,7 +208,17 @@ The `files.create` tool, allowed by default in the built-in profiles, saves a fi
 
 When a model under 4B parameters answers from attached files or connected knowledge, `meta.notice` says it can mix up numbers and details and suggests a larger model. Auto treats a question about the user's files or knowledge as one that needs a careful answer, so it prefers a larger model that fits.
 
-Each turn is offered only the tools it needs (spec §16). Huginn picks tool groups from the kind of request and cues in the message: web search for questions, files for a file name or folder, shell for "run" or "install", Git for "commit" or "branch". It then limits them to what the profile allows. A call to a tool that was not offered is refused, and the model is told which tools it has, so it cannot widen its own tools. The profile's Allow, Ask, and Deny still decide what runs. Tool ids have capability aliases, and `web.search`, `web.open`, `files.read`, `files.write`, `files.search`, and `shell.run` reach the built-in tools. A short answer that only writes out a call, such as `files.search {"query": "x"}`, is taken as the call when the tool was offered. Each call has a time limit (web 45 s, files 30 s, Git 90 s, shell 2 min), and `tool.failed` carries a `kind`: `timeout`, `cancelled`, `denied`, `not_offered`, `invalid`, or `failed`.
+### Auto and specialized AIs
+
+A chat whose `model_id` is `auto` gets an installed model chosen for each message. The message is classified as a quick question, current information, coding, a detailed question, or a task on this computer. Auto then picks the largest suitable model that fits this computer's memory, keeps a quick question on a model that is already loaded, requires tool calling for current information and tasks, and skips a model that failed in the last 10 minutes. The `chat.model_routed` event carries `model_id`, `model_name`, and a plain-language `reason`, and the reason is the first of the answer's `steps`.
+
+Before choosing a model, Auto checks the deployed specialized AIs. A chat goes to one when the message names it, or when at least two of the message's words, and at least 40% of them, are words the AI was trained on. Those words come from its name, its goal, and words that recur in its training questions. Requests that need current information, a task on this computer, or code never go to a specialized AI, because it answers without tools. An AI whose adapter file is missing on this computer, or whose base model is not installed, is skipped. Asking for it by id then fails with an explanation. When Auto routes to a specialized AI, `chat.model_routed` carries its `sai:` id and name.
+
+A model can have a `support_role`: `embedding`, `reranker`, or `classifier`. These models serve Yggdrasil instead of chatting. The role comes from the catalog, or, for models installed by URL or from Hugging Face, from the model's name, purpose, or tags. Auto, fallback, and the default model never pick one. A chat that asks for one by id fails with an explanation.
+
+If the model fails before it shows or changes anything, the turn runs once more on another installed model. `chat.model_routed` then has `fallback: true`. The answer's steps say what happened, and `meta.notice` warns when the model that answered is noticeably smaller. A model whose `llama-server` exits while loading fails at once instead of after the 120-second readiness timeout.
+
+### Effort, plans, checks, and Stop
 
 `POST /chat` takes `effort`: `auto` (the default), `fast`, `balanced`, or `thorough`. Effort sets a budget, not a number of calls the client sees:
 
@@ -123,25 +229,29 @@ Each turn is offered only the tools it needs (spec §16). Huginn picks tool grou
 
 The `chat.effort` event reports the effort used. A chosen effort is listed in the answer's `steps`.
 
-Stopping a turn, with `POST /chat/stop` or by closing the stream, stops every model call, tool call, plan step, pending approval, and paired computer working on it. The part already written is saved as the answer, with `meta.notice` "Stopped before the answer was finished." A turn stopped in the middle of a plan keeps the notes of the parts that finished. A turn stopped before anything was written keeps a short note with the sources found so far. The `chat.stopped` event carries `conversation_id` and `kept`. A new message in the same chat stops a turn still running there.
-
 A request with several parts is worked through in parts. "Compare A, B and C…" and "research A vs B" become one part per subject, looked up on the web side by side when web search is allowed without asking. "Do X, then Y, then Z" becomes parts in order, each seeing the notes before it. The final answer is written from the parts' notes, or a requested file is made from them. `plan.created` carries `steps` and `parallel`, and `plan.step` carries `index`, `step`, and `status` (`running`, `done`, or `failed`).
 
 Before an answer is shown, its arithmetic is recomputed. When the turn used reference material or tool results, each figure must appear in, or follow from, the lines about the same subject. Dates and years are skipped. This check needs no model. Only an answer with issues is sent back to the model once, with the issues named (`chat.verifying`), and the revision is kept if it fixes some. `verify.done` reports `issues`, `fixed`, and `remaining`. Remaining figures become the answer's `meta.notice`. An answer that describes tool calls instead of answering is asked for again without tools.
 
-A chat whose `model_id` is `auto` gets an installed model chosen for each message. The message is classified as a quick question, current information, coding, a detailed question, or a task on this computer. Auto then picks the largest suitable model that fits this computer's memory, keeps a quick question on a model that is already loaded, requires tool calling for current information and tasks, and skips a model that failed in the last 10 minutes. The `chat.model_routed` event carries `model_id`, `model_name`, and a plain-language `reason`, and the reason is the first of the answer's `steps`.
+Stopping a turn, with `POST /chat/stop` or by closing the stream, stops every model call, tool call, plan step, pending approval, and paired computer working on it. The part already written is saved as the answer, with `meta.notice` "Stopped before the answer was finished." A turn stopped in the middle of a plan keeps the notes of the parts that finished. A turn stopped before anything was written keeps a short note with the sources found so far. The `chat.stopped` event carries `conversation_id` and `kept`. A new message in the same chat stops a turn still running there.
 
-Before choosing a model, Auto checks the deployed specialized AIs. A chat goes to one when the message names it, or when at least two of the message's words, and at least 40% of them, are words the AI was trained on. Those words come from its name, its goal, and words that recur in its training questions. Requests that need current information, a task on this computer, or code never go to a specialized AI, because it answers without tools. An AI whose adapter file is missing on this computer, or whose base model is not installed, is skipped. Asking for it by id then fails with an explanation. When Auto routes to a specialized AI, `chat.model_routed` carries its `sai:` id and name.
+### Context, memory, and look-ups
 
-A trained revision can be exported as one GGUF file that llama.cpp, LM Studio, Ollama, and other GGUF tools load without the adapter. `POST /training/ais/{id}/revisions/{n}/export` starts the merge and returns `202` with the status, or `200` when the file already exists. The merge runs `llama-export-lora` from the installed llama.cpp in the background, and it takes seconds for a small model and a minute or two for a large one. Tensors the adapter changed are written as F16, and the rest keep the base model's quantization, so the file is a little larger than the base model. The status has `state` (`none`, `exporting`, `ready`, or `failed`), `filename` (such as `tire-bot-r2.gguf`), `size_bytes` (the estimate while exporting), `error`, and the AI's `instructions`, which are not part of the file and are needed as the system prompt elsewhere. Exporting is refused when there is not enough free disk space, when the revision's adapter or base model is not on this computer, and in builds that ship only `llama-server`. `training.export.completed` and `training.export.failed` carry `ai_id`, `name`, and `revision`, and post a notification. Exports are deleted with their AI.
+Window budgets are counted in tokens with the answering model's tokenizer (llama-server's `/tokenize`) while that model runs on this computer, and estimated at about four characters per token otherwise; `context.estimated` is `true` only when the gauge used the estimate. `context.prompt_tokens` is the whole prompt, including tokens llama-server reused from its cache, and tokens no section accounts for, such as the chat template, count as `instructions`. When a conversation's history passes half of the model's window, a summary of the older messages is written after the reply and replaces them in later turns. The messages stay saved. The `chat.summarized` event follows. The `chat.complete` payload's `context.summarized_messages` counts the messages the summary covers, and `pipeline_ms` is the time from the request to the first model call.
 
-A model can have a `support_role`: `embedding`, `reranker`, or `classifier`. These models serve Yggdrasil instead of chatting. The role comes from the catalog, or, for models installed by URL or from Hugging Face, from the model's name, purpose, or tags. Auto, fallback, and the default model never pick one. A chat that asks for one by id fails with an explanation.
+Memory is on unless the setting `memory_enabled` is `false` or a conversation has `memory_off: true` (set with `PATCH /conversations/{id}`). A message that starts "Remember that…", "Forget…", or asks "What do you remember?" is answered without a model; the reply is saved as usual and the events `memory.saved` or `memory.deleted` follow. Other turns add the memories that fit the question to the instructions and list them as `memory` sources. A secret such as a password, key, or card number is not saved.
 
 When a question needs current information and the profile allows `internet.search` without asking, Yggdrasil searches the web and reads the best page before the model answers. The `chat.lookup` event carries the `query`. The results reach the model as data, and the model answers without web tools for that turn.
 
-If the model fails before it shows or changes anything, the turn runs once more on another installed model. `chat.model_routed` then has `fallback: true`. The answer's steps say what happened, and `meta.notice` warns when the model that answered is noticeably smaller. A model whose `llama-server` exits while loading fails at once instead of after the 120-second readiness timeout.
+### Tools
 
-A profile's `knowledge_sources` lists Mimir source ids. Chat searches them on every turn and adds the matching passages before the system prompt.
+Each turn is offered only the tools it needs (spec §16). Huginn picks tool groups from the kind of request and cues in the message: web search for questions, files for a file name or folder, shell for "run" or "install", Git for "commit" or "branch". It then limits them to what the profile allows. A call to a tool that was not offered is refused, and the model is told which tools it has, so it cannot widen its own tools. The profile's Allow, Ask, and Deny still decide what runs. Tool ids have capability aliases, and `web.search`, `web.open`, `files.read`, `files.write`, `files.search`, and `shell.run` reach the built-in tools. A short answer that only writes out a call, such as `files.search {"query": "x"}`, is taken as the call when the tool was offered. Each call has a time limit (web 45 s, files 30 s, Git 90 s, shell 2 min), and `tool.failed` carries a `kind`: `timeout`, `cancelled`, `denied`, `not_offered`, `invalid`, or `failed`.
+
+See [Tools](tools.md) for policies and the tool loop.
+
+## Knowledge
+
+A profile's `knowledge_sources` lists Mimir source ids. Chat searches them on every turn and adds the matching passages to the user turn as labelled reference material, never to the system prompt, and the model is told not to follow instructions inside them (§58). A specialized AI's knowledge sources are searched when it answers, and an API request can add sources with `yggdrasil.knowledge_sources`.
 
 A knowledge source can read current data from a database or a web API instead of a file. `POST /knowledge/sources` takes `kind` `database` with `remote` `{"driver": "sqlite", "database": "~/shop.db", "query": "SELECT …"}`, or `driver` `postgres` or `mysql` with `connection_string`. It takes `kind` `api` with `remote` `{"url": "https://…", "items": "data.products", "headers": {"Authorization": "Bearer …"}}`. `refresh_minutes` (1 to 10080, default 60) sets how old the data may get.
 
@@ -149,17 +259,30 @@ A knowledge source can read current data from a database or a web API instead of
 - **APIs:** a JSON response that is a list of objects, or holds exactly one such list (or the list at `items`), becomes one passage per object. Other JSON, CSV, HTML, and text are read like files. Requests time out after 30 seconds, and responses are limited to 20 MB.
 - **Credentials:** connection strings and header values are kept in the secrets directory, not the database. They are never returned: a source reports `remote` with the driver, query, URL, `items`, `header_names`, and `refresh_minutes`. `PATCH /knowledge/sources/{id}` with `remote` changes the settings. A blank `connection_string` or header value keeps the stored one, and the credentials are deleted with the source.
 - **Refreshing:** when a search uses a source whose data is older than `refresh_minutes`, Mimir fetches it again in the background, and that search uses the data already indexed. `POST /knowledge/sources/{id}/refresh` fetches at once. If a fetch fails, the source is `failed` with the reason (credentials removed), and search keeps using the last data that was fetched.
+
 Knowledge sources read scanned PDFs with text recognition (OCR). Pages with a text layer are read as before, and only the pages without one are recognized, so a scanned appendix in a digital document is read too. Recognition runs RapidOCR in a private Python environment that is installed under `runtimes/python/envs/ocr` the first time a scanned page needs it. The install is about 110 MB to download and 290 MB on disk, and the recognition models come with it, so nothing else is downloaded. A page takes about a second on an M5 Pro. Recognized text is remembered by file content, so a folder source does not recognize its scanned PDFs again when another file changes. On the Train page, a scanned PDF has no examples to train on, so it is recommended as knowledge.
 
 Knowledge search matches words (BM25). When an embedding model is installed (one with `support_role` `embedding`, such as `nomic-embed-text-v1.5-q8` in the catalog), it also matches meaning, so "What warranty do you offer?" finds a passage about a five-year guarantee. The embedding model runs in its own `llama-server` started with `--embedding`, loaded when first needed and unloaded by the idle sweeper like any model; it appears in `GET /models/running` with `mode` `embedding`. Passages are embedded in the background after a source is added or reindexed, and the vectors are kept in the daemon database. A reindex keeps the vectors of passages whose text did not change, and installing a different embedding model embeds every passage again. A source with more than 20,000 passages is searched by words only. Search never waits for embedding: it uses the vectors that exist.
 
 Word and meaning matches are combined with reciprocal rank fusion. A passage found only by meaning must be similar enough to the question, and close to the best match. When words found something, it must also be at least as similar to the question as the best word match, so a question that names one product does not bring in every similar row. When a reranker model is installed (`support_role` `reranker`), it reorders the top 16 passages. Each hit from `POST /knowledge/search` has `match`: `keyword`, `semantic`, or `both`. `score` orders hits within one search only: BM25 for word-only search, the fused rank when meaning is used, and the reranker's score for passages it ordered. A knowledge source reports `embedded_count` and `embedding_model`. With no embedding model installed, if it cannot start, or while training is using the computer, search uses words only.
 
-Notifications come from Gjallarhorn. Each one is stored first and then delivered to its channels. A notification has `category` (`automation`, `approval`, `model`, `training`, `health`, or `system`), `severity` (`info`, `success`, `warning`, or `error`), `title`, `body`, and a `link` back to its source in the app, such as `/automations?id=…`. Each channel's attempt is recorded in `deliveries`. A delivery is `delivered`, `failed`, or `suppressed`; for example, desktop notices are suppressed when `notify_task_finish` is off. A repeat with the same source within 10 minutes is folded into the first notification and marked unread again. The `notification.created` event carries `id`, `category`, `severity`, `title`, `body`, and `link`. Finished and failed automations post to the desktop too. Model downloads, training deploys, and pairings stay in the app.
+## Training and export
+
+See [Train Your Own AI](features/train-your-own-ai.md) for the workflow.
+
+A trained revision can be exported as one GGUF file that llama.cpp, LM Studio, Ollama, and other GGUF tools load without the adapter. `POST /training/ais/{id}/revisions/{n}/export` starts the merge and returns `202` with the status, or `200` when the file already exists. The merge runs `llama-export-lora` from the installed llama.cpp in the background, and it takes seconds for a small model and a minute or two for a large one. Tensors the adapter changed are written as F16, and the rest keep the base model's quantization, so the file is a little larger than the base model. The status has `state` (`none`, `exporting`, `ready`, or `failed`), `filename` (such as `tire-bot-r2.gguf`), `size_bytes` (the estimate while exporting), `error`, and the AI's `instructions`, which are not part of the file and are needed as the system prompt elsewhere. Exporting is refused when there is not enough free disk space, when the revision's adapter or base model is not on this computer, and in builds that ship only `llama-server`. `training.export.completed` and `training.export.failed` carry `ai_id`, `name`, and `revision`, and post a notification. Exports are deleted with their AI.
+
+## Automations and notifications
 
 An automation's `notification.mode` is `condition`, `change`, `always`, `failure` (only failed runs), or `none`. An automation runs on the same stack as chat: `model_id` `auto` picks a model for each run, and memories and connected knowledge are used the same way. Tools follow the unattended policy, because nobody is there to approve them. Tools listed in the automation's `tools` were approved when it was saved, and they run even if they change things. With no `tools`, only read-only tools the profile allows without asking can run. A tool the profile denies never runs. When a run reaches a tool that was not approved, the tool is skipped and the run continues. The run's `automation.completed` event lists the tool in `skipped`, and an `approval` notification says which tools to approve.
 
+Notifications come from Gjallarhorn. Each one is stored first and then delivered to its channels. A notification has `category` (`automation`, `approval`, `model`, `training`, `health`, or `system`), `severity` (`info`, `success`, `warning`, or `error`), `title`, `body`, and a `link` back to its source in the app, such as `/automations?id=…`. Each channel's attempt is recorded in `deliveries`. A delivery is `delivered`, `failed`, or `suppressed`; for example, desktop notices are suppressed when `notify_task_finish` is off. A repeat with the same source within 10 minutes is folded into the first notification and marked unread again. The `notification.created` event carries `id`, `category`, `severity`, `title`, `body`, and `link`. Finished and failed automations post to the desktop too. Model downloads, training deploys, and pairings stay in the app.
+
+## Sharing the computer
+
 Chat, automations, knowledge indexing, benchmarks, and training share this computer in that order of priority. A chat or API request, including a request from a paired computer, never waits. An automation run waits while a chat is running, and for 20 seconds after one, so it does not load a model between someone's messages. A benchmark also waits for automations, and it waits again before each model, because loading a model unloads the others. Background embedding of knowledge passages waits for chat and automations before each small batch, and does not start while training runs. Training waits for all of them before it unloads models to free memory. While work waits, `work.waiting` carries `class`, `label`, and `reason` ("Waiting for your chat to finish"), and the benchmark's progress or the training job's detail shows the reason. A chat that arrives during training is still answered. Its steps say `Training "…" is using this computer (about N minutes left)`. If its model runs out of memory, the error says so, with the estimate and what to do. Out-of-memory failures are not retried. An automation that runs out of memory twice in a row is paused, and its notification explains why.
+
+## Connected services
 
 Connected services add tools. Today they are GitHub (`github.search`, `github.issue`, `github.comment`) and Home Assistant (`homeassistant.states`, `homeassistant.call`).
 - **Connecting:** `PUT /connectors/{id}` checks the values with the service before storing anything, and returns the account it connected as. A blank secret field keeps the stored value.
@@ -170,9 +293,15 @@ Connected services add tools. Today they are GitHub (`github.search`, `github.is
 - **Fetched first:** a read tool marked `prefetch` (Home Assistant's device list) is called before the model answers a message about its service, when the profile allows it without asking. Its data, written as plain lines, replaces the web look-up for that turn.
 - **Untrusted data:** what they return is treated as untrusted data (§58), and links in results become sources.
 
+## MCP
+
 MCP tool sources add tools the same way, with `source` `mcp:<source>`; secrets are kept in `secrets/mcp-<source>.json`. `/mcp` (outside `/api/v1`) is Yggdrasil's own MCP server for other apps, checked like `/v1`, and `/mcp/oauth/callback` is where a tool source's sign-in returns. See [MCP](mcp.md).
 
+## Personalization
+
 Personalization shapes how answers look in every chat, automation, and API request. It has four choices: `length` (`brief`, `balanced`, `detailed`), `tone` (`friendly`, `neutral`, `direct`), `format` (`prose`, `lists`), and `units` (`metric`, `imperial`). It also has two short notes, `about_me` and `instructions`, of up to 1,500 characters each. It is stored as a setting and added to the model's instructions as style guidance, after a specialized AI's own instructions. It is kept apart from permissions: what a tool may do comes only from profiles and Settings. A personalization note or a memory that tries to grant a permission is refused with 400, for example "you can always push without asking" or "don't ask before running commands". The refusal says where permissions are set. A memory that states a preference, such as "I use the terminal a lot", is saved and changes no policy.
+
+## Privacy and run records
 
 Each run records what left this computer.
 - **Record kinds:** `web_search` (the query), `web_page` (the address), `paired_computer` (the prompt and context, or training examples), `external_server` (a chat sent to a server that is not on this computer), and `connector` (the service and what it was asked; long text such as a comment's body is left out).
@@ -197,6 +326,8 @@ Every chat turn, API request, and automation run is traced. A chat or API run's 
 
 In advanced mode, an answer has "Run details". Runs are run records, so the retention and delete action above apply to them.
 
+## Profiles and orchestration
+
 A profile's `orchestration` object holds its advanced controls. Every field is optional; empty keeps the default, which follows the chat's effort.
 
 | Field | Values | Effect |
@@ -214,9 +345,13 @@ A profile's `orchestration` object holds its advanced controls. Every field is o
 
 Invalid values are refused with 400. In advanced mode, the profile editor has an Orchestration section, alongside model roles, tools, knowledge, and placement.
 
+## Structured results
+
 Structured results are checked the same way elsewhere:
 - **Tool arguments:** they are checked against each tool's schema before the tool runs. Safe repairs are made, such as `"7"` for a whole number, or JSON data where text is expected. A call with an argument of the wrong type is refused with `kind` `invalid`, naming the argument, so the model can call again.
 - **Automations:** a condition automation's result must end with the JSON its condition reads: `{"price": number}` for a threshold, or `{"significant": boolean}`. That JSON is read with the same repairs. When it is missing or wrong, the model is asked once to supply it from its own answer. Notices show the prose, never the JSON.
+
+## Capability inventory
 
 The capability inventory lists what exists right now:
 - `models` (with the computers they are on and whether they are running), `nodes` (online, memory, whether they can train), and `tools` from every source (built in, connected services, MCP), enabled or not;
@@ -230,6 +365,8 @@ Three behaviors come from the quality test set (`tests/quality`):
 - **Capability questions:** a short question about what Yggdrasil can do is answered straight from the capability inventory, without a model.
 - **False claims:** an answer that says it changed something, when no tool that changes things ran, gets the notice "Nothing was changed: no tool ran to do this, whatever the answer says."
 
+## Caches
+
 Every cache declares its policy: `key`, `ttl`, `invalidation`, `scope`, and `privacy` (`public` or `personal`). Secret data, such as credentials, is never cached; a cache that would hold it is refused when it is created.
 
 | Cache | Key | Kept | Cleared when | Privacy |
@@ -242,7 +379,7 @@ Every cache declares its policy: `key`, `ttl`, `invalidation`, `scope`, and `pri
 
 A repeat web search or page read is answered from the cache. The tool does not run, nothing leaves this computer (so no egress record is written), and the run trace counts it in `cache_hits`. In-memory caches are bounded, dropping the least recently used entry first, and can be cleared one at a time. "Delete run records now" also clears every personal in-memory cache.
 
-### Client contract
+## Client contract
 
 The desktop app, mobile apps, and other clients read a versioned contract: events, run traces, answers with their citations, steps, and files, artifacts, notifications, and egress records. The version is `major.minor`, now `1.0`.
 - **Where it appears:** every event has `contract`, and so do answer metadata and run traces. Metadata saved before the contract existed has no `contract` and reads as 1.0. Every response carries the `Yggdrasil-Contract` header, and `GET /api/v1/version` has `contract` (`version`, `major`).
@@ -250,7 +387,34 @@ The desktop app, mobile apps, and other clients read a versioned contract: event
 - **Major versions** remove something or change its meaning. A client may send `Yggdrasil-Client-Contract: 1.0`. A client built for another major version gets 426 with code `CONTRACT_MISMATCH`, and the message says whether to update the app or Yggdrasil. A client that sends no header is served as before.
 - **Compatibility test:** `tests/contract` records the contract's fields. It fails when one is removed or renamed within a major version, and when one is added without a minor version bump (`UPDATE_CONTRACT=1 go test ./tests/contract` records the new fields).
 
-Model, node, tool, conversation, and log routes follow the same prefix. The OpenAPI file is the route list to diff when a handler changes.
+## Events
+
+`GET /api/v1/events` is a server-sent event stream. Each event has `type`, `payload`, a timestamp, and `contract`. Clients should ignore types they do not know.
+
+| Type | Sent when |
+| --- | --- |
+| `chat.token` | A piece of an answer is written |
+| `chat.complete`, `chat.error`, `chat.stopped` | A turn finishes, fails, or is stopped. `chat.complete` carries the answer's `meta` and `context`. |
+| `chat.model_routed` | A model is chosen for a turn, with `reason`, and `fallback: true` after a failure |
+| `chat.effort`, `chat.lookup`, `chat.verifying`, `chat.making_file`, `chat.summarized` | Effort is set, the web is looked up first, figures are being checked, a requested file is being made, or older messages were summarized |
+| `plan.created`, `plan.step` | A request with several parts is planned, and each part runs |
+| `verify.action`, `verify.done` | The answer check corrects something, and its result |
+| `tool.requested`, `tool.started`, `tool.completed`, `tool.failed`, `tool.parsed` | A tool call waits for approval, runs, finishes, fails (with `kind`), or is read from text |
+| `knowledge.retrieved`, `knowledge.failed` | Knowledge passages are added to a turn, or the search fails |
+| `memory.saved`, `memory.deleted` | A memory is saved or forgotten from a chat |
+| `agent.started`, `agent.message`, `agent.completed`, `orchestration.role`, `orchestration.final` | A Team profile's roles run, and its final answer |
+| `task.created`, `task.started`, `task.completed`, `task.failed` | An orchestration task changes state |
+| `scheduler.placement` | Norn places work on a computer |
+| `work.waiting` | Work waits for higher-priority work, with `class`, `label`, and `reason` |
+| `automation.started`, `automation.completed`, `automation.failed` | An automation runs. `automation.completed` lists skipped tools in `skipped`. |
+| `notification.created` | A notification is stored |
+| `model.download.started`, `.progress`, `.completed`, `.failed` | A model downloads |
+| `model.load.started`, `model.load.completed`, `model.unloaded` | A model loads, or the idle sweeper unloads it |
+| `model.health.degraded`, `model.health.failed` | A loaded model stops answering health checks |
+| `model.cleanup.started`, `.completed`, `.failed` | Model files are removed |
+| `node.discovered`, `node.online`, `node.offline`, `node.paired` | Another computer is found, comes online, goes offline, or pairs |
+| `training.job`, `training.eval`, `training.deployed` | A training job changes, an evaluation runs, or an AI is deployed |
+| `training.export.completed`, `training.export.failed` | A GGUF export finishes or fails |
 
 ## OpenAI-compatible API
 

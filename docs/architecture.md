@@ -3,51 +3,84 @@
 Yggdrasil Core is one daemon process, `yggdrasil-daemon`, plus the web UI it serves. Desktop and mobile applications are separate clients. They are not built from this repository.
 
 ```text
-client (web UI, curl, another program, desktop, mobile)
+client (web UI, desktop, mobile, curl, an app over MCP or the OpenAI API)
         |
-        |  HTTP  /api/v1 and /v1     default 127.0.0.1:7331
+        |  HTTP  /api/v1, /v1, /mcp     default 127.0.0.1:7331
         v
   yggdrasil-daemon
         |
-        +-- profiles, tasks, tools
-        +-- Mimir knowledge, training (specialized AIs)
-        +-- model catalog and downloads
+        +-- request pipeline: classify, route, assemble context, plan, run tools, check
+        |     Huginn (routing) · Muninn (memory) · Mimir (knowledge) · artifacts (files)
+        +-- tools: built-in, connected services, MCP tool sources
+        +-- automations, notifications (Gjallarhorn), training (specialized AIs)
+        +-- sharing the computer, run records, what left this computer, caches
         +-- Norn placement
         |
         +-- runtime adapters
-        |     +-- llamacpp (local llama-server)
+        |     +-- llamacpp (local llama-server: chat, embedding, reranking)
         |     +-- external-openai (configured remote server)
+        +-- Python environments: training (MLX, PyTorch) and text recognition
         |
         +-- Bifrost  :7332
-              discovery, pairing, paired-node calls
+              discovery, pairing, paired-computer calls, remote training
 ```
 
-Local state is a SQLite database, model files, runtime binaries, logs, and a secrets directory under the OS data path. See [Privacy](privacy.md).
+Local state is a SQLite database, model files, runtime binaries, Python environments, logs, and a secrets directory under the OS data path. See [Configuration](configuration.md#data-directory) and [Privacy](privacy.md).
 
-## Names used in the code
+## Packages
 
-Some Norse names appear in comments and logs. Others are not packages in this repository. The table uses the names as they exist today.
+The Norse names are what the app and the code call the subsystems.
 
-| Name | Role people expect | In this repository | Status |
-| --- | --- | --- | --- |
-| Yggdrasil Core | Daemon, API, local web UI | `cmd/daemon`, `internal/app`, `internal/api`, `web/` | Implemented |
-| Bifrost | Discovery, pairing, node protocol | `internal/discovery`, `internal/nodes`, `internal/auth` | Implemented |
-| Norn | Scheduling and workload placement | `internal/scheduler` | Implemented |
-| Heimdall | Health and diagnostics | `internal/events` calls its bus a Heimdall event stream. Diagnostics and model health live in `internal/diagnostics` and `internal/models/health`. | Partial |
-| Huginn | Agent execution | `internal/huginn`: request classification, Auto model choice, and fallback model choice. Chat and tasks run through the `simple` and `team` orchestrators. | Partial. Routing and orchestrators are implemented. |
-| Muninn | Persistent memory and context | `internal/muninn`: memories ("Remember that…") with FTS5 recall, per-chat and global Memory Off, and summaries of long conversations. Conversations and messages are rows in SQLite. | Implemented (keyword recall; no embeddings yet) |
-| Mimir | Knowledge and retrieval | `internal/mimir`: file, folder, and pasted sources, SQLite FTS5 search, retrieval into chat. Sources reindex when their files change. | Implemented (keyword search; no embeddings yet) |
-| Gungnir | Tool and task execution | No package uses this name. Tools are implemented in `internal/tools` (internet, filesystem, terminal, git). Tasks are implemented in `internal/tasks`. | Planned as a named subsystem. Tools and tasks are implemented. |
+| Name | Role | Package |
+| --- | --- | --- |
+| Yggdrasil Core | Daemon, API, web UI | `cmd/daemon`, `internal/app`, `internal/api`, `web/` |
+| Huginn | Classifies each request, picks the model (Auto, specialized AIs, fallback), and chooses which tools a turn is offered | `internal/huginn` |
+| Muninn | Memories, per-chat and global Memory off, summaries of long conversations | `internal/muninn` |
+| Mimir | Connected knowledge: files, folders, uploads, databases, web APIs, scanned PDFs; keyword search plus meaning search with an embedding model | `internal/mimir`, `internal/ocr` |
+| Gjallarhorn | Notification center and delivery | `internal/gjallarhorn` |
+| Norn | Places chat roles, automations, and training on a computer | `internal/scheduler` |
+| Bifrost | Discovery, pairing, the computer-to-computer protocol | `internal/discovery`, `internal/nodes`, `internal/auth` |
+| Heimdall | Health checks, diagnostics, the event stream | `internal/events`, `internal/diagnostics`, `internal/models/health` |
+| Brokkr | Train Your Own AI: specialized AIs, trainers, export | `internal/training`, `internal/pyenv` |
+| Ymir | Model catalog, downloads, fit | `internal/models` |
+| Ratatoskr | Chat | `internal/orchestrator`, `internal/app` |
+
+Other packages:
+
+| Package | Role |
+| --- | --- |
+| `internal/tools` | Tool registry, built-in tools (internet, files, shell, Git, `files.create`), policies |
+| `internal/connectors` | GitHub and Home Assistant, with credentials kept out of model context |
+| `internal/mcp` | MCP tool sources, and Yggdrasil's own MCP server at `/mcp` |
+| `internal/artifacts` | Files attached to chats and files the assistant made |
+| `internal/automations` | Scheduled prompts |
+| `internal/share` | Who gets the computer when several kinds of work want it |
+| `internal/runlog` | A trace of each run |
+| `internal/egress`, `internal/retention` | What left this computer, and removing old run records |
+| `internal/cache` | Caches, each with a declared policy |
+| `internal/inventory` | The capability inventory: what Yggdrasil can do right now |
+| `internal/personal` | Personalization of answers |
+| `internal/structured` | Checking and repairing JSON from models (tool arguments, `response_format`, automation results) |
+| `internal/contextusage` | Splitting a prompt into the parts the context gauge shows |
+| `internal/turnopts` | What an API request asks of a turn, within its key's permissions |
 
 ## Request path
 
-1. A client calls `/api/v1/chat`, `/api/v1/tasks`, or `/v1/chat/completions`.
-2. The app resolves a profile. Built-in profiles include General Assistant (`simple`), Programming (`team`), and Research (`simple`).
-3. The task manager asks Norn where a role should run. Norn scores paired nodes that are online and have the model.
-4. The chosen machine starts the model on a runtime adapter. The default local runtime is llama.cpp.
-5. Tokens stream back as events. The web UI subscribes to `GET /api/v1/events`.
+A chat message, an API request, and an automation run take the same path.
 
-The OpenAI handler sends the last user message into that same chat path. It does not forward the rest of the message array. See [API](api.md).
+1. **Classify.** Huginn decides what kind of request it is: a quick question, current information, coding, a detailed question, a task on this computer, or a question about what Yggdrasil can do. A capability question is answered from the inventory.
+2. **Route.** With Auto, Huginn picks the model: a deployed specialized AI when the message is about what it was trained for, otherwise the largest suitable model that fits. It sets the effort (Fast, Balanced, or Thorough).
+3. **Assemble context.** Instructions come first: the profile, the specialized AI's instructions, personalization, and memories that fit the question. Retrieved content is data, not instructions: attached files, connected knowledge, and web look-ups arrive as labelled reference material in the user turn. Older messages are summarized when a conversation passes half the model's window.
+4. **Place.** Norn picks the computer. Work that uses local-only memories or knowledge stays on this computer.
+5. **Run.** A request with several parts is planned and worked through in parts, side by side when it can be. Each turn is offered only the tools it needs. Policies (Allow, Ask, Deny) are enforced by the registry, not by the model.
+6. **Check.** Figures in the answer are checked against the sources and the arithmetic is recomputed, with a correction pass when something is wrong. A claim that something was changed when no tool changed anything is called out.
+7. **Record.** The answer keeps its sources, steps, and files. The run is traced, what left the computer is recorded, and events stream to clients on `GET /api/v1/events`.
+
+If the model fails before it answers, the turn runs once more on another model. Stop ends every model call, tool, plan step, and paired computer working on the turn.
+
+## Sharing the computer
+
+Chat comes first, then automations, then background knowledge indexing, then benchmarks, then training (`internal/share`). Lower-priority work waits for higher-priority work instead of competing with it for memory. A chat that arrives during training is still answered.
 
 ## Bifrost
 
@@ -56,40 +89,40 @@ Bifrost is the internal HTTP server on port 7332.
 - mDNS service type `_localai._tcp` on domain `local.`
 - optional static peers (`YGGDRASIL_STATIC_PEERS` or `config.json`) when mDNS is not available, including Docker
 - pairing offer and approval before a peer is trusted
-- certificate-backed bearer tokens on protected routes such as remote chat and model control
+- certificate-backed bearer tokens on protected routes such as remote chat, model control, and remote training
 
-Discovery is on by default. When it is on and the internal bind address is still loopback, startup rebinds Bifrost to `0.0.0.0` so peers on the LAN can connect. Pairing routes on that port are reachable without a token until a peer is trusted. Protected routes reject unsigned calls.
+Discovery is on by default. When it is on and the internal bind address is still loopback, startup rebinds Bifrost to `0.0.0.0` so peers on the LAN can connect. Pairing routes on that port are reachable without a token until a peer is trusted. Protected routes reject unsigned calls. See [Clustering](clustering.md).
 
 ## Norn
 
-Norn is a deterministic placer. Given the nodes the daemon knows about, which models they have, and a role, it picks a node and records a `scheduler.placement` event. It does not split one model across computers. Cross-machine work that exists today is placement of whole roles, as in the Team pipeline. User schedules are a separate daemon loop in `internal/automations`. Norn places the model for a due automation the same way it places a chat role.
+Norn is a deterministic placer. Given the computers the daemon knows about, which models they have, and a role, it picks a computer and records a `scheduler.placement` event. It does not split one model across computers. Cross-machine work is placement of whole roles, as in the Team profile, of automations, and of training jobs.
 
 ## Orchestrators
 
-| Id | Behavior | Status |
-| --- | --- | --- |
-| `simple` | One model, optional tool loop | Implemented |
-| `team` | Coordinator, then worker, then reviewer | Implemented |
+| Id | Behavior |
+| --- | --- |
+| `simple` | One model with the request pipeline above |
+| `team` | Coordinator, then worker, then reviewer, possibly on different computers |
 
-Team can place those roles on different paired computers. A manual script for that is [two-machine-team-demo.md](two-machine-team-demo.md).
-
-## Heimdall, as far as it exists
-
-The event bus publishes structured events for tasks, models, tools, nodes, placement, and chat tokens. `GET /api/v1/events` is a server-sent stream of that bus. `GET /api/v1/diagnostics` builds a zip that omits secrets. A model health monitor can stop a model that stops responding. There is no separate telemetry pipeline.
+A profile's orchestration controls (effort, planning, workers, verification, tool calls, memory, context share, fallback, time limit) tune either one. See [API](api.md#profiles-and-orchestration).
 
 ## Specialized AIs
 
-`internal/training` builds a specialized AI from a base model, a LoRA adapter trained on the user's examples, system instructions, and Mimir knowledge sources. Trainers implement `training.Trainer`. The MLX trainer runs on Apple Silicon and the PEFT trainer on NVIDIA GPUs with CUDA, each in a Python environment the daemon manages under `runtimes/python` (`internal/pyenv`), and both export the adapter as a GGUF LoRA. Each computer runs one training job at a time. Norn can place a job on a paired computer: the examples go over Bifrost (`/internal/v1/training/`), and the adapter comes back to the computer that owns the AI, which evaluates and serves it.
+`internal/training` builds a specialized AI from a base model, a LoRA adapter trained on the user's examples, system instructions, and Mimir knowledge sources. Trainers implement `training.Trainer`. The MLX trainer runs on Apple Silicon and the PEFT trainer on NVIDIA GPUs with CUDA, each in a Python environment the daemon manages under `runtimes/python` (`internal/pyenv`), and both export the adapter as a GGUF LoRA. Each computer runs one training job at a time. Norn can place a job on a paired computer: the examples go over Bifrost (`/internal/v1/training/`), and the adapter comes back to the computer that owns the AI, which evaluates and serves it. A sandboxed App Store build cannot run a downloaded Python, so it uses environments bundled with the app or trains on a paired computer.
 
-llama-server loads every deployed adapter for a base model at scale 0. Each request names the adapter to apply, or none for the base model, so one process serves the base model and each specialized AI built on it. A `sai:<slug>` model id in chat or `/v1/chat/completions` adds the AI's instructions and knowledge and applies its adapter. See [features/train-your-own-ai.md](features/train-your-own-ai.md).
+llama-server loads every deployed adapter for a base model at scale 0. Each request names the adapter to apply, or none for the base model, so one process serves the base model and each specialized AI built on it. A `sai:<slug>` model id in chat or `/v1/chat/completions` adds the AI's instructions and knowledge and applies its adapter. A revision can also be exported as one standalone GGUF. See [features/train-your-own-ai.md](features/train-your-own-ai.md).
 
 ## Runtimes
 
-Runtime adapters implement `pkg/pluginapi.Runtime`: detect, install, start, stop, and health. The process that actually generates tokens is outside the daemon (`llama-server`, or an HTTP server you already run). See [runtimes.md](runtimes.md).
+Runtime adapters implement `pkg/pluginapi.Runtime`: detect, install, start, stop, and health. The process that actually generates tokens is outside the daemon (`llama-server`, or an HTTP server you already run). Embedding and reranker models run in their own `llama-server` processes for knowledge search. See [runtimes.md](runtimes.md).
+
+## Heimdall
+
+The event bus publishes structured events for chat, tasks, models, tools, computers, placement, automations, notifications, and training (see [API](api.md#events)). `GET /api/v1/events` is a server-sent stream of that bus. `GET /api/v1/diagnostics` builds a zip that omits secrets. A model health monitor stops a model that stops responding. There is no telemetry pipeline.
 
 ## What is not in this process
 
 - Yggdrasil Desktop and Yggdrasil Mobile
-- semantic (embedding) retrieval; Mimir searches by keyword
-- training on NVIDIA GPUs
 - splitting a single model across machines
+- TLS for remote API access
+- code signing of release binaries

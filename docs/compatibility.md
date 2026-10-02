@@ -15,6 +15,19 @@ Submit a correction with the [hardware compatibility](../.github/ISSUE_TEMPLATE/
 | Linux / AMD | Experimental | Experimental | Untested | Untested | `lspci` text match for AMD, ATI, or Radeon. `rocminfo` on `PATH` adds `rocm` to the reported backends. No ROCm inference run is recorded here. |
 | Linux / Intel | Experimental | Experimental | Untested | Untested | `lspci` text match for Intel display devices, and only when no other accelerator was added. Backends reported are Vulkan and CPU. |
 
+## Training, knowledge, and text recognition
+
+These features run their own programs, so they have their own status. "Manual run" means a run recorded in a pull request, not in CI.
+
+| Feature | macOS / Apple Silicon | Linux / NVIDIA | Windows / NVIDIA | Other | Notes |
+| --- | --- | --- | --- | --- | --- |
+| Training (MLX) | Manual run | Not supported | Not supported | Not supported | Apple M5 Pro, end to end through evaluation and deployment (#48) |
+| Training (PyTorch PEFT) | Not used (MLX is chosen) | Untested | Untested | Not supported | The trainer ran on Apple MPS against llama.cpp. The CUDA path, QLoRA with bitsandbytes, and uv's CUDA build selection have not run on NVIDIA hardware. |
+| Text recognition (scanned PDFs) | Manual run | Untested | Untested | Untested | RapidOCR in a pinned Python environment, with headless OpenCV so Linux servers need no graphics libraries |
+| Meaning search (embedding model) | Manual run | Untested | Untested | Untested | Nomic Embed Text v1.5 in llama-server |
+| GGUF export | Manual run | Untested | Untested | Untested | `llama-export-lora` from the llama.cpp install |
+| Mac App Store build | Simulated | | | | `YGGDRASIL_SANDBOXED=1`; bundled Python environments are not yet packaged in the store build |
+
 ## How to read the columns
 
 **Detection.** The daemon can fill a hardware inventory on that OS. GPU rows depend on external commands (`nvidia-smi`, `lspci`) or on macOS system information. A missing command degrades the inventory. It does not fail the whole detect call.

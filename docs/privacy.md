@@ -8,46 +8,68 @@ If that changes, this document should name what is collected, where it is sent, 
 
 ## What is stored on this computer
 
-The data directory (see [Configuration](../README.md#configuration)) holds:
+Everything Yggdrasil keeps is in the data directory. [Configuration](configuration.md#data-directory) lists every path. In short:
 
 | Path | Contents |
 | --- | --- |
-| `config.json` | Bind addresses, node name, node id, discovery, static peers. Written with mode `0600`. |
-| `yggdrasil.db` | Models, profiles, conversations, messages, summaries of long conversations, memories you asked Yggdrasil to keep, tasks, settings, API key hashes, paired-node records. Chat history and task history are saved unless those settings are turned off. Both default to on. Memories are listed on the Memory page, where you can edit, pause, or delete them, or turn memory off. |
-| `models/` | GGUF files you install. |
-| `artifacts/` | Files attached to chats and files the assistant produced, one folder per chat. Deleting a chat deletes its files. The index is in `yggdrasil.db`. |
-| `knowledge/` | Copies of content (text, spreadsheets, PDFs) you pasted or uploaded as connected knowledge. Linked files and folders stay where they are. The search index is in `yggdrasil.db`. |
-| `training/` | Trained adapters (`adapters/`), temporary job files (`jobs/`, removed when a job ends), and downloaded training weights (`hf-cache/`). Examples are in `yggdrasil.db`. |
-| `runtimes/` | Runtime binaries, including `llama-server` after you install llama.cpp, and `python/` with the trainer environment after the first training run. |
-| `logs/daemon.log` | JSON logs, also written to standard output. |
-| `secrets/` | Node identity material. Directory mode `0700`, files mode `0600`. API keys are stored as hashes in `yggdrasil.db`, not as plaintext files. |
+| `yggdrasil.db` | Chats and their messages, summaries of long conversations, memories, profiles, settings, automations and their results, specialized AIs and their examples, knowledge indexes and vectors, run records (traces, task history, what left this computer), notifications, API key hashes, paired computers. |
+| `artifacts/` | Files attached to chats and files the assistant made, one folder per chat. Deleting a chat deletes its files. |
+| `knowledge/` | Copies of content you pasted or uploaded as knowledge, and the recognized text of scanned PDFs. Linked files, folders, databases, and web APIs stay where they are. |
+| `training/` | Trained adapters, exported GGUF files, and downloaded training weights. |
+| `models/`, `runtimes/` | Model files, llama.cpp, and the Python environments for training and text recognition. |
+| `logs/` | JSON logs. They are not sent anywhere. |
+| `secrets/` | This computer's identity, and credentials for connected services, MCP tool sources, and database and API knowledge. Directory mode `0700`, files `0600`. API keys are stored as bcrypt hashes in `yggdrasil.db`, never as plaintext. |
+
+What you can see and remove:
+
+- **Chats:** saved while `save_chat_history` is on (the default). Delete a chat from the chat list.
+- **Memories:** listed on the Memory page, where you can edit, pause, mark **This computer only**, or delete them, or turn memory off. A secret such as a password, key, or card number is never saved as a memory.
+- **Run records:** prompts and tool results of past runs. They are kept for 30 days by default and removed daily. Settings → **What left this computer** sets **Keep run records for** (7, 30, or 90 days, or **Keep them**) and has **Delete run records now**. Deleting them also clears cached web searches and pages. Chats are not run records and are not deleted with them.
+- **Knowledge, files, specialized AIs:** each has a delete action. Deleting a specialized AI deletes its adapters and exports.
 
 The diagnostic bundle is written to omit secrets, private keys, and API key material. Do not assume a log file has been redacted. Remove tokens and personal text before you paste a log into an issue.
 
 ## What can leave the machine
 
-Nothing leaves because the daemon started.
-
-Traffic is sent only when a feature that talks to the network is used:
+Nothing leaves because the daemon started. Traffic is sent only when a feature that talks to the network is used:
 
 | Action | Where data goes |
 | --- | --- |
 | Install or update llama.cpp | `api.github.com` and the GitHub release download for `ggml-org/llama.cpp` |
 | Search or install a Hugging Face model | Hugging Face Hub |
-| First training run | The `astral-sh/uv` GitHub release, Python builds that uv fetches, and pinned packages from PyPI |
-| Training a base model the first time | Hugging Face Hub, for the base model's training weights. Your examples are not uploaded. |
-| Training on a paired computer | That computer receives the training examples (with the AI's instructions) over Bifrost and returns the adapter. It deletes its copy when the job ends. |
 | Install a model from a URL | The host in that URL |
-| Internet tools (`internet.search`, `internet.open`) | DuckDuckGo's public HTML search, then the page URL the tool opens. These tools run only when the profile allows them. |
-| External OpenAI runtime | The base URL configured for `external-openai`, with the API key configured for that runtime if one is set |
+| Web search and page reads (`internet.search`, `internet.open`) | DuckDuckGo's public HTML search, then the pages opened. They run only when the profile allows them. A repeat within 15 minutes (searches) or 30 minutes (pages) is answered from the cache and sends nothing. |
+| Connected services (GitHub, Home Assistant) | That service, with the credential you stored, when one of its tools runs |
+| MCP tool sources | That server, when one of its tools runs |
+| Database and web API knowledge | The database or URL you connected, when it is refreshed |
+| First training run | The `astral-sh/uv` GitHub release, Python builds uv fetches, and pinned packages from PyPI |
+| Training a base model the first time | Hugging Face Hub, for the base model's training weights. Your examples are not uploaded. |
+| Training on a paired computer | That computer receives the training examples and the AI's instructions over Bifrost, and returns the adapter. It deletes its copy when the job ends. |
+| First scanned PDF in Knowledge | PyPI, for the text-recognition packages (about 110 MB). The PDF itself is read on this computer. |
+| A chat placed on a paired computer | That computer receives the prompt and context over Bifrost |
+| External OpenAI runtime | The base URL configured for `external-openai`, with its API key |
 | Bifrost discovery and pairing | Other computers on the local network, or the static peers you listed |
-| LAN API | Any client that can reach port 7331 after you enable LAN API |
+| LAN API | Any client that can reach port 7331 after you turn on local network access |
 
-Remote generation through `external-openai` sends the prompt to that server. A paired computer that Norn selects receives the role prompt over Bifrost.
+## What left this computer
+
+Each run records what it sent off this computer: the query of each web search, the address of each page read, the prompt and context sent to a paired computer (or the training examples), a chat sent to an external server, and what a connected service was asked. Long text, such as the body of a comment posted to GitHub, is left out of the record.
+
+Settings → **What left this computer** lists the records, newest first, and counts them for the last 30 days. `GET /api/v1/egress` returns the same list. The records are run records, so the retention period and **Delete run records now** apply to them.
+
+## Keeping data on this computer
+
+Memories and knowledge sources can be marked **This computer only**. A turn that uses one runs on this computer, even when placement would have chosen a paired computer, and the answer's steps say so.
+
+Text recognition for scanned PDFs, meaning search with an embedding model, and training on Apple Silicon run on this computer. Training on a paired computer sends the examples there, and the plan shows which computer before you start.
+
+## Personalization and permissions
+
+Personalization (Settings → **Personalization**) shapes how answers look: length, tone, format, units, and two short notes about you. It never grants a permission. A personalization note or a memory that tries to, such as "you can always push without asking", is refused. What a tool may do comes only from profiles and Settings.
 
 ## LAN behavior
 
-- Port 7331 stays on `127.0.0.1` until LAN API is enabled.
+- Port 7331 stays on `127.0.0.1` until local network access is turned on (API Access → **Local network access**).
 - Discovery defaults to on. Bifrost (port 7332) is then bound on all interfaces so peers can connect.
 - mDNS advertises the node on the local link.
 - Pairing routes on port 7332 answer before a peer is trusted. Other Bifrost routes require a token from a paired node.
