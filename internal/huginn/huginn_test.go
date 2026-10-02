@@ -203,6 +203,21 @@ func TestToolsFor(t *testing.T) {
 	if got := ToolsFor(Local, "commit and push my changes", all); !has(got, "git.commit", "git.push") {
 		t.Fatalf("git cues = %v", got)
 	}
+	images := []string{"image.generate", "image.edit", "files.create"}
+	for msg, want := range map[string]string{
+		"Draw a fox in the snow":                  "image.generate",
+		"Can you make a picture of a lighthouse?": "image.generate",
+		"Generate a logo for my bakery":           "image.generate",
+		"Remove the background from photo.png":    "image.edit",
+		"Change the sky in this image to sunset":  "image.edit",
+	} {
+		if got := ToolsFor(Chat, msg, images); !has(got, want) {
+			t.Errorf("%q offered %v, want %s", msg, got, want)
+		}
+	}
+	if got := ToolsFor(Chat, "What is a pixel?", images); len(got) != 0 {
+		t.Errorf("plain question offered %v", got)
+	}
 	// Only tools the profile has are offered.
 	if got := ToolsFor(Local, "run the tests", []string{"terminal"}); len(got) != 1 {
 		t.Fatalf("limited profile = %v", got)

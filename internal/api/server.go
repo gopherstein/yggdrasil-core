@@ -23,6 +23,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/connectors"
 	"github.com/yeixio/yggdrasil-core/internal/events"
 	"github.com/yeixio/yggdrasil-core/internal/gjallarhorn"
+	"github.com/yeixio/yggdrasil-core/internal/imagegen"
 	"github.com/yeixio/yggdrasil-core/internal/logs"
 	"github.com/yeixio/yggdrasil-core/internal/mcp"
 	"github.com/yeixio/yggdrasil-core/internal/models"
@@ -133,6 +134,7 @@ type Server struct {
 	artifacts       *artifacts.Store
 	speech          *speech.Engine
 	speechStore     *artifacts.Store
+	images          *imagegen.Setup
 	notifications   *gjallarhorn.Hub
 	connectors      *connectors.Manager
 	mcp             *mcp.Manager
@@ -255,6 +257,7 @@ func (s *Server) routes() {
 	s.cacheRoutes(api)
 	s.trainingRoutes(api)
 	s.speechRoutes(api)
+	s.imageRoutes(api)
 
 	s.mcpRootRoutes(s.router)
 

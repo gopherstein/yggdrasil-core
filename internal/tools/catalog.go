@@ -18,6 +18,8 @@ const (
 	CapCode = "code"
 	// CapSpeech transcribes audio and reads text aloud (Gungnir §18–19).
 	CapSpeech = "speech"
+	// CapImage makes and edits images (Gungnir §17).
+	CapImage = "image"
 )
 
 // Definition is one registered tool: built in, from a connected service,
@@ -87,6 +89,10 @@ func BuiltinCatalog() []Definition {
 			Runtime: "python", Outputs: []string{OutputText}},
 		{ID: "speech.synthesize", Name: "Read Aloud", Description: "Read text aloud, on this computer, as an audio file attached to the answer that can be played. Use it when the user asks to hear something, or for narration. \"voice\" is a Piper voice such as en_US-lessac-medium (default) or de_DE-thorsten-medium.", Capability: CapSpeech, Source: "builtin", Schema: `{"text":"string","voice":"string","name":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskCreate,
 			Runtime: "python", Outputs: []string{OutputAudio}},
+		{ID: "image.generate", Name: "Generate Image", Description: "Make an image from a description, on this computer, attached to the answer as a PNG. Describe the subject, setting, style, and lighting in \"prompt\". \"width\" and \"height\" are pixels (default 1024 each, up to 1536); \"seed\" repeats an earlier image.", Capability: CapImage, Source: "builtin", Schema: `{"prompt":"string","width":"integer","height":"integer","seed":"integer","name":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskCreate,
+			Runtime: "sdcpp", Outputs: []string{OutputImage}},
+		{ID: "image.edit", Name: "Edit Image", Description: "Change a PNG or JPEG image in this chat from an instruction, on this computer, such as \"make it night\" or \"remove the car\". \"file\" is the image's name; the changed image is attached to the answer as a new file.", Capability: CapImage, Source: "builtin", Schema: `{"file":"string","prompt":"string","seed":"integer","name":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskCreate,
+			Runtime: "sdcpp", Outputs: []string{OutputImage}},
 		{ID: "code.execute", Name: "Run Code", Description: "Run Python in a sandbox for calculations, data analysis, and charts, with numpy, pandas, and matplotlib. It has no network and sees only files you list from this chat (\"files\": [\"sales.xlsx\"]), read from its working folder. Print results; files it saves there (.png, .csv, .xlsx, .pdf, and so on) are attached to the answer. Use matplotlib's savefig for charts.", Capability: CapCode, Source: "builtin", Schema: `{"code":"string","files":"array"}`, DefaultPolicy: PolicyAsk, Risk: RiskWrite,
 			Level: LevelHighImpact, Runtime: "python", Outputs: []string{OutputText, OutputFile}},
 		{ID: "terminal", Name: "Terminal", Description: "Run a shell command on this computer.", Capability: CapShell, Source: "builtin", Schema: `{"command":"string"}`, DefaultPolicy: PolicyAllow, Risk: "write"},

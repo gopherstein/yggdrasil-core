@@ -1820,6 +1820,74 @@ paths:
                 $ref: "#/components/schemas/Error"
         "503":
           description: Speech cannot run on this computer
+  /api/v1/images/setup:
+    get:
+      summary: What image generation has installed, the models on offer, and any setup in progress
+      operationId: getImageSetup
+      responses:
+        "200":
+          description: Image generation status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSetup"
+    post:
+      summary: Install stable-diffusion.cpp and an image model in the background
+      operationId: startImageSetup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [model_id]
+              properties:
+                model_id: {type: string, description: "A model from the status's models, such as flux2-klein-4b"}
+      responses:
+        "202":
+          description: Setup started; poll the status for its progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSetup"
+        "409":
+          description: Setup is already running, there is too little space, or this computer cannot run it
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Stop the setup in progress; what was downloaded is kept and resumed next time
+      operationId: cancelImageSetup
+      responses:
+        "200":
+          description: Image generation status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSetup"
+  /api/v1/images/models/{id}:
+    delete:
+      summary: Delete an installed image model to free its space
+      operationId: removeImageModel
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: Image generation status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSetup"
+        "409":
+          description: The model is being set up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/v1/artifacts:
     post:
       summary: Upload a file to attach to a chat (up to 25 MB)
@@ -4380,6 +4448,48 @@ components:
           description: Sources, steps, and files of an answer
           additionalProperties: true
       additionalProperties: true
+    ImageSetup:
+      type: object
+      properties:
+        supported: {type: boolean, description: "False where stable-diffusion.cpp has no build or cannot run"}
+        unsupported: {type: string}
+        ready: {type: boolean, description: "Images can be made now"}
+        program: {type: boolean, description: "stable-diffusion.cpp is installed"}
+        release: {type: string}
+        active: {type: string, description: "The model images are made with"}
+        models:
+          type: array
+          items:
+            type: object
+            properties:
+              id: {type: string}
+              name: {type: string}
+              description: {type: string}
+              license: {type: string}
+              memory_bytes: {type: integer, format: int64}
+              size_bytes: {type: integer, format: int64}
+              edits: {type: boolean}
+              installed: {type: boolean}
+              recommended: {type: boolean}
+              files:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    role: {type: string, enum: [diffusion, vae, llm]}
+                    repo: {type: string}
+                    path: {type: string}
+                    size_bytes: {type: integer, format: int64}
+                    sha256: {type: string}
+        job:
+          type: object
+          properties:
+            model_id: {type: string}
+            stage: {type: string, enum: [program, model]}
+            done_bytes: {type: integer, format: int64}
+            total_bytes: {type: integer, format: int64}
+            running: {type: boolean}
+            error: {type: string}
     Artifact:
       type: object
       properties:

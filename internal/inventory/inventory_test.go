@@ -129,3 +129,19 @@ func TestDirectAnswers(t *testing.T) {
 		}
 	}
 }
+
+// Image generation that is on but not set up says how to set it up, and does
+// not count as available.
+func TestImageGenerationNotSetUp(t *testing.T) {
+	s := snapshot()
+	s.Tools = append(s.Tools, Tool{ID: "image.generate", Name: "Generate Image", Description: "Make an image from a description",
+		Source: "builtin", Enabled: true, Unavailable: "image generation isn't set up yet. Set it up on the Tools page"})
+	got, ok := Direct(s, "Can you generate an image of a cat?")
+	if !ok || got != "No, I can't generate images right now. Image generation isn't set up yet. Set it up on the Tools page." {
+		t.Fatalf("answer %q", got)
+	}
+	s.Tools[len(s.Tools)-1].Unavailable = ""
+	if a := ability(t, Abilities(s), "image_generation"); !a.Available {
+		t.Fatalf("a ready image tool: %+v", a)
+	}
+}

@@ -76,8 +76,18 @@ func (a *App) buildCapabilities(ctx context.Context) inventory.Snapshot {
 	}
 	for _, def := range tools.Catalog() {
 		_, off := disabled[def.ID]
-		s.Tools = append(s.Tools, inventory.Tool{ID: def.ID, Name: def.Name, Description: def.Description,
-			Source: def.Source, Risk: def.Risk, Enabled: !off})
+		tool := inventory.Tool{ID: def.ID, Name: def.Name, Description: def.Description,
+			Source: def.Source, Risk: def.Risk, Enabled: !off}
+		if a.Tools != nil {
+			if t, err := a.Tools.Get(def.ID); err == nil {
+				if av, ok := t.(interface{ Available() (bool, string) }); ok {
+					if ready, why := av.Available(); !ready {
+						tool.Unavailable = why
+					}
+				}
+			}
+		}
+		s.Tools = append(s.Tools, tool)
 	}
 
 	if a.Connectors != nil {

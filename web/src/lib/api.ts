@@ -87,6 +87,7 @@ import type {
   MemoryItem,
   Artifact,
   SpeechResult,
+  ImageSetup,
   FileRef,
   StopChatResponse,
 } from '@/types/api'
@@ -712,6 +713,19 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ text, conversation_id: conversationId }),
     }),
+
+  /** What image generation has installed, and any setup in progress. */
+  getImageSetup: () => request<ImageSetup>('/api/v1/images/setup'),
+
+  /** Install stable-diffusion.cpp and an image model in the background. */
+  startImageSetup: (modelId: string) =>
+    request<ImageSetup>('/api/v1/images/setup', { method: 'POST', body: JSON.stringify({ model_id: modelId }) }),
+
+  /** Stop the image setup; what was downloaded is kept. */
+  cancelImageSetup: () => request<ImageSetup>('/api/v1/images/setup', { method: 'DELETE' }),
+
+  /** Delete an installed image model. */
+  removeImageModel: (id: string) => request<ImageSetup>(`/api/v1/images/models/${id}`, { method: 'DELETE' }),
 
   /** Stop a conversation's running turn on the computer running it; what was written is kept. */
   stopChat: (conversationId: string) =>

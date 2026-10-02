@@ -110,6 +110,8 @@
     "downloadFailed": "The download failed.",
     "loading": "Loading…",
     "audioFailed": "The audio could not be loaded.",
+    "imageFailed": "The image could not be loaded.",
+    "notAvailable": "Not available",
     "play": "Play",
     "meta": "{{kind}} · {{size}}",
     "kinds": {

@@ -4,15 +4,26 @@ export const UPLOAD_ACCEPT = '.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.h
 /** Audio chat can play and transcribe. */
 export const AUDIO_ACCEPT = '.wav,.mp3,.m4a,.aac,.ogg,.flac,.webm'
 
-const BINARY = ['.xlsx', '.pdf', ...AUDIO_ACCEPT.split(',')]
+/** Images chat can show and edit. */
+export const IMAGE_ACCEPT = '.png,.jpg,.jpeg'
+
+const BINARY = ['.xlsx', '.pdf', ...AUDIO_ACCEPT.split(','), ...IMAGE_ACCEPT.split(',')]
 
 export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 
-/** File types chat can read: documents, spreadsheets, PDFs, code, and audio. */
+/** File types chat can read: documents, spreadsheets, PDFs, code, audio, and images. */
 export const ATTACH_ACCEPT =
   UPLOAD_ACCEPT +
   ',.py,.js,.ts,.tsx,.jsx,.go,.rs,.java,.kt,.c,.h,.cpp,.hpp,.cs,.rb,.php,.swift,.sh,.sql,.yaml,.yml,.toml,.xml,.css,.ini,.log,' +
-  AUDIO_ACCEPT
+  AUDIO_ACCEPT +
+  ',' +
+  IMAGE_ACCEPT
+
+/** Whether a file is a PNG or JPEG image, by its name. */
+export function isImageName(filename: string): boolean {
+  const dot = filename.lastIndexOf('.')
+  return dot >= 0 && IMAGE_ACCEPT.split(',').includes(filename.slice(dot).toLowerCase())
+}
 
 /** Whether a file is audio, by its name. */
 export function isAudioName(filename: string): boolean {
