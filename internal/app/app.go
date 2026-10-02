@@ -553,6 +553,12 @@ func New(opts Options) (*App, error) {
 	// Gjallarhorn: every notice is kept in the notification center; the
 	// desktop is one delivery channel.
 	a.Notifications = gjallarhorn.NewHub(db.SQL, bus, desktopChannel{settings: settingsRepo, send: automations.OSSender{}})
+	// Email and webhook destinations keep their passwords and signing
+	// secrets in the secrets directory, and what they send is recorded in
+	// What left this computer.
+	a.Notifications.SetSecrets(secrets)
+	a.Notifications.SetSettings(settingsRepo)
+	a.Notifications.SetEgress(a.Egress)
 	a.API.BindNotifications(a.Notifications)
 	a.API.BindConnectors(a.Connectors)
 	a.API.BindMCP(a.MCP, mcp.NewServer(a.mcpBackend()), yggctlPath)
@@ -720,6 +726,7 @@ func (a *App) requireKeyForRemoteBind(ctx context.Context) error {
 func (a *App) Start(ctx context.Context) error {
 	ctx, a.cancel = context.WithCancel(ctx)
 	a.notifyFromEvents(ctx)
+	a.Notifications.Start(ctx)
 	a.watchCapabilities(ctx)
 	a.keepRunRecordsTidy(ctx)
 	_ = a.syncInternalBind()

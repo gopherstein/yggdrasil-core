@@ -160,7 +160,13 @@ Uploads send `text`, or `content_base64` for binary files such as `.xlsx` and `.
 | POST | `/automations/preview` | Run an automation once without saving it |
 | GET, PATCH, DELETE | `/automations/{id}` | An automation with its history, change it, or delete it |
 | POST | `/automations/{id}/run`, `/pause`, `/resume` | Run now, pause, or resume |
-| GET | `/notifications` | The notification center: `{"notifications": [...], "unread": n}`. `?unread=1` lists unread ones. |
+| GET | `/notifications` | The notification center: `{"notifications": [...], "unread": n}`. `?unread=1` lists unread ones; `?category=` lists one category. |
+| GET | `/notifications/{id}` | One notification with each channel's delivery |
+| GET, POST | `/notifications/destinations` | Email and webhook destinations; creating a webhook returns its signing `secret` once |
+| GET, PATCH, DELETE | `/notifications/destinations/{id}` | Read, change, or remove a destination. A blank `password` keeps the stored one |
+| POST | `/notifications/destinations/{id}/test` | Send a test notification now: `{"ok": true}`, or `ok` false with `error` and `permanent` |
+| POST | `/notifications/destinations/{id}/rotate-secret` | A new webhook signing secret; the old one stops working |
+| GET, PUT | `/notifications/quiet-hours` | Quiet hours: `enabled`, `start`, `end` (HH:MM), `time_zone`, `allow` (`errors` or `nothing`) |
 | POST | `/notifications/read` | Mark notifications read: `{"ids": [...]}`; no ids marks all |
 | POST | `/notifications/{id}/dismiss` | Dismiss one |
 
@@ -276,7 +282,15 @@ A trained revision can be exported as one GGUF file that llama.cpp, LM Studio, O
 
 An automation's `notification.mode` is `condition`, `change`, `always`, `failure` (only failed runs), or `none`. An automation runs on the same stack as chat: `model_id` `auto` picks a model for each run, and memories and connected knowledge are used the same way. Tools follow the unattended policy, because nobody is there to approve them. Tools listed in the automation's `tools` were approved when it was saved, and they run even if they change things. With no `tools`, only read-only tools the profile allows without asking can run. A tool the profile denies never runs. When a run reaches a tool that was not approved, the tool is skipped and the run continues. The run's `automation.completed` event lists the tool in `skipped`, and an `approval` notification says which tools to approve.
 
-Notifications come from Gjallarhorn. Each one is stored first and then delivered to its channels. A notification has `category` (`automation`, `approval`, `model`, `training`, `health`, or `system`), `severity` (`info`, `success`, `warning`, or `error`), `title`, `body`, and a `link` back to its source in the app, such as `/automations?id=…`. Each channel's attempt is recorded in `deliveries`. A delivery is `delivered`, `failed`, or `suppressed`; for example, desktop notices are suppressed when `notify_task_finish` is off. A repeat with the same source within 10 minutes is folded into the first notification and marked unread again. The `notification.created` event carries `id`, `category`, `severity`, `title`, `body`, and `link`. Finished and failed automations post to the desktop too. Model downloads, training deploys, and pairings stay in the app.
+Notifications come from Gjallarhorn. Each one is stored first and then delivered to its channels. A notification has `category` (`automation`, `approval`, `model`, `training`, `health`, or `system`), `severity` (`info`, `success`, `warning`, or `error`), `title`, `body`, and a `link` back to its source in the app, such as `/automations?id=…`. Each channel's attempt is recorded in `deliveries`. A delivery is `delivered`, `failed`, or `suppressed`; for example, desktop notices are suppressed when `notify_task_finish` is off. A repeat with the same source within 10 minutes is counted on the first notification (`repeat_count`) and marks it unread again. The `notification.created` event carries `id`, `category`, `severity`, `title`, `body`, and `link`. Finished and failed automations post to the desktop too.
+
+**Destinations.** Notifications can also go to email, through your own SMTP server, and to webhooks. Each destination has `categories` (empty: all) and `min_severity` (`info`, `success`, `warning`, or `error`), and receives every notification that matches, from any part of Yggdrasil.
+- **Email:** `host`, `port` (587, or 465 with `tls`), `username`, `from`, `to` (up to 20 addresses), and `tls`: `starttls` (the default), `tls`, or `none`. `none` is allowed only for a server on this computer, so a password is never sent unencrypted over the network. The password is stored in `secrets/notify-<id>`, never returned, and kept when a change leaves it blank.
+- **Webhooks:** must use `https`, except for an address on this computer or the local network (`localhost`, private IP addresses, `.local`, `.lan`, `.home.arpa`). Redirects are not followed. Each request is a JSON `POST`: `version` (1), `notification_id`, `created_at`, `category`, `severity`, `title`, `body`, `link`, `repeat_count` (when more than 1), and `source` (`type`, `id`). The `Yggdrasil-Signature` header is `t=<unix seconds>,v1=<hex HMAC-SHA256 of "<t>.<body>">`, keyed with the destination's secret. `Yggdrasil-Notification-Id` repeats the id, so a receiver can ignore a delivery it already handled.
+
+**Delivery.** Email and webhook deliveries go out in the background, so a slow server never holds up an automation. A delivery is `pending` until it is sent, then `delivered`, `failed`, or `cancelled` (its destination was removed). A failed delivery is retried after 1, 5, and 30 minutes, then given up, without running the work that made the notification again. Failures that retrying cannot fix are not retried, and their `error` says what to change: a refused sign-in, an unknown recipient, an untrusted certificate, a server without STARTTLS, a webhook answering 4xx other than 408 or 429, or one that redirects. Every email and webhook delivery is recorded in What left this computer as kind `notification`.
+
+**Quiet hours.** Between `start` and `end` in `time_zone`, deliveries outside the app are `held` until quiet hours end. That covers desktop notices, email, and webhooks. With `allow` `errors` (the default), errors still go out; `nothing` holds everything. Held notifications are in the notification center at once.
 
 ## Sharing the computer
 
@@ -304,7 +318,7 @@ Personalization shapes how answers look in every chat, automation, and API reque
 ## Privacy and run records
 
 Each run records what left this computer.
-- **Record kinds:** `web_search` (the query), `web_page` (the address), `paired_computer` (the prompt and context, or training examples), `external_server` (a chat sent to a server that is not on this computer), and `connector` (the service and what it was asked; long text such as a comment's body is left out).
+- **Record kinds:** `web_search` (the query), `web_page` (the address), `paired_computer` (the prompt and context, or training examples), `external_server` (a chat sent to a server that is not on this computer), `connector` (the service and what it was asked; long text such as a comment's body is left out), and `notification` (an email or webhook delivery: the server or host, and the notification's title).
 - **Record fields:** `source` (`chat`, `api`, `automation`, `training`), plus `conversation_id` and `task_id` when there are any.
 
 Memories and knowledge sources have `local_only`. Set it with `PATCH /memory/{id}` or the knowledge update, `{"local_only": true}`. A turn that uses a local-only memory or a passage from a local-only source runs on this computer, even when placement would have chosen a paired computer, and its steps say so.
@@ -408,7 +422,7 @@ A repeat web search or page read is answered from the cache. The tool does not r
 
 ## Client contract
 
-The desktop app, mobile apps, and other clients read a versioned contract: events, run traces, answers with their citations, steps, and files, artifacts, notifications, and egress records. The version is `major.minor`, now `1.0`.
+The desktop app, mobile apps, and other clients read a versioned contract: events, run traces, answers with their citations, steps, and files, artifacts, notifications, and egress records. The version is `major.minor`, now `1.1` (1.1 added `repeat_count` to notifications).
 - **Where it appears:** every event has `contract`, and so do answer metadata and run traces. Metadata saved before the contract existed has no `contract` and reads as 1.0. Every response carries the `Yggdrasil-Contract` header, and `GET /api/v1/version` has `contract` (`version`, `major`).
 - **Minor versions** add fields or event types. Clients ignore what they do not know, so an older client keeps working.
 - **Major versions** remove something or change its meaning. A client may send `Yggdrasil-Client-Contract: 1.0`. A client built for another major version gets 426 with code `CONTRACT_MISMATCH`, and the message says whether to update the app or Yggdrasil. A client that sends no header is served as before.

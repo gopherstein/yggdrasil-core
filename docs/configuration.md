@@ -29,7 +29,7 @@ What lives there:
 | `knowledge/` | Copies of pasted and uploaded knowledge, and `ocr-cache/` (recognized text of scanned PDFs). |
 | `training/` | Trained adapters (`adapters/`), exported GGUF files (`exports/`), job working files (`jobs/`, removed when a job ends), and downloaded training weights (`hf-cache/`). |
 | `logs/` | `daemon.log` (JSON) and llama-server logs. |
-| `secrets/` | This computer's identity (`node-<id>.key`, `.pub`), and credentials: `connector-<service>.json`, `mcp-<source>.json`, `knowledge-<source>`. Directory mode `0700`, files `0600`. |
+| `secrets/` | This computer's identity (`node-<id>.key`, `.pub`), and credentials: `connector-<service>.json`, `mcp-<source>.json`, `knowledge-<source>`, `notify-<destination>`. Directory mode `0700`, files `0600`. |
 
 ## `config.json`
 
@@ -96,6 +96,7 @@ Settings are stored in `yggdrasil.db`. The app's Settings page shows them, and `
 | `memory_enabled` | `true` | Persistent memory for chats. Each chat can still turn it off. |
 | `notify_task_finish` | `true` | Desktop notices for finished automations and tasks |
 | `notify_peer_offline` | `true` | A notice when a paired computer goes offline |
+| `notification_quiet_hours` | off, 22:00–07:00 | Quiet hours, as JSON; set them in Settings → Email and webhooks or with `PUT /api/v1/notifications/quiet-hours` |
 | `tool_terminal`, `tool_file_writes`, `tool_git` | `ask` | Default policy for the shell, file writes, and Git: `deny`, `ask`, `allow`, or `allow-for-session` |
 | `node_name`, `lan_api_enabled`, `discovery_enabled`, `web_ui_enabled` | see `config.json` | Writable through settings; stored in `config.json` |
 

@@ -442,6 +442,11 @@ paths:
           in: query
           schema:
             type: integer
+        - name: category
+          in: query
+          description: automation, approval, model, training, health, or system
+          schema:
+            type: string
       responses:
         "200":
           description: Notifications and the unread count
@@ -453,8 +458,7 @@ paths:
                   notifications:
                     type: array
                     items:
-                      type: object
-                      additionalProperties: true
+                      $ref: "#/components/schemas/Notification"
                   unread:
                     type: integer
   /api/v1/notifications/read:
@@ -950,7 +954,7 @@ paths:
                   properties:
                     id: {type: string}
                     at: {type: string, format: date-time}
-                    kind: {type: string, enum: [web_search, web_page, paired_computer, external_server, connector]}
+                    kind: {type: string, enum: [web_search, web_page, paired_computer, external_server, connector, notification]}
                     destination: {type: string}
                     detail: {type: string}
                     source: {type: string}
@@ -3914,6 +3918,207 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/v1/notifications/{id}:
+    get:
+      summary: One notification with each channel's delivery
+      operationId: getNotification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The notification
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+        "404":
+          description: No such notification
+  /api/v1/notifications/destinations:
+    get:
+      summary: Email and webhook destinations. Passwords and signing secrets are never returned.
+      operationId: listNotificationDestinations
+      responses:
+        "200":
+          description: Destinations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NotificationDestination"
+    post:
+      summary: Add an email or webhook destination; a webhook's signing secret is returned this once
+      operationId: createNotificationDestination
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationDestinationInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  destination:
+                    $ref: "#/components/schemas/NotificationDestination"
+                  secret:
+                    type: string
+                    description: The webhook signing secret, shown only now
+        "400":
+          description: Invalid destination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/notifications/destinations/{id}:
+    get:
+      summary: One destination
+      operationId: getNotificationDestination
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Destination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationDestination"
+        "404":
+          description: No such destination
+    patch:
+      summary: Change a destination; an empty password keeps the stored one
+      operationId: updateNotificationDestination
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationDestinationInput"
+      responses:
+        "200":
+          description: Destination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationDestination"
+        "400":
+          description: Invalid destination
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: No such destination
+    delete:
+      summary: Remove a destination, its stored secret, and its waiting deliveries
+      operationId: deleteNotificationDestination
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Removed
+        "404":
+          description: No such destination
+  /api/v1/notifications/destinations/{id}/test:
+    post:
+      summary: Send a test notification now
+      operationId: testNotificationDestination
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Whether it was delivered, and why not
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  error:
+                    type: string
+                  permanent:
+                    type: boolean
+                    description: Retrying will not help until the destination is changed
+        "404":
+          description: No such destination
+  /api/v1/notifications/destinations/{id}/rotate-secret:
+    post:
+      summary: Replace a webhook's signing secret; the old one stops working
+      operationId: rotateNotificationSecret
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The new secret, shown only now
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  secret:
+                    type: string
+        "400":
+          description: Not a webhook
+  /api/v1/notifications/quiet-hours:
+    get:
+      summary: Quiet hours
+      operationId: getQuietHours
+      responses:
+        "200":
+          description: Quiet hours
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuietHours"
+    put:
+      summary: Set quiet hours
+      operationId: setQuietHours
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuietHours"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuietHours"
+        "400":
+          description: Invalid quiet hours
 components:
   securitySchemes:
     bearerAuth:
@@ -4380,3 +4585,71 @@ components:
             placement:
               type: boolean
       additionalProperties: true
+    Notification:
+      type: object
+      properties:
+        id: {type: string}
+        created_at: {type: string, format: date-time}
+        source_type: {type: string}
+        source_id: {type: string}
+        category: {type: string, enum: [automation, approval, model, training, health, system]}
+        severity: {type: string, enum: [info, success, warning, error]}
+        title: {type: string}
+        body: {type: string}
+        link: {type: string}
+        read_at: {type: string, format: date-time}
+        repeat_count: {type: integer}
+        deliveries:
+          type: array
+          items:
+            type: object
+            properties:
+              channel: {type: string, description: "desktop, or email:<id> or webhook:<id>"}
+              destination_id: {type: string}
+              status: {type: string, enum: [delivered, failed, suppressed, pending, held, cancelled]}
+              attempts: {type: integer}
+              delivered_at: {type: string, format: date-time}
+              next_attempt_at: {type: string, format: date-time}
+              error: {type: string}
+    NotificationDestinationInput:
+      type: object
+      properties:
+        kind: {type: string, enum: [email, webhook], description: Required when creating}
+        name: {type: string}
+        enabled: {type: boolean}
+        email:
+          type: object
+          properties:
+            host: {type: string}
+            port: {type: integer, description: Default 587, or 465 with tls}
+            username: {type: string}
+            from: {type: string}
+            to: {type: array, items: {type: string}, maxItems: 20}
+            tls: {type: string, enum: [starttls, tls, none], description: none only for a server on this computer}
+        webhook:
+          type: object
+          properties:
+            url: {type: string, description: "https, or http on this computer or the local network"}
+        categories: {type: array, items: {type: string}, description: Empty receives every category}
+        min_severity: {type: string, enum: [info, success, warning, error]}
+        password: {type: string, description: The SMTP password; stored as a secret and never returned}
+    NotificationDestination:
+      type: object
+      properties:
+        id: {type: string}
+        kind: {type: string, enum: [email, webhook]}
+        name: {type: string}
+        enabled: {type: boolean}
+        email: {type: object, additionalProperties: true}
+        webhook: {type: object, additionalProperties: true}
+        categories: {type: array, items: {type: string}}
+        min_severity: {type: string}
+        has_secret: {type: boolean}
+    QuietHours:
+      type: object
+      properties:
+        enabled: {type: boolean}
+        start: {type: string, example: "22:00"}
+        end: {type: string, example: "07:00"}
+        time_zone: {type: string, example: Europe/Berlin}
+        allow: {type: string, enum: [errors, nothing], description: errors lets errors through; nothing holds everything}

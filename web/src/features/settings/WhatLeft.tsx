@@ -9,6 +9,7 @@ const KIND_LABEL: Record<EgressKind, string> = {
   paired_computer: 'Paired computer',
   external_server: 'External server',
   connector: 'Connected service',
+  notification: 'Notification',
 }
 
 const SOURCE_LABEL: Record<string, string> = {

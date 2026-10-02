@@ -1116,11 +1116,48 @@ export interface SpecializedAIPatch {
 export type NotificationSeverity = 'info' | 'success' | 'warning' | 'error'
 
 export interface NotificationDelivery {
+  /** desktop, or email:<id> / webhook:<id> for a destination. */
   channel: string
-  status: 'delivered' | 'failed' | 'suppressed'
+  destination_id?: string
+  status: 'delivered' | 'failed' | 'suppressed' | 'pending' | 'held' | 'cancelled'
   attempts: number
   delivered_at?: string
+  next_attempt_at?: string
   error?: string
+}
+
+export type NotificationCategory = 'automation' | 'approval' | 'model' | 'training' | 'health' | 'system'
+
+/** An email or webhook destination (Gjallarhorn §12–13). Passwords and signing secrets are never returned. */
+export interface NotificationDestination {
+  id: string
+  kind: 'email' | 'webhook'
+  name: string
+  enabled: boolean
+  email?: { host: string; port: number; username?: string; from: string; to: string[]; tls?: 'starttls' | 'tls' | 'none' }
+  webhook?: { url: string }
+  categories?: NotificationCategory[]
+  min_severity?: '' | NotificationSeverity
+  has_secret: boolean
+}
+
+export interface NotificationDestinationInput {
+  kind?: 'email' | 'webhook'
+  name?: string
+  enabled?: boolean
+  email?: NotificationDestination['email']
+  webhook?: { url: string }
+  categories?: NotificationCategory[]
+  min_severity?: '' | NotificationSeverity
+  password?: string
+}
+
+export interface QuietHours {
+  enabled: boolean
+  start: string
+  end: string
+  time_zone: string
+  allow: 'errors' | 'nothing'
 }
 
 /** A Gjallarhorn notification kept in the notification center. */
@@ -1129,13 +1166,15 @@ export interface AppNotification {
   created_at: string
   source_type: string
   source_id?: string
-  category: 'automation' | 'approval' | 'model' | 'training' | 'health' | 'system'
+  category: NotificationCategory
   severity: NotificationSeverity
   title: string
   body: string
   /** App path back to the source, such as /automations?id=…. */
   link?: string
   read_at?: string
+  /** How many times the same notice came within ten minutes. */
+  repeat_count?: number
   deliveries?: NotificationDelivery[]
 }
 
@@ -1180,7 +1219,7 @@ export interface PersonalStyle {
   instructions?: string
 }
 
-export type EgressKind = 'web_search' | 'web_page' | 'paired_computer' | 'external_server' | 'connector'
+export type EgressKind = 'web_search' | 'web_page' | 'paired_computer' | 'external_server' | 'connector' | 'notification'
 
 /** One time data left this computer (spec §63). */
 export interface EgressRecord {

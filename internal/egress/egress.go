@@ -21,6 +21,8 @@ const (
 	PairedComputer = "paired_computer"
 	ExternalServer = "external_server"
 	Connector      = "connector"
+	// Notification is an email or webhook delivery (Gjallarhorn).
+	Notification = "notification"
 )
 
 // Sources of a run.

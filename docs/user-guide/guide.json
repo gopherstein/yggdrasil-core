@@ -138,8 +138,10 @@
       "id": "notifications",
       "title": "Notifications",
       "paragraphs": [
-        "The bell next to the Yggdrasil name shows unread notifications: finished and failed automations, tools an automation skipped, finished or failed model downloads, finished or failed exports, deployed AIs, and newly paired computers. Choose one to go to it. Mark all read clears the count, and Dismiss removes one.",
-        "Notifications are kept by the daemon, so ones that arrived while the window was closed are waiting. Finished and failed automations also post a desktop notice, unless Settings turns task-finish notifications off. A repeat from the same source within 10 minutes is folded into the first notification."
+        "The bell next to the Yggdrasil name shows unread notifications: finished and failed automations, tools an automation skipped, finished or failed model downloads, finished or failed exports, deployed AIs, and newly paired computers. Choose one to go to it, or filter by category. Mark all read clears the count, and Dismiss removes one. A notice that repeats within 10 minutes is counted on the first one, such as \"failed · 3 times\".",
+        "Notifications are kept by the daemon, so ones that arrived while the window was closed are waiting. Finished and failed automations also post a desktop notice, unless Settings turns task-finish notifications off.",
+        "Settings → Email and webhooks sends notifications to your email, through your own SMTP server, or to a webhook on a service you run. Choose which categories each one receives and how important they must be, such as errors only. Test sends one right away and says what is wrong if it fails. A webhook's signing secret is shown once when you add it. A delivery that fails is tried again after 1, 5, and 30 minutes; a problem retrying cannot fix, such as a wrong password, stops at once, and the bell says the notification was not delivered everywhere.",
+        "Quiet hours hold desktop notices, email, and webhooks overnight, and send them when quiet hours end. Errors still go out unless you choose Hold everything. The bell shows every notification at once."
       ]
     },
     {

@@ -15,6 +15,7 @@ import { useUIStore } from '@/stores/uiStore'
 import type { SettingsPatch } from '@/types/api'
 import { RealmKicker } from '@/components/ui/Realm'
 import { ConnectedServices } from './ConnectedServices'
+import { NotificationDestinations } from './NotificationDestinations'
 import { WhatLeft } from './WhatLeft'
 import { Toggle } from '@/components/ui/Toggle'
 import { Personalization } from './Personalization'
@@ -533,6 +534,7 @@ export function SettingsPage() {
             />
           </div>
         </section>
+        <NotificationDestinations />
       </div>
 
       <div className="settings-group">

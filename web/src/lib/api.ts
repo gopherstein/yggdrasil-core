@@ -38,7 +38,10 @@ import type {
   MCPSpec,
   MCPUpdate,
   PersonalStyle,
+  NotificationDestination,
+  NotificationDestinationInput,
   NotificationList,
+  QuietHours,
   ToolActivityRecord,
   ToolRecord,
   Model,
@@ -795,6 +798,27 @@ export const api = {
     request<null>('/api/v1/notifications/read', { method: 'POST', body: JSON.stringify({ ids }) }),
 
   dismissNotification: (id: string) => request<null>(`/api/v1/notifications/${id}/dismiss`, { method: 'POST' }),
+
+  listNotificationDestinations: async () =>
+    (await request<NotificationDestination[]>('/api/v1/notifications/destinations')) ?? [],
+  createNotificationDestination: (input: NotificationDestinationInput) =>
+    request<{ destination: NotificationDestination; secret?: string }>('/api/v1/notifications/destinations', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+  updateNotificationDestination: (id: string, input: NotificationDestinationInput) =>
+    request<NotificationDestination>(`/api/v1/notifications/destinations/${id}`, { method: 'PATCH', body: JSON.stringify(input) }),
+  deleteNotificationDestination: (id: string) =>
+    request<null>(`/api/v1/notifications/destinations/${id}`, { method: 'DELETE' }),
+  testNotificationDestination: async (id: string) =>
+    (await request<{ ok: boolean; error?: string; permanent?: boolean }>(`/api/v1/notifications/destinations/${id}/test`, {
+      method: 'POST',
+    })) ?? { ok: false, error: 'No response' },
+  rotateNotificationSecret: (id: string) =>
+    request<{ secret: string }>(`/api/v1/notifications/destinations/${id}/rotate-secret`, { method: 'POST' }),
+  getQuietHours: () => request<QuietHours>('/api/v1/notifications/quiet-hours'),
+  setQuietHours: (q: QuietHours) =>
+    request<QuietHours>('/api/v1/notifications/quiet-hours', { method: 'PUT', body: JSON.stringify(q) }),
 
   deleteArtifact: (id: string) => request<null>(`/api/v1/artifacts/${id}`, { method: 'DELETE' }),
 

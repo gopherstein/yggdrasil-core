@@ -9,6 +9,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -39,6 +40,13 @@ const (
 	DeliveryDelivered  = "delivered"
 	DeliveryFailed     = "failed"
 	DeliverySuppressed = "suppressed"
+	// DeliveryPending waits for its next attempt: the first one, sent in
+	// the background, or a retry (§36).
+	DeliveryPending = "pending"
+	// DeliveryHeld waits for quiet hours to end (§25).
+	DeliveryHeld = "held"
+	// DeliveryCancelled was never sent, such as when its destination was removed.
+	DeliveryCancelled = "cancelled"
 )
 
 // EventCreated tells clients a notification was stored.
@@ -50,11 +58,15 @@ const dedupeWindow = 10 * time.Minute
 
 // Delivery is one channel's attempt to deliver a notification.
 type Delivery struct {
-	Channel     string     `json:"channel"`
-	Status      string     `json:"status"`
-	Attempts    int        `json:"attempts"`
-	DeliveredAt *time.Time `json:"delivered_at,omitempty"`
-	Error       string     `json:"error,omitempty"`
+	Channel string `json:"channel"`
+	// DestinationID is the email or webhook destination, when there is one.
+	DestinationID string     `json:"destination_id,omitempty"`
+	Status        string     `json:"status"`
+	Attempts      int        `json:"attempts"`
+	DeliveredAt   *time.Time `json:"delivered_at,omitempty"`
+	// NextAttemptAt is when a pending or held delivery is tried next.
+	NextAttemptAt *time.Time `json:"next_attempt_at,omitempty"`
+	Error         string     `json:"error,omitempty"`
 }
 
 // Notification is a stored notice.
@@ -68,9 +80,12 @@ type Notification struct {
 	Title      string    `json:"title"`
 	Body       string    `json:"body"`
 	// Link is an app path to the source, such as /automations?id=….
-	Link       string     `json:"link,omitempty"`
-	ReadAt     *time.Time `json:"read_at,omitempty"`
-	Deliveries []Delivery `json:"deliveries,omitempty"`
+	Link   string     `json:"link,omitempty"`
+	ReadAt *time.Time `json:"read_at,omitempty"`
+	// RepeatCount is how many times the same notice came within the dedupe
+	// window, shown as "4 times" (§22).
+	RepeatCount int        `json:"repeat_count,omitempty"`
+	Deliveries  []Delivery `json:"deliveries,omitempty"`
 }
 
 // Request asks for a notification.
@@ -104,11 +119,18 @@ type Hub struct {
 	bus      *events.Bus
 	channels map[string]Channel
 	now      func() time.Time
+	secrets  Secrets
+	settings SettingsStore
+	egress   EgressRecorder
+	client   *http.Client
+	wake     chan struct{}
 }
+
+func newID() string { return uuid.NewString() }
 
 // NewHub returns a hub using db and announcing on bus.
 func NewHub(db *sql.DB, bus *events.Bus, channels ...Channel) *Hub {
-	h := &Hub{db: db, bus: bus, channels: map[string]Channel{}, now: time.Now}
+	h := &Hub{db: db, bus: bus, channels: map[string]Channel{}, now: time.Now, client: webhookClient, wake: make(chan struct{}, 1)}
 	for _, c := range channels {
 		h.channels[c.Name()] = c
 	}
@@ -136,8 +158,11 @@ func nullable(s string) any {
 }
 
 // Notify stores a notification, announces it to the app, and delivers it to
-// the requested channels. A repeat with the same dedupe key within ten
-// minutes returns the existing notification, marked unread again.
+// the requested channels and to every destination that takes it (§15, §26).
+// Email and webhooks go out in the background and are retried on their own;
+// during quiet hours, deliveries outside the app wait (§25). A repeat with
+// the same dedupe key within ten minutes counts on the existing
+// notification, which is marked unread again (§22).
 func (h *Hub) Notify(ctx context.Context, req Request) (Notification, error) {
 	req.Title = strings.TrimSpace(req.Title)
 	if req.Title == "" {
@@ -155,12 +180,12 @@ func (h *Hub) Notify(ctx context.Context, req Request) (Notification, error) {
 		err := h.db.QueryRowContext(ctx, `SELECT id FROM notifications WHERE dedupe_key = ? AND created_at >= ? AND dismissed_at IS NULL ORDER BY created_at DESC LIMIT 1`,
 			req.DedupeKey, ts(now.Add(-dedupeWindow))).Scan(&id)
 		if err == nil {
-			_, _ = h.db.ExecContext(ctx, `UPDATE notifications SET updated_at = ?, read_at = NULL, body = ? WHERE id = ?`, ts(now), req.Body, id)
+			_, _ = h.db.ExecContext(ctx, `UPDATE notifications SET updated_at = ?, read_at = NULL, body = ?, repeat_count = repeat_count + 1 WHERE id = ?`, ts(now), req.Body, id)
 			return h.Get(ctx, id)
 		}
 	}
 	n := Notification{
-		ID: uuid.NewString(), CreatedAt: now, SourceType: req.SourceType, SourceID: req.SourceID,
+		ID: uuid.NewString(), CreatedAt: now, RepeatCount: 1, SourceType: req.SourceType, SourceID: req.SourceID,
 		Category: req.Category, Severity: req.Severity, Title: req.Title, Body: strings.TrimSpace(req.Body), Link: req.Link,
 	}
 	_, err := h.db.ExecContext(ctx, `
@@ -175,8 +200,30 @@ func (h *Hub) Notify(ctx context.Context, req Request) (Notification, error) {
 			"id": n.ID, "category": n.Category, "severity": n.Severity, "title": n.Title, "body": n.Body, "link": n.Link,
 		}))
 	}
+	heldUntil, held := h.QuietHours(ctx).HeldUntil(n.Severity, now)
 	for _, name := range req.Channels {
+		if held {
+			n.Deliveries = append(n.Deliveries, h.queue(ctx, n, name, "", DeliveryHeld, heldUntil))
+			continue
+		}
 		n.Deliveries = append(n.Deliveries, h.deliver(ctx, n, name))
+	}
+	if dests, err := h.Destinations(ctx); err == nil {
+		queued := false
+		for _, d := range dests {
+			if !d.Accepts(n) {
+				continue
+			}
+			if held {
+				n.Deliveries = append(n.Deliveries, h.queue(ctx, n, d.channelName(), d.ID, DeliveryHeld, heldUntil))
+				continue
+			}
+			n.Deliveries = append(n.Deliveries, h.queue(ctx, n, d.channelName(), d.ID, DeliveryPending, now))
+			queued = true
+		}
+		if queued {
+			h.poke()
+		}
 	}
 	return n, nil
 }
@@ -214,13 +261,13 @@ func (h *Hub) deliver(ctx context.Context, n Notification, name string) Delivery
 	return d
 }
 
-const columns = `id, created_at, source_type, COALESCE(source_id, ''), category, severity, title, body, COALESCE(link, ''), read_at`
+const columns = `id, created_at, source_type, COALESCE(source_id, ''), category, severity, title, body, COALESCE(link, ''), read_at, repeat_count`
 
 func scan(row interface{ Scan(...any) error }) (Notification, error) {
 	var n Notification
 	var created string
 	var read sql.NullString
-	if err := row.Scan(&n.ID, &created, &n.SourceType, &n.SourceID, &n.Category, &n.Severity, &n.Title, &n.Body, &n.Link, &read); err != nil {
+	if err := row.Scan(&n.ID, &created, &n.SourceType, &n.SourceID, &n.Category, &n.Severity, &n.Title, &n.Body, &n.Link, &read, &n.RepeatCount); err != nil {
 		return Notification{}, err
 	}
 	if t := parseTS(sql.NullString{String: created, Valid: true}); t != nil {
@@ -236,34 +283,40 @@ func (h *Hub) Get(ctx context.Context, id string) (Notification, error) {
 	if err != nil {
 		return Notification{}, err
 	}
-	rows, err := h.db.QueryContext(ctx, `SELECT channel, status, attempts, delivered_at, COALESCE(error, '') FROM notification_deliveries WHERE notification_id = ?`, id)
+	rows, err := h.db.QueryContext(ctx, `SELECT channel, COALESCE(destination_id, ''), status, attempts, delivered_at, next_attempt_at, COALESCE(error, '') FROM notification_deliveries WHERE notification_id = ?`, id)
 	if err != nil {
 		return n, err
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var d Delivery
-		var delivered sql.NullString
-		if err := rows.Scan(&d.Channel, &d.Status, &d.Attempts, &delivered, &d.Error); err != nil {
+		var delivered, next sql.NullString
+		if err := rows.Scan(&d.Channel, &d.DestinationID, &d.Status, &d.Attempts, &delivered, &next, &d.Error); err != nil {
 			return n, err
 		}
 		d.DeliveredAt = parseTS(delivered)
+		d.NextAttemptAt = parseTS(next)
 		n.Deliveries = append(n.Deliveries, d)
 	}
 	return n, rows.Err()
 }
 
 // List returns recent notifications that were not dismissed, newest first,
-// and how many are unread.
-func (h *Hub) List(ctx context.Context, unreadOnly bool, limit int) ([]Notification, int, error) {
+// and how many are unread. category, when set, lists that category only.
+func (h *Hub) List(ctx context.Context, unreadOnly bool, limit int, category ...string) ([]Notification, int, error) {
 	if limit <= 0 || limit > 200 {
 		limit = 50
 	}
 	where := `dismissed_at IS NULL`
+	args := []any{}
 	if unreadOnly {
 		where += ` AND read_at IS NULL`
 	}
-	rows, err := h.db.QueryContext(ctx, `SELECT `+columns+` FROM notifications WHERE `+where+` ORDER BY created_at DESC LIMIT ?`, limit)
+	if len(category) > 0 && category[0] != "" {
+		where += ` AND category = ?`
+		args = append(args, category[0])
+	}
+	rows, err := h.db.QueryContext(ctx, `SELECT `+columns+` FROM notifications WHERE `+where+` ORDER BY created_at DESC LIMIT ?`, append(args, limit)...)
 	if err != nil {
 		return nil, 0, err
 	}

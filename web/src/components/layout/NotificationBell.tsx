@@ -4,7 +4,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { api } from '@/lib/api'
 import { subscribeEvents } from '@/lib/events'
-import type { AppNotification, NotificationList } from '@/types/api'
+import type { AppNotification, NotificationCategory, NotificationList } from '@/types/api'
+import { CATEGORY_LABEL, deliveryNote } from '@/features/settings/notificationLabels'
 
 const KEY = ['notifications'] as const
 const WIDTH = 352
@@ -36,6 +37,7 @@ export function NotificationBell() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
+  const [category, setCategory] = useState<'' | NotificationCategory>('')
   const [place, setPlace] = useState<{ left: number; top: number } | null>(null)
   const button = useRef<HTMLButtonElement>(null)
   const panel = useRef<HTMLDivElement>(null)
@@ -47,7 +49,9 @@ export function NotificationBell() {
     refetchInterval: 60_000,
     retry: false,
   })
-  const notifications = query.data?.notifications ?? []
+  const all = query.data?.notifications ?? []
+  const present = (Object.keys(CATEGORY_LABEL) as NotificationCategory[]).filter((c) => all.some((n) => n.category === c))
+  const notifications = category ? all.filter((n) => n.category === category) : all
   const unread = query.data?.unread ?? 0
 
   useEffect(
@@ -169,6 +173,24 @@ export function NotificationBell() {
                 </button>
               )}
             </div>
+            {present.length > 1 && (
+              <div className="flex flex-wrap gap-1 border-b border-line/60 px-3 py-2" role="group" aria-label="Filter by category">
+                {(['', ...present] as ('' | NotificationCategory)[]).map((c) => (
+                  <button
+                    key={c || 'all'}
+                    type="button"
+                    aria-pressed={category === c}
+                    className={[
+                      'rounded-full px-2 py-0.5 text-[11px]',
+                      category === c ? 'bg-primary-soft text-ink' : 'text-ink-muted hover:bg-raised',
+                    ].join(' ')}
+                    onClick={() => setCategory(c)}
+                  >
+                    {c ? CATEGORY_LABEL[c] : 'All'}
+                  </button>
+                ))}
+              </div>
+            )}
             <ul className="min-h-0 flex-1 overflow-y-auto">
               {notifications.length === 0 && (
                 <li className="px-4 py-8 text-center text-sm text-ink-faint">
@@ -179,10 +201,14 @@ export function NotificationBell() {
                 <li key={n.id} className={['group flex gap-3 border-b border-line/40 px-4 py-3 last:border-b-0', n.read_at ? '' : 'bg-primary-soft/40'].join(' ')}>
                   <span className={['mt-1.5 h-2 w-2 shrink-0 rounded-full', SEVERITY_DOT[n.severity] ?? 'bg-info'].join(' ')} aria-hidden />
                   <button type="button" className="min-w-0 flex-1 text-left" onClick={() => openItem(n)}>
-                    <p className={['text-sm text-ink', n.read_at ? '' : 'font-semibold'].join(' ')}>{n.title}</p>
+                    <p className={['text-sm text-ink', n.read_at ? '' : 'font-semibold'].join(' ')}>
+                      {n.title}
+                      {(n.repeat_count ?? 1) > 1 && <span className="font-normal text-ink-muted"> · {n.repeat_count} times</span>}
+                    </p>
                     {n.body && <p className="mt-0.5 line-clamp-3 text-xs text-ink-muted">{n.body}</p>}
                     <p className="mt-1 text-[11px] text-ink-faint">
                       {ago(n.created_at)}
+                      {deliveryNote(n) && <span> · {deliveryNote(n)}</span>}
                       {!n.read_at && <span className="sr-only"> · unread</span>}
                     </p>
                   </button>
