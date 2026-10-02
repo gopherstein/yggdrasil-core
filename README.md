@@ -305,8 +305,6 @@ The public site is [yggdrasil.yeix.io](https://yggdrasil.yeix.io). It reads the 
 
 Parts of these are built, as listed under [Features](#features). Each linked issue tracks what is still open.
 
-- [AI experience platform](docs/features/ai-experience-platform.md) (#50)
-- [Persistent memory and cross-model context](docs/features/persistent-memory-and-cross-model-context.md) (#23)
 - [Gjallarhorn notification system](docs/features/gjallarhorn-notification-system.md) (#39)
 - [Expanded tool platform](docs/features/expanded-tool-platform.md) (#38)
 - [Orchestration layer refactor](docs/features/orchestration-layer-refactor.md) (#41)
@@ -318,7 +316,7 @@ These are not implemented yet:
 - [One-line node join](docs/features/one-line-node-join.md)
 - [Multilingual localization and language routing](docs/features/multilingual-localization-and-language-routing.md)
 
-Completed: [Scheduler and automations](docs/features/completed/scheduler-and-automations.md), [Train your own AI](docs/features/train-your-own-ai.md).
+Completed: [Scheduler and automations](docs/features/completed/scheduler-and-automations.md), [Train your own AI](docs/features/train-your-own-ai.md), [AI experience platform](docs/features/ai-experience-platform.md) (follow-ups in #111), [Persistent memory and cross-model context](docs/features/persistent-memory-and-cross-model-context.md).
 
 ### Research
 
