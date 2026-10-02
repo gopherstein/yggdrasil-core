@@ -6,6 +6,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 
 ## [Unreleased]
 
+### Added
+
+- Profile strategies. A profile can work Auto (the default), as a Single model, as Planner + workers, or as a Team. Team now runs on the same pipeline as every other chat: a planner splits the request, workers write notes for each part, the answering model writes the answer with tools, memory, and knowledge, and a reviewer checks it. Quick questions are still answered directly. Programming uses the Team strategy.
+- Workers on other computers. With the Team strategy or a worker model, each part of a plan has its own worker, which Norn can place on a paired computer, and parts on different computers are written at the same time. The chat timeline and run details show each worker's model and computer.
+- Model roles. A profile can assign primary, fast, coding, planner, worker, and reviewer models, each with an optional computer. With the chat on Auto, a profile's coding model answers coding requests and its fast model answers quick questions. A fallback order lists the models to try when the answering model fails.
+- Planning: Always asks the planner model to split a request that has no obvious parts.
+
+### Changed
+
+- The separate Team orchestrator is gone. Profiles saved with it, and API requests that name it, move to the Team strategy with their roles and models; `coordinator` becomes `planner`. A profile's role models are now used in chat: before, the model chosen in the chat replaced them all, except in Team profiles.
+
 ### Fixed
 
 - Yggdrasil Desktop: answer sources and other links that leave the app now open in the default browser. Signing in to an MCP tool source now works too: it opens in the browser and returns to the daemon's address, where before it was sent back to the app's own `wails://` address, which no browser can reach. Saving a chat file, an exported GGUF model, or a training sample now asks where to save and writes the file; a large model streams straight to disk. The desktop app's web view can't open windows or download files, so these go through the desktop shell (Yggdrasil Desktop 1.4 or later). In a browser, nothing changes.
