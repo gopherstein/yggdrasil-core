@@ -6,7 +6,7 @@
     "suggestions": {
       "explain": {
         "label": "解釋一個主題",
-        "prompt": "用兩段簡短的文字解釋什麼是 mutex。"
+        "prompt": "用兩段簡短的文字解釋什麼是互斥鎖（mutex）。"
       },
       "code": {
         "label": "幫我寫程式",

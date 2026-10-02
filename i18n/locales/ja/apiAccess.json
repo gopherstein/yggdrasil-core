@@ -109,7 +109,7 @@
     "copied": "コピーしました",
     "copy": "コピー",
     "needsKey": "Yggdrasilはネットワークに公開されているため、アプリにはAPIキーが必要です。下で作成し、設定内の<key/>の位置に入れてください。キーの権限が適用されます。",
-    "keyPlaceholder": "<your API key>",
+    "keyPlaceholder": "<あなたのAPIキー>",
     "where": {
       "claudeDesktop": "Claude Desktopで「設定 → 開発者 → 構成を編集」を開き、これを追加してClaudeを再起動してください。",
       "claudeCode": "ターミナルでこれを実行してください。",

@@ -148,7 +148,7 @@
     "how": "運作方式",
     "lora": "<strong>LoRA</strong> 會訓練一個小型附加元件（轉接器），而不是更改整個模型。原始模型保持不變，仍可使用。<strong>QLoRA</strong> 的做法相同，但是在模型的壓縮版本上進行，因此所需的記憶體更少。",
     "rag": "<strong>連接的知識</strong>就是檢索：每次回答前，Yggdrasil 都會在你的來源中搜尋與問題相符的段落，並提供給模型。這通常稱為 RAG，即檢索增強生成。",
-    "epoch": "一個 <strong>epoch</strong> 是完整走過所有範例一次。訓練損失衡量模型重現範例的接近程度。損失較低本身並不代表回答更好，所以部署前要先測試。"
+    "epoch": "一個<strong>輪次（epoch）</strong>是完整走過所有範例一次。訓練損失衡量模型重現範例的接近程度。損失較低本身並不代表回答更好，所以部署前要先測試。"
   },
   "samples": {
     "see": "查看範例檔案",
@@ -279,7 +279,7 @@
         "help": "走過所有範例的次數。"
       },
       "rank": {
-        "label": "LoRA rank",
+        "label": "LoRA 秩",
         "help": "轉接器的容量。越高學得越多，也需要更多記憶體。"
       },
       "layers": {
@@ -319,7 +319,7 @@
     "elapsed": "已經過",
     "remaining": "剩餘",
     "about": "約 {{time}}",
-    "epoch": "Epoch",
+    "epoch": "輪次",
     "epochOf": "{{epoch}} / {{epochs}}",
     "speed": "速度",
     "tokensPerSec": "{{count}} token/秒",
