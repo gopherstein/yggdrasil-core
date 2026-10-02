@@ -54,6 +54,9 @@ What lives there:
 | `discovery_enabled` | `true` | Advertise and find other computers on the local network over mDNS |
 | `static_peers` | none | `host:7332` addresses to try when mDNS cannot see them, such as across Docker networks or a VPN |
 | `advertise_host` | the first non-loopback IPv4 address | The address paired computers use to reach this one |
+| `places_geocoder_url` | `https://nominatim.openstreetmap.org` | The Nominatim service places and routes use to find places and addresses |
+| `places_overpass_url` | `https://overpass-api.de/api/interpreter` | The Overpass service for kinds of places near somewhere |
+| `places_router_url` | `https://routing.openstreetmap.de` | The OSRM service for routes. Your own OSRM server is used as `/route/v1/{driving,foot,bike}/…`. |
 | `node_name` | the host name | The name other computers see |
 | `node_id` | generated | This computer's id. Do not copy it between computers. |
 

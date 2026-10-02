@@ -11,10 +11,14 @@ export const CAPABILITIES: {
   {
     id: 'internet',
     label: 'Internet',
-    description: 'Search and read current information from the web',
+    description: 'Search and read current information from the web, and find places and directions',
     tools: [
       { id: 'internet.search', on: 'allow' },
       { id: 'internet.open', on: 'allow' },
+      { id: 'places.search', on: 'allow' },
+      { id: 'places.details', on: 'allow' },
+      { id: 'maps.route', on: 'allow' },
+      { id: 'maps.distance', on: 'allow' },
     ],
   },
   {

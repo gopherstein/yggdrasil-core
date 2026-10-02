@@ -150,13 +150,14 @@
   },
   "whatLeft": {
     "title": "What left this computer",
-    "description": "Yggdrasil works on this computer. These are the times a chat, automation, or app sent something elsewhere: web searches and pages, paired computers, and connected services. Mark memories or knowledge “This computer only” to keep chats that use them here.",
+    "description": "Yggdrasil works on this computer. These are the times a chat, automation, or app sent something elsewhere: web searches and pages, map lookups, paired computers, and connected services. Mark memories or knowledge “This computer only” to keep chats that use them here.",
     "nothing": "Nothing left this computer in the last 30 days.",
     "summary": "In the last 30 days: {{list}}.",
     "summaryItem": "{{kind}} {{count}}",
     "kinds": {
       "web_search": "Web search",
       "web_page": "Web page",
+      "places": "Maps and places",
       "paired_computer": "Paired computer",
       "external_server": "External server",
       "connector": "Connected service",
@@ -165,6 +166,7 @@
     "kindsLower": {
       "web_search": "web search",
       "web_page": "web page",
+      "places": "maps and places",
       "paired_computer": "paired computer",
       "external_server": "external server",
       "connector": "connected service",

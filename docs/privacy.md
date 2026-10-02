@@ -38,6 +38,7 @@ Nothing leaves because the daemon started. Traffic is sent only when a feature t
 | Install or update llama.cpp | `api.github.com` and the GitHub release download for `ggml-org/llama.cpp` |
 | Search or install a Hugging Face model | Hugging Face Hub |
 | Install a model from a URL | The host in that URL |
+| Places and directions (`places.search`, `places.details`, `maps.route`, `maps.distance`) | OpenStreetMap's public services, or your own (see `places_*` in configuration): Nominatim with the place or address asked about, Overpass with the kind of place and the point searched around, and the router with the two points. They run only when the profile allows the Internet capability. Each request is recorded; a repeat within the hour is answered from memory and sends nothing. |
 | Web search and page reads (`internet.search`, `internet.open`) | DuckDuckGo's public HTML search, then the pages opened. They run only when the profile allows them. A repeat within 15 minutes (searches) or 30 minutes (pages) is answered from the cache and sends nothing. |
 | Connected services (GitHub, Home Assistant) | That service, with the credential you stored, when one of its tools runs |
 | MCP tool sources | That server, when one of its tools runs |

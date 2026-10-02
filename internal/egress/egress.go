@@ -23,6 +23,8 @@ const (
 	Connector      = "connector"
 	// Notification is an email or webhook delivery (Gjallarhorn).
 	Notification = "notification"
+	// Places is a map service: finding places or a route (Gungnir §25).
+	Places = "places"
 )
 
 // Sources of a run.

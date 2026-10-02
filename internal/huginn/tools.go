@@ -19,6 +19,7 @@ var toolGroups = map[string][]string{
 	"listen":  {"speech.transcribe"},
 	"speak":   {"speech.synthesize"},
 	"draw":    {"image.generate"},
+	"places":  {"places.search", "places.details", "maps.route", "maps.distance"},
 	"retouch": {"image.edit"},
 	"shell":   {"terminal"},
 	"gitr":    {"git.status", "git.diff", "git.log", "git.show"},
@@ -49,6 +50,7 @@ var (
 	cueSpeak   = regexp.MustCompile(`(?i)(\b(read (it|this|that|them)?\s*(aloud|out loud)|out loud|aloud|text to speech|narrat\w*|voice ?over|audio version|say it)\b)`)
 	cueDraw    = regexp.MustCompile(`(?i)(\b(draw|paint|sketch|illustrat\w*|render)\b|\b(make|create|generate|design|produce|give me)\b.{0,40}\b(images?|pictures?|photos?|illustrations?|drawings?|paintings?|logos?|icons?|wallpapers?|artwork|portraits?|posters?)\b)`)
 	cueRetouch = regexp.MustCompile(`(?i)\b(edit|change|retouch|recolou?r|remove|replace|turn|make|add)\b.{0,40}\b(images?|pictures?|photos?|backgrounds?|\w+\.(png|jpe?g))\b`)
+	cuePlaces  = regexp.MustCompile(`(?i)(\b(near (me|here|by)|nearby|nearest|closest|directions?|route (from|between)|how (far|long does it take)|distance (from|to|between)|drive (from|to)|walk (from|to)|get (from|to)|address (of|for)|open now|opening hours|restaurants?|caf[eé]s?|pharmac(y|ies)|gas stations?)\b)`)
 	cueSheet   = regexp.MustCompile(`(?i)\b(spreadsheets?|xlsx|csv|excel|workbooks?|sheets?)\b`)
 	cueWeb     = regexp.MustCompile(`(?i)(\b(search|web|online|internet|look up|website|url|link|news|latest)\b|https?://)`)
 )
@@ -94,6 +96,9 @@ func ToolsFor(k Kind, message string, available []string) []string {
 	}
 	if cueSpeak.MatchString(message) {
 		want["speak"] = true
+	}
+	if cuePlaces.MatchString(message) {
+		want["places"] = true
 	}
 	if cueDraw.MatchString(message) {
 		want["draw"] = true
