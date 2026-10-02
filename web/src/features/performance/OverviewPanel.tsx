@@ -6,6 +6,7 @@ import { api } from '@/lib/api'
 import { describeNodeHardware } from '@/features/nodes/nodePresentation'
 import type { Node, RunningModelView, Task } from '@/types/api'
 import { formatTokPerSec, memoryUsePercent } from './performanceFormat'
+import { formatPercent } from '@/i18n/format'
 
 function MemoryBar({ percent }: { percent: number }) {
   const { t } = useTranslation('performance')
@@ -18,7 +19,7 @@ function MemoryBar({ percent }: { percent: number }) {
           style={{ width: `${percent}%` }}
         />
       </div>
-      <span className="w-10 shrink-0 text-right text-xs tabular-nums text-ink">{percent}%</span>
+      <span className="w-10 shrink-0 text-right text-xs tabular-nums text-ink">{formatPercent(percent / 100)}</span>
     </div>
   )
 }

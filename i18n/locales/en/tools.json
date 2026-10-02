@@ -81,7 +81,6 @@
     "installingProgram": "Installing stable-diffusion.cpp…",
     "downloadingModel": "Downloading the model…",
     "progress": "{{done}} of {{total}}",
-    "gigabytes": "{{value}} GB",
     "stop": "Stop",
     "recommended": "Recommended for this computer",
     "inUse": "In use",

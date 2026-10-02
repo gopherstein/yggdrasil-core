@@ -6,6 +6,7 @@ import {
   formatTokens,
   type ContextUsage,
 } from './contextUsage'
+import { formatPercent } from '@/i18n/format'
 
 const rowColor: Record<string, string> = {
   instructions: 'bg-ink-faint',
@@ -52,7 +53,7 @@ export function ContextUsageButton({
       <button
         type="button"
         className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-muted transition hover:bg-raised hover:text-ink"
-        aria-label={usage ? t('context.full', { percent }) : t('context.usage')}
+        aria-label={usage ? t('context.full', { percent: formatPercent(percent / 100) }) : t('context.usage')}
         aria-expanded={open}
         aria-controls={titleId}
         title={t('context.usage')}
@@ -69,7 +70,7 @@ export function ContextUsageButton({
         >
           <div className="flex items-baseline justify-between gap-3">
             <p className="text-sm font-medium text-ink">
-              {usage ? t('context.percentFull', { percent }) : t('context.title')}
+              {usage ? t('context.percentFull', { percent: formatPercent(percent / 100) }) : t('context.title')}
             </p>
             <p className="text-xs text-ink-faint">
               {usage

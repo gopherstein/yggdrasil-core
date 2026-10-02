@@ -17,6 +17,7 @@ import {
   runtimeRangeLabel,
   speedLabel,
 } from './modelPresentation'
+import { formatPercent } from '@/i18n/format'
 
 export function ModelCard({
   model,
@@ -104,7 +105,7 @@ export function ModelCard({
           </div>
           <p className="mt-1 text-xs text-ink-muted">
             {t('install.progress', {
-              percent: progress.percent.toFixed(0),
+              percent: formatPercent(progress.percent / 100),
               done: formatBytes(progress.bytes_downloaded),
               total: formatBytes(progress.bytes_total),
             })}

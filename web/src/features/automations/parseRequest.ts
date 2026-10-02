@@ -1,4 +1,5 @@
 import i18n from '@/i18n'
+import { formatDate, formatPrice } from '@/i18n/format'
 import type { AutomationCondition, AutomationNotification, AutomationSchedule } from '@/types/api'
 
 // The parser reads English requests ("every morning at 8"); what it shows the
@@ -112,11 +113,7 @@ export function formatWhen(iso: string | undefined, timeZone: string): string {
   if (!iso) return i18n.t('automations:time.notScheduled')
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return i18n.t('automations:time.notScheduled')
-  return new Intl.DateTimeFormat(undefined, {
-    timeZone: timeZone || 'UTC',
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(date)
+  return formatDate(date, { timeZone: timeZone || 'UTC', dateStyle: 'medium', timeStyle: 'short' })
 }
 
 export function civilInputValue(iso: string | undefined, timeZone: string): string {
@@ -362,7 +359,7 @@ function signalInstruction(notification: AutomationNotification): string {
 }
 
 function formatAmount(value: number): string {
-  return Number.isInteger(value) ? `$${value}` : `$${value.toFixed(2)}`
+  return formatPrice(value)
 }
 
 function conditionLabel(condition: AutomationCondition | undefined): string {

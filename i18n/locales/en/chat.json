@@ -353,8 +353,8 @@
   },
   "context": {
     "usage": "Context usage",
-    "full": "Context {{percent}}% full",
-    "percentFull": "{{percent}}% full",
+    "full": "Context {{percent}} full",
+    "percentFull": "{{percent}} full",
     "title": "Context",
     "used": "{{used}} / {{limit}} tokens",
     "usedEstimated": "~{{used}} / {{limit}} tokens",

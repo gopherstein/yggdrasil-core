@@ -19,6 +19,7 @@ import {
   metricLabels,
   modelDisplayName,
 } from './performanceFormat'
+import { formatPercent } from '@/i18n/format'
 
 const JOB_STATUSES = ['pending', 'running', 'completed', 'failed', 'cancelled', 'canceled']
 
@@ -151,7 +152,7 @@ function BenchmarkResults({
           <div className="min-w-[220px] flex-1">
             <div className="mb-1 flex justify-between text-xs text-ink-muted">
               <span>{job.progress.message || job.progress.phase}</span>
-              <span className="tabular-nums">{job.progress.percent}%</span>
+              <span className="tabular-nums">{formatPercent(job.progress.percent / 100)}</span>
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-raised">
               <div
@@ -597,7 +598,7 @@ export function BenchmarkPanel() {
                       {winnerCount > 0 ? (
                         <span className="text-accent">{t('benchmark.winners', { count: winnerCount })}</span>
                       ) : (
-                        <span className="tabular-nums">{job.progress.percent}%</span>
+                        <span className="tabular-nums">{formatPercent(job.progress.percent / 100)}</span>
                       )}
                     </div>
                   </button>

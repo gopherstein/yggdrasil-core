@@ -7,6 +7,7 @@ import { useMascotState } from '@/lib/ratatoskr/useMascotState'
 import type { SpecializedAIView } from '@/types/api'
 import { errorText } from '../display'
 import { ExportCard } from './ExportCard'
+import { formatDate, formatDecimal } from '@/i18n/format'
 
 export function DeployStep({ view }: { view: SpecializedAIView }) {
   const { t } = useTranslation('train')
@@ -42,9 +43,9 @@ export function DeployStep({ view }: { view: SpecializedAIView }) {
                     {t('deploy.meta', {
                       examples: r.example_count,
                       method: r.hyper.method?.toUpperCase(),
-                      date: new Date(r.created_at).toLocaleDateString(),
+                      date: formatDate(r.created_at),
                     })}
-                    {r.final_val_loss != null && t('deploy.valLoss', { loss: r.final_val_loss.toFixed(3) })}
+                    {r.final_val_loss != null && t('deploy.valLoss', { loss: formatDecimal(r.final_val_loss, 3) })}
                   </p>
                 </div>
                 {!r.evaluated ? (

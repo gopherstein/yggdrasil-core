@@ -10,6 +10,7 @@ import type { APIKeyRecord } from '@/types/api'
 import { KeyPermissions } from './KeyPermissions'
 import { RealmKicker } from '@/components/ui/Realm'
 import { ShareWithApps } from './ShareWithApps'
+import { formatDate } from '@/i18n/format'
 
 type ProbeState = 'checking' | 'ok' | 'fail'
 
@@ -479,7 +480,7 @@ export function ApiAccessPage() {
                   <p className="font-medium text-ink">{key.name}</p>
                   <p className="mt-0.5 text-xs text-ink-muted">
                     {t('keys.meta', {
-                      created: new Date(key.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                      created: formatDate(key.created_at, { month: 'short', day: 'numeric' }),
                       lastUsed: formatLastUsed(key.last_used_at),
                     })}
                   </p>

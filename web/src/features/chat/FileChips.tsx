@@ -1,15 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import i18n from '@/i18n'
+import { formatSize } from '@/i18n/format'
 import { useEffect, useState } from 'react'
 import { artifactObjectUrl, downloadArtifact } from '@/lib/api'
 import { isAudioName, isImageName } from '@/lib/upload'
 import type { FileRef } from '@/types/api'
 
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
 
 // A file's kind, as chat:attachments.kinds.<kind> names it.
 const knownKinds = ['spreadsheet', 'pdf', 'document', 'code', 'image', 'audio', 'video']

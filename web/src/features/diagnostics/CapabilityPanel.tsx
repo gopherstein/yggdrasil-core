@@ -1,13 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import i18n from '@/i18n'
+import { formatSize } from '@/i18n/format'
 import { api } from '@/lib/api'
-
-function bytesText(b: number): string {
-  if (b >= 1 << 30) return i18n.t('diagnostics:abilities.gigabytes', { value: (b / (1 << 30)).toFixed(1) })
-  if (b >= 1 << 20) return i18n.t('diagnostics:abilities.megabytes', { value: (b / (1 << 20)).toFixed(1) })
-  return i18n.t('diagnostics:abilities.kilobytes', { value: Math.round(b / 1024) })
-}
 
 /**
  * What Yggdrasil can do right now (spec §37): each ability, how it works
@@ -60,7 +54,7 @@ export function CapabilityPanel() {
           tools: t('abilities.tools', { count: tools }),
           services: t('abilities.services', { count: connected }),
           providers: t('abilities.providers', { healthy, total: providers.length }),
-          files: t('abilities.files', { count: snap.artifacts?.count ?? 0, size: bytesText(snap.artifacts?.bytes ?? 0) }),
+          files: t('abilities.files', { count: snap.artifacts?.count ?? 0, size: formatSize(snap.artifacts?.bytes ?? 0) }),
         })}
       </p>
     </section>

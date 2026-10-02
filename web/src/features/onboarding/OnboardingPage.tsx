@@ -16,6 +16,7 @@ import {
 } from '@/lib/profilePresets'
 import { useUIStore } from '@/stores/uiStore'
 import type { ModelDownloadProgressPayload, Purpose, Recommendation } from '@/types/api'
+import { formatPercent } from '@/i18n/format'
 
 type OnboardingStep = 'setup' | 'recommend' | 'installing' | 'ready'
 
@@ -75,7 +76,7 @@ export function OnboardingPage() {
             ...current,
             [payload.model_id]: payload.percent ?? 0,
           }))
-          setPhaseDetail(t('install.downloading', { model: payload.model_id, percent: Math.round(payload.percent ?? 0) }))
+          setPhaseDetail(t('install.downloading', { model: payload.model_id, percent: formatPercent((payload.percent ?? 0) / 100) }))
         }
         if (event.type === 'model.download.completed') {
           const modelId = event.payload?.model_id as string | undefined
@@ -403,7 +404,7 @@ export function OnboardingPage() {
                 style={{ width: `${overallProgress}%` }}
               />
             </div>
-            <p className="mt-3 text-xs text-ink-muted">{t('install.complete', { percent: overallProgress })}</p>
+            <p className="mt-3 text-xs text-ink-muted">{t('install.complete', { percent: formatPercent(overallProgress / 100) })}</p>
             <p className="mt-4 text-sm text-ink-muted">{t('install.keepOpen')}</p>
           </div>
         </div>

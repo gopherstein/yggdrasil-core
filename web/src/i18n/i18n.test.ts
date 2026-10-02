@@ -1,6 +1,19 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import i18n, { applyLanguage, resolveLanguage } from './index'
-import { formatDate, formatDateTime, formatNumber, formatRelativeTime, formatSize } from './format'
+import {
+  formatDate,
+  formatDateTime,
+  formatDecimal,
+  formatGigabytes,
+  formatMilliseconds,
+  formatNumber,
+  formatPercent,
+  formatPrice,
+  formatRelativeTime,
+  formatSize,
+  formatTokensPerSecond,
+} from './format'
+import { formatTokens } from '@/features/chat/contextUsage'
 import { directionOf } from './languages'
 import { pseudoLocalize } from './pseudo'
 
@@ -118,5 +131,42 @@ describe('formatting', () => {
   it('formats the pseudo-locale as English', async () => {
     await applyLanguage('en-XA')
     expect(formatNumber(1234.5)).toBe('1,234.5')
+  })
+
+  it('formats decimals, sizes, speeds, durations, prices, and percentages for the locale', async () => {
+    await applyLanguage('de')
+    expect(formatDecimal(0.1234, 3)).toBe('0,123')
+    expect(spaced(formatGigabytes(15.84))).toBe('16 GB')
+    expect(spaced(formatGigabytes(7.84))).toBe('7,8 GB')
+    expect(spaced(formatSize(1_500_000_000, { base: 1000 }))).toBe('1,5 GB')
+    expect(spaced(formatPercent(0.45))).toBe('45 %')
+    expect(formatTokens(12_500)).toBe('12.500') // German has no short form for thousands
+    await applyLanguage('en')
+    expect(formatDecimal(2, 1)).toBe('2.0')
+    expect(formatMilliseconds(250)).toBe('250 ms')
+    expect(formatMilliseconds(1234)).toBe('1.2 s')
+    expect(formatTokensPerSecond(12.34)).toBe('12.3 tok/s')
+    expect(formatPrice(20)).toBe('$20')
+    expect(formatPrice(19.5)).toBe('$19.50')
+    expect(formatPercent(0.45)).toBe('45%')
+    expect(formatTokens(12_500)).toBe('12.5K')
+    expect(formatTokens(950)).toBe('950')
+  })
+
+  it('formats numbers in text, but not ports and other labels', async () => {
+    await applyLanguage('de')
+    expect(i18n.t('knowledge:row.passages', { count: 1234 })).toContain('1.234')
+    await applyLanguage('en')
+    expect(i18n.t('knowledge:row.passages', { count: 1234 })).toContain('1,234')
+    expect(i18n.t('knowledge:row.passages', { count: 1 })).not.toContain('passages')
+    expect(i18n.t('apiAccess:service.lanHint', { port: 7331 })).toContain(':7331/v1')
+  })
+
+  it('says how long ago, narrowly where space is tight', async () => {
+    await applyLanguage('en')
+    const now = new Date(Date.UTC(2026, 8, 30, 20, 0))
+    expect(formatRelativeTime(new Date(now.getTime() - 5 * 60_000), now, 'narrow')).toBe('5m ago')
+    await applyLanguage('de')
+    expect(formatRelativeTime(new Date(now.getTime() - 5 * 60_000), now)).toBe('vor 5 Minuten')
   })
 })

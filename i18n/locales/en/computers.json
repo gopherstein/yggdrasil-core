@@ -60,7 +60,6 @@
   },
   "hardware": {
     "unavailable": "Hardware details unavailable",
-    "gigabytes": "{{value}} GB",
     "unified": "{{size}} unified memory",
     "vram": "{{size}} VRAM",
     "ram": "{{size}} RAM",

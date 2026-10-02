@@ -1,21 +1,21 @@
 import i18n from '@/i18n'
+import { formatDate, formatDecimal, formatMilliseconds, formatTokensPerSecond } from '@/i18n/format'
 import type { GenerationRun, GenerationRoleStep, Model } from '@/types/api'
 
 export function formatMs(ms: number): string {
   if (!ms || ms <= 0) return '—'
-  if (ms < 1000) return i18n.t('performance:units.ms', { value: ms.toFixed(0) })
-  return i18n.t('performance:units.seconds', { value: (ms / 1000).toFixed(1) })
+  return formatMilliseconds(ms)
 }
 
 export function formatRate(n: number): string {
   if (!n || n <= 0) return '—'
-  return n >= 100 ? `${n.toFixed(0)}` : `${n.toFixed(1)}`
+  return formatDecimal(n, n >= 100 ? 0 : 1)
 }
 
 export function formatWhen(iso: string): string {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return '—'
-  return d.toLocaleString(undefined, {
+  return formatDate(d, {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
@@ -90,7 +90,7 @@ export function metricLabels(advanced: boolean): MetricLabels {
 
 /** A speed in tokens per second, or — when there is none. */
 export function formatTokPerSec(n: number): string {
-  return n > 0 ? i18n.t('performance:units.tokPerSec', { value: formatRate(n) }) : '—'
+  return n > 0 ? formatTokensPerSecond(n) : '—'
 }
 
 export function estimateBenchmarkMinutes(

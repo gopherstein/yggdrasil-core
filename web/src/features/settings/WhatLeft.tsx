@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import type { EgressKind, EgressRecord } from '@/types/api'
+import { formatDate } from '@/i18n/format'
 
 // What left, in order; the names are settings:whatLeft.kinds.<kind> in the catalog.
 const KINDS: EgressKind[] = ['web_search', 'web_page', 'places', 'paired_computer', 'external_server', 'connector', 'notification']
@@ -12,7 +13,7 @@ const SOURCES = ['chat', 'api', 'automation', 'training']
 const RETENTION_DAYS = [7, 30, 90, 365, 0]
 
 function when(iso: string): string {
-  return new Date(iso).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+  return formatDate(iso, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
 }
 
 /**

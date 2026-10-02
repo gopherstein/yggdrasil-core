@@ -32,9 +32,7 @@
     "times": "{{count}} times",
     "unread": "unread",
     "dismiss": "Dismiss {{title}}",
-    "justNow": "just now",
-    "minutesAgo": "{{count}} min ago",
-    "hoursAgo": "{{count}} h ago"
+    "justNow": "just now"
   },
   "destinations": {
     "title": "Email, push, and webhooks",

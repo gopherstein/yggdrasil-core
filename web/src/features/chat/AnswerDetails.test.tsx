@@ -64,7 +64,7 @@ describe('AnswerDetails', () => {
       />,
     )
     expect(screen.getByText('Files')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Budget\.xlsx/ })).toHaveTextContent('Spreadsheet · 5 KB')
+    expect(screen.getByRole('button', { name: /Budget\.xlsx/ })).toHaveTextContent('Spreadsheet · 5 kB')
     expect(screen.queryByText('mine.csv')).not.toBeInTheDocument()
   })
 

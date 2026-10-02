@@ -1,5 +1,6 @@
 import type { FitLabel, Model, ModelFit } from '@/types/api'
 import i18n from '@/i18n'
+import { formatDate, formatNumber, formatRelativeTime } from '@/i18n/format'
 import { formatBytes } from '@/lib/format'
 
 
@@ -94,15 +95,13 @@ export function bestMachineName(
 
 export function contextTokensLabel(tokens?: number): string {
   if (!tokens) return '—'
-  if (tokens % 1024 === 0) return `${tokens / 1024}K`
-  return tokens.toLocaleString()
+  if (tokens % 1024 === 0) return `${formatNumber(tokens / 1024)}K`
+  return formatNumber(tokens)
 }
 
 export function speedLabel(fit?: ModelFit): string {
   if (!fit?.est_tok_per_sec) return ''
-  const rounded = fit.tok_per_sec_measured
-    ? fit.est_tok_per_sec.toFixed(1).replace(/\.0$/, '')
-    : String(Math.round(fit.est_tok_per_sec))
+  const rounded = formatNumber(fit.est_tok_per_sec, { maximumFractionDigits: fit.tok_per_sec_measured ? 1 : 0 })
   return i18n.t(fit.tok_per_sec_measured ? 'models:speed.measured' : 'models:speed.estimated', { value: rounded })
 }
 
@@ -138,10 +137,8 @@ export function formatLastUsed(iso?: string): string {
   if (Number.isNaN(d.getTime())) return i18n.t('models:lastUsed.never')
   const mins = Math.round((Date.now() - d.getTime()) / 60000)
   if (mins < 1) return i18n.t('models:lastUsed.justNow')
-  if (mins < 60) return i18n.t('models:lastUsed.minutes', { count: mins })
-  const hours = Math.round(mins / 60)
-  if (hours < 48) return i18n.t('models:lastUsed.hours', { count: hours })
-  return d.toLocaleDateString()
+  if (mins < 48 * 60) return formatRelativeTime(d)
+  return formatDate(d)
 }
 
 export function modelTags(model: Model): string[] {

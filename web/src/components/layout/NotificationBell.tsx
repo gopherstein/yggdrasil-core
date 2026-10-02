@@ -8,6 +8,7 @@ import { api } from '@/lib/api'
 import { subscribeEvents } from '@/lib/events'
 import type { AppNotification, NotificationCategory, NotificationList } from '@/types/api'
 import { CATEGORIES, categoryLabel, deliveryNote } from '@/features/settings/notificationLabels'
+import { formatDate, formatRelativeTime } from '@/i18n/format'
 
 const KEY = ['notifications'] as const
 const WIDTH = 352
@@ -23,11 +24,8 @@ const SEVERITY_DOT: Record<AppNotification['severity'], string> = {
 function ago(iso: string): string {
   const seconds = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000))
   if (seconds < 60) return i18n.t('notifications:bell.justNow')
-  const minutes = Math.round(seconds / 60)
-  if (minutes < 60) return i18n.t('notifications:bell.minutesAgo', { count: minutes })
-  const hours = Math.round(minutes / 60)
-  if (hours < 24) return i18n.t('notifications:bell.hoursAgo', { count: hours })
-  return new Date(iso).toLocaleDateString()
+  if (seconds < 24 * 3600) return formatRelativeTime(iso, new Date(), 'narrow')
+  return formatDate(iso)
 }
 
 /**

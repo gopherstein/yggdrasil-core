@@ -7,6 +7,7 @@ import type { ToolRecord } from '@/types/api'
 import { RealmKicker } from '@/components/ui/Realm'
 import { ImageSetupCard, VideoSetupCard } from './ImageSetup'
 import { ToolSources } from './ToolSources'
+import { formatDateTime } from '@/i18n/format'
 
 // The filters, in order; each is tools:page.filters.<id> in the catalog.
 const FILTERS = ['all', 'builtin', 'added', 'disabled'] as const
@@ -221,7 +222,7 @@ function RecentCalls({ toolId }: { toolId: string }) {
           {list.map((run) => (
             <li key={run.id} className="flex justify-between gap-2">
               <span className="min-w-0 truncate text-ink-muted" title={run.error || run.summary}>
-                {new Date(run.at).toLocaleString()} · {t(`calls.status.${run.status}`)}
+                {formatDateTime(run.at)} · {t(`calls.status.${run.status}`)}
                 {run.approval === 'you' ? t('calls.youApproved') : run.approval === 'session' ? t('calls.sessionAllowed') : ''}
                 {run.summary ? ` · ${run.summary}` : ''}
               </span>

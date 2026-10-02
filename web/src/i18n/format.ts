@@ -17,12 +17,34 @@ export function formatNumber(value: number, options?: Intl.NumberFormatOptions):
   return new Intl.NumberFormat(formatLocale(), options).format(value)
 }
 
+/** A number with exactly this many decimals, such as 0.125 or 0,125: for losses, rates, and epochs. */
+export function formatDecimal(value: number, digits: number): string {
+  return formatNumber(value, { minimumFractionDigits: digits, maximumFractionDigits: digits })
+}
+
+/** A duration in milliseconds: 250 ms under a second, 1.2 s from there. */
+export function formatMilliseconds(ms: number): string {
+  if (ms < 1000) return i18n.t('common:units.ms', { value: formatNumber(ms, { maximumFractionDigits: 0 }) })
+  return i18n.t('common:units.seconds', { value: formatDecimal(ms / 1000, 1) })
+}
+
+/** A generation speed: 12.5 tok/s, or 150 tok/s from 100 up. */
+export function formatTokensPerSecond(n: number): string {
+  return i18n.t('common:units.tokPerSec', { value: formatDecimal(n, n >= 100 ? 0 : 1) })
+}
+
 export function formatPercent(fraction: number, maximumFractionDigits = 0): string {
   return formatNumber(fraction, { style: 'percent', maximumFractionDigits })
 }
 
 export function formatCurrency(value: number, currency: string): string {
   return formatNumber(value, { style: 'currency', currency })
+}
+
+/** A price an automation watches, in dollars: $20, or $19.99 with cents. */
+export function formatPrice(value: number): string {
+  const fraction = Number.isInteger(value) ? 0 : 2
+  return formatNumber(value, { style: 'currency', currency: 'USD', minimumFractionDigits: fraction, maximumFractionDigits: fraction })
 }
 
 function asDate(value: Date | string | number): Date {
@@ -53,10 +75,17 @@ const relativeSteps: [Intl.RelativeTimeFormatUnit, number][] = [
   ['year', Number.POSITIVE_INFINITY],
 ]
 
-/** Time from now, such as "5 minutes ago" or "in 2 days", in the UI language. */
-export function formatRelativeTime(value: Date | string | number, now: Date = new Date()): string {
+/**
+ * Time from now, such as "5 minutes ago" or "in 2 days", in the UI language.
+ * The narrow style is for tight spaces: "5m ago".
+ */
+export function formatRelativeTime(
+  value: Date | string | number,
+  now: Date = new Date(),
+  style: Intl.RelativeTimeFormatStyle = 'long',
+): string {
   let amount = (asDate(value).getTime() - now.getTime()) / 1000
-  const formatter = new Intl.RelativeTimeFormat(formatLocale(), { numeric: 'auto' })
+  const formatter = new Intl.RelativeTimeFormat(formatLocale(), { numeric: 'auto', style })
   for (const [unit, size] of relativeSteps) {
     if (Math.abs(amount) < size) return formatter.format(Math.round(amount), unit)
     amount /= size
@@ -64,14 +93,24 @@ export function formatRelativeTime(value: Date | string | number, now: Date = ne
   return formatter.format(Math.round(amount), 'year')
 }
 
-/** A size in bytes, such as 1.5 GB or 1,5 GB, with the number in the UI's format. */
-export function formatSize(bytes: number): string {
-  const units = ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte'] as const
+const sizeUnits = ['byte', 'kilobyte', 'megabyte', 'gigabyte', 'terabyte'] as const
+
+/**
+ * A size in bytes, such as 1.5 GB or 1,5 GB, with the number and unit in the
+ * UI's format. Sizes count in 1024s; `base: 1000` counts in 1000s, as model
+ * downloads are sized.
+ */
+export function formatSize(bytes: number, { base = 1024 }: { base?: 1000 | 1024 } = {}): string {
   let value = bytes
   let unit = 0
-  while (Math.abs(value) >= 1024 && unit < units.length - 1) {
-    value /= 1024
+  while (Math.abs(value) >= base && unit < sizeUnits.length - 1) {
+    value /= base
     unit += 1
   }
-  return formatNumber(value, { style: 'unit', unit: units[unit], unitDisplay: 'short', maximumFractionDigits: unit === 0 ? 0 : 1 })
+  return formatNumber(value, { style: 'unit', unit: sizeUnits[unit], unitDisplay: 'short', maximumFractionDigits: unit === 0 ? 0 : 1 })
+}
+
+/** A size already in gigabytes, such as memory reported as 15.8 GB; whole numbers from 10 GB. */
+export function formatGigabytes(gb: number): string {
+  return formatNumber(gb, { style: 'unit', unit: 'gigabyte', unitDisplay: 'short', maximumFractionDigits: Math.abs(gb) >= 10 ? 0 : 1 })
 }

@@ -1,4 +1,5 @@
 import i18n from '@/i18n'
+import { formatGigabytes } from '@/i18n/format'
 import type { Accelerator, HardwareInventory, Model, Node } from '@/types/api'
 import { purposeChipIds } from '@/features/models/modelPresentation'
 
@@ -15,8 +16,7 @@ function isMeaningful(s?: string | null): s is string {
 
 function gbLabel(bytes?: number): string | null {
   if (bytes == null || bytes <= 0) return null
-  const gb = bytes / 1024 ** 3
-  return i18n.t('computers:hardware.gigabytes', { value: gb >= 10 ? Math.round(gb) : gb.toFixed(1) })
+  return formatGigabytes(bytes / 1024 ** 3)
 }
 
 function accelLine(accel?: Accelerator): string | null {

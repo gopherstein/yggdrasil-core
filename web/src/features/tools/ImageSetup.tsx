@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import i18n from '@/i18n'
+import { formatSize } from '@/i18n/format'
 import { api, type MediaKind } from '@/lib/api'
 import type { ImageSetup } from '@/types/api'
 
 function gb(bytes: number): string {
-  return i18n.t('tools:images.gigabytes', { value: (bytes / 1e9).toFixed(1) })
+  return formatSize(bytes, { base: 1000 })
 }
 
 // Wording that differs by kind is tools:<kind>.<key>; the rest is shared

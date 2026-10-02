@@ -330,7 +330,6 @@
     "trainingLoss": "Training loss",
     "validationLoss": "Validation loss",
     "peakMemory": "Peak memory",
-    "gigabytes": "{{value}} GB",
     "lossNote": "Loss shows how closely the model reproduces your examples. A lower number does not guarantee better answers, so compare the results before you deploy."
   },
   "test": {

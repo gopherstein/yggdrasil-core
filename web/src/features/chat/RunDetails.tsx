@@ -1,12 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
+import { formatMilliseconds, formatTokensPerSecond } from '@/i18n/format'
 import { api } from '@/lib/api'
 import type { RunTrace } from '@/types/api'
 import { roleLabel, roleOrder } from './runRoles'
 
 function msText(ms?: number): string {
   if (!ms) return '—'
-  return ms >= 1000 ? `${(ms / 1000).toFixed(1)} s` : `${Math.round(ms)} ms`
+  return formatMilliseconds(ms)
 }
 
 /** One labelled row of the run details. */
@@ -65,7 +66,7 @@ export function RunDetails({ runId }: { runId: string }) {
                 {m.model_id}
                 {m.node ? ` ${t('run.onComputer', { computer: m.node })}` : ''} · {t('run.calls', { count: m.calls })}
                 {m.load_ms ? ` · ${t('run.load', { time: msText(m.load_ms) })}` : ''} · {t('run.firstToken', { time: msText(m.first_token_ms) })}
-                {m.tok_per_sec ? ` · ${m.tok_per_sec.toFixed(1)} tok/s` : ''} ·{' '}
+                {m.tok_per_sec ? ` · ${formatTokensPerSecond(m.tok_per_sec)}` : ''} ·{' '}
                 {t('run.inOut', { in: m.prompt_tokens, out: m.completion_tokens })}
                 {m.cached_tokens ? ` · ${t('run.cached', { count: m.cached_tokens })}` : ''}
               </Row>

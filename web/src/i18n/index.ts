@@ -1,4 +1,4 @@
-import i18n, { type Resource } from 'i18next'
+import i18n, { type FormatterModule, type Resource } from 'i18next'
 import { notifyDesktopLanguage } from '@/lib/desktopBridge'
 import { initReactI18next } from 'react-i18next'
 import { directionOf, languages, pseudoLocale, sourceLanguage } from './languages'
@@ -27,6 +27,27 @@ export function catalogResources(): Resource {
 }
 
 const resources = catalogResources()
+
+/** Placeholders whose numbers are labels, not amounts: shown as they are, never as 7,331. */
+const rawNumbers = new Set(['port', 'code', 'id', 'version', 'revision', 'commit', 'year'])
+
+/**
+ * Numbers in text, such as {{count}} or {{total}}, in the UI's number format
+ * (multilingual spec §8): 1,234 in English, 1.234 in German. Plural forms
+ * still choose by the number itself.
+ */
+const numberFormatter: FormatterModule = {
+  type: 'formatter',
+  init() {},
+  add() {},
+  addCached() {},
+  format(value, _format, _lng, options) {
+    // Anything but a number passes through as it is.
+    if (typeof value !== 'number' || rawNumbers.has(String(options?.interpolationkey ?? ''))) return value
+    const locale = i18n.language === pseudoLocale ? sourceLanguage : requestedLocale()
+    return new Intl.NumberFormat(locale).format(value)
+  },
+}
 
 /** Languages that have a catalog, which the App language can be set to. */
 export const availableLanguages = Object.keys(resources)
@@ -102,6 +123,7 @@ function markDocument(language: string) {
 
 void i18n
   .use(initReactI18next)
+  .use(numberFormatter)
   .use({
     type: 'postProcessor',
     name: 'pseudo',
@@ -118,7 +140,8 @@ void i18n
     defaultNS: 'common',
     ns: [...new Set(Object.values(resources).flatMap((r) => Object.keys(r)))],
     postProcess: ['pseudo'],
-    interpolation: { escapeValue: false }, // React escapes.
+    // React escapes. Every number is formatted for the locale; see numberFormatter.
+    interpolation: { escapeValue: false, alwaysFormat: true },
     returnNull: false,
     // Never show a raw key: missing text falls back to English, and the
     // catalog tests catch keys English lacks.

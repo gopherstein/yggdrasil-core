@@ -52,6 +52,16 @@ before it is complete.
   `key_two`, `key_few`, or `key_many` where a language needs them. English
   has `_one` and `_other`.
 
+## Numbers, dates, and sizes
+
+Numbers, dates, times, sizes, prices, and percentages are formatted with
+`Intl` in the App language's region (`web/src/i18n/format.ts`), never by
+hand: German writes 1.234,56, 30.09.2026, and 1,5 GB. Pass them into text
+already formatted, as `{{size}}`, `{{when}}`, or `{{percent}}`; don't write
+units or `%` into the catalog. A number passed as itself, such as
+`{{count}}`, is formatted for the locale on the way in, except labels such
+as `{{port}}` and `{{version}}`. Plural forms still choose by the number.
+
 ## No hard-coded text
 
 Text people read comes from the catalog, never a literal in JSX.
