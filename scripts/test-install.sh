@@ -14,8 +14,8 @@ ls dist/*.deb dist/SHA256SUMS.txt >/dev/null
 
 work="$(mktemp -d)"
 cleanup() {
-	[[ -n "${http_pid:-}" ]] && kill "$http_pid" 2>/dev/null || true
-	[[ -n "${issuer_pid:-}" ]] && kill "$issuer_pid" 2>/dev/null || true
+	if [[ -n "${http_pid:-}" ]]; then kill "$http_pid" 2>/dev/null || true; fi
+	if [[ -n "${issuer_pid:-}" ]]; then kill "$issuer_pid" 2>/dev/null || true; fi
 }
 trap cleanup EXIT
 
