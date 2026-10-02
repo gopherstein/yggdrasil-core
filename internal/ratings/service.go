@@ -507,13 +507,8 @@ func itoa(n int) string { return string(rune('0' + n)) }
 // appVersion is the version, or "" for a development build the service
 // would refuse.
 func appVersion(v string) string {
-	if v == "" || len(v) > 32 {
+	if !versionRe.MatchString(v) {
 		return ""
-	}
-	for _, r := range v {
-		if !(r >= '0' && r <= '9' || r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r == '.' || r == '+' || r == '-') {
-			return ""
-		}
 	}
 	return v
 }

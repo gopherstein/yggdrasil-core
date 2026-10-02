@@ -38,6 +38,8 @@ var (
 	// fileQuantRe finds a GGUF quantization in a file name.
 	fileQuantRe = regexp.MustCompile(`(?i)(?:^|[-_.])((?:IQ|Q)\d(?:_[0-9A-Z]+)*|BF16|F16|F32)(?:[-_.]|$)`)
 	nonSlug     = regexp.MustCompile(`[^a-z0-9._-]+`)
+	// versionRe is a version the ratings service accepts.
+	versionRe = regexp.MustCompile(`^[0-9A-Za-z.+-]{1,32}$`)
 )
 
 // Identify says which model m is, run by runtime on backend.
