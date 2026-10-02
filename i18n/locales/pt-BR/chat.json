@@ -391,6 +391,11 @@
     "gone": "Esta execução não está mais registrada.",
     "loadFailed": "Não foi possível carregar a execução.",
     "run": "Execução",
+    "status": {
+      "completed": "Concluída",
+      "failed": "Falhou",
+      "stopped": "Interrompida"
+    },
     "strategy": "Estratégia",
     "effort": "Esforço",
     "modelCalls": "Chamadas ao modelo",

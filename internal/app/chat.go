@@ -257,7 +257,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		if routeReason != "" {
 			run.Strategy(routeReason)
 		}
-		runStatus, runErr := runlog.StatusFailed, ""
+		runStatus, runErr := runlog.StatusFailed, error(nil)
 		defer func() {
 			status := runStatus
 			if ctx.Err() != nil && status != runlog.StatusCompleted {
@@ -324,7 +324,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		for attempt := 0; ; attempt++ {
 			eventsCh, err := orch.Run(ctx, task, profile, env)
 			if err != nil {
-				runErr = err.Error()
+				runErr = codedError(err)
 				ch <- pluginapi.ChatChunk{Error: a.explainWhileTraining(err.Error()), Done: true}
 				return
 			}
@@ -394,7 +394,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 							}
 						}
 					}
-					runErr = evt.Error
+					runErr = codedChatError(evt.Error)
 					ch <- pluginapi.ChatChunk{Error: a.explainWhileTraining(evt.Error), Done: true}
 					return
 				}

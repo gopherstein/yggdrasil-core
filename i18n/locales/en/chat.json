@@ -384,6 +384,11 @@
     "gone": "This run is no longer recorded.",
     "loadFailed": "Could not load the run.",
     "run": "Run",
+    "status": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "stopped": "Stopped"
+    },
     "strategy": "Strategy",
     "effort": "Effort",
     "modelCalls": "Model calls",

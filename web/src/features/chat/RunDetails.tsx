@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { formatMilliseconds, formatTokensPerSecond } from '@/i18n/format'
-import { api } from '@/lib/api'
+import { api, errorText } from '@/lib/api'
 import type { RunTrace } from '@/types/api'
 import { roleLabel, roleOrder } from './runRoles'
 
@@ -54,8 +54,13 @@ export function RunDetails({ runId }: { runId: string }) {
       {open && run && (
         <dl className="mt-1.5 space-y-1 rounded-lg bg-raised/60 p-2.5">
           <Row label={t('run.run')}>
-            <span className="font-mono">{run.id.slice(0, 8)}</span> · {run.status}
-            {run.error ? ` · ${run.error}` : ''}
+            <span className="font-mono">{run.id.slice(0, 8)}</span> · {t(`run.status.${run.status}`, { defaultValue: run.status })}
+            {run.error ? (
+              <>
+                {' · '}
+                <span title={run.error_code ? run.error : undefined}>{errorText(run.error_code, run.error, run.error_details)}</span>
+              </>
+            ) : null}
           </Row>
           {run.strategy.length > 0 && <Row label={t('run.strategy')}>{run.strategy.join(' · ')}</Row>}
           {run.effort && <Row label={t('run.effort')}>{run.effort}</Row>}

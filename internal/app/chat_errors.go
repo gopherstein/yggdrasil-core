@@ -61,3 +61,15 @@ func codedChatError(text string) error {
 	}
 	return contracts.NewError(code, params, errString(text))
 }
+
+// codedError is err with a stable code: its own, or one recognized from its
+// text. nil stays nil.
+func codedError(err error) error {
+	if err == nil {
+		return nil
+	}
+	if code, _ := contracts.ErrorCode(err); code != "" {
+		return err
+	}
+	return codedChatError(err.Error())
+}

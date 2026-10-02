@@ -33,15 +33,15 @@ func (e automationExecutor) Execute(ctx context.Context, automation automations.
 	run.SetLanguage(e.app.appLanguage(ctx))
 	run.Note("automation", map[string]any{"name": automation.Name})
 	result, err := e.execute(runlog.With(ctx, run), automation)
-	status, errText := runlog.StatusCompleted, ""
+	status, runErr := runlog.StatusCompleted, error(nil)
 	switch {
 	case ctx.Err() != nil:
 		status = runlog.StatusStopped
 	case err != nil:
-		status, errText = runlog.StatusFailed, err.Error()
+		status, runErr = runlog.StatusFailed, codedError(err)
 	}
 	if e.app != nil && e.app.RunLog != nil {
-		if saveErr := e.app.RunLog.Save(context.WithoutCancel(ctx), run.Finish(status, errText)); saveErr != nil && e.app.Logger != nil {
+		if saveErr := e.app.RunLog.Save(context.WithoutCancel(ctx), run.Finish(status, runErr)); saveErr != nil && e.app.Logger != nil {
 			e.app.Logger.Warn("save automation run", "automation", automation.Name, "error", saveErr)
 		}
 	}

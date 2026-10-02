@@ -53,17 +53,21 @@ type ToolUse struct {
 type Run struct {
 	ID string `json:"id"`
 	// Contract is the client contract the trace is written in (§68).
-	Contract       string     `json:"contract"`
-	ConversationID string     `json:"conversation_id,omitempty"`
-	ProfileID      string     `json:"profile_id,omitempty"`
-	Source         string     `json:"source,omitempty"`
-	Strategy       []string   `json:"strategy"`
-	Effort         string     `json:"effort,omitempty"`
-	Status         string     `json:"status"`
-	Error          string     `json:"error,omitempty"`
-	StartedAt      time.Time  `json:"started_at"`
-	CompletedAt    *time.Time `json:"completed_at,omitempty"`
-	LatencyMs      float64    `json:"latency_ms,omitempty"`
+	Contract       string   `json:"contract"`
+	ConversationID string   `json:"conversation_id,omitempty"`
+	ProfileID      string   `json:"profile_id,omitempty"`
+	Source         string   `json:"source,omitempty"`
+	Strategy       []string `json:"strategy"`
+	Effort         string   `json:"effort,omitempty"`
+	Status         string   `json:"status"`
+	// Error is the English text; ErrorCode and ErrorDetails let clients
+	// show it in the App language (multilingual spec §10).
+	Error        string         `json:"error,omitempty"`
+	ErrorCode    string         `json:"error_code,omitempty"`
+	ErrorDetails map[string]any `json:"error_details,omitempty"`
+	StartedAt    time.Time      `json:"started_at"`
+	CompletedAt  *time.Time     `json:"completed_at,omitempty"`
+	LatencyMs    float64        `json:"latency_ms,omitempty"`
 	// PipelineMs is the time before the first model call.
 	PipelineMs float64    `json:"pipeline_ms,omitempty"`
 	Models     []ModelUse `json:"models"`
@@ -330,8 +334,9 @@ func (c *Collector) Pipeline(d time.Duration) {
 	c.mu.Unlock()
 }
 
-// Finish ends the run and returns it.
-func (c *Collector) Finish(status, errText string) Run {
+// Finish ends the run and returns it. err is why it failed, or nil; its
+// stable code, if it has one, goes with the text.
+func (c *Collector) Finish(status string, err error) Run {
 	if c == nil {
 		return Run{}
 	}
@@ -340,7 +345,11 @@ func (c *Collector) Finish(status, errText string) Run {
 	now := c.now().UTC()
 	r := c.run
 	r.Contract = contracts.ContractVersion
-	r.Status, r.Error, r.CompletedAt = status, errText, &now
+	r.Status, r.CompletedAt = status, &now
+	if err != nil {
+		r.Error = err.Error()
+		r.ErrorCode, r.ErrorDetails = contracts.ErrorCode(err)
+	}
 	r.LatencyMs = ms(now.Sub(r.StartedAt))
 	r.Models = []ModelUse{}
 	for _, m := range c.models {

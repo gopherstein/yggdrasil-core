@@ -5,7 +5,10 @@ import { useUIStore } from '@/stores/uiStore'
 import { AnswerDetails } from './AnswerDetails'
 import { roleLabel } from './runRoles'
 
-vi.mock('@/lib/api', () => ({ api: { getRun: vi.fn() } }))
+vi.mock('@/lib/api', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/api')>()),
+  api: { getRun: vi.fn() },
+}))
 
 describe('Run details', () => {
   it('appear in advanced mode and load the trace when opened', async () => {
@@ -68,5 +71,28 @@ describe('Run details', () => {
     expect(roleLabel('assistant')).toBe('Answer')
     expect(roleLabel('worker:3')).toBe('Worker 3')
     expect(roleLabel('reviewer')).toBe('Reviewer')
+  })
+
+  it('shows a failed run in the App language, keeping the English text', async () => {
+    vi.mocked(api.getRun).mockResolvedValue({
+      id: 'failed123456',
+      strategy: [],
+      status: 'failed',
+      error: 'llama-server: failed to allocate buffer',
+      error_code: 'OUT_OF_MEMORY',
+      started_at: '2026-10-01T20:00:00Z',
+      models: [],
+      tools: [],
+      nodes: [],
+      verification_passes: 0,
+      retries: 0,
+    })
+    useUIStore.setState({ advancedMode: true })
+    render(<AnswerDetails meta={{ run_id: 'failed123456' }} />)
+    fireEvent.click(screen.getByRole('button', { name: /Run details/ }))
+    const error = await screen.findByText('The model ran out of memory.')
+    expect(error).toHaveAttribute('title', 'llama-server: failed to allocate buffer')
+    expect(screen.getByText(/· Failed ·/)).toBeInTheDocument()
+    useUIStore.setState({ advancedMode: false })
   })
 })

@@ -377,6 +377,11 @@
     "gone": "この実行の記録はもう残っていません。",
     "loadFailed": "実行を読み込めませんでした。",
     "run": "実行",
+    "status": {
+      "completed": "完了",
+      "failed": "失敗",
+      "stopped": "停止"
+    },
     "strategy": "戦略",
     "effort": "処理の深さ",
     "modelCalls": "モデル呼び出し",
