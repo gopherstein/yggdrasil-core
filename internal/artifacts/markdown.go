@@ -172,11 +172,3 @@ func indexRune(r []rune, c rune, from int) int {
 	}
 	return -1
 }
-
-func plain(spans []span) string {
-	var b strings.Builder
-	for _, s := range spans {
-		b.WriteString(s.Text)
-	}
-	return b.String()
-}
