@@ -13,6 +13,10 @@ export const CAPABILITIES: {
     tools: [
       { id: 'internet.search', on: 'allow' },
       { id: 'internet.open', on: 'allow' },
+      { id: 'places.search', on: 'allow' },
+      { id: 'places.details', on: 'allow' },
+      { id: 'maps.route', on: 'allow' },
+      { id: 'maps.distance', on: 'allow' },
     ],
   },
   {

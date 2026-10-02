@@ -664,6 +664,7 @@ func New(opts Options) (*App, error) {
 	images := &imagegen.Engine{Setup: a.Images, WorkDir: filepath.Join(cfg.DataDir, "image-jobs")}
 	a.registerPortable(&imagegen.GenerateTool{Engine: images, Store: a.Artifacts})
 	a.registerPortable(&imagegen.EditTool{Engine: images, Store: a.Artifacts})
+	a.registerPlaces(cfg)
 	a.API.BindImages(a.Images)
 	a.Training = a.newTrainingService()
 	if err := a.Training.Recover(context.Background()); err != nil {

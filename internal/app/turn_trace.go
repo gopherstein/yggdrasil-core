@@ -305,6 +305,20 @@ func (t *turnTrace) tool(toolID string, args, result map[string]any) {
 	case "terminal":
 		t.untrusted = true
 		t.addStep("command", "Ran a command on this computer")
+	case "places.search", "places.details", "maps.route", "maps.distance":
+		// Place names and details are written by map contributors, so they
+		// are data, not instructions (§58).
+		t.untrusted = true
+		switch {
+		case toolID == "places.search" && str(args, "near") != "":
+			t.addStep("places", fmt.Sprintf("Looked up %s near %s", str(args, "query"), str(args, "near")))
+		case toolID == "places.search":
+			t.addStep("places", fmt.Sprintf("Looked up “%s” on the map", str(args, "query")))
+		case toolID == "places.details":
+			t.addStep("places", "Looked up a place's details")
+		default:
+			t.addStep("places", fmt.Sprintf("Found the way from %s to %s", str(args, "from"), str(args, "to")))
+		}
 	default:
 		if strings.HasPrefix(toolID, "git.") {
 			t.untrusted = true

@@ -29,6 +29,11 @@ type Config struct {
 	AdvertiseHost string `json:"advertise_host,omitempty"`
 	// StaticPeers are Bifrost host:port addresses to probe when mDNS is unavailable.
 	StaticPeers []string `json:"static_peers,omitempty"`
+	// Map services for places and routes; empty uses OpenStreetMap's public
+	// Nominatim, Overpass, and routing.openstreetmap.de.
+	PlacesGeocoderURL string `json:"places_geocoder_url,omitempty"`
+	PlacesOverpassURL string `json:"places_overpass_url,omitempty"`
+	PlacesRouterURL   string `json:"places_router_url,omitempty"`
 }
 
 // Manager loads and persists configuration.

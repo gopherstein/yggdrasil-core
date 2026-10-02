@@ -5,7 +5,7 @@ import { api } from '@/lib/api'
 import type { EgressKind, EgressRecord } from '@/types/api'
 
 // What left, in order; the names are settings:whatLeft.kinds.<kind> in the catalog.
-const KINDS: EgressKind[] = ['web_search', 'web_page', 'paired_computer', 'external_server', 'connector', 'notification']
+const KINDS: EgressKind[] = ['web_search', 'web_page', 'places', 'paired_computer', 'external_server', 'connector', 'notification']
 // What sent it; the names are settings:whatLeft.sources.<source>.
 const SOURCES = ['chat', 'api', 'automation', 'training']
 

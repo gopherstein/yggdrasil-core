@@ -84,6 +84,10 @@ func defaultToolPolicies() []contracts.ToolPolicy {
 func generalToolPolicies() []contracts.ToolPolicy {
 	return []contracts.ToolPolicy{
 		{ToolID: "internet.search", Policy: "allow"},
+		{ToolID: "places.search", Policy: "allow"},
+		{ToolID: "places.details", Policy: "allow"},
+		{ToolID: "maps.route", Policy: "allow"},
+		{ToolID: "maps.distance", Policy: "allow"},
 		{ToolID: "internet.open", Policy: "allow"},
 		{ToolID: "filesystem.search", Policy: "allow"},
 		{ToolID: "filesystem.read", Policy: "allow"},
@@ -109,6 +113,10 @@ func generalToolPolicies() []contracts.ToolPolicy {
 func codingToolPolicies() []contracts.ToolPolicy {
 	return []contracts.ToolPolicy{
 		{ToolID: "internet.search", Policy: "allow"},
+		{ToolID: "places.search", Policy: "allow"},
+		{ToolID: "places.details", Policy: "allow"},
+		{ToolID: "maps.route", Policy: "allow"},
+		{ToolID: "maps.distance", Policy: "allow"},
 		{ToolID: "internet.open", Policy: "allow"},
 		{ToolID: "filesystem.search", Policy: "allow"},
 		{ToolID: "filesystem.read", Policy: "allow"},
@@ -134,6 +142,10 @@ func codingToolPolicies() []contracts.ToolPolicy {
 func researchToolPolicies() []contracts.ToolPolicy {
 	return []contracts.ToolPolicy{
 		{ToolID: "internet.search", Policy: "allow"},
+		{ToolID: "places.search", Policy: "allow"},
+		{ToolID: "places.details", Policy: "allow"},
+		{ToolID: "maps.route", Policy: "allow"},
+		{ToolID: "maps.distance", Policy: "allow"},
 		{ToolID: "internet.open", Policy: "allow"},
 		{ToolID: "filesystem.search", Policy: "allow"},
 		{ToolID: "filesystem.read", Policy: "allow"},

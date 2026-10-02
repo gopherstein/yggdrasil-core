@@ -39,6 +39,25 @@ The capability names `document.create`, `pdf.create`, and `spreadsheet.create` r
 
 `spreadsheet.analyze` summarizes a spreadsheet (`.xlsx`, `.csv`, or `.tsv`) attached to or made in the chat, by name or id. For each sheet it returns the number of rows and the first five. For each column it returns the type (number, date, text, or empty), how many cells are filled, and, for numbers, the minimum, maximum, average, and total; for other columns, how many distinct values there are and the most common ones. It reads up to 10 sheets, 50 columns, and 200,000 rows, so an answer can use a whole file that would not fit in the prompt. It is offered when a message mentions a spreadsheet, CSV, Excel, a workbook, or a sheet.
 
+## Places and directions
+
+Four tools answer questions about places with [OpenStreetMap](https://www.openstreetmap.org/) data. They are part of the Internet capability, level 2, allowed by default, and not in offline profiles. They are offered when a message asks for something near somewhere, directions, how far, or opening hours.
+
+| Tool | What it does | Service |
+| --- | --- | --- |
+| `places.search` | A kind of place near somewhere, such as `{"query": "coffee", "near": "Juneau, AK"}`, nearest first within 2 km, then 10 km if there is nothing closer (`radius_m` up to 25 km). Otherwise places and addresses by name. Up to 10 results with addresses, distances, opening hours, phone, website, and an id. | Overpass for kinds of places, Nominatim for names |
+| `places.details` | One place by its id from `places.search`, such as `node/3430732134` | Nominatim |
+| `maps.route` | Turn-by-turn directions, driving (default), walking, or cycling, up to 40 steps | Nominatim for the places, then the router |
+| `maps.distance` | Straight-line and route distance and minutes; when there is no route, the straight line still answers | Nominatim, then the router |
+
+- **Places:** `near`, `from`, and `to` are names, addresses, or `lat,lon`. The user's location is not known; the model uses the place named, or where About me in Personalization says they live.
+- **Distances** come in meters, kilometers, and miles, so answers follow the units chosen in Personalization.
+- **Attribution:** results carry their attribution, "© OpenStreetMap contributors (ODbL)", and an openstreetmap.org link for each place.
+- **Fair use:** requests identify Yggdrasil, Nominatim requests are spaced at least a second apart as its usage policy asks, and a repeat within the hour is answered from memory (the Places and routes cache). For heavy use, point `places_geocoder_url`, `places_overpass_url`, and `places_router_url` at your own servers.
+- **Privacy:** each request is recorded in What left this computer as Maps and places.
+
+Recognized kinds include cafes, restaurants, fast food, bars, pharmacies, hospitals, clinics, fuel and charging stations, parking, ATMs, banks, post offices, libraries, toilets, supermarkets, bakeries, hardware stores, bookshops, hotels, museums, viewpoints, campsites, parks, playgrounds, and gyms. Anything else is searched by name.
+
 ## Running code
 
 `code.execute` runs Python the assistant writes, for calculations, data analysis, and charts. It asks first by default (level 4), and the Run code capability turns it on or off in a profile. It is offered when a message asks to calculate, analyze, chart, or run code.

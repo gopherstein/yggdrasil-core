@@ -1344,7 +1344,7 @@ export interface PersonalStyle {
   instructions?: string
 }
 
-export type EgressKind = 'web_search' | 'web_page' | 'paired_computer' | 'external_server' | 'connector' | 'notification'
+export type EgressKind = 'web_search' | 'web_page' | 'places' | 'paired_computer' | 'external_server' | 'connector' | 'notification'
 
 /** One time data left this computer (spec §63). */
 export interface EgressRecord {

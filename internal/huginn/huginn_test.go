@@ -215,6 +215,17 @@ func TestToolsFor(t *testing.T) {
 			t.Errorf("%q offered %v, want %s", msg, got, want)
 		}
 	}
+	maps := []string{"places.search", "places.details", "maps.route", "maps.distance"}
+	for _, msg := range []string{"Find coffee near me in Juneau", "Directions from the airport to downtown", "How far is Anchorage from Juneau?", "Is the pharmacy open now?"} {
+		if got := ToolsFor(Chat, msg, maps); !has(got, "places.search", "maps.route") {
+			t.Errorf("%q offered %v", msg, got)
+		}
+	}
+	for _, msg := range []string{"Where is the bug in this function?", "Add a route to the API"} {
+		if got := ToolsFor(Chat, msg, maps); len(got) != 0 {
+			t.Errorf("%q offered %v", msg, got)
+		}
+	}
 	if got := ToolsFor(Chat, "What is a pixel?", images); len(got) != 0 {
 		t.Errorf("plain question offered %v", got)
 	}

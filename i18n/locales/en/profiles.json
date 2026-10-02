@@ -152,7 +152,7 @@
   "capabilities": {
     "internet": {
       "label": "Internet",
-      "description": "Search and read current information from the web"
+      "description": "Search and read current information from the web, and find places and directions"
     },
     "files": {
       "label": "Files",
