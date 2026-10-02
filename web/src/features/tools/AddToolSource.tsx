@@ -302,6 +302,7 @@ function PasteTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
           className="field mt-1 min-h-32 w-full font-mono text-xs"
           value={text}
           spellCheck={false}
+          // eslint-disable-next-line i18next/no-literal-string -- an example of what to type, not prose
           placeholder={'{\n  "mcpServers": {\n    "example": { "command": "npx", "args": ["-y", "example-mcp"] }\n  }\n}\n\nor  https://mcp.example.com/mcp\nor  npx -y example-mcp'}
           onChange={(e) => {
             setText(e.target.value)
@@ -506,6 +507,7 @@ function CustomTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
               className="field mt-1 w-full font-mono text-xs"
               value={command}
               spellCheck={false}
+              // eslint-disable-next-line i18next/no-literal-string -- an example of what to type, not prose
               placeholder="npx -y @scope/some-mcp-server --flag"
               onChange={(e) => setCommand(e.target.value)}
             />
@@ -545,6 +547,7 @@ function CustomTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
               className="field mt-1 min-h-16 w-full font-mono text-xs"
               value={headers}
               spellCheck={false}
+              // eslint-disable-next-line i18next/no-literal-string -- an example of what to type, not prose
               placeholder="Authorization: Bearer …"
               onChange={(e) => setHeaders(e.target.value)}
             />

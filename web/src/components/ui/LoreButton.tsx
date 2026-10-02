@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { Rune } from '@/components/ui/Rune'
 import type { Lore } from '@/lib/lore'
 
@@ -27,6 +28,7 @@ export function LoreButton({
   label?: string
   className?: string
 }) {
+  const { t } = useTranslation('lore')
   const [open, setOpen] = useState(false)
   const [place, setPlace] = useState<Place | null>(null)
   const button = useRef<HTMLButtonElement>(null)
@@ -98,7 +100,7 @@ export function LoreButton({
               ref={bubble}
               id={id}
               role="dialog"
-              aria-label={`About ${lore.name}`}
+              aria-label={t('about', { name: lore.name })}
               tabIndex={-1}
               className="lore-bubble"
               data-side={place?.above ? 'top' : 'bottom'}
@@ -118,7 +120,7 @@ export function LoreButton({
                 <button
                   type="button"
                   className="-mr-1 -mt-1 rounded px-1.5 text-lg leading-none text-ink-faint hover:text-ink"
-                  aria-label="Close"
+                  aria-label={t('close')}
                   onClick={() => {
                     setOpen(false)
                     button.current?.focus()
@@ -128,7 +130,7 @@ export function LoreButton({
                 </button>
               </div>
               <p className="mt-2.5 text-[13px] leading-relaxed text-ink">{lore.story}</p>
-              <p className="label-caps mt-3 text-[10px]">In Yggdrasil</p>
+              <p className="label-caps mt-3 text-[10px]">{t('inYggdrasil')}</p>
               <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">{lore.here}</p>
             </div>,
             document.body,

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoreButton } from '@/components/ui/LoreButton'
-import { MASCOT_LORE } from '@/lib/lore'
+import { mascotLore } from '@/lib/lore'
 import { animate } from '@/lib/ratatoskr/loop'
 import { Rig, type MascotState } from '@/lib/ratatoskr/rig'
 import { readScreenshotLaunch } from '@/lib/screenshotMode'
@@ -33,6 +34,7 @@ export function Ratatoskr({
   /** Clicking him opens a short lore entry. Off where he must not take focus. */
   lore?: boolean
 }) {
+  const { t } = useTranslation('lore')
   const ref = useRef<SVGSVGElement>(null)
   const rig = useRef<Rig | null>(null)
   const detail = size >= DETAIL_PX
@@ -69,7 +71,7 @@ export function Ratatoskr({
   )
   if (!lore) return svg
   return (
-    <LoreButton lore={MASCOT_LORE} label="About Ratatoskr" className={['inline-flex shrink-0', className].filter(Boolean).join(' ')}>
+    <LoreButton lore={mascotLore()} label={t('mascot.label')} className={['inline-flex shrink-0', className].filter(Boolean).join(' ')}>
       {svg}
     </LoreButton>
   )

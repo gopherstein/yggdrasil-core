@@ -1,6 +1,7 @@
 import { useId } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoreButton } from '@/components/ui/LoreButton'
-import { LOGO_LORE } from '@/lib/lore'
+import { logoLore } from '@/lib/lore'
 
 /**
  * The Yggdrasil mark, drawn inline so it follows the theme. Geometry is copied
@@ -67,6 +68,7 @@ export function YggdrasilMark({
   lore?: boolean
 }) {
   // Several marks can be on screen at once; each needs its own mask and clip ids.
+  const { t } = useTranslation('lore')
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const small = size <= SMALL_MARK_MAX_PX
   const pads = small ? SMALL_PADS : FULL_PADS
@@ -122,7 +124,7 @@ export function YggdrasilMark({
   )
   if (!lore) return mark
   return (
-    <LoreButton lore={LOGO_LORE} label="About the Yggdrasil mark" className="inline-flex shrink-0">
+    <LoreButton lore={logoLore()} label={t('logo.label')} className="inline-flex shrink-0">
       {mark}
     </LoreButton>
   )

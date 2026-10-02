@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ScheduleBackgroundSync } from '@/components/ScheduleBackgroundSync'
 import { ApiError, api, rememberApiKey } from '@/lib/api'
 import { readScreenshotLaunch } from '@/lib/screenshotMode'
@@ -8,7 +9,8 @@ import { YggdrasilMark } from '@/components/ui/YggdrasilMark'
 
 const BOOT_GIVE_UP_MS = 25_000
 
-function BootSplash({ message }: { message: string }) {
+function BootSplash() {
+  const { t } = useTranslation()
   return (
     <div
       className="flex h-full min-h-0 flex-col items-center justify-center bg-canvas px-6"
@@ -18,9 +20,9 @@ function BootSplash({ message }: { message: string }) {
     >
       <Ratatoskr state="idle" size={160} />
       <p className="mt-4 font-display text-xl font-semibold tracking-tight text-ink">
-        Starting Yggdrasil
+        {t('boot.starting')}
       </p>
-      <p className="mt-2 text-sm text-ink-muted">{message}</p>
+      <p className="mt-2 text-sm text-ink-muted">{t('boot.preparing')}</p>
       <span
         className="mt-6 inline-block h-5 w-5 animate-spin rounded-full border-2 border-line border-t-primary"
         aria-hidden
@@ -30,23 +32,21 @@ function BootSplash({ message }: { message: string }) {
 }
 
 function BootFailed({ onRetry, busy }: { onRetry: () => void; busy: boolean }) {
+  const { t } = useTranslation()
   return (
     <div className="flex h-full min-h-0 flex-col items-center justify-center bg-canvas px-6 text-center">
       <Ratatoskr state="error" size={96} />
       <h1 className="mt-4 font-display text-2xl font-semibold tracking-tight text-ink">
-        Service unavailable
+        {t('boot.unavailable')}
       </h1>
-      <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">
-        The local Yggdrasil service has not responded yet. Wait a moment and try again — if this
-        keeps happening, check Diagnostics after the app loads.
-      </p>
+      <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">{t('boot.unavailableBody')}</p>
       <button
         type="button"
         className="btn-primary mt-6"
         disabled={busy}
         onClick={onRetry}
       >
-        {busy ? 'Retrying…' : 'Try again'}
+        {busy ? t('boot.retrying') : t('boot.tryAgain')}
       </button>
     </div>
   )
@@ -71,6 +71,7 @@ function DaemonBootGate({ children }: { children: ReactNode }) {
   const [deadline, setDeadline] = useState(() => Date.now() + BOOT_GIVE_UP_MS)
   const [timedOut, setTimedOut] = useState(false)
   const [keyDraft, setKeyDraft] = useState('')
+  const { t } = useTranslation()
 
   const healthQuery = useQuery({
     queryKey: ['health'],
@@ -128,22 +129,20 @@ function DaemonBootGate({ children }: { children: ReactNode }) {
       >
         <YggdrasilMark size={64} lore />
         <h1 className="mt-6 font-display text-2xl font-semibold tracking-tight text-ink">
-          API key required
+          {t('boot.keyRequired')}
         </h1>
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">
-          This Yggdrasil daemon is listening beyond this computer. Enter an API key to continue.
-          A key does not encrypt traffic on plain HTTP.
-        </p>
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">{t('boot.keyBody')}</p>
         <input
           type="password"
           autoComplete="off"
           value={keyDraft}
           onChange={(event) => setKeyDraft(event.target.value)}
+          // eslint-disable-next-line i18next/no-literal-string -- an example of what to type, not prose
           placeholder="ygg_…"
           className="field mt-6 w-full max-w-md"
         />
         <button type="submit" className="btn-primary mt-4" disabled={!keyDraft.trim() || healthQuery.isFetching}>
-          Continue
+          {t('boot.continue')}
         </button>
       </form>
     )
@@ -162,5 +161,5 @@ function DaemonBootGate({ children }: { children: ReactNode }) {
     )
   }
 
-  return <BootSplash message="Preparing your local AI service" />
+  return <BootSplash />
 }

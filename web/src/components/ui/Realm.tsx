@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { LoreButton } from '@/components/ui/LoreButton'
 import { realmLore } from '@/lib/lore'
@@ -11,6 +12,7 @@ export { Rune }
  * route, so a page only has to place it. Clicking it opens a short lore entry.
  */
 export function RealmKicker({ path, className = '' }: { path?: string; className?: string }) {
+  useTranslation('lore') // re-render with the App language
   const location = useLocation()
   const realm = realmFor(path ?? location.pathname)
   if (!realm) return null

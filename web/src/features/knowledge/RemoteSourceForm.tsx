@@ -98,6 +98,7 @@ export function RemoteSourceForm({ kind, onAdded }: { kind: 'database' | 'api'; 
               className="field min-h-20 w-full font-mono text-xs"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              // eslint-disable-next-line i18next/no-literal-string -- an example of what to type, not prose
               placeholder="SELECT sku, name, price, in_stock FROM products WHERE active"
               aria-label={t('remote.query')}
             />
@@ -128,6 +129,7 @@ export function RemoteSourceForm({ kind, onAdded }: { kind: 'database' | 'api'; 
                 autoComplete="off"
                 value={headerValue}
                 onChange={(e) => setHeaderValue(e.target.value)}
+                // eslint-disable-next-line i18next/no-literal-string -- an example of what to type, not prose
                 placeholder="Bearer …"
               />
             </label>

@@ -27,6 +27,7 @@ i18n/
     train.json              training specialized AIs
     profiles.json           AI profiles, their strategies, tools, and orchestrators
     diagnostics.json        the health page, logs, caches, and what Yggdrasil can do
+    lore.json               the Norse names' stories, the mascot, and the logo
 ```
 
 The desktop app's shell copies this folder when it builds and reads
@@ -50,6 +51,27 @@ before it is complete.
 - Plurals use i18next suffixes: `key_one`, `key_other`, and `key_zero`,
   `key_two`, `key_few`, or `key_many` where a language needs them. English
   has `_one` and `_other`.
+
+## No hard-coded text
+
+Text people read comes from the catalog, never a literal in JSX.
+`pnpm lint` in `web/` fails on text in JSX and on literals in attributes
+people read or hear, such as `title`, `placeholder`, `label`, and
+`aria-label` (§5 of the
+[spec](../docs/features/multilingual-localization-and-language-routing.md)).
+It leaves alone what is not prose: ids, routes, class names, URLs, acronyms,
+and the Norse names, which are the same in every language.
+
+An example of what to type, such as a URL or a command, is not translated.
+Mark it on the line before, with the reason:
+
+```tsx
+// eslint-disable-next-line i18next/no-literal-string -- an example of what to type, not prose
+placeholder="npx -y @scope/some-mcp-server"
+```
+
+The check reads JSX only. Text in plain `.ts` modules, such as labels for a
+list of choices, goes through `i18n.t('namespace:key')` too.
 
 ## Adding a language
 

@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
+import i18n from '@/i18n'
 import { realms } from '@/lib/realms'
 import { RealmKicker } from './Realm'
 import { Ratatoskr } from './Ratatoskr'
@@ -24,7 +25,7 @@ describe('lore', () => {
     const bubble = screen.getByRole('dialog', { name: 'About Mimir' })
     expect(bubble).toHaveTextContent('well of wisdom')
     expect(bubble).toHaveTextContent('In Yggdrasil')
-    expect(bubble).toHaveTextContent(realms['/knowledge'].meaning)
+    expect(bubble).toHaveTextContent(i18n.t('lore:realms.knowledge.meaning'))
   })
 
   it('closes with Escape and gives focus back', () => {
@@ -48,7 +49,14 @@ describe('lore', () => {
     kicker('/chat')
     fireEvent.click(screen.getByRole('button', { name: /Ratatoskr/ }))
     expect(screen.getByRole('dialog', { name: 'About Ratatoskr' })).toHaveTextContent('squirrel')
-    expect(Object.values(realms).every((r) => r.story.length > 40)).toBe(true)
+  })
+
+  it('has lore in the catalog for every realm', () => {
+    for (const realm of Object.values(realms)) {
+      for (const field of ['meaning', 'story', 'rune']) {
+        expect(i18n.exists(`lore:realms.${realm.id}.${field}`), `${realm.id}.${field}`).toBe(true)
+      }
+    }
   })
 
   it('opens the mascot’s and the logo’s lore', () => {

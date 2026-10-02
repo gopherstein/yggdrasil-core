@@ -1,8 +1,9 @@
+import i18n from '@/i18n'
 import type { Realm, RuneId } from './realms'
 
 /** A short lore entry, shown in a bubble when a Norse name, the mascot, or the logo is clicked. */
 export interface Lore {
-  /** The name, such as "Ratatoskr". */
+  /** The name, such as "Ratatoskr"; the same in every language. */
   name: string
   /** What it is, in a few words, shown under the name. */
   kind: string
@@ -14,30 +15,36 @@ export interface Lore {
   runeName?: string
 }
 
-export const MASCOT_LORE: Lore = {
-  name: 'Ratatoskr',
-  kind: 'The Yggdrasil mascot',
-  story:
-    'In the myths, Ratatoskr is the squirrel who runs up and down the World Tree, carrying messages between the eagle at the top and the dragon Níðhöggr at the roots. He was known to stir up a little trouble along the way.',
-  here: 'He does the same job here, carrying your requests between your apps and the models on your computers. He thinks while a reply is written, celebrates when something finishes, and naps when no model is loaded.',
+// The text is in the lore catalog (i18n/locales/<language>/lore.json), read
+// when shown so it follows the App language.
+
+export function mascotLore(): Lore {
+  return {
+    name: 'Ratatoskr',
+    kind: i18n.t('lore:mascot.kind'),
+    story: i18n.t('lore:mascot.story'),
+    here: i18n.t('lore:mascot.here'),
+  }
 }
 
-export const LOGO_LORE: Lore = {
-  name: 'Yggdrasil',
-  kind: 'The World Tree',
-  story:
-    'Yggdrasil is the great ash at the center of the Norse cosmos. Its branches reach over the heavens, its roots reach three wells, and the nine worlds hang among its boughs.',
-  here: 'The mark draws the tree as circuit traces, with roots and branches ending in nodes, like the computers Yggdrasil connects into one system.',
+export function logoLore(): Lore {
+  return {
+    name: 'Yggdrasil',
+    kind: i18n.t('lore:logo.kind'),
+    story: i18n.t('lore:logo.story'),
+    here: i18n.t('lore:logo.here'),
+  }
 }
 
 /** The lore entry for a page's Norse name. */
 export function realmLore(realm: Realm): Lore {
+  const runeName = i18n.t(`lore:realms.${realm.id}.rune`)
   return {
     name: realm.norse,
-    kind: realm.runeName,
-    story: realm.story,
-    here: realm.meaning,
+    kind: runeName,
+    story: i18n.t(`lore:realms.${realm.id}.story`),
+    here: i18n.t(`lore:realms.${realm.id}.meaning`),
     rune: realm.rune,
-    runeName: realm.runeName,
+    runeName,
   }
 }
