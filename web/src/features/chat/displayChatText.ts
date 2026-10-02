@@ -25,7 +25,7 @@ export function displayChatText(content: string): string {
     .replace(/```(?:json|JSON)?\s*```/g, '')
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
-    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/(\S)[ \t]{2,}/g, '$1 ')
     .trim()
   return cleaned
 }

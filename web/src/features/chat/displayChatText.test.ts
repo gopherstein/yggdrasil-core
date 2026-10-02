@@ -27,4 +27,18 @@ describe('displayChatText', () => {
     const raw = 'Juneau is cloudy.\n{"tool_result":{"error":"timeout"}}'
     expect(displayChatText(raw)).toBe('Juneau is cloudy.')
   })
+
+  it('keeps the indentation of a nested list', () => {
+    const raw = '- one\n- two\n  1. nested\n  2. also nested'
+    expect(displayChatText(raw)).toBe(raw)
+  })
+
+  it('keeps the indentation inside a fenced code block', () => {
+    const raw = '```python\ndef f():\n    if True:\n        return 1\n```'
+    expect(displayChatText(raw)).toBe(raw)
+  })
+
+  it('collapses double spaces in the middle of a line', () => {
+    expect(displayChatText('Juneau  is \t cloudy.')).toBe('Juneau is cloudy.')
+  })
 })
