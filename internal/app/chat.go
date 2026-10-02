@@ -553,31 +553,6 @@ func distinctNodeCount(steps []contracts.GenerationRoleStep) int {
 	return len(seen)
 }
 
-func aggregateRoleMetrics(steps []contracts.GenerationRoleStep) *pluginapi.GenerationMetrics {
-	if len(steps) == 0 {
-		return nil
-	}
-	var out pluginapi.GenerationMetrics
-	var evalMsSum float64
-	for i, s := range steps {
-		out.PromptTokens += s.PromptTokens
-		out.CompletionTokens += s.CompletionTokens
-		out.TotalTokens += s.TotalTokens
-		out.PromptMs += s.PromptMs
-		out.EvalMs += s.EvalMs
-		out.TotalMs += s.TotalMs
-		evalMsSum += s.EvalMs
-		if i == 0 {
-			out.TTFTMs = s.TTFTMs
-			out.PromptTokPerSec = s.PromptTokPerSec
-		}
-	}
-	if evalMsSum > 0 && out.CompletionTokens > 0 {
-		out.EvalTokPerSec = float64(out.CompletionTokens) / (evalMsSum / 1000.0)
-	}
-	return &out
-}
-
 func (a *App) recordGeneration(
 	ctx context.Context,
 	profile profiles.Profile,
