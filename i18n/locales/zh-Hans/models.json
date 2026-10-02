@@ -275,6 +275,7 @@
       "backend": "在内存相近的电脑上"
     },
     "overall": "总体",
+    "chosenByCommunity": "根据类似电脑的评分选出",
     "confidence": {
       "limited": "数据有限",
       "early": "早期评分"

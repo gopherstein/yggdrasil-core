@@ -367,6 +367,8 @@
     "files": "檔案",
     "sources": "來源",
     "memory": "記憶",
+    "attachedFile": "附加的檔案",
+    "madeInChat": "在此聊天中建立",
     "remembered": "已記住",
     "steps_other": "我做了什麼（{{count}} 個步驟）"
   },
@@ -400,7 +402,20 @@
     "firstToken": "首個 token {{time}}",
     "inOut": "輸入 {{in}} / 輸出 {{out}}",
     "cached": "{{count}} 個已快取",
-    "toolFailures": "{{count}} 個失敗"
+    "toolFailures": "{{count}} 個失敗",
+    "notes": {
+      "team": "團隊：規劃者拆分請求，工作者處理各個部分，審查者檢查回答",
+      "single": "單一模型，不做規劃",
+      "specialist": "專用 AI {{name}} 在這台電腦上回答",
+      "otherComputer": "{{model}} 在 {{failed}} 上失敗後，改在 {{computer}} 上回答",
+      "otherModel": "{{model}} 失敗後，改由另一個模型回答",
+      "automation": "自動化 {{name}}",
+      "repaired": "修復了結果中用於條件判斷的資料",
+      "drafted": "工作者先擬好了回答",
+      "partsParallel_other": "並行處理了 {{count}} 個部分",
+      "partsInOrder_other": "依序處理了 {{count}} 個部分",
+      "lookedUp": "先在網路上查詢"
+    }
   },
   "notices": {
     "languageWeak": "{{model}} 寫{{language}}可能不如寫英文好，而已安裝且能執行的模型中沒有更擅長的。{{language}}評級良好的模型可在「模型」頁面找到。",

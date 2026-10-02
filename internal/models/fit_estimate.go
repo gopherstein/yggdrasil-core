@@ -56,6 +56,9 @@ type FitOptions struct {
 	Proven           map[string]bool
 	Measured         map[string]MeasuredRun
 	LoadedModelNames []string
+	// Community is community ratings by model ID, from hardware like this
+	// computer's; nil leaves recommendations to the curated order.
+	Community map[string]CommunitySignal
 }
 
 // MeasuredRun is a prior successful load or benchmark on this machine.

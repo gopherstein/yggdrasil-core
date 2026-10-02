@@ -373,6 +373,8 @@
     "files": "Files",
     "sources": "Sources",
     "memory": "Memory",
+    "attachedFile": "Attached file",
+    "madeInChat": "Made in this chat",
     "remembered": "Remembered",
     "steps_one": "What I did ({{count}} step)",
     "steps_other": "What I did ({{count}} steps)"
@@ -411,7 +413,22 @@
     "firstToken": "first token {{time}}",
     "inOut": "{{in}} in / {{out}} out",
     "cached": "{{count}} cached",
-    "toolFailures": "{{count}} failed"
+    "toolFailures": "{{count}} failed",
+    "notes": {
+      "team": "Team: a planner splits the request, workers do the parts, and a reviewer checks the answer",
+      "single": "Single model, no plan",
+      "specialist": "Specialized AI {{name}} answered on this computer",
+      "otherComputer": "Answered on {{computer}} after {{model}} failed on {{failed}}",
+      "otherModel": "Answered on another model after {{model}} failed",
+      "automation": "Automation {{name}}",
+      "repaired": "Repaired the result's data for the condition",
+      "drafted": "A worker drafted the answer first",
+      "partsParallel_one": "Worked through {{count}} part side by side",
+      "partsParallel_other": "Worked through {{count}} parts side by side",
+      "partsInOrder_one": "Worked through {{count}} part",
+      "partsInOrder_other": "Worked through {{count}} parts one after another",
+      "lookedUp": "Looked up the web first"
+    }
   },
   "notices": {
     "languageWeak": "{{model}} may write {{language}} less well than English, and no installed model that fits writes it better. Models rated good in {{language}} are on the Models page.",

@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
@@ -92,6 +93,8 @@ type Collector struct {
 	tools  map[string]*ToolUse
 	nodes  map[string]bool
 	now    func() time.Time
+	// lang is the App language notes are written in; "" is English.
+	lang string
 }
 
 // New starts a run.
@@ -139,6 +142,35 @@ func (c *Collector) Strategy(note string) {
 		}
 	}
 	c.run.Strategy = append(c.run.Strategy, note)
+}
+
+// SetLanguage sets the App language Note writes in (multilingual spec §16).
+func (c *Collector) SetLanguage(lang string) {
+	if c == nil {
+		return
+	}
+	c.mu.Lock()
+	c.lang = lang
+	c.mu.Unlock()
+}
+
+// Language is the App language the run is written in.
+func (c *Collector) Language() string {
+	if c == nil {
+		return ""
+	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.lang
+}
+
+// Note adds a chat:run.notes key's text, in the App language, to the
+// strategy.
+func (c *Collector) Note(key string, params map[string]any) {
+	if c == nil {
+		return
+	}
+	c.Strategy(locale.T(c.Language(), "chat:run.notes."+key, params))
 }
 
 // Effort records the effort the run used.

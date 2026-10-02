@@ -275,6 +275,7 @@
       "backend": "在記憶體相近的電腦上"
     },
     "overall": "整體",
+    "chosenByCommunity": "根據類似電腦的評分選出",
     "confidence": {
       "limited": "資料有限",
       "early": "初期評分"

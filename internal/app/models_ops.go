@@ -445,6 +445,8 @@ func (a *App) modelsFitAll(ctx context.Context) ([]contracts.ModelsFitResponse, 
 func (a *App) fitOptions(ctx context.Context, nodeID string, local bool, running []contracts.RunningModelView) models.FitOptions {
 	opts := models.FitOptions{}
 	if local {
+		// Community ratings are for hardware like this computer's.
+		opts.Community = a.communitySignals(ctx)
 		opts.Proven = map[string]bool{}
 		opts.Measured = map[string]models.MeasuredRun{}
 		if a.Models != nil {

@@ -280,6 +280,7 @@
       "backend": "on computers with this much memory"
     },
     "overall": "overall",
+    "chosenByCommunity": "Chosen with ratings from computers like yours",
     "confidence": {
       "limited": "Limited data",
       "early": "Early ratings"

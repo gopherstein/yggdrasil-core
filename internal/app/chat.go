@@ -247,11 +247,12 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		// took, and the run is saved however the turn ends.
 		run := runlog.New(task.ID, conversationID, profile.ID, source)
 		ctx = runlog.With(ctx, run)
-		if label := strategyLabel(profile); label != "" {
-			run.Strategy(label)
+		run.SetLanguage(appLang)
+		if key := strategyNote(profile); key != "" {
+			run.Note(key, nil)
 		}
 		if special != nil {
-			run.Strategy("Specialized AI " + special.name + " answered on this computer")
+			run.Note("specialist", map[string]any{"name": special.name})
 		}
 		if routeReason != "" {
 			run.Strategy(routeReason)
@@ -350,7 +351,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 						if alt, ok := a.alternateNode(ctx, profile, profiles.RolePrimary, failedID, exclude); ok && !env.keepsLocal() {
 							step := locale.T(appLang, "chat:steps.fallbackNode", map[string]any{"model": a.modelName(failedID), "failed": a.nodeDisplayName(failedNode), "computer": a.nodeDisplayName(alt)})
 							run.Retried()
-							run.Strategy("Answered on " + a.nodeDisplayName(alt) + " after " + a.modelName(failedID) + " failed on " + a.nodeDisplayName(failedNode))
+							run.Note("otherComputer", map[string]any{"computer": a.nodeDisplayName(alt), "model": a.modelName(failedID), "failed": a.nodeDisplayName(failedNode)})
 							a.Logger.Warn("chat model failed; retrying on another computer", "model", failedID, "failed_node", failedNode, "next_node", alt, "error", evt.Error)
 							env.trace.recovered(step, "")
 							env.retryElsewhere(failedNode)
@@ -364,7 +365,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 						}
 						if next, step, notice, ok := a.fallback(ctx, env.trace.lang, failedID, evt.Error, profile.Orchestration.FallbackModels); ok {
 							run.Retried()
-							run.Strategy("Answered on another model after " + a.modelName(failedID) + " failed")
+							run.Note("otherModel", map[string]any{"model": a.modelName(failedID)})
 							a.Logger.Warn("chat model failed; retrying on another model", "failed", failedID, "next", next.ID, "error", evt.Error)
 							a.noteModelFailed(failedID)
 							env.trace.recovered(step, notice)
@@ -791,13 +792,14 @@ func withChatModel(p profiles.Profile, modelID string) profiles.Profile {
 	return out
 }
 
-// strategyLabel describes a profile's strategy for run details (§35).
-func strategyLabel(p profiles.Profile) string {
+// strategyNote is the chat:run.notes key describing a profile's strategy
+// for run details (§35), or "".
+func strategyNote(p profiles.Profile) string {
 	switch p.Orchestration.Strategy {
 	case profiles.StrategyTeam:
-		return "Team: a planner splits the request, workers do the parts, and a reviewer checks the answer"
+		return "team"
 	case profiles.StrategySingle:
-		return "Single model, no plan"
+		return "single"
 	}
 	return ""
 }

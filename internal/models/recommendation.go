@@ -14,6 +14,33 @@ const memorySafetyMargin = 0.85
 type RecommendInput struct {
 	Purpose  string
 	Hardware contracts.HardwareInventory
+	// Community is community ratings by model ID, from hardware like this
+	// computer's; nil keeps the curated order.
+	Community map[string]CommunitySignal
+}
+
+// choosePrimary picks the main model from fitting candidates in preferred
+// order: for coding, among the coding-capable ones when there are any.
+// Community ratings can move a well rated model ahead (pickByCommunity).
+func choosePrimary(purpose string, fits []CatalogEntry, community map[string]CommunitySignal) (CatalogEntry, bool) {
+	pool := fits
+	if purpose == "coding" {
+		var coding []CatalogEntry
+		for _, f := range fits {
+			if f.Capabilities.Coding {
+				coding = append(coding, f)
+			}
+		}
+		if len(coding) > 0 {
+			pool = coding
+		}
+	}
+	ids := make([]string, len(pool))
+	for i, f := range pool {
+		ids[i] = f.ID
+	}
+	i, byCommunity := pickByCommunity(ids, community)
+	return pool[i], byCommunity
 }
 
 // Recommend selects models and role assignments for a purpose given hardware.
@@ -50,15 +77,10 @@ func Recommend(catalog *Catalog, input RecommendInput) (contracts.Recommendation
 		return contracts.Recommendation{}, fmt.Errorf("no models in catalog")
 	}
 
-	// Prefer the smallest fitting model for a snappy first-run experience.
-	// Advanced users can swap models later in Profiles.
-	primary := fits[0]
-	for _, f := range fits {
-		if purpose == "coding" && f.Capabilities.Coding {
-			primary = f
-			break
-		}
-	}
+	// Prefer the smallest fitting model for a snappy first-run experience,
+	// unless community ratings favor another. Advanced users can swap
+	// models later in Profiles.
+	primary, byCommunity := choosePrimary(purpose, fits, input.Community)
 
 	secondary := primary
 	if len(fits) >= 2 {
@@ -111,6 +133,8 @@ func Recommend(catalog *Catalog, input RecommendInput) (contracts.Recommendation
 		Reason:       reason,
 		StorageBytes: storage,
 		VRAMBytes:    vramTotal(input.Hardware),
+
+		CommunityChosen: byCommunity,
 	}, nil
 }
 
@@ -271,13 +295,7 @@ func RecommendWithPresets(catalog *Catalog, presets []PurposePreset, input Recom
 		return contracts.Recommendation{}, fmt.Errorf("no models in catalog")
 	}
 
-	primary := fits[0]
-	for _, f := range fits {
-		if purpose == "coding" && f.Capabilities.Coding {
-			primary = f
-			break
-		}
-	}
+	primary, byCommunity := choosePrimary(purpose, fits, input.Community)
 
 	secondary := primary
 	if len(fits) >= 2 {
@@ -328,6 +346,8 @@ func RecommendWithPresets(catalog *Catalog, presets []PurposePreset, input Recom
 		Reason:       reason,
 		StorageBytes: storage,
 		VRAMBytes:    vramTotal(input.Hardware),
+
+		CommunityChosen: byCommunity,
 	}, nil
 }
 

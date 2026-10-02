@@ -379,6 +379,8 @@
     "files": "Fichiers",
     "sources": "Sources",
     "memory": "Mémoire",
+    "attachedFile": "Fichier joint",
+    "madeInChat": "Créé dans cette discussion",
     "remembered": "Retenu",
     "steps_one": "Ce que j'ai fait ({{count}} étape)",
     "steps_many": "Ce que j'ai fait ({{count}} étapes)",
@@ -422,7 +424,24 @@
     "firstToken": "premier token {{time}}",
     "inOut": "{{in}} en entrée / {{out}} en sortie",
     "cached": "{{count}} en cache",
-    "toolFailures": "{{count}} en échec"
+    "toolFailures": "{{count}} en échec",
+    "notes": {
+      "team": "Équipe : un planificateur découpe la demande, des exécutants traitent les parties et un relecteur vérifie la réponse",
+      "single": "Modèle unique, sans plan",
+      "specialist": "L'IA spécialisée {{name}} a répondu sur cet ordinateur",
+      "otherComputer": "Réponse sur {{computer}} après l'échec de {{model}} sur {{failed}}",
+      "otherModel": "Réponse par un autre modèle après l'échec de {{model}}",
+      "automation": "Automatisation {{name}}",
+      "repaired": "Données du résultat réparées pour la condition",
+      "drafted": "Un exécutant a d'abord esquissé la réponse",
+      "partsParallel_one": "{{count}} partie traitée en parallèle",
+      "partsParallel_many": "{{count}} parties traitées en parallèle",
+      "partsParallel_other": "{{count}} parties traitées en parallèle",
+      "partsInOrder_one": "{{count}} partie traitée",
+      "partsInOrder_many": "{{count}} parties traitées l'une après l'autre",
+      "partsInOrder_other": "{{count}} parties traitées l'une après l'autre",
+      "lookedUp": "Recherche sur le web d'abord"
+    }
   },
   "notices": {
     "languageWeak": "{{model}} écrit peut-être moins bien en {{language}} qu'en anglais, et aucun modèle installé qui convient ne le fait mieux. La page Modèles indique les modèles bien notés en {{language}}.",

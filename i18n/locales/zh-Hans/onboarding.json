@@ -39,6 +39,7 @@
   "recommend": {
     "badge": "推荐",
     "title": "为“{{purpose}}”推荐",
+    "communityChosen": "使用类似电脑的人对此配置的主模型评价很高，因此优先于通常的首选推荐它。",
     "download": "下载 {{size}}",
     "storage": "预计存储空间",
     "memory": "预计占用内存",

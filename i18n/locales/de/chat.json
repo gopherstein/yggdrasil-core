@@ -373,6 +373,8 @@
     "files": "Dateien",
     "sources": "Quellen",
     "memory": "Gedächtnis",
+    "attachedFile": "Angehängte Datei",
+    "madeInChat": "In diesem Chat erstellt",
     "remembered": "Gemerkt",
     "steps_one": "Was ich getan habe ({{count}} Schritt)",
     "steps_other": "Was ich getan habe ({{count}} Schritte)"
@@ -411,7 +413,22 @@
     "firstToken": "erstes Token {{time}}",
     "inOut": "{{in}} rein / {{out}} raus",
     "cached": "{{count}} aus Cache",
-    "toolFailures": "{{count}} fehlgeschlagen"
+    "toolFailures": "{{count}} fehlgeschlagen",
+    "notes": {
+      "team": "Team: Ein Planer teilt die Anfrage auf, Helfer erledigen die Teile, und ein Prüfer kontrolliert die Antwort",
+      "single": "Ein Modell, ohne Plan",
+      "specialist": "Spezialisierte KI {{name}} hat auf diesem Computer geantwortet",
+      "otherComputer": "Auf {{computer}} geantwortet, nachdem {{model}} auf {{failed}} fehlgeschlagen ist",
+      "otherModel": "Mit einem anderen Modell geantwortet, nachdem {{model}} fehlgeschlagen ist",
+      "automation": "Automation {{name}}",
+      "repaired": "Die Daten des Ergebnisses für die Bedingung repariert",
+      "drafted": "Ein Helfer hat die Antwort zuerst entworfen",
+      "partsParallel_one": "{{count}} Teil parallel bearbeitet",
+      "partsParallel_other": "{{count}} Teile parallel bearbeitet",
+      "partsInOrder_one": "{{count}} Teil bearbeitet",
+      "partsInOrder_other": "{{count}} Teile nacheinander bearbeitet",
+      "lookedUp": "Zuerst im Web nachgeschlagen"
+    }
   },
   "notices": {
     "languageWeak": "{{model}} schreibt {{language}} womöglich weniger gut als Englisch, und kein installiertes Modell, das passt, kann es besser. Modelle mit guter Bewertung für {{language}} findest du unter „Modelle“.",

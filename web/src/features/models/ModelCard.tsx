@@ -28,6 +28,7 @@ export function ModelCard({
   fit,
   peerFits,
   winnerLabel,
+  chosenByCommunity,
   progress,
   installing,
   onInstall,
@@ -41,6 +42,8 @@ export function ModelCard({
   fit?: ModelFit
   peerFits?: { nodeName: string; label: ModelFit['label'] }[]
   winnerLabel?: string
+  /** Community ratings helped choose this model for its badge. */
+  chosenByCommunity?: boolean
   progress?: ModelDownloadProgressPayload
   installing?: boolean
   onInstall: () => void
@@ -71,6 +74,9 @@ export function ModelCard({
       </div>
 
       <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{purpose}</p>
+      {winnerLabel && chosenByCommunity ? (
+        <p className="mt-1 text-xs text-ink-muted">{t('ratings.chosenByCommunity')}</p>
+      ) : null}
 
       <p className="mt-3 text-sm text-ink">
         <span className="font-medium">{fitLabelText(fit?.label) || t('fit.unknown')}</span>

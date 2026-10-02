@@ -30,7 +30,8 @@ type automationExecutor struct {
 // Execute runs an automation and traces the run (§35).
 func (e automationExecutor) Execute(ctx context.Context, automation automations.Automation) (automations.Execution, error) {
 	run := runlog.New(uuid.NewString(), "", automation.ProfileID, egress.SourceAutomation)
-	run.Strategy("Automation " + automation.Name)
+	run.SetLanguage(e.app.appLanguage(ctx))
+	run.Note("automation", map[string]any{"name": automation.Name})
 	result, err := e.execute(runlog.With(ctx, run), automation)
 	status, errText := runlog.StatusCompleted, ""
 	switch {

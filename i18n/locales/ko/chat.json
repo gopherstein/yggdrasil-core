@@ -367,6 +367,8 @@
     "files": "파일",
     "sources": "소스",
     "memory": "메모리",
+    "attachedFile": "첨부 파일",
+    "madeInChat": "이 채팅에서 만듦",
     "remembered": "기억함",
     "steps_other": "수행한 작업({{count}}단계)"
   },
@@ -400,7 +402,20 @@
     "firstToken": "첫 토큰 {{time}}",
     "inOut": "입력 {{in}} / 출력 {{out}}",
     "cached": "{{count}}개 캐시됨",
-    "toolFailures": "{{count}}개 실패"
+    "toolFailures": "{{count}}개 실패",
+    "notes": {
+      "team": "팀: 플래너가 요청을 나누고, 워커가 각 부분을 처리하며, 검토자가 답변을 확인",
+      "single": "단일 모델, 계획 없음",
+      "specialist": "특화 AI {{name}}이(가) 이 컴퓨터에서 답변",
+      "otherComputer": "{{model}}이(가) {{failed}}에서 실패한 뒤 {{computer}}에서 답변",
+      "otherModel": "{{model}}이(가) 실패한 뒤 다른 모델로 답변",
+      "automation": "자동화 {{name}}",
+      "repaired": "조건에 쓸 결과 데이터를 복구",
+      "drafted": "워커가 먼저 답변 초안을 작성",
+      "partsParallel_other": "{{count}}개 부분을 동시에 처리",
+      "partsInOrder_other": "{{count}}개 부분을 순서대로 처리",
+      "lookedUp": "먼저 웹에서 찾아봄"
+    }
   },
   "notices": {
     "languageWeak": "{{model}}은(는) 영어보다 {{language}}를 덜 잘 쓸 수 있고, 설치된 모델 중 이 컴퓨터에 맞으면서 더 잘 쓰는 모델이 없어요. {{language}} 평가가 좋은 모델은 모델 페이지에서 볼 수 있어요.",
