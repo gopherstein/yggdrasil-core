@@ -475,6 +475,7 @@
     "fallbackQuantOutOfMemory": "{{failedQuant}}の{{model}}がメモリ不足になったため、より小さい{{quant}}版が代わりに回答しました",
     "training": "トレーニングがこのコンピュータを使用中のため、この回答は遅くなる可能性があります。",
     "trainingNamed": "トレーニング「{{name}}」がこのコンピュータを使用中のため、この回答は遅くなる可能性があります。",
+    "trainingMoved": "このコンピュータは学習中のため、{{computer}}が回答しました",
     "leftUnderMinute": "残り1分未満です。",
     "leftMinutes_other": "残り約{{count}}分です。",
     "leftHours_other": "残り約{{count}}時間です。",

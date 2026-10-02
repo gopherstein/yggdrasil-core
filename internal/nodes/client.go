@@ -50,20 +50,30 @@ type NodeInfo struct {
 }
 
 func (c *Client) Health(ctx context.Context) error {
+	_, err := c.HealthInfo(ctx)
+	return err
+}
+
+// HealthInfo is the computer's health answer, including whether it is
+// training.
+func (c *Client) HealthInfo(ctx context.Context) (Health, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.baseURL+"/internal/v1/health", nil)
 	if err != nil {
-		return err
+		return Health{}, err
 	}
 	c.applyAuth(req)
 	resp, err := c.http.Do(req)
 	if err != nil {
-		return err
+		return Health{}, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("health HTTP %d", resp.StatusCode)
+		return Health{}, fmt.Errorf("health HTTP %d", resp.StatusCode)
 	}
-	return nil
+	var h Health
+	// An older computer answers without training; that reads as not training.
+	_ = json.NewDecoder(io.LimitReader(resp.Body, 64<<10)).Decode(&h)
+	return h, nil
 }
 
 func (c *Client) NodeInfo(ctx context.Context) (NodeInfo, error) {

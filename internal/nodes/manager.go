@@ -35,6 +35,12 @@ type Manager struct {
 
 	livenessMu sync.Mutex
 	livenessAt time.Time
+
+	// trainingMu guards training: the paired computers whose last health
+	// answer said they were training. localTraining says so for this one.
+	trainingMu    sync.Mutex
+	training      map[string]bool
+	localTraining func() bool
 }
 
 // Liveness timing for the chat path. A background loop refreshes every
@@ -97,6 +103,26 @@ func (m *Manager) name() string {
 	return m.localName
 }
 
+// SetLocalTraining tells the manager how to know this computer is training.
+func (m *Manager) SetLocalTraining(fn func() bool) { m.localTraining = fn }
+
+// TrainingNodes are the computers training now, by node ID: this one, and
+// paired computers as of their last health probe.
+func (m *Manager) TrainingNodes() map[string]bool {
+	m.trainingMu.Lock()
+	out := make(map[string]bool, len(m.training)+1)
+	for id, t := range m.training {
+		if t {
+			out[id] = true
+		}
+	}
+	m.trainingMu.Unlock()
+	if m.localTraining != nil && m.localTraining() {
+		out[m.localNodeID] = true
+	}
+	return out
+}
+
 // Pairing returns the pairing manager.
 func (m *Manager) Pairing() *auth.PairingManager { return m.pairing }
 
@@ -118,6 +144,8 @@ func (m *Manager) List(ctx context.Context) ([]contracts.Node, error) {
 	if m.advertiseAddr != nil {
 		local.Address = m.advertiseAddr()
 	}
+	training := m.TrainingNodes()
+	local.Training = training[local.ID]
 
 	paired, err := m.loadPaired(ctx)
 	if err != nil {
@@ -146,6 +174,7 @@ func (m *Manager) List(ctx context.Context) ([]contracts.Node, error) {
 		}
 		// Keep persisted status (online/offline) from last liveness probe; discovery
 		// alone must not force "online" — RefreshPairedLiveness owns that.
+		paired[i].Training = training[paired[i].ID] && paired[i].Status == contracts.NodeStatusOnline
 	}
 
 	seen := map[string]bool{local.ID: true}
@@ -193,6 +222,7 @@ func (m *Manager) RefreshPairedLiveness(ctx context.Context) {
 	type result struct {
 		id, name, addr string
 		prev, next     contracts.NodeStatus
+		training       bool
 	}
 	results := make([]result, len(paired))
 	var wg sync.WaitGroup
@@ -209,7 +239,7 @@ func (m *Manager) RefreshPairedLiveness(ctx context.Context) {
 				res.next = contracts.NodeStatusOffline
 			} else {
 				client := NewProbeClient(normalizeHTTP(ensureHostPort(addr, 7332)))
-				res.next = m.health.CheckRemote(ctx, client)
+				res.next, res.training = m.health.CheckRemoteTraining(ctx, client)
 			}
 			results[i] = res
 		}(i, n)
@@ -219,6 +249,16 @@ func (m *Manager) RefreshPairedLiveness(ctx context.Context) {
 	// Record results even when the probe deadline has passed; a capped probe
 	// that finds a peer offline must still say so.
 	ctx = context.WithoutCancel(ctx)
+	m.trainingMu.Lock()
+	if m.training == nil {
+		m.training = map[string]bool{}
+	}
+	for _, res := range results {
+		if res.id != "" {
+			m.training[res.id] = res.training
+		}
+	}
+	m.trainingMu.Unlock()
 	for _, res := range results {
 		if res.id == "" {
 			continue

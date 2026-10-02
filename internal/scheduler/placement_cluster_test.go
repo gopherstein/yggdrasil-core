@@ -191,3 +191,35 @@ func TestPlaceAutomaticPrefersAnIdleComputer(t *testing.T) {
 		t.Fatalf("this computer busy -> %s, %v", busy.NodeID, err)
 	}
 }
+
+// Work goes to another computer with the model while this one trains, yet a
+// training computer that is the only one with the model still answers (#111).
+func TestPlaceAvoidsAComputerThatIsTraining(t *testing.T) {
+	s := New(nil)
+	profile := contracts.AIProfile{ID: "general", Roles: []contracts.ModelRole{{Role: "assistant", ModelID: "m"}}}
+	here := NodeCandidate{Node: contracts.Node{ID: "here", IsLocal: true, Paired: true, Status: contracts.NodeStatusOnline}, InstalledModels: map[string]struct{}{"m": {}}}
+	gpu := NodeCandidate{Node: contracts.Node{ID: "gpu-box", Paired: true, Status: contracts.NodeStatusOnline, Address: "10.0.0.2:7332"}, InstalledModels: map[string]struct{}{"m": {}}}
+	training := map[string]bool{"here": true}
+
+	got, err := s.PlaceRole(context.Background(), ScoreInput{Role: "assistant", ModelID: "m", Profile: profile, Nodes: []NodeCandidate{here, gpu}, Training: training,
+		RunningModels: map[string]map[string]struct{}{"here": {"m": {}}}})
+	if err != nil || got.NodeID != "gpu-box" {
+		t.Fatalf("training here, model on both -> %s, %v", got.NodeID, err)
+	}
+	got, err = s.PlaceRole(context.Background(), ScoreInput{Role: "assistant", ModelID: "m", Profile: profile, Nodes: []NodeCandidate{here}, Training: training})
+	if err != nil || got.NodeID != "here" {
+		t.Fatalf("only computer, training -> %s, %v", got.NodeID, err)
+	}
+	gpuNoModel := gpu
+	gpuNoModel.InstalledModels = map[string]struct{}{}
+	got, err = s.PlaceRole(context.Background(), ScoreInput{Role: "assistant", ModelID: "m", Profile: profile, Nodes: []NodeCandidate{here, gpuNoModel}, Training: training})
+	if err != nil || got.NodeID != "here" {
+		t.Fatalf("other computer lacks the model -> %s, %v", got.NodeID, err)
+	}
+	local := profile
+	local.NodePolicy.Mode = "prefer_local"
+	got, err = s.PlaceRole(context.Background(), ScoreInput{Role: "assistant", ModelID: "m", Profile: local, Nodes: []NodeCandidate{here, gpu}, Training: training})
+	if err != nil || got.NodeID != "here" {
+		t.Fatalf("prefer_local while training -> %s, %v", got.NodeID, err)
+	}
+}

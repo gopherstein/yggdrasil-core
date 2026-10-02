@@ -96,7 +96,9 @@
     "hideDetails": "詳細を隠す",
     "manage": "管理",
     "moreActions": "{{name}}のその他の操作",
-    "removeFromTeam": "チームから削除"
+    "removeFromTeam": "チームから削除",
+    "training": "学習中",
+    "trainingHint": "AIを学習中のため、モデルがあるほかのコンピュータに作業を回します"
   },
   "deploy": {
     "title": "モデルをデプロイ",

@@ -99,7 +99,9 @@
     "hideDetails": "Details ausblenden",
     "manage": "Verwalten",
     "moreActions": "Weitere Aktionen für {{name}}",
-    "removeFromTeam": "Aus Team entfernen"
+    "removeFromTeam": "Aus Team entfernen",
+    "training": "Training",
+    "trainingHint": "Trainiert eine KI, daher geht Arbeit an andere Computer, wenn sie das Modell haben"
   },
   "deploy": {
     "title": "Modell bereitstellen",

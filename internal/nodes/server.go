@@ -64,6 +64,15 @@ type InternalDeps struct {
 	Join      http.HandlerFunc
 	// Leave hears a paired computer leaving the network.
 	Leave func(ctx context.Context, nodeID string) error
+	// TrainingActive reports whether this computer is training an AI,
+	// which its health answer tells paired computers.
+	TrainingActive func() bool
+}
+
+// Health is a computer's Bifrost health answer.
+type Health struct {
+	contracts.HealthResponse
+	Training bool `json:"training,omitempty"`
 }
 
 func NewInternalServer(deps InternalDeps) *InternalServer {
@@ -232,7 +241,11 @@ func (s *InternalServer) lookupTokenPeer(ctx context.Context, token string) (str
 }
 
 func (s *InternalServer) handleHealth(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, contracts.HealthResponse{Status: "ok", Product: "Yggdrasil", Version: version.Version})
+	h := Health{HealthResponse: contracts.HealthResponse{Status: "ok", Product: "Yggdrasil", Version: version.Version}}
+	if s.deps.TrainingActive != nil {
+		h.Training = s.deps.TrainingActive()
+	}
+	writeJSON(w, h)
 }
 
 func (s *InternalServer) handleNode(w http.ResponseWriter, r *http.Request) {

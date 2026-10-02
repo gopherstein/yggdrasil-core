@@ -475,6 +475,7 @@
     "fallbackQuantOutOfMemory": "{{failedQuant}} 的 {{model}} 記憶體不足，因此由較小的 {{quant}} 版本回答",
     "training": "訓練正在使用這台電腦，因此這次回答可能會較慢。",
     "trainingNamed": "訓練「{{name}}」正在使用這台電腦，因此這次回答可能會較慢。",
+    "trainingMoved": "這台電腦正在訓練，因此由 {{computer}} 回答",
     "leftUnderMinute": "剩不到 1 分鐘。",
     "leftMinutes_other": "大約還剩 {{count}} 分鐘。",
     "leftHours_other": "大約還剩 {{count}} 小時。",

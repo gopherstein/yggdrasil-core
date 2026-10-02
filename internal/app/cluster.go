@@ -189,6 +189,7 @@ func (a *App) placeRoleWith(ctx context.Context, profile profiles.Profile, role,
 		ExcludeNodeIDs: excludeNodeIDs,
 		RequireModel:   requireModel,
 		ActiveTasks:    a.activeWork(),
+		Training:       a.Nodes.TrainingNodes(),
 	})
 	if err != nil {
 		return "", err

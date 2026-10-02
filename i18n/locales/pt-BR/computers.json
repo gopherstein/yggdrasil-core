@@ -102,7 +102,9 @@
     "hideDetails": "Ocultar detalhes",
     "manage": "Gerenciar",
     "moreActions": "Mais ações para {{name}}",
-    "removeFromTeam": "Remover da equipe"
+    "removeFromTeam": "Remover da equipe",
+    "training": "Treinando",
+    "trainingHint": "Está treinando uma IA, então o trabalho vai para outros computadores que tenham o modelo"
   },
   "deploy": {
     "title": "Implantar um modelo",

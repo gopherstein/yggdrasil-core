@@ -56,3 +56,44 @@ func TestOfflinePeerDoesNotDelayEveryChat(t *testing.T) {
 		t.Fatalf("status = %s", status)
 	}
 }
+
+// A paired computer's health answer says when it is training, and this
+// computer's own training counts too (#111).
+func TestTrainingComesFromHealthProbes(t *testing.T) {
+	dir := t.TempDir()
+	db, err := store.Open(filepath.Join(dir, "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	training := true
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"status":"ok","product":"Yggdrasil","training":` + map[bool]string{true: "true", false: "false"}[training] + `}`))
+	}))
+	defer srv.Close()
+	addr := strings.TrimPrefix(srv.URL, "http://")
+	if _, err := db.SQL.Exec(`INSERT INTO nodes (id, name, status, is_local, address) VALUES ('peer', 'Studio', 'online', 0, ?)`, addr); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := db.SQL.Exec(`INSERT INTO node_trust (node_id, fingerprint) VALUES ('peer', 'fp')`); err != nil {
+		t.Fatal(err)
+	}
+	local, err := auth.LoadOrCreateIdentity(auth.NewSecretStore(dir), "local")
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := NewManager(db.SQL, nil, auth.NewPairingManager(db.SQL, local), "local", "Local", nil)
+	localTraining := false
+	m.SetLocalTraining(func() bool { return localTraining })
+	ctx := context.Background()
+
+	m.RefreshPairedLiveness(ctx)
+	if got := m.TrainingNodes(); !got["peer"] || got["local"] {
+		t.Fatalf("peer training: %v", got)
+	}
+	training, localTraining = false, true
+	m.RefreshPairedLiveness(ctx)
+	if got := m.TrainingNodes(); got["peer"] || !got["local"] {
+		t.Fatalf("this computer training: %v", got)
+	}
+}

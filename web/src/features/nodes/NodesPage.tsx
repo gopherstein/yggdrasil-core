@@ -133,6 +133,11 @@ function ComputerCard({
           </h2>
           <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-ink-muted">
             <Badge kind={kind} />
+            {node.training ? (
+              <span className="status-chip shrink-0 bg-warning/15 text-warning" title={t('card.trainingHint')}>
+                {t('card.training')}
+              </span>
+            ) : null}
             {kind !== 'offline' && (
               <>
                 <span className="text-ink-faint">·</span>

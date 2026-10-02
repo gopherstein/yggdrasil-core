@@ -286,9 +286,6 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		if routeReason != "" {
 			env.trace.routed(routeReason)
 		}
-		if busy, ok := a.trainingStep(appLang); ok {
-			env.trace.sharing(busy)
-		}
 		env.opts = opts
 		if facts := a.capabilityFacts(ctx, message); facts != "" {
 			env.capabilities = facts
@@ -829,6 +826,9 @@ func applyExecutionPolicy(p profiles.Profile, execution string) profiles.Profile
 }
 
 type chatExecEnv struct {
+	// trainingNoted is set once the turn's steps say this computer is
+	// training.
+	trainingNoted  bool
 	app            *App
 	ctx            context.Context
 	profile        profiles.Profile
@@ -1116,6 +1116,7 @@ func (e *chatExecEnv) NodeForRole(role string) (string, error) {
 		local := e.app.Config.Get().NodeID
 		e.roleNodes[role] = local
 		e.mu.Unlock()
+		e.noteTraining(local)
 		return local, nil
 	}
 	avoid := append([]string(nil), e.usedNodes...)
@@ -1129,6 +1130,7 @@ func (e *chatExecEnv) NodeForRole(role string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	e.noteTraining(nodeID)
 
 	e.mu.Lock()
 	e.roleNodes[role] = nodeID
@@ -1326,4 +1328,32 @@ func (a *App) keepStopped(ctx context.Context, env *chatExecEnv, conversationID,
 		"conversation_id": conversationID,
 		"kept":            kept,
 	}))
+}
+
+// noteTraining says once per turn that a training run holds this computer:
+// that the answer may be slower when it runs here, or which computer
+// answers instead.
+func (e *chatExecEnv) noteTraining(nodeID string) {
+	e.mu.Lock()
+	if e.trainingNoted {
+		e.mu.Unlock()
+		return
+	}
+	e.trainingNoted = true
+	e.mu.Unlock()
+	local := ""
+	if e.app.Config != nil {
+		local = e.app.Config.Get().NodeID
+	}
+	if nodeID != "" && nodeID != local && e.app.isTraining() {
+		name := nodeID
+		if n, err := e.app.findPairedNode(e.ctx, nodeID); err == nil {
+			name = nodeDisplayName(n)
+		}
+		e.trace.sharing(locale.T(e.trace.lang, "chat:steps.trainingMoved", map[string]any{"computer": name}))
+		return
+	}
+	if busy, ok := e.app.trainingStep(e.trace.lang); ok {
+		e.trace.sharing(busy)
+	}
 }

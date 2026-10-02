@@ -96,7 +96,9 @@
     "hideDetails": "隐藏详情",
     "manage": "管理",
     "moreActions": "{{name}} 的更多操作",
-    "removeFromTeam": "从团队中移除"
+    "removeFromTeam": "从团队中移除",
+    "training": "训练中",
+    "trainingHint": "正在训练 AI，因此工作会交给有该模型的其他电脑"
   },
   "deploy": {
     "title": "部署模型",

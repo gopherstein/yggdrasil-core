@@ -23,7 +23,16 @@ type ScoreInput struct {
 	ExcludeNodeIDs []string
 	// RequireModel skips computers that do not have the model.
 	RequireModel bool
+	// Training are the computers training an AI now, by node ID. Work goes
+	// to another computer that has the model when there is one (#111).
+	Training map[string]bool
 }
+
+// trainingPenalty sends work away from a computer that is training: an idle
+// computer with the model wins even over a training one that has it
+// running, yet a training computer that is the only one with the model
+// stays above Place's floor and still answers.
+const trainingPenalty = 250
 
 // baseRole strips a worker slot's number, so "worker:2" follows the
 // worker role's pin.
@@ -130,6 +139,11 @@ func Score(input ScoreInput) []ScoredNode {
 				}
 				break
 			}
+		}
+
+		if input.Training[n.Node.ID] && input.Profile.NodePolicy.Mode != "prefer_local" {
+			s.Score -= trainingPenalty
+			s.Reasons = append(s.Reasons, "training on this computer")
 		}
 
 		taskCount := input.ActiveTasks[n.Node.ID]

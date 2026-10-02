@@ -99,7 +99,9 @@
     "hideDetails": "Hide details",
     "manage": "Manage",
     "moreActions": "More actions for {{name}}",
-    "removeFromTeam": "Remove from team"
+    "removeFromTeam": "Remove from team",
+    "training": "Training",
+    "trainingHint": "Training an AI, so work goes to other computers when they have the model"
   },
   "deploy": {
     "title": "Deploy a model",

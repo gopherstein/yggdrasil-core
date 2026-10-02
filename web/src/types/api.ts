@@ -297,6 +297,8 @@ export interface OrchestrationPolicy {
 export type NodeStatus = 'online' | 'offline' | 'unknown'
 
 export interface Node {
+  /** Training an AI now, so work goes to another computer when it can. */
+  training?: boolean
   id: string
   name: string
   os: string

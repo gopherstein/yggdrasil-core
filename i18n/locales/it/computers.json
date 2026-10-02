@@ -102,7 +102,9 @@
     "hideDetails": "Nascondi dettagli",
     "manage": "Gestisci",
     "moreActions": "Altre azioni per {{name}}",
-    "removeFromTeam": "Rimuovi dal team"
+    "removeFromTeam": "Rimuovi dal team",
+    "training": "In addestramento",
+    "trainingHint": "Sta addestrando un'IA, quindi il lavoro va ad altri computer che hanno il modello"
   },
   "deploy": {
     "title": "Distribuisci un modello",

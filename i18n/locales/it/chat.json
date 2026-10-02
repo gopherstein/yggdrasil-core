@@ -501,6 +501,7 @@
     "fallbackQuantOutOfMemory": "{{model}} in {{failedQuant}} ha esaurito la memoria, quindi ha risposto una versione più piccola in {{quant}}",
     "training": "Un addestramento sta usando questo computer, quindi questa risposta potrebbe essere più lenta.",
     "trainingNamed": "L'addestramento “{{name}}” sta usando questo computer, quindi questa risposta potrebbe essere più lenta.",
+    "trainingMoved": "Questo computer è in addestramento, quindi ha risposto {{computer}}",
     "leftUnderMinute": "Manca meno di un minuto.",
     "leftMinutes_one": "Manca circa {{count}} minuto.",
     "leftMinutes_many": "Mancano circa {{count}} minuti.",

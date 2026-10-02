@@ -501,6 +501,7 @@
     "fallbackQuantOutOfMemory": "{{model}} em {{failedQuant}} ficou sem memória, então uma versão menor em {{quant}} respondeu",
     "training": "Um treinamento está usando este computador, então esta resposta pode demorar mais.",
     "trainingNamed": "O treinamento “{{name}}” está usando este computador, então esta resposta pode demorar mais.",
+    "trainingMoved": "Este computador está treinando, então {{computer}} respondeu",
     "leftUnderMinute": "Falta menos de um minuto.",
     "leftMinutes_one": "Falta cerca de {{count}} minuto.",
     "leftMinutes_many": "Faltam cerca de {{count}} minutos.",

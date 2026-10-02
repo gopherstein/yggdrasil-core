@@ -488,6 +488,7 @@
     "fallbackQuantOutOfMemory": "{{model}} in {{failedQuant}} hatte zu wenig Speicher, daher hat eine kleinere Version in {{quant}} geantwortet",
     "training": "Ein Training nutzt diesen Computer, daher kann diese Antwort langsamer sein.",
     "trainingNamed": "Das Training „{{name}}“ nutzt diesen Computer, daher kann diese Antwort langsamer sein.",
+    "trainingMoved": "Dieser Computer trainiert gerade, daher hat {{computer}} geantwortet",
     "leftUnderMinute": "Noch weniger als eine Minute.",
     "leftMinutes_one": "Noch etwa {{count}} Minute.",
     "leftMinutes_other": "Noch etwa {{count}} Minuten.",

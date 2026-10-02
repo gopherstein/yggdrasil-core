@@ -47,6 +47,12 @@ func (a *App) trainingStep(lang string) (string, bool) {
 	return body, true
 }
 
+// isTraining reports whether a training run holds this computer.
+func (a *App) isTraining() bool {
+	_, ok := a.training()
+	return ok
+}
+
 // training is the training run holding this computer, if there is one.
 func (a *App) training() (*share.Work, bool) {
 	if a.Share == nil {

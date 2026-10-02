@@ -374,6 +374,7 @@ func New(opts Options) (*App, error) {
 	a.Benchmarks = bench
 
 	a.Nodes = nodes.NewManager(db.SQL, bus, pairing, cfg.NodeID, cfg.NodeName, a.detectHardware)
+	a.Nodes.SetLocalTraining(a.isTraining)
 	a.Nodes.SetAdvertiseAddr(a.bifrostAdvertiseAddr)
 	a.Nodes.SetStaticPeers(cfg.StaticPeers)
 	_ = a.syncInternalBind()
@@ -746,6 +747,7 @@ func New(opts Options) (*App, error) {
 		LookupOutbound:  a.Nodes.LookupOutbound,
 		Training:        a.Training.RemoteHandler(),
 		Tools:           remotetools.Handler(a.portable, a.enterToolWork),
+		TrainingActive:  a.isTraining,
 		JoinHello:       acceptor.Hello,
 		Join:            acceptor.Join,
 		Leave:           a.peerLeft,

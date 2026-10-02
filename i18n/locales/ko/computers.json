@@ -96,7 +96,9 @@
     "hideDetails": "세부 정보 숨기기",
     "manage": "관리",
     "moreActions": "{{name}}에 대한 추가 작업",
-    "removeFromTeam": "팀에서 제거"
+    "removeFromTeam": "팀에서 제거",
+    "training": "학습 중",
+    "trainingHint": "AI를 학습 중이라 모델이 있는 다른 컴퓨터로 작업을 보냅니다"
   },
   "deploy": {
     "title": "모델 배포",

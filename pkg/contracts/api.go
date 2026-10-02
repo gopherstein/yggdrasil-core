@@ -103,6 +103,9 @@ type Node struct {
 	Hardware   *HardwareInventory `json:"hardware,omitempty"`
 	LastSeenAt *time.Time         `json:"last_seen_at,omitempty"`
 	Address    string             `json:"address,omitempty"`
+	// Training is true while the computer is training an AI, so placement
+	// sends work elsewhere when it can (#111).
+	Training bool `json:"training,omitempty"`
 }
 
 // ModelCapabilities describes model features.

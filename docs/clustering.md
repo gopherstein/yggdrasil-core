@@ -110,6 +110,8 @@ Both computers need Bifrost reachable on the network, which is so while discover
 
 Norn (`internal/scheduler`) scores candidates and picks a node for a role. With the Team strategy, a planner splits the request, each part goes to its own worker slot, and a reviewer checks the answer. With two paired computers and the models installed where those roles need them, the workers land on different machines and write their parts at the same time. The event stream records `scheduler.placement`.
 
+Placement prefers an idle computer that has the model over one that is busy answering or training. A computer that is training is passed over for another with the model, even when it has the model loaded. If it is the only one with the model, it still answers. Each computer's Bifrost health answer says whether it is training, and the Computers page shows a Training badge.
+
 ### Tools on other computers
 
 Image generation (`image.generate`, `image.edit`), video (`video.generate`), and speech (`speech.transcribe`, `speech.synthesize`) run on whichever paired computer can run them. A tool counts as available when this computer or any online paired one has a ready provider, so asking for an image on a laptop without image generation uses the workstation that has it.

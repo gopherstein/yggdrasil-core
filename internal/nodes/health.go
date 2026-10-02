@@ -31,10 +31,17 @@ func (h *HealthChecker) CheckLocal(inv contracts.HardwareInventory) contracts.No
 
 // CheckRemote performs a health request against a remote node (via client).
 func (h *HealthChecker) CheckRemote(ctx context.Context, client *Client) contracts.NodeStatus {
+	status, _ := h.CheckRemoteTraining(ctx, client)
+	return status
+}
+
+// CheckRemoteTraining is CheckRemote, and whether the computer is training.
+func (h *HealthChecker) CheckRemoteTraining(ctx context.Context, client *Client) (contracts.NodeStatus, bool) {
 	ctx, cancel := context.WithTimeout(ctx, h.timeout)
 	defer cancel()
-	if err := client.Health(ctx); err != nil {
-		return contracts.NodeStatusOffline
+	info, err := client.HealthInfo(ctx)
+	if err != nil {
+		return contracts.NodeStatusOffline, false
 	}
-	return contracts.NodeStatusOnline
+	return contracts.NodeStatusOnline, info.Training
 }

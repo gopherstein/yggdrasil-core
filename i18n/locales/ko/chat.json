@@ -475,6 +475,7 @@
     "fallbackQuantOutOfMemory": "{{failedQuant}}의 {{model}}이(가) 메모리가 부족해 더 작은 {{quant}} 버전이 대신 답했습니다",
     "training": "학습이 이 컴퓨터를 사용하고 있어서 이 답변이 느려질 수 있어요.",
     "trainingNamed": "“{{name}}” 학습이 이 컴퓨터를 사용하고 있어서 이 답변이 느려질 수 있어요.",
+    "trainingMoved": "이 컴퓨터가 학습 중이라 {{computer}}에서 답했습니다",
     "leftUnderMinute": "1분도 안 남았어요.",
     "leftMinutes_other": "약 {{count}}분 남았어요.",
     "leftHours_other": "약 {{count}}시간 남았어요.",
