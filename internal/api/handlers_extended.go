@@ -272,6 +272,21 @@ func (s *Server) handleDeleteProfile(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// handleResetProfile puts a built-in profile back to how Yggdrasil ships it
+// (spec §24).
+func (s *Server) handleResetProfile(w http.ResponseWriter, r *http.Request) {
+	if s.deps.ResetProfile == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Profiles not available.", nil)
+		return
+	}
+	p, err := s.deps.ResetProfile(r.Context(), mux.Vars(r)["id"])
+	if err != nil {
+		writeErr(w, http.StatusBadRequest, "RESET_FAILED", err.Error(), nil)
+		return
+	}
+	writeJSON(w, http.StatusOK, p)
+}
+
 func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 	if s.deps.Chat == nil {
 		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Chat not available.", nil)

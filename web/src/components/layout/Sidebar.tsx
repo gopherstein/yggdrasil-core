@@ -21,7 +21,7 @@ const mainNav = [
 const systemNav = [
   { to: '/performance', label: 'Performance' },
   { to: '/diagnostics', label: 'Diagnostics' },
-  { to: '/profiles', label: 'Profiles', advanced: true },
+  { to: '/profiles', label: 'Profiles & Orchestration', advanced: true },
   { to: '/tools', label: 'Tools', advanced: true },
   { to: '/api-access', label: 'API Access', advanced: true },
 ] as const

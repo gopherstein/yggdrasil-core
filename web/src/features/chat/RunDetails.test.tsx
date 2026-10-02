@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { api } from '@/lib/api'
 import { useUIStore } from '@/stores/uiStore'
 import { AnswerDetails } from './AnswerDetails'
+import { roleLabel } from './runRoles'
 
 vi.mock('@/lib/api', () => ({ api: { getRun: vi.fn() } }))
 
@@ -34,5 +35,38 @@ describe('Run details', () => {
     expect(screen.getByText('Looked up the web first')).toBeInTheDocument()
     expect(api.getRun).toHaveBeenCalledWith('abcdef123456')
     useUIStore.setState({ advancedMode: false })
+  })
+
+  it('labels each role and counts model calls for a team', async () => {
+    vi.mocked(api.getRun).mockResolvedValue({
+      id: 'team123456',
+      strategy: ['Team'],
+      status: 'completed',
+      started_at: '2026-10-01T20:00:00Z',
+      models: [
+        { model_id: 'qwen-7b', role: 'assistant', node: 'This Mac', calls: 1, prompt_tokens: 1, completion_tokens: 1, cached_tokens: 0 },
+        { model_id: 'qwen-3b', role: 'worker:2', node: 'Studio', calls: 1, prompt_tokens: 1, completion_tokens: 1, cached_tokens: 0 },
+        { model_id: 'qwen-3b', role: 'worker:1', node: 'Laptop', calls: 1, prompt_tokens: 1, completion_tokens: 1, cached_tokens: 0 },
+        { model_id: 'qwen-14b', role: 'planner', node: 'This Mac', calls: 1, prompt_tokens: 1, completion_tokens: 1, cached_tokens: 0 },
+      ],
+      tools: [],
+      nodes: ['This Mac', 'Studio', 'Laptop'],
+      verification_passes: 0,
+      retries: 0,
+    })
+    useUIStore.setState({ advancedMode: true })
+    render(<AnswerDetails meta={{ run_id: 'team123456' }} />)
+    fireEvent.click(screen.getByRole('button', { name: /Run details/ }))
+    expect(await screen.findByText('Worker 1')).toBeInTheDocument()
+    const labels = screen.getAllByText(/^(Planner|Worker \d|Answer)$/).map((el) => el.textContent)
+    expect(labels).toEqual(['Planner', 'Worker 1', 'Worker 2', 'Answer'])
+    expect(screen.getByText('Model calls').nextSibling?.textContent).toBe('4')
+    useUIStore.setState({ advancedMode: false })
+  })
+
+  it('names roles', () => {
+    expect(roleLabel('assistant')).toBe('Answer')
+    expect(roleLabel('worker:3')).toBe('Worker 3')
+    expect(roleLabel('reviewer')).toBe('Reviewer')
   })
 })

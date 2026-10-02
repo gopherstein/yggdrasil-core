@@ -30,6 +30,7 @@ import {
   type ProfileFilter,
 } from './profilePresentation'
 import { OrchestrationControls, cleanOrchestration } from './OrchestrationControls'
+import { EXECUTION_KEYS, MEMORY_KEYS, ORCHESTRATION_KEYS } from './orchestrationKeys'
 import { RealmKicker } from '@/components/ui/Realm'
 
 const TOOL_CATALOG: {
@@ -257,6 +258,8 @@ export function ProfilesPage() {
         node_policy: profile.node_policy,
         roles: (profile.roles ?? []).map((r) => ({ ...r })),
         tools: (profile.tools ?? []).map((t) => ({ ...t })),
+        knowledge_sources: profile.knowledge_sources,
+        orchestration: profile.orchestration,
       }),
     onSuccess: (created) => {
       queryClient.invalidateQueries({ queryKey: ['profiles'] })
@@ -265,6 +268,15 @@ export function ProfilesPage() {
         setEditingId(created.id)
         setDetailsId(created.id)
       }
+    },
+  })
+
+  const resetMutation = useMutation({
+    mutationFn: (id: string) => api.resetProfile(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['profiles'] })
+      setMenuOpenId(null)
+      setEditingId(null)
     },
   })
 
@@ -322,9 +334,9 @@ export function ProfilesPage() {
       <header className="page-header flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <RealmKicker />
-          <h1 className="page-title">Profiles</h1>
+          <h1 className="page-title">Profiles &amp; Orchestration</h1>
           <p className="page-subtitle">
-            Profiles define how your AI works — its role, tools, models, and computers.
+            A profile is a saved assistant: how it works through requests, its models, tools, memory, and computers.
           </p>
           <p className="mt-1 text-sm text-ink-muted">
             Choose one in Chat, or create your own.
@@ -627,6 +639,20 @@ export function ProfilesPage() {
                           Duplicate
                         </MenuItem>
                         <MenuItem onClick={() => beginRename(profile)}>Rename</MenuItem>
+                        {builtIn && (
+                          <MenuItem
+                            disabled={resetMutation.isPending}
+                            onClick={() => {
+                              if (window.confirm(`Reset “${profile.name}” to how Yggdrasil ships it? Your changes to it are lost.`)) {
+                                resetMutation.mutate(profile.id)
+                              } else {
+                                setMenuOpenId(null)
+                              }
+                            }}
+                          >
+                            Reset to defaults
+                          </MenuItem>
+                        )}
                         {!builtIn && (
                           <MenuItem
                             danger
@@ -806,7 +832,7 @@ function AdvancedEditor({
     <div className="space-y-5 border-t border-line pt-4">
       <section className="space-y-2">
         <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-          Identity
+          Profile
         </h3>
         <label className="block text-xs text-ink-muted">
           Name
@@ -817,70 +843,6 @@ function AdvancedEditor({
             placeholder="e.g. Programming"
           />
         </label>
-      </section>
-
-      <section className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-          How it works
-        </h3>
-        <label className="block text-xs text-ink-muted">
-          Strategy
-          <select
-            className="field mt-1 w-full py-1.5 text-sm"
-            value={strategy}
-            onChange={(e) =>
-              setOrchestration({ ...orchestration, strategy: e.target.value as OrchestrationPolicy['strategy'] })
-            }
-          >
-            {STRATEGY_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <p className="text-xs leading-relaxed text-ink-faint">{orchHint}</p>
-        <label className="block text-xs text-ink-muted">
-          Computer selection
-          <select
-            className="field mt-1 w-full py-1.5 text-sm"
-            value={nodeMode}
-            onChange={(e) =>
-              setNodeMode(e.target.value as AIProfile['node_policy']['mode'])
-            }
-          >
-            <option value="automatic">Automatic — place where the model already lives</option>
-            <option value="prefer_local">Prefer this computer</option>
-            <option value="manual">Custom — rely on role pins below</option>
-          </select>
-        </label>
-        <p className="text-xs leading-relaxed text-ink-faint">{nodeHint}</p>
-        <label className="flex items-center gap-2 text-xs text-ink-muted">
-          <input
-            type="checkbox"
-            checked={placement.remote === 'off'}
-            onChange={(e) => setPlacement({ ...placement, remote: e.target.checked ? 'off' : '' })}
-          />
-          Only this computer — never use paired computers
-        </label>
-        {placement.remote !== 'off' && nodes.length > 0 && (
-          <div className="space-y-1.5">
-            {nodes.map((n) => (
-              <label key={n.id} className="flex items-center justify-between gap-3 text-xs text-ink-muted">
-                <span className="truncate text-ink">{n.name}</span>
-                <select
-                  className="field max-w-[160px] py-1 text-xs"
-                  value={placement.preferred.includes(n.id) ? 'preferred' : placement.denied.includes(n.id) ? 'denied' : ''}
-                  onChange={(e) => setPlacement(withPlacement(placement, n.id, e.target.value))}
-                >
-                  <option value="">Allowed</option>
-                  <option value="preferred">Preferred</option>
-                  <option value="denied">Never use</option>
-                </select>
-              </label>
-            ))}
-          </div>
-        )}
       </section>
 
       <section className="space-y-2">
@@ -963,7 +925,7 @@ function AdvancedEditor({
       </section>
 
       <section className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Capabilities</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Tools</h3>
         <ul className="space-y-2">
           {CAPABILITIES.map((capability) => {
             const on = capabilityEnabled(tools, capability.id)
@@ -985,23 +947,9 @@ function AdvancedEditor({
             )
           })}
         </ul>
-      </section>
-
-      <section className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-          Connected knowledge
-        </h3>
-        <p className="text-xs text-ink-muted">
-          Chats with this profile search these sources on every question and use the matching passages.
-        </p>
-        <KnowledgePicker selected={knowledge} onChange={setKnowledge} disabled={saving} />
-      </section>
-
-      {advancedMode && (
-      <section className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-          Individual tools
-        </h3>
+        {advancedMode && (
+          <div className="space-y-3">
+        <p className="text-xs font-medium text-ink-muted">Individual tools</p>
         <ul className="space-y-2">
           {TOOL_CATALOG.map((tool) => {
             const policy = tools.find((t) => t.tool_id === tool.id)?.policy ?? 'ask'
@@ -1035,12 +983,92 @@ function AdvancedEditor({
             )
           })}
         </ul>
+          </div>
+        )}
       </section>
-      )}
 
-      {advancedMode && (
-        <OrchestrationControls value={orchestration} onChange={setOrchestration} disabled={saving} />
-      )}
+      <section className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Memory</h3>
+        <p className="text-xs text-ink-muted">
+          Chats with this profile search these sources on every question and use the matching passages.
+        </p>
+        <KnowledgePicker selected={knowledge} onChange={setKnowledge} disabled={saving} />
+        {advancedMode && (
+          <OrchestrationControls value={orchestration} onChange={setOrchestration} disabled={saving} only={MEMORY_KEYS} />
+        )}
+      </section>
+
+      <section className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Orchestration</h3>
+        <label className="block text-xs text-ink-muted">
+          Strategy
+          <select
+            className="field mt-1 w-full py-1.5 text-sm"
+            value={strategy}
+            onChange={(e) =>
+              setOrchestration({ ...orchestration, strategy: e.target.value as OrchestrationPolicy['strategy'] })
+            }
+          >
+            {STRATEGY_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="text-xs leading-relaxed text-ink-faint">{orchHint}</p>
+        {advancedMode && (
+          <OrchestrationControls value={orchestration} onChange={setOrchestration} disabled={saving} only={ORCHESTRATION_KEYS} />
+        )}
+      </section>
+
+      <section className="space-y-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Execution</h3>
+        <label className="block text-xs text-ink-muted">
+          Computer selection
+          <select
+            className="field mt-1 w-full py-1.5 text-sm"
+            value={nodeMode}
+            onChange={(e) =>
+              setNodeMode(e.target.value as AIProfile['node_policy']['mode'])
+            }
+          >
+            <option value="automatic">Automatic — place where the model already lives</option>
+            <option value="prefer_local">Prefer this computer</option>
+            <option value="manual">Custom — use the computers set in Models</option>
+          </select>
+        </label>
+        <p className="text-xs leading-relaxed text-ink-faint">{nodeHint}</p>
+        <label className="flex items-center gap-2 text-xs text-ink-muted">
+          <input
+            type="checkbox"
+            checked={placement.remote === 'off'}
+            onChange={(e) => setPlacement({ ...placement, remote: e.target.checked ? 'off' : '' })}
+          />
+          Only this computer — never use paired computers
+        </label>
+        {placement.remote !== 'off' && nodes.length > 0 && (
+          <div className="space-y-1.5">
+            {nodes.map((n) => (
+              <label key={n.id} className="flex items-center justify-between gap-3 text-xs text-ink-muted">
+                <span className="truncate text-ink">{n.name}</span>
+                <select
+                  className="field max-w-[160px] py-1 text-xs"
+                  value={placement.preferred.includes(n.id) ? 'preferred' : placement.denied.includes(n.id) ? 'denied' : ''}
+                  onChange={(e) => setPlacement(withPlacement(placement, n.id, e.target.value))}
+                >
+                  <option value="">Allowed</option>
+                  <option value="preferred">Preferred</option>
+                  <option value="denied">Never use</option>
+                </select>
+              </label>
+            ))}
+          </div>
+        )}
+        {advancedMode && (
+          <OrchestrationControls value={orchestration} onChange={setOrchestration} disabled={saving} only={EXECUTION_KEYS} />
+        )}
+      </section>
 
       <div className="flex flex-wrap items-center gap-3">
         <button

@@ -58,6 +58,7 @@ type Dependencies struct {
 	GetProfile            func(ctx context.Context, id string) (contracts.AIProfile, error)
 	UpdateProfile         func(ctx context.Context, p contracts.AIProfile) (contracts.AIProfile, error)
 	DeleteProfile         func(ctx context.Context, id string) error
+	ResetProfile          func(ctx context.Context, id string) (contracts.AIProfile, error)
 	ListNodes             func(ctx context.Context) ([]contracts.Node, error)
 	RefreshDiscovery      func(ctx context.Context) error
 	StartPairing          func(nodeID string) (*auth.PairingSession, error)
@@ -182,6 +183,7 @@ func (s *Server) routes() {
 	api.HandleFunc("/profiles/{id}", s.handleGetProfile).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/profiles/{id}", s.handlePatchProfile).Methods(http.MethodPatch)
 	api.HandleFunc("/profiles/{id}", s.handleDeleteProfile).Methods(http.MethodDelete)
+	api.HandleFunc("/profiles/{id}/reset", s.handleResetProfile).Methods(http.MethodPost)
 	api.HandleFunc("/chat", s.handleChat).Methods(http.MethodPost)
 	api.HandleFunc("/chat/stop", s.handleStopChat).Methods(http.MethodPost)
 	api.HandleFunc("/conversations/{id}/messages", s.handleConversationMessages).Methods(http.MethodGet, http.MethodOptions)

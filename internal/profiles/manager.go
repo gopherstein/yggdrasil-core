@@ -265,6 +265,24 @@ func (m *Manager) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
+// ResetPreset puts one built-in profile back to how Yggdrasil ships it
+// (spec §24). Other profiles cannot be reset; duplicate a built-in instead.
+func (m *Manager) ResetPreset(ctx context.Context, id string) (Profile, error) {
+	for _, preset := range BuiltInPresets() {
+		if preset.ID != id {
+			continue
+		}
+		if _, err := m.Get(ctx, id); err != nil {
+			return m.Create(ctx, preset)
+		}
+		if err := m.Update(ctx, preset); err != nil {
+			return Profile{}, err
+		}
+		return m.Get(ctx, id)
+	}
+	return Profile{}, fmt.Errorf("only built-in profiles can be reset to defaults")
+}
+
 // ResetToDefaults removes user-created profiles and restores built-in presets.
 func (m *Manager) ResetToDefaults(ctx context.Context) error {
 	items, err := m.List(ctx)

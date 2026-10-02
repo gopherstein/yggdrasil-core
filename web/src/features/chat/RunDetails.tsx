@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { api } from '@/lib/api'
 import type { RunTrace } from '@/types/api'
+import { roleLabel, roleOrder } from './runRoles'
 
 function msText(ms?: number): string {
   if (!ms) return '—'
@@ -55,15 +56,20 @@ export function RunDetails({ runId }: { runId: string }) {
           </Row>
           {run.strategy.length > 0 && <Row label="Strategy">{run.strategy.join(' · ')}</Row>}
           {run.effort && <Row label="Effort">{run.effort}</Row>}
-          {run.models.map((m) => (
-            <Row key={`${m.role}-${m.model_id}-${m.node}`} label={m.role ? `Model (${m.role})` : 'Model'}>
-              {m.model_id}
-              {m.node ? ` on ${m.node}` : ''} · {m.calls} {m.calls === 1 ? 'call' : 'calls'}
-              {m.load_ms ? ` · load ${msText(m.load_ms)}` : ''} · first token {msText(m.first_token_ms)}
-              {m.tok_per_sec ? ` · ${m.tok_per_sec.toFixed(1)} tok/s` : ''} · {m.prompt_tokens} in / {m.completion_tokens} out
-              {m.cached_tokens ? ` · ${m.cached_tokens} cached` : ''}
-            </Row>
-          ))}
+          {[...run.models]
+            .sort((a, b) => roleOrder(a.role) - roleOrder(b.role))
+            .map((m) => (
+              <Row key={`${m.role}-${m.model_id}-${m.node}`} label={roleLabel(m.role)}>
+                {m.model_id}
+                {m.node ? ` on ${m.node}` : ''} · {m.calls} {m.calls === 1 ? 'call' : 'calls'}
+                {m.load_ms ? ` · load ${msText(m.load_ms)}` : ''} · first token {msText(m.first_token_ms)}
+                {m.tok_per_sec ? ` · ${m.tok_per_sec.toFixed(1)} tok/s` : ''} · {m.prompt_tokens} in / {m.completion_tokens} out
+                {m.cached_tokens ? ` · ${m.cached_tokens} cached` : ''}
+              </Row>
+            ))}
+          {run.models.length > 1 && (
+            <Row label="Model calls">{run.models.reduce((n, m) => n + m.calls, 0)}</Row>
+          )}
           {run.workers ? <Row label="Workers">{`${run.workers} ${run.parallel ? 'side by side' : 'in order'}`}</Row> : null}
           {run.tools.length > 0 && (
             <Row label="Tools">

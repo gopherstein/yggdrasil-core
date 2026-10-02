@@ -1640,6 +1640,29 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/v1/profiles/{id}/reset:
+    post:
+      summary: Put a built-in profile back to how Yggdrasil ships it
+      operationId: resetProfile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AIProfile"
+        "400":
+          description: Not a built-in profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/v1/chat:
     post:
       summary: Send a chat message

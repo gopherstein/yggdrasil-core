@@ -428,6 +428,9 @@ export const api = {
   deleteProfile: (id: string) =>
     request<null>(`/api/v1/profiles/${id}`, { method: 'DELETE' }),
 
+  /** Puts a built-in profile back to how Yggdrasil ships it. */
+  resetProfile: (id: string) => request<AIProfile>(`/api/v1/profiles/${id}/reset`, { method: 'POST' }),
+
   listTools: () => request<ToolRecord[]>('/api/v1/tools'),
   toolActivity: () => request<ToolActivityRecord[]>('/api/v1/tools/activity'),
   setToolEnabled: (id: string, enabled: boolean) =>
