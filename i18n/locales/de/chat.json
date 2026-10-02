@@ -384,6 +384,11 @@
     "gone": "Dieser Durchlauf ist nicht mehr gespeichert.",
     "loadFailed": "Der Durchlauf konnte nicht geladen werden.",
     "run": "Durchlauf",
+    "status": {
+      "completed": "Abgeschlossen",
+      "failed": "Fehlgeschlagen",
+      "stopped": "Gestoppt"
+    },
     "strategy": "Strategie",
     "effort": "Aufwand",
     "modelCalls": "Modellaufrufe",
