@@ -9,6 +9,7 @@ import type { LogEntry, Node } from '@/types/api'
 import { useUIStore } from '@/stores/uiStore'
 import { RealmKicker } from '@/components/ui/Realm'
 import { CapabilityPanel } from './CapabilityPanel'
+import { ToolProvidersPanel } from './ToolProvidersPanel'
 import { CachePanel } from './CachePanel'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
 
@@ -565,6 +566,7 @@ export function DiagnosticsPage() {
       )}
 
       <CapabilityPanel />
+      <ToolProvidersPanel />
 
       {advancedMode && <ToolActivityPanel />}
 

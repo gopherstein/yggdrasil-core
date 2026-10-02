@@ -33,6 +33,25 @@ Revoke a peer with `POST /api/v1/nodes/{id}/revoke`.
 
 Norn (`internal/scheduler`) scores candidates and picks a node for a role. With the Team strategy, a planner splits the request, each part goes to its own worker slot, and a reviewer checks the answer. With two paired computers and the models installed where those roles need them, the workers land on different machines and write their parts at the same time. The event stream records `scheduler.placement`.
 
+### Tools on other computers
+
+Image generation (`image.generate`, `image.edit`) and speech (`speech.transcribe`, `speech.synthesize`) run on whichever paired computer can run them. A tool counts as available when this computer or any online paired one has a ready provider, so asking for an image on a laptop without image generation uses the workstation that has it.
+
+**Where a call runs:**
+- Placement prefers a computer whose GPU does the work. Today that is the macOS build of stable-diffusion.cpp, which uses Metal; the Linux and Windows builds run on the CPU.
+- Otherwise this computer is preferred, since nothing has to travel.
+- The chat profile's computer policy applies: Remote off keeps calls here, denied computers are skipped, preferred computers are favored, and Prefer local keeps a call here whenever it can run here.
+- When a computer cannot be reached, or turns out not to be ready, the next one is tried. The tool's own error, such as a prompt that is too long, is not retried elsewhere.
+
+**How a call runs:**
+1. This computer keeps the approval and the audit. It reads the files the call needs from the chat and sends them with the arguments to `POST /internal/v1/tools/run` on the chosen computer. Up to 40 MB travels per call.
+2. That computer runs the work after its own chats, returns the result and any files, and keeps nothing.
+3. This computer saves the files to the chat. The result names the computer that ran it.
+
+Stop closes the connection, which stops the work on the other computer. Each job sent is recorded in What left this computer.
+
+`GET /internal/v1/tools/providers` is what a computer can run. It is asked at most every 30 seconds per computer, and again after a failed call. A computer whose Yggdrasil predates remote tools answers 404 and is listed as needing a newer Yggdrasil. Diagnostics → **Tools on each computer** shows every computer's providers and their state: Ready (healthy), Installing, Failed, or Not set up (unavailable). `GET /api/v1/tools/providers` returns the same list.
+
 A manual pass is written up in [two-machine-team-demo.md](two-machine-team-demo.md). Continuous integration does not run that pass on physical hardware. The Docker cluster check uses stub inference.
 
 ## Ports

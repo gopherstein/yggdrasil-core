@@ -373,6 +373,28 @@ export interface SpeechResult {
   seconds: number
 }
 
+/** One computer's ability to run one tool (Gungnir §16). */
+export interface ToolProvider {
+  tool: string
+  /** What runs it, such as FLUX.2 [klein] 4B. */
+  name?: string
+  state: 'healthy' | 'installing' | 'failed' | 'unavailable'
+  reason?: string
+  /** A GPU does the work. */
+  accelerated: boolean
+}
+
+/** A computer's providers for tools that can run on any paired computer. */
+export interface NodeToolProviders {
+  node_id: string
+  name: string
+  local: boolean
+  online: boolean
+  /** Why its providers are unknown, such as offline. */
+  note?: string
+  providers: ToolProvider[]
+}
+
 /** An image model setup can install. */
 export interface ImageModel {
   id: string

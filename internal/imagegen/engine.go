@@ -12,11 +12,14 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 	"unicode/utf8"
+
+	"github.com/yeixio/yggdrasil-core/internal/remotetools"
 )
 
 // Limits.
@@ -55,6 +58,28 @@ func (e *Engine) Available() (bool, string) {
 		}
 	}
 	return false, "image generation isn't set up yet. Set it up on the Tools page"
+}
+
+// provider describes this computer's image provider (Gungnir §16). Only the
+// macOS build uses the GPU (Metal); the others run on the CPU.
+func (e *Engine) provider(tool string) remotetools.Provider {
+	p := remotetools.Provider{Tool: tool, Accelerated: runtime.GOOS == "darwin"}
+	st := e.Setup.Status()
+	if m, ok := Lookup(st.Active); ok {
+		p.Name = m.Name
+	}
+	switch {
+	case st.Ready:
+		p.State = remotetools.Healthy
+	case st.Job != nil && st.Job.Running:
+		p.State = remotetools.Installing
+	case st.Job != nil && st.Job.Error != "":
+		p.State, p.Reason = remotetools.Failed, st.Job.Error
+	default:
+		_, p.Reason = e.Available()
+		p.State = remotetools.Unavailable
+	}
+	return p
 }
 
 // Request is one image to make, or to edit when Reference is set.

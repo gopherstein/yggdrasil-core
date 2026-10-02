@@ -49,6 +49,9 @@ func setupInternalServer(t *testing.T) (*InternalServer, *auth.NodeIdentity, *au
 			close(ch)
 			return ch, nil
 		},
+		Tools: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			_, _ = w.Write([]byte("tools " + r.URL.Path))
+		}),
 	})
 	return srv, local, pm, peer
 }
@@ -230,3 +233,29 @@ func storeTrustHelper(t *testing.T, pm *auth.PairingManager, peer *auth.NodeIden
 // 3. A pairs → B shows incoming offer → Approve; both trust each other.
 // 4. Install a model only on B; pin Team worker→B (Profiles Edit roles).
 // 5. Chat on A with Programming (Team) profile; timeline shows worker on B.
+
+// Paired computers reach the remote tool protocol; others are refused.
+func TestToolsRouteNeedsAPairedComputer(t *testing.T) {
+	srv, _, pm, peer := setupInternalServer(t)
+	call := func(token string) *httptest.ResponseRecorder {
+		req := httptest.NewRequest(http.MethodGet, "/internal/v1/tools/providers", nil)
+		if token != "" {
+			req.Header.Set("Authorization", "Bearer "+token)
+		}
+		rr := httptest.NewRecorder()
+		srv.http.Handler.ServeHTTP(rr, req)
+		return rr
+	}
+	if rr := call(""); rr.Code != http.StatusUnauthorized {
+		t.Fatalf("unsigned: %d", rr.Code)
+	}
+	if rr := call(peer.AuthToken()); rr.Code == http.StatusOK {
+		t.Fatal("an unpaired computer reached the tools")
+	}
+	if err := storeTrustHelper(t, pm, peer); err != nil {
+		t.Fatal(err)
+	}
+	if rr := call(peer.AuthToken()); rr.Code != http.StatusOK || rr.Body.String() != "tools /tools/providers" {
+		t.Fatalf("paired: %d %q", rr.Code, rr.Body.String())
+	}
+}

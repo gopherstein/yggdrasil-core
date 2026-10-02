@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/yeixio/yggdrasil-core/internal/codeexec"
+	"github.com/yeixio/yggdrasil-core/internal/remotetools"
 	"github.com/yeixio/yggdrasil-core/internal/speech"
 )
 
@@ -31,10 +32,11 @@ func TestFileToolsHaveTheStore(t *testing.T) {
 	if tool := get("code.execute").(*codeexec.Tool); tool.Store != a.Artifacts {
 		t.Error("code.execute has no file store")
 	}
-	if tool := get("speech.transcribe").(*speech.TranscribeTool); tool.Store != a.Artifacts {
+	local := func(id string) any { return get(id).(*remotetools.Proxy).Local() }
+	if tool := local("speech.transcribe").(*speech.TranscribeTool); tool.Store != a.Artifacts {
 		t.Error("speech.transcribe has no file store")
 	}
-	if tool := get("speech.synthesize").(*speech.SynthesizeTool); tool.Store != a.Artifacts {
+	if tool := local("speech.synthesize").(*speech.SynthesizeTool); tool.Store != a.Artifacts {
 		t.Error("speech.synthesize has no file store")
 	}
 }

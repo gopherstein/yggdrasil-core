@@ -88,6 +88,7 @@ import type {
   Artifact,
   SpeechResult,
   ImageSetup,
+  NodeToolProviders,
   FileRef,
   StopChatResponse,
 } from '@/types/api'
@@ -495,6 +496,9 @@ export const api = {
   listToolRuns: async (toolId?: string) =>
     (await request<ToolRun[]>(`/api/v1/tools/runs?limit=20${toolId ? `&tool_id=${encodeURIComponent(toolId)}` : ''}`)) ?? [],
   toolActivity: () => request<ToolActivityRecord[]>('/api/v1/tools/activity'),
+
+  /** Each computer's providers for tools that can run on any paired computer. */
+  toolProviders: () => request<NodeToolProviders[]>('/api/v1/tools/providers'),
   setToolEnabled: (id: string, enabled: boolean) =>
     request<{ id: string; enabled: boolean }>(`/api/v1/tools/${encodeURIComponent(id)}/enabled`, {
       method: 'POST',

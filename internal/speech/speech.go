@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/pyenv"
+	"github.com/yeixio/yggdrasil-core/internal/remotetools"
 )
 
 //go:embed transcribe.py
@@ -80,6 +81,15 @@ func (e *Engine) Available() (bool, string) {
 		return false, why
 	}
 	return true, ""
+}
+
+// provider describes this computer's speech provider (Gungnir §16). Speech
+// runs on the CPU.
+func (e *Engine) provider(tool, name string) remotetools.Provider {
+	if ok, why := e.Available(); !ok {
+		return remotetools.Provider{Tool: tool, Name: name, State: remotetools.Unavailable, Reason: why}
+	}
+	return remotetools.Provider{Tool: tool, Name: name, State: remotetools.Healthy}
 }
 
 // Segment is a timed part of a transcript.

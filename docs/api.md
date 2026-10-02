@@ -112,6 +112,7 @@ Control-plane routes are under `/api/v1`. The OpenAI-compatible routes are under
 | POST | `/tools/{id}/test` | Run a tool with `args` and return its result |
 | POST | `/tools/decide` | Answer an Ask approval: `request_id`, `allow`, and `allow_session` |
 | GET | `/tools/activity` | Recent tool calls, kept in memory for this process |
+| GET | `/tools/providers` | Each computer's providers for image and speech tools, which can run on any paired computer: state (healthy, installing, failed, unavailable), what runs it, and whether a GPU does the work |
 | GET | `/connectors` | Connected services and their status |
 | PUT, DELETE | `/connectors/{id}` | Connect a service (`{"values": {...}}`), or disconnect it. `POST /connectors/{id}/check` tests the stored credential. |
 | GET, POST | `/mcp/servers` | MCP tool sources, or add one |

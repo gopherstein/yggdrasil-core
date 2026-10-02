@@ -48,6 +48,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/orchestrator/builtin/simple"
 	"github.com/yeixio/yggdrasil-core/internal/profiles"
 	"github.com/yeixio/yggdrasil-core/internal/pyenv"
+	"github.com/yeixio/yggdrasil-core/internal/remotetools"
 	"github.com/yeixio/yggdrasil-core/internal/runlog"
 	"github.com/yeixio/yggdrasil-core/internal/runtimes"
 	"github.com/yeixio/yggdrasil-core/internal/runtimes/external"
@@ -127,6 +128,10 @@ type App struct {
 	failedModels sync.Map
 	// Speech transcribes audio and reads text aloud (Gungnir §18–19).
 	Speech *speech.Engine
+	// toolNet places heavy tools on the computer that suits them, and
+	// portable are the tools it can place (Gungnir §14–16).
+	toolNet  *remotetools.Network
+	portable []remotetools.Portable
 	// Images makes and edits images on this computer (Gungnir §17).
 	Images *imagegen.Setup
 	// health turns computer and model health changes into notifications.
@@ -517,6 +522,9 @@ func New(opts Options) (*App, error) {
 		ToolActivity: func() any {
 			return toolReg.Recent()
 		},
+		ToolProviders: func(ctx context.Context) any {
+			return a.toolProviders(ctx)
+		},
 		ListAPIKeys:          apiKeyMgr.List,
 		CreateAPIKey:         apiKeyMgr.Create,
 		RevokeAPIKey:         apiKeyMgr.Revoke,
@@ -640,8 +648,9 @@ func New(opts Options) (*App, error) {
 		WorkDir: filepath.Join(cfg.DataDir, "code-runs"), PythonRoot: a.python.Root})
 	// Speech runs on this computer; models are kept with the runtimes.
 	a.Speech = &speech.Engine{Python: a.python, Dir: filepath.Join(cfg.RuntimesDir, "speech")}
-	a.Tools.Register(&speech.TranscribeTool{Engine: a.Speech, Store: a.Artifacts})
-	a.Tools.Register(&speech.SynthesizeTool{Engine: a.Speech, Store: a.Artifacts})
+	a.toolNet = a.newToolNetwork(cfg)
+	a.registerPortable(&speech.TranscribeTool{Engine: a.Speech, Store: a.Artifacts})
+	a.registerPortable(&speech.SynthesizeTool{Engine: a.Speech, Store: a.Artifacts})
 	a.API.BindSpeech(a.Speech, a.Artifacts)
 	a.Mimir.SetModels(newKnowledgeModels(a))
 	a.Muninn = muninn.NewStore(db.SQL)
@@ -653,8 +662,8 @@ func New(opts Options) (*App, error) {
 	a.API.BindKnowledge(a.Mimir)
 	a.Images = a.newImageSetup(cfg)
 	images := &imagegen.Engine{Setup: a.Images, WorkDir: filepath.Join(cfg.DataDir, "image-jobs")}
-	a.Tools.Register(&imagegen.GenerateTool{Engine: images, Store: a.Artifacts})
-	a.Tools.Register(&imagegen.EditTool{Engine: images, Store: a.Artifacts})
+	a.registerPortable(&imagegen.GenerateTool{Engine: images, Store: a.Artifacts})
+	a.registerPortable(&imagegen.EditTool{Engine: images, Store: a.Artifacts})
 	a.API.BindImages(a.Images)
 	a.Training = a.newTrainingService()
 	if err := a.Training.Recover(context.Background()); err != nil {
@@ -683,6 +692,7 @@ func New(opts Options) (*App, error) {
 		LookupOutbound:  a.Nodes.LookupOutbound,
 		AdvertiseAddr:   a.bifrostAdvertiseAddr,
 		Training:        a.Training.RemoteHandler(),
+		Tools:           remotetools.Handler(a.portable, a.enterToolWork),
 	})
 
 	return a, nil

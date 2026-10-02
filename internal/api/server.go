@@ -100,6 +100,7 @@ type Dependencies struct {
 	SetToolEnabled         func(ctx context.Context, id string, enabled bool) error
 	TestTool               func(ctx context.Context, id string, args map[string]any) (map[string]any, error)
 	ToolActivity           func() any
+	ToolProviders          func(ctx context.Context) any
 	ListAPIKeys            func(ctx context.Context) ([]auth.APIKeyRecord, error)
 	CreateAPIKey           func(ctx context.Context, name string) (auth.APIKeyRecord, string, error)
 	RevokeAPIKey           func(ctx context.Context, id string) error
@@ -209,6 +210,7 @@ func (s *Server) routes() {
 	api.HandleFunc("/tools", s.handleListTools).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/tools/runs", s.handleToolRuns).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/tools/activity", s.handleToolActivity).Methods(http.MethodGet, http.MethodOptions)
+	api.HandleFunc("/tools/providers", s.handleToolProviders).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/tools/decide", s.handleToolDecide).Methods(http.MethodPost)
 	api.HandleFunc("/tools/{id}/enabled", s.handleSetToolEnabled).Methods(http.MethodPost, http.MethodOptions)
 	api.HandleFunc("/tools/{id}/test", s.handleTestTool).Methods(http.MethodPost, http.MethodOptions)

@@ -21,6 +21,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/muninn"
 	"github.com/yeixio/yggdrasil-core/internal/orchestrator/builtin/simple"
 	"github.com/yeixio/yggdrasil-core/internal/profiles"
+	"github.com/yeixio/yggdrasil-core/internal/remotetools"
 	"github.com/yeixio/yggdrasil-core/internal/runlog"
 	"github.com/yeixio/yggdrasil-core/internal/runtimes/llamacpp"
 	"github.com/yeixio/yggdrasil-core/internal/share"
@@ -983,6 +984,8 @@ func (e *chatExecEnv) ExecuteTool(ctx context.Context, toolID string, args map[s
 		meta["task_id"] = e.taskID
 	}
 	ctx = artifacts.WithConversation(ctx, e.conversationID)
+	// A heavy tool may run on another computer, as the profile allows.
+	ctx = remotetools.WithPolicy(ctx, e.profile.NodePolicy)
 	e.progress(events.ToolStarted, map[string]any{"tool_id": toolID, "args": args})
 	toolStarted := time.Now()
 	result, err := e.app.Tools.Execute(ctx, toolID, args, policy, "chat requested tool", meta)
