@@ -301,6 +301,12 @@ func (p *PairingManager) IsTrusted(ctx context.Context, nodeID string) bool {
 	return err == nil
 }
 
+// Trust pairs a computer whose key was verified another way, such as by a
+// one-line join token (#40).
+func (p *PairingManager) Trust(ctx context.Context, nodeID, name, address string, cert []byte) error {
+	return p.storeTrust(ctx, nodeID, name, address, cert)
+}
+
 func (p *PairingManager) storeTrust(ctx context.Context, nodeID, name, address string, cert []byte) error {
 	fp := Fingerprint(string(cert))
 	_, err := p.db.ExecContext(ctx, `

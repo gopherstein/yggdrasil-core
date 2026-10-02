@@ -1433,6 +1433,139 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/v1/join-tokens:
+    post:
+      summary: Make a one-time join token and the command that adds a computer to this network
+      description: The token is shown once and only its proof key is kept. It lasts `ttl_minutes` (15 by default, at most 1440) and can be used once. Refused with 409 when other computers can't reach this one's Bifrost.
+      operationId: createJoinToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ttl_minutes: {type: integer, minimum: 1, maximum: 1440}
+      responses:
+        "201":
+          description: Token and command
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/JoinToken"
+                  - type: object
+                    properties:
+                      token: {type: string, description: "ygj_…, shown only now"}
+                      server: {type: string, description: This computer's Bifrost address, host:port}
+                      fingerprint: {type: string, description: "sha256: of this computer's public key"}
+                      command: {type: string}
+        "409":
+          description: Other computers can't reach this one
+    get:
+      summary: Join tokens, active and from the last week, without their secrets
+      operationId: listJoinTokens
+      responses:
+        "200":
+          description: Tokens, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items: {$ref: "#/components/schemas/JoinToken"}
+  /api/v1/join-tokens/{id}:
+    delete:
+      summary: Revoke an unused join token
+      operationId: revokeJoinToken
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Revoked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JoinToken"
+        "404":
+          description: No such token
+        "409":
+          description: Already used, revoked, or expired
+  /api/v1/network:
+    get:
+      summary: This computer's network, its Bifrost address and fingerprint, and the computers it trusts
+      operationId: getNetwork
+      responses:
+        "200":
+          description: Network
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  network_id: {type: string, description: Empty until a join token is made or a network joined}
+                  reachable: {type: boolean}
+                  node: {$ref: "#/components/schemas/NetworkNode"}
+                  peers:
+                    type: array
+                    items: {$ref: "#/components/schemas/NetworkNode"}
+  /api/v1/network/join:
+    post:
+      summary: Join this computer to the network of the computer that made a join token
+      description: Verifies the server's key against the fingerprint before proving the token, which never leaves this computer. Safe to repeat; refuses to switch networks while paired.
+      operationId: joinNetwork
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [server, token, fingerprint]
+              properties:
+                server: {type: string, description: "host:port of the issuer's Bifrost (7332 if left out)"}
+                token: {type: string}
+                fingerprint: {type: string}
+      responses:
+        "200":
+          description: Joined, or already joined
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: {type: string, enum: [joined, already_joined]}
+                  network_id: {type: string}
+                  server: {$ref: "#/components/schemas/NetworkNode"}
+                  node: {$ref: "#/components/schemas/NetworkNode"}
+        "400":
+          description: Malformed server, token, or fingerprint
+        "401":
+          description: Invalid token, or the server isn't the one the command names (JOIN_WRONG_SERVER)
+        "409":
+          description: Already in another network, or not reachable by other computers
+        "410":
+          description: The token expired, was used, or was revoked
+        "429":
+          description: Too many attempts
+        "502":
+          description: The server couldn't be reached
+  /api/v1/network/leave:
+    post:
+      summary: Leave the network, telling each paired computer, and forget them all
+      description: Models, settings, and this computer's identity stay.
+      operationId: leaveNetwork
+      responses:
+        "200":
+          description: Left
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  left: {type: array, items: {type: string}}
+                  unreachable: {type: array, items: {type: string}}
   /api/v1/models/{id}/rating:
     get:
       summary: This person's rating of a model, and exactly what sharing it would send
@@ -4521,6 +4654,24 @@ components:
         instructions:
           type: string
           maxLength: 1500
+    JoinToken:
+      type: object
+      properties:
+        id: {type: string}
+        created_at: {type: string, format: date-time}
+        expires_at: {type: string, format: date-time}
+        used_at: {type: string, format: date-time}
+        used_by: {type: string}
+        revoked_at: {type: string, format: date-time}
+        status: {type: string, enum: [active, used, revoked, expired]}
+    NetworkNode:
+      type: object
+      properties:
+        id: {type: string}
+        name: {type: string}
+        address: {type: string}
+        status: {type: string}
+        fingerprint: {type: string}
     RatingTag:
       type: string
       enum: [great_responses, fast, slow, stable, crashed, too_much_memory, great_for_coding, great_for_chat, good_tool_use, poor_tool_use]

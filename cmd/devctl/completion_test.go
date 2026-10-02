@@ -22,7 +22,7 @@ func TestCompletionPrintsEachShell(t *testing.T) {
 		if !bytes.Equal(out.Bytes(), want) {
 			t.Fatalf("%s: printed script does not match %s", shell, path)
 		}
-		for _, cmd := range []string{"version", "about", "paths", "automations", "mcp", "completion"} {
+		for _, cmd := range []string{"version", "about", "paths", "automations", "mcp", "join", "join-token", "network", "leave", "completion"} {
 			if !strings.Contains(out.String(), cmd) {
 				t.Fatalf("%s script does not offer %q", shell, cmd)
 			}
@@ -71,7 +71,10 @@ func TestBashCompletionCandidates(t *testing.T) {
 		line string
 		want string
 	}{
-		{"yggctl ''", "version about paths automations mcp completion"},
+		{"yggctl ''", "version about paths automations mcp join join-token network leave completion"},
+		{"yggctl j", "join join-token"},
+		{"yggctl join-token ''", "create list revoke"},
+		{"yggctl join --f", "--fingerprint"},
 		{"yggctl a", "about automations"},
 		{"yggctl completion ''", "bash zsh fish"},
 		{"yggctl automations p", "pause"},

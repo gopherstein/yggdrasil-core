@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/config"
 	"github.com/yeixio/yggdrasil-core/internal/version"
@@ -33,6 +35,14 @@ func main() {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
+	case "join":
+		exit(joinCommand(os.Args[2:], newDaemon(), os.Stdout))
+	case "join-token":
+		exit(joinTokenCommand(os.Args[2:], newDaemon(), os.Stdout, time.Now))
+	case "network":
+		exit(networkCommand(os.Args[2:], newDaemon(), os.Stdout))
+	case "leave":
+		exit(leaveCommand(os.Args[2:], newDaemon(), os.Stdout))
 	case "completion":
 		if err := completionCommand(os.Args[2:], os.Stdout); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -45,5 +55,18 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "usage: yggctl <version|about|paths|automations|mcp|completion>\n")
+	fmt.Fprintf(os.Stderr, "usage: yggctl <version|about|paths|automations|mcp|join|join-token|network|leave|completion>\n")
+}
+
+// exit ends with err's message and exit status: 2 for usage, 1 otherwise.
+func exit(err error) {
+	if err == nil {
+		return
+	}
+	fmt.Fprintln(os.Stderr, err)
+	var e *exitError
+	if errors.As(err, &e) {
+		os.Exit(e.code)
+	}
+	os.Exit(1)
 }

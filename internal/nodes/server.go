@@ -54,6 +54,13 @@ type InternalDeps struct {
 	// Tools serves /internal/v1/tools/ for paired computers that run tools
 	// here (Gungnir §38).
 	Tools http.Handler
+
+	// JoinHello and Join answer the one-line join handshake (#40); they
+	// check the join token themselves.
+	JoinHello http.HandlerFunc
+	Join      http.HandlerFunc
+	// Leave hears a paired computer leaving the network.
+	Leave func(ctx context.Context, nodeID string) error
 }
 
 func NewInternalServer(deps InternalDeps) *InternalServer {
@@ -81,6 +88,13 @@ func NewInternalServer(deps InternalDeps) *InternalServer {
 	api.HandleFunc("/pairing/complete", s.handlePairingComplete).Methods(http.MethodPost)
 	api.HandleFunc("/pairing/pending", s.handlePairingPending).Methods(http.MethodGet)
 	api.HandleFunc("/pairing/outbound/{code}", s.handlePairingOutbound).Methods(http.MethodGet)
+	if deps.JoinHello != nil && deps.Join != nil {
+		api.HandleFunc("/join/hello", deps.JoinHello).Methods(http.MethodPost)
+		api.HandleFunc("/join", deps.Join).Methods(http.MethodPost)
+	}
+	if deps.Leave != nil {
+		api.HandleFunc("/join/leave", s.handleLeave).Methods(http.MethodPost)
+	}
 	if deps.Training != nil {
 		api.PathPrefix("/training/").Handler(http.StripPrefix("/internal/v1", deps.Training))
 	}
@@ -138,8 +152,7 @@ func (s *InternalServer) authMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "invalid token", http.StatusUnauthorized)
 			return
 		}
-		_ = nodeID
-		next.ServeHTTP(w, r)
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), peerKey{}, nodeID)))
 	})
 }
 
@@ -148,6 +161,8 @@ func isPublicInternalPath(path string) bool {
 	case strings.HasSuffix(path, "/health"),
 		strings.HasSuffix(path, "/node"),
 		strings.HasSuffix(path, "/pairing/offer"),
+		strings.HasSuffix(path, "/join/hello"),
+		strings.HasSuffix(path, "/v1/join"),
 		strings.HasSuffix(path, "/pairing/complete"),
 		strings.HasSuffix(path, "/pairing/pending"),
 		strings.Contains(path, "/pairing/outbound/"):
@@ -155,6 +170,29 @@ func isPublicInternalPath(path string) bool {
 	default:
 		return false
 	}
+}
+
+// peerKey carries the authenticated paired computer's node ID.
+type peerKey struct{}
+
+// PeerFrom is the paired computer a request came from, or "".
+func PeerFrom(ctx context.Context) string {
+	id, _ := ctx.Value(peerKey{}).(string)
+	return id
+}
+
+// handleLeave forgets a paired computer that says it is leaving.
+func (s *InternalServer) handleLeave(w http.ResponseWriter, r *http.Request) {
+	peer := PeerFrom(r.Context())
+	if peer == "" {
+		http.Error(w, "authorization required", http.StatusUnauthorized)
+		return
+	}
+	if err := s.deps.Leave(r.Context(), peer); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (s *InternalServer) lookupTokenPeer(ctx context.Context, token string) (string, []byte, error) {

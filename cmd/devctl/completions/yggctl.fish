@@ -7,10 +7,20 @@ complete -c yggctl -n __fish_use_subcommand -a about -d 'Print the version, lice
 complete -c yggctl -n __fish_use_subcommand -a paths -d 'Print the data, model, runtime, log, and database directories'
 complete -c yggctl -n __fish_use_subcommand -a automations -d 'Manage scheduled automations on the daemon'
 complete -c yggctl -n __fish_use_subcommand -a mcp -d 'Connect an app such as Claude Desktop to Yggdrasil over MCP'
+complete -c yggctl -n __fish_use_subcommand -a join -d 'Join this computer to a Yggdrasil network'
+complete -c yggctl -n __fish_use_subcommand -a join-token -d 'Make, list, or revoke join tokens'
+complete -c yggctl -n __fish_use_subcommand -a network -d "Show this computer's network and paired computers"
+complete -c yggctl -n __fish_use_subcommand -a leave -d 'Leave the network and forget paired computers'
 complete -c yggctl -n __fish_use_subcommand -a completion -d 'Print a shell completion script'
 
 complete -c yggctl -n '__fish_seen_subcommand_from completion' -a 'bash zsh fish'
 complete -c yggctl -n '__fish_seen_subcommand_from mcp' -l url -r -d 'Yggdrasil address'
+complete -c yggctl -n '__fish_seen_subcommand_from join' -l server -r -d 'Address of the computer that made the command'
+complete -c yggctl -n '__fish_seen_subcommand_from join' -l token -r -d 'Join token'
+complete -c yggctl -n '__fish_seen_subcommand_from join' -l fingerprint -r -d "That computer's fingerprint"
+complete -c yggctl -n '__fish_seen_subcommand_from join-token; and not __fish_seen_subcommand_from create list revoke' -a 'create list revoke'
+complete -c yggctl -n '__fish_seen_subcommand_from join-token' -l ttl -r -d 'How long the token lasts, such as 15m'
+complete -c yggctl -n '__fish_seen_subcommand_from join join-token network leave' -l output -x -a 'text json' -d 'Output format'
 
 set -l ygg_automation_cmds list get create update delete run pause resume
 complete -c yggctl -n "__fish_seen_subcommand_from automations; and not __fish_seen_subcommand_from $ygg_automation_cmds" -a "$ygg_automation_cmds"

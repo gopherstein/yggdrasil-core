@@ -59,6 +59,13 @@ const (
 	NodePaired     = "node.paired"
 	NodeOnline     = "node.online"
 	NodeOffline    = "node.offline"
+	// One-line join (#40): tokens made and revoked, computers that joined
+	// or were refused, and computers that left.
+	JoinTokenCreated = "join_token.created"
+	JoinTokenRevoked = "join_token.revoked"
+	NodeJoined       = "node.join.accepted"
+	NodeJoinRefused  = "node.join.rejected"
+	NodeLeft         = "node.left"
 
 	SchedulerPlacement = "scheduler.placement"
 

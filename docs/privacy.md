@@ -12,7 +12,7 @@ Everything Yggdrasil keeps is in the data directory. [Configuration](configurati
 
 | Path | Contents |
 | --- | --- |
-| `yggdrasil.db` | The audit of tool calls (what each was about, never file contents), chats and their messages, summaries of long conversations, memories, profiles, settings, model start and crash counts for community ratings (kept 90 days), automations and their results, specialized AIs and their examples, knowledge indexes and vectors, run records (traces, task history, what left this computer), notifications, API key hashes, paired computers. |
+| `yggdrasil.db` | The audit of tool calls (what each was about, never file contents), chats and their messages, summaries of long conversations, memories, profiles, settings, model start and crash counts for community ratings (kept 90 days), automations and their results, specialized AIs and their examples, knowledge indexes and vectors, run records (traces, task history, what left this computer), notifications, API key hashes, paired computers, and join token records (a proof key and when each was used, never the token). |
 | `artifacts/` | Files attached to chats and files the assistant made, one folder per chat. Deleting a chat deletes its files. |
 | `knowledge/` | Copies of content you pasted or uploaded as knowledge, and the recognized text of scanned PDFs. Linked files, folders, databases, and web APIs stay where they are. |
 | `training/` | Trained adapters, exported GGUF files, and downloaded training weights. |
@@ -57,6 +57,7 @@ Nothing leaves because the daemon started. Traffic is sent only when a feature t
 | Community ratings | Only when you choose. With **Show community ratings** on (off by default), the public ratings summary is downloaded once a day from the ratings service, or from GitHub when it cannot be reached, while you browse models; nothing about you is sent. A rating is sent only when you tick **Share this rating with the community**: the stars and reasons, the model, the computer's class (such as Apple M4 Max with 32–64 GB of unified memory), a random rating ID, and the app version. With **Include how it runs here** also ticked, the model's median speed and time to first token on this computer, how many of its starts worked, whether it crashed or ran out of memory, and how much context it used; the dialog shows the numbers first. Never prompts, chats, file names, the computer's name, your user name, or an address; the service does not store IP addresses. Each download, rating shared, and rating withdrawn is recorded. |
 | External OpenAI runtime | The base URL configured for `external-openai`, with its API key |
 | Bifrost discovery and pairing | Other computers on the local network, or the static peers you listed |
+| Joining a network (`yggctl join`) | The computer that made the join command: this computer's name, ID, public key, and Bifrost address. The token itself is never sent; only a proof made from it. Leaving tells each paired computer. Both are recorded. |
 | LAN API | Any client that can reach port 7331 after you turn on local network access |
 
 ## What left this computer

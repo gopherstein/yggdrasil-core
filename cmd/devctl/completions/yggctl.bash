@@ -6,7 +6,7 @@ _yggctl() {
   prev="${COMP_WORDS[COMP_CWORD-1]}"
 
   if [[ ${COMP_CWORD} -eq 1 ]]; then
-    COMPREPLY=($(compgen -W "version about paths automations mcp completion" -- "$cur"))
+    COMPREPLY=($(compgen -W "version about paths automations mcp join join-token network leave completion" -- "$cur"))
     return
   fi
 
@@ -14,6 +14,23 @@ _yggctl() {
     mcp)
       if [[ "$cur" == -* ]]; then
         COMPREPLY=($(compgen -W "--url" -- "$cur"))
+      fi
+      ;;
+    join)
+      if [[ "$cur" == -* ]]; then
+        COMPREPLY=($(compgen -W "--server --token --fingerprint --output" -- "$cur"))
+      fi
+      ;;
+    join-token)
+      if [[ ${COMP_CWORD} -eq 2 ]]; then
+        COMPREPLY=($(compgen -W "create list revoke" -- "$cur"))
+      elif [[ "$cur" == -* ]]; then
+        COMPREPLY=($(compgen -W "--ttl --output" -- "$cur"))
+      fi
+      ;;
+    network|leave)
+      if [[ "$cur" == -* ]]; then
+        COMPREPLY=($(compgen -W "--output" -- "$cur"))
       fi
       ;;
     completion)
