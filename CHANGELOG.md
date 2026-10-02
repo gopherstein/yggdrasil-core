@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 
 ## [Unreleased]
 
+### Changed
+
+- Each release carries its own screenshots. After a release is published, the Screenshots workflow captures the README stills and the walkthrough from that release's interface and attaches them as `screenshot-<name>` files, which yggdrasil.yeix.io shows. Started by hand with a tag, it attaches them to an existing release.
+
 ## [1.4.0-beta.1] - 2026-10-01
 
 Beta pre-release of 1.4.0. It adds the AI experience platform and the remaining Train Your Own AI items. Existing API routes, configuration, and data are compatible: the changes add routes, optional fields, and database tables, and migrations run automatically. NVIDIA (CUDA) training, PostgreSQL and MySQL knowledge sources, and the Mac App Store sandbox have not been tested on that hardware or in that build. Binaries and the apt repository are not signed.

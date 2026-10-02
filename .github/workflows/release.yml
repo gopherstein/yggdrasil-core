@@ -156,6 +156,17 @@ jobs:
             echo "::warning::The documentation pull request is open and still needs an approving review."
           fi
 
+  # Capture the release's screenshots and walkthrough and attach them to it,
+  # for yggdrasil.yeix.io. A failure here does not undo the release.
+  screenshots:
+    needs: release
+    if: success()
+    permissions:
+      contents: write
+    uses: ./.github/workflows/screenshots.yml
+    with:
+      tag: ${{ github.ref_name }}
+
   start-desktop:
     needs: release
     if: success()
