@@ -140,6 +140,17 @@ download_release() {
 	printf '%s\n' "$tmp/${name}"
 }
 
+# quietly <what> <command…>: run a package manager, and show the end of its
+# output if it fails.
+quietly() {
+	what="$1"
+	shift
+	if ! "$@" >"$tmp/install.log" 2>&1; then
+		tail -n 25 "$tmp/install.log" >&2
+		die "$what"
+	fi
+}
+
 start_service_linux() {
 	[ "${YGGDRASIL_NO_SERVICE:-}" = "1" ] && return 0
 	if command -v systemctl >/dev/null 2>&1; then
@@ -151,17 +162,17 @@ start_service_linux() {
 install_linux() {
 	if command -v apt-get >/dev/null 2>&1 && command -v dpkg >/dev/null 2>&1; then
 		pkg="$(download_release "yggdrasil_[0-9][^ ]*_${arch}\.deb")"
-		as_root apt-get install -y "$pkg" >/dev/null || die "apt-get couldn't install ${pkg##*/}"
+		quietly "apt-get couldn't install ${pkg##*/}" as_root apt-get install -y "$pkg"
 	elif command -v rpm >/dev/null 2>&1; then
 		rarch="x86_64"
 		[ "$arch" = "arm64" ] && rarch="aarch64"
 		pkg="$(download_release "yggdrasil-[0-9][^ ]*\.${rarch}\.rpm")"
 		if command -v dnf >/dev/null 2>&1; then
-			as_root dnf install -y "$pkg" >/dev/null || die "dnf couldn't install ${pkg##*/}"
+			quietly "dnf couldn't install ${pkg##*/}" as_root dnf install -y "$pkg"
 		elif command -v yum >/dev/null 2>&1; then
-			as_root yum install -y "$pkg" >/dev/null || die "yum couldn't install ${pkg##*/}"
+			quietly "yum couldn't install ${pkg##*/}" as_root yum install -y "$pkg"
 		else
-			as_root rpm -U --replacepkgs "$pkg" || die "rpm couldn't install ${pkg##*/}"
+			quietly "rpm couldn't install ${pkg##*/}" as_root rpm -U --replacepkgs "$pkg"
 		fi
 	else
 		die "this Linux has neither apt nor rpm; see https://github.com/${REPO}#install to build from source"
