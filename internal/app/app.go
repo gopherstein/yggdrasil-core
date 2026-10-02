@@ -121,6 +121,8 @@ type App struct {
 	memTotal atomic.Uint64
 	// failedModels maps a model id to when it last could not answer.
 	failedModels sync.Map
+	// health turns computer and model health changes into notifications.
+	health *healthNotices
 	// runs maps a conversation id to its running turn, so Stop can cancel it.
 	runs     sync.Map
 	Training *training.Service
@@ -554,6 +556,7 @@ func New(opts Options) (*App, error) {
 	// Gjallarhorn: every notice is kept in the notification center; the
 	// desktop is one delivery channel.
 	a.Notifications = gjallarhorn.NewHub(db.SQL, bus, desktopChannel{settings: settingsRepo, send: automations.OSSender{}})
+	a.health = newHealthNotices()
 	// Email and webhook destinations keep their passwords and signing
 	// secrets in the secrets directory, and what they send is recorded in
 	// What left this computer.

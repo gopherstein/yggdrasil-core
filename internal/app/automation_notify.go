@@ -93,8 +93,10 @@ func desktopOnly(ctx context.Context, settings boolSettings, send automations.No
 
 // notifyFromEvents keeps the notification center up to date with things
 // that finish while nobody is looking: model downloads, training deploys,
-// and pairings (Gjallarhorn §31–32). These stay in the app; they are not
-// posted to the desktop.
+// and pairings (Gjallarhorn §31–32), and health changes: computers going
+// offline and coming back, and models that keep crashing (§23, §29). These
+// are not posted to the desktop; destinations that take their category
+// receive them.
 func (a *App) notifyFromEvents(ctx context.Context) {
 	if a.Notifications == nil || a.Bus == nil {
 		return
@@ -110,7 +112,11 @@ func (a *App) notifyFromEvents(ctx context.Context) {
 				if !ok {
 					return
 				}
-				if req, ok := noticeForEvent(a, evt); ok {
+				req, ok := noticeForEvent(a, evt)
+				if !ok {
+					req, ok = a.healthNotice(ctx, evt)
+				}
+				if ok {
 					if _, err := a.Notifications.Notify(context.WithoutCancel(ctx), req); err != nil && a.Logger != nil {
 						a.Logger.Warn("notification failed", "event", evt.Type, "error", err)
 					}

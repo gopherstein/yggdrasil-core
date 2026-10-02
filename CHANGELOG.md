@@ -21,6 +21,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 - Push notifications through ntfy, on ntfy.sh or your own server, for Android, iPhone, and browsers, with no Yeix-hosted service. Severity sets the priority, tapping opens Yggdrasil when its address is set, and on ntfy.sh only a generic notice is sent unless you choose full content.
 - Delivery retries. A failed email, push, or webhook delivery is retried after 1, 5, and 30 minutes, without rerunning the task; a failure that retrying cannot fix stops at once and says what to change.
 - Quiet hours. Desktop notices, email, push, and webhooks wait overnight and go out when quiet hours end; errors still go out unless you choose Hold everything.
+- Health notifications on changes only: a paired computer going offline and coming back, and a model that crashes twice within 30 minutes (at most once an hour, with a hint when it is out of memory). They go to the bell and to destinations that take the Health category.
 - The notification center filters by category, counts repeats ("3 times"), and says when a notification is held or was not delivered everywhere. `GET /api/v1/notifications/{id}` shows each channel's delivery. The client contract is now 1.1.
 
 ### Changed
