@@ -275,6 +275,7 @@
       "backend": "同程度のメモリのコンピュータで"
     },
     "overall": "全体",
+    "chosenByCommunity": "同じようなコンピュータの評価をもとに選ばれました",
     "confidence": {
       "limited": "データ不足",
       "early": "初期の評価"

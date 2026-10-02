@@ -44,12 +44,14 @@ export function DiscoverTab({
 
   // One winner badge per category — keep gold rare.
   const winnerByModel = new Map<string, string>()
+  const chosenByCommunity = new Set<string>()
   const seenCategories = new Set<string>()
   for (const w of winners) {
     if (seenCategories.has(w.category)) continue
     if (winnerByModel.has(w.model_id)) continue
     seenCategories.add(w.category)
     winnerByModel.set(w.model_id, w.label)
+    if (w.community_chosen) chosenByCommunity.add(w.model_id)
   }
 
   const alternative = largerAlternative(models, fits)
@@ -90,6 +92,7 @@ export function DiscoverTab({
                   fit={fits[model.id]}
                   peerFits={peerFits?.[model.id]}
                   winnerLabel={winnerByModel.get(model.id)}
+                  chosenByCommunity={chosenByCommunity.has(model.id)}
                   progress={progress[model.id]}
                   installing={installingId === model.id}
                   onInstall={() => onInstall(model.id)}

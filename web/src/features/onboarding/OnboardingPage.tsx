@@ -322,6 +322,9 @@ export function OnboardingPage() {
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
               {recommendation.reason}
             </p>
+            {recommendation.community_chosen ? (
+              <p className="mt-1 text-xs text-ink-muted">{t('recommend.communityChosen')}</p>
+            ) : null}
 
             <ul className="mt-4 space-y-3">
               {recommendation.roles.map((role) => {

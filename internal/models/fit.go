@@ -62,7 +62,9 @@ func estimateTokPerSec(e CatalogEntry, hw contracts.HardwareInventory, runtimeBy
 
 // PickWinners selects category recommendation badges for Discover.
 // Only models that can run on this machine are eligible. Heavy fits stay eligible.
-func PickWinners(catalog *Catalog, fits []contracts.ModelFit, presets *[]PurposePreset) []contracts.CategoryWinner {
+// Within a preset's preferred models, community ratings can move a well
+// rated model ahead of the curated first choice (see pickByCommunity).
+func PickWinners(catalog *Catalog, fits []contracts.ModelFit, presets *[]PurposePreset, community map[string]CommunitySignal) []contracts.CategoryWinner {
 	if catalog == nil {
 		return nil
 	}
@@ -77,6 +79,7 @@ func PickWinners(catalog *Catalog, fits []contracts.ModelFit, presets *[]Purpose
 	}
 
 	var winners []contracts.CategoryWinner
+	chosen := map[string]bool{}
 	add := func(category, label, modelID string) {
 		if modelID == "" {
 			return
@@ -87,32 +90,39 @@ func PickWinners(catalog *Catalog, fits []contracts.ModelFit, presets *[]Purpose
 			}
 		}
 		winners = append(winners, contracts.CategoryWinner{
-			Category: category,
-			Label:    label,
-			ModelID:  modelID,
+			Category:        category,
+			Label:           label,
+			ModelID:         modelID,
+			CommunityChosen: chosen[category],
 		})
 	}
 
-	// Prefer preset order when available.
-	preferFirstFit := func(ids []string) string {
+	// Prefer preset order when available, weighed against community
+	// ratings.
+	preferFirstFit := func(category string, ids []string) string {
+		var ok []string
 		for _, id := range ids {
-			e, ok := catalog.Get(id)
-			if ok && eligible(e) {
-				return id
+			if e, found := catalog.Get(id); found && eligible(e) {
+				ok = append(ok, id)
 			}
 		}
-		return ""
+		i, byCommunity := pickByCommunity(ok, community)
+		if i < 0 {
+			return ""
+		}
+		chosen[category] = byCommunity
+		return ok[i]
 	}
 
 	if presets != nil {
 		for _, p := range *presets {
 			switch p.ID {
 			case "coding":
-				add("coding", "Best coding", preferFirstFit(p.PreferredModels))
+				add("coding", "Best coding", preferFirstFit("coding", p.PreferredModels))
 			case "general":
-				add("general", "Best overall", preferFirstFit(p.PreferredModels))
+				add("general", "Best overall", preferFirstFit("general", p.PreferredModels))
 			case "research":
-				add("reasoning", "Best reasoning", preferFirstFit(p.PreferredModels))
+				add("reasoning", "Best reasoning", preferFirstFit("reasoning", p.PreferredModels))
 			}
 		}
 	}
@@ -232,6 +242,6 @@ func BuildFitResponse(catalog *Catalog, hw contracts.HardwareInventory, nodeID, 
 		NodeName:    nodeName,
 		MemoryBytes: capacity,
 		Fits:        fits,
-		Winners:     PickWinners(catalog, fits, &presets),
+		Winners:     PickWinners(catalog, fits, &presets, opts.Community),
 	}
 }

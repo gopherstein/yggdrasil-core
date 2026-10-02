@@ -143,6 +143,8 @@ export interface CategoryWinner {
   category: string
   label: string
   model_id: string
+  /** Community ratings from hardware like this computer's moved this model ahead of the curated first choice. */
+  community_chosen?: boolean
 }
 
 export interface ModelsFitResponse {
@@ -504,6 +506,8 @@ export interface Recommendation {
   reason: string
   estimated_storage_bytes: number
   estimated_vram_bytes: number
+  /** Community ratings moved the main model ahead of the curated first choice. */
+  community_chosen?: boolean
 }
 
 export type Purpose = 'general' | 'coding' | 'research' | 'custom'

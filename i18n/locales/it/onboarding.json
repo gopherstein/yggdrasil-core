@@ -41,6 +41,7 @@
   "recommend": {
     "badge": "Consigliato",
     "title": "Consigliato per {{purpose}}",
+    "communityChosen": "Chi ha un computer come il tuo valuta bene il modello principale di questa configurazione, quindi viene suggerito prima della scelta abituale.",
     "download": "Download di {{size}}",
     "storage": "Spazio stimato",
     "memory": "Memoria attiva stimata",
