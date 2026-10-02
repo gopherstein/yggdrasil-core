@@ -73,6 +73,8 @@ Control-plane routes are under `/api/v1`. The OpenAI-compatible routes are under
 | GET | `/conversations/{id}/messages` | A chat's messages, with each answer's `meta` |
 | GET | `/conversations/{id}/artifacts` | Files attached to or made in a chat |
 | POST | `/artifacts` | Upload a file to attach: `name` plus `text`, or `content_base64` for binary files |
+| GET, POST, DELETE | `/images/setup` | Image generation: what is installed and the models on offer, start setting up a model (`model_id`) in the background, or stop the setup. Poll `GET` for its progress. |
+| DELETE | `/images/models/{id}` | Delete an installed image model |
 | GET, DELETE | `/artifacts/{id}` | A file's details, or delete it. `GET /artifacts/{id}/content` returns the bytes as a download. |
 | GET, POST | `/memory` | Memories (Muninn). GET returns `memories` and `categories`. |
 | PATCH, DELETE | `/memory/{id}` | Change a memory's `content`, `category`, `enabled`, or `local_only`, or delete it |

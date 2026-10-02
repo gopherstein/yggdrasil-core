@@ -1,6 +1,6 @@
 import type { ToolPolicy } from '@/types/api'
 
-export type CapabilityId = 'internet' | 'files' | 'code' | 'speech' | 'shell' | 'git'
+export type CapabilityId = 'internet' | 'files' | 'code' | 'speech' | 'images' | 'shell' | 'git'
 
 export const CAPABILITIES: {
   id: CapabilityId
@@ -40,6 +40,15 @@ export const CAPABILITIES: {
     tools: [
       { id: 'speech.transcribe', on: 'allow' },
       { id: 'speech.synthesize', on: 'allow' },
+    ],
+  },
+  {
+    id: 'images',
+    label: 'Images',
+    description: 'Make and edit images on this computer, once image generation is set up',
+    tools: [
+      { id: 'image.generate', on: 'allow' },
+      { id: 'image.edit', on: 'allow' },
     ],
   },
   {

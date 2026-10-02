@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { api } from '@/lib/api'
 import type { ToolRecord, ToolRun } from '@/types/api'
 import { RealmKicker } from '@/components/ui/Realm'
+import { ImageSetupCard } from './ImageSetup'
 import { ToolSources } from './ToolSources'
 
 const FILTERS = ['All', 'Built-in', 'Added', 'Disabled'] as const
@@ -79,6 +80,7 @@ export function ToolsPage() {
           What the AI can do besides answering: search the web, work with files, and use the apps and services you add.
         </p>
       </div>
+      <ImageSetupCard />
       <ToolSources />
       <div>
         <h2 className="section-title">All tools</h2>

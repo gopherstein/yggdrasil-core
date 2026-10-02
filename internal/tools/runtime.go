@@ -58,6 +58,8 @@ var timeouts = map[string]time.Duration{
 	CapCode: 10 * time.Minute,
 	// The first call installs speech and downloads a model.
 	CapSpeech: 15 * time.Minute,
+	// An image on a slow computer; the image's own limit stops it sooner.
+	CapImage: 25 * time.Minute,
 }
 
 const defaultTimeout = time.Minute

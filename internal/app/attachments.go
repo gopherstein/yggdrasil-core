@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/yeixio/yggdrasil-core/internal/artifacts"
+	"github.com/yeixio/yggdrasil-core/internal/imagegen"
 	"github.com/yeixio/yggdrasil-core/internal/mimir"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
@@ -64,6 +65,26 @@ func fileRefs(list []artifacts.Artifact) []contracts.FileRef {
 // AudioToolID is the tool an audio attachment's note points to.
 const AudioToolID = "speech.transcribe"
 
+// ImageEditToolID is the tool an image attachment's note points to, when
+// images can be edited here.
+const ImageEditToolID = "image.edit"
+
+// toolReady reports a registered tool that can run on this computer now.
+func (a *App) toolReady(id string) bool {
+	if a.Tools == nil {
+		return false
+	}
+	t, err := a.Tools.Get(id)
+	if err != nil {
+		return false
+	}
+	if av, ok := t.(interface{ Available() (bool, string) }); ok {
+		ready, _ := av.Available()
+		return ready
+	}
+	return true
+}
+
 func (e *chatExecEnv) attachmentBlock(ctx context.Context, prompt string) string {
 	if e.app == nil || e.app.Artifacts == nil || e.conversationID == "" {
 		return ""
@@ -114,6 +135,16 @@ func (e *chatExecEnv) attachmentBlock(ctx context.Context, prompt string) string
 			if artifacts.IsAudio(art.Name) {
 				// Audio is not text; the model transcribes it when it needs to.
 				fmt.Fprintf(&b, "\nAudio file %s: %s. To know what it says, call %s with {\"file\": %q}.\n", label, art.Name, AudioToolID, art.Name)
+				continue
+			}
+			if art.Kind == "image" {
+				// Images are not text either; they can be changed when image
+				// editing is set up.
+				fmt.Fprintf(&b, "\nImage %s: %s. You cannot see it.", label, art.Name)
+				if imagegen.IsEditable(art.Name) && e.app.toolReady(ImageEditToolID) {
+					fmt.Fprintf(&b, " To change it, call %s with {\"file\": %q}.", ImageEditToolID, art.Name)
+				}
+				b.WriteString("\n")
 				continue
 			}
 			passages, err := mimir.FilePassages(art.Name, data)

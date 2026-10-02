@@ -10,17 +10,19 @@ import (
 
 // Tool groups, by capability. A request is offered whole groups.
 var toolGroups = map[string][]string{
-	"web":    {"internet.search", "internet.open"},
-	"read":   {"filesystem.search", "filesystem.read"},
-	"write":  {"filesystem.write"},
-	"create": {"files.create"},
-	"sheet":  {"spreadsheet.analyze"},
-	"code":   {"code.execute"},
-	"listen": {"speech.transcribe"},
-	"speak":  {"speech.synthesize"},
-	"shell":  {"terminal"},
-	"gitr":   {"git.status", "git.diff", "git.log", "git.show"},
-	"gitw":   {"git.add", "git.commit", "git.push"},
+	"web":     {"internet.search", "internet.open"},
+	"read":    {"filesystem.search", "filesystem.read"},
+	"write":   {"filesystem.write"},
+	"create":  {"files.create"},
+	"sheet":   {"spreadsheet.analyze"},
+	"code":    {"code.execute"},
+	"listen":  {"speech.transcribe"},
+	"speak":   {"speech.synthesize"},
+	"draw":    {"image.generate"},
+	"retouch": {"image.edit"},
+	"shell":   {"terminal"},
+	"gitr":    {"git.status", "git.diff", "git.log", "git.show"},
+	"gitw":    {"git.add", "git.commit", "git.push"},
 }
 
 // Groups each kind of request gets before cues in the message add more.
@@ -36,17 +38,19 @@ var kindGroups = map[Kind][]string{
 }
 
 var (
-	cueRead   = regexp.MustCompile(`(?i)(\b(files?|folders?|director(y|ies)|documents?|workspace|repo|repository|project|readme|log file)\b|[~./][\w./-]*/[\w.-]+|\b\w+\.(go|py|js|ts|tsx|md|txt|json|ya?ml|toml|csv|log|sh)\b)`)
-	cueWrite  = regexp.MustCompile(`(?i)\b(save|write|edit|update|change|fix|rename|append|create)\b.{0,40}\b(file|files|folder|config|readme|script)\b`)
-	cueShell  = regexp.MustCompile(`(?i)\b(run|execute|install|build|compile|terminal|command|shell|script|npm|pnpm|pip|brew|make|go test|go build)\b`)
-	cueGit    = regexp.MustCompile(`(?i)\b(git|commit|branch|diff|merge|rebase|staged|push|pull request)\b`)
-	cueGitW   = regexp.MustCompile(`(?i)\b(commit|stage|push)\b`)
-	cueMake   = regexp.MustCompile(`(?i)\b(make|create|write|generate|export|save|build)\b.{0,40}\b(files?|spreadsheets?|documents?|docs?|csv|xlsx|pdf|tables?|reports?|lists?)\b`)
-	cueCode   = regexp.MustCompile(`(?i)\b(calculat\w*|comput\w*|analy[sz]\w*|plot\w*|charts?|graphs?|python|statistic\w*|regression|correlat\w*|simulat\w*|forecast\w*|average|median|percentiles?|run (this|the|my) code)\b`)
-	cueListen = regexp.MustCompile(`(?i)\b(transcri\w*|recordings?|voice (notes?|memos?|messages?)|audio|podcasts?|what (does|did) (it|she|he|they) say)\b`)
-	cueSpeak  = regexp.MustCompile(`(?i)(\b(read (it|this|that|them)?\s*(aloud|out loud)|out loud|aloud|text to speech|narrat\w*|voice ?over|audio version|say it)\b)`)
-	cueSheet  = regexp.MustCompile(`(?i)\b(spreadsheets?|xlsx|csv|excel|workbooks?|sheets?)\b`)
-	cueWeb    = regexp.MustCompile(`(?i)(\b(search|web|online|internet|look up|website|url|link|news|latest)\b|https?://)`)
+	cueRead    = regexp.MustCompile(`(?i)(\b(files?|folders?|director(y|ies)|documents?|workspace|repo|repository|project|readme|log file)\b|[~./][\w./-]*/[\w.-]+|\b\w+\.(go|py|js|ts|tsx|md|txt|json|ya?ml|toml|csv|log|sh)\b)`)
+	cueWrite   = regexp.MustCompile(`(?i)\b(save|write|edit|update|change|fix|rename|append|create)\b.{0,40}\b(file|files|folder|config|readme|script)\b`)
+	cueShell   = regexp.MustCompile(`(?i)\b(run|execute|install|build|compile|terminal|command|shell|script|npm|pnpm|pip|brew|make|go test|go build)\b`)
+	cueGit     = regexp.MustCompile(`(?i)\b(git|commit|branch|diff|merge|rebase|staged|push|pull request)\b`)
+	cueGitW    = regexp.MustCompile(`(?i)\b(commit|stage|push)\b`)
+	cueMake    = regexp.MustCompile(`(?i)\b(make|create|write|generate|export|save|build)\b.{0,40}\b(files?|spreadsheets?|documents?|docs?|csv|xlsx|pdf|tables?|reports?|lists?)\b`)
+	cueCode    = regexp.MustCompile(`(?i)\b(calculat\w*|comput\w*|analy[sz]\w*|plot\w*|charts?|graphs?|python|statistic\w*|regression|correlat\w*|simulat\w*|forecast\w*|average|median|percentiles?|run (this|the|my) code)\b`)
+	cueListen  = regexp.MustCompile(`(?i)\b(transcri\w*|recordings?|voice (notes?|memos?|messages?)|audio|podcasts?|what (does|did) (it|she|he|they) say)\b`)
+	cueSpeak   = regexp.MustCompile(`(?i)(\b(read (it|this|that|them)?\s*(aloud|out loud)|out loud|aloud|text to speech|narrat\w*|voice ?over|audio version|say it)\b)`)
+	cueDraw    = regexp.MustCompile(`(?i)(\b(draw|paint|sketch|illustrat\w*|render)\b|\b(make|create|generate|design|produce|give me)\b.{0,40}\b(images?|pictures?|photos?|illustrations?|drawings?|paintings?|logos?|icons?|wallpapers?|artwork|portraits?|posters?)\b)`)
+	cueRetouch = regexp.MustCompile(`(?i)\b(edit|change|retouch|recolou?r|remove|replace|turn|make|add)\b.{0,40}\b(images?|pictures?|photos?|backgrounds?|\w+\.(png|jpe?g))\b`)
+	cueSheet   = regexp.MustCompile(`(?i)\b(spreadsheets?|xlsx|csv|excel|workbooks?|sheets?)\b`)
+	cueWeb     = regexp.MustCompile(`(?i)(\b(search|web|online|internet|look up|website|url|link|news|latest)\b|https?://)`)
 )
 
 // ToolsFor picks the tools worth offering for a request (spec §16): the
@@ -90,6 +94,12 @@ func ToolsFor(k Kind, message string, available []string) []string {
 	}
 	if cueSpeak.MatchString(message) {
 		want["speak"] = true
+	}
+	if cueDraw.MatchString(message) {
+		want["draw"] = true
+	}
+	if cueRetouch.MatchString(message) {
+		want["retouch"] = true
 	}
 	var out []string
 	for _, id := range available {

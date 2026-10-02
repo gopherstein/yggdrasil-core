@@ -356,6 +356,43 @@ export interface SpeechResult {
   seconds: number
 }
 
+/** An image model setup can install. */
+export interface ImageModel {
+  id: string
+  name: string
+  description: string
+  license: string
+  memory_bytes: number
+  size_bytes: number
+  /** It can change an image from an instruction. */
+  edits: boolean
+  installed: boolean
+  recommended: boolean
+}
+
+/** What image generation has installed, and any setup in progress. */
+export interface ImageSetup {
+  /** False where stable-diffusion.cpp has no build or cannot run; unsupported says why. */
+  supported: boolean
+  unsupported?: string
+  /** Images can be made now. */
+  ready: boolean
+  /** stable-diffusion.cpp is installed. */
+  program: boolean
+  release: string
+  /** The model images are made with. */
+  active?: string
+  models: ImageModel[]
+  job?: {
+    model_id: string
+    stage: 'program' | 'model'
+    done_bytes: number
+    total_bytes: number
+    running: boolean
+    error?: string
+  }
+}
+
 export interface Message {
   id: string
   conversation_id: string

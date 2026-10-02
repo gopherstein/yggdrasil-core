@@ -12,6 +12,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/yeixio/yggdrasil-core/internal/artifacts"
+	"github.com/yeixio/yggdrasil-core/internal/imagegen"
 	"github.com/yeixio/yggdrasil-core/internal/mimir"
 )
 
@@ -59,11 +60,12 @@ func (s *Server) handleUploadArtifact(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "The file could not be read. Files can be up to 25 MB.", nil)
 		return
 	}
-	// Audio is kept as it is, to be played and transcribed (speech.transcribe).
-	audio := artifacts.IsAudio(body.Name)
-	if !audio && !mimir.Attachable(body.Name) {
+	// Audio is kept as it is, to be played and transcribed (speech.transcribe),
+	// and so are images, to be shown and edited (image.edit).
+	kept := artifacts.IsAudio(body.Name) || imagegen.IsEditable(body.Name)
+	if !kept && !mimir.Attachable(body.Name) {
 		writeErr(w, http.StatusBadRequest, "UNSUPPORTED_FILE",
-			fmt.Sprintf("Yggdrasil can't read %s yet. Attach a document, spreadsheet, PDF, code file, or audio.", artifacts.CleanName(body.Name)), nil)
+			fmt.Sprintf("Yggdrasil can't read %s yet. Attach a document, spreadsheet, PDF, code file, audio, or a PNG or JPEG image.", artifacts.CleanName(body.Name)), nil)
 		return
 	}
 	data := []byte(body.Text)
@@ -77,7 +79,7 @@ func (s *Server) handleUploadArtifact(w http.ResponseWriter, r *http.Request) {
 	}
 	// Check the file can be read now, so a broken file is reported when it
 	// is attached rather than when the question is asked.
-	if !audio {
+	if !kept {
 		if _, err := mimir.FilePassages(body.Name, data); err != nil {
 			writeErr(w, http.StatusBadRequest, "UNREADABLE_FILE", fmt.Sprintf("Yggdrasil can't read %s: %s", artifacts.CleanName(body.Name), err.Error()), nil)
 			return

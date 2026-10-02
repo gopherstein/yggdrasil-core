@@ -67,6 +67,28 @@ Speech runs on this computer: audio and text are not sent anywhere. Both tools a
 - **Environment:** faster-whisper and Piper in a managed environment (`runtimes/python/envs/speech`), installed from PyPI the first time speech is used. Whisper models and Piper voices are downloaded from Hugging Face the first time each is used and kept in `runtimes/speech/`.
 - **Limits:** one speech job at a time, 15 minutes each, which allows for the first installation and download.
 
+## Images
+
+`image.generate` makes an image from a description, and `image.edit` changes a PNG or JPEG image in the chat from an instruction, such as "make it night" or "remove the car". Both run on this computer with [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp), so the prompt and the images are not sent anywhere. They are allowed by default and are level 1, and the Images capability turns them on or off in a profile. Offline profiles keep them. They are offered when a message asks to draw, paint, or make a picture, logo, or illustration, or to edit or change an image. An attached image is offered for editing whatever the message says.
+
+**Setup:** image generation needs a one-time setup, on the Tools page or with `POST /api/v1/images/setup`. Until then the tools are unavailable and say how to set them up, and "Can you generate images?" is answered with the same. Setup downloads two things:
+- stable-diffusion.cpp release `master-929-3f8527a` from GitHub, 17–35 MB.
+- A model from Hugging Face.
+
+Each download is pinned to a revision and checked against its SHA-256. A stopped setup resumes where it left off. The recommended model depends on this computer's memory.
+
+| Model | Download | For | What it does |
+| --- | --- | --- | --- |
+| FLUX.2 [klein] 4B | 5.2 GB | 16 GB of memory | Makes and edits images in four steps |
+| FLUX.2 [klein] 4B, high quality | 8.8 GB | 24 GB of memory or more | The same, with more detail |
+
+Each is the [FLUX.2 [klein] 4B](https://huggingface.co/black-forest-labs/FLUX.2-klein-4B) diffusion model (GGUF, Q4_0 or Q8_0), the Qwen3 4B text encoder (GGUF), and the FLUX.2 small decoder VAE. All three are Apache 2.0 and need no account to download.
+
+- **Platforms:** macOS on Apple silicon (Metal), and Linux x86-64 and Windows x64 (CPU builds, which are much slower). Elsewhere, and in the Mac App Store build, which cannot run a program it downloads, the tools are unavailable and say why.
+- **Generating:** `prompt` is up to 2,000 characters. `width` and `height` default to 1024 and are rounded to multiples of 64, between 256 and 1536 and up to about 1.5 megapixels. `seed` repeats an image, and each result includes its seed. Images are saved as PNG files attached to the answer.
+- **Editing:** `file` is an image in the chat by name or id. The result keeps the image's shape, at up to 1024 pixels on the longer side, and is attached as a new file, so the original is kept.
+- **Limits:** one image at a time, 20 minutes each.
+
 ## Descriptors and levels
 
 Every tool, whatever it comes from, has a descriptor (`GET /api/v1/tools/{id}`, and each entry of `GET /api/v1/tools`):

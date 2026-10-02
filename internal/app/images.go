@@ -1,0 +1,36 @@
+package app
+
+import (
+	"context"
+	"path/filepath"
+	"sync"
+
+	"github.com/yeixio/yggdrasil-core/internal/config"
+	"github.com/yeixio/yggdrasil-core/internal/imagegen"
+	"github.com/yeixio/yggdrasil-core/internal/pyenv"
+)
+
+// newImageSetup keeps stable-diffusion.cpp with the runtimes and image
+// models with the models, and sizes its recommendation to this computer.
+func (a *App) newImageSetup(cfg config.Config) *imagegen.Setup {
+	memory := sync.OnceValue(func() int64 {
+		inv, err := a.hw.Detect(context.Background())
+		if err != nil {
+			return 0
+		}
+		return int64(inv.Memory.TotalBytes)
+	})
+	return &imagegen.Setup{
+		ProgramDir: filepath.Join(cfg.RuntimesDir, "sdcpp"),
+		ModelsDir:  filepath.Join(cfg.ModelsDir, "images"),
+		Memory:     memory,
+		FreeBytes: func() (int64, error) {
+			inv, err := a.hw.Detect(context.Background())
+			if err != nil {
+				return 0, err
+			}
+			return int64(inv.Disk.AvailableBytes), nil
+		},
+		Sandboxed: pyenv.Sandboxed(),
+	}
+}

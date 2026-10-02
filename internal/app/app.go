@@ -32,6 +32,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/events"
 	"github.com/yeixio/yggdrasil-core/internal/gjallarhorn"
 	"github.com/yeixio/yggdrasil-core/internal/hardware"
+	"github.com/yeixio/yggdrasil-core/internal/imagegen"
 	"github.com/yeixio/yggdrasil-core/internal/inventory"
 	"github.com/yeixio/yggdrasil-core/internal/logs"
 	"github.com/yeixio/yggdrasil-core/internal/mcp"
@@ -126,6 +127,8 @@ type App struct {
 	failedModels sync.Map
 	// Speech transcribes audio and reads text aloud (Gungnir §18–19).
 	Speech *speech.Engine
+	// Images makes and edits images on this computer (Gungnir §17).
+	Images *imagegen.Setup
 	// health turns computer and model health changes into notifications.
 	health *healthNotices
 	// runs maps a conversation id to its running turn, so Stop can cancel it.
@@ -647,6 +650,11 @@ func New(opts Options) (*App, error) {
 	a.Tools.Register(&artifacts.AnalyzeTool{Store: a.Artifacts})
 	a.API.BindArtifacts(a.Artifacts)
 	a.API.BindKnowledge(a.Mimir)
+	a.Images = a.newImageSetup(cfg)
+	images := &imagegen.Engine{Setup: a.Images, WorkDir: filepath.Join(cfg.DataDir, "image-jobs")}
+	a.Tools.Register(&imagegen.GenerateTool{Engine: images, Store: a.Artifacts})
+	a.Tools.Register(&imagegen.EditTool{Engine: images, Store: a.Artifacts})
+	a.API.BindImages(a.Images)
 	a.Training = a.newTrainingService()
 	if err := a.Training.Recover(context.Background()); err != nil {
 		return nil, fmt.Errorf("training: %w", err)

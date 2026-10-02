@@ -113,10 +113,13 @@ func (o *Orchestrator) Run(
 		// Offer only the tools this request needs (spec §16). The profile
 		// still decides what is allowed; this decides what is shown.
 		offered := huginn.ToolsFor(kind, task.Prompt, enabledIDs(profile))
-		// An attached audio file is transcribed when the profile allows it,
-		// whatever the message says ("summarize this").
-		if strings.Contains(reference, "call speech.transcribe") && slices.Contains(enabledIDs(profile), "speech.transcribe") && !slices.Contains(offered, "speech.transcribe") {
-			offered = append(offered, "speech.transcribe")
+		// An attached audio file is transcribed, and an attached image can
+		// be edited, when the profile allows it, whatever the message says
+		// ("summarize this", "make it brighter").
+		for _, id := range []string{"speech.transcribe", "image.edit"} {
+			if strings.Contains(reference, "call "+id) && slices.Contains(enabledIDs(profile), id) && !slices.Contains(offered, id) {
+				offered = append(offered, id)
+			}
 		}
 		profile = offerOnly(profile, offered)
 		// A request with several parts is worked through part by part;

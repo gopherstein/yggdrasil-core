@@ -45,6 +45,9 @@ type Tool struct {
 	Source  string `json:"source"`
 	Risk    string `json:"risk,omitempty"`
 	Enabled bool   `json:"enabled"`
+	// Unavailable says why a tool that is on cannot run on this computer
+	// yet, such as image generation before it is set up.
+	Unavailable string `json:"unavailable,omitempty"`
 }
 
 // Connector is a connected-service integration.
@@ -104,7 +107,7 @@ type rule struct {
 func toolsWhere(s Snapshot, keep func(Tool) bool) []string {
 	var out []string
 	for _, t := range s.Tools {
-		if t.Enabled && keep(t) {
+		if t.Enabled && t.Unavailable == "" && keep(t) {
 			out = append(out, t.Name)
 		}
 	}
@@ -194,6 +197,11 @@ var rules = []rule{
 			v := toolsWhere(s, toolAbout(imageRe, makeRe))
 			if len(v) > 0 {
 				return true, v, ""
+			}
+			for _, t := range s.Tools {
+				if t.Enabled && t.ID == "image.generate" && t.Unavailable != "" {
+					return false, nil, strings.ToUpper(t.Unavailable[:1]) + t.Unavailable[1:] + "."
+				}
 			}
 			return false, nil, "No image model or image tool is installed. Adding a tool source that generates images, on the Tools page, would add it."
 		}},
