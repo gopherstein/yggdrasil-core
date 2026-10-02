@@ -52,6 +52,13 @@ jobs:
         run: |
           chmod +x scripts/capture-screenshots.sh
           ./scripts/capture-screenshots.sh
+      - name: Keep what the page showed when a screen timed out
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: screenshot-failures
+          path: screenshot-failed-*.png
+          if-no-files-found: ignore
       - uses: actions/upload-artifact@v7
         with:
           name: screenshots

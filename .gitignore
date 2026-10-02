@@ -27,6 +27,8 @@ assets/brand/generated/.tmp-iconset.iconset/
 screenshots/appstore/
 screenshots/raw/
 docs/screenshots/.video-tmp/
+# What a screen showed when it did not become ready (scripts/screenshots/capture.mjs)
+screenshot-failed-*.png
 
 # IDE / OS
 .DS_Store
