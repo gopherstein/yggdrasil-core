@@ -256,6 +256,8 @@
     },
     "share": "Compartilhar esta avaliação com a comunidade",
     "shareHint": "Ajuda quem tem um computador como o seu a escolher um modelo. Você pode parar de compartilhar quando quiser.",
+    "observe": "Incluir como ele roda aqui",
+    "observeNothing": "Nada medido ainda. Use o modelo por um tempo primeiro.",
     "whatIsShared": "O que é compartilhado, exatamente",
     "sent": {
       "destination": "Enviado para",
@@ -266,7 +268,8 @@
       "memory": "memória {{type}}, {{gb}} GB",
       "id": "ID da avaliação",
       "idValue": "Um ID aleatório para você alterar ou remover sua avaliação; não é gerado a partir do seu computador",
-      "never": "Nunca seus prompts, conversas, nomes de arquivos, nome do computador, nome de usuário ou endereço de rede. O serviço não guarda seu endereço IP."
+      "never": "Nunca seus prompts, conversas, nomes de arquivos, nome do computador, nome de usuário ou endereço de rede. O serviço não guarda seu endereço IP.",
+      "observations": "Como ele roda"
     },
     "notShareable": "Esta avaliação fica neste computador: {{reason}}",
     "save": "Salvar",
@@ -289,6 +292,17 @@
     "limitedHint": "Poucas pessoas avaliaram, então a nota fica perto da média até que haja mais avaliações.",
     "prompt": "Como o {{model}} está funcionando para você?",
     "notNow": "Agora não",
-    "dontAsk": "Não perguntar de novo"
+    "dontAsk": "Não perguntar de novo",
+    "firstToken": "{{time}} até o primeiro token",
+    "starts_one": "{{worked}} de {{formatted}} inicialização funcionou",
+    "starts_many": "{{worked}} de {{formatted}} inicializações funcionaram",
+    "starts_other": "{{worked}} de {{formatted}} inicializações funcionaram",
+    "crashed": "travou",
+    "outOfMemory": "ficou sem memória",
+    "contextBand": "contexto de {{band}}",
+    "crashRate": "{{percent}} travaram",
+    "observedHint_one": "De {{formatted}} avaliação que compartilhou como ele roda",
+    "observedHint_many": "De {{formatted}} avaliações que compartilharam como ele roda",
+    "observedHint_other": "De {{formatted}} avaliações que compartilharam como ele roda"
   }
 }

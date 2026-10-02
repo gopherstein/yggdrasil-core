@@ -21,6 +21,9 @@ type Manager struct {
 	// OnRemote, when set, hears each chat sent to a server that is not on
 	// this computer, such as an external OpenAI-compatible server (§63).
 	OnRemote func(ctx context.Context, host string)
+	// OnStart, when set, hears each model start on this computer and
+	// whether it failed, for community ratings' runtime observations.
+	OnStart func(ctx context.Context, modelID string, err error)
 
 	mu sync.RWMutex
 }
@@ -125,6 +128,9 @@ func (m *Manager) StartModel(ctx context.Context, runtimeID string, cfg ModelSta
 		return RunningModel{}, err
 	}
 	running, err := rt.StartModel(ctx, cfg)
+	if m.OnStart != nil {
+		m.OnStart(ctx, cfg.ModelID, err)
+	}
 	if err != nil {
 		return RunningModel{}, err
 	}

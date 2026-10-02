@@ -1475,6 +1475,7 @@ paths:
                   type: array
                   items: {$ref: "#/components/schemas/RatingTag"}
                 share: {type: boolean}
+                observations: {type: boolean, description: Include how the model runs here in a shared rating}
       responses:
         "200":
           description: Saved
@@ -4538,6 +4539,9 @@ components:
         shared: {type: boolean}
         shared_at: {type: string, format: date-time}
         updated_at: {type: string, format: date-time}
+        share_observations: {type: boolean, description: The shared rating includes how the model runs here}
+        observations:
+          $ref: "#/components/schemas/RatingObservations"
         ask: {type: boolean, description: A good time to ask for a rating}
         shares:
           type: object
@@ -4573,6 +4577,23 @@ components:
         tags:
           type: object
           additionalProperties: {type: integer}
+        observed: {type: integer, description: Ratings that shared how the model runs}
+        median_tokens_per_second: {type: number}
+        median_ttft_ms: {type: number}
+        successful_start_rate: {type: number}
+        crash_rate: {type: number}
+        out_of_memory_rate: {type: number}
+    RatingObservations:
+      type: object
+      description: How a model ran on this computer in the last 30 days, leaving out replies on paired computers; absent when nothing was measured
+      properties:
+        tokens_per_second: {type: number, description: Median, from 3 or more replies}
+        ttft_ms: {type: integer, description: Median time to first token, from 3 or more replies}
+        starts: {type: integer}
+        start_failures: {type: integer}
+        crashed: {type: boolean}
+        out_of_memory: {type: boolean}
+        context_band: {type: string, enum: [0-8k, 8-32k, 32-128k, 128k+]}
     HealthResponse:
       type: object
       properties:

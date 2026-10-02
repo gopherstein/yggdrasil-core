@@ -248,6 +248,8 @@
     },
     "share": "이 평가를 커뮤니티와 공유",
     "shareHint": "비슷한 컴퓨터를 쓰는 사람들이 모델을 고르는 데 도움이 됩니다. 언제든지 공유를 중단할 수 있습니다.",
+    "observe": "이 컴퓨터에서의 실행 정보 포함",
+    "observeNothing": "아직 측정된 내용이 없습니다. 먼저 모델을 한동안 사용해 보세요.",
     "whatIsShared": "정확히 무엇이 공유되나요",
     "sent": {
       "destination": "보내는 곳",
@@ -258,7 +260,8 @@
       "memory": "{{type}} 메모리, {{gb}}GB",
       "id": "평가 ID",
       "idValue": "평가를 변경하거나 삭제하기 위한 임의의 ID이며, 컴퓨터 정보로 만들지 않습니다",
-      "never": "프롬프트, 대화, 파일 이름, 컴퓨터 이름, 사용자 이름, 네트워크 주소는 절대 보내지 않습니다. 서비스는 IP 주소를 저장하지 않습니다."
+      "never": "프롬프트, 대화, 파일 이름, 컴퓨터 이름, 사용자 이름, 네트워크 주소는 절대 보내지 않습니다. 서비스는 IP 주소를 저장하지 않습니다.",
+      "observations": "실행 정보"
     },
     "notShareable": "이 평가는 이 컴퓨터에만 저장됩니다: {{reason}}",
     "save": "저장",
@@ -279,6 +282,13 @@
     "limitedHint": "평가한 사람이 아직 적어, 평가가 더 쌓일 때까지 점수가 평균에 가깝게 표시됩니다.",
     "prompt": "{{model}}은(는) 잘 작동하나요?",
     "notNow": "나중에",
-    "dontAsk": "다시 묻지 않기"
+    "dontAsk": "다시 묻지 않기",
+    "firstToken": "첫 토큰까지 {{time}}",
+    "starts_other": "시작 {{formatted}}회 중 {{worked}}회 성공",
+    "crashed": "충돌 발생",
+    "outOfMemory": "메모리 부족 발생",
+    "contextBand": "컨텍스트 {{band}}",
+    "crashRate": "{{percent}} 충돌",
+    "observedHint_other": "실행 정보를 공유한 평가 {{formatted}}개 기준"
   }
 }

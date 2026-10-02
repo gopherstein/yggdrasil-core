@@ -22,14 +22,15 @@ const (
 
 // Rating is one submission, in the ratings service's schema version 1.
 type Rating struct {
-	SchemaVersion int      `json:"schema_version"`
-	ClientID      string   `json:"client_id"`
-	Model         model    `json:"model"`
-	Runtime       runtime  `json:"runtime"`
-	Hardware      Hardware `json:"hardware"`
-	Stars         int      `json:"stars"`
-	Tags          []string `json:"tags,omitempty"`
-	AppVersion    string   `json:"app_version,omitempty"`
+	SchemaVersion int           `json:"schema_version"`
+	ClientID      string        `json:"client_id"`
+	Model         model         `json:"model"`
+	Runtime       runtime       `json:"runtime"`
+	Hardware      Hardware      `json:"hardware"`
+	Stars         int           `json:"stars"`
+	Tags          []string      `json:"tags,omitempty"`
+	Observations  *Observations `json:"observations,omitempty"`
+	AppVersion    string        `json:"app_version,omitempty"`
 }
 
 type model struct {
@@ -70,6 +71,13 @@ type Stats struct {
 	WeightedScore float64        `json:"weighted_score"`
 	Confidence    string         `json:"confidence"`
 	Tags          map[string]int `json:"tags,omitempty"`
+	// How the model ran for those who shared it.
+	Observed              int      `json:"observed,omitempty"`
+	MedianTokensPerSecond *float64 `json:"median_tokens_per_second,omitempty"`
+	MedianTTFTMillis      *float64 `json:"median_ttft_ms,omitempty"`
+	SuccessfulStartRate   *float64 `json:"successful_start_rate,omitempty"`
+	CrashRate             *float64 `json:"crash_rate,omitempty"`
+	OutOfMemoryRate       *float64 `json:"out_of_memory_rate,omitempty"`
 }
 
 // Client talks to the ratings service.

@@ -16,6 +16,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/store"
 	"github.com/yeixio/yggdrasil-core/internal/store/repositories"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
+	"github.com/yeixio/yggdrasil-core/pkg/pluginapi"
 )
 
 func TestIdentify(t *testing.T) {
@@ -286,5 +287,75 @@ func TestCommunity(t *testing.T) {
 	c, err = s.Community(ctx)
 	if err != nil || c.Error == "" || c.Models["qwen2.5-coder-7b-q4"].Overall == nil {
 		t.Fatalf("offline = %+v, %v", c, err)
+	}
+}
+
+func TestObservations(t *testing.T) {
+	fake := &fakeService{}
+	srv := httptest.NewServer(fake)
+	defer srv.Close()
+	s, _, records := newService(t, srv)
+	ctx := context.Background()
+	now := time.Date(2026, 10, 2, 12, 0, 0, 0, time.UTC)
+	s.Now = func() time.Time { return now }
+	s.LocalNode = func() string { return "here" }
+	s.OutOfMemory = func(text string) bool { return strings.Contains(text, "out of memory") }
+	const id = "qwen2.5-coder-7b-q4"
+
+	// Nothing measured yet.
+	if v, _ := s.Get(ctx, id); v.Observations != nil {
+		t.Fatalf("observations before any use: %+v", v.Observations)
+	}
+	add := func(n int, tps, ttft float64, total int, steps string, at time.Time) {
+		for i := range n {
+			if _, err := s.DB.Exec(`INSERT INTO generation_metrics (id, model_id, eval_tok_per_sec, ttft_ms, total_tokens, role_steps_json, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+				fmt.Sprintf("%v-%v-%d", tps, at.Unix(), i), id, tps, ttft, total, steps, at.Format(time.RFC3339)); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+	add(2, 40, 300, 2000, `[]`, now.Add(-time.Hour))
+	add(1, 50, 500, 9000, `[{"node_id":"here"}]`, now.Add(-time.Hour))
+	// On a paired computer, and too old: left out.
+	add(5, 5, 9000, 200000, `[{"node_id":"elsewhere"}]`, now.Add(-time.Hour))
+	add(5, 1, 1, 1, `[]`, now.Add(-40*24*time.Hour))
+	s.RecordStart(ctx, id, nil)
+	s.RecordStart(ctx, id, nil)
+	s.RecordStart(ctx, id, pluginapi.LoadFailed(errors.New("llama-server: out of memory")))
+	// Not the model's fault: left out.
+	s.RecordStart(ctx, id, context.Canceled)
+	s.RecordStart(ctx, id, errors.New("llama-server not installed"))
+	s.RecordCrash(ctx, id, false)
+
+	v, err := s.Get(ctx, id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := Observations{TokensPerSecond: 40, TTFTMillis: 300, Starts: 3, StartFailures: 1, Crashed: true, OutOfMemory: true, ContextBand: "8-32k"}
+	if v.Observations == nil || *v.Observations != want {
+		t.Fatalf("observations = %+v, want %+v", v.Observations, want)
+	}
+
+	// Shared without observations, nothing about how it runs is sent.
+	if _, err := s.Put(ctx, id, Input{Stars: 4, Share: true}); err != nil {
+		t.Fatal(err)
+	}
+	if fake.posts[0].Observations != nil {
+		t.Fatalf("observations sent without being chosen: %+v", fake.posts[0].Observations)
+	}
+	v, err = s.Put(ctx, id, Input{Stars: 4, Share: true, Observations: true})
+	if err != nil || !v.ShareObservations {
+		t.Fatalf("share observations = %+v, %v", v, err)
+	}
+	if got := fake.posts[1].Observations; got == nil || *got != want {
+		t.Fatalf("sent observations = %+v", got)
+	}
+	last := (*records)[len(*records)-1]
+	if !strings.Contains(last, "40.0 tokens/s") || !strings.Contains(last, "2 of 3 starts worked") {
+		t.Fatalf("record = %q", last)
+	}
+	// Keeping it private turns off sharing observations too.
+	if v, _ := s.Put(ctx, id, Input{Stars: 4, Observations: true}); v.ShareObservations {
+		t.Fatal("observations shared on a private rating")
 	}
 }

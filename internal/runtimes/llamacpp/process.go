@@ -153,7 +153,10 @@ func (r *Runtime) StartModel(ctx context.Context, cfg pluginapi.ModelStartConfig
 
 	if err := waitReady(ctx, endpoint, 120*time.Second, exited); err != nil {
 		_ = r.StopModel(ctx, instanceID)
-		return pluginapi.RunningModel{}, err
+		if ctx.Err() != nil {
+			return pluginapi.RunningModel{}, err
+		}
+		return pluginapi.RunningModel{}, pluginapi.LoadFailed(err)
 	}
 
 	return pluginapi.RunningModel{

@@ -23,6 +23,8 @@ const unrated: ModelRating = {
   rateable: true,
   tags: [],
   shared: false,
+  share_observations: false,
+  observations: { tokens_per_second: 41.5, ttft_ms: 320, starts: 3, start_failures: 1 },
   ask: true,
   shares: {
     destination: 'ratings.yggdrasil.yeix.io',
@@ -61,8 +63,16 @@ describe('ratings', () => {
     expect(screen.getByText('apple m4-max · unified memory, 32-64 GB · macos arm64')).toBeInTheDocument()
     expect(screen.getByText('ratings.yggdrasil.yeix.io')).toBeInTheDocument()
 
+    // How it runs is a second choice, shown before it is made.
+    const observe = screen.getByRole('checkbox', { name: /Include how it runs here/ })
+    expect(observe).not.toBeChecked()
+    expect(screen.getByText('41.5 tok/s, 320 ms to first token, 2 of 3 starts worked')).toBeInTheDocument()
+    fireEvent.click(observe)
+
     fireEvent.click(screen.getByRole('button', { name: 'Save and share' }))
-    await waitFor(() => expect(api.putModelRating).toHaveBeenCalledWith('qwen', { stars: 4, tags: ['fast'], share: true }))
+    await waitFor(() =>
+      expect(api.putModelRating).toHaveBeenCalledWith('qwen', { stars: 4, tags: ['fast'], share: true, observations: true }),
+    )
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
 
@@ -70,8 +80,10 @@ describe('ratings', () => {
     renderIt(<RateButton modelId="qwen" modelName="Qwen Coder" />)
     fireEvent.click(await screen.findByRole('button', { name: 'Rate Qwen Coder' }))
     fireEvent.click(screen.getByRole('radio', { name: '2 stars' }))
+    // How it runs can't be shared without the rating.
+    expect(screen.getByRole('checkbox', { name: /Include how it runs here/ })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(api.putModelRating).toHaveBeenCalledWith('qwen', { stars: 2, tags: [], share: false }))
+    await waitFor(() => expect(api.putModelRating).toHaveBeenCalledWith('qwen', { stars: 2, tags: [], share: false, observations: false }))
   })
 
   it('asks after use, and stops when told', async () => {
@@ -88,7 +100,7 @@ describe('ratings', () => {
       models: {
         qwen: {
           similar: { tier: 'class', ratings: 4, average: 4.5, weighted_score: 3.9, confidence: 'early' },
-          overall: { tier: 'global', ratings: 1200, average: 4.1, weighted_score: 4.1, confidence: 'community' },
+          overall: { tier: 'global', ratings: 1200, average: 4.1, weighted_score: 4.1, confidence: 'community', observed: 300, median_tokens_per_second: 38, crash_rate: 0.02 },
         },
       },
     })
@@ -98,5 +110,6 @@ describe('ratings', () => {
     expect(screen.getByText('Early ratings')).toBeInTheDocument()
     expect(screen.getByText('1,200 ratings')).toBeInTheDocument()
     expect(screen.getAllByText('Early ratings')).toHaveLength(1)
+    expect(screen.getByText('38.0 tok/s, 2% crashed')).toBeInTheDocument()
   })
 })

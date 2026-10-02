@@ -256,6 +256,8 @@
     },
     "share": "Partager cette note avec la communauté",
     "shareHint": "Aide les personnes ayant un ordinateur comme le vôtre à choisir un modèle. Vous pouvez arrêter le partage à tout moment.",
+    "observe": "Inclure son fonctionnement ici",
+    "observeNothing": "Rien de mesuré pour l'instant. Utilisez d'abord le modèle quelque temps.",
     "whatIsShared": "Ce qui est partagé, précisément",
     "sent": {
       "destination": "Envoyé à",
@@ -266,7 +268,8 @@
       "memory": "mémoire {{type}}, {{gb}} Go",
       "id": "Identifiant de note",
       "idValue": "Un identifiant aléatoire pour modifier ou supprimer votre note ; il n'est pas tiré de votre ordinateur",
-      "never": "Jamais vos prompts, conversations, noms de fichiers, nom d'ordinateur, nom d'utilisateur ni adresse réseau. Le service ne conserve pas votre adresse IP."
+      "never": "Jamais vos prompts, conversations, noms de fichiers, nom d'ordinateur, nom d'utilisateur ni adresse réseau. Le service ne conserve pas votre adresse IP.",
+      "observations": "Fonctionnement"
     },
     "notShareable": "Cette note reste sur cet ordinateur : {{reason}}",
     "save": "Enregistrer",
@@ -289,6 +292,17 @@
     "limitedHint": "Peu de personnes l'ont noté : le score reste proche de la moyenne jusqu'à ce qu'il y en ait davantage.",
     "prompt": "Comment {{model}} fonctionne-t-il pour vous ?",
     "notNow": "Pas maintenant",
-    "dontAsk": "Ne plus demander"
+    "dontAsk": "Ne plus demander",
+    "firstToken": "{{time}} avant le premier token",
+    "starts_one": "{{worked}} démarrage réussi sur {{formatted}}",
+    "starts_many": "{{worked}} démarrages réussis sur {{formatted}}",
+    "starts_other": "{{worked}} démarrages réussis sur {{formatted}}",
+    "crashed": "a planté",
+    "outOfMemory": "manque de mémoire",
+    "contextBand": "contexte {{band}}",
+    "crashRate": "{{percent}} de plantages",
+    "observedHint_one": "D'après {{formatted}} note partageant son fonctionnement",
+    "observedHint_many": "D'après {{formatted}} notes partageant son fonctionnement",
+    "observedHint_other": "D'après {{formatted}} notes partageant son fonctionnement"
   }
 }

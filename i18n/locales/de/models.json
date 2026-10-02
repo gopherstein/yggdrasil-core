@@ -252,6 +252,8 @@
     },
     "share": "Diese Bewertung mit der Community teilen",
     "shareHint": "Hilft Leuten mit ähnlichen Computern bei der Modellwahl. Du kannst das Teilen jederzeit beenden.",
+    "observe": "Angeben, wie es hier läuft",
+    "observeNothing": "Noch nichts gemessen. Nutze das Modell zuerst eine Weile.",
     "whatIsShared": "Was genau geteilt wird",
     "sent": {
       "destination": "Gesendet an",
@@ -262,7 +264,8 @@
       "memory": "{{type}}-Speicher, {{gb}} GB",
       "id": "Bewertungs-ID",
       "idValue": "Eine zufällige ID, damit du deine Bewertung ändern oder entfernen kannst; nicht aus deinem Computer abgeleitet",
-      "never": "Niemals deine Prompts, Chats, Dateinamen, Computernamen, Benutzernamen oder Netzwerkadresse. Der Dienst speichert deine IP-Adresse nicht."
+      "never": "Niemals deine Prompts, Chats, Dateinamen, Computernamen, Benutzernamen oder Netzwerkadresse. Der Dienst speichert deine IP-Adresse nicht.",
+      "observations": "Wie es läuft"
     },
     "notShareable": "Diese Bewertung bleibt auf diesem Computer: {{reason}}",
     "save": "Speichern",
@@ -284,6 +287,15 @@
     "limitedHint": "Erst wenige haben das bewertet, daher liegt die Wertung nahe am Durchschnitt, bis mehr dazukommen.",
     "prompt": "Wie funktioniert {{model}} für dich?",
     "notNow": "Nicht jetzt",
-    "dontAsk": "Nicht mehr fragen"
+    "dontAsk": "Nicht mehr fragen",
+    "firstToken": "{{time}} bis zum ersten Token",
+    "starts_one": "{{worked}} von {{formatted}} Start erfolgreich",
+    "starts_other": "{{worked}} von {{formatted}} Starts erfolgreich",
+    "crashed": "abgestürzt",
+    "outOfMemory": "Speicher ging aus",
+    "contextBand": "{{band}} Kontext",
+    "crashRate": "{{percent}} abgestürzt",
+    "observedHint_one": "Aus {{formatted}} Bewertung, die angab, wie es läuft",
+    "observedHint_other": "Aus {{formatted}} Bewertungen, die angaben, wie es läuft"
   }
 }

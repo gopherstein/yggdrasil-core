@@ -256,6 +256,8 @@
     },
     "share": "Compartir esta valoración con la comunidad",
     "shareHint": "Ayuda a quienes tienen equipos como el tuyo a elegir un modelo. Puedes dejar de compartirla cuando quieras.",
+    "observe": "Incluir cómo funciona aquí",
+    "observeNothing": "Aún no hay mediciones. Usa el modelo un tiempo primero.",
     "whatIsShared": "Qué se comparte exactamente",
     "sent": {
       "destination": "Se envía a",
@@ -266,7 +268,8 @@
       "memory": "memoria {{type}}, {{gb}} GB",
       "id": "ID de valoración",
       "idValue": "Un ID aleatorio para que puedas cambiar o quitar tu valoración; no se obtiene de tu equipo",
-      "never": "Nunca tus prompts, chats, nombres de archivo, nombre del equipo, nombre de usuario ni dirección de red. El servicio no guarda tu dirección IP."
+      "never": "Nunca tus prompts, chats, nombres de archivo, nombre del equipo, nombre de usuario ni dirección de red. El servicio no guarda tu dirección IP.",
+      "observations": "Cómo funciona"
     },
     "notShareable": "Esta valoración se queda en este equipo: {{reason}}",
     "save": "Guardar",
@@ -289,6 +292,17 @@
     "limitedHint": "Pocas personas lo han valorado, así que la puntuación se acerca a la media hasta que haya más.",
     "prompt": "¿Qué tal te funciona {{model}}?",
     "notNow": "Ahora no",
-    "dontAsk": "No volver a preguntar"
+    "dontAsk": "No volver a preguntar",
+    "firstToken": "{{time}} hasta el primer token",
+    "starts_one": "{{worked}} de {{formatted}} inicio funcionó",
+    "starts_many": "{{worked}} de {{formatted}} inicios funcionaron",
+    "starts_other": "{{worked}} de {{formatted}} inicios funcionaron",
+    "crashed": "se bloqueó",
+    "outOfMemory": "se quedó sin memoria",
+    "contextBand": "contexto de {{band}}",
+    "crashRate": "{{percent}} se bloqueó",
+    "observedHint_one": "De {{formatted}} valoración que compartió cómo funciona",
+    "observedHint_many": "De {{formatted}} valoraciones que compartieron cómo funciona",
+    "observedHint_other": "De {{formatted}} valoraciones que compartieron cómo funciona"
   }
 }

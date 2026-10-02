@@ -57,7 +57,13 @@ type Service struct {
 	// Models lists the catalog and installed models.
 	Models func(ctx context.Context) ([]contracts.Model, error)
 	// Record notes data leaving this computer.
-	Record     func(ctx context.Context, destination, detail string)
+	Record func(ctx context.Context, destination, detail string)
+	// OutOfMemory says whether a failed start's error means the model ran
+	// out of memory.
+	OutOfMemory func(text string) bool
+	// LocalNode is this computer's node ID, to leave out replies that ran
+	// on a paired computer.
+	LocalNode  func() string
 	AppVersion string
 	Now        func() time.Time
 
@@ -84,6 +90,8 @@ type Input struct {
 	// Share sends the rating to the community; false keeps it on this
 	// computer and withdraws it if it was shared.
 	Share bool `json:"share"`
+	// Observations includes how the model runs here in a shared rating.
+	Observations bool `json:"observations"`
 }
 
 // View is a person's rating of one model and what sharing it would send.
@@ -98,6 +106,12 @@ type View struct {
 	Shared    bool       `json:"shared"`
 	SharedAt  *time.Time `json:"shared_at,omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	// ShareObservations is whether the shared rating includes how the model
+	// runs here.
+	ShareObservations bool `json:"share_observations"`
+	// Observations are how the model ran here in the last 30 days, exactly
+	// as sharing them would send; nil when nothing was measured.
+	Observations *Observations `json:"observations,omitempty"`
 	// Ask is true when it is a good time to ask for a rating.
 	Ask bool `json:"ask"`
 	// Shares is exactly what sharing sends, besides the stars, tags, a
@@ -166,6 +180,7 @@ type row struct {
 	stars     int
 	tags      []string
 	remoteKey string
+	shareObs  bool
 	sharedAt  *time.Time
 	updatedAt time.Time
 }
@@ -175,8 +190,8 @@ func (s *Service) load(ctx context.Context, id string) (*row, error) {
 	var tags string
 	var key, shared sql.NullString
 	var updated string
-	err := s.DB.QueryRowContext(ctx, `SELECT stars, tags, remote_key, shared_at, updated_at FROM model_ratings WHERE model_id = ?`, id).
-		Scan(&r.stars, &tags, &key, &shared, &updated)
+	err := s.DB.QueryRowContext(ctx, `SELECT stars, tags, remote_key, share_observations, shared_at, updated_at FROM model_ratings WHERE model_id = ?`, id).
+		Scan(&r.stars, &tags, &key, &r.shareObs, &shared, &updated)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
@@ -203,6 +218,9 @@ func (s *Service) Get(ctx context.Context, modelID string) (View, error) {
 		v.Reason = err.Error()
 	} else {
 		v.Rateable, v.Shares = true, sh
+		if v.Observations, err = s.Observe(ctx, modelID); err != nil {
+			return View{}, err
+		}
 	}
 	r, err := s.load(ctx, modelID)
 	if err != nil {
@@ -210,6 +228,7 @@ func (s *Service) Get(ctx context.Context, modelID string) (View, error) {
 	}
 	if r != nil {
 		v.Stars, v.Tags, v.Shared, v.SharedAt = r.stars, r.tags, r.remoteKey != "", r.sharedAt
+		v.ShareObservations = r.shareObs && v.Shared
 		v.UpdatedAt = &r.updatedAt
 		if v.Tags == nil {
 			v.Tags = []string{}
@@ -296,9 +315,10 @@ func (s *Service) Put(ctx context.Context, modelID string, in Input) (View, erro
 	tags, _ := json.Marshal(in.Tags)
 	now := s.now().UTC().Format(time.RFC3339)
 	if _, err := s.DB.ExecContext(ctx, `
-		INSERT INTO model_ratings (model_id, stars, tags, updated_at) VALUES (?, ?, ?, ?)
-		ON CONFLICT(model_id) DO UPDATE SET stars = excluded.stars, tags = excluded.tags, updated_at = excluded.updated_at`,
-		modelID, in.Stars, string(tags), now); err != nil {
+		INSERT INTO model_ratings (model_id, stars, tags, share_observations, updated_at) VALUES (?, ?, ?, ?, ?)
+		ON CONFLICT(model_id) DO UPDATE SET stars = excluded.stars, tags = excluded.tags,
+			share_observations = excluded.share_observations, updated_at = excluded.updated_at`,
+		modelID, in.Stars, string(tags), in.Share && in.Observations, now); err != nil {
 		return View{}, err
 	}
 	prev, err := s.load(ctx, modelID)
@@ -334,7 +354,16 @@ func (s *Service) share(ctx context.Context, modelID string, sh *Shares, in Inpu
 	if len(r.Tags) == 0 {
 		r.Tags = nil
 	}
-	s.record(ctx, sh.Destination, "Shared a "+itoa(in.Stars)+"-star rating of "+sh.Model.ID+" "+sh.Model.Quantization+" on "+sh.Hardware.Key())
+	detail := "Shared a " + itoa(in.Stars) + "-star rating of " + sh.Model.ID + " " + sh.Model.Quantization + " on " + sh.Hardware.Key()
+	if in.Observations {
+		if r.Observations, err = s.Observe(ctx, modelID); err != nil {
+			return err
+		}
+		if r.Observations != nil {
+			detail += ", with how it runs: " + r.Observations.String()
+		}
+	}
+	s.record(ctx, sh.Destination, detail)
 	key, err := s.Client.Submit(ctx, r)
 	if err != nil {
 		return err

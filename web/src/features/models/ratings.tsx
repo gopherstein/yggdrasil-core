@@ -1,10 +1,11 @@
+import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
 import { RATING_TAGS, useCommunityRatings, useModelRating, useRatingDialog } from './ratingsState'
-import { formatDecimal, formatNumber } from '@/i18n/format'
-import type { ModelRating, RatingStats, RatingTag } from '@/types/api'
+import { formatDecimal, formatLocale, formatMilliseconds, formatNumber, formatPercent, formatTokensPerSecond } from '@/i18n/format'
+import type { ModelRating, RatingObservations, RatingStats, RatingTag } from '@/types/api'
 
 function Stars({ value }: { value: number }) {
   const full = Math.round(value)
@@ -24,6 +25,14 @@ function StatsLine({ label, stats }: { label: string; stats: RatingStats }) {
       <span className="font-medium text-ink tabular-nums">★ {formatDecimal(stats.weighted_score, 1)}</span> {label}
       <span className="text-ink-faint"> · </span>
       <span className="tabular-nums">{t('ratings.count', { count: stats.ratings, formatted: formatNumber(stats.ratings) })}</span>
+      {observedText(stats, t) ? (
+        <>
+          <span className="text-ink-faint"> · </span>
+          <span className="tabular-nums" title={t('ratings.observedHint', { count: stats.observed ?? 0, formatted: formatNumber(stats.observed ?? 0) })}>
+            {observedText(stats, t)}
+          </span>
+        </>
+      ) : null}
       {stats.confidence !== 'community' ? (
         <span className="ms-1.5 status-chip bg-raised/80 text-ink-muted" title={t('ratings.limitedHint')}>
           {t(`ratings.confidence.${stats.confidence}`)}
@@ -31,6 +40,27 @@ function StatsLine({ label, stats }: { label: string; stats: RatingStats }) {
       ) : null}
     </p>
   )
+}
+
+/** How a model ran here, in a line: speed, first token, starts, crashes. */
+function observationsText(o: RatingObservations, t: TFunction<'models'>): string {
+  const parts: string[] = []
+  if (o.tokens_per_second) parts.push(formatTokensPerSecond(o.tokens_per_second))
+  if (o.ttft_ms) parts.push(t('ratings.firstToken', { time: formatMilliseconds(o.ttft_ms) }))
+  if (o.starts) parts.push(t('ratings.starts', { count: o.starts, worked: formatNumber(o.starts - (o.start_failures ?? 0)), formatted: formatNumber(o.starts) }))
+  if (o.crashed) parts.push(t('ratings.crashed'))
+  if (o.out_of_memory) parts.push(t('ratings.outOfMemory'))
+  if (o.context_band) parts.push(t('ratings.contextBand', { band: o.context_band }))
+  return new Intl.ListFormat(formatLocale(), { style: 'short', type: 'unit' }).format(parts)
+}
+
+/** How a model ran for those in a cohort who shared it: median speed and crash rate. */
+function observedText(stats: RatingStats, t: TFunction<'models'>): string {
+  if (!stats.observed) return ''
+  const parts: string[] = []
+  if (stats.median_tokens_per_second) parts.push(formatTokensPerSecond(stats.median_tokens_per_second))
+  if (stats.crash_rate) parts.push(t('ratings.crashRate', { percent: formatPercent(stats.crash_rate) }))
+  return new Intl.ListFormat(formatLocale(), { style: 'short', type: 'unit' }).format(parts)
 }
 
 /** Community ratings of a model, from hardware like this computer's and overall, and this person's own. */
@@ -80,6 +110,7 @@ function RateModelDialog({ modelId, modelName, onClose }: { modelId: string; mod
   const [stars, setStars] = useState(0)
   const [tags, setTags] = useState<RatingTag[]>([])
   const [share, setShare] = useState(false)
+  const [observe, setObserve] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -87,6 +118,7 @@ function RateModelDialog({ modelId, modelName, onClose }: { modelId: string; mod
     setStars(rating.stars ?? 0)
     setTags(rating.tags ?? [])
     setShare(rating.shared)
+    setObserve(rating.share_observations)
   }, [rating])
 
   useEffect(() => {
@@ -105,7 +137,7 @@ function RateModelDialog({ modelId, modelName, onClose }: { modelId: string; mod
     if (err instanceof ApiError && err.status === 502) refresh()
   }
   const save = useMutation({
-    mutationFn: () => api.putModelRating(modelId, { stars, tags, share: share && Boolean(rating?.rateable) }),
+    mutationFn: () => api.putModelRating(modelId, { stars, tags, share: share && Boolean(rating?.rateable), observations: share && observe }),
     onSuccess: (next) => {
       refresh(next ?? undefined)
       onClose()
@@ -203,9 +235,27 @@ function RateModelDialog({ modelId, modelName, onClose }: { modelId: string; mod
                   })} · ${shares.hardware.platform} ${shares.hardware.architecture}`}
                 />
                 <SharedRow label={t('ratings.sent.id')} value={t('ratings.sent.idValue')} />
+                {share && observe && rating?.observations ? (
+                  <SharedRow label={t('ratings.sent.observations')} value={observationsText(rating.observations, t)} />
+                ) : null}
               </dl>
               <p className="mt-2">{t('ratings.sent.never')}</p>
             </details>
+            <label className={['mt-3 flex items-start gap-2 text-sm', share ? 'text-ink' : 'text-ink-faint'].join(' ')}>
+              <input
+                type="checkbox"
+                className="mt-1"
+                disabled={!share || !rating?.observations}
+                checked={share && observe && Boolean(rating?.observations)}
+                onChange={(e) => setObserve(e.target.checked)}
+              />
+              <span>
+                {t('ratings.observe')}
+                <span className="block text-xs text-ink-muted">
+                  {rating?.observations ? observationsText(rating.observations, t) : t('ratings.observeNothing')}
+                </span>
+              </span>
+            </label>
           </div>
         ) : null}
 

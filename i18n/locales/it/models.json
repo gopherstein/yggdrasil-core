@@ -256,6 +256,8 @@
     },
     "share": "Condividi questa valutazione con la community",
     "shareHint": "Aiuta chi ha un computer come il tuo a scegliere un modello. Puoi smettere di condividerla in qualsiasi momento.",
+    "observe": "Includi come funziona qui",
+    "observeNothing": "Ancora nessuna misura. Usa prima il modello per un po'.",
     "whatIsShared": "Cosa viene condiviso, esattamente",
     "sent": {
       "destination": "Inviato a",
@@ -266,7 +268,8 @@
       "memory": "memoria {{type}}, {{gb}} GB",
       "id": "ID valutazione",
       "idValue": "Un ID casuale per modificare o rimuovere la tua valutazione; non è ricavato dal tuo computer",
-      "never": "Mai i tuoi prompt, chat, nomi di file, nome del computer, nome utente o indirizzo di rete. Il servizio non memorizza il tuo indirizzo IP."
+      "never": "Mai i tuoi prompt, chat, nomi di file, nome del computer, nome utente o indirizzo di rete. Il servizio non memorizza il tuo indirizzo IP.",
+      "observations": "Come funziona"
     },
     "notShareable": "Questa valutazione resta su questo computer: {{reason}}",
     "save": "Salva",
@@ -289,6 +292,17 @@
     "limitedHint": "Poche persone lo hanno valutato, quindi il punteggio resta vicino alla media finché non ce ne saranno di più.",
     "prompt": "Come ti trovi con {{model}}?",
     "notNow": "Non ora",
-    "dontAsk": "Non chiedere più"
+    "dontAsk": "Non chiedere più",
+    "firstToken": "{{time}} al primo token",
+    "starts_one": "{{worked}} avvio riuscito su {{formatted}}",
+    "starts_many": "{{worked}} avvii riusciti su {{formatted}}",
+    "starts_other": "{{worked}} avvii riusciti su {{formatted}}",
+    "crashed": "si è bloccato",
+    "outOfMemory": "memoria esaurita",
+    "contextBand": "contesto {{band}}",
+    "crashRate": "{{percent}} di blocchi",
+    "observedHint_one": "Da {{formatted}} valutazione che ha condiviso come funziona",
+    "observedHint_many": "Da {{formatted}} valutazioni che hanno condiviso come funziona",
+    "observedHint_other": "Da {{formatted}} valutazioni che hanno condiviso come funziona"
   }
 }

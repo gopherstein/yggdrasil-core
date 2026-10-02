@@ -3,6 +3,7 @@ package pluginapi
 import (
 	"context"
 	"encoding/json"
+	"errors"
 )
 
 // RuntimeDetection reports what a runtime found on the host.
@@ -27,6 +28,24 @@ type RuntimeCapabilities struct {
 }
 
 // ModelStartConfig starts a model under a runtime.
+// ErrLoadFailed marks a start where the runtime ran but the model did not
+// load, such as running out of memory: a failure of the model on this
+// computer, not of the setup. Match it with errors.Is.
+var ErrLoadFailed = errors.New("the model did not load")
+
+// LoadFailed marks err as ErrLoadFailed, keeping its message.
+func LoadFailed(err error) error {
+	if err == nil {
+		return nil
+	}
+	return loadFailed{err}
+}
+
+type loadFailed struct{ err error }
+
+func (e loadFailed) Error() string   { return e.err.Error() }
+func (e loadFailed) Unwrap() []error { return []error{e.err, ErrLoadFailed} }
+
 type ModelStartConfig struct {
 	ModelID   string `json:"model_id"`
 	ModelPath string `json:"model_path"`

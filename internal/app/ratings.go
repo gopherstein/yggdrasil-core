@@ -8,6 +8,7 @@ import (
 
 	"github.com/yeixio/yggdrasil-core/internal/config"
 	"github.com/yeixio/yggdrasil-core/internal/egress"
+	modelhealth "github.com/yeixio/yggdrasil-core/internal/models/health"
 	"github.com/yeixio/yggdrasil-core/internal/ratings"
 	"github.com/yeixio/yggdrasil-core/internal/version"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
@@ -52,6 +53,8 @@ func (a *App) newRatings(cfg config.Config) *ratings.Service {
 				a.Egress.Add(ctx, egress.CommunityRatings, destination, detail)
 			}
 		},
-		AppVersion: version.Version,
+		OutOfMemory: modelhealth.OutOfMemory,
+		LocalNode:   func() string { return a.Config.Get().NodeID },
+		AppVersion:  version.Version,
 	}
 }

@@ -111,7 +111,9 @@ type App struct {
 	// RunLog keeps each request's run trace (§35).
 	RunLog *runlog.Store
 	// Caches lists every cache and its policy (§36).
-	Caches   *cache.Registry
+	Caches *cache.Registry
+	// Ratings is community model ratings (#37).
+	Ratings  *ratings.Service
 	capCache *cache.Cache[inventory.Snapshot]
 	// tokenCounts keeps counts from models' tokenizers (§66).
 	tokenCounts *cache.Cache[int]
@@ -238,12 +240,27 @@ func New(opts Options) (*App, error) {
 	healthMonitor := modelhealth.NewMonitor(modelhealth.DefaultSettings())
 	healthMonitor.Log = logger
 	healthMonitor.Probe = llamacpp.Probe
+	var ratingsRef atomic.Pointer[ratings.Service]
 	healthMonitor.Publish = func(evt modelhealth.Event) {
 		bus.Publish(events.New(evt.Type, evt.Payload))
+		// A model that stopped working on this computer counts against it
+		// in the runtime observations a shared rating may include.
+		if r := ratingsRef.Load(); r != nil && evt.Type == modelhealth.EventFailed {
+			if node, _ := evt.Payload["node_id"].(string); node == "" || node == cfgMgr.Get().NodeID {
+				model, _ := evt.Payload["model_id"].(string)
+				reason, _ := evt.Payload["reason"].(string)
+				r.RecordCrash(context.Background(), model, reason == modelhealth.ReasonOOM)
+			}
+		}
 	}
 	rtRegistry.Register(llamaRT)
 	rtRegistry.Register(external.New(external.Config{}))
 	rtMgr := runtimes.NewManager(rtRegistry, db.SQL, bus, llamaClient)
+	rtMgr.OnStart = func(ctx context.Context, modelID string, err error) {
+		if r := ratingsRef.Load(); r != nil {
+			r.RecordStart(ctx, modelID, err)
+		}
+	}
 
 	profileMgr := profiles.NewManager(db.SQL)
 	if err := profileMgr.EnsurePresets(context.Background()); err != nil {
@@ -597,7 +614,9 @@ func New(opts Options) (*App, error) {
 	a.API.BindMCP(a.MCP, mcp.NewServer(a.mcpBackend()), yggctlPath)
 	a.API.BindPersonal(a)
 	a.API.BindPrivacy(a)
-	a.API.BindRatings(a.newRatings(cfg))
+	a.Ratings = a.newRatings(cfg)
+	ratingsRef.Store(a.Ratings)
+	a.API.BindRatings(a.Ratings)
 	a.API.BindRuns(a.RunLog)
 	a.API.BindCapabilities(a)
 	a.API.BindCaches(a)

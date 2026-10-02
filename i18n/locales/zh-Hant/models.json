@@ -248,6 +248,8 @@
     },
     "share": "與社群分享此評分",
     "shareHint": "幫助使用類似電腦的人選擇模型。你可以隨時停止分享。",
+    "observe": "包含它在這台電腦上的執行情況",
+    "observeNothing": "尚未測得資料。請先使用此模型一段時間。",
     "whatIsShared": "具體分享哪些內容",
     "sent": {
       "destination": "傳送至",
@@ -258,7 +260,8 @@
       "memory": "{{type}}記憶體，{{gb}} GB",
       "id": "評分 ID",
       "idValue": "一組隨機 ID，用來變更或移除你的評分；不是由你的電腦資訊產生",
-      "never": "絕不會傳送你的提示、對話、檔案名稱、電腦名稱、使用者名稱或網路位址。這項服務不會儲存你的 IP 位址。"
+      "never": "絕不會傳送你的提示、對話、檔案名稱、電腦名稱、使用者名稱或網路位址。這項服務不會儲存你的 IP 位址。",
+      "observations": "執行情況"
     },
     "notShareable": "此評分只會保存在這台電腦上：{{reason}}",
     "save": "儲存",
@@ -279,6 +282,13 @@
     "limitedHint": "評分的人還不多，在評分增加之前，分數會偏向平均值。",
     "prompt": "{{model}}用起來如何？",
     "notNow": "稍後再說",
-    "dontAsk": "不要再問"
+    "dontAsk": "不要再問",
+    "firstToken": "第一個 token 耗時 {{time}}",
+    "starts_other": "{{formatted}} 次啟動中 {{worked}} 次成功",
+    "crashed": "曾當機",
+    "outOfMemory": "曾記憶體不足",
+    "contextBand": "{{band}} 上下文",
+    "crashRate": "{{percent}} 當機",
+    "observedHint_other": "來自 {{formatted}} 則分享執行情況的評分"
   }
 }

@@ -248,6 +248,8 @@
     },
     "share": "与社区分享此评分",
     "shareHint": "帮助使用类似电脑的人选择模型。你可以随时停止分享。",
+    "observe": "包含它在这台电脑上的运行情况",
+    "observeNothing": "尚未测得数据。请先使用该模型一段时间。",
     "whatIsShared": "具体分享哪些内容",
     "sent": {
       "destination": "发送到",
@@ -258,7 +260,8 @@
       "memory": "{{type}}内存，{{gb}} GB",
       "id": "评分 ID",
       "idValue": "一个随机 ID，用于更改或删除你的评分；不由你的电脑信息生成",
-      "never": "绝不会发送你的提示、聊天、文件名、电脑名称、用户名或网络地址。该服务不会保存你的 IP 地址。"
+      "never": "绝不会发送你的提示、聊天、文件名、电脑名称、用户名或网络地址。该服务不会保存你的 IP 地址。",
+      "observations": "运行情况"
     },
     "notShareable": "此评分仅保存在这台电脑上：{{reason}}",
     "save": "保存",
@@ -279,6 +282,13 @@
     "limitedHint": "评分的人还不多，在评分增多之前，分数会偏向平均值。",
     "prompt": "{{model}}用起来怎么样？",
     "notNow": "以后再说",
-    "dontAsk": "不再询问"
+    "dontAsk": "不再询问",
+    "firstToken": "首个 token 用时 {{time}}",
+    "starts_other": "{{formatted}} 次启动中 {{worked}} 次成功",
+    "crashed": "发生过崩溃",
+    "outOfMemory": "发生过内存不足",
+    "contextBand": "{{band}} 上下文",
+    "crashRate": "{{percent}} 崩溃",
+    "observedHint_other": "来自 {{formatted}} 条分享了运行情况的评分"
   }
 }
