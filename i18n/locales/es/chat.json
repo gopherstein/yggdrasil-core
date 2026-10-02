@@ -422,7 +422,24 @@
     "firstToken": "primer token {{time}}",
     "inOut": "{{in}} de entrada / {{out}} de salida",
     "cached": "{{count}} en caché",
-    "toolFailures": "{{count}} fallidas"
+    "toolFailures": "{{count}} fallidas",
+    "notes": {
+      "team": "Equipo: un planificador divide la solicitud, los trabajadores hacen las partes y un revisor comprueba la respuesta",
+      "single": "Un solo modelo, sin plan",
+      "specialist": "La IA especializada {{name}} respondió en esta computadora",
+      "otherComputer": "Respondió en {{computer}} después de que {{model}} fallara en {{failed}}",
+      "otherModel": "Respondió otro modelo después de que {{model}} fallara",
+      "automation": "Automatización {{name}}",
+      "repaired": "Se repararon los datos del resultado para la condición",
+      "drafted": "Un trabajador esbozó primero la respuesta",
+      "partsParallel_one": "Se trabajó {{count}} parte en paralelo",
+      "partsParallel_many": "Se trabajaron {{count}} partes en paralelo",
+      "partsParallel_other": "Se trabajaron {{count}} partes en paralelo",
+      "partsInOrder_one": "Se trabajó {{count}} parte",
+      "partsInOrder_many": "Se trabajaron {{count}} partes una tras otra",
+      "partsInOrder_other": "Se trabajaron {{count}} partes una tras otra",
+      "lookedUp": "Primero se buscó en la web"
+    }
   },
   "notices": {
     "languageWeak": "Puede que {{model}} escriba en {{language}} peor que en inglés, y ningún modelo instalado que quepa lo hace mejor. En la página Modelos encontrarás modelos con buena valoración en {{language}}.",

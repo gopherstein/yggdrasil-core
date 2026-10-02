@@ -400,7 +400,20 @@
     "firstToken": "最初のトークン {{time}}",
     "inOut": "入力{{in}} / 出力{{out}}",
     "cached": "キャッシュ{{count}}件",
-    "toolFailures": "{{count}}件失敗"
+    "toolFailures": "{{count}}件失敗",
+    "notes": {
+      "team": "チーム：プランナーが依頼を分割し、ワーカーが各パートを処理し、レビュアーが回答を確認",
+      "single": "単一モデル、計画なし",
+      "specialist": "特化型AI {{name}}がこのコンピュータで回答",
+      "otherComputer": "{{failed}}で{{model}}が失敗したため、{{computer}}で回答",
+      "otherModel": "{{model}}が失敗したため、別のモデルで回答",
+      "automation": "自動化 {{name}}",
+      "repaired": "条件に使う結果のデータを修復",
+      "drafted": "ワーカーが先に回答を下書き",
+      "partsParallel_other": "{{count}}個のパートを並列で処理",
+      "partsInOrder_other": "{{count}}個のパートを順番に処理",
+      "lookedUp": "先にWebで調査"
+    }
   },
   "notices": {
     "languageWeak": "{{model}}は英語に比べて{{language}}の文章が劣る可能性があり、インストール済みで動作するモデルの中にこれより得意なものはありません。{{language}}の評価が高いモデルは「モデル」ページで確認できます。",

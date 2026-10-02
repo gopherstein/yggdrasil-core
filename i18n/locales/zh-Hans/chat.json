@@ -400,7 +400,20 @@
     "firstToken": "首个词元 {{time}}",
     "inOut": "输入 {{in}} / 输出 {{out}}",
     "cached": "{{count}} 个已缓存",
-    "toolFailures": "{{count}} 个失败"
+    "toolFailures": "{{count}} 个失败",
+    "notes": {
+      "team": "团队：规划者拆分请求，执行者完成各部分，审核者检查回答",
+      "single": "单一模型，不做规划",
+      "specialist": "专用 AI {{name}} 在这台电脑上回答",
+      "otherComputer": "{{model}} 在 {{failed}} 上失败后，改在 {{computer}} 上回答",
+      "otherModel": "{{model}} 失败后，改由另一个模型回答",
+      "automation": "自动化 {{name}}",
+      "repaired": "修复了结果中用于条件判断的数据",
+      "drafted": "执行者先拟好了回答",
+      "partsParallel_other": "并行处理了 {{count}} 个部分",
+      "partsInOrder_other": "依次处理了 {{count}} 个部分",
+      "lookedUp": "先在网上查找"
+    }
   },
   "notices": {
     "languageWeak": "{{model}} 写{{language}}可能不如写英文好，而已安装且能运行的模型中没有更擅长的。{{language}}评级良好的模型可在“模型”页面找到。",
