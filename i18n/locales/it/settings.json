@@ -158,6 +158,14 @@
     "clear": "Cancella la cronologia delle chat",
     "clearing": "Cancellazione…"
   },
+  "ratings": {
+    "title": "Valutazioni della community",
+    "description": "Valuta i modelli da 1 a 5 stelle. Le tue valutazioni restano su questo computer, a meno che tu non scelga di condividerne una quando valuti.",
+    "show": "Mostra le valutazioni della community",
+    "showHint": "I modelli mostrano come li valuta chi ha computer simili. Un riepilogo pubblico viene scaricato una volta al giorno mentre sfogli i modelli; non invia nulla su di te.",
+    "ask": "Chiedimi di valutare i modelli",
+    "askHint": "Dopo che hai usato un modello per un po', una chat ti chiede come funziona."
+  },
   "whatLeft": {
     "title": "Cosa è uscito da questo computer",
     "description": "Yggdrasil lavora su questo computer. Queste sono le volte in cui una chat, un'automazione o un'app ha inviato qualcosa altrove: ricerche e pagine web, ricerche su mappe, computer associati e servizi collegati. Segna ricordi o conoscenza come “Solo questo computer” per tenere qui le chat che li usano.",
@@ -171,7 +179,8 @@
       "paired_computer": "Computer associato",
       "external_server": "Server esterno",
       "connector": "Servizio collegato",
-      "notification": "Notifica"
+      "notification": "Notifica",
+      "community_ratings": "Valutazioni della community"
     },
     "kindsLower": {
       "web_search": "ricerca web",
@@ -180,7 +189,8 @@
       "paired_computer": "computer associato",
       "external_server": "server esterno",
       "connector": "servizio collegato",
-      "notification": "notifica"
+      "notification": "notifica",
+      "community_ratings": "valutazioni della community"
     },
     "sources": {
       "chat": "Chat",

@@ -49,6 +49,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/orchestrator/builtin/simple"
 	"github.com/yeixio/yggdrasil-core/internal/profiles"
 	"github.com/yeixio/yggdrasil-core/internal/pyenv"
+	"github.com/yeixio/yggdrasil-core/internal/ratings"
 	"github.com/yeixio/yggdrasil-core/internal/remotetools"
 	"github.com/yeixio/yggdrasil-core/internal/replylang"
 	"github.com/yeixio/yggdrasil-core/internal/runlog"
@@ -596,6 +597,7 @@ func New(opts Options) (*App, error) {
 	a.API.BindMCP(a.MCP, mcp.NewServer(a.mcpBackend()), yggctlPath)
 	a.API.BindPersonal(a)
 	a.API.BindPrivacy(a)
+	a.API.BindRatings(a.newRatings(cfg))
 	a.API.BindRuns(a.RunLog)
 	a.API.BindCapabilities(a)
 	a.API.BindCaches(a)
@@ -963,6 +965,8 @@ func (a *App) settingsView(ctx context.Context) (contracts.SettingsView, error) 
 	saveTask, _ := a.Settings.GetBool(ctx, "save_task_history", true)
 	notifyTask, _ := a.Settings.GetBool(ctx, "notify_task_finish", true)
 	notifyPeer, _ := a.Settings.GetBool(ctx, "notify_peer_offline", true)
+	communityRatings, _ := a.Settings.GetBool(ctx, ratings.SettingShow, false)
+	ratingsPrompts, _ := a.Settings.GetBool(ctx, ratings.SettingAsk, true)
 	toolTerminal, _ := a.Settings.GetString(ctx, "tool_terminal", "ask")
 	toolFiles, _ := a.Settings.GetString(ctx, "tool_file_writes", "ask")
 	toolGit, _ := a.Settings.GetString(ctx, "tool_git", "ask")
@@ -995,6 +999,8 @@ func (a *App) settingsView(ctx context.Context) (contracts.SettingsView, error) 
 		SaveTaskHistory:         saveTask,
 		NotifyTaskFinish:        notifyTask,
 		NotifyPeerOffline:       notifyPeer,
+		CommunityRatings:        communityRatings,
+		RatingsPrompts:          ratingsPrompts,
 		ToolTerminal:            toolTerminal,
 		ToolFileWrites:          toolFiles,
 		ToolGit:                 toolGit,
@@ -1086,7 +1092,7 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 			return err
 		}
 	}
-	for _, key := range []string{"save_chat_history", "save_task_history", "notify_task_finish", "notify_peer_offline", "launch_at_login"} {
+	for _, key := range []string{"save_chat_history", "save_task_history", "notify_task_finish", "notify_peer_offline", "launch_at_login", ratings.SettingShow, ratings.SettingAsk} {
 		if v, ok := patch[key].(bool); ok {
 			if err := a.Settings.SetBool(ctx, key, v); err != nil {
 				return err

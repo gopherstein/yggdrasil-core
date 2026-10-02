@@ -158,6 +158,14 @@
     "clear": "清除聊天紀錄",
     "clearing": "正在清除…"
   },
+  "ratings": {
+    "title": "社群評分",
+    "description": "以 1 到 5 顆星為模型評分。除非你在評分時選擇分享，否則評分只會保存在這台電腦上。",
+    "show": "顯示社群評分",
+    "showHint": "模型會顯示使用類似電腦的人給出的評分。瀏覽模型時，每天下載一次公開摘要；不會傳送任何關於你的資訊。",
+    "ask": "請我為模型評分",
+    "askHint": "使用某個模型一段時間後，對話中會詢問你它用起來如何。"
+  },
   "whatLeft": {
     "title": "離開這台電腦的資料",
     "description": "Yggdrasil 在這台電腦上運作。以下是聊天、自動化或 App 將資料傳送到其他地方的紀錄：網路搜尋與網頁、地圖查詢、配對的電腦，以及已連結的服務。將記憶或知識標示為「僅限這台電腦」，就能讓使用它們的聊天留在這裡執行。",
@@ -171,7 +179,8 @@
       "paired_computer": "配對的電腦",
       "external_server": "外部伺服器",
       "connector": "已連結的服務",
-      "notification": "通知"
+      "notification": "通知",
+      "community_ratings": "社群評分"
     },
     "kindsLower": {
       "web_search": "網路搜尋",
@@ -180,7 +189,8 @@
       "paired_computer": "配對的電腦",
       "external_server": "外部伺服器",
       "connector": "已連結的服務",
-      "notification": "通知"
+      "notification": "通知",
+      "community_ratings": "社群評分"
     },
     "sources": {
       "chat": "聊天",

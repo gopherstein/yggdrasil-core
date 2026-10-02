@@ -34,6 +34,10 @@ type Config struct {
 	PlacesGeocoderURL string `json:"places_geocoder_url,omitempty"`
 	PlacesOverpassURL string `json:"places_overpass_url,omitempty"`
 	PlacesRouterURL   string `json:"places_router_url,omitempty"`
+	// Community model ratings (#37): the ratings service, and the public
+	// summary used when it cannot be reached. Empty uses Yeix's.
+	RatingsURL        string `json:"ratings_url,omitempty"`
+	RatingsSummaryURL string `json:"ratings_summary_url,omitempty"`
 }
 
 // Manager loads and persists configuration.

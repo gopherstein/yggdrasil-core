@@ -199,5 +199,64 @@
     "speedUnavailable": "Speed unavailable",
     "usedBy": "Used by: {{profiles}}",
     "openChat": "Open Chat"
+  },
+  "ratings": {
+    "rate": "Rate",
+    "rateLabel": "Rate {{model}}",
+    "yourRatingLabel_one": "Your rating of {{model}}: {{count}} star. Change it",
+    "yourRatingLabel_other": "Your rating of {{model}}: {{count}} stars. Change it",
+    "title": "Rate {{model}}",
+    "intro": "How well does it work on this computer? Your rating is saved here.",
+    "starsLabel": "Stars",
+    "stars_one": "{{count}} star",
+    "stars_other": "{{count}} stars",
+    "tagsLabel": "Why? (optional)",
+    "tags": {
+      "great_responses": "Great answers",
+      "fast": "Fast",
+      "slow": "Slow",
+      "stable": "Stable",
+      "crashed": "Crashed",
+      "too_much_memory": "Uses too much memory",
+      "great_for_coding": "Great for coding",
+      "great_for_chat": "Great for chat",
+      "good_tool_use": "Good with tools",
+      "poor_tool_use": "Poor with tools"
+    },
+    "share": "Share this rating with the community",
+    "shareHint": "Helps people with computers like yours choose a model. You can stop sharing at any time.",
+    "whatIsShared": "Exactly what is shared",
+    "sent": {
+      "destination": "Sent to",
+      "rating": "Rating",
+      "ratingValue": "The stars and reasons above",
+      "model": "Model",
+      "hardware": "Computer class",
+      "memory": "{{type}} memory, {{gb}} GB",
+      "id": "Rating ID",
+      "idValue": "A random ID, so you can change or remove your rating; not made from your computer",
+      "never": "Never your prompts, chats, file names, computer name, user name, or network address. The service doesn’t store your IP address."
+    },
+    "notShareable": "This rating stays on this computer: {{reason}}",
+    "save": "Save",
+    "saveAndShare": "Save and share",
+    "remove": "Remove rating",
+    "cancel": "Cancel",
+    "count_one": "{{formatted}} rating",
+    "count_other": "{{formatted}} ratings",
+    "similar": {
+      "family": "on computers like yours",
+      "class": "on similar computers",
+      "backend": "on computers with this much memory"
+    },
+    "overall": "overall",
+    "confidence": {
+      "limited": "Limited data",
+      "early": "Early ratings"
+    },
+    "limitedHint": "Only a few people have rated this, so the score leans toward the average until more do.",
+    "prompt": "How is {{model}} working for you?",
+    "notNow": "Not now",
+    "dontAsk": "Don’t ask again"
   }
 }

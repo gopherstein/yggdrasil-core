@@ -467,6 +467,10 @@ export interface SettingsView {
   save_task_history?: boolean
   notify_task_finish?: boolean
   notify_peer_offline?: boolean
+  /** Show community model ratings; downloads the public summary once a day while models are browsed. */
+  community_ratings?: boolean
+  /** Ask for a rating after a model has been used a while. */
+  ratings_prompts?: boolean
   tool_terminal?: string
   tool_file_writes?: string
   tool_git?: string
@@ -640,6 +644,8 @@ export interface ToolRequestedPayload {
 
 export interface SettingsPatch {
   ui_locale?: string
+  community_ratings?: boolean
+  ratings_prompts?: boolean
   assistant_language_mode?: AssistantLanguageMode
   assistant_language?: string
   memory_enabled?: boolean
@@ -1374,7 +1380,62 @@ export interface PersonalStyle {
   instructions?: string
 }
 
-export type EgressKind = 'web_search' | 'web_page' | 'places' | 'paired_computer' | 'external_server' | 'connector' | 'notification'
+export type EgressKind = 'web_search' | 'web_page' | 'places' | 'paired_computer' | 'external_server' | 'connector' | 'notification' | 'community_ratings'
+
+/** A structured reason a rating may give (#37). */
+export type RatingTag =
+  | 'great_responses'
+  | 'fast'
+  | 'slow'
+  | 'stable'
+  | 'crashed'
+  | 'too_much_memory'
+  | 'great_for_coding'
+  | 'great_for_chat'
+  | 'good_tool_use'
+  | 'poor_tool_use'
+
+/** This person's rating of a model, and exactly what sharing it would send. */
+export interface ModelRating {
+  model_id: string
+  /** False when the model cannot be compared with others' ratings; it can still be rated here. */
+  rateable: boolean
+  reason?: string
+  /** Absent when not rated. */
+  stars?: number
+  tags: RatingTag[]
+  shared: boolean
+  shared_at?: string
+  updated_at?: string
+  /** A good time to ask for a rating. */
+  ask: boolean
+  shares?: {
+    destination: string
+    model: { id: string; format: string; quantization: string; runtime: string; backend: string }
+    hardware: { platform: string; architecture: string; vendor: string; family: string; memory_type: string; memory_bucket_gb: string }
+  }
+}
+
+/** One group of hardware's ratings of a model. */
+export interface RatingStats {
+  tier: 'family' | 'class' | 'backend' | 'global'
+  cohort?: string
+  ratings: number
+  average: number
+  weighted_score: number
+  confidence: 'limited' | 'early' | 'community'
+  tags?: Partial<Record<RatingTag, number>>
+}
+
+/** Everyone's ratings of the models here, by local model ID. */
+export interface CommunityRatings {
+  enabled: boolean
+  fetched_at?: string
+  generated_at?: string
+  source?: string
+  error?: string
+  models: Record<string, { similar?: RatingStats; overall?: RatingStats }>
+}
 
 /** One time data left this computer (spec §63). */
 export interface EgressRecord {

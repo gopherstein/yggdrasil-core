@@ -3,6 +3,7 @@ import { useState } from 'react'
 import type { Model, ModelFit, ModelDownloadProgressPayload } from '@/types/api'
 import { formatBytes } from '@/lib/format'
 import { SmallModelNote } from './SmallModelNote'
+import { CommunityScore, RateButton } from './ratings'
 import { useUIStore } from '@/stores/uiStore'
 import {
   bestForLabel,
@@ -83,6 +84,8 @@ export function ModelCard({
         <p className="mt-1 text-xs text-ink">{fit.runtime_warning}</p>
       ) : null}
 
+      <CommunityScore modelId={model.id} />
+
       <div className="mt-2 flex flex-wrap gap-1.5">
         {chips.map((tag) => (
           <span key={tag} className="status-chip bg-raised/80 text-ink-muted">
@@ -124,7 +127,10 @@ export function ModelCard({
             {isDownloading ? t('install.downloading') : install.label}
           </button>
         ) : (
-          <span className="status-chip bg-success/15 text-success">{t('install.installed')}</span>
+          <>
+            <span className="status-chip bg-success/15 text-success">{t('install.installed')}</span>
+            <RateButton modelId={model.id} modelName={model.display_name} />
+          </>
         )}
         <button
           type="button"

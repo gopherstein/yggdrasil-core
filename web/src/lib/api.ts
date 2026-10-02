@@ -20,7 +20,10 @@ import type {
   LogEntry,
   Message,
   Connector,
+  CommunityRatings,
   EgressRecord,
+  ModelRating,
+  RatingTag,
   PrivacyOverview,
   RunTrace,
   CapabilitySnapshot,
@@ -818,6 +821,18 @@ export const api = {
 
   setRunRetention: (days: number) =>
     request<PrivacyOverview>('/api/v1/privacy', { method: 'PUT', body: JSON.stringify({ retention_days: days }) }),
+
+  getModelRating: (id: string) => request<ModelRating>(`/api/v1/models/${encodeURIComponent(id)}/rating`),
+
+  /** Saves a rating; share sends it to the community, false keeps it here and withdraws it if it was shared. */
+  putModelRating: (id: string, body: { stars: number; tags: RatingTag[]; share: boolean }) =>
+    request<ModelRating>(`/api/v1/models/${encodeURIComponent(id)}/rating`, { method: 'PUT', body: JSON.stringify(body) }),
+
+  deleteModelRating: (id: string) => request<null>(`/api/v1/models/${encodeURIComponent(id)}/rating`, { method: 'DELETE' }),
+
+  dismissModelRating: (id: string) => request<null>(`/api/v1/models/${encodeURIComponent(id)}/rating/dismiss`, { method: 'POST' }),
+
+  getCommunityRatings: () => request<CommunityRatings>('/api/v1/ratings/community'),
 
   deleteRunRecords: () => request<RunRecordCounts>('/api/v1/privacy/delete-runs', { method: 'POST' }),
 

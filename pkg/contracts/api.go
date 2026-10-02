@@ -684,6 +684,11 @@ type SettingsView struct {
 	SaveTaskHistory   bool `json:"save_task_history"`
 	NotifyTaskFinish  bool `json:"notify_task_finish"`
 	NotifyPeerOffline bool `json:"notify_peer_offline"`
+	// CommunityRatings shows community model ratings, downloading the
+	// public summary once a day while models are browsed (#37).
+	CommunityRatings bool `json:"community_ratings"`
+	// RatingsPrompts asks for a rating after a model has been used a while.
+	RatingsPrompts bool `json:"ratings_prompts"`
 	// Tool defaults: deny | ask | allow | allow-for-session
 	ToolTerminal   string `json:"tool_terminal"`
 	ToolFileWrites string `json:"tool_file_writes"`

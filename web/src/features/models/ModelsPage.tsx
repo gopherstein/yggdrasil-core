@@ -18,6 +18,7 @@ import {
 import { needsTightFitInstallWarning } from './modelPresentation'
 import { RunningTab } from './RunningTab'
 import { TightFitDialog } from './TightFitDialog'
+import { RatingDialogHost } from './ratings'
 import { RealmKicker } from '@/components/ui/Realm'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
 import { useMascotState } from '@/lib/ratatoskr/useMascotState'
@@ -353,6 +354,7 @@ export function ModelsPage() {
           }}
         />
       ) : null}
+      <RatingDialogHost />
     </div>
   )
 }

@@ -158,6 +158,14 @@
     "clear": "Effacer l'historique des discussions",
     "clearing": "Effacement…"
   },
+  "ratings": {
+    "title": "Notes de la communauté",
+    "description": "Notez les modèles de 1 à 5 étoiles. Vos notes restent sur cet ordinateur, sauf si vous choisissez d'en partager une en notant.",
+    "show": "Afficher les notes de la communauté",
+    "showHint": "Les modèles indiquent comment les notent les personnes ayant un ordinateur similaire. Un résumé public est téléchargé une fois par jour pendant que vous parcourez les modèles ; rien sur vous n'est envoyé.",
+    "ask": "Me proposer de noter les modèles",
+    "askHint": "Après quelque temps d'utilisation d'un modèle, une conversation vous demande comment il fonctionne."
+  },
   "whatLeft": {
     "title": "Ce qui a quitté cet ordinateur",
     "description": "Yggdrasil travaille sur cet ordinateur. Voici les fois où une discussion, une automatisation ou une app a envoyé quelque chose ailleurs : recherches et pages web, recherches de cartes, ordinateurs jumelés et services connectés. Marquez des souvenirs ou des connaissances « Cet ordinateur uniquement » pour que les discussions qui les utilisent restent ici.",
@@ -171,7 +179,8 @@
       "paired_computer": "Ordinateur jumelé",
       "external_server": "Serveur externe",
       "connector": "Service connecté",
-      "notification": "Notification"
+      "notification": "Notification",
+      "community_ratings": "Notes de la communauté"
     },
     "kindsLower": {
       "web_search": "recherche web",
@@ -180,7 +189,8 @@
       "paired_computer": "ordinateur jumelé",
       "external_server": "serveur externe",
       "connector": "service connecté",
-      "notification": "notification"
+      "notification": "notification",
+      "community_ratings": "notes de la communauté"
     },
     "sources": {
       "chat": "Discussion",

@@ -12,6 +12,7 @@ import type {
 import { formatBytes } from '@/lib/format'
 import { formatLastUsed, largerAlternative } from './modelPresentation'
 import { SmallModelNote } from './SmallModelNote'
+import { CommunityScore, RateButton } from './ratings'
 import { formatPercent } from '@/i18n/format'
 
 export function InstalledTab({
@@ -128,6 +129,7 @@ export function InstalledTab({
                     ? t('installedTab.usedBy', { profiles: usedBy.join(', ') })
                     : t('installedTab.lastUsed', { when: formatLastUsed(model.last_used_at) })}
                 </p>
+                <CommunityScore modelId={model.id} />
                 <SmallModelNote model={model} alternative={alternative} onInstallAlternative={onInstall} />
               </div>
 
@@ -158,6 +160,7 @@ export function InstalledTab({
                     {installingId === model.id ? t('installedTab.installing') : t('installedTab.installElsewhere')}
                   </button>
                 )}
+                {!dl && <RateButton modelId={model.id} modelName={model.display_name} />}
                 <div className="relative">
                   <button
                     type="button"

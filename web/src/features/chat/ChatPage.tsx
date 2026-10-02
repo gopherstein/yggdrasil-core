@@ -40,6 +40,7 @@ import { parseModelFailure, type ModelFailure } from './modelFailure'
 import { ModelFailureNotice } from './ModelFailureNotice'
 import { toolDisplayName } from './toolNames'
 import { useChatFollow } from './useChatFollow'
+import { RatingDialogHost, RatingPrompt } from '@/features/models/ratings'
 
 type TeamStep = {
   role: string
@@ -1677,6 +1678,13 @@ export function ChatPage() {
                     onNewChat={startNewChat}
                   />
                 )}
+                {routedModel && routedModel.chatId === selectedId && !isSending ? (
+                  <RatingPrompt
+                    modelId={routedModel.modelId}
+                    modelName={(modelsQuery.data ?? []).find((m) => m.id === routedModel.modelId)?.display_name ?? routedModel.modelId}
+                  />
+                ) : null}
+                <RatingDialogHost />
                   </div>
                 </div>
                 {showJump ? (

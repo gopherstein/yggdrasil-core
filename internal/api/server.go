@@ -144,6 +144,7 @@ type Server struct {
 	yggctl          func() string
 	personal        PersonalStore
 	privacy         Privacy
+	ratings         Ratings
 	runs            RunStore
 	capabilities    CapabilitySource
 	caches          CacheSource
@@ -255,6 +256,7 @@ func (s *Server) routes() {
 	s.mcpRoutes(api)
 	s.personalRoutes(api)
 	s.privacyRoutes(api)
+	s.ratingsRoutes(api)
 	s.runRoutes(api)
 	s.capabilityRoutes(api)
 	s.cacheRoutes(api)

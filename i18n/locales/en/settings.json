@@ -158,6 +158,14 @@
     "clear": "Clear chat history",
     "clearing": "Clearing…"
   },
+  "ratings": {
+    "title": "Community ratings",
+    "description": "Rate models with 1 to 5 stars. Your ratings stay on this computer unless you choose to share one when you rate it.",
+    "show": "Show community ratings",
+    "showHint": "Models show how people with similar computers rate them. A public summary is downloaded once a day while you browse models; it sends nothing about you.",
+    "ask": "Ask me to rate models",
+    "askHint": "After you’ve used a model for a while, a chat asks how it’s working."
+  },
   "whatLeft": {
     "title": "What left this computer",
     "description": "Yggdrasil works on this computer. These are the times a chat, automation, or app sent something elsewhere: web searches and pages, map lookups, paired computers, and connected services. Mark memories or knowledge “This computer only” to keep chats that use them here.",
@@ -171,7 +179,8 @@
       "paired_computer": "Paired computer",
       "external_server": "External server",
       "connector": "Connected service",
-      "notification": "Notification"
+      "notification": "Notification",
+      "community_ratings": "Community ratings"
     },
     "kindsLower": {
       "web_search": "web search",
@@ -180,7 +189,8 @@
       "paired_computer": "paired computer",
       "external_server": "external server",
       "connector": "connected service",
-      "notification": "notification"
+      "notification": "notification",
+      "community_ratings": "community ratings"
     },
     "sources": {
       "chat": "Chat",

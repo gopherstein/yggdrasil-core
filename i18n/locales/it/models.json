@@ -200,5 +200,67 @@
     "speedUnavailable": "Velocità non disponibile",
     "usedBy": "Usato da: {{profiles}}",
     "openChat": "Apri Chat"
+  },
+  "ratings": {
+    "rate": "Valuta",
+    "rateLabel": "Valuta {{model}}",
+    "yourRatingLabel_one": "La tua valutazione di {{model}}: {{count}} stella. Modificala",
+    "yourRatingLabel_many": "La tua valutazione di {{model}}: {{count}} stelle. Modificala",
+    "yourRatingLabel_other": "La tua valutazione di {{model}}: {{count}} stelle. Modificala",
+    "title": "Valuta {{model}}",
+    "intro": "Quanto funziona bene su questo computer? La tua valutazione viene salvata qui.",
+    "starsLabel": "Stelle",
+    "stars_one": "{{count}} stella",
+    "stars_many": "{{count}} stelle",
+    "stars_other": "{{count}} stelle",
+    "tagsLabel": "Perché? (facoltativo)",
+    "tags": {
+      "great_responses": "Risposte ottime",
+      "fast": "Veloce",
+      "slow": "Lento",
+      "stable": "Stabile",
+      "crashed": "Si è bloccato",
+      "too_much_memory": "Usa troppa memoria",
+      "great_for_coding": "Ottimo per programmare",
+      "great_for_chat": "Ottimo per chattare",
+      "good_tool_use": "Bravo con gli strumenti",
+      "poor_tool_use": "Scarso con gli strumenti"
+    },
+    "share": "Condividi questa valutazione con la community",
+    "shareHint": "Aiuta chi ha un computer come il tuo a scegliere un modello. Puoi smettere di condividerla in qualsiasi momento.",
+    "whatIsShared": "Cosa viene condiviso, esattamente",
+    "sent": {
+      "destination": "Inviato a",
+      "rating": "Valutazione",
+      "ratingValue": "Le stelle e i motivi qui sopra",
+      "model": "Modello",
+      "hardware": "Classe di computer",
+      "memory": "memoria {{type}}, {{gb}} GB",
+      "id": "ID valutazione",
+      "idValue": "Un ID casuale per modificare o rimuovere la tua valutazione; non è ricavato dal tuo computer",
+      "never": "Mai i tuoi prompt, chat, nomi di file, nome del computer, nome utente o indirizzo di rete. Il servizio non memorizza il tuo indirizzo IP."
+    },
+    "notShareable": "Questa valutazione resta su questo computer: {{reason}}",
+    "save": "Salva",
+    "saveAndShare": "Salva e condividi",
+    "remove": "Rimuovi valutazione",
+    "cancel": "Annulla",
+    "count_one": "{{formatted}} valutazione",
+    "count_many": "{{formatted}} valutazioni",
+    "count_other": "{{formatted}} valutazioni",
+    "similar": {
+      "family": "su computer come il tuo",
+      "class": "su computer simili",
+      "backend": "su computer con questa memoria"
+    },
+    "overall": "in totale",
+    "confidence": {
+      "limited": "Dati limitati",
+      "early": "Prime valutazioni"
+    },
+    "limitedHint": "Poche persone lo hanno valutato, quindi il punteggio resta vicino alla media finché non ce ne saranno di più.",
+    "prompt": "Come ti trovi con {{model}}?",
+    "notNow": "Non ora",
+    "dontAsk": "Non chiedere più"
   }
 }

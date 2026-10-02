@@ -156,6 +156,8 @@ export function SettingsPage() {
       }
       queryClient.invalidateQueries({ queryKey: ['settings'] })
       queryClient.invalidateQueries({ queryKey: ['nodes'] })
+      queryClient.invalidateQueries({ queryKey: ['ratings-community'] })
+      queryClient.invalidateQueries({ queryKey: ['model-rating'] })
     },
   })
 
@@ -580,6 +582,37 @@ export function SettingsPage() {
           >
             {clearHistoryMutation.isPending ? t('history.clearing') : t('history.clear')}
           </button>
+        </section>
+
+        <section className="card space-y-4">
+          <div>
+            <h2 className="section-title">{t('ratings.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('ratings.description')}</p>
+          </div>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-ink">{t('ratings.show')}</p>
+              <p className="mt-1 text-xs text-ink-muted">{t('ratings.showHint')}</p>
+            </div>
+            <Toggle
+              label={t('ratings.show')}
+              checked={settings?.community_ratings ?? false}
+              disabled={busy}
+              onChange={() => patch({ community_ratings: !(settings?.community_ratings ?? false) })}
+            />
+          </div>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-ink">{t('ratings.ask')}</p>
+              <p className="mt-1 text-xs text-ink-muted">{t('ratings.askHint')}</p>
+            </div>
+            <Toggle
+              label={t('ratings.ask')}
+              checked={settings?.ratings_prompts ?? true}
+              disabled={busy}
+              onChange={() => patch({ ratings_prompts: !(settings?.ratings_prompts ?? true) })}
+            />
+          </div>
         </section>
       </div>
 

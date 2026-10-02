@@ -158,6 +158,14 @@
     "clear": "Limpar histórico de chats",
     "clearing": "Limpando…"
   },
+  "ratings": {
+    "title": "Avaliações da comunidade",
+    "description": "Avalie modelos de 1 a 5 estrelas. Suas avaliações ficam neste computador, a menos que você escolha compartilhar uma ao avaliar.",
+    "show": "Mostrar avaliações da comunidade",
+    "showHint": "Os modelos mostram como pessoas com computadores parecidos os avaliam. Um resumo público é baixado uma vez por dia enquanto você explora modelos; nada sobre você é enviado.",
+    "ask": "Pedir que eu avalie modelos",
+    "askHint": "Depois de usar um modelo por um tempo, uma conversa pergunta como ele está funcionando."
+  },
   "whatLeft": {
     "title": "O que saiu deste computador",
     "description": "O Yggdrasil trabalha neste computador. Estas são as vezes em que um chat, uma automação ou um app enviou algo para fora: pesquisas e páginas da web, consultas de mapas, computadores pareados e serviços conectados. Marque memórias ou conhecimento como “Somente este computador” para manter aqui os chats que os usam.",
@@ -171,7 +179,8 @@
       "paired_computer": "Computador pareado",
       "external_server": "Servidor externo",
       "connector": "Serviço conectado",
-      "notification": "Notificação"
+      "notification": "Notificação",
+      "community_ratings": "Avaliações da comunidade"
     },
     "kindsLower": {
       "web_search": "pesquisa na web",
@@ -180,7 +189,8 @@
       "paired_computer": "computador pareado",
       "external_server": "servidor externo",
       "connector": "serviço conectado",
-      "notification": "notificação"
+      "notification": "notificação",
+      "community_ratings": "avaliações da comunidade"
     },
     "sources": {
       "chat": "Chat",

@@ -25,6 +25,9 @@ const (
 	Notification = "notification"
 	// Places is a map service: finding places or a route (Gungnir §25).
 	Places = "places"
+	// CommunityRatings is a rating shared or withdrawn, or the public
+	// ratings summary downloaded (#37).
+	CommunityRatings = "community_ratings"
 )
 
 // Sources of a run.

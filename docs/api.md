@@ -97,6 +97,9 @@ Control-plane routes are under `/api/v1`. The OpenAI-compatible routes are under
 | DELETE | `/models/{id}` | Remove an installed model |
 | POST | `/models/{id}/start`, `/models/{id}/stop` | Load or unload a model |
 | GET | `/models/running` | Loaded models, with `mode` (`embedding` or `reranking` for supporting models) |
+| GET, PUT, DELETE | `/models/{id}/rating` | This person's 1–5 star rating of a model, and exactly what sharing it would send. See [Community ratings](#community-ratings). |
+| POST | `/models/{id}/rating/dismiss` | Stop asking for a rating of a model |
+| GET | `/ratings/community` | Everyone's ratings of the models here, from hardware like this computer's and overall |
 | GET | `/runtimes` | Runtimes and their detection |
 | POST | `/runtimes/{id}/install` | Install a runtime (`llamacpp`) |
 
@@ -340,7 +343,7 @@ Personalization shapes how answers look in every chat, automation, and API reque
 ## Privacy and run records
 
 Each run records what left this computer.
-- **Record kinds:** `web_search` (the query), `web_page` (the address), `places` (the map service and the place, kind of place and point, or route asked for), `paired_computer` (the prompt and context, or training examples), `external_server` (a chat sent to a server that is not on this computer), `connector` (the service and what it was asked; long text such as a comment's body is left out), and `notification` (an email or webhook delivery: the server or host, and the notification's title).
+- **Record kinds:** `web_search` (the query), `web_page` (the address), `places` (the map service and the place, kind of place and point, or route asked for), `paired_computer` (the prompt and context, or training examples), `external_server` (a chat sent to a server that is not on this computer), `connector` (the service and what it was asked; long text such as a comment's body is left out), `notification` (an email or webhook delivery: the server or host, and the notification's title), and `community_ratings` (a rating shared or withdrawn, with the model and hardware class, or the public ratings summary downloaded).
 - **Record fields:** `source` (`chat`, `api`, `automation`, `training`), plus `conversation_id` and `task_id` when there are any.
 
 Memories and knowledge sources have `local_only`. Set it with `PATCH /memory/{id}` or the knowledge update, `{"local_only": true}`. A turn that uses a local-only memory or a passage from a local-only source runs on this computer, even when placement would have chosen a paired computer, and its steps say so.
@@ -361,6 +364,14 @@ Every chat turn, API request, and automation run is traced. A chat or API run's 
 - `status`: `completed`, `failed`, or `stopped`.
 
 In advanced mode, an answer has "Run details". Runs are run records, so the retention and delete action above apply to them.
+
+## Community ratings
+
+A person rates a model with 1 to 5 stars and optional reasons (`great_responses`, `fast`, `slow`, `stable`, `crashed`, `too_much_memory`, `great_for_coding`, `great_for_chat`, `good_tool_use`, `poor_tool_use`). The rating is kept on this computer.
+- **Sharing:** `PUT /models/{id}/rating` with `{"stars": 4, "tags": ["fast"], "share": true}` also sends it to the ratings service ([yeixio/yggdrasil-ratings](https://github.com/yeixio/yggdrasil-ratings)). `GET` returns `shares`, exactly what that sends besides the stars and tags: the model (a slug of its Hugging Face repository, quantization, format, runtime, and backend) and the hardware class (platform, architecture, accelerator maker and model, memory type, and a memory band). A random rating ID, made the first time a rating is shared and never derived from the computer, and the app version go with it. `share: false` withdraws a shared rating; `DELETE` withdraws it and removes it here. A `502` means the rating is saved here but the service could not be reached.
+- **Comparable models:** a model installed from somewhere other than Hugging Face, or whose quantization is not in its name, has `rateable: false` and a `reason`. It can still be rated here.
+- **When to ask:** `ask` is `true` for an installed, unrated model that has answered 10 times on at least 2 days, while the `ratings_prompts` setting is on (the default) and the person has not dismissed it.
+- **Community scores:** with the `community_ratings` setting on (off by default), `GET /ratings/community` downloads the public summary at most once a day, from the service or, when it cannot be reached, from [yeixio/yggdrasil-model-data](https://github.com/yeixio/yggdrasil-model-data), and keeps it for offline use. For each local model it returns `similar`, the narrowest published group of hardware like this computer's (`family`, then `class`, then `backend`), and `overall`. Each has `ratings`, `average`, `weighted_score` (leaning toward the average while there are few ratings), and `confidence` (`limited`, `early`, or `community`). Ratings of different quantizations, runtimes, or backends are never combined.
 
 ## Profiles and orchestration
 

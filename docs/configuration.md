@@ -58,6 +58,8 @@ What lives there:
 | `places_geocoder_url` | `https://nominatim.openstreetmap.org` | The Nominatim service places and routes use to find places and addresses |
 | `places_overpass_url` | `https://overpass-api.de/api/interpreter` | The Overpass service for kinds of places near somewhere |
 | `places_router_url` | `https://routing.openstreetmap.de` | The OSRM service for routes. Your own OSRM server is used as `/route/v1/{driving,foot,bike}/…`. |
+| `ratings_url` | `https://ratings.yggdrasil.yeix.io` | The community ratings service that shared ratings go to and the daily summary comes from |
+| `ratings_summary_url` | the summary in `yeixio/yggdrasil-model-data` | The public ratings summary used when the service cannot be reached |
 | `node_name` | the host name | The name other computers see |
 | `node_id` | generated | This computer's id. Do not copy it between computers. |
 
@@ -107,6 +109,8 @@ Settings are stored in `yggdrasil.db`. The app's Settings page shows them, and `
 | `memory_enabled` | `true` | Persistent memory for chats. Each chat can still turn it off. |
 | `notify_task_finish` | `true` | Desktop notices for finished automations and tasks |
 | `notify_peer_offline` | `true` | A notice when a paired computer goes offline |
+| `community_ratings` | `false` | Show community model ratings, downloading the public summary once a day while models are browsed |
+| `ratings_prompts` | `true` | Ask for a rating after a model has been used a while |
 | `notification_quiet_hours` | off, 22:00–07:00 | Quiet hours, as JSON; set them in Settings → Email, push, and webhooks or with `PUT /api/v1/notifications/quiet-hours` |
 | `tool_terminal`, `tool_file_writes`, `tool_git` | `ask` | Default policy for the shell, file writes, and Git: `deny`, `ask`, `allow`, or `allow-for-session` |
 | `node_name`, `lan_api_enabled`, `discovery_enabled`, `web_ui_enabled` | see `config.json` | Writable through settings; stored in `config.json` |

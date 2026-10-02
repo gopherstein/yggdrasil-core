@@ -158,6 +158,14 @@
     "clear": "清除聊天记录",
     "clearing": "正在清除…"
   },
+  "ratings": {
+    "title": "社区评分",
+    "description": "用 1 到 5 星为模型评分。除非你在评分时选择分享，否则评分只保存在这台电脑上。",
+    "show": "显示社区评分",
+    "showHint": "模型会显示使用类似电脑的人给出的评分。浏览模型时，每天下载一次公开汇总；不会发送任何关于你的信息。",
+    "ask": "请我为模型评分",
+    "askHint": "使用某个模型一段时间后，聊天中会询问你它用起来怎么样。"
+  },
   "whatLeft": {
     "title": "离开这台电脑的内容",
     "description": "Yggdrasil 在这台电脑上工作。以下是聊天、自动化或应用向其他地方发送内容的记录：网络搜索和网页、地图查询、已配对的电脑以及已连接的服务。将记忆或知识库标记为“仅限这台电脑”，即可让使用它们的聊天留在这里运行。",
@@ -171,7 +179,8 @@
       "paired_computer": "已配对的电脑",
       "external_server": "外部服务器",
       "connector": "已连接的服务",
-      "notification": "通知"
+      "notification": "通知",
+      "community_ratings": "社区评分"
     },
     "kindsLower": {
       "web_search": "网络搜索",
@@ -180,7 +189,8 @@
       "paired_computer": "已配对的电脑",
       "external_server": "外部服务器",
       "connector": "已连接的服务",
-      "notification": "通知"
+      "notification": "通知",
+      "community_ratings": "社区评分"
     },
     "sources": {
       "chat": "聊天",

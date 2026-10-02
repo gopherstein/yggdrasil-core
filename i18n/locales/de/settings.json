@@ -158,6 +158,14 @@
     "clear": "Chatverlauf löschen",
     "clearing": "Wird gelöscht …"
   },
+  "ratings": {
+    "title": "Community-Bewertungen",
+    "description": "Bewerte Modelle mit 1 bis 5 Sternen. Deine Bewertungen bleiben auf diesem Computer, außer du teilst eine beim Bewerten.",
+    "show": "Community-Bewertungen anzeigen",
+    "showHint": "Modelle zeigen, wie Leute mit ähnlichen Computern sie bewerten. Eine öffentliche Zusammenfassung wird einmal am Tag geladen, während du Modelle ansiehst; dabei wird nichts über dich gesendet.",
+    "ask": "Mich bitten, Modelle zu bewerten",
+    "askHint": "Nachdem du ein Modell eine Weile genutzt hast, fragt ein Chat, wie es läuft."
+  },
   "whatLeft": {
     "title": "Was diesen Computer verlassen hat",
     "description": "Yggdrasil arbeitet auf diesem Computer. Hier siehst du, wann ein Chat, eine Automation oder eine App etwas nach außen gesendet hat: Websuchen und Webseiten, Kartenabfragen, gekoppelte Computer und verbundene Dienste. Markiere Erinnerungen oder Wissen als „Nur dieser Computer“, damit Chats, die sie nutzen, hier bleiben.",
@@ -171,7 +179,8 @@
       "paired_computer": "Gekoppelter Computer",
       "external_server": "Externer Server",
       "connector": "Verbundener Dienst",
-      "notification": "Mitteilung"
+      "notification": "Mitteilung",
+      "community_ratings": "Community-Bewertungen"
     },
     "kindsLower": {
       "web_search": "Websuche",
@@ -180,7 +189,8 @@
       "paired_computer": "gekoppelter Computer",
       "external_server": "externer Server",
       "connector": "verbundener Dienst",
-      "notification": "Mitteilung"
+      "notification": "Mitteilung",
+      "community_ratings": "Community-Bewertungen"
     },
     "sources": {
       "chat": "Chat",
