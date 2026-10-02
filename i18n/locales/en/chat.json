@@ -414,6 +414,19 @@
     "toolFailures": "{{count}} failed"
   },
   "notices": {
-    "languageWeak": "{{model}} may write {{language}} less well than English, and no installed model that fits writes it better. Models rated good in {{language}} are on the Models page."
+    "languageWeak": "{{model}} may write {{language}} less well than English, and no installed model that fits writes it better. Models rated good in {{language}} are on the Models page.",
+    "unconfirmedFigures": "Yggdrasil could not confirm {{figures}} in the sources. Check before relying on it.",
+    "listSeparator": ", ",
+    "listAnd": "{{first}} and {{last}}",
+    "nothingChanged": "Nothing was changed: no tool ran to do this, whatever the answer says.",
+    "stoppedTimeLimit": "Stopped at this profile's time limit before the answer was finished.",
+    "stopped": "Stopped before the answer was finished.",
+    "fallbackSmaller": "{{failed}} could not answer, so the smaller {{model}} answered instead. This answer may be less detailed.",
+    "smallModelFiles": "{{model}} is a small model and can mix up numbers and details from your files. Check them against the source.",
+    "smallModelFilesChoose": "{{model}} is a small model and can mix up numbers and details from your files. Check them against the source. For questions like this, choose {{larger}} or Auto in Model.",
+    "smallModelFilesInstall": "{{model}} is a small model and can mix up numbers and details from your files. Check them against the source. A larger model from the Models page will be more reliable.",
+    "smallModelKnowledge": "{{model}} is a small model and can mix up numbers and details from your knowledge. Check them against the source.",
+    "smallModelKnowledgeChoose": "{{model}} is a small model and can mix up numbers and details from your knowledge. Check them against the source. For questions like this, choose {{larger}} or Auto in Model.",
+    "smallModelKnowledgeInstall": "{{model}} is a small model and can mix up numbers and details from your knowledge. Check them against the source. A larger model from the Models page will be more reliable."
   }
 }

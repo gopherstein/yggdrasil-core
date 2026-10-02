@@ -425,6 +425,19 @@
     "toolFailures": "{{count}} en échec"
   },
   "notices": {
-    "languageWeak": "{{model}} écrit peut-être moins bien en {{language}} qu'en anglais, et aucun modèle installé qui convient ne le fait mieux. La page Modèles indique les modèles bien notés en {{language}}."
+    "languageWeak": "{{model}} écrit peut-être moins bien en {{language}} qu'en anglais, et aucun modèle installé qui convient ne le fait mieux. La page Modèles indique les modèles bien notés en {{language}}.",
+    "unconfirmedFigures": "Yggdrasil n'a pas pu confirmer {{figures}} dans les sources. Vérifiez avant de vous y fier.",
+    "listSeparator": ", ",
+    "listAnd": "{{first}} et {{last}}",
+    "nothingChanged": "Rien n'a été modifié : aucun outil n'a été exécuté pour le faire, quoi qu'en dise la réponse.",
+    "stoppedTimeLimit": "Arrêté à la limite de temps de ce profil avant la fin de la réponse.",
+    "stopped": "Arrêté avant la fin de la réponse.",
+    "fallbackSmaller": "{{failed}} n'a pas pu répondre, c'est donc le modèle plus petit {{model}} qui a répondu. Cette réponse peut être moins détaillée.",
+    "smallModelFiles": "{{model}} est un petit modèle et peut confondre des chiffres et des détails de vos fichiers. Vérifiez-les dans la source.",
+    "smallModelFilesChoose": "{{model}} est un petit modèle et peut confondre des chiffres et des détails de vos fichiers. Vérifiez-les dans la source. Pour ce type de question, choisissez {{larger}} ou Auto dans Modèle.",
+    "smallModelFilesInstall": "{{model}} est un petit modèle et peut confondre des chiffres et des détails de vos fichiers. Vérifiez-les dans la source. Un modèle plus grand de la page Modèles sera plus fiable.",
+    "smallModelKnowledge": "{{model}} est un petit modèle et peut confondre des chiffres et des détails de vos connaissances. Vérifiez-les dans la source.",
+    "smallModelKnowledgeChoose": "{{model}} est un petit modèle et peut confondre des chiffres et des détails de vos connaissances. Vérifiez-les dans la source. Pour ce type de question, choisissez {{larger}} ou Auto dans Modèle.",
+    "smallModelKnowledgeInstall": "{{model}} est un petit modèle et peut confondre des chiffres et des détails de vos connaissances. Vérifiez-les dans la source. Un modèle plus grand de la page Modèles sera plus fiable."
   }
 }

@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/yeixio/yggdrasil-core/internal/artifacts"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/internal/mimir"
 	"github.com/yeixio/yggdrasil-core/internal/muninn"
 	"github.com/yeixio/yggdrasil-core/internal/tools"
@@ -33,6 +34,14 @@ type turnTrace struct {
 	untrusted bool
 	// runID links the answer to its run trace (§35).
 	runID string
+	// lang is the App language notices are written in (multilingual spec
+	// §16); "" is English.
+	lang string
+}
+
+// noticeText is a chat:notices key's text in the App language.
+func (t *turnTrace) noticeText(key string, params map[string]any) string {
+	return locale.T(t.lang, "chat:notices."+key, params)
 }
 
 func (t *turnTrace) addSource(c contracts.Citation) {
@@ -139,19 +148,19 @@ func (t *turnTrace) planned(parts int, parallel bool) {
 
 // verified records an answer check (spec §24). Figures that could not be
 // confirmed become the answer's notice.
-func (t *turnTrace) verified(issues, fixed int, remaining string) {
+func (t *turnTrace) verified(issues, fixed int, remaining []string) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	switch {
 	case issues == 0:
 		t.addStep("verify", "Checked the figures against the sources")
-	case fixed > 0 && remaining == "":
+	case fixed > 0 && len(remaining) == 0:
 		t.addStep("verify", "Checked the figures and corrected "+plural(fixed, "figure", "figures"))
 	default:
 		t.addStep("verify", "Checked the figures; some could not be confirmed")
 	}
-	if remaining != "" && t.notice == "" {
-		t.notice = fmt.Sprintf("Yggdrasil could not confirm %s in the sources. Check before relying on it.", remaining)
+	if len(remaining) > 0 && t.notice == "" {
+		t.notice = t.noticeText("unconfirmedFigures", map[string]any{"figures": listIn(t.lang, remaining)})
 	}
 }
 
@@ -161,7 +170,7 @@ func (t *turnTrace) unconfirmedAction() {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.addStep("verify", "Checked the answer against what actually ran")
-	t.notice = "Nothing was changed: no tool ran to do this, whatever the answer says."
+	t.notice = t.noticeText("nothingChanged", nil)
 }
 
 // stopped records that the user stopped the turn. kept says whether part
@@ -172,12 +181,12 @@ func (t *turnTrace) stopped(kept, timedOut bool) {
 	if timedOut {
 		// The profile's time limit ran out (§40).
 		t.addStep("stop", "Stopped at this profile's time limit")
-		t.notice = "Stopped at this profile's time limit before the answer was finished."
+		t.notice = t.noticeText("stoppedTimeLimit", nil)
 		return
 	}
 	t.addStep("stop", "Stopped by you")
 	if kept {
-		t.notice = "Stopped before the answer was finished."
+		t.notice = t.noticeText("stopped", nil)
 	}
 }
 
@@ -441,6 +450,18 @@ func plural(n int, one, many string) string {
 		return "1 " + one
 	}
 	return fmt.Sprintf("%d %s", n, many)
+}
+
+// listIn joins items in lang, such as "20, 30 and $9".
+func listIn(lang string, items []string) string {
+	switch len(items) {
+	case 0:
+		return ""
+	case 1:
+		return items[0]
+	}
+	first := strings.Join(items[:len(items)-1], locale.T(lang, "chat:notices.listSeparator", nil))
+	return locale.T(lang, "chat:notices.listAnd", map[string]any{"first": first, "last": items[len(items)-1]})
 }
 
 func joinNames(names []string) string {

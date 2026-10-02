@@ -105,11 +105,12 @@ func recoverable(ctx context.Context, errText, shown string, env *chatExecEnv) b
 // fallback picks the model to retry with and the words that explain it
 // (spec §14, §26). The note is empty when the answer should be as good.
 // preferred is the profile's fallback order, tried before Yggdrasil's pick.
-func (a *App) fallback(ctx context.Context, failedID, errText string, preferred []string) (model contracts.Model, step, notice string, ok bool) {
-	return fallbackFrom(failedID, errText, a.installedModels(ctx), a.memoryTotal(ctx), preferred...)
+// lang is the App language the note is written in.
+func (a *App) fallback(ctx context.Context, lang, failedID, errText string, preferred []string) (model contracts.Model, step, notice string, ok bool) {
+	return fallbackFrom(lang, failedID, errText, a.installedModels(ctx), a.memoryTotal(ctx), preferred...)
 }
 
-func fallbackFrom(failedID, errText string, installed []contracts.Model, memTotal uint64, preferred ...string) (model contracts.Model, step, notice string, ok bool) {
+func fallbackFrom(lang, failedID, errText string, installed []contracts.Model, memTotal uint64, preferred ...string) (model contracts.Model, step, notice string, ok bool) {
 	next, ok := preferredFallback(failedID, installed, preferred)
 	if !ok {
 		next, ok = huginn.Fallback(failedID, installed, memTotal)
@@ -132,7 +133,7 @@ func fallbackFrom(failedID, errText string, installed []contracts.Model, memTota
 	}
 	step = fmt.Sprintf("%s %s, so %s answered instead", huginn.Name(failed), why, huginn.Name(next))
 	if huginn.Smaller(failed, next) {
-		notice = fmt.Sprintf("%s could not answer, so the smaller %s answered instead. This answer may be less detailed.", huginn.Name(failed), huginn.Name(next))
+		notice = locale.T(lang, "chat:notices.fallbackSmaller", map[string]any{"failed": huginn.Name(failed), "model": huginn.Name(next)})
 	}
 	return next, step, notice, true
 }
@@ -202,15 +203,16 @@ func (a *App) turnHasData(ctx context.Context, conversationID string, profile pr
 
 // smallModelNotice warns that a small model answered from the user's files
 // or knowledge, where it is most likely to mix up details, and suggests a
-// larger model. dataKind is "file", "knowledge", or "" when no data was used.
-func (a *App) smallModelNotice(ctx context.Context, dataKind, modelID string, auto bool) string {
+// larger model, in the App language lang. dataKind is "file", "knowledge",
+// or "" when no data was used.
+func (a *App) smallModelNotice(ctx context.Context, lang, dataKind, modelID string, auto bool) string {
 	if dataKind == "" || modelID == "" {
 		return ""
 	}
-	return smallModelNote(dataKind, modelID, a.installedModels(ctx), a.memoryTotal(ctx), auto)
+	return smallModelNote(lang, dataKind, modelID, a.installedModels(ctx), a.memoryTotal(ctx), auto)
 }
 
-func smallModelNote(dataKind, modelID string, installed []contracts.Model, memTotal uint64, auto bool) string {
+func smallModelNote(lang, dataKind, modelID string, installed []contracts.Model, memTotal uint64, auto bool) string {
 	if dataKind == "" || modelID == "" {
 		return ""
 	}
@@ -223,26 +225,35 @@ func smallModelNote(dataKind, modelID string, installed []contracts.Model, memTo
 	if !huginn.Small(answered) {
 		return ""
 	}
-	from := "your files"
+	// The sentences are whole keys, not joined here: languages put them
+	// together differently.
+	key := "smallModelFiles"
 	if dataKind == "knowledge" {
-		from = "your knowledge"
+		key = "smallModelKnowledge"
 	}
-	note := fmt.Sprintf("%s is a small model and can mix up numbers and details from %s. Check them against the source.", huginn.Name(answered), from)
+	params := map[string]any{"model": huginn.Name(answered)}
 	if larger, ok := huginn.Larger(installed, memTotal); ok && !auto {
-		note += fmt.Sprintf(" For questions like this, choose %s or Auto in Model.", huginn.Name(larger))
+		key += "Choose"
+		params["larger"] = huginn.Name(larger)
 	} else if !ok {
-		note += " A larger model from the Models page will be more reliable."
+		key += "Install"
 	}
-	return note
+	return locale.T(lang, "chat:notices."+key, params)
 }
 
 // languageWeakNotice says, in the App language, that the model may write
 // lang less well (multilingual spec §16).
 func (a *App) languageWeakNotice(ctx context.Context, m contracts.Model, lang string) string {
+	app := a.appLanguage(ctx)
+	return locale.T(app, "chat:notices.languageWeak", map[string]any{"model": huginn.Name(m), "language": locale.LanguageName(lang, app)})
+}
+
+// appLanguage is the App language (the ui_locale setting), which the
+// notices shown with an answer are written in.
+func (a *App) appLanguage(ctx context.Context) string {
 	app := ""
 	if a.Settings != nil {
 		app, _ = a.Settings.GetString(ctx, "ui_locale", "")
 	}
-	app = locale.Resolve(app)
-	return locale.T(app, "chat:notices.languageWeak", map[string]any{"model": huginn.Name(m), "language": locale.LanguageName(lang, app)})
+	return locale.Resolve(app)
 }

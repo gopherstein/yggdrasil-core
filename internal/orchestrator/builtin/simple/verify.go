@@ -69,6 +69,8 @@ func verifyAnswer(ctx context.Context, env pluginapi.ExecutionEnvironment, role 
 		"issues":    len(issues),
 		"fixed":     len(issues) - len(remaining),
 		"remaining": huginn.Figures(remaining),
+		// figures lets the app write the list in the App language.
+		"figures": figureTexts(remaining),
 	})
 	return answer
 }
@@ -120,4 +122,12 @@ func narratesTools(answer string) bool {
 		}
 	}
 	return false
+}
+
+func figureTexts(issues []huginn.Issue) []string {
+	out := make([]string, 0, len(issues))
+	for _, is := range issues {
+		out = append(out, is.Text)
+	}
+	return out
 }

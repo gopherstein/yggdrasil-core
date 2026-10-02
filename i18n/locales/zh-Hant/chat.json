@@ -403,6 +403,19 @@
     "toolFailures": "{{count}} 個失敗"
   },
   "notices": {
-    "languageWeak": "{{model}} 寫{{language}}可能不如寫英文好，而已安裝且能執行的模型中沒有更擅長的。{{language}}評級良好的模型可在「模型」頁面找到。"
+    "languageWeak": "{{model}} 寫{{language}}可能不如寫英文好，而已安裝且能執行的模型中沒有更擅長的。{{language}}評級良好的模型可在「模型」頁面找到。",
+    "unconfirmedFigures": "Yggdrasil 無法在來源中確認 {{figures}}。請先檢查再依賴它。",
+    "listSeparator": "、",
+    "listAnd": "{{first}}和{{last}}",
+    "nothingChanged": "沒有做任何變更：無論回答怎麼說，都沒有執行任何工具來進行此操作。",
+    "stoppedTimeLimit": "已在此設定檔的時間限制處停止，回答尚未完成。",
+    "stopped": "已在回答完成前停止。",
+    "fallbackSmaller": "{{failed}} 無法回答，因此改由較小的 {{model}} 回答。此回答可能不夠詳細。",
+    "smallModelFiles": "{{model}} 是小型模型，可能會弄混你檔案中的數字和細節。請對照來源檢查。",
+    "smallModelFilesChoose": "{{model}} 是小型模型，可能會弄混你檔案中的數字和細節。請對照來源檢查。對於這類問題，請在「模型」中選擇 {{larger}} 或「自動」。",
+    "smallModelFilesInstall": "{{model}} 是小型模型，可能會弄混你檔案中的數字和細節。請對照來源檢查。從「模型」頁面取得較大的模型會更可靠。",
+    "smallModelKnowledge": "{{model}} 是小型模型，可能會弄混你知識中的數字和細節。請對照來源檢查。",
+    "smallModelKnowledgeChoose": "{{model}} 是小型模型，可能會弄混你知識中的數字和細節。請對照來源檢查。對於這類問題，請在「模型」中選擇 {{larger}} 或「自動」。",
+    "smallModelKnowledgeInstall": "{{model}} 是小型模型，可能會弄混你知識中的數字和細節。請對照來源檢查。從「模型」頁面取得較大的模型會更可靠。"
   }
 }

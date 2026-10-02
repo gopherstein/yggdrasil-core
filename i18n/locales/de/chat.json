@@ -414,6 +414,19 @@
     "toolFailures": "{{count}} fehlgeschlagen"
   },
   "notices": {
-    "languageWeak": "{{model}} schreibt {{language}} womöglich weniger gut als Englisch, und kein installiertes Modell, das passt, kann es besser. Modelle mit guter Bewertung für {{language}} findest du unter „Modelle“."
+    "languageWeak": "{{model}} schreibt {{language}} womöglich weniger gut als Englisch, und kein installiertes Modell, das passt, kann es besser. Modelle mit guter Bewertung für {{language}} findest du unter „Modelle“.",
+    "unconfirmedFigures": "Yggdrasil konnte {{figures}} in den Quellen nicht bestätigen. Prüfe das, bevor du dich darauf verlässt.",
+    "listSeparator": ", ",
+    "listAnd": "{{first}} und {{last}}",
+    "nothingChanged": "Es wurde nichts geändert: Dafür ist kein Werkzeug gelaufen, egal was die Antwort sagt.",
+    "stoppedTimeLimit": "Beim Zeitlimit dieses Profils gestoppt, bevor die Antwort fertig war.",
+    "stopped": "Gestoppt, bevor die Antwort fertig war.",
+    "fallbackSmaller": "{{failed}} konnte nicht antworten, deshalb hat das kleinere {{model}} geantwortet. Diese Antwort ist womöglich weniger ausführlich.",
+    "smallModelFiles": "{{model}} ist ein kleines Modell und kann Zahlen und Details aus deinen Dateien verwechseln. Prüfe sie anhand der Quelle.",
+    "smallModelFilesChoose": "{{model}} ist ein kleines Modell und kann Zahlen und Details aus deinen Dateien verwechseln. Prüfe sie anhand der Quelle. Wähle für Fragen wie diese {{larger}} oder „Automatisch“ unter „Modell“.",
+    "smallModelFilesInstall": "{{model}} ist ein kleines Modell und kann Zahlen und Details aus deinen Dateien verwechseln. Prüfe sie anhand der Quelle. Ein größeres Modell unter „Modelle“ ist zuverlässiger.",
+    "smallModelKnowledge": "{{model}} ist ein kleines Modell und kann Zahlen und Details aus deinem Wissen verwechseln. Prüfe sie anhand der Quelle.",
+    "smallModelKnowledgeChoose": "{{model}} ist ein kleines Modell und kann Zahlen und Details aus deinem Wissen verwechseln. Prüfe sie anhand der Quelle. Wähle für Fragen wie diese {{larger}} oder „Automatisch“ unter „Modell“.",
+    "smallModelKnowledgeInstall": "{{model}} ist ein kleines Modell und kann Zahlen und Details aus deinem Wissen verwechseln. Prüfe sie anhand der Quelle. Ein größeres Modell unter „Modelle“ ist zuverlässiger."
   }
 }
