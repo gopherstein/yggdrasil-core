@@ -535,7 +535,7 @@ Local:
 http://127.0.0.1:7331
 
 Hosted:
-https://ratings.yggdrasil.yeix.io
+https://ratings.toskar.ai
 ```
 
 Core only needs outbound communication to participate.

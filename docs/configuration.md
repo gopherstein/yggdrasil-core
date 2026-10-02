@@ -58,7 +58,7 @@ What lives there:
 | `places_geocoder_url` | `https://nominatim.openstreetmap.org` | The Nominatim service places and routes use to find places and addresses |
 | `places_overpass_url` | `https://overpass-api.de/api/interpreter` | The Overpass service for kinds of places near somewhere |
 | `places_router_url` | `https://routing.openstreetmap.de` | The OSRM service for routes. Your own OSRM server is used as `/route/v1/{driving,foot,bike}/…`. |
-| `ratings_url` | `https://ratings.yggdrasil.yeix.io` | The community ratings service that shared ratings go to and the daily summary comes from |
+| `ratings_url` | `https://ratings.toskar.ai` | The community ratings service that shared ratings go to and the daily summary comes from |
 | `ratings_summary_url` | the summary in `yeixio/yggdrasil-model-data` | The public ratings summary used when the service cannot be reached |
 | `node_name` | the host name | The name other computers see |
 | `node_id` | generated | This computer's id. Do not copy it between computers. |
