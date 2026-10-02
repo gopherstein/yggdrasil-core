@@ -317,25 +317,16 @@ func (m *Manager) StartPairing(remoteNodeID string) (*auth.PairingSession, error
 	if len(cert) == 0 {
 		return nil, fmt.Errorf("peer at %s returned an empty certificate", peerAddr)
 	}
+	if info.ID != "" && info.ID != remoteNodeID {
+		return nil, fmt.Errorf("the computer at %s is not %s any more — tap Refresh and try again", peerAddr, firstNonEmpty(d.Node.Name, remoteNodeID))
+	}
 
 	session, err := m.pairing.StartPairing(remoteNodeID, firstNonEmpty(info.Name, d.Node.Name), peerAddr, cert)
 	if err != nil {
 		return nil, err
 	}
 
-	fromAddr := ""
-	if m.advertiseAddr != nil {
-		fromAddr = m.advertiseAddr()
-	}
-	offer := auth.PairingOffer{
-		SessionID:   session.ID,
-		FromNodeID:  m.localNodeID,
-		FromName:    m.localName,
-		FromCertPEM: string(m.pairing.Identity().CertPEM),
-		FromAddress: fromAddr,
-		Code:        session.Code,
-		ExpiresAt:   session.ExpiresAt.Format(time.RFC3339),
-	}
+	offer := m.offerFor(session)
 
 	delivered := false
 	if err := client.SendPairingOffer(context.Background(), offer); err == nil {
@@ -378,22 +369,52 @@ func (m *Manager) ClaimPairing(ctx context.Context, remoteNodeID, code string) (
 	offer, err := client.FetchOutboundOffer(ctx, code)
 	if err != nil {
 		// Fallback: control API on :7331 (only works if that peer exposed LAN API).
+		err2 := err
 		if apiBase := controlAPIBase(addr); apiBase != "" {
-			if offer2, err2 := NewProbeClient(apiBase).FetchOutboundOfferControl(ctx, code); err2 == nil {
-				return m.pairing.ReceiveOffer(offer2)
-			}
+			offer, err2 = NewProbeClient(apiBase).FetchOutboundOfferControl(ctx, code)
 		}
-		return nil, fmt.Errorf(
-			"could not reach Bifrost on %s (%v). On that Mac: fully quit Yggdrasil (Cmd+Q), reopen it, keep Settings → Find other computers On, and allow Local Network for Yggdrasil",
-			ensureHostPort(addr, 7332), err,
-		)
+		if err2 != nil {
+			return nil, fmt.Errorf(
+				"could not reach Bifrost on %s (%v). On that Mac: fully quit Yggdrasil (Cmd+Q), reopen it, keep Settings → Find other computers On, and allow Local Network for Yggdrasil",
+				ensureHostPort(addr, 7332), err,
+			)
+		}
+	}
+	// The offer must be the one that computer made for this code.
+	if offer.FromNodeID != remoteNodeID || offer.Code != code {
+		return nil, fmt.Errorf("that computer answered with a different pairing — start pairing again")
 	}
 	return m.pairing.ReceiveOffer(offer)
 }
 
-// LookupOutbound exposes pending outbound sessions for peer claim.
-func (m *Manager) LookupOutbound(code string) (*auth.PairingSession, bool) {
-	return m.pairing.GetOutboundByCode(code)
+// LookupOutbound returns the signed offer for a pending outbound session, for
+// a peer that claims it by code. source is the caller's address.
+func (m *Manager) LookupOutbound(source, code string) (auth.PairingOffer, error) {
+	session, err := m.pairing.OutboundByCode(source, code)
+	if err != nil {
+		return auth.PairingOffer{}, err
+	}
+	return m.offerFor(session), nil
+}
+
+// offerFor is this computer's signed offer for an outbound session.
+func (m *Manager) offerFor(session *auth.PairingSession) auth.PairingOffer {
+	fromAddr := ""
+	if m.advertiseAddr != nil {
+		fromAddr = m.advertiseAddr()
+	}
+	offer := auth.PairingOffer{
+		SessionID:   session.ID,
+		FromNodeID:  m.localNodeID,
+		ToNodeID:    session.RemoteNodeID,
+		FromName:    firstNonEmpty(m.localName, m.localNodeID),
+		FromCertPEM: string(m.pairing.Identity().CertPEM),
+		FromAddress: fromAddr,
+		Code:        session.Code,
+		ExpiresAt:   session.ExpiresAt.Format(time.RFC3339),
+	}
+	m.pairing.SignOffer(&offer)
+	return offer
 }
 
 // ApprovePairing approves by session or code and completes mutual trust when incoming.
@@ -420,14 +441,15 @@ func (m *Manager) ApprovePairing(ctx context.Context, sessionID, code string) (*
 		if m.advertiseAddr != nil {
 			fromAddr = m.advertiseAddr()
 		}
-		client := NewClient(normalizeHTTP(incoming.RemoteAddr), nil)
-		_ = client.CompletePairing(ctx, auth.PairingComplete{
+		complete := auth.PairingComplete{
 			SessionID:   session.ID,
 			FromNodeID:  m.localNodeID,
 			FromName:    m.localName,
 			FromCertPEM: string(m.pairing.Identity().CertPEM),
 			FromAddress: fromAddr,
-		})
+		}
+		m.pairing.SignComplete(&complete, incoming.RemoteNodeID, incoming.Code)
+		_ = NewProbeClient(normalizeHTTP(incoming.RemoteAddr)).CompletePairing(ctx, complete)
 	}
 	return session, nil
 }
@@ -438,8 +460,9 @@ func (m *Manager) ReceiveOffer(offer auth.PairingOffer) (*auth.PairingSession, e
 }
 
 // CompletePairing finalizes an outbound session after peer approval.
-func (m *Manager) CompletePairing(ctx context.Context, complete auth.PairingComplete) (*auth.PairingSession, error) {
-	return m.pairing.CompleteFromPeer(ctx, complete)
+// source is the caller's address.
+func (m *Manager) CompletePairing(ctx context.Context, source string, complete auth.PairingComplete) (*auth.PairingSession, error) {
+	return m.pairing.CompleteFromPeer(ctx, source, complete)
 }
 
 // ListIncomingOffers returns pending pairing requests.

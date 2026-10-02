@@ -68,9 +68,7 @@ type Dependencies struct {
 	ApprovePairing        func(ctx context.Context, sessionID, code string) (*auth.PairingSession, error)
 	ListPairingOffers     func() []auth.PairingSession
 	ReceivePairingOffer   func(offer auth.PairingOffer) (*auth.PairingSession, error)
-	LookupOutboundPairing func(code string) (*auth.PairingSession, bool)
-	AdvertiseAddr         func() string
-	LocalCertPEM          func() string
+	LookupOutboundPairing func(source, code string) (auth.PairingOffer, error)
 	RevokeNode            func(ctx context.Context, nodeID string) error
 	ListConversations     func(ctx context.Context) ([]contracts.Conversation, error)
 	CreateConversation    func(ctx context.Context, title, profileID, modelID string) (contracts.Conversation, error)

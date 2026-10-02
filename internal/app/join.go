@@ -288,7 +288,7 @@ func (a *App) LeaveNetwork(ctx context.Context) (api.LeaveResult, error) {
 			if p.Address != "" {
 				cctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 				defer cancel()
-				resp, err := nodes.NewClient("http://"+p.Address, a.identity).Do(cctx, http.MethodPost, join.LeavePath, nil)
+				resp, err := nodes.NewClient("http://"+p.Address, a.identity, p.ID).Do(cctx, http.MethodPost, join.LeavePath, nil)
 				if err == nil {
 					_ = resp.Body.Close()
 					told = resp.StatusCode < 300

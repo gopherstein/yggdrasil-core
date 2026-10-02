@@ -14,7 +14,7 @@ Create a key from the web UI or `POST /api/v1/api-keys`. The response includes t
 
 A bearer token on plain HTTP does not encrypt traffic. It stops anonymous use of a trusted LAN. TLS or mTLS for remote access is not implemented.
 
-Bifrost, on port 7332, is a separate server. Its protected routes require a paired-node token. Pairing routes are intentionally callable before trust exists. See [clustering.md](clustering.md).
+Bifrost, on port 7332, is a separate server. Its protected routes require a paired-node token. Pairing routes answer before trust exists; they check signatures and limit attempts. See [clustering.md](clustering.md).
 
 ## Corresponding source
 

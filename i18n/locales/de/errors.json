@@ -82,6 +82,7 @@
   "NO_TEXT_FOUND": "Kein Text gefunden. Gescannte PDFs brauchen erst eine Texterkennung (OCR), bevor Yggdrasil sie lesen kann.",
   "OFFER_FAILED": "{{detail}}",
   "OUT_OF_MEMORY": "Dem Modell ist der Speicher ausgegangen.",
+  "PAIRING_RATE_LIMITED": "Zu viele Kopplungsversuche von dieser Adresse. Warte ein paar Minuten und starte die Kopplung erneut.",
   "PAIR_FAILED": "{{detail}}",
   "PEER_TOO_OLD": "Dieser Computer braucht eine neuere Version von Yggdrasil, um Werkzeuge für andere auszuführen.",
   "PERFORMANCE_LIST_FAILED": "Leistungsmessungen konnten nicht aufgelistet werden.",

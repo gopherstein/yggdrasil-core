@@ -82,6 +82,7 @@
   "NO_TEXT_FOUND": "No se encontró texto. Los PDF escaneados necesitan reconocimiento de texto (OCR) para que Yggdrasil pueda leerlos.",
   "OFFER_FAILED": "{{detail}}",
   "OUT_OF_MEMORY": "El modelo se quedó sin memoria.",
+  "PAIRING_RATE_LIMITED": "Demasiados intentos de vinculación desde esta dirección. Espera unos minutos y vuelve a empezar la vinculación.",
   "PAIR_FAILED": "{{detail}}",
   "PEER_TOO_OLD": "Esa computadora necesita una versión más reciente de Yggdrasil para ejecutar herramientas para otras.",
   "PERFORMANCE_LIST_FAILED": "No se pudieron mostrar las mediciones de rendimiento.",

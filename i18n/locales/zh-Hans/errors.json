@@ -82,6 +82,7 @@
   "NO_TEXT_FOUND": "未找到文字。扫描的 PDF 需要先进行文字识别（OCR），Yggdrasil 才能读取。",
   "OFFER_FAILED": "{{detail}}",
   "OUT_OF_MEMORY": "模型内存不足。",
+  "PAIRING_RATE_LIMITED": "来自此地址的配对尝试过多。请等几分钟后重新开始配对。",
   "PAIR_FAILED": "{{detail}}",
   "PEER_TOO_OLD": "那台电脑需要更新版本的 Yggdrasil，才能为其他电脑运行工具。",
   "PERFORMANCE_LIST_FAILED": "无法列出性能测量结果。",

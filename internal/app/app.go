@@ -283,6 +283,9 @@ func New(opts Options) (*App, error) {
 	toolReg.SetAudit(tools.NewAuditLog(db.SQL))
 
 	pairing := auth.NewPairingManager(db.SQL, identity)
+	if err := pairing.RecomputeFingerprints(context.Background()); err != nil {
+		logger.Warn("recompute paired computer fingerprints", "error", err)
+	}
 	apiKeyMgr := auth.NewAPIKeyManager(db.SQL, secrets)
 
 	a := &App{
@@ -527,20 +530,13 @@ func New(opts Options) (*App, error) {
 		ListPairingOffers:     a.Nodes.ListIncomingOffers,
 		ReceivePairingOffer:   a.Nodes.ReceiveOffer,
 		LookupOutboundPairing: a.Nodes.LookupOutbound,
-		AdvertiseAddr:         a.bifrostAdvertiseAddr,
-		LocalCertPEM: func() string {
-			if a.Identity == nil {
-				return ""
-			}
-			return string(a.Identity.CertPEM)
-		},
-		RevokeNode:   a.Nodes.Revoke,
-		ListTasks:    a.Tasks.List,
-		CreateTask:   a.Tasks.Create,
-		GetTask:      a.Tasks.Get,
-		RunTask:      a.Tasks.Run,
-		DecideTool:   toolReg.Decide,
-		DescribeTool: func(ctx context.Context, id string) (any, error) { return a.describeTool(ctx, id) },
+		RevokeNode:            a.Nodes.Revoke,
+		ListTasks:             a.Tasks.List,
+		CreateTask:            a.Tasks.Create,
+		GetTask:               a.Tasks.Get,
+		RunTask:               a.Tasks.Run,
+		DecideTool:            toolReg.Decide,
+		DescribeTool:          func(ctx context.Context, id string) (any, error) { return a.describeTool(ctx, id) },
 		ListToolRuns: func(ctx context.Context, toolID, conversationID string, limit int) (any, error) {
 			return tools.NewAuditLog(db.SQL).List(ctx, tools.AuditFilter{ToolID: toolID, ConversationID: conversationID, Limit: limit})
 		},
@@ -741,9 +737,7 @@ func New(opts Options) (*App, error) {
 		Chat:            a.internalChat,
 		ReceiveOffer:    a.Nodes.ReceiveOffer,
 		CompletePairing: a.Nodes.CompletePairing,
-		ListIncoming:    a.Nodes.ListIncomingOffers,
 		LookupOutbound:  a.Nodes.LookupOutbound,
-		AdvertiseAddr:   a.bifrostAdvertiseAddr,
 		Training:        a.Training.RemoteHandler(),
 		Tools:           remotetools.Handler(a.portable, a.enterToolWork),
 		JoinHello:       acceptor.Hello,

@@ -21,12 +21,16 @@ type Client struct {
 	baseURL  string
 	http     *http.Client
 	identity *auth.NodeIdentity
+	peerID   string // the paired computer's node ID, each token's audience
 }
 
-func NewClient(baseURL string, identity *auth.NodeIdentity) *Client {
+// NewClient calls the paired computer peerID at baseURL, signing each
+// request with identity.
+func NewClient(baseURL string, identity *auth.NodeIdentity, peerID string) *Client {
 	return &Client{
 		baseURL:  strings.TrimRight(baseURL, "/"),
 		identity: identity,
+		peerID:   peerID,
 		http:     &http.Client{Timeout: 120 * time.Second},
 	}
 }
@@ -302,6 +306,6 @@ func (c *Client) Do(ctx context.Context, method, path string, body io.Reader) (*
 
 func (c *Client) applyAuth(req *http.Request) {
 	if c.identity != nil {
-		req.Header.Set("Authorization", "Bearer "+c.identity.AuthToken())
+		req.Header.Set("Authorization", "Bearer "+c.identity.AuthToken(c.peerID))
 	}
 }

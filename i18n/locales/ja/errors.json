@@ -82,6 +82,7 @@
   "NO_TEXT_FOUND": "テキストが見つかりません。スキャンしたPDFは、Yggdrasilが読み取る前に文字認識（OCR）が必要です。",
   "OFFER_FAILED": "{{detail}}",
   "OUT_OF_MEMORY": "モデルのメモリが不足しました。",
+  "PAIRING_RATE_LIMITED": "このアドレスからのペアリングの試行が多すぎます。数分待ってから、もう一度ペアリングを始めてください。",
   "PAIR_FAILED": "{{detail}}",
   "PEER_TOO_OLD": "ほかのコンピュータのためにツールを実行するには、そのコンピュータのYggdrasilを新しくする必要があります。",
   "PERFORMANCE_LIST_FAILED": "パフォーマンスの測定結果を取得できませんでした。",

@@ -21,11 +21,17 @@ If discovery is on at startup and Bifrost is still bound to loopback, the daemon
 
 Pairing is a consent step between two daemons.
 
-1. On one computer, start pairing against a discovered node (`POST /api/v1/nodes/pair` or the web UI).
-2. On the other computer, approve the offer (`POST /api/v1/nodes/{id}/pair/approve`).
-3. Each side stores the peer identity. Later Bifrost calls that read models or run chat send a bearer token checked against that peer's certificate.
+1. On one computer, start pairing against a discovered node (`POST /api/v1/nodes/pair` or the web UI). It shows a 6-digit code.
+2. On the other computer, approve the offer with the same code (`POST /api/v1/nodes/{id}/pair/approve`), or enter the code (`POST /api/v1/nodes/pair/claim`).
+3. Each side stores the peer identity. Later Bifrost calls that read models or run chat send a bearer token checked against that peer's key.
 
-`/internal/v1/health`, `/internal/v1/node`, and the pairing routes answer without that token. Other internal routes reject a missing or invalid token.
+Both steps are signed with the computers' node keys. The offer is signed by the computer that made it and names the computer it is for. The approving computer signs its answer over the session and the code, so only the computer that was asked, holding the key that was seen when pairing started, can finish it. Each computer stores the other's key and its fingerprint, sha256 of the raw ed25519 key, the same fingerprint join commands show.
+
+Wrong codes and failed answers are limited by address. A pairing whose answer fails 5 times ends, and 10 wrong codes end every pairing waiting on that computer; start pairing again for a new code. Pending offers are listed only on this computer's API, not on Bifrost.
+
+A bearer token names the computer it is for and is good for one request, for up to 5 minutes. Both computers need this version or later to pair or to work together.
+
+`/internal/v1/health`, `/internal/v1/node`, `/internal/v1/pairing/offer`, `/internal/v1/pairing/complete`, `/internal/v1/pairing/outbound/{code}`, and the join routes answer without that token. Other internal routes reject a missing or invalid token.
 
 Revoke a peer with `POST /api/v1/nodes/{id}/revoke`.
 

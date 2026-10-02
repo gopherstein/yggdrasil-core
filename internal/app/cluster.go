@@ -24,7 +24,7 @@ import (
 )
 
 func (a *App) peerClient(n contracts.Node) *nodes.Client {
-	return nodes.NewClient(normalizeNodeAddr(n.Address), a.Identity)
+	return nodes.NewClient(normalizeNodeAddr(n.Address), a.Identity, n.ID)
 }
 
 // listNodesWithHardware returns the cluster node list with fresh hardware (incl. disk)

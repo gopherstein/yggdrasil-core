@@ -3,8 +3,11 @@ package auth
 import (
 	"crypto/ed25519"
 	"crypto/rand"
+	"crypto/sha256"
 	"crypto/x509"
+	"encoding/hex"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -64,9 +67,38 @@ func LoadOrCreateIdentity(secrets *SecretStore, nodeID string) (*NodeIdentity, e
 	return &NodeIdentity{NodeID: nodeID, PrivateKey: priv, PublicKey: pub, CertPEM: pubPEM}, nil
 }
 
-// Fingerprint returns a stable node certificate fingerprint.
+// Fingerprint is this node's key fingerprint; see KeyFingerprint.
 func (id *NodeIdentity) Fingerprint() string {
-	return Fingerprint(string(id.PublicKey))
+	return KeyFingerprint(id.PublicKey)
+}
+
+// KeyFingerprint is the one fingerprint form for a node key: sha256 of the
+// raw ed25519 public key, as "sha256:<hex>". Join commands, the network
+// page, and node_trust all use it.
+func KeyFingerprint(pub ed25519.PublicKey) string {
+	sum := sha256.Sum256(pub)
+	return "sha256:" + hex.EncodeToString(sum[:])
+}
+
+// PublicKeyFromPEM reads an ed25519 public key in PEM, either the raw form
+// node identities store or PKIX.
+func PublicKeyFromPEM(pemBytes []byte) (ed25519.PublicKey, error) {
+	block, _ := pem.Decode(pemBytes)
+	if block == nil {
+		return nil, errors.New("not a PEM public key")
+	}
+	if len(block.Bytes) == ed25519.PublicKeySize {
+		return ed25519.PublicKey(block.Bytes), nil
+	}
+	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	pk, ok := pub.(ed25519.PublicKey)
+	if !ok {
+		return nil, errors.New("not an ed25519 key")
+	}
+	return pk, nil
 }
 
 // Sign signs message with node private key.
@@ -76,22 +108,11 @@ func (id *NodeIdentity) Sign(msg []byte) []byte {
 
 // VerifyPeer verifies a peer signature with their public key PEM.
 func VerifyPeer(pubPEM, msg, sig []byte) bool {
-	block, _ := pem.Decode(pubPEM)
-	if block == nil {
-		return false
-	}
-	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
+	pub, err := PublicKeyFromPEM(pubPEM)
 	if err != nil {
-		// ed25519 raw key
-		if len(block.Bytes) == ed25519.PublicKeySize {
-			return ed25519.Verify(ed25519.PublicKey(block.Bytes), msg, sig)
-		}
 		return false
 	}
-	if pk, ok := pub.(ed25519.PublicKey); ok {
-		return ed25519.Verify(pk, msg, sig)
-	}
-	return false
+	return ed25519.Verify(pub, msg, sig)
 }
 
 // TrustRecord stored in node_trust table.

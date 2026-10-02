@@ -4239,6 +4239,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        "429":
+          description: Too many wrong codes from this address (PAIRING_RATE_LIMITED)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/v1/nodes/{id}/pair/approve:
     post:
       summary: Approve a pairing offer
@@ -5194,6 +5200,9 @@ components:
           type: string
         from_node_id:
           type: string
+        to_node_id:
+          type: string
+          description: The computer the offer is for; others refuse it.
         from_name:
           type: string
         from_cert_pem:
@@ -5204,6 +5213,9 @@ components:
           type: string
         expires_at:
           type: string
+        signature:
+          type: string
+          description: Base64 ed25519 signature by the key in from_cert_pem over the session, both node IDs, the code, the expiry, and the key's fingerprint. Unsigned offers are refused.
     APIKey:
       type: object
       properties:

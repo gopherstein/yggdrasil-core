@@ -3,6 +3,8 @@ package nodes
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"io"
 	"log/slog"
 	"net"
 	"net/http"
@@ -23,6 +25,7 @@ type InternalServer struct {
 	logger *slog.Logger
 	deps   InternalDeps
 	http   *http.Server
+	replay *auth.ReplayGuard
 }
 
 // InternalDeps wires local services into the cluster RPC.
@@ -42,11 +45,11 @@ type InternalDeps struct {
 	StopModel      func(ctx context.Context, instanceID string) error
 	Chat           func(ctx context.Context, req RemoteChatRequest) (<-chan pluginapi.ChatChunk, error)
 
+	// The pairing routes answer before trust exists. Each checks the
+	// other computer's signature and limits attempts by source address.
 	ReceiveOffer    func(offer auth.PairingOffer) (*auth.PairingSession, error)
-	CompletePairing func(ctx context.Context, complete auth.PairingComplete) (*auth.PairingSession, error)
-	ListIncoming    func() []auth.PairingSession
-	LookupOutbound  func(code string) (*auth.PairingSession, bool)
-	AdvertiseAddr   func() string
+	CompletePairing func(ctx context.Context, source string, complete auth.PairingComplete) (*auth.PairingSession, error)
+	LookupOutbound  func(source, code string) (auth.PairingOffer, error)
 
 	// Training serves /internal/v1/training/ for paired computers that send
 	// training runs here.
@@ -68,6 +71,7 @@ func NewInternalServer(deps InternalDeps) *InternalServer {
 		cfg:    deps.Config,
 		logger: deps.Logger,
 		deps:   deps,
+		replay: auth.NewReplayGuard(),
 	}
 	r := mux.NewRouter()
 	api := r.PathPrefix("/internal/v1").Subrouter()
@@ -86,7 +90,6 @@ func NewInternalServer(deps InternalDeps) *InternalServer {
 	api.HandleFunc("/chat", s.handleChat).Methods(http.MethodPost)
 	api.HandleFunc("/pairing/offer", s.handlePairingOffer).Methods(http.MethodPost)
 	api.HandleFunc("/pairing/complete", s.handlePairingComplete).Methods(http.MethodPost)
-	api.HandleFunc("/pairing/pending", s.handlePairingPending).Methods(http.MethodGet)
 	api.HandleFunc("/pairing/outbound/{code}", s.handlePairingOutbound).Methods(http.MethodGet)
 	if deps.JoinHello != nil && deps.Join != nil {
 		api.HandleFunc("/join/hello", deps.JoinHello).Methods(http.MethodPost)
@@ -148,28 +151,49 @@ func (s *InternalServer) authMiddleware(next http.Handler) http.Handler {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
-		if _, err := auth.ParseAndVerifyAuthToken(token, cert); err != nil {
+		claims, err := auth.ParseAndVerifyAuthToken(token, cert, s.localNodeID())
+		if err != nil {
 			http.Error(w, "invalid token", http.StatusUnauthorized)
+			return
+		}
+		if !s.replay.Use(claims) {
+			http.Error(w, "token already used", http.StatusUnauthorized)
 			return
 		}
 		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), peerKey{}, nodeID)))
 	})
 }
 
+// isPublicInternalPath reports the routes that answer before trust exists.
+// Paths match exactly, so a model named "node" is not one of them.
 func isPublicInternalPath(path string) bool {
-	switch {
-	case strings.HasSuffix(path, "/health"),
-		strings.HasSuffix(path, "/node"),
-		strings.HasSuffix(path, "/pairing/offer"),
-		strings.HasSuffix(path, "/join/hello"),
-		strings.HasSuffix(path, "/v1/join"),
-		strings.HasSuffix(path, "/pairing/complete"),
-		strings.HasSuffix(path, "/pairing/pending"),
-		strings.Contains(path, "/pairing/outbound/"):
+	switch path {
+	case "/internal/v1/health",
+		"/internal/v1/node",
+		"/internal/v1/pairing/offer",
+		"/internal/v1/pairing/complete",
+		"/internal/v1/join/hello",
+		"/internal/v1/join":
 		return true
-	default:
-		return false
 	}
+	rest, ok := strings.CutPrefix(path, "/internal/v1/pairing/outbound/")
+	return ok && rest != "" && !strings.Contains(rest, "/")
+}
+
+// localNodeID is this computer's node ID, the audience of tokens sent here.
+func (s *InternalServer) localNodeID() string {
+	if s.deps.Identity != nil {
+		return s.deps.Identity.NodeID
+	}
+	return s.cfg.NodeID
+}
+
+// sourceAddr is the caller's IP address, for limiting pairing attempts.
+func sourceAddr(r *http.Request) string {
+	if host, _, err := net.SplitHostPort(r.RemoteAddr); err == nil {
+		return host
+	}
+	return r.RemoteAddr
 }
 
 // peerKey carries the authenticated paired computer's node ID.
@@ -386,7 +410,7 @@ func (s *InternalServer) handlePairingOffer(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	var offer auth.PairingOffer
-	if err := json.NewDecoder(r.Body).Decode(&offer); err != nil {
+	if err := json.NewDecoder(io.LimitReader(r.Body, 64<<10)).Decode(&offer); err != nil {
 		http.Error(w, "invalid body", http.StatusBadRequest)
 		return
 	}
@@ -404,24 +428,15 @@ func (s *InternalServer) handlePairingComplete(w http.ResponseWriter, r *http.Re
 		return
 	}
 	var complete auth.PairingComplete
-	if err := json.NewDecoder(r.Body).Decode(&complete); err != nil {
+	if err := json.NewDecoder(io.LimitReader(r.Body, 64<<10)).Decode(&complete); err != nil {
 		http.Error(w, "invalid body", http.StatusBadRequest)
 		return
 	}
-	session, err := s.deps.CompletePairing(r.Context(), complete)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	if _, err := s.deps.CompletePairing(r.Context(), sourceAddr(r), complete); err != nil {
+		http.Error(w, err.Error(), pairingStatus(err))
 		return
 	}
-	writeJSON(w, session)
-}
-
-func (s *InternalServer) handlePairingPending(w http.ResponseWriter, r *http.Request) {
-	if s.deps.ListIncoming == nil {
-		writeJSON(w, []auth.PairingSession{})
-		return
-	}
-	writeJSON(w, s.deps.ListIncoming())
+	writeJSON(w, map[string]any{"ok": true})
 }
 
 func (s *InternalServer) handlePairingOutbound(w http.ResponseWriter, r *http.Request) {
@@ -429,33 +444,23 @@ func (s *InternalServer) handlePairingOutbound(w http.ResponseWriter, r *http.Re
 		http.Error(w, "unavailable", http.StatusNotImplemented)
 		return
 	}
-	code := mux.Vars(r)["code"]
-	session, ok := s.deps.LookupOutbound(code)
-	if !ok || session == nil {
-		http.Error(w, "unknown or expired code", http.StatusNotFound)
+	offer, err := s.deps.LookupOutbound(sourceAddr(r), mux.Vars(r)["code"])
+	if err != nil {
+		status := pairingStatus(err)
+		if status == http.StatusBadRequest {
+			status = http.StatusNotFound
+		}
+		http.Error(w, err.Error(), status)
 		return
 	}
-	cert := ""
-	if s.deps.Identity != nil {
-		cert = string(s.deps.Identity.CertPEM)
+	writeJSON(w, offer)
+}
+
+func pairingStatus(err error) int {
+	if errors.Is(err, auth.ErrPairingThrottled) {
+		return http.StatusTooManyRequests
 	}
-	fromAddr := ""
-	if s.deps.AdvertiseAddr != nil {
-		fromAddr = s.deps.AdvertiseAddr()
-	}
-	name := s.cfg.NodeName
-	if name == "" {
-		name = session.LocalNodeID
-	}
-	writeJSON(w, auth.PairingOffer{
-		SessionID:   session.ID,
-		FromNodeID:  session.LocalNodeID,
-		FromName:    name,
-		FromCertPEM: cert,
-		FromAddress: fromAddr,
-		Code:        session.Code,
-		ExpiresAt:   session.ExpiresAt.Format(time.RFC3339),
-	})
+	return http.StatusBadRequest
 }
 
 func writeJSON(w http.ResponseWriter, v any) {

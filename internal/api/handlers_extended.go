@@ -2,6 +2,8 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
+	"net"
 	"net/http"
 	"strconv"
 
@@ -483,30 +485,20 @@ func (s *Server) handleOutboundPairing(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Outbound pairing lookup not available.", nil)
 		return
 	}
-	code := mux.Vars(r)["code"]
-	session, ok := s.deps.LookupOutboundPairing(code)
-	if !ok || session == nil {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		host = r.RemoteAddr
+	}
+	offer, err := s.deps.LookupOutboundPairing(host, mux.Vars(r)["code"])
+	if errors.Is(err, auth.ErrPairingThrottled) {
+		writeErrFrom(w, http.StatusTooManyRequests, "PAIRING_RATE_LIMITED", err)
+		return
+	}
+	if err != nil {
 		writeErr(w, http.StatusNotFound, "NOT_FOUND", "unknown or expired code", nil)
 		return
 	}
-	cfg := s.deps.Config.Get()
-	cert := ""
-	if s.deps.LocalCertPEM != nil {
-		cert = s.deps.LocalCertPEM()
-	}
-	fromAddr := ""
-	if s.deps.AdvertiseAddr != nil {
-		fromAddr = s.deps.AdvertiseAddr()
-	}
-	writeJSON(w, http.StatusOK, auth.PairingOffer{
-		SessionID:   session.ID,
-		FromNodeID:  session.LocalNodeID,
-		FromName:    cfg.NodeName,
-		FromCertPEM: cert,
-		FromAddress: fromAddr,
-		Code:        session.Code,
-		ExpiresAt:   session.ExpiresAt.UTC().Format("2006-01-02T15:04:05Z07:00"),
-	})
+	writeJSON(w, http.StatusOK, offer)
 }
 
 func (s *Server) handleApprovePairing(w http.ResponseWriter, r *http.Request) {

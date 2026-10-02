@@ -4,12 +4,13 @@ import (
 	"crypto/ed25519"
 	"crypto/hmac"
 	"crypto/sha256"
-	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/pem"
 	"errors"
 	"strings"
+
+	"github.com/yeixio/yggdrasil-core/internal/auth"
 )
 
 // The handshake, over Bifrost (port 7332):
@@ -129,8 +130,7 @@ type ErrorResponse struct {
 // Fingerprint is a public key's fingerprint as join commands show it:
 // sha256 of the raw ed25519 key.
 func Fingerprint(pub ed25519.PublicKey) string {
-	sum := sha256.Sum256(pub)
-	return "sha256:" + hex.EncodeToString(sum[:])
+	return auth.KeyFingerprint(pub)
 }
 
 // NormalizeFingerprint accepts a fingerprint with or without "sha256:", in
@@ -147,22 +147,7 @@ func NormalizeFingerprint(fp string) (string, error) {
 // PublicKeyFromPEM reads an ed25519 public key in PEM, as node identities
 // store them.
 func PublicKeyFromPEM(s string) (ed25519.PublicKey, error) {
-	block, _ := pem.Decode([]byte(s))
-	if block == nil {
-		return nil, errors.New("not a PEM public key")
-	}
-	if len(block.Bytes) == ed25519.PublicKeySize {
-		return ed25519.PublicKey(block.Bytes), nil
-	}
-	pub, err := x509.ParsePKIXPublicKey(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	pk, ok := pub.(ed25519.PublicKey)
-	if !ok {
-		return nil, errors.New("not an ed25519 key")
-	}
-	return pk, nil
+	return auth.PublicKeyFromPEM([]byte(s))
 }
 
 // publicKeyPEM is an ed25519 public key in the PEM form node identities

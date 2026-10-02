@@ -82,6 +82,7 @@
   "NO_TEXT_FOUND": "找不到文字。掃描的 PDF 需要先進行文字辨識（OCR），Yggdrasil 才能讀取。",
   "OFFER_FAILED": "{{detail}}",
   "OUT_OF_MEMORY": "模型的記憶體不足。",
+  "PAIRING_RATE_LIMITED": "來自此位址的配對嘗試過多。請等幾分鐘後重新開始配對。",
   "PAIR_FAILED": "{{detail}}",
   "PEER_TOO_OLD": "那台電腦需要較新版本的 Yggdrasil，才能為其他電腦執行工具。",
   "PERFORMANCE_LIST_FAILED": "無法列出效能測量結果。",
