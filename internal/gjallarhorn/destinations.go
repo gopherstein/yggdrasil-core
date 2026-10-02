@@ -12,6 +12,8 @@ import (
 	"strings"
 
 	"github.com/google/uuid"
+
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
 // Destination kinds (§7).
@@ -21,7 +23,7 @@ const (
 )
 
 // ErrNotFound is returned for an unknown destination.
-var ErrNotFound = errors.New("notification destination not found")
+var ErrNotFound = contracts.NewError("DESTINATION_NOT_FOUND", nil, errors.New("notification destination not found"))
 
 // Secrets stores destination credentials apart from the database (§39).
 type Secrets interface {

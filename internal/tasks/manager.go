@@ -284,7 +284,7 @@ func (e *execEnv) modelForRole(role string) string {
 
 func (m *Manager) ensureModelRunning(ctx context.Context, modelID string) (string, error) {
 	if modelID == "" {
-		return "", fmt.Errorf("no model assigned")
+		return "", contracts.Errorf("NO_MODEL_ASSIGNED", nil, "no model assigned")
 	}
 	m.mu.Lock()
 	if rm, ok := m.running[modelID]; ok {

@@ -7,7 +7,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { RealmKicker } from '@/components/ui/Realm'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
 import { useMascotState } from '@/lib/ratatoskr/useMascotState'
-import { api, streamChat } from '@/lib/api'
+import { ApiError, api, streamChat } from '@/lib/api'
 import { ATTACH_ACCEPT, MAX_ATTACH_BYTES, isAttachable, readUpload } from '@/lib/upload'
 import { subscribeEvents } from '@/lib/events'
 import { useUIStore } from '@/stores/uiStore'
@@ -191,6 +191,8 @@ export function ChatPage() {
   const [isSending, setIsSending] = useState(false)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
   const [sendError, setSendError] = useState<string | null>(null)
+  // The stable code of the error in sendError, kept with its text so a later error never takes it.
+  const [sendErrorCode, setSendErrorCode] = useState<{ text: string; code: string } | null>(null)
   // Memory Off chosen before the conversation exists; applied when it is created.
   const [memoryOffDraft, setMemoryOffDraft] = useState(false)
   const [modelFailure, setModelFailure] = useState<ModelFailure | null>(null)
@@ -993,7 +995,7 @@ export function ChatPage() {
           }
           handleChatComplete(conversationId!)
         },
-        onError: (errMessage) => {
+        onError: (errMessage, code) => {
           setIsSending(false)
           streamingConvRef.current = null
           setStatusMessage(null)
@@ -1012,6 +1014,7 @@ export function ChatPage() {
             setStreamingContent(null)
             setResponseInterrupted(false)
             setSendError(errMessage || t('send.couldNotRespond'))
+            if (code && errMessage) setSendErrorCode({ text: errMessage, code })
           }
           queryClient.invalidateQueries({ queryKey: ['messages', conversationId] })
         },
@@ -1027,11 +1030,13 @@ export function ChatPage() {
         if (conversationId) queryClient.invalidateQueries({ queryKey: ['messages', conversationId] })
         return
       }
-      setSendError(
-        error instanceof Error
-          ? error.message
-          : t('send.unreachable'),
-      )
+      if (error instanceof ApiError && error.code) {
+        // The card explains the code in the App language; the service's text goes under Details.
+        setSendError(error.serviceMessage)
+        setSendErrorCode({ text: error.serviceMessage, code: error.code })
+      } else {
+        setSendError(error instanceof Error ? error.message : t('send.unreachable'))
+      }
       if (conversationId) {
         queryClient.invalidateQueries({ queryKey: ['messages', conversationId] })
       }
@@ -1663,6 +1668,7 @@ export function ChatPage() {
                 {sendError && (
                   <ChatErrorCard
                     raw={sendError}
+                    code={sendErrorCode?.text === sendError ? sendErrorCode.code : undefined}
                     mascot={!modelFailure}
                     onRetry={() => {
                       setSendError(null)
@@ -1732,7 +1738,11 @@ export function ChatPage() {
               ) : null}
               {!selectedId && sendError ? (
                 <div className="mt-3 flex justify-center">
-                  <ChatErrorCard raw={sendError} mascot={!showLanding && !modelFailure} />
+                  <ChatErrorCard
+                    raw={sendError}
+                    code={sendErrorCode?.text === sendError ? sendErrorCode.code : undefined}
+                    mascot={!showLanding && !modelFailure}
+                  />
                 </div>
               ) : null}
             </div>

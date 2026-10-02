@@ -45,7 +45,7 @@ func (s *Server) handleModelPlacement(w http.ResponseWriter, r *http.Request) {
 	}
 	places, ok := inventory.NodesFor(s.capabilities.Capabilities(r.Context()), mux.Vars(r)["id"])
 	if !ok {
-		writeErr(w, http.StatusNotFound, "MODEL_NOT_INSTALLED", "That model is not installed on any computer.", nil)
+		writeErr(w, http.StatusNotFound, "MODEL_NOT_INSTALLED", "That model is not installed on any computer.", map[string]any{"model_id": mux.Vars(r)["id"]})
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"model_id": mux.Vars(r)["id"], "computers": places})

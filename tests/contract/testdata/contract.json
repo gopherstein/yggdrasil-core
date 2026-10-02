@@ -1,5 +1,5 @@
 {
-  "version": "1.2",
+  "version": "1.3",
   "types": {
     "ActivityStep": [
       "kind",
@@ -45,6 +45,11 @@
       "kind",
       "source",
       "task_id"
+    ],
+    "ErrorBody": [
+      "code",
+      "details",
+      "message"
     ],
     "Event": [
       "contract",

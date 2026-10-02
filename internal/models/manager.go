@@ -267,7 +267,7 @@ func (m *Manager) Path(ctx context.Context, modelID string) (string, error) {
 		return "", err
 	}
 	if !ok {
-		return "", fmt.Errorf("model %q not installed", modelID)
+		return "", contracts.Errorf("MODEL_NOT_INSTALLED", map[string]any{"model_id": modelID}, "model %q not installed", modelID)
 	}
 	return path, nil
 }

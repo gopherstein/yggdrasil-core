@@ -31,10 +31,10 @@ func (s *Server) connectorHandler(h http.HandlerFunc) http.HandlerFunc {
 
 func writeConnectorErr(w http.ResponseWriter, err error) {
 	if errors.Is(err, connectors.ErrUnknown) {
-		writeErr(w, http.StatusNotFound, "CONNECTOR_NOT_FOUND", err.Error(), nil)
+		writeErrFrom(w, http.StatusNotFound, "CONNECTOR_NOT_FOUND", err)
 		return
 	}
-	writeErr(w, http.StatusBadRequest, "CONNECTOR_FAILED", err.Error(), nil)
+	writeErrFrom(w, http.StatusBadRequest, "CONNECTOR_FAILED", err)
 }
 
 // handleListConnectors lists every service and whether it is connected.
@@ -43,7 +43,7 @@ func writeConnectorErr(w http.ResponseWriter, err error) {
 func (s *Server) handleListConnectors(w http.ResponseWriter, r *http.Request) {
 	list, err := s.connectors.List(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "CONNECTORS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "CONNECTORS_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, list)

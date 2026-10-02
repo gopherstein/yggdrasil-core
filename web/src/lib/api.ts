@@ -97,16 +97,43 @@ import type { Upload } from '@/lib/upload'
 /** A kind of generated media with its own setup: images or video. */
 export type MediaKind = 'images' | 'video'
 import { hasEventRelay, onRelayedEvent, saveFromDaemon, signInReturnAddress } from '@/lib/desktopBridge'
+import i18n from '@/i18n'
 
+/** The service's error envelope: a stable code, its English message, and the values the message needs. */
+interface ServiceError {
+  code?: string
+  message?: string
+  details?: Record<string, unknown>
+}
+
+/**
+ * An error from the service. `message` is the text for its stable code in the
+ * App language (multilingual spec §10); `serviceMessage` is the service's own
+ * English text, for Diagnostics and logs.
+ */
 export class ApiError extends Error {
+  readonly serviceMessage: string
+
   constructor(
     public readonly status: number,
-    message: string,
+    serviceMessage: string,
     public readonly code?: string,
+    public readonly details?: Record<string, unknown>,
   ) {
-    super(message)
+    super(errorText(code, serviceMessage, details))
     this.name = 'ApiError'
+    this.serviceMessage = serviceMessage
   }
+}
+
+/**
+ * The text for an error code in the App language, from errors.json, with the
+ * values in details; the service's message, as {{detail}}, for a code the
+ * catalog does not have or does not say more about.
+ */
+export function errorText(code: string | undefined, message: string, details?: Record<string, unknown>): string {
+  if (!code || !i18n.exists(`errors:${code}`)) return message
+  return i18n.t(`errors:${code}`, { detail: message, ...details })
 }
 
 function strField(raw: Record<string, unknown>, snake: string, pascal: string): string {
@@ -205,6 +232,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T | null> {
     throw new ApiError(
       0,
       `Could not reach the local Yggdrasil service (${detail}). If this is the desktop app, quit and reopen it so the daemon restarts.`,
+      'SERVICE_UNREACHABLE',
+      { detail },
     )
   }
 
@@ -213,11 +242,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T | null> {
   }
 
   if (!response.ok) {
-    const body = await parseJson<{ error?: { code?: string; message?: string } }>(response)
+    const body = await parseJson<{ error?: ServiceError }>(response)
     throw new ApiError(
       response.status,
       body?.error?.message ?? response.statusText ?? `HTTP ${response.status}`,
       body?.error?.code,
+      body?.error?.details,
     )
   }
 
@@ -245,7 +275,8 @@ export interface StreamChatOptions {
   signal?: AbortSignal
   onToken: (content: string) => void
   onDone?: () => void
-  onError?: (message: string) => void
+  /** The error's text, and its stable code when the service sent one (error_code, contract 1.3). */
+  onError?: (message: string, code?: string) => void
 }
 
 /** Save a stored file to the user's computer. It is fetched with the same
@@ -255,7 +286,9 @@ export async function downloadArtifact(file: Pick<FileRef, 'id' | 'name'>): Prom
   if ((await saveFromDaemon(file.name, `/api/v1/artifacts/${file.id}/content`)) !== null) return
   const response = await fetch(`${getApiBase()}/api/v1/artifacts/${file.id}/content`, { headers: authHeaders() })
   if (!response.ok) {
-    throw new ApiError(response.status, response.status === 404 ? 'This file is no longer available.' : response.statusText)
+    throw response.status === 404
+      ? new ApiError(404, 'This file is no longer available.', 'FILE_NOT_FOUND')
+      : new ApiError(response.status, response.statusText)
   }
   const url = URL.createObjectURL(await response.blob())
   const link = document.createElement('a')
@@ -271,7 +304,9 @@ export async function downloadArtifact(file: Pick<FileRef, 'id' | 'name'>): Prom
 export async function artifactObjectUrl(id: string): Promise<string> {
   const response = await fetch(`${getApiBase()}/api/v1/artifacts/${id}/content?inline=1`, { headers: authHeaders() })
   if (!response.ok) {
-    throw new ApiError(response.status, response.status === 404 ? 'This file is no longer available.' : response.statusText)
+    throw response.status === 404
+      ? new ApiError(404, 'This file is no longer available.', 'FILE_NOT_FOUND')
+      : new ApiError(response.status, response.statusText)
   }
   return URL.createObjectURL(await response.blob())
 }
@@ -341,21 +376,25 @@ async function readChatStream({
   })
 
   if (!response.ok) {
-    const errBody = await parseJson<{ error?: { message?: string } }>(response)
+    const errBody = await parseJson<{ error?: ServiceError }>(response)
     throw new ApiError(
       response.status,
       errBody?.error?.message ?? response.statusText,
+      errBody?.error?.code,
+      errBody?.error?.details,
     )
   }
 
   const reader = response.body?.getReader()
   if (!reader) {
-    throw new ApiError(500, 'Streaming not supported')
+    throw new ApiError(500, 'Streaming not supported', 'SSE_UNSUPPORTED')
   }
 
   const decoder = new TextDecoder()
   let buffer = ''
   let currentEvent = 'message'
+  // error_code arrives just before error, which carries the text.
+  let errorCode: string | undefined
 
   while (true) {
     const { done, value } = await reader.read()
@@ -376,8 +415,16 @@ async function readChatStream({
         continue
       }
       const data = line.slice(5).trim()
+      if (currentEvent === 'error_code') {
+        try {
+          errorCode = (JSON.parse(data) as ServiceError).code
+        } catch {
+          // an unreadable code: the text in error still says what failed
+        }
+        continue
+      }
       if (currentEvent === 'error') {
-        onError?.(data)
+        onError?.(data, errorCode)
         return
       }
       if (currentEvent === 'token') {
@@ -782,7 +829,7 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ redirect_base: await signInReturnAddress(), ...body }),
     })
-    if (!added) throw new ApiError(404, 'That gallery entry or app setting was not found.')
+    if (!added) throw new ApiError(404, 'That gallery entry or app setting was not found.', 'TOOL_SOURCE_ENTRY_NOT_FOUND')
     return added
   },
 

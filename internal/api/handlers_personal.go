@@ -30,7 +30,7 @@ func (s *Server) handleGetPersonal(w http.ResponseWriter, r *http.Request) {
 	}
 	style, err := s.personal.PersonalStyle(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "PERSONALIZATION_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "PERSONALIZATION_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, style)
@@ -50,7 +50,7 @@ func (s *Server) handlePutPersonal(w http.ResponseWriter, r *http.Request) {
 	}
 	saved, err := s.personal.SetPersonalStyle(r.Context(), in)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "INVALID_PERSONALIZATION", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "INVALID_PERSONALIZATION", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, saved)

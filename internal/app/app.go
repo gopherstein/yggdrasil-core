@@ -1003,7 +1003,7 @@ func validLocale(tag string) bool {
 
 func setSettingString(ctx context.Context, repo *repositories.SettingsRepo, key, value string, allowed map[string]bool) error {
 	if allowed != nil && !allowed[value] {
-		return fmt.Errorf("invalid %s value %q", key, value)
+		return contracts.Errorf("INVALID_SETTING", map[string]any{"setting": key, "value": value}, "invalid %s value %q", key, value)
 	}
 	return repo.Set(ctx, key, value)
 }
@@ -1026,7 +1026,7 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 	}
 	if v, ok := patch["model_lifecycle"].(string); ok && v != "" {
 		if v != "automatic" && v != "manual" {
-			return fmt.Errorf("model_lifecycle must be automatic or manual")
+			return contracts.Errorf("INVALID_SETTING", map[string]any{"setting": "model_lifecycle", "value": v}, "model_lifecycle must be automatic or manual")
 		}
 		if err := a.Settings.Set(ctx, "model_lifecycle", v); err != nil {
 			return err
@@ -1080,7 +1080,7 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 	}
 	if v, ok := patch["ui_locale"].(string); ok {
 		if !validLocale(v) {
-			return fmt.Errorf("ui_locale must be a language tag such as en or es-MX, or empty for the system language")
+			return contracts.Errorf("INVALID_LOCALE", nil, "ui_locale must be a language tag such as en or es-MX, or empty for the system language")
 		}
 		if err := a.Settings.Set(ctx, "ui_locale", v); err != nil {
 			return err

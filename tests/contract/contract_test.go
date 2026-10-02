@@ -30,8 +30,8 @@ import (
 const snapshotFile = "testdata/contract.json"
 
 // covered are the types clients read: events, run traces, answers and
-// their citations, steps, and files, artifacts, notifications, and what
-// left the computer.
+// their citations, steps, and files, artifacts, notifications, what left
+// the computer, and errors.
 var covered = map[string]any{
 	"Event":           events.Event{},
 	"Run":             runlog.Run{},
@@ -49,6 +49,7 @@ var covered = map[string]any{
 	"EgressRecord":    egress.Record{},
 	"ContractInfo":    contracts.ContractInfo{},
 	"VersionResponse": contracts.VersionResponse{},
+	"ErrorBody":       contracts.ErrorBody{},
 }
 
 type snapshot struct {

@@ -333,7 +333,7 @@ func (c *Collector) Finish(status, errText string) Run {
 func ms(d time.Duration) float64 { return float64(d.Microseconds()) / 1000 }
 
 // ErrNotFound is returned for an unknown run.
-var ErrNotFound = errors.New("run not found")
+var ErrNotFound = contracts.NewError("RUN_NOT_FOUND", nil, errors.New("run not found"))
 
 // Store keeps runs.
 type Store struct{ db *sql.DB }

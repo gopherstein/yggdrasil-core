@@ -64,7 +64,7 @@ type RunResult struct {
 }
 
 // ErrCancelled is returned when a run stops because its context ended.
-var ErrCancelled = errors.New("training cancelled")
+var ErrCancelled = contracts.NewError("TRAINING_CANCELLED", nil, errors.New("training cancelled"))
 
 //go:embed scripts/mlx_train.py
 var mlxScript []byte

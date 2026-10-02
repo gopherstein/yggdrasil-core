@@ -34,7 +34,7 @@ func (s *Server) handleListRuns(w http.ResponseWriter, r *http.Request) {
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	list, err := s.runs.List(r.Context(), r.URL.Query().Get("conversation_id"), limit)
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "RUNS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "RUNS_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, list)
@@ -51,7 +51,7 @@ func (s *Server) handleGetRun(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "RUNS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "RUNS_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, run)

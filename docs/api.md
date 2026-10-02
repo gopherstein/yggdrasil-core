@@ -440,11 +440,17 @@ A repeat web search or page read is answered from the cache. The tool does not r
 
 ## Client contract
 
-The desktop app, mobile apps, and other clients read a versioned contract: events, run traces, answers with their citations, steps, and files, artifacts, notifications, and egress records. The version is `major.minor`, now `1.2` (1.1 added `repeat_count` to notifications; 1.2 added `setup` to answers, an offer to install what a request needed).
+The desktop app, mobile apps, and other clients read a versioned contract: events, run traces, answers with their citations, steps, and files, artifacts, notifications, and egress records. The version is `major.minor`, now `1.3` (1.1 added `repeat_count` to notifications; 1.2 added `setup` to answers, an offer to install what a request needed; 1.3 added stable error codes to chat streams).
 - **Where it appears:** every event has `contract`, and so do answer metadata and run traces. Metadata saved before the contract existed has no `contract` and reads as 1.0. Every response carries the `Yggdrasil-Contract` header, and `GET /api/v1/version` has `contract` (`version`, `major`).
 - **Minor versions** add fields or event types. Clients ignore what they do not know, so an older client keeps working.
 - **Major versions** remove something or change its meaning. A client may send `Yggdrasil-Client-Contract: 1.0`. A client built for another major version gets 426 with code `CONTRACT_MISMATCH`, and the message says whether to update the app or Yggdrasil. A client that sends no header is served as before.
 - **Compatibility test:** `tests/contract` records the contract's fields. It fails when one is removed or renamed within a major version, and when one is added without a minor version bump (`UPDATE_CONTRACT=1 go test ./tests/contract` records the new fields).
+
+## Errors
+
+An error is `{"error": {"code", "message", "details"}}`. `code` is stable, such as `MODEL_NOT_INSTALLED` or `MEMORY_LOOKS_SECRET`, and `details` has the values its message needs, such as `model_id`. Clients show text for the code from the catalog, `i18n/locales/<language>/errors.json`, in the App language; `message` is the English text, for logs, Diagnostics, and codes a client does not know yet. A code keeps its meaning, and a more specific code may replace a general one such as `BAD_REQUEST` or `INSTALL_FAILED`. Every code Yggdrasil sends has English text in `errors.json`, and a test checks it.
+
+A chat that fails while streaming sends `event: error_code` with the same `code`, `message`, and `details`, then `event: error` with the text, as before. Chat errors are recognized in core, once: `NO_MODEL_INSTALLED`, `NO_MODEL_ASSIGNED`, `MODEL_NOT_INSTALLED`, `RUNTIME_NOT_INSTALLED`, `CONTEXT_TOO_LONG`, `OUT_OF_MEMORY`, `COMPUTER_OFFLINE`, `CONNECTION_LOST`, `RUNTIME_ERROR`, and `MODEL_UNHEALTHY`, whose `error` text is the model's failure as JSON.
 
 ## Events
 

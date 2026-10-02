@@ -11,7 +11,7 @@ import (
 // ErrNeedsApproval means a scheduled run reached a tool nobody approved for
 // it. The run skips the action and reports it; it never widens its own
 // permissions because no one answered (spec §59).
-var ErrNeedsApproval = errors.New("needs your approval for this automation")
+var ErrNeedsApproval = contracts.NewError("NEEDS_APPROVAL", nil, errors.New("needs your approval for this automation"))
 
 // UnattendedPolicy is the policy a scheduled run may use for one tool.
 //

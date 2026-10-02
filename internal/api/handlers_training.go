@@ -69,11 +69,11 @@ func (s *Server) trainingHandler(h http.HandlerFunc) http.HandlerFunc {
 func writeTrainingErr(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Is(err, training.ErrNotFound), errors.Is(err, mimir.ErrNotFound):
-		writeErr(w, http.StatusNotFound, "NOT_FOUND", err.Error(), nil)
+		writeErrFrom(w, http.StatusNotFound, "NOT_FOUND", err)
 	case errors.Is(err, training.ErrConflict):
-		writeErr(w, http.StatusConflict, "CONFLICT", err.Error(), nil)
+		writeErrFrom(w, http.StatusConflict, "CONFLICT", err)
 	default:
-		writeErr(w, http.StatusBadRequest, "BAD_REQUEST", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "BAD_REQUEST", err)
 	}
 }
 
@@ -136,7 +136,7 @@ func (s *Server) handleClassifyMaterial(w http.ResponseWriter, r *http.Request) 
 func (s *Server) handleSamples(w http.ResponseWriter, r *http.Request) {
 	files, err := training.Samples()
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "INTERNAL_ERROR", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, files)

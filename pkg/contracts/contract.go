@@ -16,7 +16,7 @@ import (
 //     client built for another major version is told to update.
 //
 // tests/contract checks that no field in the contract is removed or renamed.
-const ContractVersion = "1.2"
+const ContractVersion = "1.3"
 
 // Headers that carry the contract version.
 const (

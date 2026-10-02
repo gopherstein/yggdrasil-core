@@ -66,10 +66,10 @@ func (s *Server) mcpHandler(h http.HandlerFunc) http.HandlerFunc {
 
 func writeMCPErr(w http.ResponseWriter, err error) {
 	if errors.Is(err, mcp.ErrUnknown) {
-		writeErr(w, http.StatusNotFound, "MCP_NOT_FOUND", err.Error(), nil)
+		writeErrFrom(w, http.StatusNotFound, "MCP_NOT_FOUND", err)
 		return
 	}
-	writeErr(w, http.StatusBadRequest, "MCP_FAILED", err.Error(), nil)
+	writeErrFrom(w, http.StatusBadRequest, "MCP_FAILED", err)
 }
 
 func (s *Server) handleListMCP(w http.ResponseWriter, r *http.Request) {

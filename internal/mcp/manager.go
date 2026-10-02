@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/tools"
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
 // Statuses of a tool source.
@@ -47,7 +48,7 @@ type Registry interface {
 type Sampler func(ctx context.Context, system string, messages []SampleMessage, maxTokens int) (text, model string, err error)
 
 // ErrUnknown is returned for a tool source id that does not exist.
-var ErrUnknown = errors.New("no such tool source")
+var ErrUnknown = contracts.NewError("MCP_NOT_FOUND", nil, errors.New("no such tool source"))
 
 // Manager adds, runs, and removes tool sources.
 type Manager struct {

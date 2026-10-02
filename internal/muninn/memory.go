@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/yeixio/yggdrasil-core/internal/personal"
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 	"regexp"
 	"strings"
 	"time"
@@ -41,10 +42,10 @@ const (
 const MaxMemoryRunes = 500
 
 // ErrNotFound is returned for an unknown memory.
-var ErrNotFound = errors.New("memory not found")
+var ErrNotFound = contracts.NewError("MEMORY_NOT_FOUND", nil, errors.New("memory not found"))
 
 // ErrSensitive is returned for content that looks like a credential.
-var ErrSensitive = errors.New("that looks like a password, key, or token, so Yggdrasil did not save it")
+var ErrSensitive = contracts.NewError("MEMORY_LOOKS_SECRET", nil, errors.New("that looks like a password, key, or token, so Yggdrasil did not save it"))
 
 // Memory is one durable fact or preference.
 type Memory struct {

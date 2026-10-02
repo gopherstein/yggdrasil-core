@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/tools"
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
 // Field is one value a service needs to connect, such as a token.
@@ -89,7 +90,7 @@ type Status struct {
 }
 
 // ErrUnknown is returned for a service id that does not exist.
-var ErrUnknown = errors.New("unknown service")
+var ErrUnknown = contracts.NewError("CONNECTOR_NOT_FOUND", nil, errors.New("unknown service"))
 
 // Registry is the tool registry connected tools are added to.
 type Registry interface {

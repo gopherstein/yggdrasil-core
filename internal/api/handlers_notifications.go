@@ -45,7 +45,7 @@ func (s *Server) notificationHandler(h http.HandlerFunc) http.HandlerFunc {
 func (s *Server) handleListNotifications(w http.ResponseWriter, r *http.Request) {
 	list, unread, err := s.notifications.List(r.Context(), r.URL.Query().Get("unread") == "1", 50, r.URL.Query().Get("category"))
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "NOTIFICATIONS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "NOTIFICATIONS_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"notifications": list, "unread": unread})
@@ -63,7 +63,7 @@ func (s *Server) handleReadNotifications(w http.ResponseWriter, r *http.Request)
 		}
 	}
 	if err := s.notifications.MarkRead(r.Context(), body.IDs); err != nil {
-		writeErr(w, http.StatusInternalServerError, "NOTIFICATIONS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "NOTIFICATIONS_FAILED", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -72,11 +72,11 @@ func (s *Server) handleReadNotifications(w http.ResponseWriter, r *http.Request)
 func (s *Server) handleDismissNotification(w http.ResponseWriter, r *http.Request) {
 	err := s.notifications.Dismiss(r.Context(), mux.Vars(r)["id"])
 	if errors.Is(err, sql.ErrNoRows) {
-		writeErr(w, http.StatusNotFound, "NOT_FOUND", "notification not found", nil)
+		writeErr(w, http.StatusNotFound, "NOTIFICATION_NOT_FOUND", "notification not found", nil)
 		return
 	}
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "NOTIFICATIONS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "NOTIFICATIONS_FAILED", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -86,11 +86,11 @@ func (s *Server) handleDismissNotification(w http.ResponseWriter, r *http.Reques
 func (s *Server) handleGetNotification(w http.ResponseWriter, r *http.Request) {
 	n, err := s.notifications.Get(r.Context(), mux.Vars(r)["id"])
 	if errors.Is(err, sql.ErrNoRows) {
-		writeErr(w, http.StatusNotFound, "NOT_FOUND", "notification not found", nil)
+		writeErr(w, http.StatusNotFound, "NOTIFICATION_NOT_FOUND", "notification not found", nil)
 		return
 	}
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "NOTIFICATIONS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "NOTIFICATIONS_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, n)
@@ -98,10 +98,10 @@ func (s *Server) handleGetNotification(w http.ResponseWriter, r *http.Request) {
 
 func writeDestinationErr(w http.ResponseWriter, err error) {
 	if errors.Is(err, gjallarhorn.ErrNotFound) {
-		writeErr(w, http.StatusNotFound, "NOT_FOUND", err.Error(), nil)
+		writeErrFrom(w, http.StatusNotFound, "NOT_FOUND", err)
 		return
 	}
-	writeErr(w, http.StatusBadRequest, "BAD_REQUEST", err.Error(), nil)
+	writeErrFrom(w, http.StatusBadRequest, "BAD_REQUEST", err)
 }
 
 // handleListDestinations lists email and webhook destinations. Passwords and
@@ -109,7 +109,7 @@ func writeDestinationErr(w http.ResponseWriter, err error) {
 func (s *Server) handleListDestinations(w http.ResponseWriter, r *http.Request) {
 	list, err := s.notifications.Destinations(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "NOTIFICATIONS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "NOTIFICATIONS_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, list)
@@ -202,7 +202,7 @@ func (s *Server) handlePutQuietHours(w http.ResponseWriter, r *http.Request) {
 	}
 	saved, err := s.notifications.SetQuietHours(r.Context(), q)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "BAD_REQUEST", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "BAD_REQUEST", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, saved)

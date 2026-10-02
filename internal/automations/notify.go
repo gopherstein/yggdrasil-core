@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"github.com/yeixio/yggdrasil-core/internal/structured"
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 	"strconv"
 	"strings"
 	"unicode/utf8"
 )
 
 // ErrNotifyDisabled means the user turned notifications off. The run still succeeded.
-var ErrNotifyDisabled = errors.New("notifications are disabled")
+var ErrNotifyDisabled = contracts.NewError("NOTIFICATIONS_DISABLED", nil, errors.New("notifications are disabled"))
 
 // Notice is a notification about an automation.
 type Notice struct {

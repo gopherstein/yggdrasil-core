@@ -336,7 +336,7 @@ func (a *App) ensureLocalModelWith(ctx context.Context, modelID string, adapters
 		return "stub://" + a.Config.Get().NodeID, nil
 	}
 	if modelID == "" {
-		return "", fmt.Errorf("no model assigned for role")
+		return "", contracts.Errorf("NO_MODEL_ASSIGNED", nil, "no model assigned for role")
 	}
 	path, err := a.Models.Path(ctx, modelID)
 	if err != nil {

@@ -31,3 +31,23 @@ describe('explainError', () => {
     expect(e.detail).toMatch(/^panic/)
   })
 })
+
+describe('explainError with a code', () => {
+  it('reads the code before the text', () => {
+    const e = explainError('メモリが足りません', 'OUT_OF_MEMORY')
+    expect(e.title).toBe('Not enough memory for this model')
+    expect(e.actions).toEqual(['retry', 'models'])
+    expect(e.detail).toBe('メモリが足りません')
+  })
+
+  it('shows a code’s catalog text when chat has no card for it', () => {
+    const e = explainError('that looks like a password, key, or token, so Yggdrasil did not save it', 'MEMORY_LOOKS_SECRET')
+    expect(e.title).toBe('That didn’t work')
+    expect(e.body).toBe("That looks like a password, key, or token, so Yggdrasil didn't save it.")
+    expect(e.detail).toBe('that looks like a password, key, or token, so Yggdrasil did not save it')
+  })
+
+  it('falls back to the text for a code it does not know', () => {
+    expect(explainError('ggml_metal: failed to allocate buffer, out of memory', 'SOMETHING_NEW').title).toBe('Not enough memory for this model')
+  })
+})

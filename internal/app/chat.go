@@ -603,6 +603,11 @@ func (a *App) recordGeneration(
 func (a *App) HandleHTTPChat(w http.ResponseWriter, r *http.Request, conversationID, profileID, modelID, message string, stream bool, execution string) error {
 	ch, err := a.RunChat(r.Context(), profileID, conversationID, message, stream, modelID, execution)
 	if err != nil {
+		if code, _ := contracts.ErrorCode(err); code == "" {
+			if code, params := chatErrorCode(err.Error()); code != "" {
+				return contracts.NewError(code, params, err)
+			}
+		}
 		return err
 	}
 	if !stream {
@@ -610,7 +615,7 @@ func (a *App) HandleHTTPChat(w http.ResponseWriter, r *http.Request, conversatio
 		var metrics *pluginapi.GenerationMetrics
 		for chunk := range ch {
 			if chunk.Error != "" {
-				return fmt.Errorf("%s", chunk.Error)
+				return codedChatError(chunk.Error)
 			}
 			content += chunk.Content
 			if chunk.Metrics != nil {
@@ -633,6 +638,13 @@ func (a *App) HandleHTTPChat(w http.ResponseWriter, r *http.Request, conversatio
 	w.WriteHeader(http.StatusOK)
 	for chunk := range ch {
 		if chunk.Error != "" {
+			// error_code comes first, so a client that knows it shows the
+			// error in the App language; older clients ignore it and show
+			// the text in error.
+			if code, params := chatErrorCode(chunk.Error); code != "" {
+				data, _ := json.Marshal(contracts.ErrorBody{Code: code, Message: chunk.Error, Details: params})
+				fmt.Fprintf(w, "event: error_code\ndata: %s\n\n", data)
+			}
 			fmt.Fprintf(w, "event: error\ndata: %s\n\n", chunk.Error)
 			flusher.Flush()
 			return nil
@@ -746,7 +758,7 @@ func (a *App) defaultInstalledModelID(ctx context.Context) (string, error) {
 	if stub != "" {
 		return stub, nil
 	}
-	return "", fmt.Errorf("no installed models")
+	return "", contracts.Errorf("NO_MODEL_INSTALLED", nil, "no installed models")
 }
 
 // withChatModel applies the chat's model to a profile for this turn: it

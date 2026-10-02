@@ -53,7 +53,7 @@ func (s *Server) setupRoutes(api *mux.Router, prefix string, setup func() *image
 			return
 		}
 		if err := st.Start(body.ModelID); err != nil {
-			writeErr(w, http.StatusConflict, "SETUP_REFUSED", err.Error(), nil)
+			writeErrFrom(w, http.StatusConflict, "SETUP_REFUSED", err)
 			return
 		}
 		writeJSON(w, http.StatusAccepted, st.Status())
@@ -72,7 +72,7 @@ func (s *Server) setupRoutes(api *mux.Router, prefix string, setup func() *image
 			return
 		}
 		if err := st.Remove(mux.Vars(r)["id"]); err != nil {
-			writeErr(w, http.StatusConflict, "MODEL_BUSY", err.Error(), nil)
+			writeErrFrom(w, http.StatusConflict, "MODEL_BUSY", err)
 			return
 		}
 		writeJSON(w, http.StatusOK, st.Status())

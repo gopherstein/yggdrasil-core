@@ -7,11 +7,14 @@ import { explainError } from './friendlyError'
 /** A chat error in plain language, with the next step and the details on request. */
 export function ChatErrorCard({
   raw,
+  code,
   onRetry,
   onNewChat,
   mascot = true,
 }: {
   raw: string
+  /** The error's stable code from the service, when it sent one. */
+  code?: string
   onRetry?: () => void
   onNewChat?: () => void
   /** Show Ratatoskr with the acorn dropped. Off when another mascot is already in view. */
@@ -19,7 +22,7 @@ export function ChatErrorCard({
 }) {
   const { t } = useTranslation('chat')
   const [showDetail, setShowDetail] = useState(false)
-  const e = explainError(raw)
+  const e = explainError(raw, code)
   return (
     <div role="alert" className="flex max-w-[min(42rem,85%)] gap-3 rounded-2xl border border-danger/25 bg-danger/5 px-4 py-3 text-sm">
       {mascot ? <Ratatoskr state="error" size={48} className="-ms-1 mt-0.5" /> : null}

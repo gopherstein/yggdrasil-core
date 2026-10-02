@@ -9,6 +9,8 @@ import (
 	"errors"
 	"math"
 	"unicode/utf8"
+
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
 // Semantic search (AI experience spec §61). When an embedding model is
@@ -44,7 +46,7 @@ type Models interface {
 
 // ErrNotNow means a supporting model is installed but cannot run now. Search
 // falls back to keywords, and background embedding tries again later.
-var ErrNotNow = errors.New("the supporting model cannot run right now")
+var ErrNotNow = contracts.NewError("SUPPORT_MODEL_BUSY", nil, errors.New("the supporting model cannot run right now"))
 
 // SetModels lets Mimir use installed embedding and reranker models. Call it
 // before StartIndexing. Passing nil keeps search keyword-only.

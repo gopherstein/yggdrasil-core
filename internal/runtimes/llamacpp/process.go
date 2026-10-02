@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 	"github.com/yeixio/yggdrasil-core/pkg/pluginapi"
 )
 
@@ -68,7 +69,7 @@ func (r *Runtime) StartModel(ctx context.Context, cfg pluginapi.ModelStartConfig
 		return pluginapi.RunningModel{}, err
 	}
 	if !det.Installed {
-		return pluginapi.RunningModel{}, fmt.Errorf("llama-server not installed: %s", det.Message)
+		return pluginapi.RunningModel{}, contracts.Errorf("RUNTIME_NOT_INSTALLED", map[string]any{"runtime": "llama-server"}, "llama-server not installed: %s", det.Message)
 	}
 	if cfg.ModelPath == "" {
 		return pluginapi.RunningModel{}, fmt.Errorf("model path required")
@@ -247,7 +248,7 @@ func (r *Runtime) Health(ctx context.Context) error {
 		return err
 	}
 	if !det.Installed {
-		return fmt.Errorf("llama-server not installed: %s", det.Message)
+		return contracts.Errorf("RUNTIME_NOT_INSTALLED", map[string]any{"runtime": "llama-server"}, "llama-server not installed: %s", det.Message)
 	}
 	return nil
 }

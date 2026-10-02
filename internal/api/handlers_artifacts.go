@@ -40,10 +40,10 @@ func (s *Server) artifactHandler(h http.HandlerFunc) http.HandlerFunc {
 
 func writeArtifactErr(w http.ResponseWriter, err error) {
 	if errors.Is(err, artifacts.ErrNotFound) {
-		writeErr(w, http.StatusNotFound, "NOT_FOUND", err.Error(), nil)
+		writeErrFrom(w, http.StatusNotFound, "NOT_FOUND", err)
 		return
 	}
-	writeErr(w, http.StatusBadRequest, "BAD_REQUEST", err.Error(), nil)
+	writeErrFrom(w, http.StatusBadRequest, "BAD_REQUEST", err)
 }
 
 // handleUploadArtifact saves a file to attach to a chat. The body carries
@@ -65,7 +65,8 @@ func (s *Server) handleUploadArtifact(w http.ResponseWriter, r *http.Request) {
 	kept := artifacts.IsAudio(body.Name) || imagegen.IsEditable(body.Name)
 	if !kept && !mimir.Attachable(body.Name) {
 		writeErr(w, http.StatusBadRequest, "UNSUPPORTED_FILE",
-			fmt.Sprintf("Yggdrasil can't read %s yet. Attach a document, spreadsheet, PDF, code file, audio, or a PNG or JPEG image.", artifacts.CleanName(body.Name)), nil)
+			fmt.Sprintf("Yggdrasil can't read %s yet. Attach a document, spreadsheet, PDF, code file, audio, or a PNG or JPEG image.", artifacts.CleanName(body.Name)),
+			map[string]any{"name": artifacts.CleanName(body.Name)})
 		return
 	}
 	data := []byte(body.Text)
@@ -81,7 +82,8 @@ func (s *Server) handleUploadArtifact(w http.ResponseWriter, r *http.Request) {
 	// is attached rather than when the question is asked.
 	if !kept {
 		if _, err := mimir.FilePassages(body.Name, data); err != nil {
-			writeErr(w, http.StatusBadRequest, "UNREADABLE_FILE", fmt.Sprintf("Yggdrasil can't read %s: %s", artifacts.CleanName(body.Name), err.Error()), nil)
+			writeErr(w, http.StatusBadRequest, "UNREADABLE_FILE", fmt.Sprintf("Yggdrasil can't read %s: %s", artifacts.CleanName(body.Name), err.Error()),
+				map[string]any{"name": artifacts.CleanName(body.Name), "cause": err.Error()})
 			return
 		}
 	}

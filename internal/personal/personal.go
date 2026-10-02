@@ -11,6 +11,8 @@ import (
 	"regexp"
 	"strings"
 	"unicode/utf8"
+
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
 // Style is how the person likes answers.
@@ -42,7 +44,7 @@ var choices = map[string][]string{
 
 // ErrPermission is returned for a preference or memory that tries to grant
 // a permission, such as "you can always push without asking".
-var ErrPermission = errors.New("preferences and memories cannot grant permission to use tools. Change what tools may do in Settings › Tool permissions or in a profile")
+var ErrPermission = contracts.NewError("PREFERENCE_CANNOT_GRANT_TOOLS", nil, errors.New("preferences and memories cannot grant permission to use tools. Change what tools may do in Settings › Tool permissions or in a profile"))
 
 // Clean trims a style and checks it.
 func (s Style) Clean() (Style, error) {

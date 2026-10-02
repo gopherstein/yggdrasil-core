@@ -328,7 +328,7 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 		token, err := auth.BearerToken(r)
 		if err != nil {
 			if errors.Is(err, auth.ErrAPIKeyInURL) {
-				writeErr(w, http.StatusBadRequest, "API_KEY_IN_URL", err.Error(), nil)
+				writeErrFrom(w, http.StatusBadRequest, "API_KEY_IN_URL", err)
 				return
 			}
 			writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "authorization required", nil)
@@ -458,7 +458,7 @@ func (s *Server) handleRefreshNodes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := s.deps.RefreshDiscovery(r.Context()); err != nil {
-		writeErr(w, http.StatusBadRequest, "REFRESH_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "REFRESH_FAILED", err)
 		return
 	}
 	if s.deps.ListNodes == nil {
@@ -467,7 +467,7 @@ func (s *Server) handleRefreshNodes(w http.ResponseWriter, r *http.Request) {
 	}
 	items, err := s.deps.ListNodes(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "NODES_LIST_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "NODES_LIST_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, items)
@@ -510,6 +510,11 @@ func (s *Server) handlePatchSettings(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			if errors.Is(err, auth.ErrAPIKeyRequired) {
 				writeErr(w, http.StatusBadRequest, "API_KEY_REQUIRED", "Create an API key before allowing access from other computers.", nil)
+				return
+			}
+			// A setting with an invalid value says which, with its own code.
+			if code, _ := contracts.ErrorCode(err); code != "" {
+				writeErrFrom(w, http.StatusBadRequest, code, err)
 				return
 			}
 			writeErr(w, http.StatusInternalServerError, "SETTINGS_UPDATE_FAILED", "Could not update settings.", map[string]any{"cause": err.Error()})
@@ -619,7 +624,7 @@ func (s *Server) handleStartBenchmark(w http.ResponseWriter, r *http.Request) {
 	}
 	job, err := s.deps.StartBenchmark(r.Context(), req)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "BENCHMARK_START_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "BENCHMARK_START_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusAccepted, job)
@@ -705,7 +710,7 @@ func (s *Server) handleUpdateConversation(w http.ResponseWriter, r *http.Request
 	}
 	conv, err := s.deps.UpdateConversation(r.Context(), id, body.Title, body.ProfileID, body.ModelID, body.MemoryOff)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "CONVERSATION_UPDATE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "CONVERSATION_UPDATE_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, conv)
@@ -718,7 +723,7 @@ func (s *Server) handleDeleteConversation(w http.ResponseWriter, r *http.Request
 		return
 	}
 	if err := s.deps.DeleteConversation(r.Context(), id); err != nil {
-		writeErr(w, http.StatusBadRequest, "CONVERSATION_DELETE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "CONVERSATION_DELETE_FAILED", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -781,6 +786,17 @@ func writeErr(w http.ResponseWriter, status int, code, message string, details m
 	writeJSON(w, status, contracts.APIError{
 		Error: contracts.ErrorBody{Code: code, Message: message, Details: details},
 	})
+}
+
+// writeErrFrom writes err with its own stable code and params when it has
+// them (contracts.CodedError), and with code otherwise. The message is the
+// error's English text, for logs and for clients that do not know the code.
+func writeErrFrom(w http.ResponseWriter, status int, code string, err error) {
+	if own, params := contracts.ErrorCode(err); own != "" {
+		writeErr(w, status, own, err.Error(), params)
+		return
+	}
+	writeErr(w, status, code, err.Error(), nil)
 }
 
 func (s *Server) corsMiddleware(next http.Handler) http.Handler {

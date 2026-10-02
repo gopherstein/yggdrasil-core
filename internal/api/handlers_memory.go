@@ -31,16 +31,16 @@ func (s *Server) memoryHandler(h http.HandlerFunc) http.HandlerFunc {
 
 func writeMemoryErr(w http.ResponseWriter, err error) {
 	if errors.Is(err, muninn.ErrNotFound) {
-		writeErr(w, http.StatusNotFound, "NOT_FOUND", err.Error(), nil)
+		writeErrFrom(w, http.StatusNotFound, "NOT_FOUND", err)
 		return
 	}
-	writeErr(w, http.StatusBadRequest, "BAD_REQUEST", err.Error(), nil)
+	writeErrFrom(w, http.StatusBadRequest, "BAD_REQUEST", err)
 }
 
 func (s *Server) handleListMemory(w http.ResponseWriter, r *http.Request) {
 	items, err := s.memory.List(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "INTERNAL_ERROR", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"memories": items, "categories": muninn.Categories})

@@ -16,6 +16,8 @@ import (
 	"unicode"
 
 	"github.com/google/uuid"
+
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
 // Producers.
@@ -28,7 +30,7 @@ const (
 const MaxBytes = 25 << 20
 
 // ErrNotFound is returned for an unknown artifact.
-var ErrNotFound = errors.New("file not found")
+var ErrNotFound = contracts.NewError("FILE_NOT_FOUND", nil, errors.New("file not found"))
 
 // Artifact is one stored file.
 type Artifact struct {

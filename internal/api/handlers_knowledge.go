@@ -46,10 +46,10 @@ func (s *Server) knowledgeReady(w http.ResponseWriter) bool {
 
 func writeKnowledgeErr(w http.ResponseWriter, err error) {
 	if errors.Is(err, mimir.ErrNotFound) {
-		writeErr(w, http.StatusNotFound, "NOT_FOUND", err.Error(), nil)
+		writeErrFrom(w, http.StatusNotFound, "NOT_FOUND", err)
 		return
 	}
-	writeErr(w, http.StatusBadRequest, "BAD_REQUEST", err.Error(), nil)
+	writeErrFrom(w, http.StatusBadRequest, "BAD_REQUEST", err)
 }
 
 func (s *Server) handleListKnowledge(w http.ResponseWriter, r *http.Request) {
@@ -58,7 +58,7 @@ func (s *Server) handleListKnowledge(w http.ResponseWriter, r *http.Request) {
 	}
 	items, err := s.knowledge.List(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "INTERNAL_ERROR", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, items)

@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
 // ErrAPIKeyRequired means a non-loopback listener has no API key configured.
-var ErrAPIKeyRequired = errors.New("create an API key before listening beyond loopback")
+var ErrAPIKeyRequired = contracts.NewError("API_KEY_REQUIRED", nil, errors.New("create an API key before listening beyond loopback"))
 
 // ErrAPIKeyInURL means the caller put a credential in the request URL.
-var ErrAPIKeyInURL = errors.New("send the API key as Authorization: Bearer, not in the URL")
+var ErrAPIKeyInURL = contracts.NewError("API_KEY_IN_URL", nil, errors.New("send the API key as Authorization: Bearer, not in the URL"))
 
 // BearerToken reads an API key from the Authorization header.
 // Keys in the query string are rejected and are not accepted as credentials.

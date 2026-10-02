@@ -41,7 +41,7 @@ func (s *Server) handleSpeech(w http.ResponseWriter, r *http.Request) {
 	ctx := artifacts.WithConversation(r.Context(), body.ConversationID)
 	a, seconds, err := speech.SaveSpeech(ctx, s.speech, s.speechStore, body.Text, body.Voice, "read-aloud")
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "SPEECH_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "SPEECH_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"artifact": a, "seconds": seconds})

@@ -97,7 +97,7 @@ describe('streamChat with the relay', () => {
     const onError = vi.fn()
     const onDone = vi.fn()
     await streamChat({ body: { conversation_id: 'c1', message: 'hi' }, onToken: () => {}, onDone, onError })
-    expect(onError).toHaveBeenCalledWith('The model failed.')
+    expect(onError).toHaveBeenCalledWith('The model failed.', undefined)
     expect(onDone).not.toHaveBeenCalled()
     expect(relay.listening()).toBe(0)
   })

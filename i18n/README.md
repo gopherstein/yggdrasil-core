@@ -28,6 +28,7 @@ i18n/
     profiles.json           AI profiles, their strategies, tools, and orchestrators
     diagnostics.json        the health page, logs, caches, and what Yggdrasil can do
     lore.json               the Norse names' stories, the mascot, and the logo
+    errors.json             what each error code from the service means
 ```
 
 The desktop app's shell copies this folder when it builds and reads
@@ -51,6 +52,18 @@ before it is complete.
 - Plurals use i18next suffixes: `key_one`, `key_other`, and `key_zero`,
   `key_two`, `key_few`, or `key_many` where a language needs them. English
   has `_one` and `_other`.
+
+## Errors
+
+The service sends errors with a stable code, such as `MODEL_NOT_INSTALLED`,
+and the values the message needs, such as `{{model_id}}`. `errors.json` has
+the text for each code; the web UI shows it in the App language and keeps the
+service's English text for Diagnostics. A Go test fails when core sends a
+code that `errors.json` lacks, or when `errors.json` has a code nothing sends.
+
+`{{detail}}` is the service's own text, usually English and technical: an
+entry that is only `{{detail}}` passes it on, because the page around it
+already says what failed. Keep those as `{{detail}}`.
 
 ## Numbers, dates, and sizes
 

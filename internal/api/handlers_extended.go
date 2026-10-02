@@ -20,7 +20,7 @@ func (s *Server) handleRecommendModels(w http.ResponseWriter, r *http.Request) {
 	purpose := r.URL.Query().Get("purpose")
 	rec, err := s.deps.RecommendModels(r.Context(), purpose)
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "RECOMMEND_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "RECOMMEND_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, rec)
@@ -33,7 +33,7 @@ func (s *Server) handleModelsFit(w http.ResponseWriter, r *http.Request) {
 	}
 	items, err := s.deps.ModelsFit(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "FIT_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "FIT_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, items)
@@ -53,7 +53,7 @@ func (s *Server) handleBrowseModels(w http.ResponseWriter, r *http.Request) {
 	}
 	items, err := s.deps.BrowseModels(r.Context(), q, limit)
 	if err != nil {
-		writeErr(w, http.StatusBadGateway, "BROWSE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadGateway, "BROWSE_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, items)
@@ -66,7 +66,7 @@ func (s *Server) handleListRunningModels(w http.ResponseWriter, r *http.Request)
 	}
 	items, err := s.deps.ListRunningModels(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "RUNNING_LIST_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "RUNNING_LIST_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, items)
@@ -85,7 +85,7 @@ func (s *Server) handleInstallFromURL(w http.ResponseWriter, r *http.Request) {
 	wait := r.URL.Query().Get("wait") == "true"
 	id, err := s.deps.InstallModelFromURL(r.Context(), req, wait)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "INSTALL_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "INSTALL_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"status": "started", "model_id": id})
@@ -114,7 +114,7 @@ func (s *Server) handleInstallModel(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if err := s.deps.InstallModel(r.Context(), id, wait, nodeID); err != nil {
-		writeErr(w, http.StatusBadRequest, "INSTALL_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "INSTALL_FAILED", err)
 		return
 	}
 	status := "started"
@@ -134,7 +134,7 @@ func (s *Server) handleStartModel(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&body)
 	view, err := s.deps.StartModel(r.Context(), id, body.NodeID)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "START_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "START_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, view)
@@ -153,7 +153,7 @@ func (s *Server) handleStopModel(w http.ResponseWriter, r *http.Request) {
 		instanceID = id
 	}
 	if err := s.deps.StopModel(r.Context(), instanceID, body.NodeID); err != nil {
-		writeErr(w, http.StatusBadRequest, "STOP_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "STOP_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"ok": true})
@@ -175,7 +175,7 @@ func (s *Server) handleDeleteModel(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if err := s.deps.DeleteModel(r.Context(), id, nodeID); err != nil {
-		writeErr(w, http.StatusBadRequest, "DELETE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "DELETE_FAILED", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -188,7 +188,7 @@ func (s *Server) handleListRuntimes(w http.ResponseWriter, r *http.Request) {
 	}
 	items, err := s.deps.ListRuntimes(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "RUNTIMES_LIST_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "RUNTIMES_LIST_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, items)
@@ -201,7 +201,7 @@ func (s *Server) handleInstallRuntime(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := s.deps.InstallRuntime(r.Context(), id); err != nil {
-		writeErr(w, http.StatusBadRequest, "INSTALL_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "INSTALL_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"status": "installed", "runtime_id": id})
@@ -219,7 +219,7 @@ func (s *Server) handleCreateProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	out, err := s.deps.CreateProfile(r.Context(), p)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "PROFILE_CREATE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "PROFILE_CREATE_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusCreated, out)
@@ -233,7 +233,7 @@ func (s *Server) handleGetProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	p, err := s.deps.GetProfile(r.Context(), id)
 	if err != nil {
-		writeErr(w, http.StatusNotFound, "NOT_FOUND", err.Error(), nil)
+		writeErrFrom(w, http.StatusNotFound, "NOT_FOUND", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, p)
@@ -253,7 +253,7 @@ func (s *Server) handlePatchProfile(w http.ResponseWriter, r *http.Request) {
 	p.ID = id
 	out, err := s.deps.UpdateProfile(r.Context(), p)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "PROFILE_UPDATE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "PROFILE_UPDATE_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, out)
@@ -266,7 +266,7 @@ func (s *Server) handleDeleteProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := s.deps.DeleteProfile(r.Context(), id); err != nil {
-		writeErr(w, http.StatusBadRequest, "DELETE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "DELETE_FAILED", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -281,7 +281,7 @@ func (s *Server) handleResetProfile(w http.ResponseWriter, r *http.Request) {
 	}
 	p, err := s.deps.ResetProfile(r.Context(), mux.Vars(r)["id"])
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "RESET_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "RESET_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, p)
@@ -310,7 +310,7 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 	}
 	r = r.WithContext(huginn.WithEffort(artifacts.WithAttachments(r.Context(), body.Attachments), huginn.ParseEffort(body.Effort)))
 	if err := s.deps.Chat(w, r, body.ConversationID, body.ProfileID, body.ModelID, body.Message, body.Stream, body.Execution); err != nil {
-		writeErr(w, http.StatusInternalServerError, "CHAT_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "CHAT_FAILED", err)
 	}
 }
 
@@ -340,7 +340,7 @@ func (s *Server) handleConversationMessages(w http.ResponseWriter, r *http.Reque
 	}
 	msgs, err := s.deps.ListMessages(r.Context(), id)
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "MESSAGES_LIST_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "MESSAGES_LIST_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, msgs)
@@ -353,7 +353,7 @@ func (s *Server) handleListTasks(w http.ResponseWriter, r *http.Request) {
 	}
 	items, err := s.deps.ListTasks(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "TASKS_LIST_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "TASKS_LIST_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, items)
@@ -375,7 +375,7 @@ func (s *Server) handleCreateTask(w http.ResponseWriter, r *http.Request) {
 	}
 	task, err := s.deps.CreateTask(r.Context(), body.ProfileID, body.ConversationID, body.Prompt)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "TASK_CREATE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "TASK_CREATE_FAILED", err)
 		return
 	}
 	if s.deps.RunTask != nil {
@@ -392,7 +392,7 @@ func (s *Server) handleGetTask(w http.ResponseWriter, r *http.Request) {
 	}
 	task, err := s.deps.GetTask(r.Context(), id)
 	if err != nil {
-		writeErr(w, http.StatusNotFound, "NOT_FOUND", err.Error(), nil)
+		writeErrFrom(w, http.StatusNotFound, "NOT_FOUND", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, task)
@@ -413,7 +413,7 @@ func (s *Server) handleToolDecide(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := s.deps.DecideTool(body.RequestID, body.Allow, body.AllowSession); err != nil {
-		writeErr(w, http.StatusBadRequest, "DECIDE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "DECIDE_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"status": "ok"})
@@ -433,7 +433,7 @@ func (s *Server) handlePairNode(w http.ResponseWriter, r *http.Request) {
 	}
 	session, err := s.deps.StartPairing(body.NodeID)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "PAIR_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "PAIR_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, session)
@@ -454,7 +454,7 @@ func (s *Server) handleClaimPairing(w http.ResponseWriter, r *http.Request) {
 	}
 	session, err := s.deps.ClaimPairing(r.Context(), body.NodeID, body.Code)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "CLAIM_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "CLAIM_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, session)
@@ -472,7 +472,7 @@ func (s *Server) handleReceivePairingOffer(w http.ResponseWriter, r *http.Reques
 	}
 	session, err := s.deps.ReceivePairingOffer(offer)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "OFFER_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "OFFER_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, session)
@@ -521,7 +521,7 @@ func (s *Server) handleApprovePairing(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&body)
 	session, err := s.deps.ApprovePairing(r.Context(), id, body.Code)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "APPROVE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "APPROVE_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, session)
@@ -542,7 +542,7 @@ func (s *Server) handleRevokeNode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := s.deps.RevokeNode(r.Context(), id); err != nil {
-		writeErr(w, http.StatusBadRequest, "REVOKE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "REVOKE_FAILED", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -555,7 +555,7 @@ func (s *Server) handleListAPIKeys(w http.ResponseWriter, r *http.Request) {
 	}
 	items, err := s.deps.ListAPIKeys(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "API_KEYS_LIST_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "API_KEYS_LIST_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, items)
@@ -572,7 +572,7 @@ func (s *Server) handleCreateAPIKey(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&body)
 	rec, secret, err := s.deps.CreateAPIKey(r.Context(), body.Name)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "CREATE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "CREATE_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusCreated, map[string]any{"key": rec, "secret": secret})
@@ -585,7 +585,7 @@ func (s *Server) handleDeleteAPIKey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := s.deps.RevokeAPIKey(r.Context(), id); err != nil {
-		writeErr(w, http.StatusBadRequest, "REVOKE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "REVOKE_FAILED", err)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -599,7 +599,7 @@ func (s *Server) handleRotateAPIKey(w http.ResponseWriter, r *http.Request) {
 	}
 	rec, secret, err := s.deps.RotateAPIKey(r.Context(), id)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "ROTATE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "ROTATE_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"key": rec, "secret": secret})
@@ -618,7 +618,7 @@ func (s *Server) handleSetAPIKeyPermissions(w http.ResponseWriter, r *http.Reque
 	}
 	rec, err := s.deps.SetAPIKeyPermissions(r.Context(), mux.Vars(r)["id"], p)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "PERMISSIONS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "PERMISSIONS_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, rec)

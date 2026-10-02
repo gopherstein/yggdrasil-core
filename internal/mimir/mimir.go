@@ -19,6 +19,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
 // Kind is how a source's content reaches Mimir.
@@ -40,7 +42,7 @@ const (
 )
 
 // ErrNotFound is returned for an unknown source id.
-var ErrNotFound = errors.New("knowledge source not found")
+var ErrNotFound = contracts.NewError("KNOWLEDGE_SOURCE_NOT_FOUND", nil, errors.New("knowledge source not found"))
 
 // Source is one connected knowledge source.
 type Source struct {

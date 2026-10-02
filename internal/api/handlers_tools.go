@@ -15,7 +15,7 @@ func (s *Server) handleListTools(w http.ResponseWriter, r *http.Request) {
 	}
 	list, err := s.deps.ListTools(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "TOOLS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "TOOLS_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, list)
@@ -53,7 +53,7 @@ func (s *Server) handleSetToolEnabled(w http.ResponseWriter, r *http.Request) {
 	}
 	id := mux.Vars(r)["id"]
 	if err := s.deps.SetToolEnabled(r.Context(), id, body.Enabled); err != nil {
-		writeErr(w, http.StatusBadRequest, "TOOL_UPDATE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "TOOL_UPDATE_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"id": id, "enabled": body.Enabled})
@@ -73,7 +73,7 @@ func (s *Server) handleTestTool(w http.ResponseWriter, r *http.Request) {
 	}
 	result, err := s.deps.TestTool(r.Context(), mux.Vars(r)["id"], body.Args)
 	if err != nil {
-		writeErr(w, http.StatusBadRequest, "TOOL_TEST_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "TOOL_TEST_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, result)
@@ -87,7 +87,7 @@ func (s *Server) handleDescribeTool(w http.ResponseWriter, r *http.Request) {
 	}
 	d, err := s.deps.DescribeTool(r.Context(), mux.Vars(r)["id"])
 	if err != nil {
-		writeErr(w, http.StatusNotFound, "NOT_FOUND", err.Error(), nil)
+		writeErrFrom(w, http.StatusNotFound, "NOT_FOUND", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, d)
@@ -102,7 +102,7 @@ func (s *Server) handleToolRuns(w http.ResponseWriter, r *http.Request) {
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	runs, err := s.deps.ListToolRuns(r.Context(), r.URL.Query().Get("tool_id"), r.URL.Query().Get("conversation_id"), limit)
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "TOOLS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "TOOLS_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, runs)

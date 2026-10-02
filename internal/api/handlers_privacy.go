@@ -54,7 +54,7 @@ func (s *Server) handleListEgress(w http.ResponseWriter, r *http.Request) {
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
 	list, err := s.privacy.EgressRecords(r.Context(), egress.Filter{ConversationID: r.URL.Query().Get("conversation_id"), Limit: limit})
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "EGRESS_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "EGRESS_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, list)
@@ -63,7 +63,7 @@ func (s *Server) handleListEgress(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleGetPrivacy(w http.ResponseWriter, r *http.Request) {
 	o, err := s.privacy.PrivacyOverview(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "PRIVACY_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "PRIVACY_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, o)
@@ -79,7 +79,7 @@ func (s *Server) handlePutPrivacy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := s.privacy.SetRunRetention(r.Context(), *in.RetentionDays); err != nil {
-		writeErr(w, http.StatusBadRequest, "INVALID_RETENTION", err.Error(), nil)
+		writeErrFrom(w, http.StatusBadRequest, "INVALID_RETENTION", err)
 		return
 	}
 	s.handleGetPrivacy(w, r)
@@ -89,7 +89,7 @@ func (s *Server) handlePutPrivacy(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleDeleteRuns(w http.ResponseWriter, r *http.Request) {
 	c, err := s.privacy.DeleteRunRecords(r.Context())
 	if err != nil {
-		writeErr(w, http.StatusInternalServerError, "DELETE_FAILED", err.Error(), nil)
+		writeErrFrom(w, http.StatusInternalServerError, "DELETE_FAILED", err)
 		return
 	}
 	writeJSON(w, http.StatusOK, c)
