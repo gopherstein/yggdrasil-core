@@ -1,14 +1,24 @@
 /** File types knowledge and training material accept. */
 export const UPLOAD_ACCEPT = '.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm,.xlsx,.pdf'
 
-const BINARY = ['.xlsx', '.pdf']
+/** Audio chat can play and transcribe. */
+export const AUDIO_ACCEPT = '.wav,.mp3,.m4a,.aac,.ogg,.flac,.webm'
+
+const BINARY = ['.xlsx', '.pdf', ...AUDIO_ACCEPT.split(',')]
 
 export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 
-/** File types chat can read: documents, spreadsheets, PDFs, and code. */
+/** File types chat can read: documents, spreadsheets, PDFs, code, and audio. */
 export const ATTACH_ACCEPT =
   UPLOAD_ACCEPT +
-  ',.py,.js,.ts,.tsx,.jsx,.go,.rs,.java,.kt,.c,.h,.cpp,.hpp,.cs,.rb,.php,.swift,.sh,.sql,.yaml,.yml,.toml,.xml,.css,.ini,.log'
+  ',.py,.js,.ts,.tsx,.jsx,.go,.rs,.java,.kt,.c,.h,.cpp,.hpp,.cs,.rb,.php,.swift,.sh,.sql,.yaml,.yml,.toml,.xml,.css,.ini,.log,' +
+  AUDIO_ACCEPT
+
+/** Whether a file is audio, by its name. */
+export function isAudioName(filename: string): boolean {
+  const dot = filename.lastIndexOf('.')
+  return dot >= 0 && AUDIO_ACCEPT.split(',').includes(filename.slice(dot).toLowerCase())
+}
 
 export const MAX_ATTACH_BYTES = 25 * 1024 * 1024
 

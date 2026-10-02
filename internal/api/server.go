@@ -28,6 +28,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/models"
 	"github.com/yeixio/yggdrasil-core/internal/muninn"
 	"github.com/yeixio/yggdrasil-core/internal/runtimes"
+	"github.com/yeixio/yggdrasil-core/internal/speech"
 	"github.com/yeixio/yggdrasil-core/internal/training"
 	"github.com/yeixio/yggdrasil-core/internal/version"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
@@ -130,6 +131,8 @@ type Server struct {
 	knowledge       KnowledgeService
 	memory          *muninn.Store
 	artifacts       *artifacts.Store
+	speech          *speech.Engine
+	speechStore     *artifacts.Store
 	notifications   *gjallarhorn.Hub
 	connectors      *connectors.Manager
 	mcp             *mcp.Manager
@@ -251,6 +254,7 @@ func (s *Server) routes() {
 	s.capabilityRoutes(api)
 	s.cacheRoutes(api)
 	s.trainingRoutes(api)
+	s.speechRoutes(api)
 
 	s.mcpRootRoutes(s.router)
 

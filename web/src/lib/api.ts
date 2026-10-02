@@ -86,6 +86,7 @@ import type {
   MemoryCategory,
   MemoryItem,
   Artifact,
+  SpeechResult,
   FileRef,
   StopChatResponse,
 } from '@/types/api'
@@ -259,6 +260,15 @@ export async function downloadArtifact(file: Pick<FileRef, 'id' | 'name'>): Prom
   link.click()
   link.remove()
   setTimeout(() => URL.revokeObjectURL(url), 10_000)
+}
+
+/** A stored file's contents as a URL the page can play or show; revoke it when done. */
+export async function artifactObjectUrl(id: string): Promise<string> {
+  const response = await fetch(`${getApiBase()}/api/v1/artifacts/${id}/content?inline=1`, { headers: authHeaders() })
+  if (!response.ok) {
+    throw new ApiError(response.status, response.status === 404 ? 'This file is no longer available.' : response.statusText)
+  }
+  return URL.createObjectURL(await response.blob())
 }
 
 export async function streamChat({
@@ -694,6 +704,13 @@ export const api = {
         content_base64: upload.contentBase64,
         conversation_id: conversationId,
       }),
+    }),
+
+  /** Read text aloud on this computer; the audio is kept as a file in the chat. */
+  readAloud: (text: string, conversationId?: string) =>
+    request<SpeechResult>('/api/v1/speech', {
+      method: 'POST',
+      body: JSON.stringify({ text, conversation_id: conversationId }),
     }),
 
   /** Stop a conversation's running turn on the computer running it; what was written is kept. */

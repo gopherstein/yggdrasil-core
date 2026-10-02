@@ -56,6 +56,8 @@ var timeouts = map[string]time.Duration{
 	// The first call installs the code environment; each run is held to
 	// its own, shorter limit.
 	CapCode: 10 * time.Minute,
+	// The first call installs speech and downloads a model.
+	CapSpeech: 15 * time.Minute,
 }
 
 const defaultTimeout = time.Minute

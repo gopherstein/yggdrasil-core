@@ -91,6 +91,8 @@ func generalToolPolicies() []contracts.ToolPolicy {
 		{ToolID: "files.create", Policy: "allow"},
 		{ToolID: "spreadsheet.analyze", Policy: "allow"},
 		{ToolID: "code.execute", Policy: "ask"},
+		{ToolID: "speech.transcribe", Policy: "allow"},
+		{ToolID: "speech.synthesize", Policy: "allow"},
 		{ToolID: "terminal", Policy: "allow"},
 		{ToolID: "git.status", Policy: "allow"},
 		{ToolID: "git.diff", Policy: "allow"},
@@ -112,6 +114,8 @@ func codingToolPolicies() []contracts.ToolPolicy {
 		{ToolID: "files.create", Policy: "allow"},
 		{ToolID: "spreadsheet.analyze", Policy: "allow"},
 		{ToolID: "code.execute", Policy: "ask"},
+		{ToolID: "speech.transcribe", Policy: "allow"},
+		{ToolID: "speech.synthesize", Policy: "allow"},
 		{ToolID: "terminal", Policy: "allow"},
 		{ToolID: "git.status", Policy: "allow"},
 		{ToolID: "git.diff", Policy: "allow"},
@@ -133,6 +137,8 @@ func researchToolPolicies() []contracts.ToolPolicy {
 		{ToolID: "files.create", Policy: "allow"},
 		{ToolID: "spreadsheet.analyze", Policy: "allow"},
 		{ToolID: "code.execute", Policy: "ask"},
+		{ToolID: "speech.transcribe", Policy: "allow"},
+		{ToolID: "speech.synthesize", Policy: "allow"},
 		{ToolID: "terminal", Policy: "deny"},
 		{ToolID: "git.status", Policy: "allow"},
 		{ToolID: "git.diff", Policy: "deny"},
@@ -146,7 +152,8 @@ func offlineToolPolicies() []contracts.ToolPolicy {
 	policies := generalToolPolicies()
 	for i := range policies {
 		// Files stay on this computer, so they work offline.
-		if strings.HasPrefix(policies[i].ToolID, "filesystem.") || policies[i].ToolID == "files.create" || policies[i].ToolID == "spreadsheet.analyze" {
+		if strings.HasPrefix(policies[i].ToolID, "filesystem.") || policies[i].ToolID == "files.create" || policies[i].ToolID == "spreadsheet.analyze" ||
+			strings.HasPrefix(policies[i].ToolID, "speech.") {
 			policies[i].Policy = "allow"
 			continue
 		}

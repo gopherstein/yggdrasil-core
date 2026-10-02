@@ -16,6 +16,8 @@ const (
 	CapGit      = "git"
 	// CapCode runs code in a sandbox (Gungnir §20).
 	CapCode = "code"
+	// CapSpeech transcribes audio and reads text aloud (Gungnir §18–19).
+	CapSpeech = "speech"
 )
 
 // Definition is one registered tool: built in, from a connected service,
@@ -81,6 +83,10 @@ func BuiltinCatalog() []Definition {
 		{ID: "filesystem.write", Name: "Write File", Description: "Create or replace a file in the workspace.", Capability: CapFiles, Source: "builtin", Schema: `{"path":"string","content":"string"}`, DefaultPolicy: PolicyAllow, Risk: "write"},
 		{ID: "files.create", Name: "Create File", Description: "Create a file the user can download: a Word document (.docx) or PDF (.pdf) written in Markdown, a document (.md, .txt, .html), data (.json, .csv), a spreadsheet (.xlsx, given as CSV text; a line \"## Sheet: Name\" starts another sheet, and a cell starting with = is a formula), or code. Use it when the user asks for a file, a spreadsheet, a PDF, or a document.", Capability: CapFiles, Source: "builtin", Schema: `{"name":"string","content":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskCreate},
 		{ID: "spreadsheet.analyze", Name: "Analyze Spreadsheet", Description: "Summarize a spreadsheet (.xlsx, .csv) attached to or made in this chat: each sheet's rows, and each column's type, count, minimum, maximum, average, and total, or its most common values, with the first rows. Use it to answer questions about a spreadsheet's whole contents.", Capability: CapFiles, Source: "builtin", Schema: `{"file":"string","sheet":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskRead},
+		{ID: "speech.transcribe", Name: "Transcribe Audio", Description: "Transcribe an audio file (.wav, .mp3, .m4a, .ogg, .flac, .webm) attached to this chat, on this computer: what it says, its language, and timed segments. \"quality\" is fast (default) or accurate; \"language\" is a code such as de, or empty to detect it.", Capability: CapSpeech, Source: "builtin", Schema: `{"file":"string","quality":"string","language":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskRead,
+			Runtime: "python", Outputs: []string{OutputText}},
+		{ID: "speech.synthesize", Name: "Read Aloud", Description: "Read text aloud, on this computer, as an audio file attached to the answer that can be played. Use it when the user asks to hear something, or for narration. \"voice\" is a Piper voice such as en_US-lessac-medium (default) or de_DE-thorsten-medium.", Capability: CapSpeech, Source: "builtin", Schema: `{"text":"string","voice":"string","name":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskCreate,
+			Runtime: "python", Outputs: []string{OutputAudio}},
 		{ID: "code.execute", Name: "Run Code", Description: "Run Python in a sandbox for calculations, data analysis, and charts, with numpy, pandas, and matplotlib. It has no network and sees only files you list from this chat (\"files\": [\"sales.xlsx\"]), read from its working folder. Print results; files it saves there (.png, .csv, .xlsx, .pdf, and so on) are attached to the answer. Use matplotlib's savefig for charts.", Capability: CapCode, Source: "builtin", Schema: `{"code":"string","files":"array"}`, DefaultPolicy: PolicyAsk, Risk: RiskWrite,
 			Level: LevelHighImpact, Runtime: "python", Outputs: []string{OutputText, OutputFile}},
 		{ID: "terminal", Name: "Terminal", Description: "Run a shell command on this computer.", Capability: CapShell, Source: "builtin", Schema: `{"command":"string"}`, DefaultPolicy: PolicyAllow, Risk: "write"},

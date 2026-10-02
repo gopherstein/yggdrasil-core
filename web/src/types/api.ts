@@ -339,7 +339,7 @@ export interface FileRef {
   id: string
   name: string
   mime_type: string
-  /** document, spreadsheet, pdf, image, code, or other */
+  /** document, spreadsheet, pdf, image, code, audio, or other */
   kind: string
   size_bytes: number
   producer: 'user' | 'assistant'
@@ -348,6 +348,12 @@ export interface FileRef {
 export interface Artifact extends FileRef {
   conversation_id?: string
   created_at: string
+}
+
+/** Text read aloud: the audio file and its length. */
+export interface SpeechResult {
+  artifact: Artifact
+  seconds: number
 }
 
 export interface Message {

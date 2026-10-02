@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/yeixio/yggdrasil-core/internal/contextusage"
@@ -111,7 +112,13 @@ func (o *Orchestrator) Run(
 		env.Emit(EventEffort, map[string]any{"effort": string(budget.Effort), "chosen": string(huginn.EffortFrom(ctx))})
 		// Offer only the tools this request needs (spec §16). The profile
 		// still decides what is allowed; this decides what is shown.
-		profile = offerOnly(profile, huginn.ToolsFor(kind, task.Prompt, enabledIDs(profile)))
+		offered := huginn.ToolsFor(kind, task.Prompt, enabledIDs(profile))
+		// An attached audio file is transcribed when the profile allows it,
+		// whatever the message says ("summarize this").
+		if strings.Contains(reference, "call speech.transcribe") && slices.Contains(enabledIDs(profile), "speech.transcribe") && !slices.Contains(offered, "speech.transcribe") {
+			offered = append(offered, "speech.transcribe")
+		}
+		profile = offerOnly(profile, offered)
 		// A request with several parts is worked through part by part;
 		// otherwise a current question is looked up first.
 		planned := false

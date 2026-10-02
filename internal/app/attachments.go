@@ -61,6 +61,9 @@ func fileRefs(list []artifacts.Artifact) []contracts.FileRef {
 // attached or made earlier in the chat, as reference material, so "add a
 // column to that spreadsheet" works on a file the assistant produced. It
 // returns "" when the chat has no files.
+// AudioToolID is the tool an audio attachment's note points to.
+const AudioToolID = "speech.transcribe"
+
 func (e *chatExecEnv) attachmentBlock(ctx context.Context, prompt string) string {
 	if e.app == nil || e.app.Artifacts == nil || e.conversationID == "" {
 		return ""
@@ -107,6 +110,11 @@ func (e *chatExecEnv) attachmentBlock(ctx context.Context, prompt string) string
 				label = "you made earlier in this chat"
 			default:
 				label = "attached earlier in this chat by the user"
+			}
+			if artifacts.IsAudio(art.Name) {
+				// Audio is not text; the model transcribes it when it needs to.
+				fmt.Fprintf(&b, "\nAudio file %s: %s. To know what it says, call %s with {\"file\": %q}.\n", label, art.Name, AudioToolID, art.Name)
+				continue
 			}
 			passages, err := mimir.FilePassages(art.Name, data)
 			if err != nil {

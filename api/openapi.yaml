@@ -1786,6 +1786,40 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Artifact"
+  /api/v1/speech:
+    post:
+      summary: Read text aloud on this computer; the audio is kept as a file in the chat
+      operationId: readAloud
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text: {type: string, maxLength: 5000}
+                voice: {type: string, description: "A Piper voice, such as en_US-lessac-medium (default)"}
+                conversation_id: {type: string}
+      responses:
+        "200":
+          description: The audio file and its length in seconds
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  artifact:
+                    $ref: "#/components/schemas/Artifact"
+                  seconds: {type: number}
+        "400":
+          description: Invalid text or voice, or reading failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "503":
+          description: Speech cannot run on this computer
   /api/v1/artifacts:
     post:
       summary: Upload a file to attach to a chat (up to 25 MB)

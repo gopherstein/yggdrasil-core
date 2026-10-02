@@ -27,6 +27,7 @@ import { ChatHistoryDrawer, useCanPinChatHistory } from './ChatHistoryDrawer'
 import { AnswerDetails } from './AnswerDetails'
 import { FileChip, PendingFileChip, type PendingFile } from './FileChips'
 import { MemoryToggle } from './MemoryToggle'
+import { ReadAloudButton } from './ReadAloud'
 import { ChatErrorCard } from './ChatErrorCard'
 import { ChatMarkdown } from './ChatMarkdown'
 import { ContextUsageButton } from './ContextUsageButton'
@@ -286,6 +287,15 @@ export function ChatPage() {
     retry: false,
     staleTime: 60_000,
   })
+  const toolsQuery = useQuery({
+    queryKey: ['tools'],
+    queryFn: () => api.listTools(),
+    retry: false,
+    staleTime: 60_000,
+  })
+  // Read aloud runs on this computer, where speech can be installed.
+  const speechTool = toolsQuery.data?.find((t) => t.id === 'speech.synthesize')
+  const canReadAloud = !!speechTool && speechTool.health !== 'unavailable'
 
   const messagesQuery = useQuery({
     queryKey: ['messages', selectedId],
@@ -1538,6 +1548,11 @@ export function ChatPage() {
                       <>
                         <ChatMarkdown text={text} />
                         <AnswerDetails meta={message.meta} />
+                        {canReadAloud ? (
+                          <div className="mt-2">
+                            <ReadAloudButton text={text} conversationId={message.conversation_id} />
+                          </div>
+                        ) : null}
                       </>
                     ) : (
                       <>

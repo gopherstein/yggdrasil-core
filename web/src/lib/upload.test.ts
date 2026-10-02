@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isAttachable, isBinaryUpload, readUpload } from './upload'
+import { isAttachable, isAudioName, isBinaryUpload, readUpload } from './upload'
 
 // jsdom's File lacks text() and arrayBuffer(), which browsers provide.
 function fakeFile(name: string, bytes: number[]): File {
@@ -28,5 +28,9 @@ describe('readUpload', () => {
     expect(isAttachable('main.go')).toBe(true)
     expect(isAttachable('photo.png')).toBe(false)
     expect(isAttachable('README')).toBe(false)
+    expect(isAttachable('Voice Memo.m4a')).toBe(true)
+    expect(isBinaryUpload('memo.MP3')).toBe(true)
+    expect(isAudioName('memo.wav')).toBe(true)
+    expect(isAudioName('notes.md')).toBe(false)
   })
 })

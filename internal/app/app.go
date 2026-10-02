@@ -53,6 +53,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/runtimes/llamacpp"
 	"github.com/yeixio/yggdrasil-core/internal/scheduler"
 	"github.com/yeixio/yggdrasil-core/internal/share"
+	"github.com/yeixio/yggdrasil-core/internal/speech"
 	"github.com/yeixio/yggdrasil-core/internal/store"
 	"github.com/yeixio/yggdrasil-core/internal/store/repositories"
 	"github.com/yeixio/yggdrasil-core/internal/tasks"
@@ -123,6 +124,8 @@ type App struct {
 	memTotal atomic.Uint64
 	// failedModels maps a model id to when it last could not answer.
 	failedModels sync.Map
+	// Speech transcribes audio and reads text aloud (Gungnir §18–19).
+	Speech *speech.Engine
 	// health turns computer and model health changes into notifications.
 	health *healthNotices
 	// runs maps a conversation id to its running turn, so Stop can cancel it.
@@ -630,6 +633,11 @@ func New(opts Options) (*App, error) {
 	// Code runs only inside the operating system's sandbox (Gungnir §20).
 	a.Tools.Register(&codeexec.Tool{Python: a.python, Sandbox: codeexec.Detect(), Store: a.Artifacts,
 		WorkDir: filepath.Join(cfg.DataDir, "code-runs"), PythonRoot: a.python.Root})
+	// Speech runs on this computer; models are kept with the runtimes.
+	a.Speech = &speech.Engine{Python: a.python, Dir: filepath.Join(cfg.RuntimesDir, "speech")}
+	a.Tools.Register(&speech.TranscribeTool{Engine: a.Speech, Store: a.Artifacts})
+	a.Tools.Register(&speech.SynthesizeTool{Engine: a.Speech, Store: a.Artifacts})
+	a.API.BindSpeech(a.Speech, a.Artifacts)
 	a.Mimir.SetModels(newKnowledgeModels(a))
 	a.Muninn = muninn.NewStore(db.SQL)
 	a.summarizer = &muninn.Summarizer{Store: a.Muninn}

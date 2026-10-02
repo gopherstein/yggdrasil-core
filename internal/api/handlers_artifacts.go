@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -58,9 +59,11 @@ func (s *Server) handleUploadArtifact(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "The file could not be read. Files can be up to 25 MB.", nil)
 		return
 	}
-	if !mimir.Attachable(body.Name) {
+	// Audio is kept as it is, to be played and transcribed (speech.transcribe).
+	audio := artifacts.IsAudio(body.Name)
+	if !audio && !mimir.Attachable(body.Name) {
 		writeErr(w, http.StatusBadRequest, "UNSUPPORTED_FILE",
-			fmt.Sprintf("Yggdrasil can't read %s yet. Attach a document, spreadsheet, PDF, or code file.", artifacts.CleanName(body.Name)), nil)
+			fmt.Sprintf("Yggdrasil can't read %s yet. Attach a document, spreadsheet, PDF, code file, or audio.", artifacts.CleanName(body.Name)), nil)
 		return
 	}
 	data := []byte(body.Text)
@@ -74,9 +77,11 @@ func (s *Server) handleUploadArtifact(w http.ResponseWriter, r *http.Request) {
 	}
 	// Check the file can be read now, so a broken file is reported when it
 	// is attached rather than when the question is asked.
-	if _, err := mimir.FilePassages(body.Name, data); err != nil {
-		writeErr(w, http.StatusBadRequest, "UNREADABLE_FILE", fmt.Sprintf("Yggdrasil can't read %s: %s", artifacts.CleanName(body.Name), err.Error()), nil)
-		return
+	if !audio {
+		if _, err := mimir.FilePassages(body.Name, data); err != nil {
+			writeErr(w, http.StatusBadRequest, "UNREADABLE_FILE", fmt.Sprintf("Yggdrasil can't read %s: %s", artifacts.CleanName(body.Name), err.Error()), nil)
+			return
+		}
 	}
 	a, err := s.artifacts.Save(r.Context(), artifacts.Input{
 		ConversationID: body.ConversationID,
@@ -128,7 +133,7 @@ func (s *Server) handleArtifactContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	disposition := "attachment"
-	if r.URL.Query().Get("inline") == "1" && (a.Kind == "pdf" || a.Kind == "image") {
+	if r.URL.Query().Get("inline") == "1" && (a.Kind == "pdf" || a.Kind == "image" || a.Kind == "audio") {
 		disposition = "inline"
 	}
 	w.Header().Set("Content-Type", a.MimeType)
@@ -137,8 +142,8 @@ func (s *Server) handleArtifactContent(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("Content-Security-Policy", "sandbox; default-src 'none'; img-src 'self'; style-src 'unsafe-inline'")
 	w.Header().Set("Cache-Control", "private, no-store")
-	w.WriteHeader(http.StatusOK)
-	_, _ = w.Write(data)
+	// ServeContent answers range requests, which browsers need to play audio.
+	http.ServeContent(w, r, "", a.CreatedAt, bytes.NewReader(data))
 }
 
 // asciiName is the fallback filename for clients that ignore filename*.

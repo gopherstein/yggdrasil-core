@@ -24,7 +24,8 @@ What lives there:
 | `yggdrasil.db` | SQLite: models, profiles, chats, memories, settings, automations, specialized AIs and their examples, knowledge indexes and vectors, run records, notifications, API key hashes, paired computers. |
 | `models/` | Installed GGUF model files. |
 | `runtimes/llamacpp/` | `llama-server` and the other llama.cpp programs. |
-| `runtimes/python/` | `uv`, a private Python, and the environments for training (`envs/trainer-mlx`, `envs/trainer-peft`), text recognition (`envs/ocr`), and running code (`envs/code`), each installed the first time it is needed. |
+| `runtimes/python/` | `uv`, a private Python, and the environments for training (`envs/trainer-mlx`, `envs/trainer-peft`), text recognition (`envs/ocr`), running code (`envs/code`), and speech (`envs/speech`), each installed the first time it is needed. |
+| `runtimes/speech/` | Downloaded Whisper models (`whisper/`) and Piper voices (`voices/`), and each speech job's files (`jobs/`, removed when the job ends). |
 | `artifacts/` | Files attached to chats and files the assistant made, one folder per chat. |
 | `knowledge/` | Copies of pasted and uploaded knowledge, and `ocr-cache/` (recognized text of scanned PDFs). |
 | `training/` | Trained adapters (`adapters/`), exported GGUF files (`exports/`), job working files (`jobs/`, removed when a job ends), and downloaded training weights (`hf-cache/`). |

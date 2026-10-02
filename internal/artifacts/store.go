@@ -103,6 +103,18 @@ func MimeType(name string) string {
 		return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 	case ".docx":
 		return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+	case ".wav":
+		return "audio/wav"
+	case ".mp3":
+		return "audio/mpeg"
+	case ".m4a", ".aac":
+		return "audio/mp4"
+	case ".ogg":
+		return "audio/ogg"
+	case ".flac":
+		return "audio/flac"
+	case ".webm":
+		return "audio/webm"
 	}
 	if t := mime.TypeByExtension(ext); t != "" {
 		return t
@@ -113,6 +125,9 @@ func MimeType(name string) string {
 	return "application/octet-stream"
 }
 
+// IsAudio reports an audio file: one that can be played and transcribed.
+func IsAudio(name string) bool { return kindOf(name) == "audio" }
+
 func kindOf(name string) string {
 	switch strings.ToLower(filepath.Ext(name)) {
 	case ".csv", ".tsv", ".xlsx":
@@ -121,6 +136,8 @@ func kindOf(name string) string {
 		return "pdf"
 	case ".png", ".jpg", ".jpeg", ".gif", ".webp":
 		return "image"
+	case ".wav", ".mp3", ".m4a", ".aac", ".ogg", ".flac", ".webm":
+		return "audio"
 	case ".txt", ".md", ".markdown", ".html", ".htm", ".json", ".jsonl", ".log", ".docx":
 		return "document"
 	case ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java", ".kt", ".c", ".h", ".cpp", ".hpp", ".cs",

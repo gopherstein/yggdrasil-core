@@ -1,6 +1,6 @@
 import type { ToolPolicy } from '@/types/api'
 
-export type CapabilityId = 'internet' | 'files' | 'code' | 'shell' | 'git'
+export type CapabilityId = 'internet' | 'files' | 'code' | 'speech' | 'shell' | 'git'
 
 export const CAPABILITIES: {
   id: CapabilityId
@@ -32,6 +32,15 @@ export const CAPABILITIES: {
     label: 'Run code',
     description: 'Run Python in a sandbox for calculations, analysis, and charts; asks first',
     tools: [{ id: 'code.execute', on: 'ask' }],
+  },
+  {
+    id: 'speech',
+    label: 'Speech',
+    description: 'Transcribe audio and read text aloud, on this computer',
+    tools: [
+      { id: 'speech.transcribe', on: 'allow' },
+      { id: 'speech.synthesize', on: 'allow' },
+    ],
   },
   {
     id: 'shell',

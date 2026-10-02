@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { downloadArtifact } from '@/lib/api'
+import { useEffect, useState } from 'react'
+import { artifactObjectUrl, downloadArtifact } from '@/lib/api'
+import { isAudioName } from '@/lib/upload'
 import type { FileRef } from '@/types/api'
 
 function formatSize(bytes: number): string {
@@ -14,11 +15,19 @@ const kindLabel: Record<string, string> = {
   document: 'Document',
   code: 'Code',
   image: 'Image',
+  audio: 'Audio',
 }
 
 function FileIcon({ kind }: { kind: string }) {
   const tone =
     kind === 'spreadsheet' ? 'text-success' : kind === 'pdf' ? 'text-danger' : kind === 'code' ? 'text-bifrost' : 'text-mimir'
+  if (kind === 'audio') {
+    return (
+      <svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0 text-norn" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden>
+        <path d="M2.5 6v4M5.5 3.5v9M8.5 5.5v5M11.5 2.5v11M14 6.5v3" strokeLinecap="round" />
+      </svg>
+    )
+  }
   return (
     <svg viewBox="0 0 16 16" className={`h-4 w-4 shrink-0 ${tone}`} fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden>
       <path d="M4 1.5h5.5L13 5v9.5H4z" strokeLinejoin="round" />
@@ -28,8 +37,13 @@ function FileIcon({ kind }: { kind: string }) {
   )
 }
 
-/** A stored file. Clicking it downloads the file. */
+/** A stored file. Clicking it downloads the file; audio plays instead. */
 export function FileChip({ file }: { file: FileRef }) {
+  if (file.kind === 'audio') return <AudioChip file={file} />
+  return <DownloadChip file={file} />
+}
+
+function DownloadChip({ file }: { file: FileRef }) {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   return (
@@ -61,6 +75,68 @@ export function FileChip({ file }: { file: FileRef }) {
   )
 }
 
+/** An audio file: Play loads it and shows a player; it can still be downloaded. */
+export function AudioChip({ file, autoPlay = false }: { file: FileRef; autoPlay?: boolean }) {
+  const [url, setUrl] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  const load = async () => {
+    setBusy(true)
+    setError(null)
+    try {
+      setUrl(await artifactObjectUrl(file.id))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'The audio could not be loaded.')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  useEffect(() => {
+    if (autoPlay) void load()
+    // Load once, when the chip first appears.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  useEffect(() => () => {
+    if (url) URL.revokeObjectURL(url)
+  }, [url])
+
+  return (
+    <span className="inline-flex max-w-full flex-col gap-1.5 rounded-lg border border-line/70 bg-surface px-2.5 py-1.5 text-xs text-ink">
+      <span className="flex items-center gap-2">
+        <FileIcon kind="audio" />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-medium">{file.name}</span>
+          <span className={`block text-[11px] ${error ? 'text-danger' : 'text-ink-faint'}`}>
+            {error ?? `Audio · ${formatSize(file.size_bytes)}${busy ? ' · Loading…' : ''}`}
+          </span>
+        </span>
+        {url ? null : (
+          <button
+            type="button"
+            className="shrink-0 rounded-md border border-line/70 px-2 py-0.5 text-ink-muted transition hover:border-primary/50 hover:text-ink"
+            disabled={busy}
+            onClick={() => void load()}
+          >
+            Play
+          </button>
+        )}
+        <button
+          type="button"
+          className="shrink-0 rounded-md px-1.5 py-0.5 text-ink-faint transition hover:text-ink"
+          title={`Download ${file.name}`}
+          aria-label={`Download ${file.name}`}
+          onClick={() => void downloadArtifact(file).catch((err: unknown) => setError(err instanceof Error ? err.message : 'The download failed.'))}
+        >
+          ↓
+        </button>
+      </span>
+      {url ? <audio controls autoPlay src={url} className="h-8 w-64 max-w-full" aria-label={file.name} /> : null}
+    </span>
+  )
+}
+
 /** A file waiting in the composer: uploading, ready, or failed. */
 export interface PendingFile {
   key: string
@@ -81,7 +157,7 @@ export function PendingFileChip({ file, onRemove }: { file: PendingFile; onRemov
       ].join(' ')}
       title={file.error ?? file.name}
     >
-      <FileIcon kind={file.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'document'} />
+      <FileIcon kind={file.name.toLowerCase().endsWith('.pdf') ? 'pdf' : isAudioName(file.name) ? 'audio' : 'document'} />
       <span className="min-w-0">
         <span className="block truncate font-medium text-ink">{file.name}</span>
         <span className={`block truncate text-[11px] ${file.status === 'error' ? 'text-danger' : 'text-ink-faint'}`}>

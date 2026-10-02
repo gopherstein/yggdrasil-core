@@ -56,6 +56,17 @@ It runs only inside the operating system's sandbox. There is no fallback: where 
 - **Files out:** files the code saves there (`.png`, `.jpg`, `.svg`, `.pdf`, `.csv`, `.tsv`, `.xlsx`, `.json`, `.txt`, `.md`, `.html`; up to 10, 25 MB each) are attached to the answer. Others are listed as skipped.
 - **Limits:** 90 seconds per run and 32 KB each of printed output and errors. A memory limit of 4 GB of address space applies on Linux. Each run gets a new working folder, which is deleted afterwards.
 
+## Speech
+
+Speech runs on this computer: audio and text are not sent anywhere. Both tools are allowed by default and are level 1, and the Speech capability turns them on or off in a profile. Offline profiles keep them.
+
+- **`speech.transcribe`** writes down what an audio file in the chat says, with Whisper (faster-whisper). `file` is the file's name or id; `quality` is `fast` (the default, Whisper base, about 145 MB) or `accurate` (Whisper small, about 480 MB); `language` is a code such as `de`, or empty to detect it. It returns the text, the language, the length, and timed segments. It is offered when a message attaches audio or mentions transcribing, a recording, a voice note, or a podcast.
+- **`speech.synthesize`** reads text aloud with Piper and attaches a `.wav` file to the answer. `text` is up to 5,000 characters; `voice` is a Piper voice name such as `de_DE-thorsten-medium` (the default is `en_US-lessac-medium`); `name` names the file. It is offered when a message asks to read something aloud, narrate it, or turn text into speech.
+- **Read aloud:** answers in the app have a Read aloud button, which calls `POST /api/v1/speech` and plays the result. The audio is kept in the chat like any other file.
+- **Audio files:** chats accept `.wav`, `.mp3`, `.m4a`, `.aac`, `.ogg`, `.flac`, and `.webm` (up to 25 MB). They play in the chat, and the assistant is told it can transcribe them.
+- **Environment:** faster-whisper and Piper in a managed environment (`runtimes/python/envs/speech`), installed from PyPI the first time speech is used. Whisper models and Piper voices are downloaded from Hugging Face the first time each is used and kept in `runtimes/speech/`.
+- **Limits:** one speech job at a time, 15 minutes each, which allows for the first installation and download.
+
 ## Descriptors and levels
 
 Every tool, whatever it comes from, has a descriptor (`GET /api/v1/tools/{id}`, and each entry of `GET /api/v1/tools`):
