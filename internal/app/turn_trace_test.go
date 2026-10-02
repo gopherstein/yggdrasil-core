@@ -78,3 +78,18 @@ func TestEffectivePolicyAsksAfterUntrustedContent(t *testing.T) {
 		}
 	}
 }
+
+// Map results are other people's writing: the turn treats them as data and
+// shows what was looked up.
+func TestPlacesAreUntrustedSteps(t *testing.T) {
+	tr := &turnTrace{}
+	tr.tool("places.search", map[string]any{"query": "coffee", "near": "Juneau"}, map[string]any{"places": []any{}})
+	tr.tool("maps.route", map[string]any{"from": "the airport", "to": "downtown"}, map[string]any{})
+	if !tr.sawUntrusted() {
+		t.Fatal("map results were trusted")
+	}
+	meta := tr.meta()
+	if meta == nil || len(meta.Steps) != 2 || meta.Steps[0].Text != "Looked up coffee near Juneau" || meta.Steps[1].Text != "Found the way from the airport to downtown" {
+		t.Fatalf("steps %+v", meta)
+	}
+}
