@@ -50,6 +50,7 @@ Nothing leaves because the daemon started. Traffic is sent only when a feature t
 | Image generation setup | GitHub, for the pinned stable-diffusion.cpp release, and Hugging Face, for the model's files. Only when you set it up. Prompts and images stay on this computer. |
 | First scanned PDF in Knowledge | PyPI, for the text-recognition packages (about 110 MB). The PDF itself is read on this computer. |
 | A chat placed on a paired computer | That computer receives the prompt and context over Bifrost |
+| An image or speech tool run on a paired computer | That computer receives the tool's arguments, such as the prompt, and the chat file it needs, such as the image to edit or the audio to transcribe, over Bifrost. It returns the result and keeps nothing. Each job is recorded. |
 | Email, push, and webhook notifications | Your SMTP server, the ntfy server (ntfy.sh or your own), or the webhook address, with each notification's title and text; push to ntfy.sh sends only a generic notice unless you choose full content. Only for destinations you add, and only for the categories and severities you choose |
 | External OpenAI runtime | The base URL configured for `external-openai`, with its API key |
 | Bifrost discovery and pairing | Other computers on the local network, or the static peers you listed |

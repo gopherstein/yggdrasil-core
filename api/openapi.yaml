@@ -2481,6 +2481,35 @@ paths:
                 items:
                   type: object
                   additionalProperties: true
+  /api/v1/tools/providers:
+    get:
+      summary: Each computer's providers for tools that can run on any paired computer, and their state
+      operationId: toolProviders
+      responses:
+        "200":
+          description: This computer first, then each paired computer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    node_id: {type: string}
+                    name: {type: string}
+                    local: {type: boolean}
+                    online: {type: boolean}
+                    note: {type: string, description: "Why its providers are unknown, such as offline"}
+                    providers:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          tool: {type: string}
+                          name: {type: string, description: "What runs it, such as FLUX.2 [klein] 4B"}
+                          state: {type: string, enum: [healthy, installing, failed, unavailable]}
+                          reason: {type: string}
+                          accelerated: {type: boolean, description: "A GPU does the work"}
   /api/v1/tools/decide:
     post:
       summary: Answer a tool approval request

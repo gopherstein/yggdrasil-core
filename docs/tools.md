@@ -84,6 +84,7 @@ Each download is pinned to a revision and checked against its SHA-256. A stopped
 
 Each is the [FLUX.2 [klein] 4B](https://huggingface.co/black-forest-labs/FLUX.2-klein-4B) diffusion model (GGUF, Q4_0 or Q8_0), the Qwen3 4B text encoder (GGUF), and the FLUX.2 small decoder VAE. All three are Apache 2.0 and need no account to download.
 
+- **Other computers:** a paired computer with image generation set up makes images for this one, preferring one whose GPU does the work ([tools on other computers](clustering.md#tools-on-other-computers)).
 - **Platforms:** macOS on Apple silicon (Metal), and Linux x86-64 and Windows x64 (CPU builds, which are much slower). Elsewhere, and in the Mac App Store build, which cannot run a program it downloads, the tools are unavailable and say why.
 - **Generating:** `prompt` is up to 2,000 characters. `width` and `height` default to 1024 and are rounded to multiples of 64, between 256 and 1536 and up to about 1.5 megapixels. `seed` repeats an image, and each result includes its seed. Images are saved as PNG files attached to the answer.
 - **Editing:** `file` is an image in the chat by name or id. The result keeps the image's shape, at up to 1024 pixels on the longer side, and is attached as a new file, so the original is kept.

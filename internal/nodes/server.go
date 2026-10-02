@@ -51,6 +51,9 @@ type InternalDeps struct {
 	// Training serves /internal/v1/training/ for paired computers that send
 	// training runs here.
 	Training http.Handler
+	// Tools serves /internal/v1/tools/ for paired computers that run tools
+	// here (Gungnir §38).
+	Tools http.Handler
 }
 
 func NewInternalServer(deps InternalDeps) *InternalServer {
@@ -80,6 +83,9 @@ func NewInternalServer(deps InternalDeps) *InternalServer {
 	api.HandleFunc("/pairing/outbound/{code}", s.handlePairingOutbound).Methods(http.MethodGet)
 	if deps.Training != nil {
 		api.PathPrefix("/training/").Handler(http.StripPrefix("/internal/v1", deps.Training))
+	}
+	if deps.Tools != nil {
+		api.PathPrefix("/tools/").Handler(http.StripPrefix("/internal/v1", deps.Tools))
 	}
 
 	s.http = &http.Server{
