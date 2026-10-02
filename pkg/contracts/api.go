@@ -432,6 +432,26 @@ type MessageMeta struct {
 	// Contract is the client contract the metadata was written in (§68).
 	// Metadata saved before the contract existed has none, and reads as 1.0.
 	Contract string `json:"contract,omitempty"`
+	// Setup offers to install what the request needed (Gungnir §29).
+	Setup *SetupOffer `json:"setup,omitempty"`
+}
+
+// SetupOffer offers to install a missing ability, such as image generation,
+// and to finish the request once it is ready.
+type SetupOffer struct {
+	// Ability is the inventory ability, such as image_generation.
+	Ability string `json:"ability"`
+	Label   string `json:"label"`
+	// Option is what to install: for image_generation, the model id for
+	// POST /api/v1/images/setup.
+	Option    string `json:"option"`
+	Name      string `json:"name"`
+	SizeBytes int64  `json:"size_bytes"`
+	NodeID    string `json:"node_id,omitempty"`
+	NodeName  string `json:"node_name,omitempty"`
+	// Request is the message to send again once it is set up; empty for a
+	// question about the ability.
+	Request string `json:"request,omitempty"`
 }
 
 // FileRef points at a stored file (an artifact). Its bytes are at

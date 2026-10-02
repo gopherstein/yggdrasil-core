@@ -28,3 +28,16 @@ The model system prompt is built only from tools whose policy is not deny, and e
 ## Capability inventory
 
 The capability inventory is a different list: what Yggdrasil can do right now, worked out from the installed models, online computers, enabled tools, and connected services. Diagnostics → **What Yggdrasil can do** shows it, and a chat question such as "Can you generate an image?" is answered from it. `GET /api/v1/capabilities` returns it.
+
+A tool that is on but cannot run here yet, such as image generation before it is set up, does not count as available; the tool's reason is listed with it (`unavailable`).
+
+### Guided installation
+
+When a missing ability can be installed, the inventory lists the setup (`setups`, and `setup` on the ability): what would be installed, its download size, and the computer it would run on. Today that is image generation, with the model recommended for this computer.
+
+A chat request that needs it, such as "Make me an image of a Viking tree", is answered by Yggdrasil instead of the model. The answer says what is missing and what would be installed, and the answer's `setup` (client contract 1.2) carries the offer, which the app shows as a card:
+1. **Set up** starts the install.
+2. The card shows the download as it goes.
+3. When it is ready, the card sends the request again, so it is finished.
+
+"Can you generate images?" gets the same card, without a request to finish. Offers appear only in chats in the app, and only when the chat's profile allows the tools the setup would add; an API caller gets the model's answer as before.

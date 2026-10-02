@@ -332,6 +332,17 @@
     "useModel": "Use this model",
     "viewInModels": "View in Models"
   },
+  "setup": {
+    "details": "{{name}} · {{size}} download · on {{node}}",
+    "thisComputer": "this computer",
+    "install": "Set up",
+    "installing": "Installing…",
+    "downloading": "Downloading… {{done}} of {{total}}",
+    "stop": "Stop",
+    "ready": "{{label}} is set up.",
+    "continue": "Continue",
+    "continuing": "Set up. Finishing your request…"
+  },
   "readAloud": {
     "button": "Read aloud",
     "hint": "Read this answer aloud on this computer",

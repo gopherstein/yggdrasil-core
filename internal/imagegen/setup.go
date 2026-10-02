@@ -28,6 +28,9 @@ type Setup struct {
 	// Sandboxed refuses setup: the Mac App Store build cannot run a program
 	// it downloads.
 	Sandboxed bool
+	// Changed is called when what is installed changes: a setup ended or a
+	// model was removed.
+	Changed func()
 	// archive overrides this platform's build; tests set it.
 	archive *Archive
 	// fileURL overrides where model files come from; tests set it.
@@ -219,6 +222,9 @@ func gb(n int64) float64 { return float64(n) / (1 << 30) }
 
 func (s *Setup) run(ctx context.Context, j *job, m Model, program bool, archive Archive) {
 	err := s.install(ctx, j, m, program, archive)
+	if s.Changed != nil {
+		defer s.Changed()
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	j.running = false
@@ -320,5 +326,9 @@ func (s *Setup) Remove(id string) error {
 	if busy {
 		return errors.New("this model is being set up; stop the setup first")
 	}
-	return os.RemoveAll(s.modelDir(id))
+	err := os.RemoveAll(s.modelDir(id))
+	if s.Changed != nil {
+		s.Changed()
+	}
+	return err
 }

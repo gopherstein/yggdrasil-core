@@ -145,3 +145,26 @@ func TestImageGenerationNotSetUp(t *testing.T) {
 		t.Fatalf("a ready image tool: %+v", a)
 	}
 }
+
+// A request for a missing ability that can be installed is found; a
+// question, an available ability, or one without a setup is not.
+func TestNeeds(t *testing.T) {
+	s := snapshot()
+	s.Setups = []Setup{{Ability: "image_generation", Option: "flux2-klein-4b", Name: "FLUX.2 [klein] 4B", SizeBytes: 5_207_178_964, Tools: []string{"image.generate"}}}
+	a, ok := Needs(s, "Make me an image of a Viking tree")
+	if !ok || a.ID != "image_generation" || a.Setup == nil || a.Setup.Option != "flux2-klein-4b" {
+		t.Fatalf("needs = %+v %v", a, ok)
+	}
+	for _, msg := range []string{"Can you generate an image of a cat?", "What is the capital of France?", "Run the tests"} {
+		if a, ok := Needs(s, msg); ok {
+			t.Errorf("%q needs %s", msg, a.ID)
+		}
+	}
+	if a := ability(t, Abilities(s), "image_generation"); a.Setup == nil {
+		t.Error("the ability does not carry its setup")
+	}
+	s.Setups = nil
+	if _, ok := Needs(s, "Make me an image of a Viking tree"); ok {
+		t.Error("offered with nothing to install")
+	}
+}

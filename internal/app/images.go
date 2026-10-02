@@ -32,5 +32,7 @@ func (a *App) newImageSetup(cfg config.Config) *imagegen.Setup {
 			return int64(inv.Disk.AvailableBytes), nil
 		},
 		Sandboxed: pyenv.Sandboxed(),
+		// "Can you make images?" and setup offers read the inventory.
+		Changed: a.invalidateCapabilities,
 	}
 }

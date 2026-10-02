@@ -332,6 +332,23 @@ export interface MessageMeta {
   run_id?: string
   /** The client contract the metadata was written in (spec §68); missing means 1.0. */
   contract?: string
+  /** An offer to install what the request needed (contract 1.2). */
+  setup?: SetupOffer
+}
+
+/** An offer to install a missing ability, then finish the request (Gungnir §29). */
+export interface SetupOffer {
+  /** The inventory ability, such as image_generation. */
+  ability: string
+  label: string
+  /** What to install: for image_generation, an image model id. */
+  option: string
+  name: string
+  size_bytes: number
+  node_id?: string
+  node_name?: string
+  /** The message to send again once it is set up; empty for a question. */
+  request?: string
 }
 
 /** A stored file: an attachment or a file the assistant produced. */
