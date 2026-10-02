@@ -118,5 +118,43 @@
     "deployToName": "{{name}}にデプロイ",
     "deploy": "デプロイ",
     "downloadSize": "ダウンロードサイズ 約{{size}}"
+  },
+  "join": {
+    "open": "コマンドで追加",
+    "title": "コマンドでコンピュータを追加",
+    "description": "サーバーや、SSHで接続できるコンピュータ向けです。そのコンピュータでコマンドを実行すると、このチームに参加します。ペアリングコードや近くの検索は不要です。",
+    "close": "閉じる",
+    "make": "参加コマンドを作成",
+    "making": "作成中…",
+    "makeHint": "コマンドは15分間、1回だけ使えます。",
+    "kindLabel": "実行する場所",
+    "kinds": {
+      "installed": "Yggdrasilがインストール済み",
+      "install": "インストールして参加",
+      "windows": "Windows"
+    },
+    "kindHints": {
+      "installed": "すでにYggdrasilが動いているコンピュータで実行します。",
+      "install": "LinuxまたはmacOSにYggdrasilをインストールし、サービスとして起動して参加します。",
+      "windows": "WindowsにYggdrasilをインストールして参加します。PowerShellで実行してください。"
+    },
+    "commandLabel": "参加コマンド",
+    "copy": "コピー",
+    "copied": "コピーしました",
+    "expiresIn": "残り {{time}}",
+    "oneUse": "1回のみ使用可",
+    "revoke": "取り消す",
+    "newCommand": "新しいコマンド",
+    "another": "別のコンピュータを追加",
+    "joined": "✓ {{name}} がチームに参加しました。",
+    "fingerprint": "コマンドは、このコンピュータに接続していることを確認します: {{fingerprint}}",
+    "status": {
+      "active": "使用待ち",
+      "used": "使用済み",
+      "revoked": "取り消し済み",
+      "expired": "期限切れ"
+    },
+    "usedBy": "{{name}} が使用",
+    "recent_other": "最近のコマンド {{count}} 件"
   }
 }

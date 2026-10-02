@@ -22,6 +22,8 @@ import type {
   Connector,
   CommunityRatings,
   EgressRecord,
+  JoinToken,
+  JoinTokenCreated,
   ModelRating,
   RatingTag,
   PrivacyOverview,
@@ -831,6 +833,14 @@ export const api = {
 
   setRunRetention: (days: number) =>
     request<PrivacyOverview>('/api/v1/privacy', { method: 'PUT', body: JSON.stringify({ retention_days: days }) }),
+
+  /** Makes a one-time join token for adding a computer (#40); the token is in the answer only. */
+  createJoinToken: (ttlMinutes?: number) =>
+    request<JoinTokenCreated>('/api/v1/join-tokens', { method: 'POST', body: JSON.stringify(ttlMinutes ? { ttl_minutes: ttlMinutes } : {}) }),
+
+  listJoinTokens: async () => (await request<JoinToken[]>('/api/v1/join-tokens')) ?? [],
+
+  revokeJoinToken: (id: string) => request<JoinToken>(`/api/v1/join-tokens/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
   getModelRating: (id: string) => request<ModelRating>(`/api/v1/models/${encodeURIComponent(id)}/rating`),
 

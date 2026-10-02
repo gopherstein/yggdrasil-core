@@ -118,5 +118,43 @@
     "deployToName": "部署到 {{name}}",
     "deploy": "部署",
     "downloadSize": "下载大小约 {{size}}"
+  },
+  "join": {
+    "open": "通过命令添加",
+    "title": "通过命令添加电脑",
+    "description": "适用于服务器或你通过 SSH 访问的任何电脑。在那里运行命令，它就会加入这个团队。无需配对码，也无需附近查找。",
+    "close": "关闭",
+    "make": "创建加入命令",
+    "making": "正在创建…",
+    "makeHint": "此命令只能使用一次，有效期 15 分钟。",
+    "kindLabel": "在哪里运行",
+    "kinds": {
+      "installed": "已安装 Yggdrasil",
+      "install": "安装并加入",
+      "windows": "Windows"
+    },
+    "kindHints": {
+      "installed": "在已经运行 Yggdrasil 的电脑上运行。",
+      "install": "在 Linux 或 macOS 上安装 Yggdrasil，作为服务启动并加入。",
+      "windows": "在 Windows 上安装 Yggdrasil 并加入。请在 PowerShell 中运行。"
+    },
+    "commandLabel": "加入命令",
+    "copy": "复制",
+    "copied": "已复制",
+    "expiresIn": "{{time}} 后过期",
+    "oneUse": "仅可使用一次",
+    "revoke": "撤销",
+    "newCommand": "新命令",
+    "another": "添加另一台电脑",
+    "joined": "✓ {{name}} 已加入团队。",
+    "fingerprint": "命令会核实连接的是这台电脑：{{fingerprint}}",
+    "status": {
+      "active": "等待使用",
+      "used": "已使用",
+      "revoked": "已撤销",
+      "expired": "已过期"
+    },
+    "usedBy": "由 {{name}} 使用",
+    "recent_other": "最近的 {{count}} 条命令"
   }
 }

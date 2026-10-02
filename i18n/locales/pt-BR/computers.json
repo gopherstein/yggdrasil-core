@@ -126,5 +126,45 @@
     "deployToName": "Implantar em {{name}}",
     "deploy": "Implantar",
     "downloadSize": "Tamanho do download ~{{size}}"
+  },
+  "join": {
+    "open": "Adicionar por comando",
+    "title": "Adicionar um computador por comando",
+    "description": "Para um servidor ou qualquer computador que você acessa por SSH. Execute o comando nele, e ele entra nesta equipe. Sem código de pareamento nem busca por perto.",
+    "close": "Fechar",
+    "make": "Criar um comando de entrada",
+    "making": "Criando…",
+    "makeHint": "O comando funciona uma vez, por 15 minutos.",
+    "kindLabel": "Onde executar",
+    "kinds": {
+      "installed": "Yggdrasil instalado",
+      "install": "Instalar e entrar",
+      "windows": "Windows"
+    },
+    "kindHints": {
+      "installed": "Em um computador que já roda o Yggdrasil.",
+      "install": "Instala o Yggdrasil no Linux ou macOS, inicia como serviço e entra.",
+      "windows": "Instala o Yggdrasil no Windows e entra. Execute no PowerShell."
+    },
+    "commandLabel": "Comando de entrada",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "expiresIn": "Expira em {{time}}",
+    "oneUse": "funciona uma vez",
+    "revoke": "Revogar",
+    "newCommand": "Novo comando",
+    "another": "Adicionar outro computador",
+    "joined": "✓ {{name}} entrou na equipe.",
+    "fingerprint": "O comando verifica se chegou a este computador: {{fingerprint}}",
+    "status": {
+      "active": "Aguardando uso",
+      "used": "Usado",
+      "revoked": "Revogado",
+      "expired": "Expirado"
+    },
+    "usedBy": "usado por {{name}}",
+    "recent_one": "{{count}} comando recente",
+    "recent_many": "{{count}} comandos recentes",
+    "recent_other": "{{count}} comandos recentes"
   }
 }

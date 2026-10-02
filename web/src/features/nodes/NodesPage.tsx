@@ -10,6 +10,7 @@ import { formatBytes } from '@/lib/format'
 import { useUIStore } from '@/stores/uiStore'
 import type { Model, Node, PairingSession } from '@/types/api'
 import { DeployModelsPanel } from './DeployModelsPanel'
+import { JoinByCommand } from './JoinByCommand'
 import {
   availableForLabels,
   combinedMemoryBytes,
@@ -355,6 +356,7 @@ export function NodesPage() {
   const [pairingSession, setPairingSession] = useState<PairingSession | null>(null)
   const [claimCodes, setClaimCodes] = useState<Record<string, string>>({})
   const [removingKey, setRemovingKey] = useState<string | null>(null)
+  const [joinOpen, setJoinOpen] = useState(false)
 
   const nodesQuery = useQuery({
     queryKey: ['nodes'],
@@ -526,14 +528,19 @@ export function NodesPage() {
           </h1>
           <p className="page-subtitle">{t('page.subtitle')}</p>
         </div>
-        <button
-          type="button"
-          className="btn-primary"
-          disabled={refreshMutation.isPending}
-          onClick={() => refreshMutation.mutate()}
-        >
-          {refreshMutation.isPending ? t('page.scanning') : t('page.find')}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button type="button" className="btn-secondary" aria-expanded={joinOpen} onClick={() => setJoinOpen((v) => !v)}>
+            {t('join.open')}
+          </button>
+          <button
+            type="button"
+            className="btn-primary"
+            disabled={refreshMutation.isPending}
+            onClick={() => refreshMutation.mutate()}
+          >
+            {refreshMutation.isPending ? t('page.scanning') : t('page.find')}
+          </button>
+        </div>
         {headerMascot ? <Ratatoskr state={headerMascot} size={96} className="order-first sm:order-none" /> : null}
       </header>
 
@@ -555,6 +562,8 @@ export function NodesPage() {
           )}
         </section>
       )}
+
+      {joinOpen ? <JoinByCommand onClose={() => setJoinOpen(false)} /> : null}
 
       {actionError && (
         <div className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">

@@ -51,6 +51,8 @@ For a server or any computer you reach over SSH, without mDNS or a screen, join 
 
    `YGGDRASIL_VERSION` installs a particular release instead of the latest. Without `join`, the scripts only install.
 
+The Computers page does the same: **Add by command** makes a command, with tabs for a computer that has Yggdrasil, one to install it on (Linux, macOS), and Windows, a copy button, a countdown, **Revoke**, and the recent commands. It says when the computer has joined.
+
 The token lasts 15 minutes (`--ttl` up to `24h`) and works once. `yggctl join-token list` shows recent tokens, and `yggctl join-token revoke <id>` stops an unused one. Only a proof key derived from the token is stored, and the token is never logged.
 
 How the join stays safe over Bifrost's plain HTTP:

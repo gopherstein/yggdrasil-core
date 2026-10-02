@@ -122,5 +122,44 @@
     "deployToName": "Auf {{name}} bereitstellen",
     "deploy": "Bereitstellen",
     "downloadSize": "Downloadgröße ca. {{size}}"
+  },
+  "join": {
+    "open": "Per Befehl hinzufügen",
+    "title": "Computer per Befehl hinzufügen",
+    "description": "Für einen Server oder jeden Computer, den du per SSH erreichst. Führe den Befehl dort aus, und er tritt diesem Team bei. Kein Kopplungscode und keine Suche in der Nähe nötig.",
+    "close": "Schließen",
+    "make": "Beitrittsbefehl erstellen",
+    "making": "Wird erstellt …",
+    "makeHint": "Der Befehl funktioniert einmal, 15 Minuten lang.",
+    "kindLabel": "Wo du ihn ausführst",
+    "kinds": {
+      "installed": "Yggdrasil installiert",
+      "install": "Installieren und beitreten",
+      "windows": "Windows"
+    },
+    "kindHints": {
+      "installed": "Auf einem Computer, auf dem Yggdrasil schon läuft.",
+      "install": "Installiert Yggdrasil unter Linux oder macOS, startet es als Dienst und tritt bei.",
+      "windows": "Installiert Yggdrasil unter Windows und tritt bei. Führe ihn in PowerShell aus."
+    },
+    "commandLabel": "Beitrittsbefehl",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "expiresIn": "Läuft in {{time}} ab",
+    "oneUse": "einmal verwendbar",
+    "revoke": "Widerrufen",
+    "newCommand": "Neuer Befehl",
+    "another": "Weiteren Computer hinzufügen",
+    "joined": "✓ {{name}} ist dem Team beigetreten.",
+    "fingerprint": "Der Befehl prüft, dass er diesen Computer erreicht: {{fingerprint}}",
+    "status": {
+      "active": "Wartet auf Verwendung",
+      "used": "Verwendet",
+      "revoked": "Widerrufen",
+      "expired": "Abgelaufen"
+    },
+    "usedBy": "verwendet von {{name}}",
+    "recent_one": "{{count}} letzter Befehl",
+    "recent_other": "{{count}} letzte Befehle"
   }
 }

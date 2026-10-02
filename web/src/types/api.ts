@@ -1406,6 +1406,31 @@ export interface PersonalStyle {
 
 export type EgressKind = 'web_search' | 'web_page' | 'places' | 'paired_computer' | 'external_server' | 'connector' | 'notification' | 'community_ratings'
 
+/** A one-line join token's record (#40); the token itself is shown once. */
+export interface JoinToken {
+  id: string
+  created_at: string
+  expires_at: string
+  used_at?: string
+  /** The computer that joined with it. */
+  used_by?: string
+  revoked_at?: string
+  status: 'active' | 'used' | 'revoked' | 'expired'
+}
+
+/** A new join token and the commands that use it. */
+export interface JoinTokenCreated extends JoinToken {
+  token: string
+  server: string
+  fingerprint: string
+  /** yggctl join … for a computer with Yggdrasil installed. */
+  command: string
+  /** Installs Yggdrasil on Linux or macOS, then joins. */
+  install_command: string
+  /** The same in PowerShell. */
+  windows_command: string
+}
+
 /** A structured reason a rating may give (#37). */
 export type RatingTag =
   | 'great_responses'

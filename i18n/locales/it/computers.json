@@ -126,5 +126,45 @@
     "deployToName": "Distribuisci su {{name}}",
     "deploy": "Distribuisci",
     "downloadSize": "Dimensione del download ~{{size}}"
+  },
+  "join": {
+    "open": "Aggiungi con un comando",
+    "title": "Aggiungi un computer con un comando",
+    "description": "Per un server o qualsiasi computer che raggiungi via SSH. Esegui lì il comando e si unirà a questo team. Non servono codici di abbinamento né ricerca nelle vicinanze.",
+    "close": "Chiudi",
+    "make": "Crea un comando di adesione",
+    "making": "Creazione…",
+    "makeHint": "Il comando funziona una volta, per 15 minuti.",
+    "kindLabel": "Dove eseguirlo",
+    "kinds": {
+      "installed": "Yggdrasil installato",
+      "install": "Installa e unisciti",
+      "windows": "Windows"
+    },
+    "kindHints": {
+      "installed": "Su un computer in cui Yggdrasil è già in esecuzione.",
+      "install": "Installa Yggdrasil su Linux o macOS, lo avvia come servizio e si unisce.",
+      "windows": "Installa Yggdrasil su Windows e si unisce. Eseguilo in PowerShell."
+    },
+    "commandLabel": "Comando di adesione",
+    "copy": "Copia",
+    "copied": "Copiato",
+    "expiresIn": "Scade tra {{time}}",
+    "oneUse": "valido una volta",
+    "revoke": "Revoca",
+    "newCommand": "Nuovo comando",
+    "another": "Aggiungi un altro computer",
+    "joined": "✓ {{name}} si è unito al team.",
+    "fingerprint": "Il comando verifica di raggiungere questo computer: {{fingerprint}}",
+    "status": {
+      "active": "In attesa di essere usato",
+      "used": "Usato",
+      "revoked": "Revocato",
+      "expired": "Scaduto"
+    },
+    "usedBy": "usato da {{name}}",
+    "recent_one": "{{count}} comando recente",
+    "recent_many": "{{count}} comandi recenti",
+    "recent_other": "{{count}} comandi recenti"
   }
 }

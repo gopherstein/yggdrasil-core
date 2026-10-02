@@ -122,5 +122,44 @@
     "deployToName": "Deploy to {{name}}",
     "deploy": "Deploy",
     "downloadSize": "Download size ~{{size}}"
+  },
+  "join": {
+    "open": "Add by command",
+    "title": "Add a computer by command",
+    "description": "For a server or any computer you reach over SSH. Run the command there, and it joins this team. No pairing code or nearby discovery needed.",
+    "close": "Close",
+    "make": "Make a join command",
+    "making": "Making…",
+    "makeHint": "The command works once, for 15 minutes.",
+    "kindLabel": "Where to run it",
+    "kinds": {
+      "installed": "Yggdrasil installed",
+      "install": "Install and join",
+      "windows": "Windows"
+    },
+    "kindHints": {
+      "installed": "On a computer that already runs Yggdrasil.",
+      "install": "Installs Yggdrasil on Linux or macOS, starts it as a service, and joins.",
+      "windows": "Installs Yggdrasil on Windows and joins. Run it in PowerShell."
+    },
+    "commandLabel": "Join command",
+    "copy": "Copy",
+    "copied": "Copied",
+    "expiresIn": "Expires in {{time}}",
+    "oneUse": "works once",
+    "revoke": "Revoke",
+    "newCommand": "New command",
+    "another": "Add another computer",
+    "joined": "✓ {{name}} joined the team.",
+    "fingerprint": "The command checks that it reaches this computer: {{fingerprint}}",
+    "status": {
+      "active": "Waiting to be used",
+      "used": "Used",
+      "revoked": "Revoked",
+      "expired": "Expired"
+    },
+    "usedBy": "used by {{name}}",
+    "recent_one": "{{count}} recent command",
+    "recent_other": "{{count}} recent commands"
   }
 }

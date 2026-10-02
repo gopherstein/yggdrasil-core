@@ -118,5 +118,43 @@
     "deployToName": "部署到 {{name}}",
     "deploy": "部署",
     "downloadSize": "下載大小約 {{size}}"
+  },
+  "join": {
+    "open": "透過指令新增",
+    "title": "透過指令新增電腦",
+    "description": "適用於伺服器或你透過 SSH 連線的任何電腦。在那裡執行指令，它就會加入這個團隊。不需要配對碼，也不需要附近搜尋。",
+    "close": "關閉",
+    "make": "建立加入指令",
+    "making": "正在建立…",
+    "makeHint": "此指令只能使用一次，有效期 15 分鐘。",
+    "kindLabel": "在哪裡執行",
+    "kinds": {
+      "installed": "已安裝 Yggdrasil",
+      "install": "安裝並加入",
+      "windows": "Windows"
+    },
+    "kindHints": {
+      "installed": "在已經執行 Yggdrasil 的電腦上執行。",
+      "install": "在 Linux 或 macOS 上安裝 Yggdrasil，以服務啟動並加入。",
+      "windows": "在 Windows 上安裝 Yggdrasil 並加入。請在 PowerShell 中執行。"
+    },
+    "commandLabel": "加入指令",
+    "copy": "複製",
+    "copied": "已複製",
+    "expiresIn": "{{time}} 後過期",
+    "oneUse": "僅能使用一次",
+    "revoke": "撤銷",
+    "newCommand": "新指令",
+    "another": "新增另一台電腦",
+    "joined": "✓ {{name}} 已加入團隊。",
+    "fingerprint": "指令會確認連線的是這台電腦：{{fingerprint}}",
+    "status": {
+      "active": "等待使用",
+      "used": "已使用",
+      "revoked": "已撤銷",
+      "expired": "已過期"
+    },
+    "usedBy": "由 {{name}} 使用",
+    "recent_other": "最近的 {{count}} 個指令"
   }
 }
