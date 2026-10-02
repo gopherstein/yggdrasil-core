@@ -1,0 +1,401 @@
+{
+  "landing": {
+    "title": "What can I help you with?",
+    "subtitle": "Talk to your local AI. Yggdrasil picks the right resources automatically.",
+    "try": "Try:",
+    "suggestions": {
+      "explain": {
+        "label": "Explain a topic",
+        "prompt": "Explain what a mutex is in two short paragraphs."
+      },
+      "code": {
+        "label": "Help me code",
+        "prompt": "Help me write a clean Go function that retries an HTTP request with backoff."
+      },
+      "plan": {
+        "label": "Plan something",
+        "prompt": "Help me outline a weekend trip itinerary in three short sections."
+      }
+    }
+  },
+  "header": {
+    "history": "History",
+    "newChat": "New chat",
+    "untitledChat": "Chat",
+    "assistant": "Assistant",
+    "delete": "Delete",
+    "deleteChat": "Delete chat",
+    "latest": "Latest"
+  },
+  "composer": {
+    "placeholder": "Ask Yggdrasil anything…",
+    "message": "Message",
+    "attach": "Attach files",
+    "attachHint": "Attach a document, spreadsheet, PDF, or code file",
+    "profile": "Profile",
+    "profileHint": "Which assistant style to use",
+    "assistantProfile": "Assistant profile",
+    "runOn": "Run on",
+    "choose": "Choose…",
+    "automatic": "Automatic",
+    "thisComputer": "This computer",
+    "runOnAutomatic": "Norn chooses the best available computer.",
+    "runOnLocal": "Run only on this computer.",
+    "model": "Model",
+    "modelHint": "Which installed model answers this chat",
+    "noModel": "No model installed",
+    "auto": "Auto",
+    "models": "Models",
+    "specialized": "Specialized AIs",
+    "effort": "Effort",
+    "send": "Send",
+    "stop": "Stop",
+    "autoHint": "Auto picks an installed model for each message",
+    "autoLastUsed": "Auto · last used {{model}}",
+    "autoPicks": "Auto · picks a model for each message",
+    "web": "Web",
+    "noModelAsk": "No model installed yet — sending will ask before downloading.",
+    "noModelDownload": "No model installed yet — sending will download automatically.",
+    "openModels": "Open Models",
+    "chooseRunOn": "Choose <strong>Run on</strong> before sending (Settings → Run chats on)."
+  },
+  "effort": {
+    "auto": {
+      "label": "Auto",
+      "hint": "Yggdrasil decides: quick questions stay fast, big or data questions get more care."
+    },
+    "fast": {
+      "label": "Fast",
+      "hint": "Answers in one go, without planning or a second pass."
+    },
+    "balanced": {
+      "label": "Balanced",
+      "hint": "Plans big requests, reads a page when looking things up, and fixes figures once."
+    },
+    "thorough": {
+      "label": "Thorough",
+      "hint": "Reads more pages, uses the largest model that fits, and checks figures twice."
+    }
+  },
+  "memory": {
+    "on": "Memory on",
+    "off": "Memory off",
+    "onHint": "This chat uses what you asked Yggdrasil to remember. Click to keep memory out of this chat.",
+    "offHint": "Memory is off for this chat. Saved memories are not used here and are not deleted.",
+    "disabledHint": "Memory is off for all chats. Turn it on from the Memory page."
+  },
+  "send": {
+    "waitForFiles": "Wait for the files to finish adding, then send.",
+    "summarizeFile_one": "Summarize this file.",
+    "summarizeFile_other": "Summarize these files.",
+    "chooseRunOn": "Choose where to run this chat: Automatic or This computer.",
+    "downloadFailed": "Could not download a model for this chat.",
+    "installFirst": "Install a model first, then try again.",
+    "startFailed": "Could not start a conversation.",
+    "noReply": "The model stopped before it could reply. Yggdrasil stopped it and cleaned up the failed process.",
+    "couldNotRespond": "The model could not respond.",
+    "unreachable": "Could not reach the local AI. Check Diagnostics for details.",
+    "generationFailed": "Something went wrong while generating a response.",
+    "confirmDownload": "Download “{{model}}” so chat can continue? You can change this under Settings → Download models.",
+    "deleteFailed": "Could not delete this chat."
+  },
+  "attachments": {
+    "unsupported": "Yggdrasil can't read this type of file yet",
+    "tooLarge": "Files can be up to 25 MB",
+    "addFailed": "The file could not be added.",
+    "adding": "Adding…",
+    "remove": "Remove {{name}}",
+    "download": "Download {{name}}",
+    "downloading": "Downloading…",
+    "downloadFailed": "The download failed.",
+    "loading": "Loading…",
+    "audioFailed": "The audio could not be loaded.",
+    "play": "Play",
+    "meta": "{{kind}} · {{size}}",
+    "kinds": {
+      "spreadsheet": "Spreadsheet",
+      "pdf": "PDF",
+      "document": "Document",
+      "code": "Code",
+      "image": "Image",
+      "audio": "Audio",
+      "other": "File"
+    }
+  },
+  "status": {
+    "starting": "Starting…",
+    "working": "Working…",
+    "workingLabel": "Working",
+    "downloadingModel": "Downloading model…",
+    "toolAllowedSession": "Tool allowed for this session…",
+    "toolAllowed": "Tool allowed…",
+    "toolDenied": "Tool denied — continuing without it…",
+    "waitingForPermission": "Waiting for permission: {{tool}}",
+    "checkingSources": "Checking sources…",
+    "toolFailed": "{{tool}} failed",
+    "roleOn": "{{role}} on {{computer}}…",
+    "roleRunning": "{{role}} running…",
+    "switchingTo": "Switching to {{model}}…",
+    "using": "Using {{model}}…",
+    "verifying": "Checking the figures against the sources…",
+    "workingThrough_one": "Working through {{count}} part…",
+    "workingThrough_other": "Working through {{count}} parts…",
+    "workingOn": "Working on: {{step}}…",
+    "puttingTogether": "Putting it together…",
+    "writingNamed": "Writing {{name}}…",
+    "writingFile": "Writing the file…",
+    "searchingWebFor": "Searching the web for “{{query}}”…",
+    "searchingWeb": "Searching the web…",
+    "loadingRoleOn": "Loading {{role}} on {{computer}}…",
+    "loadingModelOn": "Loading model on {{computer}}…",
+    "loadingModel": "Loading model…",
+    "roleGeneratingOn": "{{role}} generating on {{computer}}…",
+    "generatingOn": "Generating on {{computer}}…",
+    "generating": "Generating response…",
+    "foundPassages_one": "Found {{count}} passage in {{source}}…",
+    "foundPassages_other": "Found {{count}} passages in {{source}}…",
+    "foundPassagesMore_one": "Found {{count}} passage in {{source}} and {{more}} more…",
+    "foundPassagesMore_other": "Found {{count}} passages in {{source}} and {{more}} more…",
+    "yourKnowledge": "your knowledge",
+    "checkedKnowledge": "Checked your knowledge…",
+    "readingHost": "Reading {{host}}…",
+    "readingPage": "Reading a page…",
+    "readingFile": "Reading a file…",
+    "searchingFiles": "Searching local files…",
+    "readingSpreadsheet": "Reading the spreadsheet…",
+    "creatingFile": "Creating the file…",
+    "runningCode": "Running code in the sandbox…",
+    "runningCommand": "Running command…",
+    "checkingGit": "Checking git…",
+    "usingTool": "Using {{tool}}…"
+  },
+  "tools": {
+    "names": {
+      "internet": {
+        "search": "Web search",
+        "open": "Open page"
+      },
+      "filesystem": {
+        "search": "Find files",
+        "read": "Read file",
+        "write": "Write file"
+      },
+      "files": {
+        "create": "Create file"
+      },
+      "spreadsheet": {
+        "analyze": "Analyze spreadsheet"
+      },
+      "code": {
+        "execute": "Run code"
+      },
+      "terminal": "Terminal",
+      "git": {
+        "status": "Git status",
+        "diff": "Git diff",
+        "log": "Git log",
+        "show": "Git show",
+        "add": "Git add",
+        "commit": "Git commit",
+        "push": "Git push"
+      }
+    },
+    "unnamed": "Tool",
+    "noArguments": "No arguments",
+    "argumentsUnavailable": "Arguments unavailable",
+    "noDetails": "No extra details",
+    "permissionTitle": "Allow {{tool}}?",
+    "permissionReason": "The assistant wants to use a local tool to continue.",
+    "allowOnce": "Allow once",
+    "allowSession": "Allow for session",
+    "deny": "Deny",
+    "decideFailed": "Could not record the tool permission choice.",
+    "failed": "{{tool}} failed",
+    "retry": "Retry",
+    "used_one": "Used {{count}} tool",
+    "used_other": "Used {{count}} tools",
+    "completed": "Completed",
+    "completedIn": "Completed in {{ms}} ms",
+    "traceFailed": "Failed"
+  },
+  "transcript": {
+    "plan": "Plan",
+    "onComputer": "on <computer>{{computer}}</computer>",
+    "interrupted": "Response interrupted"
+  },
+  "roles": {
+    "role": "Role",
+    "answer": "Answer",
+    "planner": "Planner",
+    "reviewer": "Reviewer",
+    "worker": "Worker {{n}}"
+  },
+  "deleteDialog": {
+    "title": "Delete this chat?",
+    "body": "“{{title}}” will be removed permanently.",
+    "untitled": "Untitled",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting…"
+  },
+  "history": {
+    "label": "Chat history",
+    "title": "Chats",
+    "pin": "Pin",
+    "pinned": "Pinned",
+    "pinSidebar": "Pin history sidebar",
+    "unpinSidebar": "Unpin history sidebar",
+    "close": "Close history",
+    "search": "Search chats",
+    "searchPlaceholder": "Search…",
+    "loading": "Loading chats…",
+    "empty": "No previous conversations yet.",
+    "startNew": "Start a new chat",
+    "noMatches": "No matching chats.",
+    "untitled": "Untitled",
+    "actionsFor": "Actions for {{title}}",
+    "chat": "chat",
+    "rename": "Rename",
+    "unpin": "Unpin",
+    "delete": "Delete",
+    "groups": {
+      "pinned": "Pinned",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "week": "Previous 7 days",
+      "month": "Previous 30 days",
+      "older": "Older"
+    }
+  },
+  "errors": {
+    "tryAgain": "Try again",
+    "startNew": "Start a new chat",
+    "openModels": "Open Models",
+    "openComputers": "Open Computers",
+    "details": "Details",
+    "hideDetails": "Hide details",
+    "notResponding": {
+      "title": "Yggdrasil isn't responding",
+      "body": "The local service stopped answering. If this is the desktop app, quit and reopen it, then try again."
+    },
+    "engineMissing": {
+      "title": "The AI engine isn't installed yet",
+      "body": "Install it from Models, then send your message again."
+    },
+    "noModel": {
+      "title": "No model is ready",
+      "body": "Install or choose a model, then try again."
+    },
+    "tooLong": {
+      "title": "This conversation is too long for the model",
+      "body": "Start a new chat, or choose a model that can hold more text."
+    },
+    "outOfMemory": {
+      "title": "Not enough memory for this model",
+      "body": "Close other apps or choose a smaller model, then try again."
+    },
+    "offline": {
+      "title": "A computer you're using is offline",
+      "body": "Turn it on and open Yggdrasil there, or run this chat on this computer."
+    },
+    "connection": {
+      "title": "Couldn't reach the model",
+      "body": "The model stopped responding. This is usually temporary."
+    },
+    "serverError": {
+      "title": "The model ran into a problem",
+      "body": "Try again. If it keeps happening, try another model."
+    },
+    "didNotWork": "That didn’t work",
+    "generic": {
+      "title": "Something went wrong",
+      "body": "Yggdrasil could not finish that reply. Try again in a moment."
+    }
+  },
+  "modelFailure": {
+    "retry": "Retry",
+    "chooseOther": "Use another assistant/model",
+    "details": "Details",
+    "hideDetails": "Hide details",
+    "reason": "Reason: {{value}}",
+    "runtime": "Runtime: {{value}}",
+    "computer": "Computer: {{value}}",
+    "exitCode": "Exit code: {{value}}",
+    "lastProbe": "Last health probe: {{value}}"
+  },
+  "capability": {
+    "enableInternet": "Enable Internet",
+    "installed": "Installed",
+    "notInstalled": "Not installed",
+    "useModel": "Use this model",
+    "viewInModels": "View in Models"
+  },
+  "readAloud": {
+    "button": "Read aloud",
+    "hint": "Read this answer aloud on this computer",
+    "busy": "Reading aloud… (the first time downloads a voice)",
+    "failed": "It could not be read aloud."
+  },
+  "context": {
+    "usage": "Context usage",
+    "full": "Context {{percent}}% full",
+    "percentFull": "{{percent}}% full",
+    "title": "Context",
+    "used": "{{used}} / {{limit}} tokens",
+    "usedEstimated": "~{{used}} / {{limit}} tokens",
+    "limit": "{{limit}} tokens",
+    "summarized_one": "The oldest message was sent as a summary so the conversation fits. Every message is still saved.",
+    "summarized_other": "The {{count}} oldest messages were sent as a summary so the conversation fits. Every message is still saved.",
+    "empty": "Send a message to see how much of this model’s memory the chat is using.",
+    "rows": {
+      "instructions": "Instructions",
+      "tools": "Tools",
+      "conversation": "Conversation",
+      "toolResults": "Tool results"
+    }
+  },
+  "answer": {
+    "files": "Files",
+    "sources": "Sources",
+    "memory": "Memory",
+    "remembered": "Remembered",
+    "steps_one": "What I did ({{count}} step)",
+    "steps_other": "What I did ({{count}} steps)"
+  },
+  "run": {
+    "details": "Run details",
+    "gone": "This run is no longer recorded.",
+    "loadFailed": "Could not load the run.",
+    "run": "Run",
+    "strategy": "Strategy",
+    "effort": "Effort",
+    "modelCalls": "Model calls",
+    "workers": "Workers",
+    "workersParallel_one": "{{count}} side by side",
+    "workersParallel_other": "{{count}} side by side",
+    "workersInOrder_one": "{{count}} in order",
+    "workersInOrder_other": "{{count}} in order",
+    "tools": "Tools",
+    "computers": "Computers",
+    "cacheHits": "Cache hits",
+    "verification": "Verification",
+    "verificationNone": "none",
+    "verificationPasses_one": "{{count}} pass",
+    "verificationPasses_other": "{{count}} passes",
+    "verificationIssues": "{{issues}} issues, {{fixed}} fixed",
+    "retries": "Retries",
+    "context": "Context",
+    "contextTokens": "{{tokens}} tokens",
+    "contextTokensOf": "{{tokens}} of {{limit}} tokens",
+    "latency": "Latency",
+    "beforeModel": "({{time}} before the model)",
+    "onComputer": "on {{computer}}",
+    "calls_one": "{{count}} call",
+    "calls_other": "{{count}} calls",
+    "load": "load {{time}}",
+    "firstToken": "first token {{time}}",
+    "inOut": "{{in}} in / {{out}} out",
+    "cached": "{{count}} cached",
+    "toolFailures": "{{count}} failed"
+  }
+}

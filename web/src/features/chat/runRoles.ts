@@ -1,8 +1,12 @@
+import i18n from '@/i18n'
+
 /** How a role reads in run details: the planner, each worker, the answer, and the reviewer (spec O7). */
 export function roleLabel(role?: string): string {
-  if (!role || role === 'assistant') return 'Answer'
+  if (!role || role === 'assistant') return i18n.t('chat:roles.answer')
   const slot = /^worker:(\d+)$/.exec(role)
-  if (slot) return `Worker ${slot[1]}`
+  if (slot) return i18n.t('chat:roles.worker', { n: slot[1] })
+  if (role === 'planner') return i18n.t('chat:roles.planner')
+  if (role === 'reviewer') return i18n.t('chat:roles.reviewer')
   return role.charAt(0).toUpperCase() + role.slice(1)
 }
 

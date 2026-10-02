@@ -9,6 +9,7 @@ i18n/
   languages.json            languages that can be chosen, with their direction
   locales/<language>/       one folder per BCP 47 tag, such as en, es, pt-BR
     common.json             navigation, status, and words used everywhere
+    chat.json               Chat: the composer, history, progress, and errors
     settings.json           and one file per area of the app
     desktop.json            the desktop app's own menus, tray, and closing screen
     mobile.json             the iPhone app's text

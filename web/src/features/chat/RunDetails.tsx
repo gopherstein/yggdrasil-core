@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { api } from '@/lib/api'
 import type { RunTrace } from '@/types/api'
@@ -24,6 +25,7 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
  * opened.
  */
 export function RunDetails({ runId }: { runId: string }) {
+  const { t } = useTranslation('chat')
   const [open, setOpen] = useState(false)
   const [run, setRun] = useState<RunTrace | null>(null)
   const [error, setError] = useState('')
@@ -35,9 +37,9 @@ export function RunDetails({ runId }: { runId: string }) {
       try {
         const r = await api.getRun(runId)
         if (r) setRun(r)
-        else setError('This run is no longer recorded.')
+        else setError(t('run.gone'))
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Could not load the run.')
+        setError(err instanceof Error ? err.message : t('run.loadFailed'))
       }
     }
   }
@@ -45,64 +47,75 @@ export function RunDetails({ runId }: { runId: string }) {
   return (
     <div className="text-xs text-ink-muted">
       <button type="button" className="underline-offset-2 hover:text-ink hover:underline" aria-expanded={open} onClick={() => void toggle()}>
-        {open ? '▾' : '▸'} Run details
+        {open ? '▾' : '▸'} {t('run.details')}
       </button>
       {open && error && <p className="mt-1 text-danger">{error}</p>}
       {open && run && (
         <dl className="mt-1.5 space-y-1 rounded-lg bg-raised/60 p-2.5">
-          <Row label="Run">
+          <Row label={t('run.run')}>
             <span className="font-mono">{run.id.slice(0, 8)}</span> · {run.status}
             {run.error ? ` · ${run.error}` : ''}
           </Row>
-          {run.strategy.length > 0 && <Row label="Strategy">{run.strategy.join(' · ')}</Row>}
-          {run.effort && <Row label="Effort">{run.effort}</Row>}
+          {run.strategy.length > 0 && <Row label={t('run.strategy')}>{run.strategy.join(' · ')}</Row>}
+          {run.effort && <Row label={t('run.effort')}>{run.effort}</Row>}
           {[...run.models]
             .sort((a, b) => roleOrder(a.role) - roleOrder(b.role))
             .map((m) => (
               <Row key={`${m.role}-${m.model_id}-${m.node}`} label={roleLabel(m.role)}>
                 {m.model_id}
-                {m.node ? ` on ${m.node}` : ''} · {m.calls} {m.calls === 1 ? 'call' : 'calls'}
-                {m.load_ms ? ` · load ${msText(m.load_ms)}` : ''} · first token {msText(m.first_token_ms)}
-                {m.tok_per_sec ? ` · ${m.tok_per_sec.toFixed(1)} tok/s` : ''} · {m.prompt_tokens} in / {m.completion_tokens} out
-                {m.cached_tokens ? ` · ${m.cached_tokens} cached` : ''}
+                {m.node ? ` ${t('run.onComputer', { computer: m.node })}` : ''} · {t('run.calls', { count: m.calls })}
+                {m.load_ms ? ` · ${t('run.load', { time: msText(m.load_ms) })}` : ''} · {t('run.firstToken', { time: msText(m.first_token_ms) })}
+                {m.tok_per_sec ? ` · ${m.tok_per_sec.toFixed(1)} tok/s` : ''} ·{' '}
+                {t('run.inOut', { in: m.prompt_tokens, out: m.completion_tokens })}
+                {m.cached_tokens ? ` · ${t('run.cached', { count: m.cached_tokens })}` : ''}
               </Row>
             ))}
           {run.models.length > 1 && (
-            <Row label="Model calls">{run.models.reduce((n, m) => n + m.calls, 0)}</Row>
+            <Row label={t('run.modelCalls')}>{run.models.reduce((n, m) => n + m.calls, 0)}</Row>
           )}
-          {run.workers ? <Row label="Workers">{`${run.workers} ${run.parallel ? 'side by side' : 'in order'}`}</Row> : null}
+          {run.workers ? (
+            <Row label={t('run.workers')}>
+              {t(run.parallel ? 'run.workersParallel' : 'run.workersInOrder', { count: run.workers })}
+            </Row>
+          ) : null}
           {run.tools.length > 0 && (
-            <Row label="Tools">
+            <Row label={t('run.tools')}>
               {run.tools
-                .map((t) => `${t.tool_id} ×${t.calls} (${msText(t.total_ms)}${t.failures ? `, ${t.failures} failed` : ''})`)
+                .map(
+                  (tool) =>
+                    `${tool.tool_id} ×${tool.calls} (${msText(tool.total_ms)}${tool.failures ? `, ${t('run.toolFailures', { count: tool.failures })}` : ''})`,
+                )
                 .join(', ')}
             </Row>
           )}
-          {run.nodes.length > 0 && <Row label="Computers">{run.nodes.join(', ')}</Row>}
+          {run.nodes.length > 0 && <Row label={t('run.computers')}>{run.nodes.join(', ')}</Row>}
           {run.cache_hits && Object.keys(run.cache_hits).length > 0 && (
-            <Row label="Cache hits">
+            <Row label={t('run.cacheHits')}>
               {Object.entries(run.cache_hits)
                 .map(([tool, n]) => `${tool} ×${n}`)
                 .join(', ')}
             </Row>
           )}
-          <Row label="Verification">
+          <Row label={t('run.verification')}>
             {run.verification_passes === 0
-              ? 'none'
-              : `${run.verification_passes} ${run.verification_passes === 1 ? 'pass' : 'passes'}${
-                  run.verification_issues ? `, ${run.verification_issues} issues, ${run.verification_fixed ?? 0} fixed` : ''
+              ? t('run.verificationNone')
+              : `${t('run.verificationPasses', { count: run.verification_passes })}${
+                  run.verification_issues
+                    ? `, ${t('run.verificationIssues', { issues: run.verification_issues, fixed: run.verification_fixed ?? 0 })}`
+                    : ''
                 }`}
           </Row>
-          <Row label="Retries">{run.retries}</Row>
+          <Row label={t('run.retries')}>{run.retries}</Row>
           {run.context_tokens ? (
-            <Row label="Context">
-              {run.context_tokens}
-              {run.context_limit ? ` of ${run.context_limit}` : ''} tokens
+            <Row label={t('run.context')}>
+              {run.context_limit
+                ? t('run.contextTokensOf', { tokens: run.context_tokens, limit: run.context_limit })
+                : t('run.contextTokens', { tokens: run.context_tokens })}
             </Row>
           ) : null}
-          <Row label="Latency">
+          <Row label={t('run.latency')}>
             {msText(run.latency_ms)}
-            {run.pipeline_ms ? ` (${msText(run.pipeline_ms)} before the model)` : ''}
+            {run.pipeline_ms ? ` ${t('run.beforeModel', { time: msText(run.pipeline_ms) })}` : ''}
           </Row>
         </dl>
       )}

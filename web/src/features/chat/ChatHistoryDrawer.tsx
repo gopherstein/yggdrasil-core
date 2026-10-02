@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
+import { useTranslation } from 'react-i18next'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import type { Conversation } from '@/types/api'
 
@@ -20,7 +21,10 @@ export function useCanPinChatHistory(): boolean {
   return canPin
 }
 
-function recencyGroup(iso: string): string {
+// Groups, in order; their names are chat:history.groups.<group> in the catalog.
+type Group = 'pinned' | 'today' | 'yesterday' | 'week' | 'month' | 'older'
+
+function recencyGroup(iso: string): Group {
   const d = new Date(iso)
   const now = new Date()
   const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
@@ -31,26 +35,19 @@ function recencyGroup(iso: string): string {
   const start30 = new Date(startToday)
   start30.setDate(start30.getDate() - 30)
 
-  if (d >= startToday) return 'Today'
-  if (d >= startYesterday) return 'Yesterday'
-  if (d >= start7) return 'Previous 7 days'
-  if (d >= start30) return 'Previous 30 days'
-  return 'Older'
+  if (d >= startToday) return 'today'
+  if (d >= startYesterday) return 'yesterday'
+  if (d >= start7) return 'week'
+  if (d >= start30) return 'month'
+  return 'older'
 }
 
-const GROUP_ORDER = [
-  'Pinned',
-  'Today',
-  'Yesterday',
-  'Previous 7 days',
-  'Previous 30 days',
-  'Older',
-] as const
+const GROUP_ORDER: Group[] = ['pinned', 'today', 'yesterday', 'week', 'month', 'older']
 
 function groupConversations(
   items: Conversation[],
   pinnedIds: string[],
-): { label: string; items: Conversation[] }[] {
+): { label: Group; items: Conversation[] }[] {
   const pinnedSet = new Set(pinnedIds)
   const pinned: Conversation[] = []
   const rest: Conversation[] = []
@@ -59,9 +56,9 @@ function groupConversations(
     else rest.push(c)
   }
 
-  const map = new Map<string, Conversation[]>()
+  const map = new Map<Group, Conversation[]>()
   if (pinned.length > 0) {
-    map.set('Pinned', pinned)
+    map.set('pinned', pinned)
   }
   for (const c of rest) {
     const label = recencyGroup(c.updated_at || c.created_at)
@@ -122,6 +119,7 @@ export function ChatHistoryDrawer({
   onCommitRename,
   onCancelRename,
 }: ChatHistoryDrawerProps) {
+  const { t } = useTranslation('chat')
   const [search, setSearch] = useState('')
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
   const panelRef = useRef<HTMLElement | null>(null)
@@ -166,10 +164,10 @@ export function ChatHistoryDrawer({
           : 'relative z-10 h-full shrink-0 border-r border-line/50',
       ].join(' ')}
       role="dialog"
-      aria-label="Chat history"
+      aria-label={t('history.label')}
     >
       <div className="flex shrink-0 items-center gap-2 border-b border-line/40 px-3 py-3">
-        <h2 className="flex-1 font-display text-base font-semibold text-ink">Chats</h2>
+        <h2 className="flex-1 font-display text-base font-semibold text-ink">{t('history.title')}</h2>
         {canPinDrawer && (
           <button
             type="button"
@@ -179,18 +177,18 @@ export function ChatHistoryDrawer({
                 ? 'bg-primary-soft text-primary-active'
                 : 'text-ink-faint hover:bg-raised hover:text-ink',
             ].join(' ')}
-            title={drawerPinned ? 'Unpin history sidebar' : 'Pin history sidebar'}
+            title={drawerPinned ? t('history.unpinSidebar') : t('history.pinSidebar')}
             aria-pressed={drawerPinned}
             onClick={onToggleDrawerPinned}
           >
-            {drawerPinned ? 'Pinned' : 'Pin'}
+            {drawerPinned ? t('history.pinned') : t('history.pin')}
           </button>
         )}
         <button
           type="button"
           className="rounded-md px-2 py-1 text-sm text-ink-faint hover:bg-raised hover:text-ink"
-          title="Close history"
-          aria-label="Close history"
+          title={t('history.close')}
+          aria-label={t('history.close')}
           onClick={onClose}
         >
           ×
@@ -199,12 +197,12 @@ export function ChatHistoryDrawer({
 
       <div className="shrink-0 px-3 pt-3">
         <label className="block">
-          <span className="sr-only">Search chats</span>
+          <span className="sr-only">{t('history.search')}</span>
           <input
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search…"
+            placeholder={t('history.searchPlaceholder')}
             className="field w-full py-2 text-sm"
             autoFocus={mode === 'overlay'}
           />
@@ -212,7 +210,7 @@ export function ChatHistoryDrawer({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-2 py-3">
-        {loading && <LoadingSpinner label="Loading chats…" />}
+        {loading && <LoadingSpinner label={t('history.loading')} />}
         {error && (
           <p className="px-2 text-xs text-danger" role="alert">
             {error}
@@ -221,21 +219,21 @@ export function ChatHistoryDrawer({
 
         {!loading && conversations.length === 0 && (
           <div className="px-2 py-6 text-center">
-            <p className="text-sm text-ink-muted">No previous conversations yet.</p>
+            <p className="text-sm text-ink-muted">{t('history.empty')}</p>
             <button type="button" className="btn-primary mt-4 text-xs" onClick={onNewChat}>
-              Start a new chat
+              {t('history.startNew')}
             </button>
           </div>
         )}
 
         {!loading && conversations.length > 0 && grouped.length === 0 && (
-          <p className="px-2 text-xs text-ink-faint">No matching chats.</p>
+          <p className="px-2 text-xs text-ink-faint">{t('history.noMatches')}</p>
         )}
 
         {grouped.map((group) => (
           <div key={group.label} className="mb-4">
             <p className="mb-1 px-2 text-[11px] font-medium uppercase tracking-wide text-ink-faint">
-              {group.label}
+              {t(`history.groups.${group.label}`)}
             </p>
             <ul className="space-y-0.5">
               {group.items.map((conversation) => {
@@ -274,11 +272,11 @@ export function ChatHistoryDrawer({
                               <span
                                 className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
                                 aria-hidden
-                                title="Pinned"
+                                title={t('history.pinned')}
                               />
                             ) : null}
                             <span className="line-clamp-2 min-w-0">
-                              {conversation.title || 'Untitled'}
+                              {conversation.title || t('history.untitled')}
                             </span>
                           </span>
                         </button>
@@ -291,7 +289,7 @@ export function ChatHistoryDrawer({
                                 ? 'opacity-100'
                                 : 'opacity-0 group-hover:opacity-100 focus:opacity-100',
                             ].join(' ')}
-                            aria-label={`Actions for ${conversation.title || 'chat'}`}
+                            aria-label={t('history.actionsFor', { title: conversation.title || t('history.chat') })}
                             aria-expanded={menuOpenId === conversation.id}
                             onClick={(e) => {
                               e.stopPropagation()
@@ -318,7 +316,7 @@ export function ChatHistoryDrawer({
                                   e.stopPropagation()
                                 }}
                               >
-                                Rename
+                                {t('history.rename')}
                               </button>
                               <button
                                 type="button"
@@ -330,7 +328,7 @@ export function ChatHistoryDrawer({
                                   e.stopPropagation()
                                 }}
                               >
-                                {isPinned ? 'Unpin' : 'Pin'}
+                                {isPinned ? t('history.unpin') : t('history.pin')}
                               </button>
                               <button
                                 type="button"
@@ -341,7 +339,7 @@ export function ChatHistoryDrawer({
                                   onDelete(conversation, e)
                                 }}
                               >
-                                Delete
+                                {t('history.delete')}
                               </button>
                             </div>
                           )}
@@ -364,7 +362,7 @@ export function ChatHistoryDrawer({
         <button
           type="button"
           className="absolute inset-0 z-20 bg-ink/25 animate-fade"
-          aria-label="Close history"
+          aria-label={t('history.close')}
           onClick={onClose}
         />
         {panel}

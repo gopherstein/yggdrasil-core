@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 /** Memory On/Off for one chat. Off keeps saved memories out of it without deleting anything. */
@@ -12,10 +13,11 @@ export function MemoryToggle({
   disabled?: boolean
   onChange: (off: boolean) => void
 }) {
+  const { t } = useTranslation('chat')
   if (!memoryEnabled) {
     return (
-      <Link to="/memory" className="composer-select text-xs text-ink-faint" title="Memory is off for all chats. Turn it on from the Memory page.">
-        Memory off
+      <Link to="/memory" className="composer-select text-xs text-ink-faint" title={t('memory.disabledHint')}>
+        {t('memory.off')}
       </Link>
     )
   }
@@ -26,15 +28,11 @@ export function MemoryToggle({
       className={['composer-select text-xs', on ? 'text-ink' : 'text-ink-faint'].join(' ')}
       aria-pressed={on}
       disabled={disabled}
-      title={
-        on
-          ? 'This chat uses what you asked Yggdrasil to remember. Click to keep memory out of this chat.'
-          : 'Memory is off for this chat. Saved memories are not used here and are not deleted.'
-      }
+      title={on ? t('memory.onHint') : t('memory.offHint')}
       onClick={() => onChange(on)}
     >
       <span className={['mr-1.5 inline-block h-1.5 w-1.5 rounded-full', on ? 'bg-norn' : 'bg-line'].join(' ')} aria-hidden />
-      {on ? 'Memory on' : 'Memory off'}
+      {on ? t('memory.on') : t('memory.off')}
     </button>
   )
 }

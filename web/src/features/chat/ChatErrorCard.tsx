@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
@@ -16,6 +17,7 @@ export function ChatErrorCard({
   /** Show Ratatoskr with the acorn dropped. Off when another mascot is already in view. */
   mascot?: boolean
 }) {
+  const { t } = useTranslation('chat')
   const [showDetail, setShowDetail] = useState(false)
   const e = explainError(raw)
   return (
@@ -27,27 +29,27 @@ export function ChatErrorCard({
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
           {e.actions.includes('retry') && onRetry ? (
             <button type="button" className="btn-primary px-3 py-1 text-xs" onClick={onRetry}>
-              Try again
+              {t('errors.tryAgain')}
             </button>
           ) : null}
           {e.actions.includes('new-chat') && onNewChat ? (
             <button type="button" className="btn-secondary px-3 py-1 text-xs" onClick={onNewChat}>
-              Start a new chat
+              {t('errors.startNew')}
             </button>
           ) : null}
           {e.actions.includes('models') ? (
             <Link to="/models" className="btn-secondary px-3 py-1 text-xs">
-              Open Models
+              {t('errors.openModels')}
             </Link>
           ) : null}
           {e.actions.includes('computers') ? (
             <Link to="/nodes" className="btn-secondary px-3 py-1 text-xs">
-              Open Computers
+              {t('errors.openComputers')}
             </Link>
           ) : null}
           {e.detail ? (
             <button type="button" className="ml-auto text-xs text-ink-faint hover:text-ink" onClick={() => setShowDetail((v) => !v)}>
-              {showDetail ? 'Hide details' : 'Details'}
+              {showDetail ? t('errors.hideDetails') : t('errors.details')}
             </button>
           ) : null}
         </div>
