@@ -7,6 +7,7 @@ package gjallarhorn
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/yeixio/yggdrasil-core/internal/events"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 )
 
 // Categories.
@@ -77,8 +79,14 @@ type Notification struct {
 	SourceID   string    `json:"source_id,omitempty"`
 	Category   string    `json:"category"`
 	Severity   string    `json:"severity"`
-	Title      string    `json:"title"`
-	Body       string    `json:"body"`
+	// Title and Body are in English, for logs and clients that read text.
+	Title string `json:"title"`
+	Body  string `json:"body"`
+	// Message is the title and body as catalog keys with their values
+	// (multilingual spec §22), so each place that shows the notification
+	// writes it in its own language. Notices whose text comes from
+	// elsewhere, such as an automation's result, may have none.
+	Message *locale.Message `json:"message,omitempty"`
 	// Link is an app path to the source, such as /automations?id=….
 	Link   string     `json:"link,omitempty"`
 	ReadAt *time.Time `json:"read_at,omitempty"`
@@ -86,6 +94,9 @@ type Notification struct {
 	// window, shown as "4 times" (§22).
 	RepeatCount int        `json:"repeat_count,omitempty"`
 	Deliveries  []Delivery `json:"deliveries,omitempty"`
+	// lang is the language Title and Body are written in, once a delivery
+	// has localized them (see Hub.localized); "" is English.
+	lang string
 }
 
 // Request asks for a notification.
@@ -96,7 +107,10 @@ type Request struct {
 	Severity   string
 	Title      string
 	Body       string
-	Link       string
+	// Message is the title and body as catalog keys. With a message, Title
+	// and Body may be left empty: they are written from it in English.
+	Message *locale.Message
+	Link    string
 	// DedupeKey folds repeats within dedupeWindow into one notification.
 	DedupeKey string
 	// Channels to deliver to besides the notification center, such as "desktop".
@@ -127,6 +141,50 @@ type Hub struct {
 }
 
 func newID() string { return uuid.NewString() }
+
+// messageJSON is a message as stored, or NULL for none.
+func messageJSON(m *locale.Message) any {
+	if m == nil {
+		return nil
+	}
+	raw, err := json.Marshal(m)
+	if err != nil {
+		return nil
+	}
+	return string(raw)
+}
+
+// language is the App language (the ui_locale setting), which text that
+// leaves the app is written in: desktop notices, email, push, and webhooks.
+// "" (the system's language) and an unknown tag are English.
+func (h *Hub) language(ctx context.Context) string {
+	if h.settings == nil {
+		return locale.Source
+	}
+	tag, _, err := h.settings.Get(ctx, "ui_locale")
+	if err != nil {
+		return locale.Source
+	}
+	return locale.Resolve(tag)
+}
+
+// localized is n with its title and body written in the App language.
+func (h *Hub) localized(ctx context.Context, n Notification) Notification {
+	n.lang = h.language(ctx)
+	if n.Message != nil {
+		n.Title, n.Body = n.Message.Render(n.lang)
+	}
+	return n
+}
+
+// text is a catalog key in the language n is written in.
+func (n Notification) text(key string, params map[string]any) string {
+	lang := n.lang
+	if lang == "" {
+		lang = locale.Source
+	}
+	return locale.T(lang, key, params)
+}
 
 // NewHub returns a hub using db and announcing on bus.
 func NewHub(db *sql.DB, bus *events.Bus, channels ...Channel) *Hub {
@@ -164,6 +222,9 @@ func nullable(s string) any {
 // the same dedupe key within ten minutes counts on the existing
 // notification, which is marked unread again (§22).
 func (h *Hub) Notify(ctx context.Context, req Request) (Notification, error) {
+	if req.Message != nil && strings.TrimSpace(req.Title) == "" {
+		req.Title, req.Body = req.Message.Render(locale.Source)
+	}
 	req.Title = strings.TrimSpace(req.Title)
 	if req.Title == "" {
 		return Notification{}, fmt.Errorf("title required")
@@ -180,24 +241,25 @@ func (h *Hub) Notify(ctx context.Context, req Request) (Notification, error) {
 		err := h.db.QueryRowContext(ctx, `SELECT id FROM notifications WHERE dedupe_key = ? AND created_at >= ? AND dismissed_at IS NULL ORDER BY created_at DESC LIMIT 1`,
 			req.DedupeKey, ts(now.Add(-dedupeWindow))).Scan(&id)
 		if err == nil {
-			_, _ = h.db.ExecContext(ctx, `UPDATE notifications SET updated_at = ?, read_at = NULL, body = ?, repeat_count = repeat_count + 1 WHERE id = ?`, ts(now), req.Body, id)
+			_, _ = h.db.ExecContext(ctx, `UPDATE notifications SET updated_at = ?, read_at = NULL, body = ?, message = ?, repeat_count = repeat_count + 1 WHERE id = ?`,
+				ts(now), req.Body, messageJSON(req.Message), id)
 			return h.Get(ctx, id)
 		}
 	}
 	n := Notification{
 		ID: uuid.NewString(), CreatedAt: now, RepeatCount: 1, SourceType: req.SourceType, SourceID: req.SourceID,
-		Category: req.Category, Severity: req.Severity, Title: req.Title, Body: strings.TrimSpace(req.Body), Link: req.Link,
+		Category: req.Category, Severity: req.Severity, Title: req.Title, Body: strings.TrimSpace(req.Body), Message: req.Message, Link: req.Link,
 	}
 	_, err := h.db.ExecContext(ctx, `
-		INSERT INTO notifications (id, created_at, updated_at, source_type, source_id, category, severity, title, body, link, dedupe_key)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		n.ID, ts(now), ts(now), n.SourceType, nullable(n.SourceID), n.Category, n.Severity, n.Title, n.Body, nullable(n.Link), nullable(req.DedupeKey))
+		INSERT INTO notifications (id, created_at, updated_at, source_type, source_id, category, severity, title, body, message, link, dedupe_key)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		n.ID, ts(now), ts(now), n.SourceType, nullable(n.SourceID), n.Category, n.Severity, n.Title, n.Body, messageJSON(n.Message), nullable(n.Link), nullable(req.DedupeKey))
 	if err != nil {
 		return Notification{}, err
 	}
 	if h.bus != nil {
 		h.bus.Publish(events.New(EventCreated, map[string]any{
-			"id": n.ID, "category": n.Category, "severity": n.Severity, "title": n.Title, "body": n.Body, "link": n.Link,
+			"id": n.ID, "category": n.Category, "severity": n.Severity, "title": n.Title, "body": n.Body, "message": n.Message, "link": n.Link,
 		}))
 	}
 	heldUntil, held := h.QuietHours(ctx).HeldUntil(n.Severity, now)
@@ -238,7 +300,7 @@ func (h *Hub) deliver(ctx context.Context, n Notification, name string) Delivery
 		err = fmt.Errorf("channel %q is not available", name)
 	default:
 		dctx, cancel := context.WithTimeout(ctx, 15*time.Second)
-		err = ch.Deliver(dctx, n)
+		err = ch.Deliver(dctx, h.localized(ctx, n))
 		cancel()
 	}
 	now := h.now().UTC()
@@ -261,14 +323,20 @@ func (h *Hub) deliver(ctx context.Context, n Notification, name string) Delivery
 	return d
 }
 
-const columns = `id, created_at, source_type, COALESCE(source_id, ''), category, severity, title, body, COALESCE(link, ''), read_at, repeat_count`
+const columns = `id, created_at, source_type, COALESCE(source_id, ''), category, severity, title, body, COALESCE(message, ''), COALESCE(link, ''), read_at, repeat_count`
 
 func scan(row interface{ Scan(...any) error }) (Notification, error) {
 	var n Notification
-	var created string
+	var created, message string
 	var read sql.NullString
-	if err := row.Scan(&n.ID, &created, &n.SourceType, &n.SourceID, &n.Category, &n.Severity, &n.Title, &n.Body, &n.Link, &read, &n.RepeatCount); err != nil {
+	if err := row.Scan(&n.ID, &created, &n.SourceType, &n.SourceID, &n.Category, &n.Severity, &n.Title, &n.Body, &message, &n.Link, &read, &n.RepeatCount); err != nil {
 		return Notification{}, err
+	}
+	if message != "" {
+		var m locale.Message
+		if json.Unmarshal([]byte(message), &m) == nil {
+			n.Message = &m
+		}
 	}
 	if t := parseTS(sql.NullString{String: created, Valid: true}); t != nil {
 		n.CreatedAt = *t

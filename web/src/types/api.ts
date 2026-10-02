@@ -1289,6 +1289,19 @@ export interface QuietHours {
 }
 
 /** A Gjallarhorn notification kept in the notification center. */
+/** A catalog key with the values it needs, or literal text shown as it is. */
+export interface LocalizedText {
+  key?: string
+  params?: Record<string, unknown>
+  text?: string
+}
+
+/** Text core keeps to show later in the reader's language (multilingual spec §22). */
+export interface LocalizedMessage {
+  title: LocalizedText
+  body?: LocalizedText[]
+}
+
 export interface AppNotification {
   id: string
   created_at: string
@@ -1296,8 +1309,10 @@ export interface AppNotification {
   source_id?: string
   category: NotificationCategory
   severity: NotificationSeverity
+  /** In English; message, when there is one, is shown in the App language. */
   title: string
   body: string
+  message?: LocalizedMessage
   /** App path back to the source, such as /automations?id=…. */
   link?: string
   read_at?: string

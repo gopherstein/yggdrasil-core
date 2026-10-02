@@ -2,12 +2,12 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/events"
 	"github.com/yeixio/yggdrasil-core/internal/gjallarhorn"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 )
 
 // Model crashes notify only when they repeat (Gjallarhorn §23, §29): one
@@ -48,8 +48,8 @@ func (h *healthNotices) notice(evt events.Event, name func(modelID string) strin
 		}
 		h.offline[id] = true
 		return gjallarhorn.Request{SourceType: "node", SourceID: id, Category: gjallarhorn.CategoryHealth, Severity: gjallarhorn.SeverityWarning,
-			Title: computerName(str("name")) + " went offline", Body: "Work that needs it runs on another computer, or waits until it is back.",
-			Link: "/nodes", DedupeKey: "node.offline:" + id}, true
+			Message: computerNotice("computerOffline", str("name"), "computerOfflineBody"),
+			Link:    "/nodes", DedupeKey: "node.offline:" + id}, true
 	case events.NodeOnline:
 		id := str("node_id")
 		if !h.offline[id] {
@@ -58,8 +58,8 @@ func (h *healthNotices) notice(evt events.Event, name func(modelID string) strin
 		}
 		delete(h.offline, id)
 		return gjallarhorn.Request{SourceType: "node", SourceID: id, Category: gjallarhorn.CategoryHealth, Severity: gjallarhorn.SeveritySuccess,
-			Title: computerName(str("name")) + " is back online", Body: "It can run work again.",
-			Link: "/nodes", DedupeKey: "node.online:" + id}, true
+			Message: computerNotice("computerOnline", str("name"), "computerOnlineBody"),
+			Link:    "/nodes", DedupeKey: "node.online:" + id}, true
 	case events.ModelHealthFailed:
 		model := str("model_id")
 		if model == "" {
@@ -78,21 +78,23 @@ func (h *healthNotices) notice(evt events.Event, name func(modelID string) strin
 			return gjallarhorn.Request{}, false
 		}
 		h.notified[model] = now
-		body := fmt.Sprintf("It stopped %d times in the last %d minutes. Chats answered on another model.", len(recent), int(crashWindow.Minutes()))
+		m := notice("modelCrashing", map[string]any{"model": name(model)},
+			"modelCrashingBody", map[string]any{"count": len(recent), "minutes": int(crashWindow.Minutes())})
 		if memory, _ := evt.Payload["likely_memory_pressure"].(bool); memory {
-			body += " It is probably running out of memory: close other apps, or choose a smaller model."
+			m.Body = append(m.Body, locale.Key("notifications:notices.modelCrashingMemory", nil))
 		}
 		return gjallarhorn.Request{SourceType: "model", SourceID: model, Category: gjallarhorn.CategoryHealth, Severity: gjallarhorn.SeverityError,
-			Title: name(model) + " keeps crashing", Body: body, Link: "/models", DedupeKey: "model.crashing:" + model}, true
+			Message: m, Link: "/models", DedupeKey: "model.crashing:" + model}, true
 	}
 	return gjallarhorn.Request{}, false
 }
 
-func computerName(name string) string {
+// computerNotice is a notice about a paired computer, by name when it has one.
+func computerNotice(title, name, body string) *locale.Message {
 	if name == "" {
-		return "A paired computer"
+		return notice(title+"Unnamed", nil, body, nil)
 	}
-	return name
+	return notice(title, map[string]any{"computer": name}, body, nil)
 }
 
 // healthNotice is the notification for a health event, if any.

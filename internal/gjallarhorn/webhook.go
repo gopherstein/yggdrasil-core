@@ -16,6 +16,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 )
 
 // Webhook request headers (§13).
@@ -33,11 +35,18 @@ type WebhookPayload struct {
 	CreatedAt      time.Time `json:"created_at"`
 	Category       string    `json:"category"`
 	Severity       string    `json:"severity"`
-	Title          string    `json:"title"`
-	Body           string    `json:"body"`
-	Link           string    `json:"link,omitempty"`
-	RepeatCount    int       `json:"repeat_count,omitempty"`
-	Source         struct {
+	// Title and Body are written in Language, the App language.
+	Title string `json:"title"`
+	Body  string `json:"body"`
+	// Language is the BCP 47 tag Title and Body are in, such as "de".
+	Language string `json:"language,omitempty"`
+	// Message is the title and body as catalog keys with their values
+	// (i18n/locales/<language>/notifications.json), for receivers that
+	// write the notice in their own language.
+	Message     *locale.Message `json:"message,omitempty"`
+	Link        string          `json:"link,omitempty"`
+	RepeatCount int             `json:"repeat_count,omitempty"`
+	Source      struct {
 		Type string `json:"type"`
 		ID   string `json:"id,omitempty"`
 	} `json:"source"`
@@ -113,7 +122,10 @@ var webhookClient = &http.Client{
 
 func payloadFor(n Notification) WebhookPayload {
 	p := WebhookPayload{Version: 1, NotificationID: n.ID, CreatedAt: n.CreatedAt, Category: n.Category, Severity: n.Severity,
-		Title: n.Title, Body: n.Body, Link: n.Link}
+		Title: n.Title, Body: n.Body, Language: n.lang, Message: n.Message, Link: n.Link}
+	if p.Language == "" {
+		p.Language = locale.Source
+	}
 	if n.RepeatCount > 1 {
 		p.RepeatCount = n.RepeatCount
 	}

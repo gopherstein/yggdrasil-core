@@ -3,6 +3,7 @@ package automations
 import (
 	"context"
 	"errors"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/internal/structured"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 	"strconv"
@@ -15,8 +16,13 @@ var ErrNotifyDisabled = contracts.NewError("NOTIFICATIONS_DISABLED", nil, errors
 
 // Notice is a notification about an automation.
 type Notice struct {
+	// Title and Body are in English, for the desktop sender and logs.
 	Title string
 	Body  string
+	// Message is the title and body as catalog keys and literal text (the
+	// automation's name, what the model wrote), so each place that shows the
+	// notice writes it in its own language (multilingual spec §22).
+	Message *locale.Message
 	// AutomationID links the notice to its automation.
 	AutomationID string
 	// Failure is true when the notice reports a failed run.
@@ -180,33 +186,46 @@ func availabilityStated(line string) bool {
 }
 
 func noticeFor(n Notification, result string) Notice {
-	title := "Yggdrasil"
-	body := "Finished."
+	body := []locale.Text{locale.Key("notifications:notices.automationFinished", nil)}
 	signal, ok := parseSignal(result)
 	if ok && strings.TrimSpace(signal.prose) != "" {
-		body = signal.prose
+		body = []locale.Text{locale.Literal(oneLine(signal.prose, 180))}
 	} else if prose := strings.TrimSpace(result); prose != "" && !ok {
-		body = prose
+		body = []locale.Text{locale.Literal(oneLine(prose, 180))}
 	} else if ok {
 		body = signal.sentence(currencyOf(n))
 	}
-	return Notice{Title: oneLine(title, 80), Body: oneLine(body, 180)}
+	return withMessage(Notice{}, locale.Message{Title: locale.Key("notifications:notices.automationUnnamed", nil), Body: body})
+}
+
+// withMessage is notice with message, and its title and body in English.
+func withMessage(notice Notice, m locale.Message) Notice {
+	notice.Message = &m
+	notice.Title, notice.Body = m.Render(locale.Source)
+	return notice
 }
 
 // noticeTitle replaces the generic title once the caller knows the automation name.
 func noticeTitle(name string, notice Notice) Notice {
-	title := strings.TrimSpace(name)
-	if title == "" {
-		title = notice.Title
+	m := locale.Message{Title: locale.Key("notifications:notices.automationUnnamed", nil)}
+	if notice.Message != nil {
+		m = *notice.Message
+	} else if notice.Title != "" || notice.Body != "" {
+		// A notice written as text keeps its text.
+		m = locale.Message{Title: locale.Literal(oneLine(notice.Title, 80))}
+		if notice.Body != "" {
+			m.Body = []locale.Text{locale.Literal(notice.Body)}
+		}
 	}
-	if title == "" {
-		title = "Yggdrasil"
+	if name = strings.TrimSpace(name); name != "" {
+		m.Title = locale.Literal(oneLine(name, 80))
+	} else if m.Title.Key == "" && m.Title.Text == "" {
+		m.Title = locale.Key("notifications:notices.automationUnnamed", nil)
 	}
-	notice.Title = oneLine(title, 80)
-	if notice.Body == "" {
-		notice.Body = "Finished."
+	if len(m.Body) == 0 {
+		m.Body = []locale.Text{locale.Key("notifications:notices.automationFinished", nil)}
 	}
-	return notice
+	return withMessage(notice, m)
 }
 
 // currencyOf is the currency a threshold's price is in, or "" when the
@@ -221,29 +240,29 @@ func currencyOf(n Notification) string {
 	return n.Condition.Currency
 }
 
-func (s parsedSignal) sentence(currency string) string {
-	var parts []string
+func (s parsedSignal) sentence(currency string) []locale.Text {
+	var parts []locale.Text
 	if s.Price != nil {
 		price := strconv.FormatFloat(*s.Price, 'f', -1, 64)
 		if currency != "" {
 			price += " " + currency
 		}
-		parts = append(parts, "Price is "+price+".")
+		parts = append(parts, locale.Key("notifications:notices.automationPrice", map[string]any{"price": price}))
 	}
 	if s.Available != nil {
 		if *s.Available {
-			parts = append(parts, "It is available.")
+			parts = append(parts, locale.Key("notifications:notices.automationAvailable", nil))
 		} else {
-			parts = append(parts, "It is not available.")
+			parts = append(parts, locale.Key("notifications:notices.automationUnavailable", nil))
 		}
 	}
 	if s.Significant != nil && *s.Significant {
-		parts = append(parts, "This result is significant.")
+		parts = append(parts, locale.Key("notifications:notices.automationSignificant", nil))
 	}
 	if len(parts) == 0 {
-		return "Finished."
+		return []locale.Text{locale.Key("notifications:notices.automationFinished", nil)}
 	}
-	return strings.Join(parts, " ")
+	return parts
 }
 
 // signalSchema is every field a result's JSON may carry. None is required

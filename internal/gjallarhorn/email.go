@@ -141,7 +141,7 @@ func emailMessage(cfg EmailConfig, n Notification, now time.Time) []byte {
 	var b bytes.Buffer
 	subject := n.Title
 	if n.RepeatCount > 1 {
-		subject = fmt.Sprintf("%s (%d times)", n.Title, n.RepeatCount)
+		subject = n.text("notifications:sent.times", map[string]any{"title": n.Title, "count": n.RepeatCount})
 	}
 	host := "yggdrasil.local"
 	if from, err := mail.ParseAddress(cfg.From); err == nil {
@@ -165,8 +165,11 @@ func emailMessage(cfg EmailConfig, n Notification, now time.Time) []byte {
 	if n.Body != "" {
 		text += n.Body + "\n\n"
 	}
-	text += fmt.Sprintf("%s · %s · %s\n", n.Category, n.Severity, n.CreatedAt.Local().Format("Jan 2, 3:04 PM"))
-	text += "\nSent by Yggdrasil. Change what is sent in Settings → Notifications.\n"
+	// The date is written the same way in every language: Go has no
+	// localized month names.
+	text += fmt.Sprintf("%s · %s · %s\n", n.text("notifications:categories."+n.Category, nil),
+		n.text("notifications:sent.severities."+n.Severity, nil), n.CreatedAt.Local().Format("2006-01-02 15:04"))
+	text += "\n" + n.text("notifications:sent.footer", nil) + "\n"
 	_, _ = qp.Write([]byte(strings.ReplaceAll(text, "\n", "\r\n")))
 	_ = qp.Close()
 	return b.Bytes()

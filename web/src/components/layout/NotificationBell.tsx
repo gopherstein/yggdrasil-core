@@ -7,7 +7,7 @@ import i18n from '@/i18n'
 import { api } from '@/lib/api'
 import { subscribeEvents } from '@/lib/events'
 import type { AppNotification, NotificationCategory, NotificationList } from '@/types/api'
-import { CATEGORIES, categoryLabel, deliveryNote } from '@/features/settings/notificationLabels'
+import { CATEGORIES, categoryLabel, deliveryNote, noticeText } from '@/features/settings/notificationLabels'
 import { formatDate, formatRelativeTime } from '@/i18n/format'
 
 const KEY = ['notifications'] as const
@@ -198,31 +198,34 @@ export function NotificationBell() {
                   {t('bell.empty')}
                 </li>
               )}
-              {notifications.map((n) => (
-                <li key={n.id} className={['group flex gap-3 border-b border-line/40 px-4 py-3 last:border-b-0', n.read_at ? '' : 'bg-primary-soft/40'].join(' ')}>
-                  <span className={['mt-1.5 h-2 w-2 shrink-0 rounded-full', SEVERITY_DOT[n.severity] ?? 'bg-info'].join(' ')} aria-hidden />
-                  <button type="button" className="min-w-0 flex-1 text-start" onClick={() => openItem(n)}>
-                    <p className={['text-sm text-ink', n.read_at ? '' : 'font-semibold'].join(' ')}>
-                      {n.title}
-                      {(n.repeat_count ?? 1) > 1 && <span className="font-normal text-ink-muted"> · {t('bell.times', { count: n.repeat_count })}</span>}
-                    </p>
-                    {n.body && <p className="mt-0.5 line-clamp-3 text-xs text-ink-muted">{n.body}</p>}
-                    <p className="mt-1 text-[11px] text-ink-faint">
-                      {ago(n.created_at)}
-                      {deliveryNote(n) && <span> · {deliveryNote(n)}</span>}
-                      {!n.read_at && <span className="sr-only"> · {t('bell.unread')}</span>}
-                    </p>
-                  </button>
-                  <button
-                    type="button"
-                    className="self-start rounded p-1 text-ink-faint opacity-60 hover:bg-raised hover:text-ink group-hover:opacity-100"
-                    aria-label={t('bell.dismiss', { title: n.title })}
-                    onClick={() => dismiss.mutate(n.id)}
-                  >
-                    ×
-                  </button>
-                </li>
-              ))}
+              {notifications.map((n) => {
+                const text = noticeText(n)
+                return (
+                  <li key={n.id} className={['group flex gap-3 border-b border-line/40 px-4 py-3 last:border-b-0', n.read_at ? '' : 'bg-primary-soft/40'].join(' ')}>
+                    <span className={['mt-1.5 h-2 w-2 shrink-0 rounded-full', SEVERITY_DOT[n.severity] ?? 'bg-info'].join(' ')} aria-hidden />
+                    <button type="button" className="min-w-0 flex-1 text-start" onClick={() => openItem(n)}>
+                      <p className={['text-sm text-ink', n.read_at ? '' : 'font-semibold'].join(' ')}>
+                        {text.title}
+                        {(n.repeat_count ?? 1) > 1 && <span className="font-normal text-ink-muted"> · {t('bell.times', { count: n.repeat_count })}</span>}
+                      </p>
+                      {text.body && <p className="mt-0.5 line-clamp-3 text-xs text-ink-muted">{text.body}</p>}
+                      <p className="mt-1 text-[11px] text-ink-faint">
+                        {ago(n.created_at)}
+                        {deliveryNote(n) && <span> · {deliveryNote(n)}</span>}
+                        {!n.read_at && <span className="sr-only"> · {t('bell.unread')}</span>}
+                      </p>
+                    </button>
+                    <button
+                      type="button"
+                      className="self-start rounded p-1 text-ink-faint opacity-60 hover:bg-raised hover:text-ink group-hover:opacity-100"
+                      aria-label={t('bell.dismiss', { title: text.title })}
+                      onClick={() => dismiss.mutate(n.id)}
+                    >
+                      ×
+                    </button>
+                  </li>
+                )
+              })}
             </ul>
           </div>,
           document.body,

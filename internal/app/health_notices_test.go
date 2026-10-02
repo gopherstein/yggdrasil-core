@@ -24,13 +24,13 @@ func TestComputerHealthNotifiesOnChanges(t *testing.T) {
 		t.Fatal("a computer that was never offline was announced back")
 	}
 	req, ok := h.notice(off, name, true)
-	if !ok || req.Title != "Studio went offline" || req.Category != gjallarhorn.CategoryHealth || req.Severity != gjallarhorn.SeverityWarning {
+	if title, _ := rendered(req, "en"); !ok || title != "Studio went offline" || req.Category != gjallarhorn.CategoryHealth || req.Severity != gjallarhorn.SeverityWarning {
 		t.Fatalf("offline = %+v %v", req, ok)
 	}
 	if _, ok := h.notice(off, name, true); ok {
 		t.Fatal("the same offline state was announced twice")
 	}
-	if req, ok := h.notice(on, name, true); !ok || req.Title != "Studio is back online" || req.Severity != gjallarhorn.SeveritySuccess {
+	if req, ok := h.notice(on, name, true); !ok || title(req) != "Studio is back online" || req.Severity != gjallarhorn.SeveritySuccess {
 		t.Fatalf("back = %+v %v", req, ok)
 	}
 	if _, ok := h.notice(off, name, false); ok {
@@ -59,11 +59,11 @@ func TestModelCrashingNotifiesWhenRepeated(t *testing.T) {
 	}
 	clock = clock.Add(5 * time.Minute)
 	req, ok := h.notice(crash, name, true)
-	if !ok || req.Title != "Qwen 2.5 7B keeps crashing" || req.Severity != gjallarhorn.SeverityError {
+	if !ok || title(req) != "Qwen 2.5 7B keeps crashing" || req.Severity != gjallarhorn.SeverityError {
 		t.Fatalf("crashing = %+v %v", req, ok)
 	}
-	if want := "running out of memory"; !strings.Contains(req.Body, want) {
-		t.Fatalf("body %q lacks %q", req.Body, want)
+	if _, body := rendered(req, "en"); !strings.Contains(body, "running out of memory") || !strings.Contains(body, "stopped 2 times") {
+		t.Fatalf("body %q lacks the crash count or the memory hint", body)
 	}
 	clock = clock.Add(10 * time.Minute)
 	if _, ok := h.notice(crash, name, true); ok {
@@ -75,4 +75,9 @@ func TestModelCrashingNotifiesWhenRepeated(t *testing.T) {
 	if _, ok := h.notice(crash, name, true); !ok {
 		t.Fatal("not announced again after the hour")
 	}
+}
+
+func title(req gjallarhorn.Request) string {
+	t, _ := rendered(req, "en")
+	return t
 }

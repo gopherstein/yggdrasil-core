@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 )
 
 // SettingsStore keeps quiet hours with the other settings.
@@ -253,7 +255,7 @@ func (h *Hub) send(ctx context.Context, n Notification, channel, destinationID s
 		if !ok {
 			return PermanentError{Err: fmt.Errorf("channel %q is not available", channel)}
 		}
-		err := ch.Deliver(dctx, n)
+		err := ch.Deliver(dctx, h.localized(ctx, n))
 		if err == ErrSuppressed {
 			return PermanentError{Err: err}
 		}
@@ -266,7 +268,7 @@ func (h *Hub) send(ctx context.Context, n Notification, channel, destinationID s
 	if !dest.Enabled {
 		return PermanentError{Err: fmt.Errorf("the destination is turned off")}
 	}
-	return h.sendTo(dctx, dest, n)
+	return h.sendTo(dctx, dest, h.localized(ctx, n))
 }
 
 // sendTo delivers to a destination and records what left this computer.
@@ -309,8 +311,11 @@ func (h *Hub) TestDestination(ctx context.Context, id string) error {
 	}
 	now := h.now().UTC()
 	n := Notification{ID: "test-" + newID(), CreatedAt: now, SourceType: "test", Category: CategorySystem, Severity: SeverityInfo,
-		Title: "Test from Yggdrasil", Body: "Notifications to " + dest.Name + " work."}
+		Message: &locale.Message{
+			Title: locale.Key("notifications:notices.test", nil),
+			Body:  []locale.Text{locale.Key("notifications:notices.testBody", map[string]any{"destination": dest.Name})},
+		}}
 	tctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
-	return h.sendTo(tctx, dest, n)
+	return h.sendTo(tctx, dest, h.localized(tctx, n))
 }

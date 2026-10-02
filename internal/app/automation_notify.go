@@ -2,11 +2,11 @@ package app
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/yeixio/yggdrasil-core/internal/automations"
 	"github.com/yeixio/yggdrasil-core/internal/events"
 	"github.com/yeixio/yggdrasil-core/internal/gjallarhorn"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/internal/training"
 )
 
@@ -69,6 +69,7 @@ func (n automationNotifier) Notify(ctx context.Context, notice automations.Notic
 		Severity:   severity,
 		Title:      notice.Title,
 		Body:       notice.Body,
+		Message:    notice.Message,
 		Link:       link,
 		Channels:   []string{"desktop"},
 	})
@@ -130,31 +131,39 @@ func noticeForEvent(a *App, evt events.Event) (gjallarhorn.Request, bool) {
 	str := func(k string) string { v, _ := evt.Payload[k].(string); return v }
 	switch evt.Type {
 	case events.ModelDownloadCompleted:
-		name := a.modelName(str("model_id"))
 		return gjallarhorn.Request{SourceType: "model", SourceID: str("model_id"), Category: gjallarhorn.CategoryModel,
-			Severity: gjallarhorn.SeveritySuccess, Title: "Model ready", Body: fmt.Sprintf("%s finished downloading and is ready to use.", name),
-			Link: "/models", DedupeKey: "model.download:" + str("model_id")}, true
+			Severity: gjallarhorn.SeveritySuccess, Link: "/models", DedupeKey: "model.download:" + str("model_id"),
+			Message: notice("modelReady", nil, "modelReadyBody", map[string]any{"model": a.modelName(str("model_id"))})}, true
 	case events.ModelDownloadFailed:
-		name := a.modelName(str("model_id"))
 		return gjallarhorn.Request{SourceType: "model", SourceID: str("model_id"), Category: gjallarhorn.CategoryModel,
-			Severity: gjallarhorn.SeverityError, Title: "Download failed", Body: fmt.Sprintf("%s could not be downloaded: %s", name, str("error")),
-			Link: "/models", DedupeKey: "model.download:" + str("model_id")}, true
+			Severity: gjallarhorn.SeverityError, Link: "/models", DedupeKey: "model.download:" + str("model_id"),
+			Message: notice("downloadFailed", nil, "downloadFailedBody", map[string]any{"model": a.modelName(str("model_id")), "error": str("error")})}, true
 	case training.EventExportCompleted:
 		return gjallarhorn.Request{SourceType: "training", SourceID: str("ai_id"), Category: gjallarhorn.CategoryTraining,
-			Severity: gjallarhorn.SeveritySuccess, Title: "Model exported", Body: fmt.Sprintf("%s is ready to download as a GGUF file.", str("name")),
-			Link: "/train"}, true
+			Severity: gjallarhorn.SeveritySuccess, Link: "/train",
+			Message: notice("modelExported", nil, "modelExportedBody", map[string]any{"name": str("name")})}, true
 	case training.EventExportFailed:
 		return gjallarhorn.Request{SourceType: "training", SourceID: str("ai_id"), Category: gjallarhorn.CategoryTraining,
-			Severity: gjallarhorn.SeverityError, Title: "Export failed", Body: fmt.Sprintf("%s could not be exported: %s", str("name"), str("error")),
-			Link: "/train"}, true
+			Severity: gjallarhorn.SeverityError, Link: "/train",
+			Message: notice("exportFailed", nil, "exportFailedBody", map[string]any{"name": str("name"), "error": str("error")})}, true
 	case "training.deployed":
 		return gjallarhorn.Request{SourceType: "training", SourceID: str("ai_id"), Category: gjallarhorn.CategoryTraining,
-			Severity: gjallarhorn.SeveritySuccess, Title: "Specialized AI deployed", Body: "It is now in the Chat model menu and the API.",
-			Link: "/train"}, true
+			Severity: gjallarhorn.SeveritySuccess, Link: "/train",
+			Message: notice("aiDeployed", nil, "aiDeployedBody", nil)}, true
 	case events.NodePaired:
 		return gjallarhorn.Request{SourceType: "node", SourceID: str("node_id"), Category: gjallarhorn.CategorySystem,
-			Severity: gjallarhorn.SeveritySuccess, Title: "Computer paired", Body: "It can now run work with this computer.",
-			Link: "/nodes", DedupeKey: "node.paired:" + str("node_id")}, true
+			Severity: gjallarhorn.SeveritySuccess, Link: "/nodes", DedupeKey: "node.paired:" + str("node_id"),
+			Message: notice("computerPaired", nil, "computerPairedBody", nil)}, true
 	}
 	return gjallarhorn.Request{}, false
+}
+
+// notice is a notification's message from the notices in
+// i18n/locales/<language>/notifications.json: a title and a body sentence.
+func notice(title string, titleParams map[string]any, body string, bodyParams map[string]any) *locale.Message {
+	m := &locale.Message{Title: locale.Key("notifications:notices."+title, titleParams)}
+	if body != "" {
+		m.Body = []locale.Text{locale.Key("notifications:notices."+body, bodyParams)}
+	}
+	return m
 }

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/events"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	modelhealth "github.com/yeixio/yggdrasil-core/internal/models/health"
 )
 
@@ -182,9 +183,9 @@ func (r *Runner) execute(ctx context.Context, automation Automation, occurrence 
 		if err != nil {
 			return err
 		}
-		message := execErr.Error()
-		if modelhealth.OutOfMemory(message) {
-			message = "This computer ran out of memory for the model."
+		message := locale.Literal(execErr.Error())
+		if modelhealth.OutOfMemory(execErr.Error()) {
+			message = locale.Key("notifications:notices.automationOutOfMemory", nil)
 			if updated.ConsecutiveFailures >= oomPauseAfter && r.Pause != nil && updated.Enabled {
 				if err := r.Pause(ctx, automation.ID); err != nil {
 					if r.Logger != nil {
@@ -192,7 +193,7 @@ func (r *Runner) execute(ctx context.Context, automation Automation, occurrence 
 					}
 				} else {
 					updated.Enabled = false
-					message = fmt.Sprintf("Paused after running out of memory %d times in a row. Choose a smaller model for this automation, or close other work, then resume it.", updated.ConsecutiveFailures)
+					message = locale.Key("notifications:notices.automationPausedMemory", map[string]any{"count": updated.ConsecutiveFailures})
 				}
 			}
 		}
@@ -228,7 +229,7 @@ func (r *Runner) reportAbandoned(ctx context.Context, runs []Run) error {
 			errs = append(errs, err)
 			continue
 		}
-		sent, notifyErr := r.notifyRepeated(ctx, automation, run, run.Error)
+		sent, notifyErr := r.notifyRepeated(ctx, automation, run, locale.Literal(run.Error))
 		if err := r.Store.SetNotificationSent(ctx, run.ID, sent); err != nil {
 			errs = append(errs, err)
 			continue
@@ -241,18 +242,21 @@ func (r *Runner) reportAbandoned(ctx context.Context, runs []Run) error {
 	return errors.Join(errs...)
 }
 
-func (r *Runner) notifyRepeated(ctx context.Context, automation Automation, run Run, message string) (bool, error) {
+// notifyRepeated tells the user an automation keeps failing, and why.
+func (r *Runner) notifyRepeated(ctx context.Context, automation Automation, run Run, reason locale.Text) (bool, error) {
 	if automation.ConsecutiveFailures < 2 && run.Attempt < MaxAttempts {
 		return false, nil
 	}
 	if r.Notify == nil {
 		return false, errors.New("notifier is not configured")
 	}
-	body := fmt.Sprintf("Could not run after %d attempts: %s", run.Attempt, message)
+	what := locale.Key("notifications:notices.automationFailedAttempts", map[string]any{"count": run.Attempt})
 	if run.Attempt < MaxAttempts {
-		body = fmt.Sprintf("Could not run (%d failures in a row): %s", automation.ConsecutiveFailures, message)
+		what = locale.Key("notifications:notices.automationFailedInARow", map[string]any{"count": automation.ConsecutiveFailures})
 	}
-	if err := r.Notify.Notify(ctx, noticeTitle(automation.Name, Notice{Body: body, AutomationID: automation.ID, Failure: true})); err != nil {
+	notice := Notice{AutomationID: automation.ID, Failure: true,
+		Message: &locale.Message{Body: []locale.Text{what, reason}}}
+	if err := r.Notify.Notify(ctx, noticeTitle(automation.Name, notice)); err != nil {
 		return false, err
 	}
 	return true, nil

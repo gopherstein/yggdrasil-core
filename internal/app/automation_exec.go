@@ -149,24 +149,21 @@ func (e automationExecutor) reportSkipped(ctx context.Context, automation automa
 			names = append(names, id)
 		}
 	}
+	tools := strings.Join(names, ", ")
+	m := notice("toolsSkippedUnnamed", map[string]any{"tools": tools}, "toolsSkippedBody", nil)
+	if name := strings.TrimSpace(automation.Name); name != "" {
+		m = notice("toolsSkipped", map[string]any{"automation": name, "tools": tools}, "toolsSkippedBody", nil)
+	}
 	_, _ = e.app.Notifications.Notify(context.WithoutCancel(ctx), gjallarhorn.Request{
 		SourceType: "automation",
 		SourceID:   automation.ID,
 		Category:   gjallarhorn.CategoryApproval,
 		Severity:   gjallarhorn.SeverityWarning,
-		Title:      fmt.Sprintf("%s skipped %s", automationName(automation), strings.Join(names, ", ")),
-		Body:       "These need your approval, so the run went on without them. Open the automation and allow them to let later runs use them.",
+		Message:    m,
 		Link:       "/automations?id=" + automation.ID,
 		DedupeKey:  "automation.skipped:" + automation.ID,
 		Channels:   []string{"desktop"},
 	})
-}
-
-func automationName(a automations.Automation) string {
-	if strings.TrimSpace(a.Name) != "" {
-		return a.Name
-	}
-	return "An automation"
 }
 
 type automationEnv struct {

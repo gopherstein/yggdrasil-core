@@ -99,11 +99,11 @@ type ntfyMessage struct {
 }
 
 func ntfyMessageFor(c NtfyConfig, n Notification) ntfyMessage {
-	m := ntfyMessage{Topic: c.Topic, Title: "Yggdrasil", Message: "You have a new Yggdrasil notification.", Priority: ntfyPriority(n.Severity)}
+	m := ntfyMessage{Topic: c.Topic, Title: "Yggdrasil", Message: n.text("notifications:sent.privatePush", nil), Priority: ntfyPriority(n.Severity)}
 	if c.Content == "full" {
 		m.Title = n.Title
 		if n.RepeatCount > 1 {
-			m.Title = fmt.Sprintf("%s (%d times)", n.Title, n.RepeatCount)
+			m.Title = n.text("notifications:sent.times", map[string]any{"title": n.Title, "count": n.RepeatCount})
 		}
 		m.Message = n.Body
 		if m.Message == "" {

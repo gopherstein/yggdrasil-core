@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/yeixio/yggdrasil-core/internal/automations"
@@ -88,11 +89,23 @@ func TestAutomationNoticesGoToTheNotificationCenter(t *testing.T) {
 	}
 }
 
+// rendered is a notice's title and body in lang.
+func rendered(req gjallarhorn.Request, lang string) (title, body string) {
+	if req.Message == nil {
+		return req.Title, req.Body
+	}
+	return req.Message.Render(lang)
+}
+
 func TestEventsBecomeNotifications(t *testing.T) {
 	a := &App{}
 	req, ok := noticeForEvent(a, events.New(events.ModelDownloadCompleted, map[string]any{"model_id": "llama-1b"}))
-	if !ok || req.Title != "Model ready" || req.Category != gjallarhorn.CategoryModel || req.Link != "/models" {
+	if title, _ := rendered(req, "en"); !ok || title != "Model ready" || req.Category != gjallarhorn.CategoryModel || req.Link != "/models" {
 		t.Fatalf("download = %+v", req)
+	}
+	// The same notice in the App language, wherever it is shown (§22).
+	if title, body := rendered(req, "de"); title == "Model ready" || !strings.Contains(body, "llama-1b") {
+		t.Fatalf("German download notice = %q / %q", title, body)
 	}
 	if _, ok := noticeForEvent(a, events.New(events.ChatToken, nil)); ok {
 		t.Fatal("chat tokens are not notifications")
