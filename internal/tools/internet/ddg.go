@@ -2,6 +2,7 @@ package internet
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -10,6 +11,8 @@ import (
 	"unicode/utf8"
 
 	"golang.org/x/net/html"
+
+	"github.com/yeixio/yggdrasil-core/internal/netguard"
 )
 
 const maxSearchBytes = 1 << 20
@@ -91,16 +94,20 @@ func unwrapDuckLink(raw string) string {
 	return ""
 }
 
-// HTTPFetcher downloads a page and returns readable text.
+// HTTPFetcher downloads a page and returns readable text. It opens only
+// public addresses: a page on this computer or the local network is
+// refused, including through a redirect.
 type HTTPFetcher struct {
-	Client *http.Client
+	// Guard checks every connection; nil uses the system's resolver.
+	Guard *netguard.Guard
 }
 
 func (f HTTPFetcher) client() *http.Client {
-	if f.Client != nil {
-		return f.Client
+	guard := f.Guard
+	if guard == nil {
+		guard = &netguard.Guard{}
 	}
-	return &http.Client{Timeout: 15 * time.Second}
+	return guard.Client(15 * time.Second)
 }
 
 func (f HTTPFetcher) Open(ctx context.Context, rawURL string) (Page, error) {
@@ -109,6 +116,9 @@ func (f HTTPFetcher) Open(ctx context.Context, rawURL string) (Page, error) {
 		return Page{}, errString("url must be http or https")
 	}
 	body, err := get(ctx, f.client(), parsed.String(), maxPageBytes)
+	if errors.Is(err, netguard.ErrPrivate) {
+		return Page{}, netguard.ErrPrivate
+	}
 	if err != nil {
 		return Page{}, err
 	}
