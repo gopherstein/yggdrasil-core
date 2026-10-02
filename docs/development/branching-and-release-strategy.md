@@ -346,7 +346,7 @@ release: prepare v1.3.0-beta.1
 
 That PR may include:
 
-- `CHANGELOG.md` updates,
+- the `CHANGELOG.md` section written by `scripts/changelog.py release` from `changes/unreleased/`,
 - release notes source,
 - documentation changes,
 - compatibility notes,

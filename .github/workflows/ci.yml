@@ -47,6 +47,10 @@ jobs:
         run: |
           python3 scripts/test_publish_docs.py
           python3 scripts/publish-docs.py --destination "$RUNNER_TEMP/docs-validation" --version 0.0.0-test --commit "$GITHUB_SHA"
+      - name: Changelog fragments
+        run: |
+          python3 scripts/test_changelog.py
+          python3 scripts/changelog.py check
       - name: Format check
         run: |
           unformatted=$(gofmt -l $(find . -name '*.go' \

@@ -7,7 +7,7 @@ A tag with a pre-release suffix (`-alpha.N`, `-beta.N`, `-rc.N`) is published as
 After a successful release, the workflow sends a `core-release` event to `yeixio/yggdrasil-desktop`, which builds the desktop, Mac App Store, and iOS apps from that core release. Sending it needs the repository secret `YGGDRASIL_DESKTOP_TOKEN`: a fine-grained personal access token (or GitHub App token) for `yeixio/yggdrasil-desktop` only, with the **Contents: Read and write** permission. Without the secret, the run shows a "Desktop not notified" warning, and the desktop repository picks the release up in its daily check, or when its Release workflow is started by hand.
 
 - [ ] Version passed into the release build matches the tag (`scripts/build/package-core-release.sh` strips a leading `v` in CI).
-- [ ] [CHANGELOG.md](../CHANGELOG.md) has an entry for the release, moved out of Unreleased.
+- [ ] The release's section is in [CHANGELOG.md](../CHANGELOG.md): `python3 scripts/changelog.py release <version>` writes it from the fragments in [changes/unreleased/](../changes/unreleased/) and removes them. Edit the section's opening sentence by hand if the release needs one.
 - [ ] CI is green on the commit being tagged, including `gofmt`, `go vet`, golangci-lint, `go test`, web lint, the web build, and the cross-compile job.
 - [ ] `govulncheck` from the security workflow is green. `pnpm audit` is informational today because that step does not fail the job. Read its output.
 - [ ] Linux amd64, Linux arm64, macOS amd64, macOS arm64, and Windows amd64 archives or packages built.

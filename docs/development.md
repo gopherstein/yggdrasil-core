@@ -90,7 +90,7 @@ The web check in CI is `pnpm lint`, `pnpm exec tsc -b --pretty false`, `pnpm tes
 
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on pull requests and on pushes to `main`, on Ubuntu, in two jobs:
 
-- **go:** user-guide publish checks; `gofmt`, `go vet`, golangci-lint, `go test ./...`; then cross-compiles of `yggdrasil-daemon` and `yggctl` for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, and windows/amd64 (`CGO_ENABLED=0`). These share one runner, so the module and build caches are reused.
+- **go:** user-guide publish checks; changelog fragment checks; `gofmt`, `go vet`, golangci-lint, `go test ./...`; then cross-compiles of `yggdrasil-daemon` and `yggctl` for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, and windows/amd64 (`CGO_ENABLED=0`). These share one runner, so the module and build caches are reused.
 - **frontend:** web lint, typecheck, test, and build.
 
 To keep runs short:
@@ -117,6 +117,16 @@ Issue labels are defined in [`.github/labels.yml`](../.github/labels.yml). GitHu
 Tag `v*` → release workflow → Linux `.deb` and `.rpm` (amd64 and arm64), macOS headless archives (arm64 and amd64), Windows amd64 headless archive, `SHA256SUMS.txt` → GitHub Release.
 
 The same job opens a Homebrew formula pull request, updates the `apt` branch, and opens a documentation snapshot pull request. The release token cannot approve those pull requests, so a required review leaves them open and does not fail the release. Signing is not part of this workflow. The checklist is [release-checklist.md](release-checklist.md).
+
+## Changelog and shared files
+
+A pull request does not edit `CHANGELOG.md`. It adds a fragment under [`changes/unreleased/`](../changes/unreleased/README.md), a small Markdown file with `### Added`, `### Changed`, or `### Fixed` (and so on) and one bullet per change. Two pull requests never touch the same fragment, so they cannot conflict over the changelog. `python3 scripts/changelog.py preview` shows the next release's section; the release preparation runs `python3 scripts/changelog.py release <version>`, which writes it into `CHANGELOG.md` and removes the fragments.
+
+Other files many pull requests touch merge cleanly when each change goes next to related lines rather than at the end of the file:
+
+- **`api/openapi.yaml`:** add a path beside the other paths for the same area (all the `/api/v1/notifications/...` paths together), and a schema beside related schemas, not at the end of `components`.
+- **`docs/user-guide/guide.json`:** change the section the feature belongs to, not the last section.
+- **`web/src/types/api.ts` and `web/src/lib/api.ts`:** add a type or method beside the ones for the same feature.
 
 ## Conventions
 

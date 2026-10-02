@@ -44,3 +44,4 @@ The agreement is [CLA.md](../CLA.md).
 - [ ] No secrets or personal data included
 - [ ] Public APIs documented
 - [ ] Relevant docs updated
+- [ ] A changelog fragment in `changes/unreleased/` for anything users or integrators notice (not an edit to `CHANGELOG.md`)
