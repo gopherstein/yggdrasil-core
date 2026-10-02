@@ -8,6 +8,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/internal/tools"
 )
 
@@ -27,19 +28,14 @@ const (
 	Local Kind = "local"
 )
 
-// Describe is a plain-language name for a kind, used in "Auto chose … for …".
-func (k Kind) Describe() string {
+// Describe is a plain-language name for a kind in lang, used in "Auto
+// chose … for …".
+func (k Kind) Describe(lang string) string {
 	switch k {
-	case Current:
-		return "a question about current information"
-	case Coding:
-		return "a coding question"
-	case Research:
-		return "a question that needs a detailed answer"
-	case Local:
-		return "a task on this computer"
+	case Current, Coding, Research, Local:
+		return locale.T(lang, "chat:steps.kinds."+string(k), nil)
 	default:
-		return "a quick question"
+		return locale.T(lang, "chat:steps.kinds.chat", nil)
 	}
 }
 

@@ -58,11 +58,11 @@ func TestChooseSpecialist(t *testing.T) {
 			t.Errorf("%q = %q, want %s", tc.message, got.ID, tc.want)
 			continue
 		}
-		if !strings.HasPrefix(reason, "Auto chose "+got.Name) {
+		if !strings.HasPrefix(reason.Render("en"), "Auto chose "+got.Name) {
 			t.Errorf("reason = %q", reason)
 		}
 	}
-	if _, reason, _ := ChooseSpecialist("What winter tires fit a 2019 Civic?", Chat, list); !strings.Contains(reason, "(tire, winter)") {
+	if _, reason, _ := ChooseSpecialist("What winter tires fit a 2019 Civic?", Chat, list); !strings.Contains(reason.Render("en"), "(tire, winter)") {
 		t.Errorf("reason = %q", reason)
 	}
 	if _, _, ok := ChooseSpecialist("What winter tires fit a 2019 Civic?", Chat, nil); ok {

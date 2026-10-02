@@ -7,8 +7,10 @@ import (
 	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/artifacts"
+	"github.com/yeixio/yggdrasil-core/internal/huginn"
 	"github.com/yeixio/yggdrasil-core/internal/mimir"
 	modelhealth "github.com/yeixio/yggdrasil-core/internal/models/health"
+	"github.com/yeixio/yggdrasil-core/internal/muninn"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
@@ -179,5 +181,30 @@ func TestNoticesInAppLanguage(t *testing.T) {
 	tiny.Parameters = "1B"
 	if note := smallModelNote("de", "knowledge", "llama-1b", []contracts.Model{tiny}, 24e9, false); !strings.Contains(note, "deinem Wissen") || !strings.Contains(note, "„Modelle“") {
 		t.Fatalf("note = %q", note)
+	}
+}
+
+// The steps listed with an answer are in the App language too.
+func TestStepsInAppLanguage(t *testing.T) {
+	tr := &turnTrace{lang: "de"}
+	tr.knowledge([]mimir.Hit{{Title: "row 1", SourceName: "inventory.csv"}, {Title: "row 2", SourceName: "inventory.csv"}})
+	tr.stopped(false, false)
+	tr.memories([]muninn.Memory{{Content: "a"}, {Content: "b"}})
+	steps := tr.meta().Steps
+	for i, want := range []string{"inventory.csv", "Von dir", "2"} {
+		if !strings.Contains(steps[i].Text, want) || strings.Contains(steps[i].Text, "Found") || strings.Contains(steps[i].Text, "Used") {
+			t.Errorf("step %d = %q, want %q in it", i, steps[i].Text, want)
+		}
+	}
+	models := []contracts.Model{installed("big", "Qwen 14B", 12e9), installed("small", "Llama 1B", 1.6e9)}
+	if _, step, _, _ := fallbackFrom("de", "big", "x", models, 24e9); !strings.Contains(step, "Qwen 14B") || strings.Contains(step, "answered instead") {
+		t.Fatalf("step = %q", step)
+	}
+	c := huginn.Choice{Model: models[0], Kind: huginn.Coding, Effort: huginn.EffortThorough, Lang: "es"}
+	if r := c.Reason("de"); !strings.Contains(r, "Spanisch") || !strings.Contains(r, "Gründlich") {
+		t.Fatalf("reason = %q", r)
+	}
+	if r := c.Reason("en"); r != "Auto chose Qwen 14B for a coding question in Spanish at Thorough effort" {
+		t.Fatalf("reason = %q", r)
 	}
 }

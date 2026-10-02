@@ -1,11 +1,11 @@
 package huginn
 
 import (
-	"fmt"
 	"slices"
 	"strconv"
 	"strings"
 
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
@@ -19,14 +19,35 @@ const (
 	fullShare  = 0.60
 )
 
-// Choice is the model picked for a request and why, in plain language.
+// Choice is the model picked for a request and what it was picked for.
+// Reason says why in plain language.
 type Choice struct {
 	Model  contracts.Model
-	Reason string
+	Kind   Kind
+	Effort Effort
+	// Lang is the answer's language when the model was picked for writing
+	// it well, or "".
+	Lang string
 	// LanguageWeak is set when the model is expected to write the answer's
 	// language materially worse and nothing installed that fits does
 	// better (§16), so the user can be told.
 	LanguageWeak bool
+}
+
+// Reason says why the model was picked, in the App language app, such as
+// "Auto chose Qwen 2.5 7B for a coding question at Thorough effort".
+func (c Choice) Reason(app string) string {
+	key := "chat:steps.autoChose"
+	params := map[string]any{"model": Name(c.Model), "kind": c.Kind.Describe(app)}
+	if c.Lang != "" {
+		key += "In"
+		params["language"] = locale.LanguageName(c.Lang, app)
+	}
+	if c.Effort == EffortFast || c.Effort == EffortThorough {
+		key += "Effort"
+		params["effort"] = c.Effort.Describe(app)
+	}
+	return locale.T(app, key, params)
 }
 
 func has(list []string, v string) bool { return slices.Contains(list, v) }
@@ -154,14 +175,11 @@ func ChooseIn(k Kind, e Effort, lang string, installed []contracts.Model, memTot
 		}
 	}
 	pick := func(m contracts.Model) (Choice, bool) {
-		reason := fmt.Sprintf("Auto chose %s for %s", Name(m), k.Describe())
+		c := Choice{Model: m, Kind: k, Effort: e, LanguageWeak: WeakIn(m, lang) && languageRank(m, lang) >= bestRank}
 		if lang != "" && !strings.HasPrefix(lang, "en") && languageRank(m, lang) >= rankGood {
-			reason += " in " + languageName(lang)
+			c.Lang = lang
 		}
-		if e == EffortFast || e == EffortThorough {
-			reason += fmt.Sprintf(" at %s effort", e.Label())
-		}
-		return Choice{Model: m, Reason: reason, LanguageWeak: WeakIn(m, lang) && languageRank(m, lang) >= bestRank}, true
+		return c, true
 	}
 
 	// A quick request goes to a suitable model that is already loaded, so it

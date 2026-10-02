@@ -74,8 +74,8 @@ func TestChooseMatchesTheRequest(t *testing.T) {
 		if !ok || got.Model.ID != c.want {
 			t.Errorf("Choose(%s) = %s, want %s", c.kind, got.Model.ID, c.want)
 		}
-		if !strings.Contains(got.Reason, c.kind.Describe()) || !strings.Contains(got.Reason, got.Model.ID) {
-			t.Errorf("reason = %q", got.Reason)
+		if !strings.Contains(got.Reason("en"), c.kind.Describe("en")) || !strings.Contains(got.Reason("en"), got.Model.ID) {
+			t.Errorf("reason = %q", got.Reason("en"))
 		}
 	}
 }
@@ -163,7 +163,7 @@ func TestBudgets(t *testing.T) {
 
 func TestChooseFollowsEffort(t *testing.T) {
 	// Thorough takes the largest model even for a quick question.
-	if got, _ := ChooseFor(Chat, EffortThorough, library, 24*gb); got.Model.ID != "qwen-14b" || !strings.Contains(got.Reason, "Thorough effort") {
+	if got, _ := ChooseFor(Chat, EffortThorough, library, 24*gb); got.Model.ID != "qwen-14b" || !strings.Contains(got.Reason("en"), "Thorough effort") {
 		t.Fatalf("thorough = %+v", got)
 	}
 	// Fast keeps research on a quick model that is already loaded.

@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
@@ -44,6 +45,12 @@ func (e Effort) Label() string {
 	default:
 		return "Auto"
 	}
+}
+
+// Describe is the effort's label in the App language app, as the effort
+// control shows it.
+func (e Effort) Describe(app string) string {
+	return locale.T(app, "chat:effort."+string(ParseEffort(string(e)))+".label", nil)
 }
 
 // Budget is what a turn may spend. Efforts map to budgets, never to call

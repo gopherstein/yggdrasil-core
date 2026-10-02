@@ -1,11 +1,11 @@
 package huginn
 
 import (
-	"fmt"
 	"regexp"
 	"sort"
 	"strings"
 
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
@@ -123,18 +123,18 @@ func (s Specialist) named(message string) bool {
 // mostly about what one was trained on. Requests that need tools, current
 // information, or code never go to a specialist, because it answers from
 // its training alone.
-func ChooseSpecialist(message string, k Kind, list []Specialist) (Specialist, string, bool) {
+func ChooseSpecialist(message string, k Kind, list []Specialist) (Specialist, locale.Text, bool) {
 	if k == Current || k == Local || k == Coding || len(list) == 0 {
-		return Specialist{}, "", false
+		return Specialist{}, locale.Text{}, false
 	}
 	for _, s := range list {
 		if s.named(message) {
-			return s, fmt.Sprintf("Auto chose %s because the message asks for it", s.Name), true
+			return s, locale.Key("chat:steps.specialistNamed", map[string]any{"name": s.Name}), true
 		}
 	}
 	terms := topicTerms(message)
 	if len(terms) == 0 {
-		return Specialist{}, "", false
+		return Specialist{}, locale.Text{}, false
 	}
 	var best Specialist
 	var bestHits []string
@@ -151,13 +151,14 @@ func ChooseSpecialist(message string, k Kind, list []Specialist) (Specialist, st
 		}
 	}
 	if len(bestHits) < minTopicWords || float64(len(bestHits)) < minTopicShare*float64(len(terms)) {
-		return Specialist{}, "", false
+		return Specialist{}, locale.Text{}, false
 	}
 	sort.Strings(bestHits)
 	if len(bestHits) > 3 {
 		bestHits = bestHits[:3]
 	}
-	return best, fmt.Sprintf("Auto chose %s, the specialized AI trained for this (%s)", best.Name, strings.Join(bestHits, ", ")), true
+	// The words are the message's own, so they stay as written.
+	return best, locale.Key("chat:steps.specialistTopic", map[string]any{"name": best.Name, "words": strings.Join(bestHits, ", ")}), true
 }
 
 // Supporting reports a model that serves Yggdrasil instead of chatting: an
