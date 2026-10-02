@@ -40,6 +40,7 @@ class StatusTest(unittest.TestCase):
             d = pathlib.Path(tmp)
             catalog(d, "en", "common", {"nav": {"models": "Models"}})
             catalog(d, "de", "common", {"nav": {"models": "Modelle"}})
+            (d / "languages.json").write_text(json.dumps([{"code": "en"}, {"code": "de"}]))
             (d / "glossary.json").write_text(json.dumps({"terms": [{"term": "Models", "key": "common:nav.models"}]}))
             self.assertEqual(i18n.glossary("de", d), [("Models", "Models", "Modelle")])
             self.assertEqual(i18n.check(d), [])
@@ -48,12 +49,44 @@ class StatusTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             d = pathlib.Path(tmp)
             catalog(d, "en", "common", {"nav": {"models": "Models"}})
+            (d / "languages.json").write_text(json.dumps([{"code": "en"}]))
             terms = [{"term": "Models", "key": "common:nav.models"}, {"term": "Models", "key": "common:nav.gone"}]
             (d / "glossary.json").write_text(json.dumps({"terms": terms}))
             problems = i18n.check(d)
         self.assertEqual(len(problems), 2)
         self.assertIn("common:nav.gone", problems[0])
         self.assertIn("listed twice", problems[1])
+
+    def test_kept_text_is_not_counted(self):
+        english = {"chat:pdf": "PDF", "chat:name": "Name", "chat:gone": "Not translated yet"}
+        german = {"chat:pdf": "PDF", "chat:name": "Name", "chat:gone": "Not translated yet"}
+        listed = {"all": ["chat:pdf"], "de": ["chat:name"]}
+        _, same = i18n.status(english, german, i18n.kept("de", listed))
+        self.assertEqual(same, ["chat:gone"])
+        # Another language keeps only what is under all.
+        _, same = i18n.status(english, german, i18n.kept("fr", listed))
+        self.assertEqual(same, ["chat:gone", "chat:name"])
+
+    def test_check_finds_a_stale_same_as_english_list(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            d = pathlib.Path(tmp)
+            catalog(d, "en", "common", {"nav": {"models": "Models", "name": "Name", "pdf": "PDF"}})
+            catalog(d, "de", "common", {"nav": {"models": "Modelle", "name": "Name", "pdf": "PDF"}})
+            (d / "languages.json").write_text(json.dumps([{"code": "en"}, {"code": "de"}]))
+            (d / "glossary.json").write_text(json.dumps({"terms": []}))
+            listed = {
+                "about": "text",
+                "all": ["common:nav.pdf", "common:nav.gone"],
+                "de": ["common:nav.name", "common:nav.models", "common:nav.pdf"],
+                "xx": ["common:nav.name"],
+            }
+            (d / "same-as-english.json").write_text(json.dumps(listed))
+            problems = i18n.check(d)
+        self.assertEqual(len(problems), 4, problems)
+        self.assertIn("all lists common:nav.gone", problems[0])
+        self.assertIn("de's common:nav.models is translated now", problems[1])
+        self.assertIn("de lists common:nav.pdf, which is already under all", problems[2])
+        self.assertIn("xx is not in languages.json", problems[3])
 
     def test_the_real_glossary(self):
         self.assertEqual(i18n.check(), [])

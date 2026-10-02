@@ -8,6 +8,7 @@ folder when it builds, so all of them share one catalog.
 i18n/
   languages.json            languages that can be chosen, with their direction
   glossary.json             the main terms, by the key that holds each one
+  same-as-english.json      text meant to read the same as English, such as PDF
   locales/<language>/       one folder per BCP 47 tag, such as en, es, pt-BR
     common.json             navigation, status, and words used everywhere
     chat.json               Chat: the composer, history, progress, and errors
@@ -91,8 +92,13 @@ python3 scripts/i18n.py glossary de
 
 To see what a language still lacks, run `python3 scripts/i18n.py status`.
 It lists keys that are missing and text that is the same as English, with
-`--keys` for the keys themselves. Some text is meant to stay the same, such
-as `PDF`. CI checks that every glossary key exists in English.
+`--keys` for the keys themselves. Text that is meant to read the same, such
+as `PDF`, `Git commit`, or German `Name`, is listed in
+`same-as-english.json` (under `all` for every language, or under the
+language) and isn't counted. When you keep such text on purpose, add its key
+there; when you translate a listed key, remove it. CI checks that the
+glossary and that list name keys English has, and that a language's listed
+text still matches English.
 
 ## Keys
 

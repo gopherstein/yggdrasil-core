@@ -51,7 +51,7 @@ jobs:
         run: |
           python3 scripts/test_changelog.py
           python3 scripts/changelog.py check
-      - name: Translation glossary
+      - name: Translation checks
         run: |
           python3 scripts/test_i18n.py
           python3 scripts/i18n.py check

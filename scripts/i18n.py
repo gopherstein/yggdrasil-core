@@ -8,14 +8,17 @@ reviewing it:
 
 - missing: keys English has and the language does not, which show in
   English until they are translated;
-- same as English: text identical to English, which is often not translated
-  yet, though some is meant to stay, such as "Chat" or "API".
+- same as English: text identical to English that is not listed in
+  i18n/same-as-english.json as meant to stay, such as "PDF" or German "Name",
+  so it is probably not translated yet.
 
 Usage:
     scripts/i18n.py status [LANGUAGE ...] [--keys]
                                        what each language lacks; --keys lists them
     scripts/i18n.py glossary LANGUAGE  the glossary's terms in a language
-    scripts/i18n.py check              every glossary key exists in English
+    scripts/i18n.py check              the glossary and the same-as-English list
+                                       name keys English has, and listed text
+                                       still matches English
 """
 
 from __future__ import annotations
@@ -67,16 +70,30 @@ def has_words(text: str) -> bool:
     return any(c.isalpha() for c in PLACEHOLDER.sub("", text))
 
 
-def status(english: dict[str, str], translated: dict[str, str]) -> tuple[list[str], list[str]]:
-    """The keys a language is missing, and those whose text is the same as English.
+def status(english: dict[str, str], translated: dict[str, str], keep: frozenset[str] = frozenset()) -> tuple[list[str], list[str]]:
+    """The keys a language is missing, and those whose text is the same as
+    English and not in keep, the keys meant to stay that way.
 
     A plural key counts as present when the language has any of its forms,
     because languages use different forms; the web tests check the forms.
     """
     have = {base(k) for k in translated}
     missing = sorted({base(k) for k in english if base(k) not in have})
-    same = sorted(k for k, text in translated.items() if english.get(k) == text and has_words(text))
+    same = sorted(k for k, text in translated.items() if english.get(k) == text and has_words(text) and k not in keep)
     return missing, same
+
+
+def same_as_english(i18n: pathlib.Path = I18N) -> dict[str, list[str]]:
+    """The keys meant to read the same as English: under "all", and by language."""
+    path = i18n / "same-as-english.json"
+    if not path.exists():
+        return {}
+    return {k: v for k, v in json.loads(path.read_text(encoding="utf-8")).items() if isinstance(v, list)}
+
+
+def kept(language: str, listed: dict[str, list[str]]) -> frozenset[str]:
+    """The keys language keeps the same as English."""
+    return frozenset(listed.get("all", [])) | frozenset(listed.get(language, []))
 
 
 def glossary(language: str, i18n: pathlib.Path = I18N) -> list[tuple[str, str, str]]:
@@ -87,7 +104,9 @@ def glossary(language: str, i18n: pathlib.Path = I18N) -> list[tuple[str, str, s
 
 
 def check(i18n: pathlib.Path = I18N) -> list[str]:
-    """Problems with the glossary: a key English lacks, or a term listed twice."""
+    """Problems with the glossary and the same-as-English list: a key English
+    lacks, a term or key listed twice, or a language's listed key whose text
+    no longer matches English (it was translated, so it no longer belongs)."""
     terms = json.loads((i18n / "glossary.json").read_text(encoding="utf-8"))["terms"]
     english = load(SOURCE, i18n)
     problems, seen = [], set()
@@ -97,6 +116,22 @@ def check(i18n: pathlib.Path = I18N) -> list[str]:
         if t["term"] in seen:
             problems.append(f"glossary: {t['term']!r} is listed twice")
         seen.add(t["term"])
+    known = {lang["code"] for lang in languages(i18n)}
+    listed = same_as_english(i18n)
+    for group, keys in listed.items():
+        if group != "all" and group not in known:
+            problems.append(f"same-as-english: {group} is not in languages.json")
+            continue
+        translated = load(group, i18n) if group != "all" else {}
+        for key in sorted(set(keys)):
+            if key not in english:
+                problems.append(f"same-as-english: {group} lists {key}, which English does not have")
+            elif group != "all" and key in listed.get("all", []):
+                problems.append(f"same-as-english: {group} lists {key}, which is already under all")
+            elif group != "all" and translated.get(key) != english[key]:
+                problems.append(f"same-as-english: {group}'s {key} is translated now; remove it from the list")
+        if len(set(keys)) != len(keys):
+            problems.append(f"same-as-english: {group} lists a key twice")
     return problems
 
 
@@ -129,6 +164,7 @@ def main(argv: list[str]) -> int:
         return 0
 
     english = load(SOURCE)
+    keep = same_as_english()
     wanted = args.languages or [code for code in listed if code != SOURCE]
     for code in wanted:
         if code not in listed:
@@ -136,7 +172,7 @@ def main(argv: list[str]) -> int:
             return 1
     print(f"English has {len({base(k) for k in english})} keys.")
     for code in wanted:
-        missing, same = status(english, load(code))
+        missing, same = status(english, load(code), kept(code, keep))
         print(f"{code:<8} {listed[code].get('status', ''):<10} missing {len(missing):>4}   same as English {len(same):>4}")
         if args.keys:
             for k in missing:
