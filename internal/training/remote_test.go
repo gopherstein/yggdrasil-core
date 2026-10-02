@@ -2,6 +2,7 @@ package training
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
@@ -142,6 +143,46 @@ func TestCancelRemoteTraining(t *testing.T) {
 		t.Fatal("the trainer computer did not start")
 	}
 	if _, err := coord.svc.CancelJob(ctx, job.ID); err != nil {
+		t.Fatal(err)
+	}
+	job = waitJob(t, coord, job.ID)
+	trainer.svc.Wait()
+	if job.State != StateCancelled {
+		t.Fatalf("state = %s (%s)", job.State, job.Error)
+	}
+	if _, err := os.Stat(trainer.svc.remoteDir(job.ID)); !os.IsNotExist(err) {
+		t.Fatal("the trainer computer kept the cancelled run's files")
+	}
+}
+
+func TestCancelWhileSendingRun(t *testing.T) {
+	fastPolling(t)
+	coord, trainer, peer := pair(t, "block")
+	ctx := context.Background()
+	remote := http.StripPrefix("/internal/v1", trainer.svc.RemoteHandler())
+	// The trainer computer starts the run, and the job is cancelled before
+	// its reply reaches the coordinator.
+	peer.set(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost || !strings.HasSuffix(r.URL.Path, "/training/runs") {
+			remote.ServeHTTP(w, r)
+			return
+		}
+		rec := httptest.NewRecorder()
+		remote.ServeHTTP(rec, r)
+		var started struct{ ID string }
+		if err := json.Unmarshal(rec.Body.Bytes(), &started); err != nil {
+			t.Error(err)
+		}
+		<-trainer.trainer.started
+		if _, err := coord.svc.CancelJob(ctx, started.ID); err != nil {
+			t.Error(err)
+		}
+		w.WriteHeader(rec.Code)
+		_, _ = w.Write(rec.Body.Bytes())
+	}))
+	ai := readyAI(t, coord)
+	job, err := coord.svc.StartTraining(ctx, ai.ID, "")
+	if err != nil {
 		t.Fatal(err)
 	}
 	job = waitJob(t, coord, job.ID)
