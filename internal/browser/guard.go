@@ -8,24 +8,26 @@ package browser
 import (
 	"context"
 	"errors"
-	"net"
-	"net/netip"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/yeixio/yggdrasil-core/internal/netguard"
 )
 
 // ErrPrivate is a request for this computer or the local network.
 var ErrPrivate = errors.New("this address is on your own network or computer, which the browser does not open")
 
-// Guard decides which hosts the browser may reach.
+// Guard decides which hosts the browser may reach. The address rules are
+// netguard's, shared with internet.open; this adds a short cache, names
+// that are local by convention, and a hook for tests.
 type Guard struct {
 	// Allow, when set, lets a host through regardless; tests use it for
 	// their local servers.
 	Allow func(host string) bool
-	// Resolver looks hosts up; nil uses the system's.
-	Resolver *net.Resolver
+	// Net looks hosts up and judges their addresses; nil uses the system's.
+	Net *netguard.Guard
 
 	mu    sync.Mutex
 	cache map[string]guardEntry
@@ -34,23 +36,6 @@ type Guard struct {
 type guardEntry struct {
 	err error
 	at  time.Time
-}
-
-// private reports an address that is not on the public internet.
-func private(a netip.Addr) bool {
-	a = a.Unmap()
-	if a.IsLoopback() || a.IsPrivate() || a.IsLinkLocalUnicast() || a.IsLinkLocalMulticast() ||
-		a.IsInterfaceLocalMulticast() || a.IsMulticast() || a.IsUnspecified() {
-		return true
-	}
-	// Carrier-grade NAT and other shared or reserved ranges.
-	for _, p := range []netip.Prefix{netip.MustParsePrefix("100.64.0.0/10"), netip.MustParsePrefix("0.0.0.0/8"),
-		netip.MustParsePrefix("192.0.0.0/24"), netip.MustParsePrefix("198.18.0.0/15"), netip.MustParsePrefix("240.0.0.0/4")} {
-		if p.Contains(a) {
-			return true
-		}
-	}
-	return false
 }
 
 // CheckURL allows an http or https address on the public internet.
@@ -69,7 +54,7 @@ func (g *Guard) CheckHost(ctx context.Context, host string) error {
 	if g.Allow != nil && g.Allow(host) {
 		return nil
 	}
-	if host == "localhost" || strings.HasSuffix(host, ".localhost") || strings.HasSuffix(host, ".local") || strings.HasSuffix(host, ".internal") {
+	if strings.HasSuffix(host, ".local") || strings.HasSuffix(host, ".internal") || strings.HasSuffix(host, ".lan") || strings.HasSuffix(host, ".home.arpa") {
 		return ErrPrivate
 	}
 	g.mu.Lock()
@@ -89,26 +74,17 @@ func (g *Guard) CheckHost(ctx context.Context, host string) error {
 }
 
 func (g *Guard) lookup(ctx context.Context, host string) error {
-	if a, err := netip.ParseAddr(strings.Trim(host, "[]")); err == nil {
-		if private(a) {
-			return ErrPrivate
-		}
-		return nil
-	}
-	r := g.Resolver
-	if r == nil {
-		r = net.DefaultResolver
+	ng := g.Net
+	if ng == nil {
+		ng = &netguard.Guard{}
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	addrs, err := r.LookupNetIP(ctx, "ip", host)
-	if err != nil {
-		return errors.New("the site's address could not be found")
-	}
-	for _, a := range addrs {
-		if private(a) {
+	if _, err := ng.Lookup(ctx, strings.Trim(host, "[]")); err != nil {
+		if errors.Is(err, netguard.ErrPrivate) {
 			return ErrPrivate
 		}
+		return errors.New("the site's address could not be found")
 	}
 	return nil
 }

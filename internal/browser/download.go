@@ -17,6 +17,8 @@ import (
 
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
+
+	"github.com/yeixio/yggdrasil-core/internal/netguard"
 )
 
 // maxDownload is the largest file brought into a chat.
@@ -31,7 +33,7 @@ func (m *Manager) client() *http.Client {
 			return err
 		}
 		a, err := netip.ParseAddr(host)
-		if err == nil && private(a) && (m.Guard.Allow == nil || !m.Guard.Allow(host)) {
+		if err == nil && netguard.Private(a) && (m.Guard.Allow == nil || !m.Guard.Allow(host)) {
 			return ErrPrivate
 		}
 		return nil
