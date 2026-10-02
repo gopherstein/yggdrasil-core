@@ -1,0 +1,57 @@
+{
+  "tagline": "Lokale KI-Steuerzentrale",
+  "nav": {
+    "label": "Haupt",
+    "main": "Haupt",
+    "system": "System",
+    "chat": "Chat",
+    "automations": "Automationen",
+    "models": "Modelle",
+    "train": "Trainieren",
+    "knowledge": "Wissen",
+    "memory": "Gedächtnis",
+    "computers": "Computer",
+    "performance": "Leistung",
+    "diagnostics": "Diagnose",
+    "profiles": "Profile & Orchestrierung",
+    "tools": "Werkzeuge",
+    "apiAccess": "API-Zugriff",
+    "settings": "Einstellungen"
+  },
+  "status": {
+    "starting": "Startet …",
+    "unavailable": "Dienst nicht verfügbar",
+    "noModel": "Kein Modell",
+    "ready": "Bereit",
+    "unavailableHint": "Der lokale Yggdrasil-Dienst antwortet nicht.",
+    "noModelHint": "Installiere unter „Modelle“ ein Modell, um zu chatten.",
+    "readyHint": "Der lokale Dienst ist bereit."
+  },
+  "subsystems": {
+    "title": "System",
+    "bifrostHint": "Computer finden und vernetzen",
+    "computersNone": "Keine Computer",
+    "computersConnected_one": "{{count}} Computer verbunden",
+    "computersConnected_other": "{{count}} Computer verbunden",
+    "nornHint": "Norn verteilt Arbeit auf deine Computer",
+    "nornAutomatic": "Automatisch",
+    "mimirHint": "Lokales Wissen und Gedächtnis",
+    "mimirReady": "Bereit"
+  },
+  "boot": {
+    "starting": "Yggdrasil startet",
+    "preparing": "Dein lokaler KI-Dienst wird vorbereitet",
+    "unavailable": "Dienst nicht verfügbar",
+    "unavailableBody": "Der lokale Yggdrasil-Dienst hat noch nicht geantwortet. Warte einen Moment und versuche es erneut. Wenn das öfter passiert, sieh nach dem Laden der App unter „Diagnose“ nach.",
+    "retrying": "Neuer Versuch …",
+    "tryAgain": "Erneut versuchen",
+    "keyRequired": "API-Schlüssel erforderlich",
+    "keyBody": "Dieser Yggdrasil-Daemon ist auch außerhalb dieses Computers erreichbar. Gib einen API-Schlüssel ein, um fortzufahren. Ein Schlüssel verschlüsselt den Datenverkehr über einfaches HTTP nicht.",
+    "continue": "Weiter"
+  },
+  "units": {
+    "ms": "{{value}} ms",
+    "seconds": "{{value}} s",
+    "tokPerSec": "{{value}} tok/s"
+  }
+}

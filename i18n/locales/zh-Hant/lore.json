@@ -1,0 +1,84 @@
+{
+  "about": "關於 {{name}}",
+  "close": "關閉",
+  "inYggdrasil": "在 Yggdrasil 中",
+  "mascot": {
+    "label": "關於 Ratatoskr",
+    "kind": "Yggdrasil 的吉祥物",
+    "story": "在神話中，Ratatoskr 是一隻在世界之樹上跑上跑下的松鼠，負責在樹頂的老鷹與樹根處的巨龍 Níðhöggr 之間傳遞訊息。據說牠一路上還喜歡惹點小麻煩。",
+    "here": "在這裡，牠做的是同樣的工作：在你的 App 和你電腦上的模型之間傳遞請求。撰寫回覆時牠會思考，事情完成時牠會慶祝，沒有載入模型時牠就去打個盹。"
+  },
+  "logo": {
+    "label": "關於 Yggdrasil 標誌",
+    "kind": "世界之樹",
+    "story": "Yggdrasil 是北歐神話宇宙中心那棵巨大的梣樹。它的枝幹伸展到天界之上，樹根延伸至三口泉井，九個世界就懸掛在它的枝枒之間。",
+    "here": "這個標誌以電路線條描繪這棵樹，樹根和枝幹的末端都是節點，就像 Yggdrasil 連接成一個系統的那些電腦。"
+  },
+  "realms": {
+    "chat": {
+      "meaning": "在「聊天」中，你的訊息會被送到你電腦上的模型，再把回答帶回來。",
+      "story": "Ratatoskr 是一隻在 Yggdrasil 樹幹上跑上跑下的松鼠，在樹頂的老鷹與啃咬樹根的巨龍 Níðhöggr 之間傳遞訊息。",
+      "rune": "Ansuz，言語的符文"
+    },
+    "automations": {
+      "meaning": "Norn 女神掌管注定發生的事與發生的時刻。Norn 負責執行排程的工作。",
+      "story": "三位 Norn 女神 Urðr、Verðandi 與 Skuld 住在 Yggdrasil 下方的 Urðr 之泉旁。她們澆灌樹根，編織過去、現在與未來。",
+      "rune": "Jera，歲月流轉的符文"
+    },
+    "models": {
+      "meaning": "Ymir 是最初的巨人，世界由他而生。模型則是其他一切的基礎。",
+      "story": "太初之時有 Ymir，他是第一位巨人。他被殺後，眾神用他的身體造出世界：以他的血肉造成大地，以他的骨頭造成山脈，以他的頭骨造成天空。",
+      "rune": "Uruz，原始力量的符文"
+    },
+    "train": {
+      "meaning": "Brokkr 是打造 Mjölnir 的鐵匠。在這裡，你可以打造屬於自己的 AI。",
+      "story": "Brokkr 和他的兄弟 Sindri 是矮人鐵匠。他們與 Loki 打賭，鍛造出 Thor 的鐵鎚 Mjölnir；即使被一隻蒼蠅叮咬，Brokkr 仍然持續拉動風箱。",
+      "rune": "Kenaz，火炬與技藝的符文"
+    },
+    "knowledge": {
+      "meaning": "Mimir 守護著智慧之泉。Mimir 讓你的知識可以被搜尋。",
+      "story": "Mímir 守護著 Yggdrasil 一條樹根下的智慧之泉。Odin 為了喝一口泉水而獻出一隻眼睛；Mímir 死後，Odin 保留了他的頭顱，讓它繼續提供建言。",
+      "rune": "Laguz，水與泉的符文"
+    },
+    "memory": {
+      "meaning": "Muninn 是 Odin 象徵記憶的渡鴉，牠會保存你請 Yggdrasil 記住的事。",
+      "story": "Huginn 和 Muninn，也就是「思想」與「記憶」，是 Odin 的兩隻渡鴉。每天早晨牠們飛越世界，回來向他報告所見所聞。Odin 說，他最怕的是 Muninn 一去不回。",
+      "rune": "Othala，珍藏之物的符文"
+    },
+    "nodes": {
+      "meaning": "Bifrost 是連接各個世界的彩虹橋。它連接你的電腦。",
+      "story": "Bifröst 是一座燃燒的彩虹橋，連接人類的世界 Midgard 與眾神的家園 Asgard。Heimdall 在橋的盡頭守望。",
+      "rune": "Raidho，旅程的符文"
+    },
+    "performance": {
+      "meaning": "Sleipnir 是 Odin 的八足駿馬，也是跑得最快的馬。",
+      "story": "Sleipnir 是 Odin 的八足灰馬，是所有駿馬中最迅捷的一匹。牠載著 Odin 越過天空與海洋，甚至曾遠赴 Hel 再返回。",
+      "rune": "Ehwaz，馬的符文"
+    },
+    "diagnostics": {
+      "meaning": "Heimdall 守望著橋樑，任何事都逃不過他的眼睛。他負責看守系統的健康狀態。",
+      "story": "Heimdall 是眾神的守望者。他需要的睡眠比鳥兒還少，夜裡能看見百里之外，還能聽見青草生長的聲音。到了 Ragnarök 之時，他將吹響 Gjallarhorn。",
+      "rune": "Algiz，守護的符文"
+    },
+    "profiles": {
+      "meaning": "Odin 派出他的渡鴉。設定檔決定助理如何思考，以及它可以做什麼。",
+      "story": "Odin 是眾神之父。他在 Yggdrasil 上倒吊九夜以求得符文，為了智慧獻出一隻眼睛，並且每天派他的渡鴉飛越世界。",
+      "rune": "Mannaz，自我的符文"
+    },
+    "tools": {
+      "meaning": "Gungnir 是 Odin 從不失手的長矛。工具是助理採取行動的方式。",
+      "story": "Gungnir 是 Odin 的長矛，由被稱為 Ivaldi 之子的矮人們鍛造。無論擲向誰，它都從不落空。",
+      "rune": "Tiwaz，形如長矛的符文"
+    },
+    "api-access": {
+      "meaning": "Valgrind 是 Valhalla 的大門。API 金鑰決定誰可以進入。",
+      "story": "Valgrind 是矗立在 Valhalla 前方的古老大門。它神聖而古老，很少有人知道它的門閂是如何扣上的。",
+      "rune": "Thurisaz，門的符文"
+    },
+    "settings": {
+      "meaning": "Forseti 公正地裁決每一件事。設定就是 Yggdrasil 遵守的規則。",
+      "story": "Baldr 之子 Forseti 坐鎮於 Glitnir，那是一座以黃金為柱、白銀為頂的殿堂。每個帶著紛爭來找他的人，離開時都已和解。",
+      "rune": "Isa，靜止的符文"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "title": "已連結的服務",
+  "description": "讓 AI 讀取你使用的服務並在其中執行動作。權杖會保存在這台電腦上，AI 看不到；AI 只會看到服務傳回的內容。讀取不需確認，進行變更前則會先詢問你。",
+  "generic": "發生錯誤。",
+  "needsAttention": "需要處理：{{error}}",
+  "lastCheckFailed": "上次檢查失敗",
+  "connectedAs": "已以 {{account}} 身分連結",
+  "notConnected": "未連結",
+  "checking": "正在檢查…",
+  "check": "檢查",
+  "change": "變更",
+  "disconnect": "中斷連結",
+  "connect": "連結",
+  "optional": "（選填）",
+  "stored": "已儲存（{{value}}）。留空即可保留原值。",
+  "save": "儲存",
+  "cancel": "取消",
+  "tools": "工具：{{tools}}",
+  "asksFirst": "{{name}}（會先詢問）"
+}

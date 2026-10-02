@@ -1,0 +1,77 @@
+{
+  "header": {
+    "welcome": "Te damos la bienvenida",
+    "lede": "Esta app puede ejecutar IA de forma privada en tus propias computadoras."
+  },
+  "hardware": {
+    "title": "Esta computadora",
+    "description": "Hardware detectado para la inferencia local.",
+    "detecting": "Detectando el hardware…",
+    "processor": "Procesador",
+    "cores_one": "{{count}} núcleo",
+    "cores_many": "{{count}} núcleos",
+    "cores_other": "{{count}} núcleos",
+    "memory": "Memoria",
+    "graphics": "Gráficos",
+    "system": "Sistema",
+    "unavailable": "Los detalles del hardware aparecerán cuando el backend de la app esté en ejecución. Puedes continuar la configuración ahora."
+  },
+  "question": "¿Qué te gustaría que hiciera tu IA?",
+  "purposes": {
+    "general": {
+      "title": "Asistente general",
+      "description": "Preguntas cotidianas, ayuda para escribir y conversación local primero."
+    },
+    "coding": {
+      "title": "Programación",
+      "description": "Ayuda con código que puede usar automáticamente todas tus computadoras vinculadas cuando tienen modelos instalados."
+    },
+    "research": {
+      "title": "Investigación",
+      "description": "Lectura de textos largos, resúmenes y razonamiento cuidadoso."
+    },
+    "custom": {
+      "title": "Personalizado",
+      "description": "Elige tú mismo los modelos y la orquestación en el modo avanzado."
+    }
+  },
+  "continue": "Continuar",
+  "finding": "Buscando una configuración…",
+  "recommendFailed": "No se pudo obtener una recomendación.",
+  "recommend": {
+    "badge": "Recomendado",
+    "title": "Recomendado para {{purpose}}",
+    "download": "Descarga de {{size}}",
+    "storage": "Almacenamiento estimado",
+    "memory": "Memoria activa estimada",
+    "install": "Instalar la configuración recomendada",
+    "skip": "Omitir por ahora",
+    "back": "Atrás"
+  },
+  "roles": {
+    "coordinator": "Coordinador",
+    "worker": "Trabajador",
+    "reviewer": "Revisor",
+    "researcher": "Investigador",
+    "assistant": "Asistente"
+  },
+  "install": {
+    "runtime": "Instalando el entorno de ejecución de modelos local…",
+    "model": "Instalando {{model}}…",
+    "downloading": "Descargando {{model}}… {{percent}}",
+    "profile": "Creando tu perfil de IA…",
+    "conversation": "Preparando tu primera conversación…",
+    "chatTitle": "Chat de {{profile}}",
+    "working": "Instalando…",
+    "complete": "{{percent}} completado",
+    "keepOpen": "Las descargas de modelos grandes pueden tardar varios minutos. Mantén esta ventana abierta.",
+    "failed": "Falló la instalación.",
+    "downloadFailed": "Falló la descarga del modelo.",
+    "noProfileId": "Se creó el perfil, pero no se devolvió ningún ID."
+  },
+  "ready": {
+    "title": "Todo listo",
+    "description": "Tu configuración recomendada está instalada. Empieza a chatear con tu IA local.",
+    "start": "Empezar a chatear"
+  }
+}

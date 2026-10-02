@@ -1,0 +1,43 @@
+{
+  "page": {
+    "title": "記憶",
+    "description": "你請 Yggdrasil 記住的事情。這些記憶屬於 Yggdrasil，而不屬於某一個模型，因此在不同聊天、重新啟動和更換模型後都會保留。只有與問題相關的記憶才會被使用，而且都保存在這台電腦上。在任何聊天中說「記住……」即可新增一則。",
+    "useInChats": "在聊天中使用記憶",
+    "off": "記憶已關閉。聊天不會使用這裡儲存的內容，也不會刪除任何資料。",
+    "loading": "正在載入…",
+    "emptyTitle": "還沒有任何記憶",
+    "emptyDescription": "告訴 Yggdrasil 值得記住的事，例如「記住我習慣使用公制單位」或「記住這個專案使用 Go」。"
+  },
+  "categories": {
+    "identity": "關於你",
+    "preferences": "偏好",
+    "projects": "專案",
+    "technical": "技術",
+    "interests": "興趣",
+    "people": "人物",
+    "other": "其他"
+  },
+  "add": {
+    "label": "新增記憶",
+    "placeholder": "我偏好簡短並附上範例的回答",
+    "category": "類別",
+    "chooseForMe": "幫我選擇",
+    "button": "新增"
+  },
+  "row": {
+    "text": "記憶內容",
+    "save": "儲存",
+    "cancel": "取消",
+    "fromChat": "你在聊天中要求的",
+    "addedHere": "在這裡新增",
+    "category": "類別",
+    "edit": "編輯",
+    "pause": "暫停",
+    "useAgain": "重新使用",
+    "localOnly": "僅限這台電腦",
+    "localOnlyOn": "僅限這台電腦 ✓",
+    "localOnlyHint": "永遠不要將這則記憶傳送到配對的電腦。使用它的聊天會在這台電腦上執行。",
+    "delete": "刪除",
+    "deleteLabel": "刪除記憶：{{content}}"
+  }
+}

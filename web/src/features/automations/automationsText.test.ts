@@ -22,6 +22,13 @@ describe('automation and tool text', () => {
     )
   })
 
+  it('writes times in the App language’s clock', async () => {
+    await applyLanguage('de')
+    expect(scheduleLabel({ kind: 'weekly', time_zone: 'UTC', hour: 18, minute: 30, weekday: 5 })).toContain('18:30')
+    await applyLanguage('ja')
+    expect(scheduleLabel({ kind: 'daily', time_zone: 'UTC', hour: 8, minute: 0 })).toContain('8:00')
+  })
+
   it('shows schedules, notices, categories, and tool sources in the App language', async () => {
     await applyLanguage('en-XA')
     expect(scheduleLabel({ kind: 'weekly', time_zone: 'UTC', hour: 9, minute: 0, weekday: 1 })).toMatch(pseudo)

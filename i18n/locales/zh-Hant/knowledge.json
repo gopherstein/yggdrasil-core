@@ -1,0 +1,106 @@
+{
+  "page": {
+    "title": "知識",
+    "description": "Mimir 讓目錄、價格、政策和文件都能被搜尋。當設定檔或專用 AI 使用某個來源時，與每個問題相符的段落會加入其中。編輯檔案後，下一個問題就會看到變更，不需要重新訓練。",
+    "loading": "正在載入…",
+    "emptyTitle": "尚未連接任何知識",
+    "emptyDescription": "連接這台電腦上的檔案或檔案夾、貼上內容，或從資料庫或 Web API 讀取。支援 PDF、Excel、CSV、TSV、JSON、JSONL、Markdown、純文字和 HTML 檔案。"
+  },
+  "badge": {
+    "linked": "已連結",
+    "database": "資料庫",
+    "api": "Web API",
+    "copy": "副本"
+  },
+  "meaning": {
+    "full": "可依語意搜尋，而不只是比對字詞。",
+    "partial": "可依語意搜尋：目前已處理 {{total}} 個段落中的 {{embedded}} 個。"
+  },
+  "refresh": {
+    "days_other": "{{count}} 天",
+    "hours_other": "{{count}} 小時",
+    "minutes_other": "{{count}} 分鐘",
+    "note": "當問題用到它且資料已超過 {{every}}，或按下「重新索引」時，會再次擷取。"
+  },
+  "row": {
+    "failed": "失敗",
+    "passages_other": "{{count}} 個段落",
+    "indexed": "於 {{when}} 建立索引",
+    "watches": "檔案變更時會自動重新索引。",
+    "edit": "編輯",
+    "indexing": "正在建立索引…",
+    "reindex": "重新索引",
+    "localOnlyHint": "永遠不要將這個來源的段落傳送到配對的電腦。使用它的聊天會在這台電腦上執行。",
+    "localOnly": "僅限這台電腦",
+    "localOnlyOn": "僅限這台電腦 ✓",
+    "confirmDisconnect": "要中斷連接 {{name}} 嗎？使用它的設定檔和 AI 將無法再看到它。你的檔案不會被刪除。",
+    "disconnect": "中斷連接",
+    "editLabel": "編輯 {{name}}",
+    "saveHint": "儲存後會重新索引這個來源。聊天和專用 AI 會在下一個問題時看到變更。",
+    "saving": "正在儲存…",
+    "save": "儲存",
+    "cancel": "取消"
+  },
+  "add": {
+    "title": "連接知識",
+    "modes": {
+      "path": "檔案或檔案夾",
+      "text": "上傳或貼上",
+      "database": "資料庫",
+      "api": "Web API"
+    },
+    "path": "這台電腦上的路徑",
+    "pathHint": "Yggdrasil 會直接讀取原位置的內容，並自動取得編輯後的變更。",
+    "chooseFile": "選擇檔案",
+    "pastePlaceholder": "貼上純文字、Markdown 或 CSV",
+    "content": "內容",
+    "name": "名稱（選填）",
+    "indexing": "正在建立索引…",
+    "connect": "連接"
+  },
+  "remote": {
+    "database": "資料庫",
+    "sqlite": "SQLite 檔案",
+    "file": "這台電腦上的檔案",
+    "connection": "連線字串",
+    "connectionHint": "請使用只能讀取的帳號。它會與資料庫分開儲存，之後也不會再顯示。",
+    "query": "查詢",
+    "queryHint": "一條 SELECT 敘述。它以唯讀方式執行，因此 Yggdrasil 永遠不會更改資料庫。每一列會成為一個段落。",
+    "url": "URL",
+    "urlHint": "JSON、CSV 或純文字。物件清單中的每一項會成為一個段落。",
+    "items": "回應中的清單（選填）",
+    "header": "標頭",
+    "value": "值（選填）",
+    "refresh": "資料超過以下時間時重新擷取",
+    "refreshChoices": {
+      "m5": "5 分鐘",
+      "m15": "15 分鐘",
+      "h1": "1 小時",
+      "h6": "6 小時",
+      "d1": "1 天"
+    },
+    "name": "名稱（選填）",
+    "connecting": "正在連接…",
+    "connect": "連接"
+  },
+  "search": {
+    "title": "試著問個問題",
+    "description": "看看一個問題會把哪些段落帶進聊天中。",
+    "placeholder": "你們有 225/45R17 的現貨嗎？",
+    "question": "問題",
+    "search": "搜尋",
+    "nothing": "沒有相符的結果。"
+  },
+  "picker": {
+    "none": "尚未連接任何知識。",
+    "disconnect": "中斷連接 {{name}}",
+    "remove": "移除",
+    "connectExisting": "連接現有知識",
+    "connectExistingOption": "連接現有知識…",
+    "pathPlaceholder": "或是檔案或檔案夾，例如 ~/Documents/catalog",
+    "path": "檔案或檔案夾路徑",
+    "indexing": "正在建立索引…",
+    "connect": "連接",
+    "manage": "在<link>知識</link>頁面管理來源、編輯貼上的內容，並試用搜尋。"
+  }
+}

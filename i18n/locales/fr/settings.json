@@ -1,0 +1,237 @@
+{
+  "page": {
+    "title": "Paramètres",
+    "subtitle": "Comment Yggdrasil doit se comporter sur cet ordinateur.",
+    "loading": "Chargement des paramètres…"
+  },
+  "groups": {
+    "general": "Général",
+    "ai": "Comportement de l'IA",
+    "network": "Réseau et accès",
+    "privacy": "Confidentialité et sécurité",
+    "storage": "Stockage",
+    "about": "À propos",
+    "danger": "Zone de danger"
+  },
+  "appearance": {
+    "title": "Apparence",
+    "description": "Choisissez le mode clair, sombre ou celui du système.",
+    "dark": "Sombre",
+    "light": "Clair",
+    "system": "Système"
+  },
+  "language": {
+    "title": "Langue",
+    "description": "La langue des menus, boutons et messages d'Yggdrasil sur chaque ordinateur et téléphone que vous utilisez avec. Chaque appareil peut suivre la langue de son propre système.",
+    "appLanguage": "Langue de l'app",
+    "systemDefault": "Langue du système ({{language}})",
+    "pseudo": "Pseudo-langue (pour tester les traductions)",
+    "pseudoRtl": "Pseudo-langue de droite à gauche (pour tester la mise en page)",
+    "status": {
+      "machine": "Traduction automatique : certaines formulations peuvent sembler étranges jusqu'à ce qu'une personne les relise.",
+      "partial": "Traduction partielle. Ce qui n'est pas encore traduit s'affiche en anglais.",
+      "community": "Traduit par la communauté Yggdrasil."
+    },
+    "saved": "Enregistré.",
+    "saveFailed": "Impossible d'enregistrer la langue : {{error}}"
+  },
+  "personalization": {
+    "title": "Personnalisation",
+    "description": "La forme des réponses, dans chaque discussion et automatisation. Cela ne règle que le style. Ce que l'IA peut faire se définit dans Autorisations des outils, et rien ici ni dans Mémoire ne peut le modifier.",
+    "length": {
+      "label": "Longueur des réponses",
+      "brief": "Brève",
+      "balanced": "Équilibrée",
+      "detailed": "Détaillée"
+    },
+    "tone": {
+      "label": "Ton",
+      "friendly": "Amical",
+      "neutral": "Neutre",
+      "direct": "Direct"
+    },
+    "format": {
+      "label": "Format",
+      "prose": "Paragraphes",
+      "lists": "Listes"
+    },
+    "units": {
+      "label": "Unités",
+      "metric": "Métriques",
+      "imperial": "Impériales"
+    },
+    "noPreference": "Aucune préférence",
+    "aboutYou": "À propos de vous",
+    "aboutYouPlaceholder": "Je suis ingénieur backend à Lyon. Mon projet principal est un service en Go.",
+    "instructions": "Autres indications sur la façon de répondre",
+    "instructionsPlaceholder": "Montre des exemples de code en Go. Cite les sources à la fin.",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Enregistré",
+    "saveFailed": "Impossible d'enregistrer."
+  },
+  "background": {
+    "title": "Continuer en arrière-plan",
+    "description": "Fermer la fenêtre laisse Discussion, l'API et vos planifications en fonctionnement. Cette option reste activée tant qu'une planification existe."
+  },
+  "launchAtLogin": {
+    "title": "Ouvrir à la connexion",
+    "description": "Lancer Yggdrasil automatiquement lorsque vous ouvrez une session sur cet ordinateur."
+  },
+  "defaultProfile": {
+    "title": "Profil par défaut",
+    "description": "Utilisé lorsque vous commencez une nouvelle discussion.",
+    "automatic": "Automatique"
+  },
+  "runOn": {
+    "title": "Exécuter les discussions sur",
+    "description": "Où le travail doit s'exécuter par défaut dans votre équipe.",
+    "automatic": "Automatique",
+    "local": "Cet ordinateur",
+    "ask": "Demander à chaque fois"
+  },
+  "lifecycle": {
+    "title": "Cycle de vie des modèles",
+    "description": "En automatique, les modèles restent chargés après une discussion. En manuel, Démarrer et Arrêter sont à votre charge.",
+    "automatic": "Automatique",
+    "manual": "Manuel",
+    "idleUnload": "Décharger les modèles inactifs après",
+    "idleUnloadHint": "Libère de la mémoire lorsqu'un modèle n'a pas été utilisé depuis un moment. Indiquez 0 pour garder les modèles chargés.",
+    "minutes": "minutes"
+  },
+  "downloads": {
+    "title": "Télécharger les modèles",
+    "description": "Lorsqu'un profil a besoin d'un modèle qui n'est pas encore installé.",
+    "ask": "Demander d'abord",
+    "automatic": "Automatique"
+  },
+  "advanced": {
+    "title": "Mode avancé",
+    "description": "Afficher les ID des modèles, les détails de l'API, les profils, les journaux et d'autres réglages pour utilisateurs avancés."
+  },
+  "discovery": {
+    "title": "Rechercher d'autres ordinateurs",
+    "description": "Annoncer cet ordinateur et rechercher d'autres installations d'Yggdrasil sur votre réseau.",
+    "needsRestart": "Les réglages réseau ont été mis à jour. Redémarrez Yggdrasil pour que les autres ordinateurs puissent pleinement joindre celui-ci.",
+    "restartManually": "Quittez complètement Yggdrasil, puis rouvrez-le pour finir d'appliquer les réglages réseau.",
+    "restartNow": "Redémarrer maintenant",
+    "status": "État : <strong>{{state}}</strong>"
+  },
+  "onOff": {
+    "on": "Activé",
+    "off": "Désactivé"
+  },
+  "api": {
+    "title": "Accès API",
+    "description": "Comment les apps et les autres appareils peuvent communiquer avec Yggdrasil.",
+    "local": "API locale",
+    "lan": "API LAN",
+    "manage": "Gérer l'accès API"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Alertes pour les travaux de longue durée et la connectivité de l'équipe.",
+    "taskFinish": "Notifier à la fin des tâches",
+    "peerOffline": "Notifier quand un ordinateur jumelé se déconnecte"
+  },
+  "toolPermissions": {
+    "title": "Autorisations des outils",
+    "description": "Règles par défaut de ce que l'IA peut faire sur cet ordinateur.",
+    "terminal": "Commandes de terminal",
+    "fileWrites": "Écriture de fichiers",
+    "git": "Opérations Git",
+    "ask": "Demander",
+    "allowSession": "Autoriser pour la session",
+    "allow": "Autoriser",
+    "deny": "Refuser"
+  },
+  "history": {
+    "title": "Historique",
+    "description": "Choisissez ce qu'Yggdrasil conserve sur cet ordinateur.",
+    "saveChats": "Enregistrer l'historique des discussions",
+    "saveTasks": "Enregistrer l'historique des tâches",
+    "confirmClear": "Supprimer tout l'historique des discussions sur cet ordinateur ? Cette action est irréversible.",
+    "clear": "Effacer l'historique des discussions",
+    "clearing": "Effacement…"
+  },
+  "whatLeft": {
+    "title": "Ce qui a quitté cet ordinateur",
+    "description": "Yggdrasil travaille sur cet ordinateur. Voici les fois où une discussion, une automatisation ou une app a envoyé quelque chose ailleurs : recherches et pages web, recherches de cartes, ordinateurs jumelés et services connectés. Marquez des souvenirs ou des connaissances « Cet ordinateur uniquement » pour que les discussions qui les utilisent restent ici.",
+    "nothing": "Rien n'a quitté cet ordinateur au cours des 30 derniers jours.",
+    "summary": "Au cours des 30 derniers jours : {{list}}.",
+    "summaryItem": "{{kind}} {{count}}",
+    "kinds": {
+      "web_search": "Recherche web",
+      "web_page": "Page web",
+      "places": "Cartes et lieux",
+      "paired_computer": "Ordinateur jumelé",
+      "external_server": "Serveur externe",
+      "connector": "Service connecté",
+      "notification": "Notification"
+    },
+    "kindsLower": {
+      "web_search": "recherche web",
+      "web_page": "page web",
+      "places": "cartes et lieux",
+      "paired_computer": "ordinateur jumelé",
+      "external_server": "serveur externe",
+      "connector": "service connecté",
+      "notification": "notification"
+    },
+    "sources": {
+      "chat": "Discussion",
+      "api": "API",
+      "automation": "Automatisation",
+      "training": "Entraînement"
+    },
+    "keepFor": "Conserver l'historique des exécutions pendant",
+    "retention": {
+      "days_one": "{{count}} jour",
+      "days_many": "{{count}} jours",
+      "days_other": "{{count}} jours",
+      "year": "1 an",
+      "forever": "Toujours"
+    },
+    "delete": "Supprimer l'historique des exécutions",
+    "confirmDelete": "Supprimer l'historique des exécutions maintenant ? Cela efface les prompts et résultats d'outils enregistrés des exécutions passées, ainsi que cette liste. Les discussions ne sont pas supprimées.",
+    "deleted": "{{tasks}} enregistrements d'exécution, {{automations}} résultats d'automatisation et {{entries}} entrées ci-dessous supprimés.",
+    "footnote": "L'historique des exécutions contient les prompts et les résultats d'outils des exécutions passées. La conservation des discussions dépend du réglage Historique ci-dessous. Chaque automatisation garde son dernier résultat, auquel « notifier quand le résultat change » se compare."
+  },
+  "storage": {
+    "folders": "Dossiers de données",
+    "data": "Données",
+    "models": "Modèles",
+    "runtimes": "Moteurs d'exécution",
+    "logs": "Journaux",
+    "showInFinder": "Afficher dans le Finder",
+    "openFolder": "Ouvrir le dossier",
+    "opened": "Ouvert",
+    "copyPath": "Copiez le chemin ci-dessous",
+    "pending": "Apparaîtra quand Yggdrasil sera en cours d'exécution",
+    "limit": "Stockage maximal des modèles",
+    "limitDescription": "Limite indicative pour les modèles téléchargés sur cet ordinateur.",
+    "unlimited": "Illimité"
+  },
+  "about": {
+    "tagline": "Plan de contrôle d'IA locale",
+    "versionUnavailable": "Version indisponible",
+    "build": "Build {{commit}}",
+    "source": "Code source correspondant",
+    "thisComputer": "Cet ordinateur",
+    "service": "Service",
+    "unavailable": "Indisponible",
+    "diagnostics": "Ouvrir les diagnostics"
+  },
+  "reset": {
+    "title": "Réinitialiser l'application",
+    "description": "Restaurer les valeurs par défaut et relancer la configuration initiale. Efface les discussions, les profils personnalisés, les tâches et les clés API.",
+    "button": "Réinitialiser les paramètres et les données…",
+    "warningKeep": "Cette action est irréversible. Vous referez la configuration initiale. Les modèles et moteurs d'exécution téléchargés seront conservés.",
+    "warningDelete": "Cette action est irréversible. Vous referez la configuration initiale. Les modèles téléchargés seront également supprimés.",
+    "deleteModels": "Supprimer aussi les modèles téléchargés",
+    "confirm": "Oui, réinitialiser",
+    "resetting": "Réinitialisation…",
+    "cancel": "Annuler",
+    "failed": "Impossible de réinitialiser l'application. Réessayez."
+  }
+}

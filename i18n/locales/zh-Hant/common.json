@@ -1,0 +1,56 @@
+{
+  "tagline": "本機 AI 控制中心",
+  "nav": {
+    "label": "主要",
+    "main": "主要",
+    "system": "系統",
+    "chat": "聊天",
+    "automations": "自動化",
+    "models": "模型",
+    "train": "訓練",
+    "knowledge": "知識",
+    "memory": "記憶",
+    "computers": "電腦",
+    "performance": "效能",
+    "diagnostics": "診斷",
+    "profiles": "設定檔與協作編排",
+    "tools": "工具",
+    "apiAccess": "API 存取",
+    "settings": "設定"
+  },
+  "status": {
+    "starting": "正在啟動…",
+    "unavailable": "服務無法使用",
+    "noModel": "沒有模型",
+    "ready": "就緒",
+    "unavailableHint": "本機的 Yggdrasil 服務沒有回應。",
+    "noModelHint": "請先在「模型」中安裝模型，才能開始聊天。",
+    "readyHint": "本機服務已就緒。"
+  },
+  "subsystems": {
+    "title": "系統",
+    "bifrostHint": "電腦探索與網路連線",
+    "computersNone": "沒有電腦",
+    "computersConnected_other": "已連線 {{count}} 台電腦",
+    "nornHint": "Norn 會在你的電腦之間排程工作",
+    "nornAutomatic": "自動",
+    "mimirHint": "本機知識與記憶",
+    "mimirReady": "就緒"
+  },
+  "boot": {
+    "starting": "正在啟動 Yggdrasil",
+    "preparing": "正在準備你的本機 AI 服務",
+    "unavailable": "服務無法使用",
+    "unavailableBody": "本機的 Yggdrasil 服務還沒有回應。請稍候再試一次。如果一直發生這種情況，請在 App 載入後查看「診斷」。",
+    "retrying": "正在重試…",
+    "tryAgain": "再試一次",
+    "keyRequired": "需要 API 金鑰",
+    "keyBody": "這個 Yggdrasil 背景服務正在接受這台電腦以外的連線。請輸入 API 金鑰以繼續。在一般 HTTP 連線上，金鑰並不會將傳輸內容加密。",
+    "continue": "繼續"
+  },
+  "units": {
+    "ms": "{{value}} ms",
+    "seconds": "{{value}} 秒",
+    "tokPerSec": "{{value}} tok/s"
+  }
+}

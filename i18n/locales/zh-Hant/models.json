@@ -1,0 +1,202 @@
+{
+  "page": {
+    "title": "模型",
+    "subtitle": "選擇要安裝的模型。Yggdrasil 會推薦適合你硬體的模型。",
+    "loading": "正在載入模型資料庫…",
+    "search": "搜尋模型…",
+    "emptyTitle": "沒有精選模型",
+    "emptyDescription": "本機目錄是空的。請試試「瀏覽所有模型」，從 Hugging Face 安裝。",
+    "ready": "{{model}} 已下載完成，可以開始使用。",
+    "readyFallback": "模型",
+    "dismiss": "關閉"
+  },
+  "tabs": {
+    "discover": "探索",
+    "installed": "已安裝",
+    "running": "執行中"
+  },
+  "target": {
+    "label": "模型適用於：",
+    "aria": "用於模型建議的電腦",
+    "thisComputer": "這台電腦",
+    "all": "所有電腦",
+    "computer": "電腦",
+    "clusterView": "叢集檢視 · {{running}}",
+    "running_other": "{{count}} 個模型執行中",
+    "allHint": "可以安裝到每一台配對的電腦。建議仍會著重在適合的模型。",
+    "basedOn": "建議是根據 {{name}} 的硬體提供。",
+    "manage": "管理電腦",
+    "useAnother": "使用其他電腦",
+    "hardwareUnavailable": "無法取得硬體詳細資訊",
+    "unifiedMemory": "{{size}} 統一記憶體",
+    "memory": "{{size}} 記憶體"
+  },
+  "discover": {
+    "recommended": "推薦",
+    "recommendedHint": "適合所選電腦的精選模型，以用途為優先。",
+    "browseAll": "瀏覽所有模型",
+    "noRecommendations": "目前還沒有建議。",
+    "noMatches": "沒有符合這個搜尋的精選模型。"
+  },
+  "categories": {
+    "coding": "程式設計",
+    "general": "一般助理",
+    "reasoning": "推理",
+    "vision": "視覺",
+    "fast": "小巧快速",
+    "large": "大型模型"
+  },
+  "fit": {
+    "excellent": "非常適合",
+    "good": "適合",
+    "tight": "勉強可用",
+    "heavy": "可能執行緩慢",
+    "unsupported": "不支援",
+    "unknown": "適合度未知"
+  },
+  "install": {
+    "install": "安裝",
+    "anyway": "仍要安裝",
+    "unsupported": "不支援",
+    "downloading": "正在下載…",
+    "installing": "正在安裝…",
+    "installed": "已安裝",
+    "progress": "{{percent}} · {{done}} / {{total}}"
+  },
+  "speed": {
+    "measured": "實測 {{value}} tok/s",
+    "estimated": "預估約 {{value}} tok/s",
+    "tokPerSec": "{{value}} tok/s"
+  },
+  "memory": {
+    "approximate": "約 {{range}}",
+    "unified": "{{size}} 統一記憶體",
+    "plain": "{{size}} 記憶體",
+    "needed": "約 {{size}}"
+  },
+  "status": {
+    "running": "執行中",
+    "downloading": "正在下載",
+    "installed": "已安裝",
+    "notInstalled": "未安裝"
+  },
+  "lastUsed": {
+    "never": "從未使用",
+    "justNow": "剛剛"
+  },
+  "tags": {
+    "context": "{{count}}K 上下文"
+  },
+  "tools": {
+    "webSummary": "使用本機工具 · 可擷取網頁",
+    "webDetail": "經你核准後，可以讀取檔案、使用 git，以及執行終端機指令。像 curl 這樣的指令可以在網路上查詢資料。沒有獨立的瀏覽器。",
+    "blockedSummary": "使用本機工具 · 這個設定檔已封鎖網路",
+    "blockedDetail": "這個模型可以執行終端機指令，但目前的助理設定檔已關閉終端機，因此無法擷取網頁。",
+    "chatSummary": "僅限聊天 · 無法存取網路",
+    "chatDetail": "由模型本身回答。它無法執行終端機指令，因此無法在網路上查詢任何資料。"
+  },
+  "chips": {
+    "coding": "程式設計",
+    "tools": "工具",
+    "reasoning": "推理",
+    "vision": "視覺",
+    "fast": "快速",
+    "general": "一般"
+  },
+  "support": {
+    "embedding": "嵌入模型：協助搜尋知識，無法聊天",
+    "reranker": "重新排序模型：排列搜尋結果，無法聊天",
+    "classifier": "分類模型：分類請求，無法聊天"
+  },
+  "bestFor": {
+    "coding": "最適合程式設計",
+    "reasoning": "最適合縝密推理",
+    "vision": "最適合圖片和文件",
+    "fast": "最適合快速回答",
+    "large": "最適合困難問題",
+    "everyday": "日常本機助理"
+  },
+  "small": {
+    "note": "小巧又快速，但可能會弄錯事實和數字，尤其是來自你的檔案和知識的內容。關於你的資料的問題，較大的模型會更可靠。",
+    "installedOther": "已安裝 {{model}}。遇到這類問題時，請在聊天中選擇它或「自動」。",
+    "fitsOther": "{{model}} 適合這台電腦。",
+    "installOther": "安裝 {{model}}"
+  },
+  "capability": {
+    "noWeb": "目前的配置無法即時存取網路。",
+    "noTools": "{{model}} 無法使用工具，因此無法查詢這項資料。請改用支援工具的模型，例如下方的模型。",
+    "noLocalTools": "{{model}} 不使用本機工具，因此無法替你讀取檔案、執行指令或使用 git。",
+    "noVision": "{{model}} 無法查看圖片。"
+  },
+  "card": {
+    "details": "詳細資訊",
+    "hideDetails": "隱藏詳細資訊",
+    "modelSize": "模型大小",
+    "quantization": "量化",
+    "unknown": "未知",
+    "runtimeMemory": "預估執行記憶體",
+    "context": "設定的上下文長度",
+    "machineMemory": "機器記憶體",
+    "available": "目前可用",
+    "expected": "預期表現",
+    "gpu": "GPU",
+    "recommendations": "建議",
+    "onYourComputers": "在你的電腦上",
+    "bestMachine": "最適合的機器：{{name}}",
+    "family": "模型系列",
+    "parameters": "參數",
+    "format": "格式",
+    "runtime": "執行環境",
+    "modelId": "模型 ID"
+  },
+  "tightFit": {
+    "label": "勉強可用",
+    "hint": "會使用這台電腦大部分的可用記憶體，可能較不穩定。",
+    "title": "這個模型在這台電腦上可能不穩定",
+    "body": "{{model}} 會使用這台電腦上大部分的可用記憶體。在較重的工作負載或較長的上下文下，它可能執行緩慢、停止回應，或導致系統不穩定。",
+    "advice": "Yggdrasil 建議為作業系統和顯示功能保留更多記憶體。",
+    "cancel": "取消",
+    "install": "仍要安裝"
+  },
+  "browse": {
+    "title": "瀏覽所有模型",
+    "description": "在 Hugging Face 上搜尋 Yggdrasil 可以在本機執行的模型。安裝會使用上方所選的電腦。",
+    "close": "關閉",
+    "placeholder": "搜尋模型…",
+    "search": "搜尋",
+    "searching": "正在搜尋 Hugging Face…",
+    "failed": "無法連線到 Hugging Face。請檢查網路後再試一次。",
+    "install": "安裝",
+    "installFailed": "安裝失敗"
+  },
+  "installedTab": {
+    "empty": "還沒有已安裝的模型。從「探索」安裝後，它們就會出現在這裡。",
+    "runningOn": "在 {{computer}} 上執行",
+    "downloading": "正在下載… {{percent}}",
+    "installedOn": "已安裝在 {{where}}",
+    "thisComputer": "這台電腦",
+    "usedBy": "使用者：{{profiles}}",
+    "lastUsed": "上次使用：{{when}}",
+    "chat": "聊天",
+    "start": "啟動",
+    "installElsewhere": "安裝到其他電腦",
+    "installing": "正在安裝…",
+    "moreActions": "{{model}} 的更多動作",
+    "stop": "停止",
+    "remove": "移除"
+  },
+  "runningTab": {
+    "empty": "目前沒有載入任何模型。需要時，聊天會自動啟動一個模型。",
+    "active": "使用中的模型",
+    "inUse": " · 使用中約 {{size}}",
+    "ofHost": "，這台電腦共 {{size}}",
+    "runningOn": "在 {{computer}} 上執行",
+    "stop": "停止",
+    "memory": "記憶體",
+    "memoryUnavailable": "無法取得記憶體用量",
+    "speed": "速度",
+    "speedUnavailable": "無法取得速度",
+    "usedBy": "使用者：{{profiles}}",
+    "openChat": "打開聊天"
+  }
+}

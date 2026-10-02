@@ -1,0 +1,192 @@
+{
+  "page": {
+    "title": "Estado de Yggdrasil",
+    "attention": "Algo requiere atención.",
+    "mostly": "Casi todo en orden: hay algo que revisar.",
+    "normal": "Todo funciona con normalidad.",
+    "creating": "Creando…",
+    "export": "Exportar diagnóstico",
+    "exportHint": "Crea un paquete para solucionar problemas. Los secretos quedan excluidos.",
+    "overall": "Estado general",
+    "allOk": "✓ Todos los sistemas funcionan",
+    "needsAttention": "⚠ Requiere atención",
+    "checkBelow": "⚠ Revisa los elementos de abajo",
+    "checking": "Comprobando…",
+    "refresh": "Actualizar",
+    "tip": "Consejo: instala un modelo en Modelos antes de chatear.",
+    "bundleCreated": "Se creó el paquete de diagnóstico",
+    "bundleAt": "Se creó el paquete de diagnóstico en <path>{{path}}</path>",
+    "bundleShare": "Se creó el paquete de diagnóstico. Puedes compartir este archivo cuando pidas ayuda.",
+    "bundleFailed": "No se pudo crear el paquete de diagnóstico. Comprueba que el daemon esté en ejecución."
+  },
+  "checked": {
+    "never": "Todavía no se comprobó",
+    "justNow": "Última comprobación: justo ahora",
+    "at": "Última comprobación: {{when}}"
+  },
+  "ago": {
+    "justNow": "justo ahora",
+    "minutes_one": "{{count}} minuto",
+    "minutes_many": "{{count}} minutos",
+    "minutes_other": "{{count}} minutos",
+    "hours_one": "{{count}} hora",
+    "hours_many": "{{count}} horas",
+    "hours_other": "{{count}} horas",
+    "days_one": "{{count}} día",
+    "days_many": "{{count}} días",
+    "days_other": "{{count}} días"
+  },
+  "rows": {
+    "working": "Procesando…",
+    "retry": "Reintentar",
+    "openSettings": "Abrir Configuración",
+    "viewDetails": "Ver detalles",
+    "openModels": "Abrir Modelos",
+    "openComputers": "Abrir Computadoras",
+    "manageModels": "Administrar modelos",
+    "apiSettings": "Configuración de la API",
+    "healthy": "En buen estado",
+    "unavailable": "No disponible",
+    "control": {
+      "label": "Servicio de control",
+      "notResponding": "No responde",
+      "message": "No se puede acceder al servicio local de Yggdrasil. Sal de la app y vuelve a abrirla, o comprueba que el daemon esté en ejecución."
+    },
+    "runtime": {
+      "label": "Entorno de ejecución de modelos",
+      "needsAttention": "Requiere atención",
+      "notResponding": "El entorno de ejecución de modelos local no responde.",
+      "notSetUp": "Sin configurar",
+      "installModel": "Instala un modelo para terminar de configurar el entorno de ejecución.",
+      "idle": "Inactivo",
+      "running_one": "{{count}} modelo en ejecución",
+      "running_many": "{{count}} modelos en ejecución",
+      "running_other": "{{count}} modelos en ejecución"
+    },
+    "database": {
+      "label": "Base de datos local"
+    },
+    "bifrost": {
+      "label": "Red Bifrost",
+      "offline_one": "{{count}} computadora sin conexión",
+      "offline_many": "{{count}} computadoras sin conexión",
+      "offline_other": "{{count}} computadoras sin conexión",
+      "silentFor_one": "{{names}} no responde desde hace {{ago}}.",
+      "silentFor_many": "{{names}} no responden desde hace {{ago}}.",
+      "silentFor_other": "{{names}} no responden desde hace {{ago}}.",
+      "silent_one": "{{names}} no responde.",
+      "silent_many": "{{names}} no responden.",
+      "silent_other": "{{names}} no responden.",
+      "connected_one": "{{count}} computadora conectada",
+      "connected_many": "{{count}} computadoras conectadas",
+      "connected_other": "{{count}} computadoras conectadas",
+      "none": "No se encontraron computadoras",
+      "noneHint": "Agrega otra computadora o revisa Buscar otras computadoras en Configuración."
+    },
+    "storage": {
+      "label": "Almacenamiento",
+      "available": "{{size}} disponibles",
+      "modelsUse": "Los modelos ocupan alrededor de {{size}} en esta computadora.",
+      "freeUp": "Libera espacio en disco antes de instalar más modelos."
+    },
+    "api": {
+      "label": "API",
+      "lan": "LAN activada",
+      "local": "Solo local",
+      "lanHint": "Otros dispositivos de tu red pueden acceder a la API si están autorizados."
+    }
+  },
+  "env": {
+    "title": "Entorno",
+    "version": "Versión",
+    "apiBind": "Enlace de la API",
+    "node": "Nodo",
+    "dataDir": "Directorio de datos"
+  },
+  "logs": {
+    "hide": "Ocultar registros",
+    "view": "Ver registros",
+    "files": "Archivos de registro",
+    "live": "En vivo",
+    "loading": "Cargando los registros…",
+    "none": "Todavía no hay archivos de registro. Aparecen después de que la app se inicia y realiza trabajo.",
+    "kinds": {
+      "daemon": "App",
+      "runtime": "Entorno de ejecución de modelos",
+      "other": "Otro"
+    },
+    "kindsAdvanced": {
+      "daemon": "Daemon",
+      "runtime": "Runtime"
+    },
+    "select": "Selecciona un registro",
+    "selectHint": "Elige un archivo de registro a la izquierda para revisar la salida reciente.",
+    "recent": "Se muestra la parte más reciente de este archivo",
+    "full": "Archivo completo",
+    "copied": "Copiado",
+    "copyFailed": "No se pudo copiar",
+    "copy": "Copiar",
+    "reading": "Leyendo el registro…",
+    "readFailed": "No se pudo leer este registro. Es posible que se haya rotado o eliminado.",
+    "empty": "(vacío)"
+  },
+  "tools": {
+    "title": "Actividad de herramientas",
+    "none": "Todavía no hay llamadas a herramientas en esta sesión."
+  },
+  "caches": {
+    "title": "Cachés",
+    "description": "Lo que Yggdrasil conserva para responder más rápido las consultas repetidas. Las cachés personales se quedan en esta computadora y se borran junto con los registros de ejecución. Las contraseñas y las claves nunca se guardan en caché.",
+    "by": "Por {{key}}",
+    "keptUntil": "se conserva hasta que se invalide",
+    "keptFor": "se conserva {{ttl}}",
+    "clearedWhen": "; se borra cuando {{invalidation}}",
+    "entries_one": "{{count}} entrada",
+    "entries_many": "{{count}} entradas",
+    "entries_other": "{{count}} entradas",
+    "hitsMisses": " · {{hits}} aciertos · {{misses}} fallos",
+    "clear": "Borrar"
+  },
+  "abilities": {
+    "title": "Lo que Yggdrasil puede hacer",
+    "description": "Según lo que está instalado, en línea y conectado ahora mismo. El chat responde preguntas como “¿Puedes generar una imagen?” a partir de esta lista.",
+    "available": " (disponible)",
+    "notAvailable": " (no disponible)",
+    "via": "Mediante {{via}}. ",
+    "summary": "{{models}} · {{computers}} · {{tools}} · {{services}} · {{providers}} · {{files}}",
+    "models_one": "{{count}} modelo instalado",
+    "models_many": "{{count}} modelos instalados",
+    "models_other": "{{count}} modelos instalados",
+    "computers": "{{online}} de {{total}} computadoras en línea",
+    "tools_one": "{{count}} herramienta",
+    "tools_many": "{{count}} herramientas",
+    "tools_other": "{{count}} herramientas",
+    "services_one": "{{count}} servicio conectado",
+    "services_many": "{{count}} servicios conectados",
+    "services_other": "{{count}} servicios conectados",
+    "providers": "{{healthy}} de {{total}} proveedores listos",
+    "files_one": "{{count}} archivo ({{size}})",
+    "files_many": "{{count}} archivos ({{size}})",
+    "files_other": "{{count}} archivos ({{size}})"
+  },
+  "providers": {
+    "title": "Herramientas en cada computadora",
+    "description": "Las imágenes y la voz se procesan en la computadora vinculada que pueda hacerlo, de preferencia una cuya GPU haga el trabajo. Los archivos se le envían para la tarea y el resultado vuelve a este chat.",
+    "computer": "Computadora",
+    "thisComputer": "esta computadora",
+    "gpu": "GPU",
+    "tools": {
+      "image.generate": "Crear imágenes",
+      "image.edit": "Editar imágenes",
+      "video.generate": "Crear videos",
+      "speech.transcribe": "Transcribir",
+      "speech.synthesize": "Leer en voz alta"
+    },
+    "states": {
+      "healthy": "Listo",
+      "installing": "Instalando",
+      "failed": "Falló",
+      "unavailable": "Sin configurar"
+    }
+  }
+}

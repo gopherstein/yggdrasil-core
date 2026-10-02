@@ -1,0 +1,43 @@
+{
+  "page": {
+    "title": "Gedächtnis",
+    "description": "Dinge, die sich Yggdrasil für dich merken soll. Sie gehören Yggdrasil, nicht einem einzelnen Modell, und bleiben daher über Chats, Neustarts und Modellwechsel hinweg erhalten. Es werden nur die Erinnerungen genutzt, die zu einer Frage passen, und sie bleiben auf diesem Computer. Sag in einem beliebigen Chat „Merke dir, dass …“, um eine hinzuzufügen.",
+    "useInChats": "Gedächtnis in Chats nutzen",
+    "off": "Das Gedächtnis ist aus. Chats nutzen nicht, was hier gespeichert ist, und nichts wird gelöscht.",
+    "loading": "Wird geladen …",
+    "emptyTitle": "Noch nichts gemerkt",
+    "emptyDescription": "Erzähl Yggdrasil, was es sich merken soll, etwa „Merke dir, dass ich metrische Einheiten bevorzuge“ oder „Merke dir, dass dieses Projekt Go nutzt.“"
+  },
+  "categories": {
+    "identity": "Über dich",
+    "preferences": "Vorlieben",
+    "projects": "Projekte",
+    "technical": "Technisches",
+    "interests": "Interessen",
+    "people": "Personen",
+    "other": "Sonstiges"
+  },
+  "add": {
+    "label": "Erinnerung hinzufügen",
+    "placeholder": "Ich mag kurze Antworten mit Beispielen",
+    "category": "Kategorie",
+    "chooseForMe": "Für mich wählen",
+    "button": "Hinzufügen"
+  },
+  "row": {
+    "text": "Text der Erinnerung",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "fromChat": "Von dir im Chat erbeten",
+    "addedHere": "Hier hinzugefügt",
+    "category": "Kategorie",
+    "edit": "Bearbeiten",
+    "pause": "Pausieren",
+    "useAgain": "Wieder nutzen",
+    "localOnly": "Nur dieser Computer",
+    "localOnlyOn": "Nur dieser Computer ✓",
+    "localOnlyHint": "Diese Erinnerung nie an einen gekoppelten Computer senden. Chats, die sie nutzen, laufen hier.",
+    "delete": "Löschen",
+    "deleteLabel": "Erinnerung löschen: {{content}}"
+  }
+}

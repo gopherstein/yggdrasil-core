@@ -1,0 +1,127 @@
+{
+  "page": {
+    "title": "パフォーマンス",
+    "subtitle": "AIが今何をしているか。負荷、速度、チーム内での作業の流れを確認できます。",
+    "views": "パフォーマンスの表示"
+  },
+  "tabs": {
+    "overview": "概要",
+    "benchmarks": "ベンチマーク",
+    "activity": "アクティビティ"
+  },
+  "roles": {
+    "role": "役割",
+    "worker": "ワーカー{{n}}",
+    "planner": "プランナー",
+    "reviewer": "レビュアー"
+  },
+  "route": {
+    "multiple": "複数のコンピュータ",
+    "thisComputer": "このコンピュータ"
+  },
+  "metrics": {
+    "speed": "生成速度",
+    "prompt": "プロンプト処理",
+    "firstResponse": "最初の応答",
+    "total": "合計応答時間",
+    "teamRun": "チーム実行"
+  },
+  "metricsAdvanced": {
+    "speed": "評価 tok/s",
+    "prompt": "プロンプト評価",
+    "firstResponse": "TTFT",
+    "total": "合計",
+    "teamRun": "マシン間"
+  },
+  "overview": {
+    "loading": "AIの状態を確認しています…",
+    "memory": "メモリ",
+    "idle": "アイドル",
+    "active": "アクティブ",
+    "offline": "オフライン",
+    "unreachable": "現在接続できません。",
+    "idleNoModels": "アイドル（モデル未読み込み）",
+    "model": "モデル",
+    "speed": "速度",
+    "computers_other": "{{count}}台のコンピュータが接続中",
+    "models_other": "{{count}}個のモデルが実行中",
+    "tasks_other": "アクティブなタスク{{count}}件",
+    "acrossMachines": "マシン間の作業",
+    "taskStatus": {
+      "running": "実行中",
+      "pending": "保留中"
+    },
+    "taskInProgress": "タスク処理中",
+    "noComputers": "チームにはまだコンピュータがありません。",
+    "addComputer": "コンピュータを追加",
+    "nothingLoaded": "現在読み込まれているものはありません。モデルを比較したいときは<chat>チャット</chat>を開くか、ベンチマークを実行してください。"
+  },
+  "activity": {
+    "generation": "生成",
+    "helpedPeer": "他のマシンを支援",
+    "promptTokPerSec": "プロンプト tok/s",
+    "tokensOut": "出力トークン",
+    "perRoleAcross": "コンピュータ全体の役割別",
+    "perRoleTurn": "このターンの役割別",
+    "runs": "実行",
+    "averageOf": "{{metric}}の平均",
+    "averageResponse": "平均応答",
+    "crossMachine": "マシン間",
+    "teamRuns": "チーム実行",
+    "filterComputer": "コンピュータで絞り込む",
+    "computer": "コンピュータ",
+    "filterModel": "モデルで絞り込む",
+    "model": "モデル",
+    "filterProfile": "プロファイルで絞り込む",
+    "profile": "プロファイル",
+    "filterDate": "日付で絞り込む",
+    "loading": "アクティビティを読み込んでいます…",
+    "loadFailed": "パフォーマンス履歴を読み込めませんでした。Yggdrasilは実行中ですか？",
+    "emptyTitle": "まだアクティビティはありません",
+    "emptyDescription": "チャットでメッセージをいくつか送ってみてください。複数のコンピュータを使ったターンはチーム実行として表示されます。",
+    "noMatches": "この条件に一致する実行はありません。"
+  },
+  "benchmark": {
+    "fastest": "最速",
+    "results": "結果",
+    "status": "状態：{{status}}",
+    "statuses": {
+      "pending": "保留中",
+      "running": "実行中",
+      "completed": "完了",
+      "failed": "失敗",
+      "cancelled": "キャンセル済み",
+      "canceled": "キャンセル済み"
+    },
+    "winner": "勝者 · {{workload}}",
+    "leading": "リード中 · {{workload}}",
+    "hideDetail": "詳細な結果を隠す",
+    "detail": "詳細な結果",
+    "model": "モデル",
+    "load": "読み込み",
+    "running": "ベンチマークを実行しています…",
+    "title": "モデルを比較",
+    "description": "同じプロンプトを複数のモデルで実行し、作業の種類ごとにどれが最も速いかを確認します。",
+    "chooseModels": "モデルを選択",
+    "chooseWorkloads": "ワークロードを選択",
+    "run": "ベンチマークを実行",
+    "step": "{{n}}. {{label}}",
+    "loadingModels": "モデルを読み込んでいます…",
+    "installFirst": "ベンチマークの前に、「モデル」ページで少なくとも1つのモデルをインストールしてください。",
+    "selected": "{{count}}/6 選択済み",
+    "prompts_other": "プロンプト{{count}}件",
+    "warning": "ベンチマーク中、Yggdrasilはモデルを一時的に読み込んだり解放したりします。テスト中は実行中のチャットが遅くなる場合があります。",
+    "runsPerPrompt": "プロンプトごとの計測回数",
+    "starting": "開始中…",
+    "cancel": "キャンセル",
+    "estimate": "{{models}} · {{workloads}} · 約{{minutes}}",
+    "models_other": "モデル{{count}}個",
+    "workloads_other": "ワークロード{{count}}件",
+    "minutes_other": "{{count}}分",
+    "startFailed": "ベンチマークを開始できませんでした。",
+    "recent": "最近のベンチマーク",
+    "recentHint": "ジョブはYggdrasilの実行中は保持されます。",
+    "jobSummary": "{{models}} · {{workloads}} · {{when}}",
+    "winners_other": "勝者{{count}}件"
+  }
+}

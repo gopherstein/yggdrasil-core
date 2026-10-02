@@ -1,0 +1,77 @@
+{
+  "header": {
+    "welcome": "Bienvenue",
+    "lede": "Cette app peut exécuter de l'IA en toute confidentialité sur vos propres ordinateurs."
+  },
+  "hardware": {
+    "title": "Cet ordinateur",
+    "description": "Matériel détecté pour l'inférence locale.",
+    "detecting": "Détection du matériel…",
+    "processor": "Processeur",
+    "cores_one": "{{count}} cœur",
+    "cores_many": "{{count}} cœurs",
+    "cores_other": "{{count}} cœurs",
+    "memory": "Mémoire",
+    "graphics": "Graphismes",
+    "system": "Système",
+    "unavailable": "Les détails du matériel apparaîtront une fois le backend de l'app lancé. Vous pouvez poursuivre la configuration dès maintenant."
+  },
+  "question": "Que souhaitez-vous que votre IA fasse ?",
+  "purposes": {
+    "general": {
+      "title": "Assistant général",
+      "description": "Questions du quotidien, aide à la rédaction et conversations en local d'abord."
+    },
+    "coding": {
+      "title": "Programmation",
+      "description": "Une aide au code qui peut utiliser automatiquement tous vos ordinateurs jumelés lorsque des modèles y sont installés."
+    },
+    "research": {
+      "title": "Recherche",
+      "description": "Lecture de textes longs, résumés et raisonnement approfondi."
+    },
+    "custom": {
+      "title": "Personnalisé",
+      "description": "Choisissez vous-même les modèles et l'orchestration en mode avancé."
+    }
+  },
+  "continue": "Continuer",
+  "finding": "Recherche d'une configuration…",
+  "recommendFailed": "Impossible d'obtenir une recommandation.",
+  "recommend": {
+    "badge": "Recommandé",
+    "title": "Recommandé pour {{purpose}}",
+    "download": "Téléchargement de {{size}}",
+    "storage": "Stockage estimé",
+    "memory": "Mémoire active estimée",
+    "install": "Installer la configuration recommandée",
+    "skip": "Passer pour l'instant",
+    "back": "Retour"
+  },
+  "roles": {
+    "coordinator": "Coordinateur",
+    "worker": "Exécutant",
+    "reviewer": "Relecteur",
+    "researcher": "Chercheur",
+    "assistant": "Assistant"
+  },
+  "install": {
+    "runtime": "Installation du moteur d'exécution local des modèles…",
+    "model": "Installation de {{model}}…",
+    "downloading": "Téléchargement de {{model}}… {{percent}}",
+    "profile": "Création de votre profil d'IA…",
+    "conversation": "Préparation de votre première discussion…",
+    "chatTitle": "Discussion {{profile}}",
+    "working": "Installation…",
+    "complete": "{{percent}} terminé",
+    "keepOpen": "Le téléchargement de grands modèles peut prendre plusieurs minutes. Gardez cette fenêtre ouverte.",
+    "failed": "L'installation a échoué.",
+    "downloadFailed": "Le téléchargement du modèle a échoué.",
+    "noProfileId": "Le profil a été créé, mais aucun identifiant n'a été renvoyé."
+  },
+  "ready": {
+    "title": "Tout est prêt",
+    "description": "Votre configuration recommandée est installée. Commencez à discuter avec votre IA locale.",
+    "start": "Commencer à discuter"
+  }
+}

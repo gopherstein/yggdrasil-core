@@ -1,0 +1,75 @@
+{
+  "header": {
+    "welcome": "환영합니다",
+    "lede": "이 앱은 내 컴퓨터에서 AI를 비공개로 실행할 수 있어요."
+  },
+  "hardware": {
+    "title": "이 컴퓨터",
+    "description": "로컬 추론에 사용할 하드웨어를 감지했어요.",
+    "detecting": "하드웨어를 감지하는 중…",
+    "processor": "프로세서",
+    "cores_other": "{{count}}코어",
+    "memory": "메모리",
+    "graphics": "그래픽",
+    "system": "시스템",
+    "unavailable": "앱 백엔드가 실행되면 하드웨어 정보가 표시돼요. 지금 설정을 계속할 수 있어요."
+  },
+  "question": "AI로 무엇을 하고 싶으세요?",
+  "purposes": {
+    "general": {
+      "title": "일반 어시스턴트",
+      "description": "일상적인 질문, 글쓰기 도움, 로컬 우선 대화."
+    },
+    "coding": {
+      "title": "프로그래밍",
+      "description": "모델이 설치된 페어링된 컴퓨터를 모두 자동으로 활용할 수 있는 코딩 도움."
+    },
+    "research": {
+      "title": "리서치",
+      "description": "긴 글 읽기, 요약, 신중한 추론."
+    },
+    "custom": {
+      "title": "사용자 지정",
+      "description": "고급 모드에서 모델과 오케스트레이션을 직접 선택해요."
+    }
+  },
+  "continue": "계속",
+  "finding": "설정을 찾는 중…",
+  "recommendFailed": "추천을 받을 수 없어요.",
+  "recommend": {
+    "badge": "추천",
+    "title": "{{purpose}} 추천 설정",
+    "download": "{{size}} 다운로드",
+    "storage": "예상 저장 공간",
+    "memory": "예상 사용 메모리",
+    "install": "추천 설정 설치",
+    "skip": "나중에 하기",
+    "back": "뒤로"
+  },
+  "roles": {
+    "coordinator": "코디네이터",
+    "worker": "워커",
+    "reviewer": "검토자",
+    "researcher": "리서처",
+    "assistant": "어시스턴트"
+  },
+  "install": {
+    "runtime": "로컬 모델 런타임을 설치하는 중…",
+    "model": "{{model}} 설치하는 중…",
+    "downloading": "{{model}} 다운로드하는 중… {{percent}}",
+    "profile": "AI 프로필을 만드는 중…",
+    "conversation": "첫 대화를 준비하는 중…",
+    "chatTitle": "{{profile}} 채팅",
+    "working": "설치하는 중…",
+    "complete": "{{percent}} 완료",
+    "keepOpen": "큰 모델은 다운로드하는 데 몇 분이 걸릴 수 있어요. 이 창을 열어 두세요.",
+    "failed": "설치에 실패했어요.",
+    "downloadFailed": "모델 다운로드에 실패했어요.",
+    "noProfileId": "프로필은 만들어졌지만 ID가 반환되지 않았어요."
+  },
+  "ready": {
+    "title": "준비가 끝났어요",
+    "description": "추천 설정이 설치되었어요. 로컬 AI와 채팅을 시작하세요.",
+    "start": "채팅 시작"
+  }
+}

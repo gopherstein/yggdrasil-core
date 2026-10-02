@@ -3,6 +3,8 @@ package training
 import (
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -21,6 +23,11 @@ func TestParseExamplesFormats(t *testing.T) {
 		{"qa csv", "faq.csv", "question,answer\nDo you rotate tires?,Yes with every oil change.\n", 1, "Do you rotate tires?"},
 		{"catalog csv", "stock.csv", "sku,price\nA1,9.99\n", 0, ""},
 		{"pasted QA", "notes.txt", "Q: What PSI?\nA: Check the door jamb sticker.\n\nQ: Can I mix brands?\nA: Match all four when you can.", 2, "What PSI?"},
+		// The labels each language's paste hint suggests (train.json material.placeholder).
+		{"pasted QA in Spanish", "notas.txt", "P: ¿Qué presión?\nR: Mira la etiqueta de la puerta.\n\nP: ¿Puedo mezclar marcas?\nR: Mejor las cuatro iguales.", 2, "¿Qué presión?"},
+		{"pasted QA in French", "notes.txt", "Q : Quelle pression ?\nR : Voir l'étiquette de la portière.", 1, "Quelle pression ?"},
+		{"pasted QA in Italian", "note.txt", "D: Che pressione?\nR: Guarda l'etichetta sulla portiera.", 1, "Che pressione?"},
+		{"pasted QA in Chinese", "笔记.txt", "问：胎压多少？\n答：看车门上的标签。\n\n问：可以混用品牌吗？\n答：最好四个一致。", 2, "胎压多少？"},
 		{"pasted dialog", "chat.txt", "Customer: I need tires\nAgent: What is the year, make, and model?\nCustomer: 2018 Camry\nAgent: Great, 215/55R17 fits.", 2, "I need tires"},
 		{"prose", "policy.md", "# Returns\n\nUnmounted tires can be returned within 30 days.", 0, ""},
 	}
@@ -204,5 +211,32 @@ func TestVolatileWarningPlural(t *testing.T) {
 	one := Stats(ValidateExamples([]Example{ex("price?", "It is $5.00 today.")}, 0))
 	if !strings.Contains(strings.Join(one.Warnings, " "), "1 answer states prices") {
 		t.Fatalf("warnings = %v", one.Warnings)
+	}
+}
+
+// Every language's paste hint shows a format the importer reads, so pasting
+// examples written the way the hint shows works in every App language.
+func TestPasteHintInEveryLanguageReads(t *testing.T) {
+	files, err := filepath.Glob(filepath.Join("..", "..", "i18n", "locales", "*", "train.json"))
+	if err != nil || len(files) == 0 {
+		t.Fatalf("no train.json in the catalog: %v", err)
+	}
+	for _, file := range files {
+		raw, err := os.ReadFile(file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var catalog struct {
+			Material struct {
+				Placeholder string `json:"placeholder"`
+			} `json:"material"`
+		}
+		if err := json.Unmarshal(raw, &catalog); err != nil {
+			t.Fatalf("%s: %v", file, err)
+		}
+		examples := examplesFromDialog(catalog.Material.Placeholder)
+		if len(examples) == 0 || len(examples[0]) < 2 || examples[0][0].Role != "user" || examples[0][1].Role != "assistant" {
+			t.Errorf("%s: the paste hint %q doesn't read as a question and an answer: %+v", file, catalog.Material.Placeholder, examples)
+		}
 	}
 }

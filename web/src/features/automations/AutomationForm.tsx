@@ -34,7 +34,7 @@ interface AutomationFormProps {
 }
 
 export function AutomationForm({ profiles, models, tools, initial, seedDescription = '', pending, error, onCancel, onSubmit }: AutomationFormProps) {
-  const { t } = useTranslation('automations')
+  const { t, i18n } = useTranslation('automations')
   const advanced = useUIStore((state) => state.advancedMode) && new URLSearchParams(window.location.search).get('simple') !== '1'
   const advancedRef = useRef<HTMLDetailsElement>(null)
   const zone = initial?.schedule.time_zone || localTimeZone()
@@ -176,6 +176,7 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
           placeholder={t('form.describePlaceholder')}
           onChange={(event) => setDescription(event.target.value)}
         />
+        {i18n.language.split('-')[0] !== 'en' ? <span className="block text-xs text-ink-faint">{t('form.englishOnly')}</span> : null}
       </label>
       <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={applyDescription}>
         {t('form.setUp')}

@@ -1,0 +1,380 @@
+{
+  "explainer": "训练教会你的 AI 如何完成它的工作。已连接的知识库则为它提供完成工作所需的最新信息。",
+  "generic": "出了点问题。",
+  "uses": {
+    "training": {
+      "label": "训练",
+      "description": "教它如何回应。会融入模型之中。"
+    },
+    "knowledge": {
+      "label": "知识库",
+      "description": "需要时查找。编辑后保持最新。"
+    },
+    "both": {
+      "label": "两者",
+      "description": "示例教会模式；事实保持连接。"
+    }
+  },
+  "presets": {
+    "quick": {
+      "label": "快速",
+      "description": "简短运行，用来验证想法。适合语气和格式。"
+    },
+    "balanced": {
+      "label": "均衡",
+      "description": "默认选项。从你的示例中学习工作流程和术语。"
+    },
+    "quality": {
+      "label": "最高质量",
+      "description": "在每一层上进行更长时间的训练。需要更多示例、内存和时间。"
+    }
+  },
+  "flags": {
+    "empty": {
+      "label": "空白",
+      "help": "没有问题或回答。"
+    },
+    "no_answer": {
+      "label": "没有回答",
+      "help": "最后一轮不是回答，因此没有可学习的内容。"
+    },
+    "duplicate": {
+      "label": "重复",
+      "help": "与之前的示例相同。只有第一份会参与训练。"
+    },
+    "too_long": {
+      "label": "太长",
+      "help": "超出了模型可训练的长度。请缩短或拆分。"
+    },
+    "short_answer": {
+      "label": "回答过短",
+      "help": "一个词的回答几乎教不了什么。它仍会参与训练。"
+    },
+    "volatile_facts": {
+      "label": "易变的事实",
+      "help": "包含价格、库存数量或 SKU。模型可能会记住一个日后会变化的数值。请把这类事实放在知识库中。"
+    }
+  },
+  "flagCount": {
+    "empty": "{{count}} 个空白",
+    "no_answer": "{{count}} 个没有回答",
+    "duplicate": "{{count}} 个重复",
+    "too_long": "{{count}} 个太长",
+    "short_answer": "{{count}} 个回答过短",
+    "volatile_facts": "{{count}} 个含易变事实"
+  },
+  "states": {
+    "queued": "排队中",
+    "preparing_dataset": "正在准备",
+    "loading_model": "正在加载模型",
+    "training": "正在训练",
+    "exporting": "正在导出",
+    "evaluating": "正在测试",
+    "complete": "已完成",
+    "failed": "失败",
+    "cancelled": "已取消"
+  },
+  "fit": {
+    "comfortable": "适合",
+    "tight": "勉强适合",
+    "too_large": "太大",
+    "unsupported": "不支持"
+  },
+  "duration": {
+    "s": "{{s}} 秒",
+    "m": "{{m}} 分钟",
+    "ms": "{{m}} 分 {{s}} 秒",
+    "h": "{{h}} 小时",
+    "hm": "{{h}} 小时 {{m}} 分"
+  },
+  "steps": {
+    "describe": "描述",
+    "base": "基础模型",
+    "material": "素材",
+    "examples": "示例",
+    "plan": "检查",
+    "train": "训练",
+    "test": "测试",
+    "deploy": "部署"
+  },
+  "page": {
+    "title": "训练你自己的 AI",
+    "description": "打造一个擅长某项工作的小助手。用示例告诉它该如何回应，并连接它需要的信息。你不需要了解模型是如何训练的。",
+    "settingUpExample": "正在设置示例…",
+    "tryExample": "试试示例",
+    "build": "打造新的 AI",
+    "loading": "正在加载…",
+    "nothing": "还没有打造任何 AI。",
+    "emptyTitle": "打造专用 AI",
+    "emptyDescription": "描述它的工作，添加优质回答的示例，并连接它应查找的数据。Yggdrasil 会推荐一个基础模型，在这台电脑上训练它，并让你在使用前与原始模型进行比较。",
+    "exampleHint": "这个示例使用一家虚构的轮胎店，让你先看到真实的数据。",
+    "exampleBadge": "示例",
+    "deployed": "已部署 · 修订版 {{revision}}",
+    "notDeployed": "未部署",
+    "newTitle": "你的 AI 应该做什么？",
+    "newDescription": "用一两句话描述它的工作，就像向新员工解释一样。",
+    "name": "名称",
+    "namePlaceholder": "轮胎店助手",
+    "job": "工作内容",
+    "jobPlaceholder": "回答顾客关于轮胎的问题。询问车辆的年份、品牌和型号，解释适配情况，并推荐我们有库存的轮胎。",
+    "creating": "正在创建…",
+    "continue": "继续",
+    "cancel": "取消",
+    "base": "基于 {{model}}",
+    "noBase": "还没有基础模型",
+    "buildSteps": "打造步骤",
+    "done": "已完成"
+  },
+  "example": {
+    "title": "在这个示例中",
+    "describe": "这个示例是一家轮胎店的助手。Yggdrasil 根据描述起草了指令。你可以修改任何内容；在你按下“训练”之前，什么都不会开始训练。",
+    "base": "Yggdrasil 选择了能在这台电脑上轻松训练且允许商业使用的最小模型。较小的模型几分钟就能训练完。",
+    "material": "已添加三个文件，Yggdrasil 对每个文件进行了分类。聊天记录被归为“训练”，因为它们展示了如何回答。库存被归为“知识库”，因为价格和库存会变化。政策被归为“知识库”，因为助手应该准确引用它们。打开“查看示例文件”即可阅读。",
+    "examples": "有三个示例是故意设置了缺陷的。重复的示例和没有回答的问题会被自动排除。包含价格的回答仍会参与训练，所以它被标记了出来。试着把它排除。",
+    "plan": "这个示例使用“快速”，因此训练只需几分钟。“保持连接”下的所有内容会在每个问题时被搜索，而不是被训练进模型。",
+    "train": "观察训练损失随着模型学习示例而下降。损失低意味着它能很好地模仿示例，而不代表它的回答是正确的。这正是下一步要检查的。",
+    "test": "比较各列。专用 AI 的回答应该会询问车辆信息，并以 Tread Right Tires 的名义结尾。也要留意编造的细节，例如听起来合理但实际错误的轮胎尺寸：小模型擅长学习风格，却不擅长记住事实，这就是价格和尺寸应放在知识库中的原因。添加一个测试提示词，例如“Pilot Sport 4 多少钱？”，看看已连接的知识库如何发挥作用。",
+    "deploy": "部署后，在聊天中问它某款轮胎的价格。然后打开“知识库”，编辑库存，再问一次。无需重新训练，回答就会改变。完成后，可在“描述”步骤中删除这个示例。"
+  },
+  "concepts": {
+    "training": "训练",
+    "trainingTitle": "训练 AI 的行为方式",
+    "trainingBody": "优质回答的示例会教会它扮演的角色、你的术语、它应该提出的问题、它遵循的步骤、它的语气以及回复的格式。",
+    "trainingUse": "适用：聊天记录、问答对、示例回复。",
+    "knowledge": "知识库",
+    "knowledgeTitle": "连接 AI 所知道的内容",
+    "knowledgeBody": "会变化或必须保持准确的信息在需要时才去查找：库存、价格、SKU、商品目录、政策和文档。随时编辑，无需重新训练。",
+    "knowledgeUse": "适用：电子表格、CSV 导出文件、商品列表、政策文档。",
+    "how": "工作原理",
+    "lora": "<strong>LoRA</strong> 训练的是一个小型附加组件（适配器），而不是改动整个模型。原始模型保持不变，仍可使用。<strong>QLoRA</strong> 的做法相同，但基于模型的压缩副本，因此占用的内存更少。",
+    "rag": "<strong>已连接的知识库</strong>就是检索：每次回答之前，Yggdrasil 会在你的来源中搜索与问题匹配的段落，并把它们交给模型。这通常被称为 RAG，即检索增强生成。",
+    "epoch": "一个<strong>轮次（epoch）</strong>是对你所有示例的一次完整遍历。训练损失衡量模型复现你的示例的接近程度。损失更低本身并不意味着回答更好，所以部署前要先测试。"
+  },
+  "samples": {
+    "see": "查看示例文件",
+    "description": "优质素材是什么样的。下载一个作为你自己数据的模板。",
+    "hide": "隐藏",
+    "preview": "预览",
+    "download": "下载",
+    "moreLines": "… 还有 {{count}} 行"
+  },
+  "describe": {
+    "title": "描述这个 AI",
+    "description": "指令会随每条消息一起发送，也会加入每个训练示例中，因此 AI 学习指令的方式与使用时一致。",
+    "name": "名称",
+    "job": "工作内容",
+    "instructions": "指令",
+    "instructionsHint": "训练后修改指令，最好重新训练一次，让示例与之保持一致。",
+    "saveContinue": "保存并继续",
+    "continue": "继续",
+    "confirmDelete": "删除 {{name}}？它的示例、训练出的修订版以及由其素材创建的知识库都会被删除。",
+    "delete": "删除"
+  },
+  "base": {
+    "title": "选择基础模型",
+    "description": "较小的模型训练更快，回答也更快。训练适配情况与运行模型分开检查，因为训练需要的内存是运行的数倍。",
+    "checking": "正在检查这台电脑能训练什么…",
+    "recommended": "推荐",
+    "selected": "已选择",
+    "installed": "已安装",
+    "memory": " · 训练约需 {{size}}",
+    "download": " · 需一次性下载 {{size}}",
+    "notInstalled": "{{model}} 尚未安装。没有它也能训练，但测试和使用训练结果需要它。<link>从“模型”中安装</link>。",
+    "continue": "继续"
+  },
+  "material": {
+    "add": "添加素材",
+    "filePaste": "文件或粘贴",
+    "chats": "已保存的聊天",
+    "continue": "继续",
+    "tooLarge": "该文件超过 20 MB。请改为从“知识库”连接它，那样会直接从磁盘读取。",
+    "chooseFile": "选择文件",
+    "pasteHint": "或粘贴到下方。支持 JSONL 聊天记录、问答表格、CSV、Excel、PDF、Markdown 和文本。",
+    "ready": "{{filename}} 已就绪。",
+    "readsPdf": "Yggdrasil 会读取其中的文本来进行分类。",
+    "readsSheet": "Yggdrasil 会读取第一个工作表来进行分类。",
+    "clear": "清除",
+    "placeholder": "问：你的 AI 应该处理的问题\n答：你希望它给出的回答\n\n问：…",
+    "label": "素材",
+    "recommends": "Yggdrasil 建议",
+    "examplesFound_other": "找到 {{count}} 个示例",
+    "useFor": "将此素材用于",
+    "recommendedTag": "（推荐）",
+    "adding": "正在添加…",
+    "addMaterial": "添加素材",
+    "chatsHint": "选择那些回答正是你想要的聊天。每个聊天都会成为一个训练示例，你可以在下一步中编辑。",
+    "noChats": "没有已保存的聊天。",
+    "untitledChat": "未命名聊天",
+    "addChats_other": "添加 {{count}} 个聊天",
+    "addChatsNone": "添加聊天",
+    "list": "素材",
+    "recommendedUse": "建议用于{{use}}",
+    "examples_other": "{{count}} 个示例",
+    "connected": "已作为知识库连接",
+    "confirmRemove": "移除 {{name}}？它的示例和已连接的知识库也会一并移除。",
+    "remove": "移除"
+  },
+  "examples": {
+    "title": "检查示例",
+    "willTrain": "{{total}} 个中有 <strong>{{usable}}</strong> 个将参与训练",
+    "filters": {
+      "all": "全部",
+      "flagged": "已标记",
+      "excluded": "已排除"
+    },
+    "loading": "正在加载示例…",
+    "showMore": "显示更多（还剩 {{count}} 个）",
+    "continue": "继续",
+    "excluded": "已排除",
+    "turns": "{{count}} 轮",
+    "q": "问",
+    "a": "答",
+    "empty": "空白",
+    "noAnswer": "没有回答",
+    "answer": "回答",
+    "save": "保存",
+    "cancel": "取消",
+    "editAnswer": "编辑回答",
+    "include": "包含",
+    "exclude": "排除",
+    "delete": "删除",
+    "writeTitle": "编写示例",
+    "writeDescription": "展示一个问题以及你想要的回答。写出如何使用事实，而不是事实本身。",
+    "questionPlaceholder": "顾客的问题",
+    "question": "问题",
+    "answerPlaceholder": "你想要的回答",
+    "add": "添加示例"
+  },
+  "plan": {
+    "willTrain": "将被训练",
+    "examples_other": "<strong>{{count}}</strong> 个示例教它如何回应。",
+    "base": "基础模型：{{model}}",
+    "notChosen": "未选择",
+    "connected": "保持连接",
+    "connectedHint": "每个问题都会查找。之后可以编辑，无需重新训练。",
+    "effort": "训练强度",
+    "where": "训练位置",
+    "estimating": "正在估算…",
+    "starting": "正在启动…",
+    "train": "训练修订版 {{revision}}",
+    "thisComputer": "这台电脑",
+    "nornPicked": "由 Norn 选择",
+    "trainHere": "改为在这里训练",
+    "memory": "内存",
+    "memoryOf": "{{needed}} / {{available}}",
+    "download": "下载",
+    "none": "无",
+    "disk": "磁盘",
+    "time": "大致时间",
+    "advanced": "高级设置",
+    "advancedHint": "字段留空则使用预设（{{preset}}）。即使超出内存，也会使用你在这里固定的设置。",
+    "presetSummary": "{{method}}，{{iters}} 步",
+    "method": "方法",
+    "presetMethod": "预设（{{method}}）",
+    "lora": "LoRA，全精度基础模型",
+    "qlora": "QLoRA，4 位基础模型",
+    "fields": {
+      "epochs": {
+        "label": "轮次",
+        "help": "遍历全部示例的次数。"
+      },
+      "rank": {
+        "label": "LoRA 秩",
+        "help": "适配器容量。越高学到的越多，需要的内存也越多。"
+      },
+      "layers": {
+        "label": "层数",
+        "help": "训练最后多少层。-1 表示训练全部层。"
+      },
+      "learning_rate": {
+        "label": "学习率",
+        "help": "步长。太高会让模型遗忘基础模型的能力。"
+      },
+      "batch_size": {
+        "label": "批大小",
+        "help": "每一步的示例数。"
+      },
+      "max_seq_length": {
+        "label": "最大词元数",
+        "help": "最长示例的词元数。"
+      }
+    },
+    "saveAdvanced": "保存高级设置",
+    "usePreset": "使用预设"
+  },
+  "train": {
+    "none": "还没有训练。请检查计划并开始训练。",
+    "compare": "与基础模型比较",
+    "earlier": "之前的运行",
+    "revision": "修订版 {{revision}}",
+    "on": "在 {{computer}} 上使用 {{backend}} · {{method}} · {{epochs}} 个轮次",
+    "cancelling": "正在取消…",
+    "cancel": "取消",
+    "stages": "训练阶段",
+    "failed": "{{error}} 临时文件已删除。基础模型未被更改。",
+    "failedDefault": "训练失败。",
+    "cancelled": "已取消。临时文件已删除。",
+    "step": "第 {{iter}} 步，共 {{iters}} 步",
+    "downloaded": "已下载 {{done}}/{{total}}",
+    "elapsed": "已用时间",
+    "remaining": "剩余时间",
+    "about": "约 {{time}}",
+    "epoch": "轮次",
+    "epochOf": "{{epoch}}/{{epochs}}",
+    "speed": "速度",
+    "tokensPerSec": "{{count}} 词元/秒",
+    "trainingLoss": "训练损失",
+    "validationLoss": "验证损失",
+    "peakMemory": "峰值内存",
+    "lossNote": "损失表示模型复现你的示例的接近程度。数值更低并不保证回答更好，所以部署前请先比较结果。"
+  },
+  "test": {
+    "first": "请先训练一个修订版，然后在这里将它与基础模型进行比较。",
+    "title": "与基础模型比较",
+    "revision": "修订版",
+    "deployedTag": "（已部署）",
+    "description": "两边获得相同的指令和已连接的知识库，因此差异就是训练带来的。默认的测试提示词是未参与训练的问题。",
+    "prompts": "测试提示词，每行一个",
+    "comparing": "正在比较…",
+    "again": "再次运行",
+    "run": "运行比较",
+    "save": "保存提示词",
+    "results": "结果",
+    "running": "正在运行",
+    "failed": "失败",
+    "base": "基础",
+    "specialized": "专用",
+    "continue": "继续部署"
+  },
+  "deploy": {
+    "title": "部署",
+    "description": "已部署的 AI 会出现在聊天的模型菜单和 API 中。它会把基础模型、适配器修订版、指令和已连接的知识库放在一起。基础模型本身仍可单独使用。",
+    "first": "请先训练并测试一个修订版。",
+    "revision": "修订版 {{revision}}",
+    "deployed": "已部署",
+    "meta": "{{examples}} 个示例 · {{method}} · {{date}}",
+    "valLoss": " · 验证损失 {{loss}}",
+    "compareFirst": "请先比较",
+    "undeploy": "取消部署",
+    "switch": "切换到此修订版",
+    "deploy": "部署",
+    "use": "使用它",
+    "useBody": "在聊天中，从模型菜单里选择 <name>{{name}}</name>。<link>打开聊天</link>。在其他程序中，请使用模型 ID <id>{{id}}</id>：",
+    "runsHere": "它在这台电脑上运行，适配器也保存在这里。重新训练会创建新的修订版；在你部署新修订版之前，这个修订版会继续回答。"
+  },
+  "export": {
+    "title": "导出为 GGUF 文件",
+    "description": "将修订版 {{revision}} 合并到其基础模型中，生成一个可供 llama.cpp、LM Studio、Ollama 及其他 GGUF 工具加载的文件。文件大小与基础模型相近。它的指令和已连接的知识库仍保留在 Yggdrasil 中。",
+    "exporting": "正在导出…",
+    "upTo": "最多 {{size}}",
+    "failed": "导出失败：{{error}}",
+    "saving": "正在保存…",
+    "download": "下载 {{filename}}",
+    "savedTo": "已保存到 {{path}}",
+    "deleteFile": "删除文件",
+    "tryAgain": "重试",
+    "export": "导出",
+    "cancel": "取消",
+    "instructions": "用作系统提示词的指令"
+  }
+}

@@ -72,6 +72,9 @@ function readLocale(language: string): Record<string, Flat> {
 /** Every way a language's files differ from English that would show wrong text. */
 function compareToEnglish(language: string, en: Record<string, Flat>, translated: Record<string, Flat>): string[] {
   const problems: string[] = []
+  // Every form the language uses, such as _many in Spanish for 1,000,000:
+  // one that is missing would fall back to English.
+  const categories = new Intl.PluralRules(language).resolvedOptions().pluralCategories
   for (const [ns, keys] of Object.entries(translated)) {
     if (!en[ns]) {
       problems.push(`${language}/${ns}.json has no English file`)
@@ -87,8 +90,12 @@ function compareToEnglish(language: string, en: Record<string, Flat>, translated
       if (placeholders(text).join() !== placeholders(englishText).join()) {
         problems.push(`${language} ${ns}:${key} has placeholders ${placeholders(text).join(',') || 'none'}, English has ${placeholders(englishText).join(',') || 'none'}`)
       }
-      if (pluralSuffix.test(key) && keys[`${baseKey(key)}_other`] === undefined) {
-        problems.push(`${language} ${ns}:${baseKey(key)} has no _other form`)
+      if (pluralSuffix.test(key)) {
+        for (const category of categories) {
+          if (keys[`${baseKey(key)}_${category}`] === undefined) {
+            problems.push(`${language} ${ns}:${baseKey(key)} has no _${category} form`)
+          }
+        }
       }
     }
   }
@@ -142,6 +149,13 @@ describe('the catalog checks', () => {
       'de common:count has no _other form',
       'de/other.json has no English file',
     ])
+  })
+
+  it('find plural forms the language uses that are missing', () => {
+    const es = { common: { count_one: '{{count}} modelo', count_other: '{{count}} modelos' } }
+    expect(compareToEnglish('es', en, es)).toEqual(['es common:count has no _many form'])
+    const ja = { common: { count_other: '{{count}} 個のモデル' } }
+    expect(compareToEnglish('ja', en, ja)).toEqual([])
   })
 
   it('accept a partial translation and extra plural forms', () => {

@@ -1,0 +1,388 @@
+{
+  "explainer": "L'entraînement apprend à votre IA comment faire son travail. Les connaissances connectées lui donnent les informations à jour dont elle a besoin pour le faire.",
+  "generic": "Un problème est survenu.",
+  "uses": {
+    "training": {
+      "label": "Entraînement",
+      "description": "Apprend comment répondre. Intégré au modèle."
+    },
+    "knowledge": {
+      "label": "Connaissances",
+      "description": "Consultées au besoin. Restent à jour quand vous les modifiez."
+    },
+    "both": {
+      "label": "Les deux",
+      "description": "Les exemples enseignent la méthode ; les faits restent connectés."
+    }
+  },
+  "presets": {
+    "quick": {
+      "label": "Rapide",
+      "description": "Un court entraînement pour tester l'idée. Bien pour le ton et le format."
+    },
+    "balanced": {
+      "label": "Équilibré",
+      "description": "Le réglage par défaut. Apprend les méthodes de travail et la terminologie à partir de vos exemples."
+    },
+    "quality": {
+      "label": "Qualité maximale",
+      "description": "Un entraînement plus long sur toutes les couches. Nécessite plus d'exemples, de mémoire et de temps."
+    }
+  },
+  "flags": {
+    "empty": {
+      "label": "Vide",
+      "help": "Ne contient ni question ni réponse."
+    },
+    "no_answer": {
+      "label": "Sans réponse",
+      "help": "Le dernier tour n'est pas une réponse : il n'y a donc rien à apprendre."
+    },
+    "duplicate": {
+      "label": "Doublon",
+      "help": "Identique à un exemple précédent. Seule la première copie sert à l'entraînement."
+    },
+    "too_long": {
+      "label": "Trop long",
+      "help": "Plus long que ce sur quoi le modèle peut s'entraîner. Raccourcissez-le ou divisez-le."
+    },
+    "short_answer": {
+      "label": "Réponse courte",
+      "help": "Une réponse d'un seul mot apprend peu de chose. Elle sert quand même à l'entraînement."
+    },
+    "volatile_facts": {
+      "label": "Faits changeants",
+      "help": "Indique un prix, un niveau de stock ou une référence. Le modèle risque de mémoriser une valeur qui changera plus tard. Gardez ces faits dans les connaissances."
+    }
+  },
+  "flagCount": {
+    "empty": "{{count}} vide(s)",
+    "no_answer": "{{count}} sans réponse",
+    "duplicate": "{{count}} doublon(s)",
+    "too_long": "{{count}} trop long(s)",
+    "short_answer": "{{count}} réponse(s) courte(s)",
+    "volatile_facts": "{{count}} avec faits changeants"
+  },
+  "states": {
+    "queued": "En file d'attente",
+    "preparing_dataset": "Préparation",
+    "loading_model": "Chargement du modèle",
+    "training": "Entraînement",
+    "exporting": "Exportation",
+    "evaluating": "Test",
+    "complete": "Terminé",
+    "failed": "Échec",
+    "cancelled": "Annulé"
+  },
+  "fit": {
+    "comfortable": "Adapté",
+    "tight": "Juste",
+    "too_large": "Trop grand",
+    "unsupported": "Non pris en charge"
+  },
+  "duration": {
+    "s": "{{s}} s",
+    "m": "{{m}} min",
+    "ms": "{{m}} min {{s}} s",
+    "h": "{{h}} h",
+    "hm": "{{h}} h {{m}} min"
+  },
+  "steps": {
+    "describe": "Décrire",
+    "base": "Modèle de base",
+    "material": "Matériel",
+    "examples": "Exemples",
+    "plan": "Vérifier",
+    "train": "Entraîner",
+    "test": "Tester",
+    "deploy": "Déployer"
+  },
+  "page": {
+    "title": "Entraînez votre propre IA",
+    "description": "Créez un petit assistant spécialisé dans une tâche. Montrez-lui comment répondre avec des exemples, et connectez les informations dont il a besoin. Inutile de savoir comment on entraîne un modèle.",
+    "settingUpExample": "Préparation de l'exemple…",
+    "tryExample": "Essayer un exemple",
+    "build": "Créer une nouvelle IA",
+    "loading": "Chargement…",
+    "nothing": "Rien de créé pour l'instant.",
+    "emptyTitle": "Créez une IA spécialisée",
+    "emptyDescription": "Décrivez la tâche, ajoutez des exemples de bonnes réponses et connectez les données qu'elle doit consulter. Yggdrasil recommande un modèle de base, l'entraîne sur cet ordinateur et vous permet de le comparer à l'original avant de l'utiliser.",
+    "exampleHint": "L'exemple utilise un magasin de pneus fictif, pour que vous voyiez d'abord des données réelles.",
+    "exampleBadge": "Exemple",
+    "deployed": "Déployée · révision {{revision}}",
+    "notDeployed": "Non déployée",
+    "newTitle": "Que doit faire votre IA ?",
+    "newDescription": "Décrivez la tâche en une phrase ou deux, comme vous l'expliqueriez à un nouvel employé.",
+    "name": "Nom",
+    "namePlaceholder": "Assistant du magasin de pneus",
+    "job": "La tâche",
+    "jobPlaceholder": "Répondre aux questions des clients sur les pneus. Demander l'année, la marque et le modèle du véhicule, expliquer la compatibilité et recommander les pneus que nous avons en stock.",
+    "creating": "Création…",
+    "continue": "Continuer",
+    "cancel": "Annuler",
+    "base": "Base {{model}}",
+    "noBase": "Pas encore de modèle de base",
+    "buildSteps": "Étapes de création",
+    "done": "terminé"
+  },
+  "example": {
+    "title": "Dans cet exemple",
+    "describe": "Cet exemple est un assistant pour un magasin de pneus. Yggdrasil a rédigé les instructions à partir de la description. Modifiez ce que vous voulez ; rien n'est entraîné tant que vous n'appuyez pas sur Entraîner.",
+    "base": "Yggdrasil a choisi le plus petit modèle qui s'entraîne confortablement sur cet ordinateur et autorise un usage commercial. Les petits modèles s'entraînent en quelques minutes.",
+    "material": "Trois fichiers ont été ajoutés, et Yggdrasil a classé chacun d'eux. Les discussions sont devenues Entraînement, car elles montrent comment répondre. L'inventaire est devenu Connaissances, car les prix et les stocks changent. Les politiques sont devenues Connaissances, car l'assistant doit les citer exactement. Ouvrez « Voir les fichiers d'exemple » pour les lire.",
+    "examples": "Trois exemples sont volontairement imparfaits. Le doublon et la question sans réponse sont exclus automatiquement. La réponse qui indique un prix sert quand même à l'entraînement, c'est pourquoi elle est signalée. Essayez de l'exclure.",
+    "plan": "L'exemple utilise Rapide : l'entraînement prend donc quelques minutes. Tout ce qui figure sous « Reste connecté » est recherché à chaque question au lieu d'être appris.",
+    "train": "Regardez la perte d'entraînement baisser à mesure que le modèle apprend les exemples. Une perte faible signifie qu'il les reproduit bien, pas que ses réponses sont justes. C'est ce que vérifie l'étape suivante.",
+    "test": "Comparez les colonnes. Les réponses spécialisées doivent demander le véhicule et se terminer par la signature Tread Right Tires. Repérez aussi les détails inventés, comme une taille de pneu qui semble plausible mais ne l'est pas : un petit modèle apprend bien le style et mal les faits, c'est pourquoi les prix et les tailles ont leur place dans les connaissances. Ajoutez un prompt de test comme « Combien coûte le Pilot Sport 4 ? » pour voir les connaissances connectées à l'œuvre.",
+    "deploy": "Après le déploiement, demandez-lui dans Discussion le prix d'un pneu. Ouvrez ensuite Connaissances, modifiez l'inventaire et reposez la question. La réponse change sans réentraînement. Supprimez l'exemple depuis l'étape Décrire quand vous avez terminé."
+  },
+  "concepts": {
+    "training": "Entraînement",
+    "trainingTitle": "Entraînez le comportement de votre IA",
+    "trainingBody": "Des exemples de bonnes réponses lui apprennent son rôle, votre terminologie, les questions qu'elle doit poser, les étapes qu'elle suit, son ton et la mise en forme de ses réponses.",
+    "trainingUse": "À utiliser : transcriptions de discussions, paires de questions et réponses, exemples de réponses.",
+    "knowledge": "Connaissances",
+    "knowledgeTitle": "Connectez ce que votre IA sait",
+    "knowledgeBody": "Les informations qui changent ou doivent rester exactes sont consultées au moment voulu : inventaire, prix, références, catalogues, politiques et documents. Modifiez-les à tout moment sans réentraînement.",
+    "knowledgeUse": "À utiliser : tableurs, exports CSV, listes de produits, documents de politique.",
+    "how": "Comment ça marche",
+    "lora": "<strong>LoRA</strong> entraîne un petit module complémentaire (un adaptateur) au lieu de modifier tout le modèle. Le modèle d'origine reste intact et disponible. <strong>QLoRA</strong> fait de même sur une copie compressée du modèle, pour qu'il tienne dans moins de mémoire.",
+    "rag": "Les <strong>connaissances connectées</strong> reposent sur la récupération : avant chaque réponse, Yggdrasil recherche dans vos sources les passages correspondant à la question et les transmet au modèle. On parle souvent de RAG, génération augmentée par récupération.",
+    "epoch": "Une <strong>époque</strong> est un passage sur l'ensemble de vos exemples. La perte d'entraînement mesure à quel point le modèle reproduit fidèlement vos exemples. Une perte plus faible ne signifie pas à elle seule de meilleures réponses, c'est pourquoi vous testez avant de déployer."
+  },
+  "samples": {
+    "see": "Voir les fichiers d'exemple",
+    "description": "À quoi ressemble un bon matériel. Téléchargez-en un comme modèle pour vos propres données.",
+    "hide": "Masquer",
+    "preview": "Aperçu",
+    "download": "Télécharger",
+    "moreLines": "… {{count}} lignes de plus"
+  },
+  "describe": {
+    "title": "Décrire l'IA",
+    "description": "Les instructions sont envoyées avec chaque message et ajoutées à chaque exemple d'entraînement : l'IA les apprend ainsi de la même manière qu'elle les utilisera.",
+    "name": "Nom",
+    "job": "La tâche",
+    "instructions": "Instructions",
+    "instructionsHint": "Si vous modifiez les instructions après l'entraînement, mieux vaut entraîner à nouveau pour que les exemples correspondent.",
+    "saveContinue": "Enregistrer et continuer",
+    "continue": "Continuer",
+    "confirmDelete": "Supprimer {{name}} ? Ses exemples, ses révisions entraînées et les connaissances créées à partir de son matériel seront supprimés.",
+    "delete": "Supprimer"
+  },
+  "base": {
+    "title": "Choisir un modèle de base",
+    "description": "Les petits modèles s'entraînent et répondent plus vite. La faisabilité de l'entraînement est vérifiée séparément de l'exécution du modèle, car l'entraînement nécessite plusieurs fois plus de mémoire.",
+    "checking": "Vérification de ce que cet ordinateur peut entraîner…",
+    "recommended": "Recommandé",
+    "selected": "Sélectionné",
+    "installed": "Installé",
+    "memory": " · l'entraînement nécessite environ {{size}}",
+    "download": " · télécharge {{size}} une seule fois",
+    "notInstalled": "{{model}} n'est pas installé. L'entraînement fonctionne sans lui, mais vous en aurez besoin pour tester et utiliser le résultat. <link>Installez-le depuis Modèles</link>.",
+    "continue": "Continuer"
+  },
+  "material": {
+    "add": "Ajouter du matériel",
+    "filePaste": "Fichier ou collage",
+    "chats": "Discussions enregistrées",
+    "continue": "Continuer",
+    "tooLarge": "Ce fichier dépasse 20 Mo. Connectez-le plutôt depuis Connaissances, qui le lit sur le disque.",
+    "chooseFile": "Choisir un fichier",
+    "pasteHint": "ou collez ci-dessous. Les discussions JSONL, tableaux de questions-réponses, CSV, Excel, PDF, Markdown et texte sont pris en charge.",
+    "ready": "{{filename}} est prêt.",
+    "readsPdf": "Yggdrasil lit son texte pour le classer.",
+    "readsSheet": "Yggdrasil lit la première feuille pour le classer.",
+    "clear": "Effacer",
+    "placeholder": "Q : Une question que votre IA doit traiter\nR : La réponse que vous voulez qu'elle donne\n\nQ : …",
+    "label": "Matériel",
+    "recommends": "Yggdrasil recommande",
+    "examplesFound_one": "{{count}} exemple trouvé",
+    "examplesFound_many": "{{count}} exemples trouvés",
+    "examplesFound_other": "{{count}} exemples trouvés",
+    "useFor": "Utiliser ce matériel pour",
+    "recommendedTag": " (recommandé)",
+    "adding": "Ajout…",
+    "addMaterial": "Ajouter le matériel",
+    "chatsHint": "Choisissez des discussions dont les réponses ressemblent à ce que vous voulez. Chacune devient un exemple d'entraînement que vous pourrez modifier à l'étape suivante.",
+    "noChats": "Aucune discussion enregistrée.",
+    "untitledChat": "Discussion sans titre",
+    "addChats_one": "Ajouter {{count}} discussion",
+    "addChats_many": "Ajouter {{count}} discussions",
+    "addChats_other": "Ajouter {{count}} discussions",
+    "addChatsNone": "Ajouter des discussions",
+    "list": "Matériel",
+    "recommendedUse": "recommandé : {{use}}",
+    "examples_one": "{{count}} exemple",
+    "examples_many": "{{count}} exemples",
+    "examples_other": "{{count}} exemples",
+    "connected": "Connecté comme connaissances",
+    "confirmRemove": "Retirer {{name}} ? Ses exemples et ses connaissances connectées seront aussi supprimés.",
+    "remove": "Retirer"
+  },
+  "examples": {
+    "title": "Vérifier les exemples",
+    "willTrain": "<strong>{{usable}}</strong> sur {{total}} serviront à l'entraînement",
+    "filters": {
+      "all": "Tous",
+      "flagged": "Signalés",
+      "excluded": "Exclus"
+    },
+    "loading": "Chargement des exemples…",
+    "showMore": "Afficher plus ({{count}} restants)",
+    "continue": "Continuer",
+    "excluded": "Exclu",
+    "turns": "{{count}} tours",
+    "q": "Q",
+    "a": "R",
+    "empty": "vide",
+    "noAnswer": "sans réponse",
+    "answer": "Réponse",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "editAnswer": "Modifier la réponse",
+    "include": "Inclure",
+    "exclude": "Exclure",
+    "delete": "Supprimer",
+    "writeTitle": "Rédiger un exemple",
+    "writeDescription": "Montrez une question et la réponse que vous voulez. Expliquez comment utiliser les faits, pas les faits eux-mêmes.",
+    "questionPlaceholder": "Question du client",
+    "question": "Question",
+    "answerPlaceholder": "La réponse que vous voulez",
+    "add": "Ajouter l'exemple"
+  },
+  "plan": {
+    "willTrain": "Sera entraîné",
+    "examples_one": "<strong>{{count}}</strong> exemple apprend comment répondre.",
+    "examples_many": "<strong>{{count}}</strong> exemples apprennent comment répondre.",
+    "examples_other": "<strong>{{count}}</strong> exemples apprennent comment répondre.",
+    "base": "Modèle de base : {{model}}",
+    "notChosen": "non choisi",
+    "connected": "Reste connecté",
+    "connectedHint": "Consulté à chaque question. Modifiable plus tard sans réentraînement.",
+    "effort": "Effort d'entraînement",
+    "where": "Où l'entraîner",
+    "estimating": "Estimation…",
+    "starting": "Démarrage…",
+    "train": "Entraîner la révision {{revision}}",
+    "thisComputer": "cet ordinateur",
+    "nornPicked": "Choisi par Norn",
+    "trainHere": "Entraîner plutôt ici",
+    "memory": "Mémoire",
+    "memoryOf": "{{needed}} sur {{available}}",
+    "download": "Téléchargement",
+    "none": "Aucun",
+    "disk": "Disque",
+    "time": "Durée approximative",
+    "advanced": "Réglages avancés",
+    "advancedHint": "Laissez un champ vide pour utiliser le préréglage ({{preset}}). Les réglages que vous fixez ici sont utilisés même s'ils ne tiennent pas en mémoire.",
+    "presetSummary": "{{method}}, {{iters}} étapes",
+    "method": "Méthode",
+    "presetMethod": "Préréglage ({{method}})",
+    "lora": "LoRA, base en pleine précision",
+    "qlora": "QLoRA, base en 4 bits",
+    "fields": {
+      "epochs": {
+        "label": "Époques",
+        "help": "Passages sur l'ensemble des exemples."
+      },
+      "rank": {
+        "label": "Rang LoRA",
+        "help": "Capacité de l'adaptateur. Plus il est élevé, plus il apprend et plus il demande de mémoire."
+      },
+      "layers": {
+        "label": "Couches",
+        "help": "Nombre de dernières couches à entraîner. -1 les entraîne toutes."
+      },
+      "learning_rate": {
+        "label": "Taux d'apprentissage",
+        "help": "Taille des pas. Trop élevé, le modèle de base est oublié."
+      },
+      "batch_size": {
+        "label": "Taille de lot",
+        "help": "Exemples par étape."
+      },
+      "max_seq_length": {
+        "label": "Tokens max",
+        "help": "Exemple le plus long, en tokens."
+      }
+    },
+    "saveAdvanced": "Enregistrer les réglages avancés",
+    "usePreset": "Utiliser le préréglage"
+  },
+  "train": {
+    "none": "Aucun entraînement pour l'instant. Vérifiez le plan et lancez l'entraînement.",
+    "compare": "Comparer avec le modèle de base",
+    "earlier": "Entraînements précédents",
+    "revision": "Révision {{revision}}",
+    "on": "Sur {{computer}} avec {{backend}} · {{method}} · {{epochs}} époques",
+    "cancelling": "Annulation…",
+    "cancel": "Annuler",
+    "stages": "Étapes de l'entraînement",
+    "failed": "{{error}} Les fichiers temporaires ont été supprimés. Le modèle de base n'a pas été modifié.",
+    "failedDefault": "L'entraînement a échoué.",
+    "cancelled": "Annulé. Les fichiers temporaires ont été supprimés.",
+    "step": "étape {{iter}} sur {{iters}}",
+    "downloaded": "{{done}} téléchargés sur {{total}}",
+    "elapsed": "Écoulé",
+    "remaining": "Restant",
+    "about": "environ {{time}}",
+    "epoch": "Époque",
+    "epochOf": "{{epoch}} sur {{epochs}}",
+    "speed": "Vitesse",
+    "tokensPerSec": "{{count}} tokens/s",
+    "trainingLoss": "Perte d'entraînement",
+    "validationLoss": "Perte de validation",
+    "peakMemory": "Mémoire maximale",
+    "lossNote": "La perte indique à quel point le modèle reproduit fidèlement vos exemples. Un chiffre plus bas ne garantit pas de meilleures réponses : comparez donc les résultats avant de déployer."
+  },
+  "test": {
+    "first": "Entraînez d'abord une révision. Comparez-la ensuite ici avec le modèle de base.",
+    "title": "Comparer avec le modèle de base",
+    "revision": "Révision",
+    "deployedTag": " (déployée)",
+    "description": "Les deux côtés reçoivent les mêmes instructions et connaissances connectées : la différence correspond donc à ce que l'entraînement a apporté. Les prompts de test par défaut sont des questions tenues à l'écart de l'entraînement.",
+    "prompts": "Prompts de test, un par ligne",
+    "comparing": "Comparaison…",
+    "again": "Relancer",
+    "run": "Lancer la comparaison",
+    "save": "Enregistrer les prompts",
+    "results": "Résultats",
+    "running": "En cours",
+    "failed": "Échec",
+    "base": "Base",
+    "specialized": "Spécialisée",
+    "continue": "Passer au déploiement"
+  },
+  "deploy": {
+    "title": "Déployer",
+    "description": "Une IA déployée apparaît dans le menu des modèles de Discussion et dans l'API. Elle réunit son modèle de base, sa révision d'adaptateur, ses instructions et ses connaissances connectées. Le modèle de base reste disponible séparément.",
+    "first": "Entraînez et testez d'abord une révision.",
+    "revision": "Révision {{revision}}",
+    "deployed": "Déployée",
+    "meta": "{{examples}} exemples · {{method}} · {{date}}",
+    "valLoss": " · perte de validation {{loss}}",
+    "compareFirst": "Comparez-la d'abord",
+    "undeploy": "Retirer le déploiement",
+    "switch": "Passer à cette révision",
+    "deploy": "Déployer",
+    "use": "L'utiliser",
+    "useBody": "Dans Discussion, choisissez <name>{{name}}</name> dans le menu des modèles. <link>Ouvrir Discussion</link>. Depuis d'autres programmes, utilisez l'identifiant de modèle <id>{{id}}</id> :",
+    "runsHere": "Elle s'exécute sur cet ordinateur, où son adaptateur est stocké. Un réentraînement crée une nouvelle révision ; celle-ci continue de répondre jusqu'à ce que vous déployiez la nouvelle."
+  },
+  "export": {
+    "title": "Exporter en fichier GGUF",
+    "description": "Fusionnez la révision {{revision}} avec son modèle de base en un seul fichier que llama.cpp, LM Studio, Ollama et d'autres outils GGUF peuvent charger. Le fichier fait à peu près la taille du modèle de base. Ses instructions et ses connaissances connectées restent dans Yggdrasil.",
+    "exporting": "Exportation…",
+    "upTo": "jusqu'à {{size}}",
+    "failed": "L'exportation a échoué : {{error}}",
+    "saving": "Enregistrement…",
+    "download": "Télécharger {{filename}}",
+    "savedTo": "Enregistré dans {{path}}",
+    "deleteFile": "Supprimer le fichier",
+    "tryAgain": "Réessayer",
+    "export": "Exporter",
+    "cancel": "Annuler",
+    "instructions": "Instructions à utiliser comme prompt système"
+  }
+}

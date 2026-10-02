@@ -22,6 +22,7 @@ export function LanguageSettings() {
   const systemLanguage = resolveLanguage('', systemLanguages())
   const nameOf = (code: string) => languages.find((l) => l.code === code)?.name ?? code
   const choices = languages.filter((l) => availableLanguages.includes(l.code))
+  const shown = languages.find((l) => l.code === (saved ? resolveLanguage(saved, []) : systemLanguage))
 
   return (
     <section className="card space-y-4">
@@ -51,6 +52,9 @@ export function LanguageSettings() {
           ) : null}
         </select>
       </label>
+      {shown && shown.status !== 'source' && shown.status !== 'reviewed' ? (
+        <p className="text-xs text-ink-faint">{t(`language.status.${shown.status}`)}</p>
+      ) : null}
       {save.isError ? (
         <p className="text-sm text-danger">
           {t('language.saveFailed', { error: save.error instanceof Error ? save.error.message : String(save.error) })}

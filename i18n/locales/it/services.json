@@ -1,0 +1,20 @@
+{
+  "title": "Servizi collegati",
+  "description": "Permetti all'IA di leggere e agire nei servizi che usi. I token restano su questo computer, fuori dalla vista dell'IA, che vede solo ciò che il servizio restituisce. La lettura è consentita; per le modifiche ti chiede prima.",
+  "generic": "Qualcosa è andato storto.",
+  "needsAttention": "Richiede attenzione: {{error}}",
+  "lastCheckFailed": "l'ultimo controllo non è riuscito",
+  "connectedAs": "Collegato come {{account}}",
+  "notConnected": "Non collegato",
+  "checking": "Controllo…",
+  "check": "Controlla",
+  "change": "Cambia",
+  "disconnect": "Scollega",
+  "connect": "Collega",
+  "optional": " (facoltativo)",
+  "stored": "Salvato ({{value}}). Lascia vuoto per mantenerlo.",
+  "save": "Salva",
+  "cancel": "Annulla",
+  "tools": "Strumenti: {{tools}}",
+  "asksFirst": "{{name}} (chiede prima)"
+}

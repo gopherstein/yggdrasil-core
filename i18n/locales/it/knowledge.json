@@ -1,0 +1,114 @@
+{
+  "page": {
+    "title": "Conoscenza",
+    "description": "Mimir rende ricercabili cataloghi, prezzi, regolamenti e documenti. Quando un profilo o un'IA specializzata usa una fonte, i passaggi pertinenti a ogni domanda vengono aggiunti al contesto. Modifica un file e la domanda successiva vede la modifica. Nessun riaddestramento.",
+    "loading": "Caricamento…",
+    "emptyTitle": "Nessuna conoscenza collegata",
+    "emptyDescription": "Collega un file o una cartella di questo computer, incolla del contenuto, oppure leggi da un database o da un'API web. Funzionano file PDF, Excel, CSV, TSV, JSON, JSONL, Markdown, di testo e HTML."
+  },
+  "badge": {
+    "linked": "Collegato",
+    "database": "Database",
+    "api": "API web",
+    "copy": "Copia"
+  },
+  "meaning": {
+    "full": "Ricercabile per significato, non solo per parole corrispondenti.",
+    "partial": "Ricercabile per significato: {{embedded}} passaggi su {{total}} finora."
+  },
+  "refresh": {
+    "days_one": "{{count}} giorno",
+    "days_many": "{{count}} giorni",
+    "days_other": "{{count}} giorni",
+    "hours_one": "{{count}} ora",
+    "hours_many": "{{count}} ore",
+    "hours_other": "{{count}} ore",
+    "minutes_one": "{{count}} minuto",
+    "minutes_many": "{{count}} minuti",
+    "minutes_other": "{{count}} minuti",
+    "note": "Viene recuperata di nuovo quando una domanda la usa e i dati hanno più di {{every}}, oppure con Reindicizza."
+  },
+  "row": {
+    "failed": "Non riuscito",
+    "passages_one": "{{count}} passaggio",
+    "passages_many": "{{count}} passaggi",
+    "passages_other": "{{count}} passaggi",
+    "indexed": "indicizzato {{when}}",
+    "watches": "Si reindicizza da solo quando i file cambiano.",
+    "edit": "Modifica",
+    "indexing": "Indicizzazione…",
+    "reindex": "Reindicizza",
+    "localOnlyHint": "Non inviare mai passaggi di questa fonte a un computer associato. Le chat che la usano vengono eseguite qui.",
+    "localOnly": "Solo questo computer",
+    "localOnlyOn": "Solo questo computer ✓",
+    "confirmDisconnect": "Scollegare {{name}}? I profili e le IA che la usano non la vedranno più. I tuoi file non vengono eliminati.",
+    "disconnect": "Scollega",
+    "editLabel": "Modifica {{name}}",
+    "saveHint": "Il salvataggio reindicizza la fonte. Le chat e le IA specializzate vedono la modifica alla domanda successiva.",
+    "saving": "Salvataggio…",
+    "save": "Salva",
+    "cancel": "Annulla"
+  },
+  "add": {
+    "title": "Collega conoscenza",
+    "modes": {
+      "path": "File o cartella",
+      "text": "Carica o incolla",
+      "database": "Database",
+      "api": "API web"
+    },
+    "path": "Percorso su questo computer",
+    "pathHint": "Yggdrasil lo legge dove si trova e recepisce le modifiche automaticamente.",
+    "chooseFile": "Scegli un file",
+    "pastePlaceholder": "Incolla testo, Markdown o CSV",
+    "content": "Contenuto",
+    "name": "Nome (facoltativo)",
+    "indexing": "Indicizzazione…",
+    "connect": "Collega"
+  },
+  "remote": {
+    "database": "Database",
+    "sqlite": "File SQLite",
+    "file": "File su questo computer",
+    "connection": "Stringa di connessione",
+    "connectionHint": "Usa un account di sola lettura. Viene conservata separatamente dal database e non viene più mostrata.",
+    "query": "Query",
+    "queryHint": "Una sola SELECT. Viene eseguita in sola lettura, quindi Yggdrasil non modifica mai il database. Ogni riga diventa un passaggio.",
+    "url": "URL",
+    "urlHint": "JSON, CSV o testo. Un elenco di oggetti diventa un passaggio per elemento.",
+    "items": "Elenco nella risposta (facoltativo)",
+    "header": "Intestazione",
+    "value": "Valore (facoltativo)",
+    "refresh": "Recupera di nuovo se più vecchia di",
+    "refreshChoices": {
+      "m5": "5 minuti",
+      "m15": "15 minuti",
+      "h1": "1 ora",
+      "h6": "6 ore",
+      "d1": "1 giorno"
+    },
+    "name": "Nome (facoltativo)",
+    "connecting": "Collegamento…",
+    "connect": "Collega"
+  },
+  "search": {
+    "title": "Prova una domanda",
+    "description": "Vedi quali passaggi una domanda porterebbe nella chat.",
+    "placeholder": "Avete il 225/45R17 disponibile?",
+    "question": "Domanda",
+    "search": "Cerca",
+    "nothing": "Nessuna corrispondenza."
+  },
+  "picker": {
+    "none": "Nessuna conoscenza collegata.",
+    "disconnect": "Scollega {{name}}",
+    "remove": "Rimuovi",
+    "connectExisting": "Collega conoscenza esistente",
+    "connectExistingOption": "Collega conoscenza esistente…",
+    "pathPlaceholder": "Oppure un file o una cartella, come ~/Documents/catalog",
+    "path": "Percorso del file o della cartella",
+    "indexing": "Indicizzazione…",
+    "connect": "Collega",
+    "manage": "Gestisci le fonti, modifica il contenuto incollato e prova le ricerche nella pagina <link>Conoscenza</link>."
+  }
+}

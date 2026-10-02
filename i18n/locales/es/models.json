@@ -1,0 +1,204 @@
+{
+  "page": {
+    "title": "Modelos",
+    "subtitle": "Elige qué instalar: Yggdrasil te recomienda modelos adecuados para tu hardware.",
+    "loading": "Cargando la biblioteca de modelos…",
+    "search": "Buscar modelos…",
+    "emptyTitle": "No hay modelos seleccionados",
+    "emptyDescription": "El catálogo local está vacío. Prueba Explorar todos los modelos para instalar desde Hugging Face.",
+    "ready": "{{model}} terminó de descargarse y está listo para usarse.",
+    "readyFallback": "El modelo",
+    "dismiss": "Descartar"
+  },
+  "tabs": {
+    "discover": "Descubrir",
+    "installed": "Instalados",
+    "running": "En ejecución"
+  },
+  "target": {
+    "label": "Modelos para:",
+    "aria": "Computadora para las recomendaciones de modelos",
+    "thisComputer": "Esta computadora",
+    "all": "Todas las computadoras",
+    "computer": "Computadora",
+    "clusterView": "Vista del clúster · {{running}}",
+    "running_one": "{{count}} modelo en ejecución",
+    "running_many": "{{count}} modelos en ejecución",
+    "running_other": "{{count}} modelos en ejecución",
+    "allHint": "Las instalaciones pueden ir a cualquier computadora vinculada. Las recomendaciones siguen destacando lo que funciona bien.",
+    "basedOn": "Las recomendaciones se basan en el hardware de {{name}}.",
+    "manage": "Administrar computadoras",
+    "useAnother": "Usar otra computadora",
+    "hardwareUnavailable": "Detalles del hardware no disponibles",
+    "unifiedMemory": "{{size}} de memoria unificada",
+    "memory": "{{size}} de memoria"
+  },
+  "discover": {
+    "recommended": "Recomendados",
+    "recommendedHint": "Selección de modelos adecuados para la computadora elegida, ordenados por propósito.",
+    "browseAll": "Explorar todos los modelos",
+    "noRecommendations": "Todavía no hay recomendaciones disponibles.",
+    "noMatches": "Ningún modelo seleccionado coincide con esta búsqueda."
+  },
+  "categories": {
+    "coding": "Programación",
+    "general": "Asistentes generales",
+    "reasoning": "Razonamiento",
+    "vision": "Visión",
+    "fast": "Pequeños y rápidos",
+    "large": "Modelos grandes"
+  },
+  "fit": {
+    "excellent": "Ideal",
+    "good": "Adecuado",
+    "tight": "Justo",
+    "heavy": "Puede ir lento",
+    "unsupported": "No compatible",
+    "unknown": "Compatibilidad desconocida"
+  },
+  "install": {
+    "install": "Instalar",
+    "anyway": "Instalar de todos modos",
+    "unsupported": "No compatible",
+    "downloading": "Descargando…",
+    "installing": "Instalando…",
+    "installed": "Instalado",
+    "progress": "{{percent}} · {{done}} / {{total}}"
+  },
+  "speed": {
+    "measured": "Medido: {{value}} tok/s",
+    "estimated": "Estimado: ~{{value}} tok/s",
+    "tokPerSec": "{{value}} tok/s"
+  },
+  "memory": {
+    "approximate": "{{range}} aproximadamente",
+    "unified": "{{size}} de memoria unificada",
+    "plain": "{{size}} de memoria",
+    "needed": "~{{size}}"
+  },
+  "status": {
+    "running": "En ejecución",
+    "downloading": "Descargando",
+    "installed": "Instalado",
+    "notInstalled": "No instalado"
+  },
+  "lastUsed": {
+    "never": "Nunca",
+    "justNow": "Justo ahora"
+  },
+  "tags": {
+    "context": "Contexto de {{count}}K"
+  },
+  "tools": {
+    "webSummary": "Usa herramientas locales · Puede consultar la web",
+    "webDetail": "Puede leer archivos, usar git y ejecutar comandos de terminal después de que los apruebes. Un comando como curl puede buscar algo en la web. No hay un navegador aparte.",
+    "blockedSummary": "Usa herramientas locales · Web bloqueada por este perfil",
+    "blockedDetail": "Este modelo puede ejecutar comandos de terminal, pero el perfil de asistente actual desactiva la terminal, así que no puede consultar páginas web.",
+    "chatSummary": "Solo chat · Sin acceso a la web",
+    "chatDetail": "Responde con lo que sabe el propio modelo. No puede ejecutar comandos de terminal, así que no puede buscar nada en la web."
+  },
+  "chips": {
+    "coding": "Programación",
+    "tools": "Herramientas",
+    "reasoning": "Razonamiento",
+    "vision": "Visión",
+    "fast": "Rápido",
+    "general": "General"
+  },
+  "support": {
+    "embedding": "Modelo de embeddings: ayuda a buscar en el conocimiento, no chatea",
+    "reranker": "Reranker: ordena los resultados de búsqueda, no chatea",
+    "classifier": "Clasificador: clasifica las solicitudes, no chatea"
+  },
+  "bestFor": {
+    "coding": "Ideal para programar",
+    "reasoning": "Ideal para razonar con cuidado",
+    "vision": "Ideal para imágenes y documentos",
+    "fast": "Ideal para respuestas rápidas",
+    "large": "Ideal para problemas difíciles",
+    "everyday": "Asistente local para el día a día"
+  },
+  "small": {
+    "note": "Pequeño y rápido, pero puede confundir datos y números, sobre todo los de tus archivos y tu conocimiento. Para preguntas sobre tus datos, un modelo más grande es más confiable.",
+    "installedOther": "{{model}} está instalado. Elígelo, o Automático, en el chat para esas preguntas.",
+    "fitsOther": "{{model}} es adecuado para esta computadora.",
+    "installOther": "Instalar {{model}}"
+  },
+  "capability": {
+    "noWeb": "El acceso a la web en vivo no está disponible con la configuración actual.",
+    "noTools": "{{model}} no puede usar herramientas, así que no puede buscar eso. Cambia a un modelo compatible con herramientas, como uno de los de abajo.",
+    "noLocalTools": "{{model}} no usa herramientas locales, así que no puede leer archivos, ejecutar comandos ni usar git por ti.",
+    "noVision": "{{model}} no puede ver imágenes."
+  },
+  "card": {
+    "details": "Detalles",
+    "hideDetails": "Ocultar detalles",
+    "modelSize": "Tamaño del modelo",
+    "quantization": "Cuantización",
+    "unknown": "Desconocido",
+    "runtimeMemory": "Memoria estimada en ejecución",
+    "context": "Contexto configurado",
+    "machineMemory": "Memoria de la máquina",
+    "available": "Disponible ahora",
+    "expected": "Comportamiento esperado",
+    "gpu": "GPU",
+    "recommendations": "Recomendaciones",
+    "onYourComputers": "En tus computadoras",
+    "bestMachine": "Mejor máquina disponible: {{name}}",
+    "family": "Familia del modelo",
+    "parameters": "Parámetros",
+    "format": "Formato",
+    "runtime": "Entorno de ejecución",
+    "modelId": "ID del modelo"
+  },
+  "tightFit": {
+    "label": "Justo",
+    "hint": "Usa casi toda la memoria disponible de esta computadora y puede ser menos estable.",
+    "title": "Este modelo puede ser inestable en esta computadora",
+    "body": "{{model}} usa casi toda la memoria disponible en esta computadora. Puede ir lento, dejar de responder o causar inestabilidad en el sistema con cargas de trabajo más pesadas o contextos más grandes.",
+    "advice": "Yggdrasil recomienda dejar más memoria disponible para el sistema operativo y los gráficos.",
+    "cancel": "Cancelar",
+    "install": "Instalar de todos modos"
+  },
+  "browse": {
+    "title": "Explorar todos los modelos",
+    "description": "Busca en Hugging Face modelos que Yggdrasil puede ejecutar localmente. Se instalan en la computadora elegida arriba.",
+    "close": "Cerrar",
+    "placeholder": "Buscar modelos…",
+    "search": "Buscar",
+    "searching": "Buscando en Hugging Face…",
+    "failed": "No se pudo acceder a Hugging Face. Revisa tu conexión de red y vuelve a intentarlo.",
+    "install": "Instalar",
+    "installFailed": "Falló la instalación"
+  },
+  "installedTab": {
+    "empty": "Todavía no hay modelos instalados. Instálalos desde Descubrir y aparecerán aquí.",
+    "runningOn": "En ejecución en {{computer}}",
+    "downloading": "Descargando… {{percent}}",
+    "installedOn": "Instalado en {{where}}",
+    "thisComputer": "Esta computadora",
+    "usedBy": "Lo usa {{profiles}}",
+    "lastUsed": "Último uso: {{when}}",
+    "chat": "Chat",
+    "start": "Iniciar",
+    "installElsewhere": "Instalar en otras computadoras",
+    "installing": "Instalando…",
+    "moreActions": "Más acciones para {{model}}",
+    "stop": "Detener",
+    "remove": "Quitar"
+  },
+  "runningTab": {
+    "empty": "No hay modelos cargados en este momento. El chat iniciará uno automáticamente cuando lo necesites.",
+    "active": "Modelos activos",
+    "inUse": " · ~{{size}} en uso",
+    "ofHost": " de {{size}} en esta computadora",
+    "runningOn": "En ejecución en {{computer}}",
+    "stop": "Detener",
+    "memory": "Memoria",
+    "memoryUnavailable": "Uso de memoria no disponible",
+    "speed": "Velocidad",
+    "speedUnavailable": "Velocidad no disponible",
+    "usedBy": "Lo usa: {{profiles}}",
+    "openChat": "Abrir el chat"
+  }
+}

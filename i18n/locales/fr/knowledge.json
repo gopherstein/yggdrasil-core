@@ -1,0 +1,114 @@
+{
+  "page": {
+    "title": "Connaissances",
+    "description": "Mimir permet de rechercher dans vos catalogues, prix, politiques et documents. Lorsqu'un profil ou une IA spécialisée utilise une source, les passages correspondant à chaque question lui sont ajoutés. Modifiez un fichier, et la question suivante voit le changement. Aucun réentraînement.",
+    "loading": "Chargement…",
+    "emptyTitle": "Aucune connaissance connectée",
+    "emptyDescription": "Connectez un fichier ou un dossier de cet ordinateur, collez du contenu, ou lisez depuis une base de données ou une API web. Les fichiers PDF, Excel, CSV, TSV, JSON, JSONL, Markdown, texte et HTML sont pris en charge."
+  },
+  "badge": {
+    "linked": "Lié",
+    "database": "Base de données",
+    "api": "API web",
+    "copy": "Copie"
+  },
+  "meaning": {
+    "full": "Recherche par le sens, pas seulement par mots exacts.",
+    "partial": "Recherche par le sens : {{embedded}} passages sur {{total}} pour l'instant."
+  },
+  "refresh": {
+    "days_one": "{{count}} jour",
+    "days_many": "{{count}} jours",
+    "days_other": "{{count}} jours",
+    "hours_one": "{{count}} heure",
+    "hours_many": "{{count}} heures",
+    "hours_other": "{{count}} heures",
+    "minutes_one": "{{count}} minute",
+    "minutes_many": "{{count}} minutes",
+    "minutes_other": "{{count}} minutes",
+    "note": "Récupéré à nouveau lorsqu'une question l'utilise et que les données datent de plus de {{every}}, ou lors d'une réindexation."
+  },
+  "row": {
+    "failed": "Échec",
+    "passages_one": "{{count}} passage",
+    "passages_many": "{{count}} passages",
+    "passages_other": "{{count}} passages",
+    "indexed": "indexé {{when}}",
+    "watches": "Se réindexe automatiquement quand les fichiers changent.",
+    "edit": "Modifier",
+    "indexing": "Indexation…",
+    "reindex": "Réindexer",
+    "localOnlyHint": "Ne jamais envoyer de passages de cette source à un ordinateur jumelé. Les discussions qui l'utilisent s'exécutent ici.",
+    "localOnly": "Cet ordinateur uniquement",
+    "localOnlyOn": "Cet ordinateur uniquement ✓",
+    "confirmDisconnect": "Déconnecter {{name}} ? Les profils et IA qui l'utilisent ne le verront plus. Vos fichiers ne sont pas supprimés.",
+    "disconnect": "Déconnecter",
+    "editLabel": "Modifier {{name}}",
+    "saveHint": "L'enregistrement réindexe la source. Les discussions et les IA spécialisées voient le changement dès leur prochaine question.",
+    "saving": "Enregistrement…",
+    "save": "Enregistrer",
+    "cancel": "Annuler"
+  },
+  "add": {
+    "title": "Connecter des connaissances",
+    "modes": {
+      "path": "Fichier ou dossier",
+      "text": "Importer ou coller",
+      "database": "Base de données",
+      "api": "API web"
+    },
+    "path": "Chemin sur cet ordinateur",
+    "pathHint": "Yggdrasil le lit sur place et prend en compte les modifications automatiquement.",
+    "chooseFile": "Choisir un fichier",
+    "pastePlaceholder": "Collez du texte, du Markdown ou du CSV",
+    "content": "Contenu",
+    "name": "Nom (facultatif)",
+    "indexing": "Indexation…",
+    "connect": "Connecter"
+  },
+  "remote": {
+    "database": "Base de données",
+    "sqlite": "Fichier SQLite",
+    "file": "Fichier sur cet ordinateur",
+    "connection": "Chaîne de connexion",
+    "connectionHint": "Utilisez un compte en lecture seule. Elle est stockée à part de la base de données et ne sera plus affichée.",
+    "query": "Requête",
+    "queryHint": "Un seul SELECT. Il s'exécute en lecture seule : Yggdrasil ne modifie jamais la base de données. Chaque ligne devient un passage.",
+    "url": "URL",
+    "urlHint": "JSON, CSV ou texte. Une liste d'objets donne un passage par élément.",
+    "items": "Liste dans la réponse (facultatif)",
+    "header": "En-tête",
+    "value": "Valeur (facultatif)",
+    "refresh": "Récupérer à nouveau après",
+    "refreshChoices": {
+      "m5": "5 minutes",
+      "m15": "15 minutes",
+      "h1": "1 heure",
+      "h6": "6 heures",
+      "d1": "1 jour"
+    },
+    "name": "Nom (facultatif)",
+    "connecting": "Connexion…",
+    "connect": "Connecter"
+  },
+  "search": {
+    "title": "Essayer une question",
+    "description": "Voyez quels passages une question apporterait dans la discussion.",
+    "placeholder": "Avez-vous du 225/45R17 en stock ?",
+    "question": "Question",
+    "search": "Rechercher",
+    "nothing": "Aucun résultat."
+  },
+  "picker": {
+    "none": "Aucune connaissance connectée.",
+    "disconnect": "Déconnecter {{name}}",
+    "remove": "Retirer",
+    "connectExisting": "Connecter des connaissances existantes",
+    "connectExistingOption": "Connecter des connaissances existantes…",
+    "pathPlaceholder": "Ou un fichier ou dossier, comme ~/Documents/catalog",
+    "path": "Chemin du fichier ou du dossier",
+    "indexing": "Indexation…",
+    "connect": "Connecter",
+    "manage": "Gérez les sources, modifiez le contenu collé et testez des recherches sur la page <link>Connaissances</link>."
+  }
+}

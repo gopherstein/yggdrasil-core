@@ -1,0 +1,58 @@
+{
+  "tagline": "Plano de control de IA local",
+  "nav": {
+    "label": "Principal",
+    "main": "Principal",
+    "system": "Sistema",
+    "chat": "Chat",
+    "automations": "Automatizaciones",
+    "models": "Modelos",
+    "train": "Entrenar",
+    "knowledge": "Conocimiento",
+    "memory": "Memoria",
+    "computers": "Computadoras",
+    "performance": "Rendimiento",
+    "diagnostics": "Diagnóstico",
+    "profiles": "Perfiles y orquestación",
+    "tools": "Herramientas",
+    "apiAccess": "Acceso a la API",
+    "settings": "Configuración"
+  },
+  "status": {
+    "starting": "Iniciando…",
+    "unavailable": "Servicio no disponible",
+    "noModel": "Sin modelo",
+    "ready": "Listo",
+    "unavailableHint": "El servicio local de Yggdrasil no responde.",
+    "noModelHint": "Instala un modelo en Modelos para empezar a chatear.",
+    "readyHint": "El servicio local está listo."
+  },
+  "subsystems": {
+    "title": "Sistema",
+    "bifrostHint": "Detección de computadoras y red",
+    "computersNone": "Sin computadoras",
+    "computersConnected_one": "{{count}} computadora conectada",
+    "computersConnected_many": "{{count}} computadoras conectadas",
+    "computersConnected_other": "{{count}} computadoras conectadas",
+    "nornHint": "Norn reparte el trabajo entre tus computadoras",
+    "nornAutomatic": "Automático",
+    "mimirHint": "Conocimiento y memoria locales",
+    "mimirReady": "Listo"
+  },
+  "boot": {
+    "starting": "Iniciando Yggdrasil",
+    "preparing": "Preparando tu servicio de IA local",
+    "unavailable": "Servicio no disponible",
+    "unavailableBody": "El servicio local de Yggdrasil todavía no responde. Espera un momento y vuelve a intentarlo. Si sigue pasando, revisa Diagnóstico cuando cargue la app.",
+    "retrying": "Reintentando…",
+    "tryAgain": "Reintentar",
+    "keyRequired": "Se requiere una clave de API",
+    "keyBody": "Este daemon de Yggdrasil acepta conexiones desde fuera de esta computadora. Ingresa una clave de API para continuar. Una clave no cifra el tráfico por HTTP sin cifrar.",
+    "continue": "Continuar"
+  },
+  "units": {
+    "ms": "{{value}} ms",
+    "seconds": "{{value}} s",
+    "tokPerSec": "{{value}} tok/s"
+  }
+}

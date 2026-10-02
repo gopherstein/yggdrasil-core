@@ -1,0 +1,405 @@
+{
+  "landing": {
+    "title": "무엇을 도와드릴까요?",
+    "subtitle": "로컬 AI와 대화하세요. Yggdrasil이 알맞은 리소스를 자동으로 선택해요.",
+    "try": "예시:",
+    "suggestions": {
+      "explain": {
+        "label": "주제 설명",
+        "prompt": "뮤텍스가 무엇인지 짧은 두 문단으로 설명해 줘."
+      },
+      "code": {
+        "label": "코딩 도움",
+        "prompt": "백오프를 적용해 HTTP 요청을 재시도하는 깔끔한 Go 함수를 작성하도록 도와줘."
+      },
+      "plan": {
+        "label": "계획 세우기",
+        "prompt": "주말 여행 일정의 개요를 짧은 세 부분으로 정리하도록 도와줘."
+      }
+    }
+  },
+  "header": {
+    "history": "기록",
+    "newChat": "새 채팅",
+    "untitledChat": "채팅",
+    "assistant": "어시스턴트",
+    "delete": "삭제",
+    "deleteChat": "채팅 삭제",
+    "latest": "최신"
+  },
+  "composer": {
+    "placeholder": "Yggdrasil에게 무엇이든 물어보세요…",
+    "message": "메시지",
+    "attach": "파일 첨부",
+    "attachHint": "문서, 스프레드시트, PDF 또는 코드 파일 첨부",
+    "profile": "프로필",
+    "profileHint": "사용할 어시스턴트 스타일",
+    "assistantProfile": "어시스턴트 프로필",
+    "runOn": "실행 위치",
+    "choose": "선택…",
+    "automatic": "자동",
+    "thisComputer": "이 컴퓨터",
+    "runOnAutomatic": "Norn이 사용 가능한 최적의 컴퓨터를 선택해요.",
+    "runOnLocal": "이 컴퓨터에서만 실행해요.",
+    "model": "모델",
+    "modelHint": "이 채팅에 답할 설치된 모델",
+    "noModel": "설치된 모델 없음",
+    "auto": "자동",
+    "models": "모델",
+    "specialized": "전문 AI",
+    "effort": "노력 수준",
+    "send": "보내기",
+    "stop": "중지",
+    "autoHint": "자동은 메시지마다 설치된 모델을 선택해요",
+    "autoLastUsed": "자동 · 마지막 사용 {{model}}",
+    "autoPicks": "자동 · 메시지마다 모델 선택",
+    "web": "웹",
+    "noModelAsk": "아직 설치된 모델이 없어요. 보내면 다운로드하기 전에 물어봐요.",
+    "noModelDownload": "아직 설치된 모델이 없어요. 보내면 자동으로 다운로드해요.",
+    "openModels": "모델 열기",
+    "chooseRunOn": "보내기 전에 <strong>실행 위치</strong>를 선택하세요(설정 → 채팅 실행 위치)."
+  },
+  "effort": {
+    "auto": {
+      "label": "자동",
+      "hint": "Yggdrasil이 결정해요. 간단한 질문은 빠르게, 큰 질문이나 데이터 관련 질문은 더 신중하게 처리해요."
+    },
+    "fast": {
+      "label": "빠르게",
+      "hint": "계획이나 재검토 없이 한 번에 답해요."
+    },
+    "balanced": {
+      "label": "균형 있게",
+      "hint": "큰 요청은 계획을 세우고, 정보를 찾을 때 페이지를 읽으며, 수치를 한 번 수정해요."
+    },
+    "thorough": {
+      "label": "꼼꼼하게",
+      "hint": "더 많은 페이지를 읽고, 맞는 모델 중 가장 큰 모델을 사용하며, 수치를 두 번 확인해요."
+    }
+  },
+  "memory": {
+    "on": "메모리 켬",
+    "off": "메모리 끔",
+    "onHint": "이 채팅은 Yggdrasil에게 기억해 달라고 한 내용을 사용해요. 이 채팅에서 메모리를 제외하려면 클릭하세요.",
+    "offHint": "이 채팅에서 메모리가 꺼져 있어요. 저장된 메모리는 여기서 사용되지 않으며 삭제되지 않아요.",
+    "disabledHint": "모든 채팅에서 메모리가 꺼져 있어요. 메모리 페이지에서 켜세요."
+  },
+  "send": {
+    "waitForFiles": "파일 추가가 끝날 때까지 기다린 후 보내세요.",
+    "summarizeFile_other": "첨부한 파일을 요약해 줘.",
+    "chooseRunOn": "이 채팅을 실행할 위치를 선택하세요: 자동 또는 이 컴퓨터.",
+    "downloadFailed": "이 채팅에 사용할 모델을 다운로드할 수 없어요.",
+    "installFirst": "먼저 모델을 설치한 다음 다시 시도하세요.",
+    "startFailed": "대화를 시작할 수 없어요.",
+    "noReply": "모델이 답하기 전에 멈췄어요. Yggdrasil이 모델을 중지하고 실패한 프로세스를 정리했어요.",
+    "couldNotRespond": "모델이 응답할 수 없어요.",
+    "unreachable": "로컬 AI에 연결할 수 없어요. 자세한 내용은 진단을 확인하세요.",
+    "generationFailed": "응답을 생성하는 중에 문제가 발생했어요.",
+    "confirmDownload": "채팅을 계속하기 위해 “{{model}}”을(를) 다운로드할까요? 설정 → 모델 다운로드에서 변경할 수 있어요.",
+    "deleteFailed": "이 채팅을 삭제할 수 없어요."
+  },
+  "attachments": {
+    "unsupported": "Yggdrasil이 아직 이 형식의 파일을 읽을 수 없어요",
+    "tooLarge": "파일은 최대 25MB까지 첨부할 수 있어요",
+    "addFailed": "파일을 추가할 수 없어요.",
+    "adding": "추가하는 중…",
+    "remove": "{{name}} 제거",
+    "download": "{{name}} 다운로드",
+    "downloading": "다운로드하는 중…",
+    "downloadFailed": "다운로드에 실패했어요.",
+    "loading": "불러오는 중…",
+    "audioFailed": "오디오를 불러올 수 없어요.",
+    "imageFailed": "이미지를 불러올 수 없어요.",
+    "videoFailed": "동영상을 불러올 수 없어요.",
+    "notAvailable": "사용할 수 없음",
+    "play": "재생",
+    "meta": "{{kind}} · {{size}}",
+    "kinds": {
+      "spreadsheet": "스프레드시트",
+      "pdf": "PDF",
+      "document": "문서",
+      "code": "코드",
+      "image": "이미지",
+      "audio": "오디오",
+      "video": "동영상",
+      "other": "파일"
+    }
+  },
+  "status": {
+    "starting": "시작하는 중…",
+    "working": "작업하는 중…",
+    "workingLabel": "작업 중",
+    "downloadingModel": "모델을 다운로드하는 중…",
+    "toolAllowedSession": "이 세션 동안 도구를 허용했어요…",
+    "toolAllowed": "도구를 허용했어요…",
+    "toolDenied": "도구가 거부되었어요. 도구 없이 계속하는 중…",
+    "waitingForPermission": "권한 대기 중: {{tool}}",
+    "checkingSources": "소스를 확인하는 중…",
+    "toolFailed": "{{tool}} 실패",
+    "roleOn": "{{computer}}에서 {{role}}…",
+    "roleRunning": "{{role}} 실행 중…",
+    "switchingTo": "{{model}}(으)로 전환하는 중…",
+    "using": "{{model}} 사용 중…",
+    "verifying": "수치를 소스와 대조하는 중…",
+    "workingThrough_other": "{{count}}개 부분을 처리하는 중…",
+    "workingOn": "작업 중: {{step}}…",
+    "puttingTogether": "정리하는 중…",
+    "writingNamed": "{{name}} 작성하는 중…",
+    "writingFile": "파일을 작성하는 중…",
+    "searchingWebFor": "웹에서 “{{query}}” 검색하는 중…",
+    "searchingWeb": "웹을 검색하는 중…",
+    "loadingRoleOn": "{{computer}}에서 {{role}} 불러오는 중…",
+    "loadingModelOn": "{{computer}}에서 모델을 불러오는 중…",
+    "loadingModel": "모델을 불러오는 중…",
+    "roleGeneratingOn": "{{computer}}에서 {{role}} 생성하는 중…",
+    "generatingOn": "{{computer}}에서 생성하는 중…",
+    "generating": "응답을 생성하는 중…",
+    "foundPassages_other": "{{source}}에서 구절 {{count}}개를 찾았어요…",
+    "foundPassagesMore_other": "{{source}} 외 {{more}}곳에서 구절 {{count}}개를 찾았어요…",
+    "yourKnowledge": "내 지식",
+    "checkedKnowledge": "내 지식을 확인했어요…",
+    "readingHost": "{{host}} 읽는 중…",
+    "readingPage": "페이지를 읽는 중…",
+    "readingFile": "파일을 읽는 중…",
+    "searchingFiles": "로컬 파일을 검색하는 중…",
+    "readingSpreadsheet": "스프레드시트를 읽는 중…",
+    "creatingFile": "파일을 만드는 중…",
+    "runningCode": "샌드박스에서 코드를 실행하는 중…",
+    "runningCommand": "명령을 실행하는 중…",
+    "checkingGit": "git 확인하는 중…",
+    "usingTool": "{{tool}} 사용 중…"
+  },
+  "tools": {
+    "names": {
+      "internet": {
+        "search": "웹 검색",
+        "open": "페이지 열기"
+      },
+      "filesystem": {
+        "search": "파일 찾기",
+        "read": "파일 읽기",
+        "write": "파일 쓰기"
+      },
+      "files": {
+        "create": "파일 만들기"
+      },
+      "spreadsheet": {
+        "analyze": "스프레드시트 분석"
+      },
+      "code": {
+        "execute": "코드 실행"
+      },
+      "terminal": "터미널",
+      "git": {
+        "status": "Git status",
+        "diff": "Git diff",
+        "log": "Git log",
+        "show": "Git show",
+        "add": "Git add",
+        "commit": "Git commit",
+        "push": "Git push"
+      }
+    },
+    "unnamed": "도구",
+    "noArguments": "인수 없음",
+    "argumentsUnavailable": "인수 정보 없음",
+    "noDetails": "추가 정보 없음",
+    "permissionTitle": "{{tool}}을(를) 허용할까요?",
+    "permissionReason": "어시스턴트가 계속하려면 로컬 도구를 사용해야 해요.",
+    "allowOnce": "한 번 허용",
+    "allowSession": "세션 동안 허용",
+    "deny": "거부",
+    "decideFailed": "도구 권한 선택을 기록할 수 없어요.",
+    "failed": "{{tool}} 실패",
+    "retry": "다시 시도",
+    "used_other": "도구 {{count}}개 사용함",
+    "completed": "완료됨",
+    "completedIn": "{{ms}}ms 만에 완료됨",
+    "traceFailed": "실패"
+  },
+  "transcript": {
+    "plan": "계획",
+    "onComputer": "<computer>{{computer}}</computer>에서",
+    "interrupted": "응답이 중단되었어요"
+  },
+  "roles": {
+    "role": "역할",
+    "answer": "답변",
+    "planner": "플래너",
+    "reviewer": "검토자",
+    "worker": "워커 {{n}}"
+  },
+  "deleteDialog": {
+    "title": "이 채팅을 삭제할까요?",
+    "body": "“{{title}}”이(가) 영구적으로 삭제돼요.",
+    "untitled": "제목 없음",
+    "cancel": "취소",
+    "delete": "삭제",
+    "deleting": "삭제하는 중…"
+  },
+  "history": {
+    "label": "채팅 기록",
+    "title": "채팅",
+    "pin": "고정",
+    "pinned": "고정됨",
+    "pinSidebar": "기록 사이드바 고정",
+    "unpinSidebar": "기록 사이드바 고정 해제",
+    "close": "기록 닫기",
+    "search": "채팅 검색",
+    "searchPlaceholder": "검색…",
+    "loading": "채팅을 불러오는 중…",
+    "empty": "아직 이전 대화가 없어요.",
+    "startNew": "새 채팅 시작",
+    "noMatches": "일치하는 채팅이 없어요.",
+    "untitled": "제목 없음",
+    "actionsFor": "{{title}}에 대한 작업",
+    "chat": "채팅",
+    "rename": "이름 변경",
+    "unpin": "고정 해제",
+    "delete": "삭제",
+    "groups": {
+      "pinned": "고정됨",
+      "today": "오늘",
+      "yesterday": "어제",
+      "week": "지난 7일",
+      "month": "지난 30일",
+      "older": "이전"
+    }
+  },
+  "errors": {
+    "tryAgain": "다시 시도",
+    "startNew": "새 채팅 시작",
+    "openModels": "모델 열기",
+    "openComputers": "컴퓨터 열기",
+    "details": "세부 정보",
+    "hideDetails": "세부 정보 숨기기",
+    "notResponding": {
+      "title": "Yggdrasil이 응답하지 않아요",
+      "body": "로컬 서비스가 응답을 멈췄어요. 데스크톱 앱이라면 종료했다가 다시 연 다음 다시 시도하세요."
+    },
+    "engineMissing": {
+      "title": "AI 엔진이 아직 설치되지 않았어요",
+      "body": "모델에서 설치한 다음 메시지를 다시 보내세요."
+    },
+    "noModel": {
+      "title": "준비된 모델이 없어요",
+      "body": "모델을 설치하거나 선택한 다음 다시 시도하세요."
+    },
+    "tooLong": {
+      "title": "이 대화는 모델이 처리하기에 너무 길어요",
+      "body": "새 채팅을 시작하거나 더 많은 텍스트를 처리할 수 있는 모델을 선택하세요."
+    },
+    "outOfMemory": {
+      "title": "이 모델을 실행할 메모리가 부족해요",
+      "body": "다른 앱을 닫거나 더 작은 모델을 선택한 다음 다시 시도하세요."
+    },
+    "offline": {
+      "title": "사용 중인 컴퓨터가 오프라인이에요",
+      "body": "해당 컴퓨터를 켜고 Yggdrasil을 열거나, 이 채팅을 이 컴퓨터에서 실행하세요."
+    },
+    "connection": {
+      "title": "모델에 연결할 수 없어요",
+      "body": "모델이 응답을 멈췄어요. 보통 일시적인 문제예요."
+    },
+    "serverError": {
+      "title": "모델에 문제가 발생했어요",
+      "body": "다시 시도하세요. 문제가 계속되면 다른 모델을 사용해 보세요."
+    },
+    "didNotWork": "작동하지 않았어요",
+    "generic": {
+      "title": "문제가 발생했어요",
+      "body": "Yggdrasil이 답변을 마치지 못했어요. 잠시 후 다시 시도하세요."
+    }
+  },
+  "modelFailure": {
+    "retry": "다시 시도",
+    "chooseOther": "다른 어시스턴트/모델 사용",
+    "details": "세부 정보",
+    "hideDetails": "세부 정보 숨기기",
+    "reason": "이유: {{value}}",
+    "runtime": "런타임: {{value}}",
+    "computer": "컴퓨터: {{value}}",
+    "exitCode": "종료 코드: {{value}}",
+    "lastProbe": "마지막 상태 확인: {{value}}"
+  },
+  "capability": {
+    "enableInternet": "인터넷 사용",
+    "installed": "설치됨",
+    "notInstalled": "설치되지 않음",
+    "useModel": "이 모델 사용",
+    "viewInModels": "모델에서 보기"
+  },
+  "setup": {
+    "details": "{{name}} · {{size}} 다운로드 · {{node}}에 설치",
+    "thisComputer": "이 컴퓨터",
+    "install": "설정",
+    "installing": "설치하는 중…",
+    "downloading": "다운로드하는 중… {{total}} 중 {{done}}",
+    "stop": "중지",
+    "ready": "{{label}} 설정이 끝났어요.",
+    "continue": "계속",
+    "continuing": "설정이 끝났어요. 요청을 마무리하는 중…"
+  },
+  "readAloud": {
+    "button": "소리 내어 읽기",
+    "hint": "이 컴퓨터에서 이 답변을 소리 내어 읽기",
+    "busy": "소리 내어 읽는 중…(처음에는 음성을 다운로드해요)",
+    "failed": "소리 내어 읽을 수 없어요."
+  },
+  "context": {
+    "usage": "컨텍스트 사용량",
+    "full": "컨텍스트 {{percent}} 사용",
+    "percentFull": "{{percent}} 사용",
+    "title": "컨텍스트",
+    "used": "{{used}} / {{limit}} 토큰",
+    "usedEstimated": "약 {{used}} / {{limit}} 토큰",
+    "limit": "{{limit}} 토큰",
+    "summarized_other": "대화가 들어갈 수 있도록 가장 오래된 메시지 {{count}}개를 요약해서 보냈어요. 모든 메시지는 그대로 저장되어 있어요.",
+    "empty": "메시지를 보내면 이 채팅이 모델의 메모리를 얼마나 사용하는지 확인할 수 있어요.",
+    "rows": {
+      "instructions": "지침",
+      "tools": "도구",
+      "conversation": "대화",
+      "toolResults": "도구 결과"
+    }
+  },
+  "answer": {
+    "files": "파일",
+    "sources": "소스",
+    "memory": "메모리",
+    "remembered": "기억함",
+    "steps_other": "수행한 작업({{count}}단계)"
+  },
+  "run": {
+    "details": "실행 세부 정보",
+    "gone": "이 실행은 더 이상 기록되어 있지 않아요.",
+    "loadFailed": "실행을 불러올 수 없어요.",
+    "run": "실행",
+    "strategy": "전략",
+    "effort": "노력 수준",
+    "modelCalls": "모델 호출",
+    "workers": "워커",
+    "workersParallel_other": "{{count}}개 동시 실행",
+    "workersInOrder_other": "{{count}}개 순서대로 실행",
+    "tools": "도구",
+    "computers": "컴퓨터",
+    "cacheHits": "캐시 적중",
+    "verification": "검증",
+    "verificationNone": "없음",
+    "verificationPasses_other": "{{count}}회",
+    "verificationIssues": "문제 {{issues}}개, {{fixed}}개 수정됨",
+    "retries": "재시도",
+    "context": "컨텍스트",
+    "contextTokens": "{{tokens}} 토큰",
+    "contextTokensOf": "{{limit}} 토큰 중 {{tokens}}",
+    "latency": "지연 시간",
+    "beforeModel": "(모델 실행 전 {{time}})",
+    "onComputer": "{{computer}}에서",
+    "calls_other": "호출 {{count}}회",
+    "load": "로드 {{time}}",
+    "firstToken": "첫 토큰 {{time}}",
+    "inOut": "입력 {{in}} / 출력 {{out}}",
+    "cached": "{{count}}개 캐시됨",
+    "toolFailures": "{{count}}개 실패"
+  }
+}

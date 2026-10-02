@@ -1,0 +1,366 @@
+{
+  "page": {
+    "title": "Profils et orchestration",
+    "subtitle": "Un profil est un assistant enregistré : sa façon de traiter les demandes, ses modèles, ses outils, sa mémoire et ses ordinateurs.",
+    "hint": "Choisissez-en un dans Discussion, ou créez le vôtre.",
+    "create": "Créer un profil",
+    "createTitle": "Créer un nouveau profil",
+    "loading": "Chargement des profils…",
+    "loadFailed": "Impossible de charger les profils. Le daemon local est-il en cours d'exécution ?",
+    "emptyTitle": "Aucun profil pour l'instant",
+    "emptyDescription": "Créez un profil pour indiquer à Discussion comment votre assistant doit travailler.",
+    "noneInFilter": "Aucun profil dans ce filtre.",
+    "filter": "Filtrer les profils",
+    "filters": {
+      "all": "Tous",
+      "builtin": "Intégrés",
+      "custom": "Personnalisés"
+    }
+  },
+  "create": {
+    "title": "Créer un profil",
+    "startFrom": "Partir de :",
+    "startingWith": "À partir de <strong>{{name}}</strong>. Vous pourrez le renommer et l'ajuster après sa création.",
+    "creating": "Création…",
+    "create": "Créer",
+    "cancel": "Annuler",
+    "copyName": "{{name}} (copie)",
+    "options": {
+      "general": {
+        "label": "Assistant général",
+        "description": "Questions du quotidien et discussions en local d'abord."
+      },
+      "coding": {
+        "label": "Programmation",
+        "description": "Aide au code avec une équipe d'IA répartie sur vos ordinateurs."
+      },
+      "research": {
+        "label": "Recherche",
+        "description": "Lecture de textes longs et raisonnement approfondi."
+      },
+      "blank": {
+        "label": "Vide",
+        "description": "Partez de zéro et définissez vous-même les rôles, les outils et les ordinateurs."
+      }
+    }
+  },
+  "purposes": {
+    "general": "Conversation du quotidien",
+    "coding": "Programmation et aide au code",
+    "research": "Recherche et lecture de textes longs",
+    "custom": "Configuration personnalisée"
+  },
+  "card": {
+    "rename": "Renommer le profil",
+    "builtin": "Intégré",
+    "custom": "Personnalisé",
+    "automaticSelection": "Sélection automatique des ordinateurs",
+    "customSelection": "Sélection personnalisée des ordinateurs",
+    "tools_one": "{{count}} outil",
+    "tools_many": "{{count}} outils",
+    "tools_other": "{{count}} outils",
+    "askFirst": " · {{count}} avec demande préalable",
+    "noTools": "Aucun outil activé",
+    "more": "+{{count}} de plus",
+    "useInChat": "Utiliser dans Discussion",
+    "close": "Fermer",
+    "edit": "Modifier",
+    "hideDetails": "Masquer les détails",
+    "details": "Détails",
+    "moreActions": "Autres actions pour {{name}}",
+    "howItWorks": "Fonctionnement",
+    "computerSelection": "Sélection des ordinateurs",
+    "selectionDetail": "{{title}}. {{detail}}",
+    "strategy": "Stratégie : <strong>{{strategy}}</strong>",
+    "thisMachine": "{{name}} (cette machine)"
+  },
+  "menu": {
+    "duplicate": "Dupliquer",
+    "rename": "Renommer",
+    "confirmReset": "Rétablir « {{name}} » tel que fourni avec Yggdrasil ? Vos modifications seront perdues.",
+    "reset": "Rétablir les valeurs par défaut",
+    "confirmDelete": "Supprimer « {{name}} » ? Cette action est irréversible.",
+    "delete": "Supprimer"
+  },
+  "strategies": {
+    "auto": {
+      "label": "Auto",
+      "detail": "Yggdrasil décide : les questions rapides passent par un seul modèle, les demandes en plusieurs parties sont planifiées et vérifiées."
+    },
+    "single": {
+      "label": "Modèle unique",
+      "detail": "Un seul modèle répond à chaque demande, sans plan."
+    },
+    "planned": {
+      "label": "Planificateur + exécutants",
+      "detail": "Les demandes en plusieurs parties sont toujours traitées partie par partie avant que la réponse soit rédigée."
+    },
+    "team": {
+      "label": "Équipe",
+      "detail": "Un planificateur découpe chaque demande, des exécutants traitent les parties (sur d'autres ordinateurs quand c'est possible) et un relecteur vérifie la réponse. Les questions rapides reçoivent toujours une réponse directe."
+    },
+    "teamTitle": "Équipe d'IA",
+    "automaticTitle": "Automatique",
+    "withStrategy": "{{title}} · Stratégie : {{strategy}}"
+  },
+  "computers": {
+    "prefer_local": {
+      "title": "Privilégier cet ordinateur",
+      "short": "Cet ordinateur d'abord",
+      "detail": "Essaie d'abord de s'exécuter sur cette machine. Se rabat sur un ordinateur jumelé lorsqu'un modèle n'est pas installé ici."
+    },
+    "manual": {
+      "title": "Personnalisé",
+      "short": "Personnalisé",
+      "detail": "Utilise les rôles épinglés pour le placement. Idéal pour exécuter une étape précise sur une machine précise."
+    },
+    "automatic": {
+      "title": "Automatique",
+      "short": "Automatique",
+      "detail": "Place chaque étape sur l'ordinateur jumelé qui possède déjà le modèle. Aucune adresse IP ni aucun port à configurer."
+    }
+  },
+  "chips": {
+    "files": "Fichiers",
+    "git": "Git",
+    "terminal": "Terminal",
+    "ok": "{{label}} ✓",
+    "ask": "{{label}} Demander"
+  },
+  "roles": {
+    "role": "Rôle",
+    "assistant": "Principal",
+    "fast": "Rapide",
+    "coding": "Code",
+    "planner": "Planificateur",
+    "worker": "Exécutant",
+    "reviewer": "Relecteur",
+    "numbered": "{{role}} {{n}}",
+    "automaticModel": "Modèle automatique",
+    "pinnedComputer": "Ordinateur épinglé",
+    "automaticComputer": "Ordinateur automatique",
+    "hint": "{{model}} · {{computer}}",
+    "help": {
+      "assistant": "Rédige la réponse. En automatique, utilise le modèle choisi dans la discussion.",
+      "fast": "Répond aux questions rapides lorsque la discussion est en Auto.",
+      "coding": "Répond aux demandes de code lorsque la discussion est en Auto.",
+      "planner": "Découpe une demande en parties.",
+      "worker": "Traite une partie d'un plan. Les parties peuvent s'exécuter simultanément sur différents ordinateurs.",
+      "reviewer": "Vérifie la réponse avant que vous la voyiez.",
+      "other": "Une étape nommée du déroulement de ce profil."
+    }
+  },
+  "capabilities": {
+    "internet": {
+      "label": "Internet",
+      "description": "Rechercher et lire des informations à jour sur le web, et trouver des lieux et des itinéraires"
+    },
+    "files": {
+      "label": "Fichiers",
+      "description": "Rechercher, lire et écrire des fichiers dans l'espace de travail"
+    },
+    "code": {
+      "label": "Exécuter du code",
+      "description": "Exécuter du Python dans un bac à sable pour des calculs, des analyses et des graphiques ; demande d'abord"
+    },
+    "speech": {
+      "label": "Voix",
+      "description": "Transcrire de l'audio et lire du texte à voix haute, sur cet ordinateur"
+    },
+    "images": {
+      "label": "Images",
+      "description": "Créer et modifier des images sur cet ordinateur, une fois la génération d'images configurée"
+    },
+    "video": {
+      "label": "Vidéo",
+      "description": "Créer de courts clips sur cet ordinateur, une fois la génération de vidéos configurée"
+    },
+    "shell": {
+      "label": "Shell",
+      "description": "Exécuter des commandes sur cet ordinateur"
+    },
+    "git": {
+      "label": "Git",
+      "description": "Examiner le dépôt, puis faire un commit ou un push"
+    }
+  },
+  "tools": {
+    "internet": {
+      "search": {
+        "label": "Recherche web",
+        "description": "Effectue une recherche sur le web public et renvoie des titres, des liens et des extraits."
+      },
+      "open": {
+        "label": "Ouvrir une page web",
+        "description": "Ouvre une URL et renvoie un texte lisible."
+      }
+    },
+    "filesystem": {
+      "search": {
+        "label": "Rechercher des fichiers",
+        "description": "Recherche des fichiers par nom dans l'espace de travail."
+      },
+      "read": {
+        "label": "Lire un fichier",
+        "description": "Permet à l'assistant d'ouvrir des fichiers de votre espace de travail Yggdrasil pour citer ou résumer leur contenu réel."
+      },
+      "write": {
+        "label": "Écrire un fichier",
+        "description": "Permet à l'assistant de créer ou de mettre à jour des fichiers dans l'espace de travail."
+      }
+    },
+    "terminal": {
+      "label": "Terminal",
+      "description": "Exécute des commandes shell sur cet ordinateur."
+    },
+    "git": {
+      "status": {
+        "label": "Git status",
+        "description": "Indique quels fichiers ont été modifiés pour que l'assistant puisse raisonner sur votre arbre de travail."
+      },
+      "diff": {
+        "label": "Git diff",
+        "description": "Affiche les modifications de code réelles pour que l'assistant puisse relire ou expliquer un patch."
+      },
+      "log": {
+        "label": "Git log",
+        "description": "Affiche les commits récents de l'espace de travail."
+      },
+      "show": {
+        "label": "Git show",
+        "description": "Affiche un commit."
+      },
+      "add": {
+        "label": "Git add",
+        "description": "Indexe des fichiers pour un commit. Utile quand vous voulez de l'aide pour préparer un commit."
+      },
+      "commit": {
+        "label": "Git commit",
+        "description": "Crée un commit git local."
+      },
+      "push": {
+        "label": "Git push",
+        "description": "Envoie les commits vers le dépôt distant."
+      }
+    }
+  },
+  "policies": {
+    "deny": {
+      "label": "Refuser",
+      "description": "Jamais disponible pour ce profil."
+    },
+    "ask": {
+      "label": "Demander à chaque fois",
+      "description": "Affiche une demande dans la discussion avant chaque utilisation."
+    },
+    "allow-for-session": {
+      "label": "Demander une fois par session",
+      "description": "Demande la première fois, puis s'en souvient jusqu'au redémarrage de l'app."
+    },
+    "allow": {
+      "label": "Toujours autoriser",
+      "description": "S'exécute sans demander. Idéal pour les outils peu risqués que vous utilisez souvent."
+    }
+  },
+  "editor": {
+    "profile": "Profil",
+    "name": "Nom",
+    "namePlaceholder": "ex. Programmation",
+    "models": "Modèles",
+    "modelsHint": "En automatique, utilise le modèle choisi dans la discussion.",
+    "model": "Modèle",
+    "automatic": "Automatique",
+    "computer": "Ordinateur",
+    "fallback": "Ordre de repli",
+    "fallbackHint": "Essayés dans l'ordre lorsque le modèle qui répond échoue. Ensuite, Yggdrasil choisit un autre modèle installé.",
+    "none": "Aucun",
+    "tools": "Outils",
+    "on": "Activé",
+    "off": "Désactivé",
+    "individualTools": "Outils individuels",
+    "memory": "Mémoire",
+    "memoryHint": "Les discussions avec ce profil recherchent dans ces sources à chaque question et utilisent les passages correspondants.",
+    "orchestration": "Orchestration",
+    "strategy": "Stratégie",
+    "execution": "Exécution",
+    "computerSelection": "Sélection des ordinateurs",
+    "selectionOptions": {
+      "automatic": "Automatique : placer là où le modèle se trouve déjà",
+      "prefer_local": "Privilégier cet ordinateur",
+      "manual": "Personnalisé : utiliser les ordinateurs définis dans Modèles"
+    },
+    "localOnly": "Cet ordinateur uniquement : ne jamais utiliser les ordinateurs jumelés",
+    "allowed": "Autorisés",
+    "preferred": "Privilégiés",
+    "never": "Ne jamais utiliser",
+    "save": "Enregistrer le profil",
+    "cancel": "Annuler"
+  },
+  "controls": {
+    "default": "Par défaut",
+    "effort": {
+      "label": "Niveau de raisonnement",
+      "help": "Utilisé lorsqu'une discussion laisse l'effort sur Auto.",
+      "fast": "Rapide",
+      "balanced": "Équilibré",
+      "thorough": "Approfondi"
+    },
+    "planning": {
+      "label": "Planification",
+      "help": "Traiter partie par partie les demandes qui en comportent plusieurs. Toujours découpe aussi les demandes sans parties évidentes.",
+      "on": "Quand une demande a des parties",
+      "always": "Toujours",
+      "off": "Ne jamais planifier"
+    },
+    "parallel": {
+      "label": "Parallélisme",
+      "help": "Rechercher en parallèle les parties indépendantes.",
+      "on": "En parallèle",
+      "off": "Une à la fois"
+    },
+    "verification": {
+      "label": "Vérification",
+      "help": "Vérifier les chiffres par rapport aux sources avant de répondre.",
+      "off": "Désactivée",
+      "check": "Vérifier et signaler",
+      "correct": "Vérifier et corriger une fois",
+      "thorough": "Vérifier et corriger deux fois"
+    },
+    "memory": {
+      "label": "Mémoire",
+      "help": "Utiliser les souvenirs persistants dans les discussions de ce profil.",
+      "off": "Désactivée pour ce profil"
+    },
+    "fallback": {
+      "label": "Repli",
+      "help": "Répondre avec un autre modèle lorsque celui choisi échoue.",
+      "off": "Afficher plutôt l'échec"
+    },
+    "max_workers": {
+      "label": "Exécutants",
+      "help": "Nombre maximal de parties dans un plan (2–8)."
+    },
+    "max_tool_calls": {
+      "label": "Appels d'outils",
+      "help": "Nombre maximal d'appels d'outils par tour (1–50)."
+    },
+    "retries": {
+      "label": "Nouvelles tentatives",
+      "help": "Tentatives après l'échec d'un modèle (1–3) : le même modèle sur un autre ordinateur, puis un autre modèle."
+    },
+    "timeout_seconds": {
+      "label": "Délai maximal (s)",
+      "help": "Arrêter un tour qui dure plus longtemps (10–3600)."
+    },
+    "context_share": {
+      "label": "Budget de contexte",
+      "help": "Part maximale de la fenêtre que les messages précédents peuvent occuper (0.1–0.9)."
+    }
+  },
+  "orchestrators": {
+    "title": "Orchestrateurs",
+    "description": "Moteurs d'orchestration modulaires qui coordonnent les modèles et les outils.",
+    "emptyTitle": "Gestion des orchestrateurs bientôt disponible",
+    "emptyDescription": "Les orchestrateurs intégrés et ceux des plugins seront configurables ici en mode avancé."
+  }
+}

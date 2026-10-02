@@ -1,0 +1,114 @@
+{
+  "page": {
+    "title": "Conhecimento",
+    "description": "O Mimir mantém catálogos, preços, políticas e documentos pesquisáveis. Quando um perfil ou uma IA especializada usa uma fonte, os trechos que correspondem a cada pergunta são adicionados a ela. Edite um arquivo e a próxima pergunta já vê a mudança. Sem retreinamento.",
+    "loading": "Carregando…",
+    "emptyTitle": "Nenhum conhecimento conectado",
+    "emptyDescription": "Conecte um arquivo ou pasta deste computador, cole conteúdo ou leia de um banco de dados ou de uma API web. Funcionam arquivos PDF, Excel, CSV, TSV, JSON, JSONL, Markdown, texto e HTML."
+  },
+  "badge": {
+    "linked": "Vinculado",
+    "database": "Banco de dados",
+    "api": "API web",
+    "copy": "Cópia"
+  },
+  "meaning": {
+    "full": "Pesquisável pelo significado, não só por palavras correspondentes.",
+    "partial": "Pesquisável pelo significado: {{embedded}} de {{total}} trechos até agora."
+  },
+  "refresh": {
+    "days_one": "{{count}} dia",
+    "days_many": "{{count}} dias",
+    "days_other": "{{count}} dias",
+    "hours_one": "{{count}} hora",
+    "hours_many": "{{count}} horas",
+    "hours_other": "{{count}} horas",
+    "minutes_one": "{{count}} minuto",
+    "minutes_many": "{{count}} minutos",
+    "minutes_other": "{{count}} minutos",
+    "note": "Buscado novamente quando uma pergunta o usa e os dados têm mais de {{every}}, ou ao reindexar."
+  },
+  "row": {
+    "failed": "Falhou",
+    "passages_one": "{{count}} trecho",
+    "passages_many": "{{count}} trechos",
+    "passages_other": "{{count}} trechos",
+    "indexed": "indexado {{when}}",
+    "watches": "Reindexa sozinho quando os arquivos mudam.",
+    "edit": "Editar",
+    "indexing": "Indexando…",
+    "reindex": "Reindexar",
+    "localOnlyHint": "Nunca enviar trechos desta fonte para um computador pareado. Os chats que a usam são executados aqui.",
+    "localOnly": "Somente este computador",
+    "localOnlyOn": "Somente este computador ✓",
+    "confirmDisconnect": "Desconectar {{name}}? Os perfis e IAs que a usam deixam de vê-la. Seus arquivos não são apagados.",
+    "disconnect": "Desconectar",
+    "editLabel": "Editar {{name}}",
+    "saveHint": "Salvar reindexa a fonte. Os chats e as IAs especializadas veem a mudança na próxima pergunta.",
+    "saving": "Salvando…",
+    "save": "Salvar",
+    "cancel": "Cancelar"
+  },
+  "add": {
+    "title": "Conectar conhecimento",
+    "modes": {
+      "path": "Arquivo ou pasta",
+      "text": "Enviar ou colar",
+      "database": "Banco de dados",
+      "api": "API web"
+    },
+    "path": "Caminho neste computador",
+    "pathHint": "O Yggdrasil o lê no lugar e detecta edições automaticamente.",
+    "chooseFile": "Escolher um arquivo",
+    "pastePlaceholder": "Cole texto, Markdown ou CSV",
+    "content": "Conteúdo",
+    "name": "Nome (opcional)",
+    "indexing": "Indexando…",
+    "connect": "Conectar"
+  },
+  "remote": {
+    "database": "Banco de dados",
+    "sqlite": "Arquivo SQLite",
+    "file": "Arquivo neste computador",
+    "connection": "String de conexão",
+    "connectionHint": "Use uma conta que só possa ler. Ela é armazenada separada do banco de dados e não é exibida novamente.",
+    "query": "Consulta",
+    "queryHint": "Um único SELECT. Ele é executado em modo somente leitura, então o Yggdrasil nunca altera o banco de dados. Cada linha vira um trecho.",
+    "url": "URL",
+    "urlHint": "JSON, CSV ou texto. Uma lista de objetos vira um trecho por item.",
+    "items": "Lista na resposta (opcional)",
+    "header": "Cabeçalho",
+    "value": "Valor (opcional)",
+    "refresh": "Buscar novamente quando tiver mais de",
+    "refreshChoices": {
+      "m5": "5 minutos",
+      "m15": "15 minutos",
+      "h1": "1 hora",
+      "h6": "6 horas",
+      "d1": "1 dia"
+    },
+    "name": "Nome (opcional)",
+    "connecting": "Conectando…",
+    "connect": "Conectar"
+  },
+  "search": {
+    "title": "Teste uma pergunta",
+    "description": "Veja quais trechos uma pergunta traria para o chat.",
+    "placeholder": "Vocês têm 225/45R17 em estoque?",
+    "question": "Pergunta",
+    "search": "Pesquisar",
+    "nothing": "Nada correspondeu."
+  },
+  "picker": {
+    "none": "Nenhum conhecimento conectado.",
+    "disconnect": "Desconectar {{name}}",
+    "remove": "Remover",
+    "connectExisting": "Conectar conhecimento existente",
+    "connectExistingOption": "Conectar conhecimento existente…",
+    "pathPlaceholder": "Ou um arquivo ou pasta, como ~/Documents/catalog",
+    "path": "Caminho do arquivo ou pasta",
+    "indexing": "Indexando…",
+    "connect": "Conectar",
+    "manage": "Gerencie fontes, edite conteúdo colado e teste pesquisas na página <link>Conhecimento</link>."
+  }
+}

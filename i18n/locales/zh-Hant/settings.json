@@ -1,0 +1,235 @@
+{
+  "page": {
+    "title": "設定",
+    "subtitle": "Yggdrasil 在這台電腦上的運作方式。",
+    "loading": "正在載入設定…"
+  },
+  "groups": {
+    "general": "一般",
+    "ai": "AI 行為",
+    "network": "網路與存取",
+    "privacy": "隱私權與安全性",
+    "storage": "儲存空間",
+    "about": "關於",
+    "danger": "危險區域"
+  },
+  "appearance": {
+    "title": "外觀",
+    "description": "選擇淺色、深色或跟隨系統。",
+    "dark": "深色",
+    "light": "淺色",
+    "system": "系統"
+  },
+  "language": {
+    "title": "語言",
+    "description": "Yggdrasil 在你使用的每台電腦和手機上，選單、按鈕和訊息所使用的語言。每台裝置也可以跟隨自己的系統語言。",
+    "appLanguage": "App 語言",
+    "systemDefault": "系統預設（{{language}}）",
+    "pseudo": "虛擬語系（用於測試翻譯）",
+    "pseudoRtl": "由右至左虛擬語系（用於測試版面）",
+    "status": {
+      "machine": "機器翻譯，在經人工審閱前，部分用語可能不太通順。",
+      "partial": "部分翻譯。尚未翻譯的內容會以英文顯示。",
+      "community": "由 Yggdrasil 社群翻譯。"
+    },
+    "saved": "已儲存。",
+    "saveFailed": "無法儲存語言：{{error}}"
+  },
+  "personalization": {
+    "title": "個人化",
+    "description": "在每個聊天和自動化中，回答應呈現的樣子。這只影響風格。AI 可以做什麼是在「工具權限」中設定，這裡或「記憶」中的任何內容都無法變更。",
+    "length": {
+      "label": "回答長度",
+      "brief": "簡短",
+      "balanced": "適中",
+      "detailed": "詳細"
+    },
+    "tone": {
+      "label": "語氣",
+      "friendly": "親切",
+      "neutral": "中性",
+      "direct": "直接"
+    },
+    "format": {
+      "label": "格式",
+      "prose": "段落",
+      "lists": "清單"
+    },
+    "units": {
+      "label": "單位",
+      "metric": "公制",
+      "imperial": "英制"
+    },
+    "noPreference": "沒有偏好",
+    "aboutYou": "關於你",
+    "aboutYouPlaceholder": "我是住在朱諾的後端工程師，主要專案是一個 Go 服務。",
+    "instructions": "其他關於如何回答的要求",
+    "instructionsPlaceholder": "以 Go 顯示程式碼範例。在結尾列出資料來源。",
+    "save": "儲存",
+    "saving": "正在儲存…",
+    "saved": "已儲存",
+    "saveFailed": "無法儲存。"
+  },
+  "background": {
+    "title": "在背景持續執行",
+    "description": "關閉視窗後，聊天、API 和你的排程仍會繼續執行。只要有排程存在，這個選項就會保持開啟。"
+  },
+  "launchAtLogin": {
+    "title": "登入時啟動",
+    "description": "登入這台電腦時自動啟動 Yggdrasil。"
+  },
+  "defaultProfile": {
+    "title": "預設設定檔",
+    "description": "開始新聊天時使用。",
+    "automatic": "自動"
+  },
+  "runOn": {
+    "title": "聊天執行位置",
+    "description": "預設情況下，工作應在團隊中的哪裡執行。",
+    "automatic": "自動",
+    "local": "這台電腦",
+    "ask": "每次都詢問"
+  },
+  "lifecycle": {
+    "title": "模型生命週期",
+    "description": "「自動」會在聊天後讓模型保持就緒。「手動」則由你自行啟動和停止。",
+    "automatic": "自動",
+    "manual": "手動",
+    "idleUnload": "閒置多久後卸載模型",
+    "idleUnloadHint": "模型一段時間未使用時釋放記憶體。設為 0 則讓模型保持載入。",
+    "minutes": "分鐘"
+  },
+  "downloads": {
+    "title": "下載模型",
+    "description": "當設定檔需要尚未安裝的模型時。",
+    "ask": "先詢問",
+    "automatic": "自動"
+  },
+  "advanced": {
+    "title": "進階模式",
+    "description": "顯示模型 ID、API 詳細資訊、設定檔、記錄檔，以及其他進階使用者控制項。"
+  },
+  "discovery": {
+    "title": "尋找其他電腦",
+    "description": "在網路上公開這台電腦，並尋找其他安裝了 Yggdrasil 的電腦。",
+    "needsRestart": "網路設定已更新。請重新啟動 Yggdrasil，讓其他電腦能完整連線到這台電腦。",
+    "restartManually": "請完全結束 Yggdrasil，然後重新打開，以完成套用網路設定。",
+    "restartNow": "立即重新啟動",
+    "status": "狀態：<strong>{{state}}</strong>"
+  },
+  "onOff": {
+    "on": "開啟",
+    "off": "關閉"
+  },
+  "api": {
+    "title": "API 存取",
+    "description": "App 和其他裝置如何與 Yggdrasil 溝通。",
+    "local": "本機 API",
+    "lan": "LAN API",
+    "manage": "管理 API 存取"
+  },
+  "notifications": {
+    "title": "通知",
+    "description": "針對長時間執行的工作和團隊連線狀態的提醒。",
+    "taskFinish": "工作完成時通知",
+    "peerOffline": "配對的電腦離線時通知"
+  },
+  "toolPermissions": {
+    "title": "工具權限",
+    "description": "AI 在這台電腦上可以做什麼的預設規則。",
+    "terminal": "終端機指令",
+    "fileWrites": "寫入檔案",
+    "git": "Git 操作",
+    "ask": "詢問",
+    "allowSession": "在本次工作階段允許",
+    "allow": "允許",
+    "deny": "拒絕"
+  },
+  "history": {
+    "title": "歷史紀錄",
+    "description": "控制 Yggdrasil 在這台電腦上保留哪些內容。",
+    "saveChats": "儲存聊天紀錄",
+    "saveTasks": "儲存工作紀錄",
+    "confirmClear": "要刪除這台電腦上的所有聊天紀錄嗎？這個動作無法復原。",
+    "clear": "清除聊天紀錄",
+    "clearing": "正在清除…"
+  },
+  "whatLeft": {
+    "title": "離開這台電腦的資料",
+    "description": "Yggdrasil 在這台電腦上運作。以下是聊天、自動化或 App 將資料傳送到其他地方的紀錄：網路搜尋與網頁、地圖查詢、配對的電腦，以及已連結的服務。將記憶或知識標示為「僅限這台電腦」，就能讓使用它們的聊天留在這裡執行。",
+    "nothing": "過去 30 天內沒有任何資料離開這台電腦。",
+    "summary": "過去 30 天內：{{list}}。",
+    "summaryItem": "{{kind}} {{count}} 次",
+    "kinds": {
+      "web_search": "網路搜尋",
+      "web_page": "網頁",
+      "places": "地圖與地點",
+      "paired_computer": "配對的電腦",
+      "external_server": "外部伺服器",
+      "connector": "已連結的服務",
+      "notification": "通知"
+    },
+    "kindsLower": {
+      "web_search": "網路搜尋",
+      "web_page": "網頁",
+      "places": "地圖與地點",
+      "paired_computer": "配對的電腦",
+      "external_server": "外部伺服器",
+      "connector": "已連結的服務",
+      "notification": "通知"
+    },
+    "sources": {
+      "chat": "聊天",
+      "api": "API",
+      "automation": "自動化",
+      "training": "訓練"
+    },
+    "keepFor": "執行紀錄保留期限",
+    "retention": {
+      "days_other": "{{count}} 天",
+      "year": "1 年",
+      "forever": "永久保留"
+    },
+    "delete": "立即刪除執行紀錄",
+    "confirmDelete": "要立即刪除執行紀錄嗎？這會移除過去執行所儲存的提示和工具結果，以及這份清單。聊天不會被刪除。",
+    "deleted": "已刪除 {{tasks}} 筆執行紀錄、{{automations}} 筆自動化結果，以及下方 {{entries}} 筆項目。",
+    "footnote": "執行紀錄包含過去執行的提示和工具結果。是否保留聊天由下方的「歷史紀錄」決定。每項自動化都會保留最新的結果，供「結果有變化時通知」進行比較。"
+  },
+  "storage": {
+    "folders": "資料目錄",
+    "data": "資料",
+    "models": "模型",
+    "runtimes": "執行環境",
+    "logs": "記錄檔",
+    "showInFinder": "在 Finder 中顯示",
+    "openFolder": "打開檔案夾",
+    "opened": "已打開",
+    "copyPath": "從下方拷貝路徑",
+    "pending": "Yggdrasil 執行時就會顯示",
+    "limit": "模型儲存空間上限",
+    "limitDescription": "這台電腦上已下載模型的軟性上限。",
+    "unlimited": "無限制"
+  },
+  "about": {
+    "tagline": "本機 AI 控制中心",
+    "versionUnavailable": "無法取得版本",
+    "build": "建置版本 {{commit}}",
+    "source": "對應原始碼",
+    "thisComputer": "這台電腦",
+    "service": "服務",
+    "unavailable": "無法使用",
+    "diagnostics": "打開診斷"
+  },
+  "reset": {
+    "title": "重置應用程式",
+    "description": "恢復預設值並重新開始初始設定。會清除聊天、自訂設定檔、工作和 API 金鑰。",
+    "button": "重置設定和 App 資料…",
+    "warningKeep": "這個動作無法復原。你將重新進行初始設定。已下載的模型和執行環境會保留。",
+    "warningDelete": "這個動作無法復原。你將重新進行初始設定。已下載的模型也會被刪除。",
+    "deleteModels": "同時刪除已下載的模型",
+    "confirm": "是，重置",
+    "resetting": "正在重置…",
+    "cancel": "取消",
+    "failed": "無法重置應用程式。請再試一次。"
+  }
+}

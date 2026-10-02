@@ -44,6 +44,34 @@ English (`en`) is the source. Every other language has the same files and
 keys; a key that is missing falls back to English, so a language can ship
 before it is complete.
 
+## Languages
+
+Tier 1 of the spec (§27): English, German (`de`), Spanish (`es`), French
+(`fr`), Italian (`it`), Brazilian Portuguese (`pt-BR`), Japanese (`ja`),
+Korean (`ko`), Simplified Chinese (`zh-Hans`), and Traditional Chinese
+(`zh-Hant`). All but English are machine translated (`status: machine`), and
+Settings says so under the language picker until a person reviews one and
+its status becomes `reviewed`.
+
+A system language finds its catalog by exact tag, by base language (de-AT →
+de), by script (zh-TW and zh-HK → zh-Hant, zh-CN → zh-Hans), or by another
+region in the same script (pt-PT → pt-BR). Simplified and Traditional
+Chinese never stand in for each other.
+
+Two things stay in English for now. Automations read requests written in
+English, so the request box keeps its English example in every language and
+says so. And the import of pasted training examples reads each language's
+own labels (`Q:`/`A:`, `P:`/`R:`, `F:`/`A:`, `问：`/`答：`, …): a language's
+`material.placeholder` in `train.json` must use labels the importer knows
+(`internal/training/dataset.go`), and a test checks that it does.
+
+### Reviewing a translation
+
+Read it in the app, fix wording in `locales/<tag>/*.json`, and set the
+language's `status` to `reviewed` (or `community`) in `languages.json` in
+the same pull request. Keep the glossary consistent: the same English term
+gets the same translation everywhere.
+
 ## Keys
 
 - Keys are stable names, never the English text: `nav.models`, not
@@ -100,13 +128,16 @@ list of choices, goes through `i18n.t('namespace:key')` too.
 
 1. Add it to `languages.json` with its native name, `dir` (`ltr` or `rtl`),
    and `status`: `machine`, `partial`, `reviewed`, or `community`.
-2. Copy `locales/en` to `locales/<tag>` and translate the values.
+2. Copy `locales/en` to `locales/<tag>` and translate the values. Plural
+   keys take every form the language uses (`Intl.PluralRules`): Spanish,
+   French, Italian, and Portuguese add `_many`; Japanese, Korean, and Chinese
+   have only `_other`.
 3. Hermes on iOS has no `Intl.PluralRules`, so the iPhone app loads plural
    rules for each language: add the language's line to
    `mobile/src/i18n/plurals.ts` in yeixio/yggdrasil-desktop.
 4. Run `pnpm test` in `web/`. It checks every file against English: valid
    JSON, no duplicate keys, no keys English lacks, the same placeholders,
-   and complete plural forms.
+   and every plural form the language uses.
 
 ## Pseudo-locales
 

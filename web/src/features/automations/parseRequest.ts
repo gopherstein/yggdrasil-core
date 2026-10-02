@@ -390,12 +390,9 @@ function intervalLabel(seconds: number): string {
   return i18n.t('automations:schedule.seconds', { count: seconds })
 }
 
+/** A time of day in the App language's clock: 6:30 PM in English, 18:30 in German. */
 function clockLabel(hour: number, minute: number): string {
-  return i18n.t('automations:time.clock', {
-    hour: hour % 12 === 0 ? 12 : hour % 12,
-    minute: String(minute).padStart(2, '0'),
-    meridiem: i18n.t(hour >= 12 ? 'automations:time.pm' : 'automations:time.am'),
-  })
+  return formatDate(new Date(2000, 0, 1, hour, minute), { hour: 'numeric', minute: '2-digit' })
 }
 
 interface CivilParts {

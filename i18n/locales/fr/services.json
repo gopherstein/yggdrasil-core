@@ -1,0 +1,20 @@
+{
+  "title": "Services connectés",
+  "description": "Laissez l'IA lire et agir dans les services que vous utilisez. Les jetons restent sur cet ordinateur, hors de la vue de l'IA ; elle ne voit que ce que le service renvoie. La lecture est autorisée, et les modifications vous sont d'abord demandées.",
+  "generic": "Un problème est survenu.",
+  "needsAttention": "Action requise : {{error}}",
+  "lastCheckFailed": "la dernière vérification a échoué",
+  "connectedAs": "Connecté en tant que {{account}}",
+  "notConnected": "Non connecté",
+  "checking": "Vérification…",
+  "check": "Vérifier",
+  "change": "Modifier",
+  "disconnect": "Déconnecter",
+  "connect": "Connecter",
+  "optional": " (facultatif)",
+  "stored": "Enregistré ({{value}}). Laissez vide pour le conserver.",
+  "save": "Enregistrer",
+  "cancel": "Annuler",
+  "tools": "Outils : {{tools}}",
+  "asksFirst": "{{name}} (demande d'abord)"
+}

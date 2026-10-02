@@ -1,0 +1,166 @@
+{
+  "page": {
+    "title": "Yggdrasil 健康狀態",
+    "attention": "有項目需要處理。",
+    "mostly": "大致正常，有一個項目需要查看。",
+    "normal": "一切運作正常。",
+    "creating": "正在建立…",
+    "export": "匯出診斷資料",
+    "exportHint": "建立疑難排解資料包。不包含任何機密資訊。",
+    "overall": "整體狀態",
+    "allOk": "✓ 所有系統運作正常",
+    "needsAttention": "⚠ 需要處理",
+    "checkBelow": "⚠ 請檢查下方項目",
+    "checking": "正在檢查…",
+    "refresh": "重新整理",
+    "tip": "提示：聊天前請先在「模型」中安裝模型。",
+    "bundleCreated": "已建立診斷資料包",
+    "bundleAt": "已在 <path>{{path}}</path> 建立診斷資料包",
+    "bundleShare": "已建立診斷資料包。尋求協助時可以分享這個檔案。",
+    "bundleFailed": "無法建立診斷資料包。請確認背景服務正在執行。"
+  },
+  "checked": {
+    "never": "尚未檢查",
+    "justNow": "剛剛檢查過",
+    "at": "上次檢查：{{when}}"
+  },
+  "ago": {
+    "justNow": "剛剛",
+    "minutes_other": "{{count}} 分鐘",
+    "hours_other": "{{count}} 小時",
+    "days_other": "{{count}} 天"
+  },
+  "rows": {
+    "working": "正在處理…",
+    "retry": "重試",
+    "openSettings": "打開設定",
+    "viewDetails": "檢視詳細資訊",
+    "openModels": "打開模型",
+    "openComputers": "打開電腦",
+    "manageModels": "管理模型",
+    "apiSettings": "API 設定",
+    "healthy": "正常",
+    "unavailable": "無法使用",
+    "control": {
+      "label": "控制服務",
+      "notResponding": "沒有回應",
+      "message": "無法連線到本機的 Yggdrasil 服務。請結束並重新打開 App，或確認背景服務正在執行。"
+    },
+    "runtime": {
+      "label": "模型執行環境",
+      "needsAttention": "需要處理",
+      "notResponding": "本機模型執行環境沒有回應。",
+      "notSetUp": "尚未設定",
+      "installModel": "安裝一個模型即可完成執行環境的設定。",
+      "idle": "閒置",
+      "running_other": "{{count}} 個模型執行中"
+    },
+    "database": {
+      "label": "本機資料庫"
+    },
+    "bifrost": {
+      "label": "Bifrost 網路",
+      "offline_other": "{{count}} 台電腦離線",
+      "silentFor_other": "{{names}} 已經 {{ago}} 沒有回應。",
+      "silent_other": "{{names}} 沒有回應。",
+      "connected_other": "已連線 {{count}} 台電腦",
+      "none": "找不到任何電腦",
+      "noneHint": "請加入另一台電腦，或在「設定」中檢查「尋找其他電腦」。"
+    },
+    "storage": {
+      "label": "儲存空間",
+      "available": "{{size}} 可用",
+      "modelsUse": "模型在這台電腦上使用了約 {{size}}。",
+      "freeUp": "安裝更多模型前，請先釋放磁碟空間。"
+    },
+    "api": {
+      "label": "API",
+      "lan": "已啟用 LAN",
+      "local": "僅限本機",
+      "lanHint": "經授權後，網路上的其他裝置可以連線到 API。"
+    }
+  },
+  "env": {
+    "title": "環境",
+    "version": "版本",
+    "apiBind": "API 綁定位址",
+    "node": "節點",
+    "dataDir": "資料目錄"
+  },
+  "logs": {
+    "hide": "隱藏記錄檔",
+    "view": "檢視記錄檔",
+    "files": "記錄檔",
+    "live": "即時",
+    "loading": "正在載入記錄檔…",
+    "none": "還沒有記錄檔。App 啟動並執行工作後就會出現。",
+    "kinds": {
+      "daemon": "App",
+      "runtime": "模型執行環境",
+      "other": "其他"
+    },
+    "kindsAdvanced": {
+      "daemon": "背景服務",
+      "runtime": "執行環境"
+    },
+    "select": "選擇記錄檔",
+    "selectHint": "在左側選擇一個記錄檔，以檢查最近的輸出。",
+    "recent": "正在顯示這個檔案最近的部分",
+    "full": "完整檔案",
+    "copied": "已拷貝",
+    "copyFailed": "拷貝失敗",
+    "copy": "拷貝",
+    "reading": "正在讀取記錄檔…",
+    "readFailed": "無法讀取這個記錄檔。它可能已被輪替或移除。",
+    "empty": "（空白）"
+  },
+  "tools": {
+    "title": "工具活動",
+    "none": "這個工作階段中還沒有任何工具呼叫。"
+  },
+  "caches": {
+    "title": "快取",
+    "description": "Yggdrasil 為了更快回答重複問題而保留的內容。個人快取會留在這台電腦上，並會隨執行紀錄一起清除。密碼和金鑰永遠不會被快取。",
+    "by": "依 {{key}}",
+    "keptUntil": "保留到失效為止",
+    "keptFor": "保留 {{ttl}}",
+    "clearedWhen": "；在{{invalidation}}時清除",
+    "entries_other": "{{count}} 筆項目",
+    "hitsMisses": " · 命中 {{hits}} 次 · 未命中 {{misses}} 次",
+    "clear": "清除"
+  },
+  "abilities": {
+    "title": "Yggdrasil 能做什麼",
+    "description": "依據目前已安裝、上線和連結的項目而定。聊天會根據這份清單回答「你能產生圖片嗎？」之類的問題。",
+    "available": "（可用）",
+    "notAvailable": "（無法使用）",
+    "via": "透過 {{via}}。",
+    "summary": "{{models}} · {{computers}} · {{tools}} · {{services}} · {{providers}} · {{files}}",
+    "models_other": "已安裝 {{count}} 個模型",
+    "computers": "{{total}} 台電腦中有 {{online}} 台上線",
+    "tools_other": "{{count}} 個工具",
+    "services_other": "{{count}} 個已連結的服務",
+    "providers": "{{total}} 個提供者中有 {{healthy}} 個就緒",
+    "files_other": "{{count}} 個檔案（{{size}}）"
+  },
+  "providers": {
+    "title": "每台電腦上的工具",
+    "description": "圖片和語音會在任何能執行它們的配對電腦上執行，並優先選擇由 GPU 處理的電腦。檔案會傳送到該電腦處理，結果再回到這個聊天中。",
+    "computer": "電腦",
+    "thisComputer": "這台電腦",
+    "gpu": "GPU",
+    "tools": {
+      "image.generate": "產生圖片",
+      "image.edit": "編輯圖片",
+      "video.generate": "產生影片",
+      "speech.transcribe": "轉錄文字",
+      "speech.synthesize": "朗讀"
+    },
+    "states": {
+      "healthy": "就緒",
+      "installing": "正在安裝",
+      "failed": "失敗",
+      "unavailable": "尚未設定"
+    }
+  }
+}

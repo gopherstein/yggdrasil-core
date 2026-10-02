@@ -1,0 +1,56 @@
+{
+  "tagline": "ローカルAIコントロールプレーン",
+  "nav": {
+    "label": "メイン",
+    "main": "メイン",
+    "system": "システム",
+    "chat": "チャット",
+    "automations": "自動化",
+    "models": "モデル",
+    "train": "トレーニング",
+    "knowledge": "ナレッジ",
+    "memory": "メモリ",
+    "computers": "コンピュータ",
+    "performance": "パフォーマンス",
+    "diagnostics": "診断",
+    "profiles": "プロファイルとオーケストレーション",
+    "tools": "ツール",
+    "apiAccess": "APIアクセス",
+    "settings": "設定"
+  },
+  "status": {
+    "starting": "起動中…",
+    "unavailable": "サービスを利用できません",
+    "noModel": "モデルなし",
+    "ready": "準備完了",
+    "unavailableHint": "ローカルのYggdrasilサービスが応答していません。",
+    "noModelHint": "チャットを始めるには「モデル」でモデルをインストールしてください。",
+    "readyHint": "ローカルサービスの準備ができました。"
+  },
+  "subsystems": {
+    "title": "システム",
+    "bifrostHint": "コンピュータの検出とネットワーク",
+    "computersNone": "コンピュータなし",
+    "computersConnected_other": "{{count}}台のコンピュータが接続中",
+    "nornHint": "Nornがコンピュータ間で作業をスケジュールします",
+    "nornAutomatic": "自動",
+    "mimirHint": "ローカルのナレッジとメモリ",
+    "mimirReady": "準備完了"
+  },
+  "boot": {
+    "starting": "Yggdrasilを起動しています",
+    "preparing": "ローカルAIサービスを準備しています",
+    "unavailable": "サービスを利用できません",
+    "unavailableBody": "ローカルのYggdrasilサービスがまだ応答していません。少し待ってからもう一度お試しください。これが続く場合は、アプリの読み込み後に「診断」を確認してください。",
+    "retrying": "再試行中…",
+    "tryAgain": "再試行",
+    "keyRequired": "APIキーが必要です",
+    "keyBody": "このYggdrasilデーモンは、このコンピュータの外部からの接続を受け付けています。続けるにはAPIキーを入力してください。通常のHTTPでは、キーを使っても通信は暗号化されません。",
+    "continue": "続ける"
+  },
+  "units": {
+    "ms": "{{value}} ms",
+    "seconds": "{{value}} s",
+    "tokPerSec": "{{value}} tok/s"
+  }
+}

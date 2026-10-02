@@ -1,0 +1,20 @@
+{
+  "title": "連携サービス",
+  "description": "普段使っているサービスの情報をAIが読み取り、操作できるようにします。トークンはこのコンピュータに保存され、AIからは見えません。AIが見るのはサービスが返す内容だけです。読み取りは許可されており、変更の前には確認を求めます。",
+  "generic": "問題が発生しました。",
+  "needsAttention": "対応が必要です：{{error}}",
+  "lastCheckFailed": "前回の確認に失敗しました",
+  "connectedAs": "{{account}}として接続中",
+  "notConnected": "未接続",
+  "checking": "確認中…",
+  "check": "確認",
+  "change": "変更",
+  "disconnect": "接続解除",
+  "connect": "接続",
+  "optional": "（任意）",
+  "stored": "保存済み（{{value}}）。変更しない場合は空欄のままにしてください。",
+  "save": "保存",
+  "cancel": "キャンセル",
+  "tools": "ツール：{{tools}}",
+  "asksFirst": "{{name}}（事前に確認）"
+}

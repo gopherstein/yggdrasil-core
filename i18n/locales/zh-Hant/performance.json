@@ -1,0 +1,127 @@
+{
+  "page": {
+    "title": "效能",
+    "subtitle": "你的 AI 目前正在做什麼：負載、速度，以及工作如何在團隊中分配。",
+    "views": "效能檢視"
+  },
+  "tabs": {
+    "overview": "概覽",
+    "benchmarks": "效能測試",
+    "activity": "活動"
+  },
+  "roles": {
+    "role": "角色",
+    "worker": "工作者 {{n}}",
+    "planner": "規劃者",
+    "reviewer": "審查者"
+  },
+  "route": {
+    "multiple": "多台電腦",
+    "thisComputer": "這台電腦"
+  },
+  "metrics": {
+    "speed": "生成速度",
+    "prompt": "提示處理",
+    "firstResponse": "首次回應",
+    "total": "總回應時間",
+    "teamRun": "團隊執行"
+  },
+  "metricsAdvanced": {
+    "speed": "評估 tok/s",
+    "prompt": "提示評估",
+    "firstResponse": "TTFT",
+    "total": "總計",
+    "teamRun": "跨機器"
+  },
+  "overview": {
+    "loading": "正在查看你的 AI 在做什麼…",
+    "memory": "記憶體",
+    "idle": "閒置",
+    "active": "使用中",
+    "offline": "離線",
+    "unreachable": "目前無法連線。",
+    "idleNoModels": "閒置：沒有載入模型",
+    "model": "模型",
+    "speed": "速度",
+    "computers_other": "已連線 {{count}} 台電腦",
+    "models_other": "{{count}} 個模型執行中",
+    "tasks_other": "{{count}} 項進行中的工作",
+    "acrossMachines": "跨機器工作",
+    "taskStatus": {
+      "running": "執行中",
+      "pending": "等待中"
+    },
+    "taskInProgress": "工作進行中",
+    "noComputers": "你的團隊中還沒有電腦。",
+    "addComputer": "加入電腦",
+    "nothingLoaded": "目前沒有載入任何模型。想比較模型時，請打開<chat>聊天</chat>或執行效能測試。"
+  },
+  "activity": {
+    "generation": "生成",
+    "helpedPeer": "協助其他電腦",
+    "promptTokPerSec": "提示 tok/s",
+    "tokensOut": "輸出 token",
+    "perRoleAcross": "各角色在各電腦上的表現",
+    "perRoleTurn": "本輪各角色的表現",
+    "runs": "執行次數",
+    "averageOf": "{{metric}}平均值",
+    "averageResponse": "平均回應時間",
+    "crossMachine": "跨機器",
+    "teamRuns": "團隊執行",
+    "filterComputer": "依電腦篩選",
+    "computer": "電腦",
+    "filterModel": "依模型篩選",
+    "model": "模型",
+    "filterProfile": "依設定檔篩選",
+    "profile": "設定檔",
+    "filterDate": "依日期篩選",
+    "loading": "正在載入活動…",
+    "loadFailed": "無法載入效能歷史紀錄。Yggdrasil 是否正在執行？",
+    "emptyTitle": "還沒有任何活動",
+    "emptyDescription": "傳送幾則聊天訊息。使用多台電腦的團隊回合會被標示為團隊執行。",
+    "noMatches": "沒有符合這些篩選條件的執行紀錄。"
+  },
+  "benchmark": {
+    "fastest": "最快",
+    "results": "結果",
+    "status": "狀態：{{status}}",
+    "statuses": {
+      "pending": "等待中",
+      "running": "執行中",
+      "completed": "已完成",
+      "failed": "失敗",
+      "cancelled": "已取消",
+      "canceled": "已取消"
+    },
+    "winner": "勝出 · {{workload}}",
+    "leading": "領先 · {{workload}}",
+    "hideDetail": "隱藏詳細結果",
+    "detail": "詳細結果",
+    "model": "模型",
+    "load": "載入",
+    "running": "正在執行效能測試…",
+    "title": "比較模型",
+    "description": "在多個模型上執行相同的提示，看看哪一個在各類工作中最快。",
+    "chooseModels": "選擇模型",
+    "chooseWorkloads": "選擇工作負載",
+    "run": "執行效能測試",
+    "step": "{{n}}. {{label}}",
+    "loadingModels": "正在載入模型…",
+    "installFirst": "進行效能測試前，請先在「模型」頁面安裝至少一個模型。",
+    "selected": "已選擇 {{count}}/6",
+    "prompts_other": "{{count}} 個提示",
+    "warning": "進行效能測試時，Yggdrasil 會暫時載入和卸載模型。測試期間，進行中的聊天可能會變慢。",
+    "runsPerPrompt": "每個提示的測量次數",
+    "starting": "正在開始…",
+    "cancel": "取消",
+    "estimate": "{{models}} · {{workloads}} · 約 {{minutes}}",
+    "models_other": "{{count}} 個模型",
+    "workloads_other": "{{count}} 項工作負載",
+    "minutes_other": "{{count}} 分鐘",
+    "startFailed": "無法開始效能測試。",
+    "recent": "最近的效能測試",
+    "recentHint": "Yggdrasil 執行期間，這些工作會持續保留。",
+    "jobSummary": "{{models}} · {{workloads}} · {{when}}",
+    "winners_other": "{{count}} 個勝出者"
+  }
+}

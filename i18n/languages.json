@@ -1,3 +1,12 @@
 [
-  { "code": "en", "name": "English", "dir": "ltr", "status": "source" }
+  { "code": "en", "name": "English", "dir": "ltr", "status": "source" },
+  { "code": "de", "name": "Deutsch", "dir": "ltr", "status": "machine" },
+  { "code": "es", "name": "Español", "dir": "ltr", "status": "machine" },
+  { "code": "fr", "name": "Français", "dir": "ltr", "status": "machine" },
+  { "code": "it", "name": "Italiano", "dir": "ltr", "status": "machine" },
+  { "code": "pt-BR", "name": "Português (Brasil)", "dir": "ltr", "status": "machine" },
+  { "code": "ja", "name": "日本語", "dir": "ltr", "status": "machine" },
+  { "code": "ko", "name": "한국어", "dir": "ltr", "status": "machine" },
+  { "code": "zh-Hans", "name": "简体中文", "dir": "ltr", "status": "machine" },
+  { "code": "zh-Hant", "name": "繁體中文", "dir": "ltr", "status": "machine" }
 ]

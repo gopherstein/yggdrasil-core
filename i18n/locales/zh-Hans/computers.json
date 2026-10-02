@@ -1,0 +1,122 @@
+{
+  "page": {
+    "title": "你的 Yggdrasil 团队",
+    "titleAdvanced": "你的 AI 集群",
+    "subtitle": "这些电脑作为一个 AI 系统协同工作。添加一台机器，然后把模型部署到合适的地方。",
+    "find": "查找电脑",
+    "scanning": "正在扫描…",
+    "looking": "正在查找电脑…",
+    "emptyTitle": "组建你的 AI 团队",
+    "emptyDescription": "在你网络中的另一台电脑上安装 Yggdrasil，它会自动出现在这里。"
+  },
+  "status": {
+    "team": "团队状态",
+    "cluster": "集群状态",
+    "computers_other": "{{count}} 台电脑",
+    "combinedMemory": " · 合计内存 {{size}}",
+    "modelsRunning_other": " · {{count}} 个模型正在运行",
+    "bestAt": "擅长"
+  },
+  "errors": {
+    "action": "无法完成该操作",
+    "network": "请在两台电脑上都允许 Yggdrasil 访问本地网络/通过防火墙，并在“设置”中保持“查找其他电脑”为开启状态。",
+    "generic": "出了点问题",
+    "claimFailed": "无法加载该代码对应的配对请求"
+  },
+  "pairing": {
+    "waiting": "等待批准",
+    "pairingWith": "正在与 <name>{{name}}</name> 配对。在那台电脑上打开“电脑”，然后批准传入的请求。",
+    "otherComputer": "另一台电脑",
+    "code": "代码：<code>{{code}}</code>",
+    "incoming": "传入的请求",
+    "offerCode": "代码 <code>{{code}}</code>",
+    "approve": "批准"
+  },
+  "nearby": {
+    "title": "可添加",
+    "description": "Yggdrasil 在你的网络中找到了这些电脑。"
+  },
+  "fleet": {
+    "title": "你的 Yggdrasil 团队",
+    "titleAdvanced": "你的集群",
+    "moves": "工作会在这个团队中自动分配。",
+    "movesAdvanced": "工作会在这个集群中自动分配。",
+    "alone": "目前这是团队中唯一的电脑。",
+    "installModels": "安装模型",
+    "openChat": "打开聊天"
+  },
+  "membership": {
+    "local": "这台电脑",
+    "paired": "已配对",
+    "nearby": "可配对",
+    "offline": "离线"
+  },
+  "online": {
+    "online": "在线",
+    "offline": "离线",
+    "checking": "正在检查…"
+  },
+  "hardware": {
+    "unavailable": "无法获取硬件详情",
+    "unified": "{{size}} 统一内存",
+    "vram": "{{size}} 显存",
+    "ram": "{{size}} 内存",
+    "memory": "{{size}} 内存"
+  },
+  "abilities": {
+    "general": "通用",
+    "coding": "编程",
+    "reasoning": "推理",
+    "vision": "视觉",
+    "tools": "工具",
+    "fast": "快速",
+    "large": "大型模型"
+  },
+  "card": {
+    "nearbyHint": "位于你的网络中，可以加入这个团队。",
+    "running": "正在运行：<strong>{{models}}</strong>",
+    "models_other": "{{count}} 个模型",
+    "availableFor": "适用于：",
+    "partOfTeam": "已加入这个团队",
+    "disk": "磁盘",
+    "diskFree": "可用 {{free}}，共 {{total}}",
+    "diskLow": "剩余空间不足以安装更多模型",
+    "modelsHere": "这台电脑上的模型",
+    "modelsHereCount": "这台电脑上的模型（{{count}}）",
+    "noModels": "还没有。请在下方部署，或打开“模型”。",
+    "remove": "移除",
+    "removing": "正在移除…",
+    "noAddress": "还没有地址——试试“查找电脑”",
+    "connecting": "正在连接…",
+    "addToTeam": "添加到团队",
+    "codePlaceholder": "代码",
+    "codeFor": "{{name}} 的配对代码",
+    "approving": "正在批准…",
+    "approveCode": "使用代码批准",
+    "hideDetails": "隐藏详情",
+    "manage": "管理",
+    "moreActions": "{{name}} 的更多操作",
+    "removeFromTeam": "从团队中移除"
+  },
+  "deploy": {
+    "title": "部署模型",
+    "description": "在一台或多台电脑上同时安装模型。Yggdrasil 会在开始前检查可用磁盘空间。",
+    "model": "模型",
+    "chooseModel": "选择模型…",
+    "modelSize": "{{model}}（{{size}}）",
+    "computers": "电脑",
+    "selectMissing": "选择所有需要它的电脑",
+    "thisComputer": "{{name}}（这台电脑）",
+    "installed": "已安装",
+    "free": "可用 {{size}}",
+    "alreadyOn": "已在 {{names}} 上。",
+    "notEnoughDisk": "可用磁盘空间不足",
+    "conflict": "{{name}}：需要 {{needed}}，可用 {{available}}",
+    "tryAnyway": "仍然尝试（这些电脑上的下载可能会失败）",
+    "deploying": "正在部署…",
+    "deployTo_other": "部署到 {{count}} 台电脑",
+    "deployToName": "部署到 {{name}}",
+    "deploy": "部署",
+    "downloadSize": "下载大小约 {{size}}"
+  }
+}

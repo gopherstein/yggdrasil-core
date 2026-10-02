@@ -1,0 +1,84 @@
+{
+  "about": "Informazioni su {{name}}",
+  "close": "Chiudi",
+  "inYggdrasil": "In Yggdrasil",
+  "mascot": {
+    "label": "Informazioni su Ratatoskr",
+    "kind": "La mascotte di Yggdrasil",
+    "story": "Nei miti, Ratatoskr è lo scoiattolo che corre su e giù per l'Albero del Mondo, portando messaggi tra l'aquila in cima e il drago Níðhöggr tra le radici. Era noto per seminare un po' di zizzania lungo la strada.",
+    "here": "Qui fa lo stesso lavoro: porta le tue richieste tra le tue app e i modelli sui tuoi computer. Riflette mentre viene scritta una risposta, festeggia quando qualcosa finisce e sonnecchia quando non è caricato nessun modello."
+  },
+  "logo": {
+    "label": "Informazioni sul simbolo di Yggdrasil",
+    "kind": "L'Albero del Mondo",
+    "story": "Yggdrasil è il grande frassino al centro del cosmo norreno. I suoi rami si stendono sopra i cieli, le sue radici raggiungono tre pozzi, e i nove mondi pendono tra le sue fronde.",
+    "here": "Il simbolo disegna l'albero come le piste di un circuito, con radici e rami che terminano in nodi, come i computer che Yggdrasil unisce in un unico sistema."
+  },
+  "realms": {
+    "chat": {
+      "meaning": "La chat è il luogo in cui i tuoi messaggi vengono portati ai modelli sui tuoi computer, e le risposte riportate indietro.",
+      "story": "Ratatoskr è lo scoiattolo che corre su e giù per il tronco di Yggdrasil, portando messaggi tra l'aquila in cima all'albero e il drago Níðhöggr che ne rode le radici.",
+      "rune": "Ansuz, la runa della parola"
+    },
+    "automations": {
+      "meaning": "Le Norne custodiscono ciò che è destinato ad accadere, e quando. Norn esegue il lavoro pianificato.",
+      "story": "Le tre Norne, Urðr, Verðandi e Skuld, vivono presso il Pozzo di Urðr sotto Yggdrasil. Innaffiano le radici dell'albero e plasmano ciò che fu, ciò che è e ciò che sarà.",
+      "rune": "Jera, la runa dell'anno che gira"
+    },
+    "models": {
+      "meaning": "Ymir è il primo gigante, dal quale fu creato il mondo. I modelli sono ciò su cui si costruisce tutto il resto.",
+      "story": "In principio c'era Ymir, il primo dei giganti. Quando fu ucciso, gli dèi costruirono il mondo con il suo corpo: la terra dalla sua carne, le montagne dalle sue ossa e il cielo dal suo cranio.",
+      "rune": "Uruz, la runa della forza primordiale"
+    },
+    "train": {
+      "meaning": "Brokkr è il fabbro che forgiò Mjölnir. Qui forgi un'IA tutta tua.",
+      "story": "Brokkr e suo fratello Sindri erano fabbri nani. Per una scommessa con Loki forgiarono Mjölnir, il martello di Thor, con Brokkr che azionava il mantice anche mentre una mosca lo pungeva.",
+      "rune": "Kenaz, la runa della torcia e del mestiere"
+    },
+    "knowledge": {
+      "meaning": "Mimir custodisce il pozzo della saggezza. Mimir rende ricercabile la tua conoscenza.",
+      "story": "Mímir custodiva il pozzo della saggezza sotto una delle radici di Yggdrasil. Odino diede un occhio per berne un sorso, e dopo la morte di Mímir ne conservò la testa perché potesse continuare a dare consiglio.",
+      "rune": "Laguz, la runa dell'acqua e del pozzo"
+    },
+    "memory": {
+      "meaning": "Muninn, il corvo della memoria di Odino, custodisce ciò che chiedi a Yggdrasil di ricordare.",
+      "story": "Huginn e Muninn, Pensiero e Memoria, sono i corvi di Odino. Ogni mattina volano sopra il mondo e tornano a raccontargli ciò che hanno visto. Odino diceva di temere soprattutto che Muninn non tornasse.",
+      "rune": "Othala, la runa di ciò che si custodisce"
+    },
+    "nodes": {
+      "meaning": "Bifrost è il ponte arcobaleno tra i mondi. Collega i tuoi computer.",
+      "story": "Bifröst è il ponte arcobaleno fiammeggiante tra Midgard, il mondo degli uomini, e Asgard, la dimora degli dèi. Heimdall fa la guardia alla sua estremità.",
+      "rune": "Raidho, la runa del viaggio"
+    },
+    "performance": {
+      "meaning": "Sleipnir è il cavallo a otto zampe di Odino, il più veloce di tutti.",
+      "story": "Sleipnir è il cavallo grigio a otto zampe di Odino, il più rapido di tutti i destrieri. Porta Odino attraverso il cielo e il mare, e una volta fino a Hel e ritorno.",
+      "rune": "Ehwaz, la runa del cavallo"
+    },
+    "diagnostics": {
+      "meaning": "Heimdall veglia sul ponte e non si lascia sfuggire nulla. Tiene d'occhio lo stato di salute.",
+      "story": "Heimdall è la sentinella degli dèi. Ha bisogno di meno sonno di un uccello, vede a cento leghe di notte e sente crescere l'erba. Al Ragnarök suonerà il Gjallarhorn.",
+      "rune": "Algiz, la runa della protezione"
+    },
+    "profiles": {
+      "meaning": "Odino manda in volo i suoi corvi. I profili decidono come ragiona l'assistente e cosa può fare.",
+      "story": "Odino è il Padre di tutti. Rimase appeso nove notti a Yggdrasil per conquistare le rune, diede un occhio per la saggezza, e ogni giorno manda i suoi corvi sopra il mondo.",
+      "rune": "Mannaz, la runa del sé"
+    },
+    "tools": {
+      "meaning": "Gungnir è la lancia di Odino, che non manca mai il bersaglio. Gli strumenti sono il modo in cui l'assistente agisce.",
+      "story": "Gungnir è la lancia di Odino, forgiata dai nani chiamati figli di Ivaldi. Chiunque sia il bersaglio contro cui viene scagliata, non lo manca mai.",
+      "rune": "Tiwaz, la runa a forma di lancia"
+    },
+    "api-access": {
+      "meaning": "Valgrind è il cancello del Valhalla. Le chiavi API decidono chi può entrare.",
+      "story": "Valgrind è l'antico cancello che si erge davanti al Valhalla. È sacro e vetusto, e pochi sanno come sia chiusa la sua serratura.",
+      "rune": "Thurisaz, la runa del cancello"
+    },
+    "settings": {
+      "meaning": "Forseti risolve ogni questione con equità. Le impostazioni sono le regole che Yggdrasil rispetta.",
+      "story": "Forseti, figlio di Baldr, siede in Glitnir, una sala con colonne d'oro e un tetto d'argento. Chiunque gli porti una contesa se ne va riconciliato.",
+      "rune": "Isa, la runa della quiete"
+    }
+  }
+}

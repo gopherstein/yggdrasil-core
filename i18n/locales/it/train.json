@@ -1,0 +1,388 @@
+{
+  "explainer": "L'addestramento insegna alla tua IA come svolgere il suo lavoro. La conoscenza collegata le fornisce le informazioni aggiornate di cui ha bisogno per svolgerlo.",
+  "generic": "Qualcosa è andato storto.",
+  "uses": {
+    "training": {
+      "label": "Addestramento",
+      "description": "Insegna come rispondere. Viene integrato nel modello."
+    },
+    "knowledge": {
+      "label": "Conoscenza",
+      "description": "Consultata quando serve. Resta aggiornata quando la modifichi."
+    },
+    "both": {
+      "label": "Entrambi",
+      "description": "Gli esempi insegnano lo schema; i fatti restano collegati."
+    }
+  },
+  "presets": {
+    "quick": {
+      "label": "Rapido",
+      "description": "Un'esecuzione breve per verificare l'idea. Adatto per tono e formato."
+    },
+    "balanced": {
+      "label": "Equilibrato",
+      "description": "L'impostazione predefinita. Impara flussi di lavoro e terminologia dai tuoi esempi."
+    },
+    "quality": {
+      "label": "Massima qualità",
+      "description": "Addestramento più lungo su tutti i livelli. Richiede più esempi, memoria e tempo."
+    }
+  },
+  "flags": {
+    "empty": {
+      "label": "Vuoto",
+      "help": "Non ha né domanda né risposta."
+    },
+    "no_answer": {
+      "label": "Nessuna risposta",
+      "help": "L'ultimo turno non è una risposta, quindi non c'è nulla da cui imparare."
+    },
+    "duplicate": {
+      "label": "Duplicato",
+      "help": "Uguale a un esempio precedente. Viene usata solo la prima copia per l'addestramento."
+    },
+    "too_long": {
+      "label": "Troppo lungo",
+      "help": "Più lungo di quanto il modello possa usare per l'addestramento. Accorcialo o dividilo."
+    },
+    "short_answer": {
+      "label": "Risposta breve",
+      "help": "Una risposta di una parola insegna poco. Viene comunque usata per l'addestramento."
+    },
+    "volatile_facts": {
+      "label": "Fatti variabili",
+      "help": "Indica un prezzo, una giacenza o uno SKU. Il modello potrebbe memorizzare un valore che in seguito cambia. Tieni questi fatti nella conoscenza."
+    }
+  },
+  "flagCount": {
+    "empty": "{{count}} vuoti",
+    "no_answer": "{{count}} senza risposta",
+    "duplicate": "{{count}} duplicati",
+    "too_long": "{{count}} troppo lunghi",
+    "short_answer": "{{count}} con risposta breve",
+    "volatile_facts": "{{count}} con fatti variabili"
+  },
+  "states": {
+    "queued": "In coda",
+    "preparing_dataset": "Preparazione",
+    "loading_model": "Caricamento del modello",
+    "training": "Addestramento",
+    "exporting": "Esportazione",
+    "evaluating": "Test",
+    "complete": "Completato",
+    "failed": "Non riuscito",
+    "cancelled": "Annullato"
+  },
+  "fit": {
+    "comfortable": "Ci sta",
+    "tight": "Al limite",
+    "too_large": "Troppo grande",
+    "unsupported": "Non supportato"
+  },
+  "duration": {
+    "s": "{{s}} s",
+    "m": "{{m}} min",
+    "ms": "{{m}} min {{s}} s",
+    "h": "{{h}} h",
+    "hm": "{{h}} h {{m}} min"
+  },
+  "steps": {
+    "describe": "Descrivi",
+    "base": "Modello di base",
+    "material": "Materiale",
+    "examples": "Esempi",
+    "plan": "Revisione",
+    "train": "Addestra",
+    "test": "Prova",
+    "deploy": "Distribuisci"
+  },
+  "page": {
+    "title": "Addestra la tua IA",
+    "description": "Crea un piccolo assistente bravo in un solo compito. Mostragli come rispondere con degli esempi e collega le informazioni di cui ha bisogno. Non serve sapere come si addestrano i modelli.",
+    "settingUpExample": "Preparazione dell'esempio…",
+    "tryExample": "Prova un esempio",
+    "build": "Crea una nuova IA",
+    "loading": "Caricamento…",
+    "nothing": "Ancora niente di creato.",
+    "emptyTitle": "Crea un'IA specializzata",
+    "emptyDescription": "Descrivi il compito, aggiungi esempi di buone risposte e collega i dati che deve consultare. Yggdrasil consiglia un modello di base, lo addestra su questo computer e ti permette di confrontarlo con l'originale prima di usarlo.",
+    "exampleHint": "L'esempio usa un gommista di prova, così puoi vedere prima dati reali.",
+    "exampleBadge": "Esempio",
+    "deployed": "Distribuita · revisione {{revision}}",
+    "notDeployed": "Non distribuita",
+    "newTitle": "Cosa deve fare la tua IA?",
+    "newDescription": "Descrivi il compito in una o due frasi, come lo spiegheresti a un nuovo dipendente.",
+    "name": "Nome",
+    "namePlaceholder": "Assistente del gommista",
+    "job": "Il compito",
+    "jobPlaceholder": "Rispondi alle domande dei clienti sugli pneumatici. Chiedi anno, marca e modello del veicolo, spiega la compatibilità e consiglia gli pneumatici che abbiamo in magazzino.",
+    "creating": "Creazione…",
+    "continue": "Continua",
+    "cancel": "Annulla",
+    "base": "Base {{model}}",
+    "noBase": "Ancora nessun modello di base",
+    "buildSteps": "Passaggi di creazione",
+    "done": "fatto"
+  },
+  "example": {
+    "title": "In questo esempio",
+    "describe": "Questo esempio è un assistente per un gommista. Yggdrasil ha scritto una bozza delle istruzioni a partire dalla descrizione. Modifica quello che vuoi; non viene addestrato nulla finché non premi Addestra.",
+    "base": "Yggdrasil ha scelto il modello più piccolo che si addestra senza problemi su questo computer e ne consente l'uso commerciale. I modelli più piccoli si addestrano in pochi minuti.",
+    "material": "Sono stati aggiunti tre file, e Yggdrasil li ha classificati uno per uno. Le chat sono diventate Addestramento perché mostrano come rispondere. L'inventario è diventato Conoscenza perché prezzi e giacenze cambiano. I regolamenti sono diventati Conoscenza perché l'assistente deve citarli esattamente. Apri \"Vedi i file di esempio\" per leggerli.",
+    "examples": "Tre esempi sono difettosi di proposito. Il duplicato e la domanda senza risposta vengono esclusi automaticamente. La risposta che indica un prezzo viene comunque usata per l'addestramento, ed è per questo che è segnalata. Prova a escluderla.",
+    "plan": "L'esempio usa Rapido, quindi l'addestramento richiede pochi minuti. Tutto ciò che si trova in \"Resta collegata\" viene cercato a ogni domanda invece di essere integrato con l'addestramento.",
+    "train": "Osserva la perdita di addestramento scendere mentre il modello impara gli esempi. Una perdita bassa significa che li riproduce bene, non che le sue risposte siano giuste. È ciò che verifica il passaggio successivo.",
+    "test": "Confronta le colonne. Le risposte specializzate dovrebbero chiedere il veicolo e firmarsi come Tread Right Tires. Cerca anche i dettagli inventati, come una misura di pneumatico che sembra giusta ma non lo è: un modello piccolo impara bene lo stile e male i fatti, ed è per questo che prezzi e misure vanno nella conoscenza. Aggiungi un prompt di prova come \"Quanto costa il Pilot Sport 4?\" per vedere all'opera la conoscenza collegata.",
+    "deploy": "Dopo la distribuzione, chiedile in Chat il prezzo di uno pneumatico. Poi apri Conoscenza, modifica l'inventario e chiedi di nuovo. La risposta cambia senza riaddestramento. Quando hai finito, elimina l'esempio dal passaggio Descrivi."
+  },
+  "concepts": {
+    "training": "Addestramento",
+    "trainingTitle": "Addestra il comportamento della tua IA",
+    "trainingBody": "Gli esempi di buone risposte le insegnano il suo ruolo, la tua terminologia, le domande da fare, i passaggi da seguire, il tono e come formattare le risposte.",
+    "trainingUse": "Usa: trascrizioni di chat, coppie di domande e risposte, risposte di esempio.",
+    "knowledge": "Conoscenza",
+    "knowledgeTitle": "Collega ciò che la tua IA sa",
+    "knowledgeBody": "Le informazioni che cambiano o devono restare esatte vengono consultate quando servono: inventario, prezzi, SKU, cataloghi, regolamenti e documenti. Modificale quando vuoi senza riaddestrare.",
+    "knowledgeUse": "Usa: fogli di calcolo, esportazioni CSV, elenchi di prodotti, documenti con i regolamenti.",
+    "how": "Come funziona",
+    "lora": "<strong>LoRA</strong> addestra un piccolo componente aggiuntivo (un adattatore) invece di modificare l'intero modello. Il modello originale resta intatto e disponibile. <strong>QLoRA</strong> fa lo stesso su una copia compressa del modello, così occupa meno memoria.",
+    "rag": "La <strong>conoscenza collegata</strong> è il recupero di informazioni: prima di ogni risposta Yggdrasil cerca nelle tue fonti i passaggi pertinenti alla domanda e li fornisce al modello. Spesso si chiama RAG, generazione aumentata dal recupero (retrieval-augmented generation).",
+    "epoch": "Un'<strong>epoca</strong> è una passata su tutti i tuoi esempi. La perdita di addestramento misura quanto fedelmente il modello riproduce i tuoi esempi. Una perdita più bassa non significa di per sé risposte migliori, ed è per questo che si prova prima di distribuire."
+  },
+  "samples": {
+    "see": "Vedi i file di esempio",
+    "description": "Come si presenta un buon materiale. Scaricane uno come modello per i tuoi dati.",
+    "hide": "Nascondi",
+    "preview": "Anteprima",
+    "download": "Scarica",
+    "moreLines": "… altre {{count}} righe"
+  },
+  "describe": {
+    "title": "Descrivi l'IA",
+    "description": "Le istruzioni vengono inviate con ogni messaggio e aggiunte a ogni esempio di addestramento, così l'IA le impara nello stesso modo in cui le userà.",
+    "name": "Nome",
+    "job": "Il compito",
+    "instructions": "Istruzioni",
+    "instructionsHint": "Se cambi le istruzioni dopo l'addestramento, è meglio addestrare di nuovo, così gli esempi corrispondono.",
+    "saveContinue": "Salva e continua",
+    "continue": "Continua",
+    "confirmDelete": "Eliminare {{name}}? Verranno rimossi i suoi esempi, le revisioni addestrate e la conoscenza creata dal suo materiale.",
+    "delete": "Elimina"
+  },
+  "base": {
+    "title": "Scegli un modello di base",
+    "description": "I modelli più piccoli si addestrano e rispondono più in fretta. La compatibilità per l'addestramento viene verificata separatamente da quella per l'esecuzione, perché l'addestramento richiede molta più memoria.",
+    "checking": "Verifica di cosa può addestrare questo computer…",
+    "recommended": "Consigliato",
+    "selected": "Selezionato",
+    "installed": "Installato",
+    "memory": " · l'addestramento richiede circa {{size}}",
+    "download": " · scarica {{size}} una sola volta",
+    "notInstalled": "{{model}} non è installato. L'addestramento funziona anche senza, ma ti serve per provare e usare il risultato. <link>Installalo da Modelli</link>.",
+    "continue": "Continua"
+  },
+  "material": {
+    "add": "Aggiungi materiale",
+    "filePaste": "File o incolla",
+    "chats": "Chat salvate",
+    "continue": "Continua",
+    "tooLarge": "Quel file supera i 20 MB. Collegalo invece da Conoscenza, che lo legge dal disco.",
+    "chooseFile": "Scegli un file",
+    "pasteHint": "oppure incolla qui sotto. Funzionano chat JSONL, tabelle di domande e risposte, CSV, Excel, PDF, Markdown e testo.",
+    "ready": "{{filename}} è pronto.",
+    "readsPdf": "Yggdrasil ne legge il testo per classificarlo.",
+    "readsSheet": "Yggdrasil legge il primo foglio per classificarlo.",
+    "clear": "Cancella",
+    "placeholder": "D: Una domanda che la tua IA deve saper gestire\nR: La risposta che vuoi che dia\n\nD: …",
+    "label": "Materiale",
+    "recommends": "Yggdrasil consiglia",
+    "examplesFound_one": "{{count}} esempio trovato",
+    "examplesFound_many": "{{count}} esempi trovati",
+    "examplesFound_other": "{{count}} esempi trovati",
+    "useFor": "Usa questo materiale per",
+    "recommendedTag": " (consigliato)",
+    "adding": "Aggiunta…",
+    "addMaterial": "Aggiungi materiale",
+    "chatsHint": "Scegli le chat con il tipo di risposte che desideri. Ognuna diventa un esempio di addestramento che potrai modificare nel passaggio successivo.",
+    "noChats": "Nessuna chat salvata.",
+    "untitledChat": "Chat senza titolo",
+    "addChats_one": "Aggiungi {{count}} chat",
+    "addChats_many": "Aggiungi {{count}} chat",
+    "addChats_other": "Aggiungi {{count}} chat",
+    "addChatsNone": "Aggiungi chat",
+    "list": "Materiale",
+    "recommendedUse": "consigliato: {{use}}",
+    "examples_one": "{{count}} esempio",
+    "examples_many": "{{count}} esempi",
+    "examples_other": "{{count}} esempi",
+    "connected": "Collegato come conoscenza",
+    "confirmRemove": "Rimuovere {{name}}? Verranno rimossi anche i suoi esempi e la conoscenza collegata.",
+    "remove": "Rimuovi"
+  },
+  "examples": {
+    "title": "Rivedi gli esempi",
+    "willTrain": "<strong>{{usable}}</strong> su {{total}} verranno usati per l'addestramento",
+    "filters": {
+      "all": "Tutti",
+      "flagged": "Segnalati",
+      "excluded": "Esclusi"
+    },
+    "loading": "Caricamento degli esempi…",
+    "showMore": "Mostra altri ({{count}} rimanenti)",
+    "continue": "Continua",
+    "excluded": "Escluso",
+    "turns": "{{count}} turni",
+    "q": "D",
+    "a": "R",
+    "empty": "vuoto",
+    "noAnswer": "nessuna risposta",
+    "answer": "Risposta",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "editAnswer": "Modifica risposta",
+    "include": "Includi",
+    "exclude": "Escludi",
+    "delete": "Elimina",
+    "writeTitle": "Scrivi un esempio",
+    "writeDescription": "Mostra una domanda e la risposta che desideri. Scrivi come usare i fatti, non i fatti stessi.",
+    "questionPlaceholder": "Domanda del cliente",
+    "question": "Domanda",
+    "answerPlaceholder": "La risposta che desideri",
+    "add": "Aggiungi esempio"
+  },
+  "plan": {
+    "willTrain": "Verrà addestrato",
+    "examples_one": "<strong>{{count}}</strong> esempio insegna come rispondere.",
+    "examples_many": "<strong>{{count}}</strong> esempi insegnano come rispondere.",
+    "examples_other": "<strong>{{count}}</strong> esempi insegnano come rispondere.",
+    "base": "Modello di base: {{model}}",
+    "notChosen": "non scelto",
+    "connected": "Resta collegata",
+    "connectedHint": "Consultata a ogni domanda. Puoi modificarla in seguito senza riaddestrare.",
+    "effort": "Intensità dell'addestramento",
+    "where": "Dove viene addestrata",
+    "estimating": "Stima…",
+    "starting": "Avvio…",
+    "train": "Addestra la revisione {{revision}}",
+    "thisComputer": "questo computer",
+    "nornPicked": "Scelto da Norn",
+    "trainHere": "Addestra invece qui",
+    "memory": "Memoria",
+    "memoryOf": "{{needed}} su {{available}}",
+    "download": "Download",
+    "none": "Nessuno",
+    "disk": "Disco",
+    "time": "Tempo, circa",
+    "advanced": "Impostazioni avanzate",
+    "advancedHint": "Lascia vuoto un campo per usare il preset ({{preset}}). Le impostazioni che fissi qui vengono usate anche se non ci stanno in memoria.",
+    "presetSummary": "{{method}}, {{iters}} passi",
+    "method": "Metodo",
+    "presetMethod": "Preset ({{method}})",
+    "lora": "LoRA, base a precisione piena",
+    "qlora": "QLoRA, base a 4 bit",
+    "fields": {
+      "epochs": {
+        "label": "Epoche",
+        "help": "Passate su tutti gli esempi."
+      },
+      "rank": {
+        "label": "Rango LoRA",
+        "help": "Capacità dell'adattatore. Più alto impara di più e richiede più memoria."
+      },
+      "layers": {
+        "label": "Livelli",
+        "help": "Quanti degli ultimi livelli addestrare. -1 li addestra tutti."
+      },
+      "learning_rate": {
+        "label": "Tasso di apprendimento",
+        "help": "Ampiezza del passo. Se è troppo alto, il modello dimentica quello di base."
+      },
+      "batch_size": {
+        "label": "Dimensione del batch",
+        "help": "Esempi per passo."
+      },
+      "max_seq_length": {
+        "label": "Token massimi",
+        "help": "Esempio più lungo, in token."
+      }
+    },
+    "saveAdvanced": "Salva impostazioni avanzate",
+    "usePreset": "Usa il preset"
+  },
+  "train": {
+    "none": "Ancora nessun addestramento. Rivedi il piano e avvia l'addestramento.",
+    "compare": "Confronta con il modello di base",
+    "earlier": "Esecuzioni precedenti",
+    "revision": "Revisione {{revision}}",
+    "on": "Su {{computer}} con {{backend}} · {{method}} · {{epochs}} epoche",
+    "cancelling": "Annullamento…",
+    "cancel": "Annulla",
+    "stages": "Fasi dell'addestramento",
+    "failed": "{{error}} I file temporanei sono stati rimossi. Il modello di base non è stato modificato.",
+    "failedDefault": "Addestramento non riuscito.",
+    "cancelled": "Annullato. I file temporanei sono stati rimossi.",
+    "step": "passo {{iter}} di {{iters}}",
+    "downloaded": "Scaricati {{done}} di {{total}}",
+    "elapsed": "Trascorso",
+    "remaining": "Rimanente",
+    "about": "circa {{time}}",
+    "epoch": "Epoca",
+    "epochOf": "{{epoch}} di {{epochs}}",
+    "speed": "Velocità",
+    "tokensPerSec": "{{count}} token/s",
+    "trainingLoss": "Perdita di addestramento",
+    "validationLoss": "Perdita di validazione",
+    "peakMemory": "Picco di memoria",
+    "lossNote": "La perdita indica quanto fedelmente il modello riproduce i tuoi esempi. Un numero più basso non garantisce risposte migliori, quindi confronta i risultati prima di distribuire."
+  },
+  "test": {
+    "first": "Addestra prima una revisione. Poi confrontala qui con il modello di base.",
+    "title": "Confronta con il modello di base",
+    "revision": "Revisione",
+    "deployedTag": " (distribuita)",
+    "description": "Entrambi i lati ricevono le stesse istruzioni e la stessa conoscenza collegata, quindi la differenza è ciò che ha aggiunto l'addestramento. I prompt di prova predefiniti sono domande escluse dall'addestramento.",
+    "prompts": "Prompt di prova, uno per riga",
+    "comparing": "Confronto…",
+    "again": "Esegui di nuovo",
+    "run": "Esegui confronto",
+    "save": "Salva prompt",
+    "results": "Risultati",
+    "running": "In esecuzione",
+    "failed": "Non riuscito",
+    "base": "Base",
+    "specialized": "Specializzata",
+    "continue": "Continua con la distribuzione"
+  },
+  "deploy": {
+    "title": "Distribuisci",
+    "description": "Un'IA distribuita compare nel menu dei modelli di Chat e nell'API. Tiene insieme il suo modello di base, la revisione dell'adattatore, le istruzioni e la conoscenza collegata. Il modello di base resta disponibile anche da solo.",
+    "first": "Addestra e prova prima una revisione.",
+    "revision": "Revisione {{revision}}",
+    "deployed": "Distribuita",
+    "meta": "{{examples}} esempi · {{method}} · {{date}}",
+    "valLoss": " · perdita di validazione {{loss}}",
+    "compareFirst": "Prima confrontala",
+    "undeploy": "Ritira",
+    "switch": "Passa a questa revisione",
+    "deploy": "Distribuisci",
+    "use": "Usala",
+    "useBody": "In Chat, scegli <name>{{name}}</name> dal menu dei modelli. <link>Apri Chat</link>. Da altri programmi, usa l'ID del modello <id>{{id}}</id>:",
+    "runsHere": "Viene eseguita su questo computer, dove è salvato il suo adattatore. Un nuovo addestramento crea una nuova revisione; questa continua a rispondere finché non distribuisci quella nuova."
+  },
+  "export": {
+    "title": "Esporta come file GGUF",
+    "description": "Unisci la revisione {{revision}} al suo modello di base in un unico file che llama.cpp, LM Studio, Ollama e altri strumenti GGUF possono caricare. Il file ha all'incirca le dimensioni del modello di base. Le sue istruzioni e la conoscenza collegata restano in Yggdrasil.",
+    "exporting": "Esportazione…",
+    "upTo": "fino a {{size}}",
+    "failed": "Esportazione non riuscita: {{error}}",
+    "saving": "Salvataggio…",
+    "download": "Scarica {{filename}}",
+    "savedTo": "Salvato in {{path}}",
+    "deleteFile": "Elimina file",
+    "tryAgain": "Riprova",
+    "export": "Esporta",
+    "cancel": "Annulla",
+    "instructions": "Istruzioni da usare come prompt di sistema"
+  }
+}

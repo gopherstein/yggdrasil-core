@@ -1,0 +1,364 @@
+{
+  "page": {
+    "title": "設定檔與協作編排",
+    "subtitle": "設定檔是一個儲存起來的助理：包括它如何處理請求，以及它的模型、工具、記憶和電腦。",
+    "hint": "在聊天中選擇一個，或建立你自己的設定檔。",
+    "create": "建立設定檔",
+    "createTitle": "建立新的設定檔",
+    "loading": "正在載入設定檔…",
+    "loadFailed": "無法載入設定檔。本機背景服務是否正在執行？",
+    "emptyTitle": "還沒有任何設定檔",
+    "emptyDescription": "建立一個設定檔，告訴「聊天」你的助理應該如何運作。",
+    "noneInFilter": "這個篩選條件中沒有設定檔。",
+    "filter": "篩選設定檔",
+    "filters": {
+      "all": "全部",
+      "builtin": "內建",
+      "custom": "自訂"
+    }
+  },
+  "create": {
+    "title": "建立設定檔",
+    "startFrom": "起始範本：",
+    "startingWith": "以 <strong>{{name}}</strong> 為起點。建立後可以重新命名並微調。",
+    "creating": "正在建立…",
+    "create": "建立",
+    "cancel": "取消",
+    "copyName": "{{name}}（副本）",
+    "options": {
+      "general": {
+        "label": "一般助理",
+        "description": "日常問題，以及以本機為優先的聊天。"
+      },
+      "coding": {
+        "label": "程式設計",
+        "description": "由分布在你各台電腦上的 AI 團隊提供程式碼協助。"
+      },
+      "research": {
+        "label": "研究",
+        "description": "長篇閱讀和縝密推理。"
+      },
+      "blank": {
+        "label": "空白",
+        "description": "從空白開始，自行設定角色、工具和電腦。"
+      }
+    }
+  },
+  "purposes": {
+    "general": "日常對話",
+    "coding": "程式設計與程式碼協助",
+    "research": "研究與長篇閱讀",
+    "custom": "自訂配置"
+  },
+  "card": {
+    "rename": "重新命名設定檔",
+    "builtin": "內建",
+    "custom": "自訂",
+    "automaticSelection": "自動選擇電腦",
+    "customSelection": "自訂選擇電腦",
+    "tools_other": "{{count}} 個工具",
+    "askFirst": " · {{count}} 個會先詢問",
+    "noTools": "未啟用任何工具",
+    "more": "還有 {{count}} 個",
+    "useInChat": "在聊天中使用",
+    "close": "關閉",
+    "edit": "編輯",
+    "hideDetails": "隱藏詳細資訊",
+    "details": "詳細資訊",
+    "moreActions": "{{name}} 的更多動作",
+    "howItWorks": "運作方式",
+    "computerSelection": "電腦選擇",
+    "selectionDetail": "{{title}}。{{detail}}",
+    "strategy": "策略：<strong>{{strategy}}</strong>",
+    "thisMachine": "{{name}}（這台機器）"
+  },
+  "menu": {
+    "duplicate": "複製",
+    "rename": "重新命名",
+    "confirmReset": "要將「{{name}}」重置為 Yggdrasil 的原始設定嗎？你對它所做的變更將會遺失。",
+    "reset": "重置為預設值",
+    "confirmDelete": "要刪除「{{name}}」嗎？這個動作無法復原。",
+    "delete": "刪除"
+  },
+  "strategies": {
+    "auto": {
+      "label": "自動",
+      "detail": "由 Yggdrasil 決定：簡單的問題交給一個模型，包含多個部分的請求則會先規劃再檢查。"
+    },
+    "single": {
+      "label": "單一模型",
+      "detail": "由一個模型回答每個請求，不做規劃。"
+    },
+    "planned": {
+      "label": "規劃者 + 工作者",
+      "detail": "包含多個部分的請求，一律會先分部分處理，再撰寫回答。"
+    },
+    "team": {
+      "label": "團隊",
+      "detail": "規劃者拆分每個請求，工作者處理各個部分（可能時會在其他電腦上執行），審查者再檢查回答。簡單的問題仍會直接回答。"
+    },
+    "teamTitle": "AI 團隊",
+    "automaticTitle": "自動",
+    "withStrategy": "{{title}} · 策略：{{strategy}}"
+  },
+  "computers": {
+    "prefer_local": {
+      "title": "優先使用這台電腦",
+      "short": "這台電腦優先",
+      "detail": "先嘗試在這台機器上執行。如果這裡沒有安裝模型，則改用配對的電腦。"
+    },
+    "manual": {
+      "title": "自訂",
+      "short": "自訂",
+      "detail": "依照角色固定的電腦配置。適合想讓特定步驟在特定機器上執行的情況。"
+    },
+    "automatic": {
+      "title": "自動",
+      "short": "自動",
+      "detail": "將每個步驟放在已有該模型的配對電腦上。不需要設定 IP 或連接埠。"
+    }
+  },
+  "chips": {
+    "files": "檔案",
+    "git": "Git",
+    "terminal": "終端機",
+    "ok": "{{label}} ✓",
+    "ask": "{{label}} 詢問"
+  },
+  "roles": {
+    "role": "角色",
+    "assistant": "主要",
+    "fast": "快速",
+    "coding": "程式設計",
+    "planner": "規劃者",
+    "worker": "工作者",
+    "reviewer": "審查者",
+    "numbered": "{{role}} {{n}}",
+    "automaticModel": "自動選擇模型",
+    "pinnedComputer": "固定的電腦",
+    "automaticComputer": "自動選擇電腦",
+    "hint": "{{model}} · {{computer}}",
+    "help": {
+      "assistant": "撰寫回答。「自動」會使用聊天中選擇的模型。",
+      "fast": "聊天設為「自動」時，負責回答簡單的問題。",
+      "coding": "聊天設為「自動」時，負責回答程式設計請求。",
+      "planner": "將請求拆分成多個部分。",
+      "worker": "處理計畫中的一個部分。各部分可以同時在不同電腦上執行。",
+      "reviewer": "在你看到回答前先進行檢查。",
+      "other": "這個設定檔工作流程中的一個具名步驟。"
+    }
+  },
+  "capabilities": {
+    "internet": {
+      "label": "網際網路",
+      "description": "在網路上搜尋並閱讀最新資訊，以及尋找地點和路線"
+    },
+    "files": {
+      "label": "檔案",
+      "description": "在工作區中尋找、讀取和寫入檔案"
+    },
+    "code": {
+      "label": "執行程式碼",
+      "description": "在沙盒中執行 Python 以進行計算、分析和製作圖表；會先詢問"
+    },
+    "speech": {
+      "label": "語音",
+      "description": "在這台電腦上轉錄音訊和朗讀文字"
+    },
+    "images": {
+      "label": "圖片",
+      "description": "設定好圖片生成後，在這台電腦上製作和編輯圖片"
+    },
+    "video": {
+      "label": "影片",
+      "description": "設定好影片生成後，在這台電腦上製作短片"
+    },
+    "shell": {
+      "label": "Shell",
+      "description": "在這台電腦上執行指令"
+    },
+    "git": {
+      "label": "Git",
+      "description": "檢查儲存庫，以及進行 commit 或 push"
+    }
+  },
+  "tools": {
+    "internet": {
+      "search": {
+        "label": "網路搜尋",
+        "description": "搜尋公開網路，並傳回標題、連結和摘要片段。"
+      },
+      "open": {
+        "label": "打開網頁",
+        "description": "打開一個 URL 並傳回可閱讀的文字。"
+      }
+    },
+    "filesystem": {
+      "search": {
+        "label": "尋找檔案",
+        "description": "依名稱在工作區中尋找檔案。"
+      },
+      "read": {
+        "label": "讀取檔案",
+        "description": "讓助理打開你 Yggdrasil 工作區中的檔案，以便引用或摘要實際內容。"
+      },
+      "write": {
+        "label": "寫入檔案",
+        "description": "讓助理在工作區中建立或更新檔案。"
+      }
+    },
+    "terminal": {
+      "label": "終端機",
+      "description": "在這台電腦上執行 shell 指令。"
+    },
+    "git": {
+      "status": {
+        "label": "Git status",
+        "description": "顯示哪些檔案已變更，讓助理能理解你的工作樹狀態。"
+      },
+      "diff": {
+        "label": "Git diff",
+        "description": "顯示實際的程式碼變更，讓助理能審查或解釋修補程式。"
+      },
+      "log": {
+        "label": "Git log",
+        "description": "顯示工作區中最近的 commit。"
+      },
+      "show": {
+        "label": "Git show",
+        "description": "顯示單一 commit。"
+      },
+      "add": {
+        "label": "Git add",
+        "description": "將檔案暫存以準備 commit。適合在你需要協助準備 commit 時使用。"
+      },
+      "commit": {
+        "label": "Git commit",
+        "description": "建立本機 git commit。"
+      },
+      "push": {
+        "label": "Git push",
+        "description": "將 commit 推送到遠端。"
+      }
+    }
+  },
+  "policies": {
+    "deny": {
+      "label": "拒絕",
+      "description": "這個設定檔永遠無法使用。"
+    },
+    "ask": {
+      "label": "每次都詢問",
+      "description": "每次使用前都會在聊天中顯示確認提示。"
+    },
+    "allow-for-session": {
+      "label": "每個工作階段詢問一次",
+      "description": "第一次使用時詢問，之後會記住，直到你重新啟動 App。"
+    },
+    "allow": {
+      "label": "一律允許",
+      "description": "不詢問直接執行。最適合經常使用的低風險工具。"
+    }
+  },
+  "editor": {
+    "profile": "設定檔",
+    "name": "名稱",
+    "namePlaceholder": "例如：程式設計",
+    "models": "模型",
+    "modelsHint": "「自動」會使用聊天中選擇的模型。",
+    "model": "模型",
+    "automatic": "自動",
+    "computer": "電腦",
+    "fallback": "備援順序",
+    "fallbackHint": "當回答的模型失敗時，會依序嘗試這些模型。之後，Yggdrasil 會挑選另一個已安裝的模型。",
+    "none": "無",
+    "tools": "工具",
+    "on": "開啟",
+    "off": "關閉",
+    "individualTools": "個別工具",
+    "memory": "記憶",
+    "memoryHint": "使用這個設定檔的聊天會在每個問題時搜尋這些來源，並使用相符的段落。",
+    "orchestration": "協作編排",
+    "strategy": "策略",
+    "execution": "執行",
+    "computerSelection": "電腦選擇",
+    "selectionOptions": {
+      "automatic": "自動：放在已有該模型的電腦上",
+      "prefer_local": "優先使用這台電腦",
+      "manual": "自訂：使用在「模型」中設定的電腦"
+    },
+    "localOnly": "僅限這台電腦：永遠不使用配對的電腦",
+    "allowed": "允許",
+    "preferred": "優先",
+    "never": "永不使用",
+    "save": "儲存設定檔",
+    "cancel": "取消"
+  },
+  "controls": {
+    "default": "預設",
+    "effort": {
+      "label": "推理程度",
+      "help": "當聊天的投入程度設為「自動」時使用。",
+      "fast": "快速",
+      "balanced": "平衡",
+      "thorough": "徹底"
+    },
+    "planning": {
+      "label": "規劃",
+      "help": "將包含多個部分的請求分部分處理。選擇「一律」時，也會拆分沒有明顯部分的請求。",
+      "on": "當請求包含多個部分時",
+      "always": "一律",
+      "off": "永不規劃"
+    },
+    "parallel": {
+      "label": "平行處理",
+      "help": "同時查詢彼此獨立的部分。",
+      "on": "同時進行",
+      "off": "一次一個"
+    },
+    "verification": {
+      "label": "驗證",
+      "help": "回答前先對照來源檢查數據。",
+      "off": "關閉",
+      "check": "檢查並回報",
+      "correct": "檢查並修正一次",
+      "thorough": "檢查並修正兩次"
+    },
+    "memory": {
+      "label": "記憶",
+      "help": "在這個設定檔的聊天中使用永久記憶。",
+      "off": "這個設定檔關閉"
+    },
+    "fallback": {
+      "label": "備援",
+      "help": "當選擇的模型失敗時，改用其他模型回答。",
+      "off": "改為顯示失敗訊息"
+    },
+    "max_workers": {
+      "label": "工作者",
+      "help": "一個計畫中最多的部分數（2–8）。"
+    },
+    "max_tool_calls": {
+      "label": "工具呼叫",
+      "help": "一輪中最多的工具呼叫次數（1–50）。"
+    },
+    "retries": {
+      "label": "重試",
+      "help": "模型失敗後的重試次數（1–3）：先在另一台電腦上使用相同模型，再改用其他模型。"
+    },
+    "timeout_seconds": {
+      "label": "時間限制（秒）",
+      "help": "停止執行時間超過此值的回合（10–3600）。"
+    },
+    "context_share": {
+      "label": "上下文預算",
+      "help": "較早的訊息最多可使用的上下文視窗比例（0.1–0.9）。"
+    }
+  },
+  "orchestrators": {
+    "title": "編排器",
+    "description": "可插拔的編排引擎，負責協調模型和工具。",
+    "emptyTitle": "編排器管理功能即將推出",
+    "emptyDescription": "內建和外掛的編排器將可在進階模式中於此處設定。"
+  }
+}

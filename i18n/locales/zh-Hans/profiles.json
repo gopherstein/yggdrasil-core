@@ -1,0 +1,364 @@
+{
+  "page": {
+    "title": "配置与编排",
+    "subtitle": "配置就是一个保存好的助手：它如何处理请求，以及它的模型、工具、记忆和电脑。",
+    "hint": "在聊天中选择一个，或创建你自己的配置。",
+    "create": "创建配置",
+    "createTitle": "创建新配置",
+    "loading": "正在加载配置…",
+    "loadFailed": "无法加载配置。本地守护进程在运行吗？",
+    "emptyTitle": "还没有配置",
+    "emptyDescription": "创建一个配置，告诉聊天你的助手应该如何工作。",
+    "noneInFilter": "此筛选条件下没有配置。",
+    "filter": "筛选配置",
+    "filters": {
+      "all": "全部",
+      "builtin": "内置",
+      "custom": "自定义"
+    }
+  },
+  "create": {
+    "title": "创建配置",
+    "startFrom": "从以下开始：",
+    "startingWith": "以 <strong>{{name}}</strong> 为起点。创建后可以重命名和微调。",
+    "creating": "正在创建…",
+    "create": "创建",
+    "cancel": "取消",
+    "copyName": "{{name}}（副本）",
+    "options": {
+      "general": {
+        "label": "通用助手",
+        "description": "日常问答和本地优先的聊天。"
+      },
+      "coding": {
+        "label": "编程",
+        "description": "由跨越你多台电脑的 AI 团队提供代码帮助。"
+      },
+      "research": {
+        "label": "研究",
+        "description": "长篇阅读和严谨推理。"
+      },
+      "blank": {
+        "label": "空白",
+        "description": "从空白开始，自行设置角色、工具和电脑。"
+      }
+    }
+  },
+  "purposes": {
+    "general": "日常对话",
+    "coding": "编程与代码帮助",
+    "research": "研究与长篇阅读",
+    "custom": "自定义设置"
+  },
+  "card": {
+    "rename": "重命名配置",
+    "builtin": "内置",
+    "custom": "自定义",
+    "automaticSelection": "自动选择电脑",
+    "customSelection": "自定义选择电脑",
+    "tools_other": "{{count}} 个工具",
+    "askFirst": " · {{count}} 个需先询问",
+    "noTools": "未启用工具",
+    "more": "还有 {{count}} 个",
+    "useInChat": "在聊天中使用",
+    "close": "关闭",
+    "edit": "编辑",
+    "hideDetails": "隐藏详情",
+    "details": "详情",
+    "moreActions": "{{name}} 的更多操作",
+    "howItWorks": "工作方式",
+    "computerSelection": "电脑选择",
+    "selectionDetail": "{{title}}。{{detail}}",
+    "strategy": "策略：<strong>{{strategy}}</strong>",
+    "thisMachine": "{{name}}（这台机器）"
+  },
+  "menu": {
+    "duplicate": "复制",
+    "rename": "重命名",
+    "confirmReset": "将“{{name}}”重置为 Yggdrasil 的初始状态？你对它所做的更改将丢失。",
+    "reset": "恢复默认",
+    "confirmDelete": "删除“{{name}}”？此操作无法撤销。",
+    "delete": "删除"
+  },
+  "strategies": {
+    "auto": {
+      "label": "自动",
+      "detail": "由 Yggdrasil 决定：简单问题由一个模型回答，包含多个部分的请求会先规划再核查。"
+    },
+    "single": {
+      "label": "单一模型",
+      "detail": "由一个模型回答每个请求，不做规划。"
+    },
+    "planned": {
+      "label": "规划者 + 执行者",
+      "detail": "包含多个部分的请求总是先分部分处理，再撰写回答。"
+    },
+    "team": {
+      "label": "团队",
+      "detail": "规划者拆分每个请求，执行者分别完成各部分（条件允许时在其他电脑上完成），审核者检查回答。简单问题仍会直接回答。"
+    },
+    "teamTitle": "AI 团队",
+    "automaticTitle": "自动",
+    "withStrategy": "{{title}} · 策略：{{strategy}}"
+  },
+  "computers": {
+    "prefer_local": {
+      "title": "优先使用这台电脑",
+      "short": "这台电脑优先",
+      "detail": "先尝试在这台机器上运行。如果这里没有安装所需模型，则改用已配对的电脑。"
+    },
+    "manual": {
+      "title": "自定义",
+      "short": "自定义",
+      "detail": "按角色固定的电脑来安排运行位置。适合希望某个步骤在特定机器上运行的情况。"
+    },
+    "automatic": {
+      "title": "自动",
+      "short": "自动",
+      "detail": "把每个步骤放到已经装有该模型的已配对电脑上。无需设置 IP 或端口。"
+    }
+  },
+  "chips": {
+    "files": "文件",
+    "git": "Git",
+    "terminal": "终端",
+    "ok": "{{label}} ✓",
+    "ask": "{{label}} 询问"
+  },
+  "roles": {
+    "role": "角色",
+    "assistant": "主要",
+    "fast": "快速",
+    "coding": "编程",
+    "planner": "规划者",
+    "worker": "执行者",
+    "reviewer": "审核者",
+    "numbered": "{{role}} {{n}}",
+    "automaticModel": "自动选择模型",
+    "pinnedComputer": "固定的电脑",
+    "automaticComputer": "自动选择电脑",
+    "hint": "{{model}} · {{computer}}",
+    "help": {
+      "assistant": "撰写回答。“自动”会使用聊天中选择的模型。",
+      "fast": "当聊天设为“自动”时，回答简单问题。",
+      "coding": "当聊天设为“自动”时，回答编程请求。",
+      "planner": "把请求拆分成多个部分。",
+      "worker": "处理计划中的一个部分。各部分可以同时在不同的电脑上运行。",
+      "reviewer": "在你看到回答之前进行检查。",
+      "other": "此配置工作流中的一个命名步骤。"
+    }
+  },
+  "capabilities": {
+    "internet": {
+      "label": "互联网",
+      "description": "从网络搜索和阅读最新信息，查找地点和路线"
+    },
+    "files": {
+      "label": "文件",
+      "description": "在工作区中查找、读取和写入文件"
+    },
+    "code": {
+      "label": "运行代码",
+      "description": "在沙盒中运行 Python 进行计算、分析和制作图表；会先询问"
+    },
+    "speech": {
+      "label": "语音",
+      "description": "在这台电脑上转录音频和朗读文本"
+    },
+    "images": {
+      "label": "图片",
+      "description": "设置好图片生成后，在这台电脑上生成和编辑图片"
+    },
+    "video": {
+      "label": "视频",
+      "description": "设置好视频生成后，在这台电脑上生成短视频"
+    },
+    "shell": {
+      "label": "Shell",
+      "description": "在这台电脑上运行命令"
+    },
+    "git": {
+      "label": "Git",
+      "description": "查看代码仓库，以及提交或推送"
+    }
+  },
+  "tools": {
+    "internet": {
+      "search": {
+        "label": "网络搜索",
+        "description": "搜索公共网络，返回标题、链接和摘要。"
+      },
+      "open": {
+        "label": "打开网页",
+        "description": "打开一个 URL 并返回可读的文本。"
+      }
+    },
+    "filesystem": {
+      "search": {
+        "label": "查找文件",
+        "description": "按名称在工作区中查找文件。"
+      },
+      "read": {
+        "label": "读取文件",
+        "description": "让助手打开你的 Yggdrasil 工作区中的文件，以便引用或总结真实内容。"
+      },
+      "write": {
+        "label": "写入文件",
+        "description": "让助手在工作区中创建或更新文件。"
+      }
+    },
+    "terminal": {
+      "label": "终端",
+      "description": "在这台电脑上运行 shell 命令。"
+    },
+    "git": {
+      "status": {
+        "label": "Git status",
+        "description": "显示哪些文件有改动，便于助手了解你的工作区状态。"
+      },
+      "diff": {
+        "label": "Git diff",
+        "description": "显示实际的代码改动，便于助手审查或解释补丁。"
+      },
+      "log": {
+        "label": "Git log",
+        "description": "显示工作区中最近的提交。"
+      },
+      "show": {
+        "label": "Git show",
+        "description": "显示一次提交。"
+      },
+      "add": {
+        "label": "Git add",
+        "description": "将文件暂存以便提交。需要帮忙准备提交时很有用。"
+      },
+      "commit": {
+        "label": "Git commit",
+        "description": "创建一个本地 git 提交。"
+      },
+      "push": {
+        "label": "Git push",
+        "description": "将提交推送到远程仓库。"
+      }
+    }
+  },
+  "policies": {
+    "deny": {
+      "label": "拒绝",
+      "description": "此配置始终无法使用。"
+    },
+    "ask": {
+      "label": "每次询问",
+      "description": "每次使用前都在聊天中弹出提示。"
+    },
+    "allow-for-session": {
+      "label": "每次会话询问一次",
+      "description": "第一次使用时提示，之后一直记住，直到你重启应用。"
+    },
+    "allow": {
+      "label": "始终允许",
+      "description": "无需询问即可运行。最适合你经常使用的低风险工具。"
+    }
+  },
+  "editor": {
+    "profile": "配置",
+    "name": "名称",
+    "namePlaceholder": "例如：编程",
+    "models": "模型",
+    "modelsHint": "“自动”会使用聊天中选择的模型。",
+    "model": "模型",
+    "automatic": "自动",
+    "computer": "电脑",
+    "fallback": "备用顺序",
+    "fallbackHint": "当回答的模型失败时，按顺序尝试。这些都失败后，Yggdrasil 会选择另一个已安装的模型。",
+    "none": "无",
+    "tools": "工具",
+    "on": "开",
+    "off": "关",
+    "individualTools": "单个工具",
+    "memory": "记忆",
+    "memoryHint": "使用此配置的聊天在每个问题上都会搜索这些来源，并使用匹配的段落。",
+    "orchestration": "编排",
+    "strategy": "策略",
+    "execution": "执行",
+    "computerSelection": "电脑选择",
+    "selectionOptions": {
+      "automatic": "自动——放在已装有该模型的电脑上",
+      "prefer_local": "优先使用这台电脑",
+      "manual": "自定义——使用在“模型”中设置的电脑"
+    },
+    "localOnly": "仅限这台电脑——绝不使用已配对的电脑",
+    "allowed": "允许",
+    "preferred": "优先",
+    "never": "绝不使用",
+    "save": "保存配置",
+    "cancel": "取消"
+  },
+  "controls": {
+    "default": "默认",
+    "effort": {
+      "label": "推理程度",
+      "help": "当聊天的投入程度设为“自动”时使用。",
+      "fast": "快速",
+      "balanced": "均衡",
+      "thorough": "深入"
+    },
+    "planning": {
+      "label": "规划",
+      "help": "将包含多个部分的请求分部分处理。“始终”也会拆分没有明显部分的请求。",
+      "on": "当请求包含多个部分时",
+      "always": "始终",
+      "off": "从不规划"
+    },
+    "parallel": {
+      "label": "并行",
+      "help": "同时查找彼此独立的部分。",
+      "on": "并行",
+      "off": "逐个进行"
+    },
+    "verification": {
+      "label": "核查",
+      "help": "回答前根据来源核对数字。",
+      "off": "关闭",
+      "check": "核查并报告",
+      "correct": "核查并修正一次",
+      "thorough": "核查并修正两次"
+    },
+    "memory": {
+      "label": "记忆",
+      "help": "在此配置的聊天中使用长期记忆。",
+      "off": "此配置关闭"
+    },
+    "fallback": {
+      "label": "备用",
+      "help": "所选模型失败时，改用另一个模型回答。",
+      "off": "改为显示失败信息"
+    },
+    "max_workers": {
+      "label": "执行者",
+      "help": "一个计划中最多的部分数（2–8）。"
+    },
+    "max_tool_calls": {
+      "label": "工具调用",
+      "help": "一轮中最多的工具调用次数（1–50）。"
+    },
+    "retries": {
+      "label": "重试",
+      "help": "模型失败后的重试次数（1–3）：先在另一台电脑上用同一个模型，再换另一个模型。"
+    },
+    "timeout_seconds": {
+      "label": "时间限制（秒）",
+      "help": "运行时间超过此值时停止该轮（10–3600）。"
+    },
+    "context_share": {
+      "label": "上下文预算",
+      "help": "较早的消息最多可占用的上下文窗口比例（0.1–0.9）。"
+    }
+  },
+  "orchestrators": {
+    "title": "编排器",
+    "description": "可插拔的编排引擎，用于协调模型和工具。",
+    "emptyTitle": "编排器管理即将推出",
+    "emptyDescription": "内置和插件编排器将可以在高级模式下于此处配置。"
+  }
+}

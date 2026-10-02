@@ -36,6 +36,18 @@ describe('resolveLanguage', () => {
     expect(resolveLanguage('', ['zh-Hant'], available)).toBe('zh-Hant')
   })
 
+  it('matches Chinese by script and Portuguese by region', () => {
+    const tier1 = ['en', 'pt-BR', 'zh-Hans', 'zh-Hant']
+    expect(resolveLanguage('', ['zh-TW'], tier1)).toBe('zh-Hant')
+    expect(resolveLanguage('', ['zh-HK'], tier1)).toBe('zh-Hant')
+    expect(resolveLanguage('', ['zh-CN'], tier1)).toBe('zh-Hans')
+    expect(resolveLanguage('', ['zh'], tier1)).toBe('zh-Hans')
+    expect(resolveLanguage('', ['pt-PT'], tier1)).toBe('pt-BR')
+    expect(resolveLanguage('', ['pt'], tier1)).toBe('pt-BR')
+    // Simplified Chinese readers don't get Traditional, or the other way round.
+    expect(resolveLanguage('', ['zh-CN'], ['en', 'zh-Hant'])).toBe('en')
+  })
+
   it('ends at English', () => {
     expect(resolveLanguage('', ['fr-FR'], available)).toBe('en')
     expect(resolveLanguage('', [], available)).toBe('en')
@@ -101,8 +113,8 @@ describe('formatting', () => {
   const when = new Date(Date.UTC(2026, 8, 30, 20, 0))
 
   it('follows the locale asked for, even before its text is translated', async () => {
-    await applyLanguage('de')
-    expect(i18n.language).toBe('en') // no German catalog yet: the text stays English
+    await applyLanguage('nl')
+    expect(i18n.language).toBe('en') // no Dutch catalog yet: the text stays English
     expect(document.documentElement.lang).toBe('en')
     expect(formatNumber(1234.56)).toBe('1.234,56')
     expect(spaced(formatSize(1.5 * 1024 ** 3))).toBe('1,5 GB')

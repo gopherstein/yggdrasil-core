@@ -1,0 +1,361 @@
+{
+  "app": {
+    "starting": "Démarrage d'Yggdrasil",
+    "back": "Retour",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "dismiss": "Ignorer",
+    "loading": "Chargement",
+    "save": "Enregistrer"
+  },
+  "tabs": {
+    "chat": "Discussion",
+    "computers": "Ordinateurs",
+    "models": "Modèles",
+    "settings": "Paramètres"
+  },
+  "screens": {
+    "connect": "Connexion",
+    "chat": "Discussion"
+  },
+  "units": {
+    "megabytes": "{{value}} Mo",
+    "gigabytes": "{{value}} Go"
+  },
+  "connection": {
+    "enterAddress": "Saisissez l'adresse de l'ordinateur qui exécute Yggdrasil.",
+    "couldNotReach": "Impossible de joindre Yggdrasil.",
+    "unreachable": "Yggdrasil est injoignable sur cet ordinateur. Utilisez le même réseau Wi-Fi et activez l'accès LAN pour l'API sur cet ordinateur.",
+    "keyRejected": "Cette clé API a été refusée. Créez une clé dans Accès API sur l'ordinateur, puis collez-la ici.",
+    "dropped": "La connexion à Yggdrasil a été interrompue.",
+    "chatFailed": "La discussion a échoué.",
+    "requestFailed": "La requête a échoué"
+  },
+  "connect": {
+    "title": "Connecter un ordinateur",
+    "subtitle": "Le téléphone utilise l'ordinateur qui exécute déjà vos modèles. Sur cet ordinateur, ouvrez Accès API, autorisez l'API sur votre réseau local et créez une clé.",
+    "address": "Adresse de l'ordinateur",
+    "addressPlaceholder": "192.168.1.20",
+    "apiKey": "Clé API",
+    "apiKeyPlaceholder": "Collez la clé",
+    "connect": "Connecter",
+    "connecting": "Connexion",
+    "notReady": "Yggdrasil a répondu, mais n'est pas prêt."
+  },
+  "discovery": {
+    "onThisNetwork": "Sur ce réseau",
+    "useAddress": "Utilise l'adresse de cet ordinateur",
+    "version": "Yggdrasil {{version}}",
+    "looking": "Recherche d'ordinateurs sur ce réseau…",
+    "lookingLabel": "Recherche d'ordinateurs sur ce réseau",
+    "none": "Aucun ordinateur trouvé. Lancez Yggdrasil sur votre ordinateur et utilisez le même Wi-Fi, ou saisissez son adresse.",
+    "localNetworkDenied": "Yggdrasil n'est peut-être pas autorisé à rechercher des ordinateurs sur votre réseau. Autorisez-le dans Réglages > Confidentialité et sécurité > Réseau local.",
+    "listFailed": "Impossible de lister les ordinateurs de ce réseau. Vous pouvez toujours saisir une adresse ci-dessous."
+  },
+  "computers": {
+    "title": "Ordinateurs",
+    "subtitle": "Les ordinateurs que votre ordinateur connecté peut joindre, et s'ils sont en ligne.",
+    "disconnected": "Connectez-vous à un ordinateur qui exécute Yggdrasil pour discuter avec ses modèles et voir ses autres ordinateurs.",
+    "enterAddress": "Saisir une adresse",
+    "loading": "Chargement des ordinateurs",
+    "none": "Aucun ordinateur n'est visible depuis cette connexion.",
+    "unnamed": "Ordinateur",
+    "thisConnection": "Cette connexion",
+    "meta": "{{platform}} · {{status}}",
+    "metaPaired": "{{platform}} · {{status}} · jumelé",
+    "status": {
+      "online": "en ligne",
+      "offline": "hors ligne",
+      "degraded": "dégradé"
+    }
+  },
+  "models": {
+    "title": "Modèles",
+    "onComputer": "Sur votre ordinateur",
+    "connectFirst": "Connectez un ordinateur pour voir les modèles qui y sont installés.",
+    "loading": "Chargement des modèles",
+    "noneInstalled": "Aucun modèle n'est encore installé sur cet ordinateur.",
+    "status": {
+      "installed": "installé",
+      "loaded": "chargé",
+      "downloading": "téléchargement"
+    },
+    "support": {
+      "embedding": "Modèle auxiliaire · recherche dans les connaissances par le sens",
+      "reranker": "Modèle auxiliaire · classe les meilleurs passages",
+      "classifier": "Modèle auxiliaire · aide Auto à orienter les demandes",
+      "other": "Modèle auxiliaire"
+    }
+  },
+  "phoneModels": {
+    "heading": "Sur cet iPhone",
+    "copy": "Voici les plus petits modèles du catalogue Yggdrasil. Le fichier est téléchargé sur ce téléphone et y reste.",
+    "meta": "{{parameters}} · {{size}}",
+    "chat": "Discuter",
+    "remove": "Supprimer",
+    "install": "Installer",
+    "installing": "Installation {{percent}}",
+    "tooLarge": "Trop grand pour ce téléphone",
+    "installFailed": "Impossible d'installer le modèle.",
+    "noPlace": "Ce téléphone n'a aucun emplacement pour stocker des modèles.",
+    "noSpace": "Ce téléphone n'a pas assez de stockage libre pour ce modèle.",
+    "downloadIncomplete": "Le téléchargement du modèle ne s'est pas terminé.",
+    "summaries": {
+      "qwen2-5-coder-1-5b-q4": "Assistant de code très rapide pour les modifications rapides et les petites tâches.",
+      "llama-3-2-1b-q4": "Minuscule assistant généraliste quand vous voulez un maximum de vitesse et peu de mémoire.",
+      "llama-3-2-3b-q4": "Assistant du quotidien équilibré avec un long contexte.",
+      "phi-3-5-mini-q4": "Modèle compact de Microsoft, bon en raisonnement et en code léger.",
+      "gemma-2-2b-q4": "Petit modèle de Google pour des discussions du quotidien réactives.",
+      "qwen2-5-3b-q4": "Modèle généraliste de taille moyenne, compétent, avec appel d'outils.",
+      "deepseek-r1-distill-1-5b-q4": "Modèle de raisonnement léger distillé à partir de DeepSeek R1."
+    }
+  },
+  "onboarding": {
+    "welcome": "Bienvenue dans",
+    "lede": "Cette app peut exécuter de l'IA en toute confidentialité sur cet iPhone.",
+    "thisIPhone": "Cet iPhone",
+    "hardware": "Matériel détecté pour l'inférence locale.",
+    "device": "Appareil",
+    "memory": "Mémoire",
+    "system": "Système",
+    "question": "Que souhaitez-vous que votre IA fasse ?",
+    "purposes": {
+      "general": {
+        "title": "Assistant général",
+        "description": "Questions du quotidien, aide à la rédaction et conversations en local d'abord."
+      },
+      "coding": {
+        "title": "Programmation",
+        "description": "Aide au code pour les modifications rapides et les petites tâches sur cet iPhone."
+      },
+      "research": {
+        "title": "Recherche",
+        "description": "Résumés et raisonnement approfondi, entièrement sur ce téléphone."
+      },
+      "custom": {
+        "title": "Personnalisé",
+        "description": "Choisissez vous-même un modèle parmi ceux qui conviennent à cet iPhone."
+      }
+    },
+    "continue": "Continuer",
+    "recommended": "Recommandé",
+    "recommendedFor": "Recommandé pour {{purpose}}",
+    "modelFacts": "{{parameters}} · téléchargement de {{download}} · environ {{memory}} de mémoire",
+    "install": "Installer la configuration recommandée",
+    "tooLarge": "Ce modèle nécessite plus de mémoire que cet iPhone ne peut en libérer.",
+    "chooseOther": "Choisir un autre modèle",
+    "installing": "Installation de {{model}}",
+    "downloaded": "{{percent}} téléchargé",
+    "keepOpen": "Le téléchargement de grands modèles peut prendre plusieurs minutes. Gardez Yggdrasil ouvert.",
+    "ready": "Tout est prêt",
+    "installed": "{{model}} est installé. Commencez à discuter avec votre IA locale.",
+    "startChatting": "Commencer à discuter"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitle": "Les modèles que vous installez sur cet iPhone restent sur cet iPhone. Les discussions avec un ordinateur connecté restent sur cet ordinateur.",
+    "thisIPhone": "Cet iPhone",
+    "whereChatsRun": "Où s'exécutent les discussions",
+    "onDevice": "Sur cet appareil, une fois un modèle installé",
+    "computer": "Ordinateur",
+    "connectedComputer": "Ordinateur connecté",
+    "notConnected": "Non connecté",
+    "coreVersion": "Yggdrasil sur cet ordinateur",
+    "updateCore": "Mettez à jour Yggdrasil sur cet ordinateur vers la version 1.4 ou ultérieure pour voir les sources des réponses, ce qu'a fait l'assistant, la progression en direct et l'effort.",
+    "jobsKeepRunning": "Fermer cette app n'arrête pas une tâche déjà en cours sur cet ordinateur.",
+    "forget": "Oublier cet ordinateur",
+    "connect": "Connecter un ordinateur",
+    "about": "À propos",
+    "version": "Version {{version}}",
+    "aboutCopy": "L'arbre-monde qui relie les royaumes. Yggdrasil relie vos apps aux modèles de vos ordinateurs et de cet iPhone.",
+    "dangerZone": "Zone de danger",
+    "resetTitle": "Réinitialiser cet iPhone",
+    "resetCopy": "Rétablir la configuration d'accueil. Efface les discussions de cet iPhone et oublie l'ordinateur connecté.",
+    "resetButton": "Réinitialiser les paramètres et les données…",
+    "resetDeletesModels": "Cette action est irréversible. Les modèles téléchargés seront également supprimés.",
+    "resetKeepsModels": "Cette action est irréversible. Les modèles téléchargés seront conservés.",
+    "alsoDeleteModels": "Supprimer aussi les modèles téléchargés",
+    "resetting": "Réinitialisation…",
+    "confirmReset": "Oui, réinitialiser",
+    "resetFailed": "Impossible de réinitialiser Yggdrasil."
+  },
+  "language": {
+    "title": "Langue",
+    "appLanguage": "Langue de l'app",
+    "automatic": "Automatique ({{language}})",
+    "automaticHint": "Suit la langue de l'app de l'ordinateur connecté, ou la langue de cet iPhone s'il n'y en a pas.",
+    "choose": "Choisir la langue de l'app",
+    "pseudo": "Pseudo-langue (en-XA)"
+  },
+  "chat": {
+    "history": "Historique des discussions",
+    "newChat": "Nouvelle discussion",
+    "chats": "Discussions",
+    "search": "Rechercher",
+    "rename": "Renommer",
+    "renameChat": "Renommer la discussion",
+    "delete": "Supprimer",
+    "deleteChat": "Supprimer la discussion",
+    "computer": "Ordinateur",
+    "newOnComputer": "Nouvelle discussion sur cet ordinateur",
+    "untitled": "Discussion",
+    "model": "Modèle",
+    "chooseModel": "Choisir un modèle",
+    "loading": "Chargement de la discussion",
+    "placeholder": "Écrire à Yggdrasil",
+    "send": "Envoyer",
+    "sending": "Envoi",
+    "stop": "Arrêter",
+    "working": "En cours…",
+    "thinkingOnPhone": "Réflexion sur cet iPhone…",
+    "installFirst": "Installez un modèle pour discuter sur cet iPhone.",
+    "setUpModel": "Configurer un modèle",
+    "modelMissing": "Ce modèle n'est pas installé sur ce téléphone.",
+    "interrupted": "Réponse interrompue",
+    "couldNotRun": "Ce téléphone n'a pas pu exécuter le modèle.",
+    "noProfile": "Cet ordinateur n'a pas encore de profil. Créez-en d'abord un dans l'app Mac.",
+    "noChatPlace": "Cet iPhone n'a aucun emplacement pour stocker les discussions.",
+    "speed": "{{generated}} tok/s",
+    "speedWithPrompt": "{{generated}} tok/s · prompt {{prompt}} tok/s",
+    "groups": {
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "week": "7 derniers jours",
+      "month": "30 derniers jours",
+      "older": "Plus anciennes"
+    },
+    "empty": {
+      "title": "Comment puis-je vous aider ?",
+      "phone": "Parlez à l'IA de cet iPhone. Rien de ce que vous écrivez n'en sort.",
+      "computer": "Yggdrasil choisit le bon modèle et le bon ordinateur, effectue des recherches si nécessaire et montre ce qu'il a utilisé."
+    },
+    "unsent": {
+      "notSent": "Non envoyé",
+      "retry": "Réessayer",
+      "retryLabel": "Renvoyer",
+      "edit": "Modifier",
+      "editLabel": "Modifier le message"
+    },
+    "approval": {
+      "title": "Autoriser {{tool}} ?",
+      "fallback": "Cet outil veut s'exécuter sur votre ordinateur.",
+      "wantsToRun": "{{tool}} veut s'exécuter.",
+      "wantsToRunSummary": "{{tool}} veut s'exécuter : {{summary}}",
+      "deny": "Refuser",
+      "allowOnce": "Autoriser une fois"
+    }
+  },
+  "effort": {
+    "title": "Effort",
+    "label": "Effort : {{effort}}",
+    "hint": "Détermine le soin apporté à la réponse",
+    "auto": {
+      "label": "Auto",
+      "hint": "Yggdrasil décide : les questions rapides restent rapides, les grandes questions ou celles sur des données reçoivent plus de soin."
+    },
+    "fast": {
+      "label": "Rapide",
+      "hint": "Répond d'un seul coup, sans planification ni seconde passe."
+    },
+    "balanced": {
+      "label": "Équilibré",
+      "hint": "Planifie les grandes demandes, lit une page lors des recherches et corrige les chiffres une fois."
+    },
+    "thorough": {
+      "label": "Approfondi",
+      "hint": "Lit plus de pages, utilise le plus grand modèle qui tient en mémoire et vérifie les chiffres deux fois."
+    }
+  },
+  "answer": {
+    "files": "Fichiers",
+    "filesHint": "Ouvrez les fichiers sur l'ordinateur qui les a créés.",
+    "sources": "Sources",
+    "source": "Source",
+    "opensInSafari": "S'ouvre dans Safari",
+    "steps_one": "Ce que j'ai fait · {{count}} étape",
+    "steps_many": "Ce que j'ai fait · {{count}} étapes",
+    "steps_other": "Ce que j'ai fait · {{count}} étapes"
+  },
+  "tools": {
+    "internet": {
+      "search": "Recherche web",
+      "open": "Ouvrir une page"
+    },
+    "filesystem": {
+      "search": "Rechercher des fichiers",
+      "read": "Lire un fichier",
+      "write": "Écrire un fichier"
+    },
+    "terminal": "Terminal",
+    "git": {
+      "commit": "Git commit",
+      "push": "Git push"
+    },
+    "unnamed": "Outil"
+  },
+  "progress": {
+    "searchingWeb": "Recherche sur le web…",
+    "searchingWebFor": "Recherche sur le web de « {{query}} »…",
+    "readingPage": "Lecture d'une page…",
+    "readingHost": "Lecture de {{host}}…",
+    "readingFile": "Lecture d'un fichier…",
+    "searchingFiles": "Recherche dans les fichiers locaux…",
+    "runningCommand": "Exécution de la commande…",
+    "checkingGit": "Vérification de git…",
+    "usingTool": "Utilisation de {{tool}}…",
+    "checkedKnowledge": "Connaissances consultées…",
+    "yourKnowledge": "vos connaissances",
+    "foundPassages_one": "{{count}} passage trouvé dans {{source}}…",
+    "foundPassages_many": "{{count}} passages trouvés dans {{source}}…",
+    "foundPassages_other": "{{count}} passages trouvés dans {{source}}…",
+    "foundPassagesMore_one": "{{count}} passage trouvé dans {{source}} et {{more}} autres…",
+    "foundPassagesMore_many": "{{count}} passages trouvés dans {{source}} et {{more}} autres…",
+    "foundPassagesMore_other": "{{count}} passages trouvés dans {{source}} et {{more}} autres…",
+    "checkingSources": "Vérification des sources…",
+    "toolFailed": "Échec de {{tool}}",
+    "waitingForPermission": "En attente d'autorisation : {{tool}}",
+    "switchingTo": "Passage à {{model}}…",
+    "using": "Utilisation de {{model}}…",
+    "workingThrough_one": "Traitement de {{count}} partie…",
+    "workingThrough_many": "Traitement de {{count}} parties…",
+    "workingThrough_other": "Traitement de {{count}} parties…",
+    "planning": "Planification…",
+    "workingOn": "En cours : {{step}}…",
+    "puttingTogether": "Assemblage de la réponse…",
+    "verifying": "Vérification des chiffres par rapport aux sources…",
+    "writingFile": "Écriture du fichier…",
+    "writingNamed": "Rédaction de {{name}}…",
+    "loadingModel": "Chargement du modèle…",
+    "loadingModelOn": "Chargement du modèle sur {{node}}…",
+    "generating": "Génération de la réponse…",
+    "generatingOn": "Génération sur {{node}}…"
+  },
+  "realms": {
+    "about": "{{norse}}. {{rune}}. À propos de ce nom",
+    "chat": {
+      "meaning": "Discussion est l'endroit où vos messages sont portés jusqu'aux modèles de cet iPhone ou de vos ordinateurs, et où les réponses vous reviennent.",
+      "story": "Ratatoskr est l'écureuil qui monte et descend le tronc d'Yggdrasil, portant les messages entre l'aigle au sommet de l'arbre et le dragon Níðhöggr qui en ronge les racines.",
+      "runeName": "Ansuz, la rune de la parole"
+    },
+    "models": {
+      "meaning": "Ymir est le premier géant, à partir duquel le monde fut créé. Les modèles sont le socle de tout le reste.",
+      "story": "Au commencement était Ymir, le premier des géants. Lorsqu'il fut tué, les dieux bâtirent le monde à partir de lui : la terre de sa chair, les montagnes de ses os et le ciel de son crâne.",
+      "runeName": "Uruz, la rune de la force brute"
+    },
+    "computers": {
+      "meaning": "Bifrost est le pont arc-en-ciel entre les mondes. Il relie vos ordinateurs.",
+      "story": "Bifröst est le pont arc-en-ciel ardent qui relie Midgard, le monde des hommes, à Asgard, la demeure des dieux. Heimdall monte la garde à son extrémité.",
+      "runeName": "Raidho, la rune du voyage"
+    },
+    "connect": {
+      "meaning": "Valgrind est la porte du Valhalla. Une clé API décide qui peut entrer.",
+      "story": "Valgrind est l'antique porte qui se dresse devant le Valhalla. Elle est sacrée et ancienne, et rares sont ceux qui savent comment se ferme son verrou.",
+      "runeName": "Thurisaz, la rune de la porte"
+    },
+    "settings": {
+      "meaning": "Forseti règle chaque différend avec équité. Les paramètres sont les règles que suit Yggdrasil.",
+      "story": "Forseti, fils de Baldr, siège à Glitnir, une salle aux piliers d'or et au toit d'argent. Tous ceux qui lui soumettent un différend repartent réconciliés.",
+      "runeName": "Isa, la rune de l'immobilité"
+    }
+  }
+}
