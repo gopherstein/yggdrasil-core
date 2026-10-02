@@ -351,6 +351,7 @@ func entryToContract(e CatalogEntry, installed bool) contracts.Model {
 		Installed:    installed,
 		Dynamic:      e.Dynamic,
 		SupportRole:  e.SupportRole,
+		Languages:    e.Languages,
 	}
 	m.SupportRole = contracts.SupportRoleOf(m)
 	return m

@@ -200,5 +200,33 @@
     "speedUnavailable": "Velocidad no disponible",
     "usedBy": "Lo usa: {{profiles}}",
     "openChat": "Abrir el chat"
+  },
+  "languages": {
+    "title": "Idiomas",
+    "yours": "{{language}}: {{level}}",
+    "notRated": "Sin valoración para {{language}}",
+    "withMore_one": "{{first}} · {{count}} idioma más",
+    "withMore_many": "{{first}} · {{count}} idiomas más",
+    "withMore_other": "{{first}} · {{count}} idiomas más",
+    "detail": "{{level}} · {{confidence}} · {{sources}}",
+    "levels": {
+      "limited": "Limitado",
+      "fair": "Aceptable",
+      "good": "Bueno",
+      "excellent": "Excelente"
+    },
+    "confidence": {
+      "low": "confianza baja",
+      "medium": "confianza media",
+      "high": "confianza alta"
+    },
+    "sources": {
+      "model_card": "ficha del modelo",
+      "maintainer": "equipo de Yggdrasil",
+      "benchmark": "pruebas comparativas",
+      "provider": "proveedor",
+      "community": "valoraciones de la comunidad",
+      "local_evaluation": "probado en esta computadora"
+    }
   }
 }

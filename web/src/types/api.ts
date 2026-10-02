@@ -63,6 +63,14 @@ export interface HardwareInventory {
   detected_at: string
 }
 
+/** How well a model writes a language. A language without one is unknown. */
+export interface LanguageCapability {
+  language: string
+  level: 'limited' | 'fair' | 'good' | 'excellent'
+  confidence: 'low' | 'medium' | 'high'
+  sources: string[]
+}
+
 export interface ModelCapabilities {
   tool_calling: boolean
   vision: boolean
@@ -87,6 +95,8 @@ export interface Model {
   context?: number
   capabilities: ModelCapabilities
   source?: ModelSource
+  /** How well the model writes each language it has a level for, best first (multilingual spec §13–14). */
+  languages?: LanguageCapability[]
   purpose?: string[]
   tags?: string[]
   runtime?: string[]

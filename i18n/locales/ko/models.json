@@ -198,5 +198,31 @@
     "speedUnavailable": "속도 정보 없음",
     "usedBy": "사용 중인 프로필: {{profiles}}",
     "openChat": "채팅 열기"
+  },
+  "languages": {
+    "title": "언어",
+    "yours": "{{language}}: {{level}}",
+    "notRated": "{{language}} 평가 없음",
+    "withMore_other": "{{first}} · 외 {{count}}개 언어",
+    "detail": "{{level}} · {{confidence}} · {{sources}}",
+    "levels": {
+      "limited": "제한적",
+      "fair": "보통",
+      "good": "좋음",
+      "excellent": "우수"
+    },
+    "confidence": {
+      "low": "신뢰도 낮음",
+      "medium": "신뢰도 보통",
+      "high": "신뢰도 높음"
+    },
+    "sources": {
+      "model_card": "모델 카드",
+      "maintainer": "Yggdrasil 관리자",
+      "benchmark": "벤치마크",
+      "provider": "제공자",
+      "community": "커뮤니티 평가",
+      "local_evaluation": "이 컴퓨터에서 테스트함"
+    }
   }
 }

@@ -198,5 +198,31 @@
     "speedUnavailable": "無法取得速度",
     "usedBy": "使用者：{{profiles}}",
     "openChat": "打開聊天"
+  },
+  "languages": {
+    "title": "語言",
+    "yours": "{{language}}：{{level}}",
+    "notRated": "尚無{{language}}的評級",
+    "withMore_other": "{{first}} · 另有 {{count}} 種語言",
+    "detail": "{{level}} · {{confidence}} · {{sources}}",
+    "levels": {
+      "limited": "有限",
+      "fair": "普通",
+      "good": "良好",
+      "excellent": "優秀"
+    },
+    "confidence": {
+      "low": "可信度低",
+      "medium": "可信度中",
+      "high": "可信度高"
+    },
+    "sources": {
+      "model_card": "模型卡",
+      "maintainer": "Yggdrasil 維護者",
+      "benchmark": "基準測試",
+      "provider": "提供者",
+      "community": "社群評分",
+      "local_evaluation": "在這台電腦上測試過"
+    }
   }
 }

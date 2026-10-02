@@ -13,6 +13,9 @@ import {
   machineMemoryLabel,
   memoryLabel,
   modelToolAssessment,
+  languageDetail,
+  languageName,
+  languageSummary,
   purposeChips,
   runtimeRangeLabel,
   speedLabel,
@@ -41,7 +44,7 @@ export function ModelCard({
   installing?: boolean
   onInstall: () => void
 }) {
-  const { t } = useTranslation('models')
+  const { t, i18n } = useTranslation('models')
   const advancedMode = useUIStore((s) => s.advancedMode)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const isDownloading = model.status === 'downloading' || Boolean(progress)
@@ -53,6 +56,7 @@ export function ModelCard({
   const runtime = runtimeRangeLabel(fit)
   const machine = machineMemoryLabel(fit)
   const peers = (peerFits ?? []).filter((peer) => peer.nodeName)
+  const languages = languageSummary(model, i18n.language)
 
   return (
     <article className="card flex h-full min-w-0 flex-col overflow-hidden transition duration-150">
@@ -93,6 +97,11 @@ export function ModelCard({
       <p className="mt-2 text-xs text-ink-muted" title={tools.detail}>
         {tools.summary}
       </p>
+      {languages ? (
+        <p className="mt-1 text-xs text-ink-muted" title={languages.title}>
+          {languages.text}
+        </p>
+      ) : null}
       <SmallModelNote model={model} alternative={alternative} onInstallAlternative={onInstallAlternative} />
 
       {isDownloading && progress && (
@@ -159,6 +168,19 @@ export function ModelCard({
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
+              </dd>
+            </div>
+          ) : null}
+          {(model.languages ?? []).length > 0 ? (
+            <div className="pt-2">
+              <dt>{t('languages.title')}</dt>
+              <dd className="mt-1 space-y-0.5 text-ink">
+                {(model.languages ?? []).map((l) => (
+                  <p key={l.language} className="flex justify-between gap-3">
+                    <span>{languageName(l.language)}</span>
+                    <span className="text-end text-ink-muted">{languageDetail(l)}</span>
+                  </p>
+                ))}
               </dd>
             </div>
           ) : null}

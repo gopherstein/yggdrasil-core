@@ -113,6 +113,29 @@ type ModelCapabilities struct {
 	Coding          bool   `json:"coding"`
 }
 
+// LanguageCapability is how well a model writes a language (multilingual
+// spec §13–14, §31). Levels are coarse on purpose: they don't imply
+// precision the sources don't have. A language a model has no level for is
+// unknown, and is left out.
+type LanguageCapability struct {
+	// Language is a BCP 47 tag, such as "de" or "zh-Hans".
+	Language string `json:"language"`
+	// Level is "limited", "fair", "good", or "excellent".
+	Level string `json:"level"`
+	// Confidence in the level: "low", "medium", or "high".
+	Confidence string `json:"confidence"`
+	// Sources the level comes from: "model_card", "maintainer",
+	// "benchmark", "provider", "community", or "local_evaluation".
+	Sources []string `json:"sources"`
+}
+
+// Language capability levels, confidences, and sources.
+var (
+	LanguageLevels      = []string{"limited", "fair", "good", "excellent"}
+	LanguageConfidences = []string{"low", "medium", "high"}
+	LanguageSources     = []string{"model_card", "maintainer", "benchmark", "provider", "community", "local_evaluation"}
+)
+
 // ModelSource describes where a model artifact comes from.
 type ModelSource struct {
 	URL    string `json:"url"`
@@ -146,6 +169,9 @@ type Model struct {
 	// SupportRole marks a model that serves Yggdrasil instead of chatting:
 	// SupportEmbedding, SupportReranker, or SupportClassifier. Empty for chat models.
 	SupportRole string `json:"support_role,omitempty"`
+	// Languages are how well the model writes each language it has a level
+	// for (§13–14, §31), best first.
+	Languages []LanguageCapability `json:"languages,omitempty"`
 }
 
 // Supporting model roles (spec §61).
