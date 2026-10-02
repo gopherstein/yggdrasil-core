@@ -1,5 +1,5 @@
 {
-  "version": "1.1",
+  "version": "1.2",
   "types": {
     "ActivityStep": [
       "kind",
@@ -76,6 +76,7 @@
       "files",
       "notice",
       "run_id",
+      "setup",
       "sources",
       "steps"
     ],
@@ -132,6 +133,16 @@
       "verification_issues",
       "verification_passes",
       "workers"
+    ],
+    "SetupOffer": [
+      "ability",
+      "label",
+      "name",
+      "node_id",
+      "node_name",
+      "option",
+      "request",
+      "size_bytes"
     ],
     "ToolUse": [
       "calls",

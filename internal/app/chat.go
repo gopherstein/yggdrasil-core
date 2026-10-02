@@ -78,6 +78,11 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			NodePolicy:     contracts.NodePolicy{Mode: "automatic"},
 		}
 	}
+	// A request for something that is not installed but can be, such as an
+	// image before image generation is set up, is offered the setup (§29).
+	if ch, ok := a.offerSetup(ctx, profile, conversationID, message); ok {
+		return ch, nil
+	}
 	// A profile's own effort applies when the chat leaves effort on Auto (§40).
 	if pe := profile.Orchestration.Effort; pe != "" && huginn.EffortFrom(ctx) == huginn.EffortAuto {
 		ctx = huginn.WithEffort(ctx, huginn.ParseEffort(pe))

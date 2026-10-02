@@ -71,7 +71,7 @@ Speech runs on this computer: audio and text are not sent anywhere. Both tools a
 
 `image.generate` makes an image from a description, and `image.edit` changes a PNG or JPEG image in the chat from an instruction, such as "make it night" or "remove the car". Both run on this computer with [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp), so the prompt and the images are not sent anywhere. They are allowed by default and are level 1, and the Images capability turns them on or off in a profile. Offline profiles keep them. They are offered when a message asks to draw, paint, or make a picture, logo, or illustration, or to edit or change an image. An attached image is offered for editing whatever the message says.
 
-**Setup:** image generation needs a one-time setup, on the Tools page or with `POST /api/v1/images/setup`. Until then the tools are unavailable and say how to set them up, and "Can you generate images?" is answered with the same. Setup downloads two things:
+**Setup:** image generation needs a one-time setup, on the Tools page, from a chat, or with `POST /api/v1/images/setup`. Until then the tools are unavailable and say how to set them up. Asking for an image in a chat offers the setup there, and makes the image once it is ready (see [guided installation](capabilities.md#guided-installation)). Setup downloads two things:
 - stable-diffusion.cpp release `master-929-3f8527a` from GitHub, 17–35 MB.
 - A model from Hugging Face.
 

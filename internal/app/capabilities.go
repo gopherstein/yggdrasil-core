@@ -119,6 +119,7 @@ func (a *App) buildCapabilities(ctx context.Context) inventory.Snapshot {
 			Scan(&s.Artifacts.Count, &s.Artifacts.Bytes)
 	}
 
+	s.Setups = a.setupOptions(s)
 	s.Abilities = inventory.Abilities(s)
 	return s
 }
@@ -143,5 +144,9 @@ func (a *App) answerCapabilityQuestion(ctx context.Context, conversationID, mess
 		return nil, false
 	}
 	meta := &contracts.MessageMeta{Steps: []contracts.ActivityStep{{Kind: "share", Text: "Checked what Yggdrasil can do right now"}}}
+	// "Can you generate images?" on a computer that could: offer the setup.
+	if asked := inventory.Ask(a.Capabilities(ctx), message); len(asked) == 1 && asked[0].Setup != nil {
+		meta.Setup = setupOffer(asked[0], "")
+	}
 	return a.replyDirectly(ctx, conversationID, message, reply, meta), true
 }

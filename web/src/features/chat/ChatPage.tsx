@@ -30,6 +30,7 @@ import { AnswerDetails } from './AnswerDetails'
 import { FileChip, PendingFileChip, type PendingFile } from './FileChips'
 import { MemoryToggle } from './MemoryToggle'
 import { ReadAloudButton } from './ReadAloud'
+import { SetupOfferCard } from './SetupOffer'
 import { ChatErrorCard } from './ChatErrorCard'
 import { ChatMarkdown } from './ChatMarkdown'
 import { ContextUsageButton } from './ContextUsageButton'
@@ -849,6 +850,14 @@ export function ChatPage() {
     })
   }
 
+  // A setup offered in an answer finishes the request once it is ready
+  // (Gungnir §29); the card holds a stable callback to the latest send.
+  const sendRef = useRef<(text: string) => void>(() => {})
+  useEffect(() => {
+    sendRef.current = (text: string) => void sendMessage(text)
+  })
+  const continueAfterSetup = useCallback((text: string) => sendRef.current(text), [])
+
   const sendMessage = async (overrideText?: string) => {
     const readyFiles = overrideText == null ? pendingFiles.filter((f) => f.status === 'ready' && f.file) : []
     if (overrideText == null && pendingFiles.some((f) => f.status === 'uploading')) {
@@ -1516,6 +1525,9 @@ export function ChatPage() {
                       <>
                         <ChatMarkdown text={text} />
                         <AnswerDetails meta={message.meta} />
+                        {message.meta?.setup ? (
+                          <SetupOfferCard offer={message.meta.setup} onContinue={continueAfterSetup} />
+                        ) : null}
                         {canReadAloud ? (
                           <div className="mt-2">
                             <ReadAloudButton text={text} conversationId={message.conversation_id} />

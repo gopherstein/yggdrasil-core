@@ -82,6 +82,24 @@ type Ability struct {
 	Via       []string `json:"via,omitempty"`
 	// Note says how it works, or what would make it possible.
 	Note string `json:"note,omitempty"`
+	// Setup is what would add a missing ability, when Yggdrasil can install
+	// it (Gungnir §29).
+	Setup *Setup `json:"setup,omitempty"`
+}
+
+// Setup is an installable way to add an ability: a provider, how much it
+// downloads, and the computer it would run on.
+type Setup struct {
+	Ability string `json:"ability"`
+	// Option is what to install, such as an image model's id.
+	Option    string `json:"option"`
+	Name      string `json:"name"`
+	SizeBytes int64  `json:"size_bytes"`
+	NodeID    string `json:"node_id,omitempty"`
+	NodeName  string `json:"node_name,omitempty"`
+	// Tools are the tools it makes ready; a profile that denies them is
+	// not offered it.
+	Tools []string `json:"tools"`
 }
 
 // Snapshot is the inventory at one moment.
@@ -94,6 +112,8 @@ type Snapshot struct {
 	Providers  []Provider  `json:"providers"`
 	Artifacts  Artifacts   `json:"artifacts"`
 	Abilities  []Ability   `json:"abilities"`
+	// Setups are installable ways to add missing abilities.
+	Setups []Setup `json:"setups,omitempty"`
 }
 
 // rule decides one ability from a snapshot.
@@ -284,9 +304,34 @@ func Abilities(s Snapshot) []Ability {
 	out := make([]Ability, 0, len(rules))
 	for _, r := range rules {
 		ok, via, note := r.eval(s)
-		out = append(out, Ability{ID: r.id, Label: r.label, Available: ok, Via: via, Note: note})
+		a := Ability{ID: r.id, Label: r.label, Available: ok, Via: via, Note: note}
+		if !ok {
+			for i := range s.Setups {
+				if s.Setups[i].Ability == r.id {
+					a.Setup = &s.Setups[i]
+					break
+				}
+			}
+		}
+		out = append(out, a)
 	}
 	return out
+}
+
+// Needs returns the missing ability a request asks for, when it can be set
+// up: "Make me an image of a Viking tree" on a computer without image
+// generation (Gungnir §29). A question about abilities is not a request.
+func Needs(s Snapshot, message string) (Ability, bool) {
+	if IsQuestion(message) {
+		return Ability{}, false
+	}
+	all := Abilities(s)
+	for i, r := range rules {
+		if r.cue.MatchString(message) && !all[i].Available && all[i].Setup != nil {
+			return all[i], true
+		}
+	}
+	return Ability{}, false
 }
 
 // askRe is a question about what the assistant can do, not a request to do it.
