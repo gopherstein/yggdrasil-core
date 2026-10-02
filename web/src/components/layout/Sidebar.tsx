@@ -122,13 +122,15 @@ export function Sidebar() {
         <div className="flex items-center gap-2.5">
           <YggdrasilMark size={36} lore />
           <a href="/" className="brand flex min-w-0 flex-1 items-center gap-2.5 no-underline">
-            <div className="min-w-0 leading-none">
-              <div className="flex items-center gap-2">
-                <p className="font-display text-xl font-semibold tracking-tight text-ink">
-                  Yggdrasil
-                </p>
+            <div className="min-w-0 flex-1 leading-none">
+              <p className="truncate font-display text-xl font-semibold tracking-tight text-ink">
+                Yggdrasil
+              </p>
+              {/* Status sits under the title so it never runs into the bell; a long
+                  label truncates (the hint is in title) and the version wraps below. */}
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span
-                  className={['status-chip shrink-0', statusTone].join(' ')}
+                  className={['status-chip min-w-0 max-w-full', statusTone].join(' ')}
                   title={
                     !serviceOk
                       ? t('status.unavailableHint')
@@ -137,13 +139,16 @@ export function Sidebar() {
                         : t('status.readyHint')
                   }
                 >
-                  <span className={['h-1.5 w-1.5 rounded-full', statusDot].join(' ')} aria-hidden />
-                  {statusLabel}
+                  <span className={['h-1.5 w-1.5 shrink-0 rounded-full', statusDot].join(' ')} aria-hidden />
+                  <span className="truncate">{statusLabel}</span>
                 </span>
+                <p
+                  className="min-w-0 max-w-full truncate text-[11px] leading-none text-ink-faint"
+                  title={runningVersion || t('tagline')}
+                >
+                  {runningVersion || t('tagline')}
+                </p>
               </div>
-              <p className="mt-1 whitespace-nowrap text-[11px] leading-none text-ink-faint">
-                {runningVersion || t('tagline')}
-              </p>
             </div>
           </a>
           <NotificationBell />
