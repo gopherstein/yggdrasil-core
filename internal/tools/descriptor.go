@@ -34,6 +34,7 @@ const (
 	OutputFile  = "file"
 	OutputImage = "image"
 	OutputAudio = "audio"
+	OutputVideo = "video"
 )
 
 // Requirements are what a tool needs to run (§7).

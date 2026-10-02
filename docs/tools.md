@@ -109,6 +109,24 @@ Each is the [FLUX.2 [klein] 4B](https://huggingface.co/black-forest-labs/FLUX.2-
 - **Editing:** `file` is an image in the chat by name or id. The result keeps the image's shape, at up to 1024 pixels on the longer side, and is attached as a new file, so the original is kept.
 - **Limits:** one image at a time, 20 minutes each.
 
+## Video
+
+`video.generate` makes a short clip on this computer, from a description or from an image in the chat brought to life. It uses the same stable-diffusion.cpp as images, with its own setup. It is allowed by default and level 1, the Video capability turns it on or off in a profile, and offline profiles keep it. It is offered when a message asks for a video, clip, or animation, or to bring an image to life.
+
+**Setup:** on the Tools page under Video generation, from a chat when a request needs it, or with `POST /api/v1/video/setup`. Setup installs stable-diffusion.cpp if image generation hasn't, then downloads the model from Hugging Face, pinned to revisions and checked against their SHA-256.
+
+| Model | Download | For | What it does |
+| --- | --- | --- | --- |
+| Wan 2.2 TI2V 5B | 8.5 GB | 16 GB of memory | A clip from a description, or from an image |
+
+The model is Wan 2.2 TI2V 5B (GGUF, Q4_K_M) with the umt5-xxl text encoder (GGUF) and the Wan 2.2 VAE. All three are Apache 2.0 and need no account to download.
+
+- **Clips:** `prompt` describes the subject, motion, camera, and style. `seconds` is 1 to 5 (default 2), made at 16 frames a second. The size is 832×480, or the image's shape (480×832 for a tall one, 640×640 for a square one); `width` and `height` change it, within about 832×480 pixels, in multiples of 32. `seed` repeats a clip, and each result includes it.
+- **From an image:** `image` is a PNG or JPEG in the chat, by name or id. It becomes the first frame.
+- **Output:** clips are WebM (VP8), attached to the answer, where they play.
+- **Other computers:** a paired computer with video set up makes clips for this one, preferring one whose GPU does the work. A laptop can ask a workstation.
+- **Time:** a clip takes several minutes; each frame costs about as much as an image. One clip runs at a time, for up to 75 minutes. Stop ends it.
+
 ## Descriptors and levels
 
 Every tool, whatever it comes from, has a descriptor (`GET /api/v1/tools/{id}`, and each entry of `GET /api/v1/tools`):

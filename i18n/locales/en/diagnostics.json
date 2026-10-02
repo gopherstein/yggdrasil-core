@@ -167,6 +167,7 @@
     "tools": {
       "image.generate": "Make images",
       "image.edit": "Edit images",
+      "video.generate": "Make videos",
       "speech.transcribe": "Transcribe",
       "speech.synthesize": "Read aloud"
     },

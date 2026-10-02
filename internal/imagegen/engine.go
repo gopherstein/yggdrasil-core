@@ -38,9 +38,19 @@ type Engine struct {
 	Setup *Setup
 	// WorkDir holds each job's files while it runs.
 	WorkDir string
+	// What names what it makes in messages: image generation (the
+	// default) or video generation.
+	What string
 
 	// mu runs one image at a time; each uses all of the memory it can.
 	mu sync.Mutex
+}
+
+func (e *Engine) what() string {
+	if e.What != "" {
+		return e.What
+	}
+	return "image generation"
 }
 
 // Available reports whether images can be made, and what would set it up.
@@ -54,10 +64,10 @@ func (e *Engine) Available() (bool, string) {
 	}
 	for _, m := range st.Models {
 		if m.Recommended {
-			return false, fmt.Sprintf("image generation isn't set up yet. Set it up on the Tools page: %s, a %.1f GB download", m.Name, float64(m.SizeBytes)/1e9)
+			return false, fmt.Sprintf("%s isn't set up yet. Set it up on the Tools page: %s, %.1f GB to download", e.what(), m.Name, float64(m.SizeBytes)/1e9)
 		}
 	}
-	return false, "image generation isn't set up yet. Set it up on the Tools page"
+	return false, e.what() + " isn't set up yet. Set it up on the Tools page"
 }
 
 // provider describes this computer's image provider (Gungnir §16). Only the
@@ -65,7 +75,7 @@ func (e *Engine) Available() (bool, string) {
 func (e *Engine) provider(tool string) remotetools.Provider {
 	p := remotetools.Provider{Tool: tool, Accelerated: runtime.GOOS == "darwin"}
 	st := e.Setup.Status()
-	if m, ok := Lookup(st.Active); ok {
+	if m, ok := e.Setup.lookup(st.Active); ok {
 		p.Name = m.Name
 	}
 	switch {
@@ -197,28 +207,37 @@ func (e *Engine) Generate(ctx context.Context, req Request) (Result, error) {
 		}
 		args = append(args, "-r", ref)
 	}
-	ctx, cancel := context.WithTimeout(ctx, runLimit)
+	start := time.Now()
+	data, err := runCLI(ctx, cli, dir, args, out, "image", runLimit)
+	if err != nil {
+		return Result{}, err
+	}
+	return Result{PNG: data, Width: w, Height: h, Seed: seed, Seconds: time.Since(start).Seconds(), Model: model.Name}, nil
+}
+
+// runCLI runs sd-cli in dir and returns the file it wrote to out.
+func runCLI(ctx context.Context, cli, dir string, args []string, out, what string, limit time.Duration) ([]byte, error) {
+	ctx, cancel := context.WithTimeout(ctx, limit)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, cli, args...)
 	cmd.Dir = dir
 	cmd.WaitDelay = 5 * time.Second
 	var stderr tail
 	cmd.Stdout, cmd.Stderr = &stderr, &stderr
-	start := time.Now()
 	if err := cmd.Run(); err != nil {
 		if ctx.Err() == context.DeadlineExceeded {
-			return Result{}, fmt.Errorf("the image took longer than %d minutes and was stopped", int(runLimit.Minutes()))
+			return nil, fmt.Errorf("the %s took longer than %d minutes and was stopped", what, int(limit.Minutes()))
 		}
 		if ctx.Err() != nil {
-			return Result{}, ctx.Err()
+			return nil, ctx.Err()
 		}
-		return Result{}, fmt.Errorf("the image could not be made: %s", stderr.lastLine(err))
+		return nil, fmt.Errorf("the %s could not be made: %s", what, stderr.lastLine(err))
 	}
 	data, err := os.ReadFile(out)
 	if err != nil {
-		return Result{}, fmt.Errorf("the image could not be made: %s", stderr.lastLine(err))
+		return nil, fmt.Errorf("the %s could not be made: %s", what, stderr.lastLine(err))
 	}
-	return Result{PNG: data, Width: w, Height: h, Seed: seed, Seconds: time.Since(start).Seconds(), Model: model.Name}, nil
+	return data, nil
 }
 
 // tail keeps the end of sd-cli's output, for its error.

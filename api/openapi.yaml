@@ -1888,6 +1888,74 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/v1/video/setup:
+    get:
+      summary: What video generation has installed, the models on offer, and any setup in progress
+      operationId: getVideoSetup
+      responses:
+        "200":
+          description: Image generation status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSetup"
+    post:
+      summary: Install stable-diffusion.cpp and a video model in the background
+      operationId: startVideoSetup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [model_id]
+              properties:
+                model_id: {type: string, description: "A model from the status's models, such as wan2.2-ti2v-5b"}
+      responses:
+        "202":
+          description: Setup started; poll the status for its progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSetup"
+        "409":
+          description: Setup is already running, there is too little space, or this computer cannot run it
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Stop the setup in progress; what was downloaded is kept and resumed next time
+      operationId: cancelVideoSetup
+      responses:
+        "200":
+          description: Image generation status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSetup"
+  /api/v1/video/models/{id}:
+    delete:
+      summary: Delete an installed video model to free its space
+      operationId: removeVideoModel
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        "200":
+          description: Image generation status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSetup"
+        "409":
+          description: The model is being set up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/v1/artifacts:
     post:
       summary: Upload a file to attach to a chat (up to 25 MB)
@@ -4497,7 +4565,8 @@ components:
               license: {type: string}
               memory_bytes: {type: integer, format: int64}
               size_bytes: {type: integer, format: int64}
-              edits: {type: boolean}
+              edits: {type: boolean, description: "Edits images, or for a video model, animates them"}
+              kind: {type: string, enum: [image, video]}
               installed: {type: boolean}
               recommended: {type: boolean}
               files:
@@ -4505,7 +4574,7 @@ components:
                 items:
                   type: object
                   properties:
-                    role: {type: string, enum: [diffusion, vae, llm]}
+                    role: {type: string, enum: [diffusion, vae, llm, t5xxl]}
                     repo: {type: string}
                     path: {type: string}
                     size_bytes: {type: integer, format: int64}
@@ -4913,7 +4982,7 @@ components:
         default_policy: {type: string}
         version: {type: integer}
         input_schema: {type: object, additionalProperties: true, description: JSON Schema of the arguments}
-        outputs: {type: array, items: {type: string, enum: [text, file, image, audio]}}
+        outputs: {type: array, items: {type: string, enum: [text, file, image, audio, video]}}
         level: {type: integer, minimum: 1, maximum: 4, description: "1 low risk on this computer, 2 reads outside data, 3 changes things, 4 runs commands or code"}
         level_name: {type: string}
         execution: {type: string, enum: [local, remote, either]}

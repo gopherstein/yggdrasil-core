@@ -19,6 +19,7 @@ var toolGroups = map[string][]string{
 	"listen":  {"speech.transcribe"},
 	"speak":   {"speech.synthesize"},
 	"draw":    {"image.generate"},
+	"film":    {"video.generate"},
 	"places":  {"places.search", "places.details", "maps.route", "maps.distance"},
 	"retouch": {"image.edit"},
 	"shell":   {"terminal"},
@@ -51,6 +52,7 @@ var (
 	cueDraw    = regexp.MustCompile(`(?i)(\b(draw|paint|sketch|illustrat\w*|render)\b|\b(make|create|generate|design|produce|give me)\b.{0,40}\b(images?|pictures?|photos?|illustrations?|drawings?|paintings?|logos?|icons?|wallpapers?|artwork|portraits?|posters?)\b)`)
 	cueRetouch = regexp.MustCompile(`(?i)\b(edit|change|retouch|recolou?r|remove|replace|turn|make|add)\b.{0,40}\b(images?|pictures?|photos?|backgrounds?|\w+\.(png|jpe?g))\b`)
 	cuePlaces  = regexp.MustCompile(`(?i)(\b(near (me|here|by)|nearby|nearest|closest|directions?|route (from|between)|how (far|long does it take)|distance (from|to|between)|drive (from|to)|walk (from|to)|get (from|to)|address (of|for)|open now|opening hours|restaurants?|caf[eé]s?|pharmac(y|ies)|gas stations?)\b)`)
+	cueFilm    = regexp.MustCompile(`(?i)\b(videos?|clips?|animat\w*|movies?|footage|gifs?|bring (it|this|that|the|my)( \w+)? to life|make (it|this) move)\b`)
 	cueSheet   = regexp.MustCompile(`(?i)\b(spreadsheets?|xlsx|csv|excel|workbooks?|sheets?)\b`)
 	cueWeb     = regexp.MustCompile(`(?i)(\b(search|web|online|internet|look up|website|url|link|news|latest)\b|https?://)`)
 )
@@ -99,6 +101,9 @@ func ToolsFor(k Kind, message string, available []string) []string {
 	}
 	if cuePlaces.MatchString(message) {
 		want["places"] = true
+	}
+	if cueFilm.MatchString(message) {
+		want["film"] = true
 	}
 	if cueDraw.MatchString(message) {
 		want["draw"] = true

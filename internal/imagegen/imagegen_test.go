@@ -33,7 +33,10 @@ while [ $# -gt 0 ]; do
   if [ "$1" = "-p" ] && [ "$2" = "fail" ]; then echo "  |=====>    | 2/4" >&2; echo "error: out of memory" >&2; exit 1; fi
   shift
 done
-cp "$(dirname "$0")/sample.png" "$out"
+case "$out" in
+  *.webm) printf '\032\105\337\243webm' > "$out" ;;
+  *) cp "$(dirname "$0")/sample.png" "$out" ;;
+esac
 `
 
 func samplePNG(t *testing.T, w, h int) []byte {
@@ -353,7 +356,7 @@ func TestNotSetUp(t *testing.T) {
 	f := newFixture(t)
 	eng := &Engine{Setup: f.setup, WorkDir: t.TempDir()}
 	ok, why := eng.Available()
-	if ok || !strings.Contains(why, "isn't set up yet") || !strings.Contains(why, "FLUX.2 [klein] 4B, a 5.2 GB download") {
+	if ok || !strings.Contains(why, "isn't set up yet") || !strings.Contains(why, "FLUX.2 [klein] 4B, 5.2 GB to download") {
 		t.Fatalf("available %v %q", ok, why)
 	}
 	if _, err := eng.Generate(context.Background(), Request{Prompt: "a cat"}); err == nil {

@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { api } from '@/lib/api'
+import { api, type MediaKind } from '@/lib/api'
 import type { SetupOffer } from '@/types/api'
 
 function gb(bytes: number): string {
@@ -19,11 +19,12 @@ export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onCon
   const [started, setStarted] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const continued = useRef(false)
-  const images = offer.ability === 'image_generation'
+  // The setup each installable ability uses.
+  const kind: MediaKind | null = offer.ability === 'image_generation' ? 'images' : offer.ability === 'video_generation' ? 'video' : null
   const statusQuery = useQuery({
-    queryKey: ['images', 'setup'],
-    queryFn: () => api.getImageSetup(),
-    enabled: images,
+    queryKey: [kind ?? 'none', 'setup'],
+    queryFn: () => api.getMediaSetup(kind!),
+    enabled: kind !== null,
     retry: false,
     refetchInterval: (query) => (query.state.data?.job?.running ? 1000 : false),
   })
@@ -39,7 +40,7 @@ export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onCon
     if (offer.request) onContinue(offer.request)
   }, [ready, started, offer.request, onContinue, queryClient])
 
-  if (!images || !status) return null
+  if (!kind || !status) return null
 
   const where = offer.node_name ? `${offer.node_name} (${t('setup.thisComputer')})` : t('setup.thisComputer')
   const percent = job && job.total_bytes > 0 ? Math.round((job.done_bytes / job.total_bytes) * 100) : 0
@@ -67,7 +68,7 @@ export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onCon
             <button
               type="button"
               className="text-xs text-ink-faint underline-offset-2 hover:text-ink hover:underline"
-              onClick={() => void api.cancelImageSetup().then(() => statusQuery.refetch())}
+              onClick={() => void api.cancelMediaSetup(kind).then(() => statusQuery.refetch())}
             >
               {t('setup.stop')}
             </button>
@@ -87,9 +88,9 @@ export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onCon
             onClick={async () => {
               setError(null)
               try {
-                const next = await api.startImageSetup(offer.option)
+                const next = await api.startMediaSetup(kind, offer.option)
                 setStarted(true)
-                if (next) queryClient.setQueryData(['images', 'setup'], next)
+                if (next) queryClient.setQueryData([kind, 'setup'], next)
                 else void statusQuery.refetch()
               } catch (err) {
                 setError(err instanceof Error ? err.message : String(err))

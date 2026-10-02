@@ -93,6 +93,9 @@ import type {
   StopChatResponse,
 } from '@/types/api'
 import type { Upload } from '@/lib/upload'
+
+/** A kind of generated media with its own setup: images or video. */
+export type MediaKind = 'images' | 'video'
 import { hasEventRelay, onRelayedEvent, saveFromDaemon, signInReturnAddress } from '@/lib/desktopBridge'
 
 export class ApiError extends Error {
@@ -717,6 +720,19 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ text, conversation_id: conversationId }),
     }),
+
+  /** What image (images) or video generation has installed, and any setup in progress. */
+  getMediaSetup: (kind: MediaKind) => request<ImageSetup>(`/api/v1/${kind}/setup`),
+
+  /** Install stable-diffusion.cpp and a model of that kind in the background. */
+  startMediaSetup: (kind: MediaKind, modelId: string) =>
+    request<ImageSetup>(`/api/v1/${kind}/setup`, { method: 'POST', body: JSON.stringify({ model_id: modelId }) }),
+
+  /** Stop the setup; what was downloaded is kept. */
+  cancelMediaSetup: (kind: MediaKind) => request<ImageSetup>(`/api/v1/${kind}/setup`, { method: 'DELETE' }),
+
+  /** Delete an installed model of that kind. */
+  removeMediaModel: (kind: MediaKind, id: string) => request<ImageSetup>(`/api/v1/${kind}/models/${id}`, { method: 'DELETE' }),
 
   /** What image generation has installed, and any setup in progress. */
   getImageSetup: () => request<ImageSetup>('/api/v1/images/setup'),

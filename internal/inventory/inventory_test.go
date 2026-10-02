@@ -168,3 +168,17 @@ func TestNeeds(t *testing.T) {
 		t.Error("offered with nothing to install")
 	}
 }
+
+// Video generation is its own ability, offered a setup when it can be
+// installed.
+func TestVideoAbility(t *testing.T) {
+	s := snapshot()
+	s.Setups = []Setup{{Ability: "video_generation", Option: "wan2.2-ti2v-5b", Name: "Wan 2.2 TI2V 5B", SizeBytes: 8_497_662_272, Tools: []string{"video.generate"}}}
+	if a, ok := Needs(s, "Make a short video of waves on a beach"); !ok || a.ID != "video_generation" {
+		t.Fatalf("needs %+v %v", a, ok)
+	}
+	s.Tools = append(s.Tools, Tool{ID: "video.generate", Name: "Generate Video", Enabled: true})
+	if a := ability(t, Abilities(s), "video_generation"); !a.Available || a.Setup != nil {
+		t.Fatalf("ready %+v", a)
+	}
+}

@@ -215,6 +215,12 @@ func TestToolsFor(t *testing.T) {
 			t.Errorf("%q offered %v, want %s", msg, got, want)
 		}
 	}
+	film := []string{"video.generate", "image.generate"}
+	for _, msg := range []string{"Make a short video of waves on a beach", "Animate this photo", "Bring this picture to life"} {
+		if got := ToolsFor(Chat, msg, film); !has(got, "video.generate") {
+			t.Errorf("%q offered %v", msg, got)
+		}
+	}
 	mailCal := []string{"email.search", "email.read", "email.send", "calendar.search", "calendar.availability", "calendar.create"}
 	for msg, want := range map[string]string{
 		"Anything new in my inbox from Sam?":    "email.search",

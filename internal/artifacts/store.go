@@ -114,7 +114,8 @@ func MimeType(name string) string {
 	case ".flac":
 		return "audio/flac"
 	case ".webm":
-		return "audio/webm"
+		// A clip, or a voice recording from a browser; either plays as video.
+		return "video/webm"
 	}
 	if t := mime.TypeByExtension(ext); t != "" {
 		return t
@@ -126,7 +127,10 @@ func MimeType(name string) string {
 }
 
 // IsAudio reports an audio file: one that can be played and transcribed.
-func IsAudio(name string) bool { return kindOf(name) == "audio" }
+// A .webm file counts: it is a video kind, but its sound can be transcribed.
+func IsAudio(name string) bool {
+	return kindOf(name) == "audio" || strings.EqualFold(filepath.Ext(name), ".webm")
+}
 
 func kindOf(name string) string {
 	switch strings.ToLower(filepath.Ext(name)) {
@@ -136,8 +140,10 @@ func kindOf(name string) string {
 		return "pdf"
 	case ".png", ".jpg", ".jpeg", ".gif", ".webp":
 		return "image"
-	case ".wav", ".mp3", ".m4a", ".aac", ".ogg", ".flac", ".webm":
+	case ".wav", ".mp3", ".m4a", ".aac", ".ogg", ".flac":
 		return "audio"
+	case ".webm":
+		return "video"
 	case ".txt", ".md", ".markdown", ".html", ".htm", ".json", ".jsonl", ".log", ".docx":
 		return "document"
 	case ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java", ".kt", ".c", ".h", ".cpp", ".hpp", ".cs",

@@ -136,6 +136,7 @@ type Server struct {
 	speech          *speech.Engine
 	speechStore     *artifacts.Store
 	images          *imagegen.Setup
+	video           *imagegen.Setup
 	notifications   *gjallarhorn.Hub
 	connectors      *connectors.Manager
 	mcp             *mcp.Manager

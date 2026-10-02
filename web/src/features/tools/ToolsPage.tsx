@@ -5,7 +5,7 @@ import i18n from '@/i18n'
 import { api } from '@/lib/api'
 import type { ToolRecord } from '@/types/api'
 import { RealmKicker } from '@/components/ui/Realm'
-import { ImageSetupCard } from './ImageSetup'
+import { ImageSetupCard, VideoSetupCard } from './ImageSetup'
 import { ToolSources } from './ToolSources'
 
 // The filters, in order; each is tools:page.filters.<id> in the catalog.
@@ -85,6 +85,7 @@ export function ToolsPage() {
         <p className="mt-1 max-w-2xl text-sm text-ink-muted">{t('page.description')}</p>
       </div>
       <ImageSetupCard />
+      <VideoSetupCard />
       <ToolSources />
       <div>
         <h2 className="section-title">{t('page.allTitle')}</h2>

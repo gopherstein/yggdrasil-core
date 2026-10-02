@@ -35,6 +35,16 @@ func (a *App) setupOptions(s inventory.Snapshot) []inventory.Setup {
 			}
 		}
 	}
+	if a.Video != nil {
+		if st := a.Video.Status(); st.Supported && !st.Ready {
+			for _, m := range st.Models {
+				if m.Recommended {
+					out = append(out, inventory.Setup{Ability: "video_generation", Option: m.ID, Name: m.Name, SizeBytes: m.SizeBytes,
+						NodeID: local.ID, NodeName: local.Name, Tools: []string{"video.generate"}})
+				}
+			}
+		}
+	}
 	return out
 }
 

@@ -20,6 +20,8 @@ const (
 	CapSpeech = "speech"
 	// CapImage makes and edits images (Gungnir §17).
 	CapImage = "image"
+	// CapVideo makes short clips (Gungnir §27).
+	CapVideo = "video"
 )
 
 // Definition is one registered tool: built in, from a connected service,
@@ -95,6 +97,8 @@ func BuiltinCatalog() []Definition {
 			Runtime: "python", Outputs: []string{OutputAudio}},
 		{ID: "image.generate", Name: "Generate Image", Description: "Make an image from a description, on this computer, attached to the answer as a PNG. Describe the subject, setting, style, and lighting in \"prompt\". \"width\" and \"height\" are pixels (default 1024 each, up to 1536); \"seed\" repeats an earlier image.", Capability: CapImage, Source: "builtin", Schema: `{"prompt":"string","width":"integer","height":"integer","seed":"integer","name":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskCreate,
 			Runtime: "sdcpp", Outputs: []string{OutputImage}},
+		{ID: "video.generate", Name: "Generate Video", Description: "Make a short clip, on this computer, attached to the answer as a video that plays: from a description in \"prompt\" (subject, motion, camera, style), or from an image in this chat (\"image\" is its name) brought to life. \"seconds\" is 1 to 5 (default 2); it takes several minutes, so say so. \"width\" and \"height\" default to 832×480 landscape, or the image's shape.", Capability: CapVideo, Source: "builtin", Schema: `{"prompt":"string","image":"string","seconds":"number","width":"integer","height":"integer","seed":"integer","name":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskCreate,
+			Runtime: "sdcpp", Outputs: []string{OutputVideo}},
 		{ID: "image.edit", Name: "Edit Image", Description: "Change a PNG or JPEG image in this chat from an instruction, on this computer, such as \"make it night\" or \"remove the car\". \"file\" is the image's name; the changed image is attached to the answer as a new file.", Capability: CapImage, Source: "builtin", Schema: `{"file":"string","prompt":"string","seed":"integer","name":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskCreate,
 			Runtime: "sdcpp", Outputs: []string{OutputImage}},
 		{ID: "code.execute", Name: "Run Code", Description: "Run Python in a sandbox for calculations, data analysis, and charts, with numpy, pandas, and matplotlib. It has no network and sees only files you list from this chat (\"files\": [\"sales.xlsx\"]), read from its working folder. Print results; files it saves there (.png, .csv, .xlsx, .pdf, and so on) are attached to the answer. Use matplotlib's savefig for charts.", Capability: CapCode, Source: "builtin", Schema: `{"code":"string","files":"array"}`, DefaultPolicy: PolicyAsk, Risk: RiskWrite,

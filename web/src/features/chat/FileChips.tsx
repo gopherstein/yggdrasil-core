@@ -12,7 +12,7 @@ function formatSize(bytes: number): string {
 }
 
 // A file's kind, as chat:attachments.kinds.<kind> names it.
-const knownKinds = ['spreadsheet', 'pdf', 'document', 'code', 'image', 'audio']
+const knownKinds = ['spreadsheet', 'pdf', 'document', 'code', 'image', 'audio', 'video']
 
 function kindLabel(kind: string): string {
   return i18n.t(`chat:attachments.kinds.${knownKinds.includes(kind) ? kind : 'other'}`)
@@ -21,6 +21,14 @@ function kindLabel(kind: string): string {
 function FileIcon({ kind }: { kind: string }) {
   const tone =
     kind === 'spreadsheet' ? 'text-success' : kind === 'pdf' ? 'text-danger' : kind === 'code' ? 'text-bifrost' : 'text-mimir'
+  if (kind === 'video') {
+    return (
+      <svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0 text-bifrost" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden>
+        <rect x="1.5" y="3" width="10" height="10" rx="1.5" />
+        <path d="M11.5 6.5l3-1.5v6l-3-1.5" strokeLinejoin="round" />
+      </svg>
+    )
+  }
   if (kind === 'image') {
     return (
       <svg viewBox="0 0 16 16" className="h-4 w-4 shrink-0 text-bifrost" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden>
@@ -50,6 +58,7 @@ function FileIcon({ kind }: { kind: string }) {
 export function FileChip({ file }: { file: FileRef }) {
   if (file.kind === 'audio') return <AudioChip file={file} />
   if (file.kind === 'image') return <ImageChip file={file} />
+  if (file.kind === 'video') return <VideoChip file={file} />
   return <DownloadChip file={file} />
 }
 
@@ -186,6 +195,56 @@ export function ImageChip({ file }: { file: FileRef }) {
       )}
       <span className="flex items-center gap-2 px-1">
         <FileIcon kind="image" />
+        <span className={`min-w-0 flex-1 truncate ${error ? 'text-danger' : ''}`} title={error ?? file.name}>
+          {error ?? file.name}
+        </span>
+        <button
+          type="button"
+          className="shrink-0 rounded-md px-1.5 py-0.5 text-ink-faint transition hover:text-ink"
+          title={t('attachments.download', { name: file.name })}
+          aria-label={t('attachments.download', { name: file.name })}
+          onClick={() => void downloadArtifact(file).catch((err: unknown) => setError(err instanceof Error ? err.message : t('attachments.downloadFailed')))}
+        >
+          ↓
+        </button>
+      </span>
+    </span>
+  )
+}
+
+/** A video, which plays in the chat; it can be downloaded. */
+export function VideoChip({ file }: { file: FileRef }) {
+  const { t } = useTranslation('chat')
+  const [url, setUrl] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    let made: string | null = null
+    artifactObjectUrl(file.id)
+      .then((u) => {
+        made = u
+        if (cancelled) URL.revokeObjectURL(u)
+        else setUrl(u)
+      })
+      .catch((err: unknown) => setError(err instanceof Error ? err.message : t('attachments.videoFailed')))
+    return () => {
+      cancelled = true
+      if (made) URL.revokeObjectURL(made)
+    }
+  }, [file.id, t])
+
+  return (
+    <span className="inline-flex max-w-full flex-col gap-1.5 rounded-lg border border-line/70 bg-surface p-1.5 text-xs text-ink">
+      {url ? (
+        <video src={url} controls loop playsInline className="max-h-80 w-auto max-w-full rounded-md sm:max-w-[28rem]" aria-label={file.name} />
+      ) : (
+        <span className="flex h-24 w-40 items-center justify-center rounded-md bg-raised text-ink-faint">
+          {error ? t('attachments.notAvailable') : t('attachments.loading')}
+        </span>
+      )}
+      <span className="flex items-center gap-2 px-1">
+        <FileIcon kind="video" />
         <span className={`min-w-0 flex-1 truncate ${error ? 'text-danger' : ''}`} title={error ?? file.name}>
           {error ?? file.name}
         </span>

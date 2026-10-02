@@ -210,7 +210,7 @@ export interface ToolRecord {
   /** The common descriptor (Gungnir §7). */
   version?: number
   input_schema?: Record<string, unknown>
-  outputs?: ('text' | 'file' | 'image' | 'audio')[]
+  outputs?: ('text' | 'file' | 'image' | 'audio' | 'video')[]
   /** 1 low risk on this computer, 2 reads outside data, 3 changes things, 4 runs commands or code. */
   level?: 1 | 2 | 3 | 4
   level_name?: string
@@ -403,8 +403,9 @@ export interface ImageModel {
   license: string
   memory_bytes: number
   size_bytes: number
-  /** It can change an image from an instruction. */
+  /** It can change an image from an instruction, or, for a video model, animate one. */
   edits: boolean
+  kind: 'image' | 'video'
   installed: boolean
   recommended: boolean
 }

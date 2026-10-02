@@ -2,37 +2,52 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import i18n from '@/i18n'
-import { api } from '@/lib/api'
+import { api, type MediaKind } from '@/lib/api'
 import type { ImageSetup } from '@/types/api'
 
 function gb(bytes: number): string {
   return i18n.t('tools:images.gigabytes', { value: (bytes / 1e9).toFixed(1) })
 }
 
-/**
- * Image generation (Gungnir §17): set it up with a recommended model, watch
- * the download, and remove models to free space.
- */
+// Wording that differs by kind is tools:<kind>.<key>; the rest is shared
+// under tools:images.
+const OWN = new Set(['title', 'unsupported', 'ready', 'notSetUp', 'makesAndEdits', 'makes', 'setUp'])
+
+/** Image generation (Gungnir §17). */
 export function ImageSetupCard() {
-  const { t } = useTranslation('tools')
+  return <MediaSetupCard kind="images" />
+}
+
+/** Video generation (Gungnir §27). */
+export function VideoSetupCard() {
+  return <MediaSetupCard kind="video" />
+}
+
+/**
+ * Set up a kind of generated media with a recommended model, watch the
+ * download, and remove models to free space.
+ */
+function MediaSetupCard({ kind }: { kind: MediaKind }) {
+  const { t: tt } = useTranslation('tools')
+  const t = (key: string, opts?: Record<string, unknown>) => tt(`${OWN.has(key.split('.')[1]) ? kind : 'images'}.${key.split('.')[1]}`, opts)
   const queryClient = useQueryClient()
   const [choice, setChoice] = useState<string | null>(null)
   const setupQuery = useQuery({
-    queryKey: ['images', 'setup'],
-    queryFn: () => api.getImageSetup(),
+    queryKey: [kind, 'setup'],
+    queryFn: () => api.getMediaSetup(kind),
     retry: false,
     // Follow a setup while it runs.
     refetchInterval: (query) => (query.state.data?.job?.running ? 1000 : false),
   })
   const update = (status: ImageSetup | null) => {
-    if (status) queryClient.setQueryData(['images', 'setup'], status)
-    else void queryClient.invalidateQueries({ queryKey: ['images', 'setup'] })
+    if (status) queryClient.setQueryData([kind, 'setup'], status)
+    else void queryClient.invalidateQueries({ queryKey: [kind, 'setup'] })
     // Tools become ready, or stop being ready.
     void queryClient.invalidateQueries({ queryKey: ['tools'] })
   }
-  const start = useMutation({ mutationFn: (id: string) => api.startImageSetup(id), onSuccess: update })
-  const cancel = useMutation({ mutationFn: () => api.cancelImageSetup(), onSuccess: update })
-  const remove = useMutation({ mutationFn: (id: string) => api.removeImageModel(id), onSuccess: update })
+  const start = useMutation({ mutationFn: (id: string) => api.startMediaSetup(kind, id), onSuccess: update })
+  const cancel = useMutation({ mutationFn: () => api.cancelMediaSetup(kind), onSuccess: update })
+  const remove = useMutation({ mutationFn: (id: string) => api.removeMediaModel(kind, id), onSuccess: update })
 
   // When a setup ends, the image tools become ready (or stay not ready).
   const wasRunning = useRef(false)
@@ -53,9 +68,9 @@ export function ImageSetupCard() {
   const percent = job && job.total_bytes > 0 ? Math.round((job.done_bytes / job.total_bytes) * 100) : 0
 
   return (
-    <section className="card space-y-3" aria-labelledby="image-setup-title">
+    <section className="card space-y-3" aria-labelledby={`${kind}-setup-title`}>
       <div>
-        <h2 id="image-setup-title" className="section-title">
+        <h2 id={`${kind}-setup-title`} className="section-title">
           {t('images.title')}
         </h2>
         <p className="mt-1 max-w-2xl text-sm text-ink-muted">
@@ -89,7 +104,7 @@ export function ImageSetupCard() {
               {!model.installed ? (
                 <input
                   type="radio"
-                  name="image-model"
+                  name={`${kind}-model`}
                   className="mt-1"
                   checked={selected === model.id}
                   onChange={() => setChoice(model.id)}

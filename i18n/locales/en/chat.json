@@ -111,6 +111,7 @@
     "loading": "Loading…",
     "audioFailed": "The audio could not be loaded.",
     "imageFailed": "The image could not be loaded.",
+    "videoFailed": "The video could not be loaded.",
     "notAvailable": "Not available",
     "play": "Play",
     "meta": "{{kind}} · {{size}}",
@@ -121,6 +122,7 @@
       "code": "Code",
       "image": "Image",
       "audio": "Audio",
+      "video": "Video",
       "other": "File"
     }
   },

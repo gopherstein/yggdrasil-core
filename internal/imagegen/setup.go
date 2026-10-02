@@ -31,6 +31,8 @@ type Setup struct {
 	// Changed is called when what is installed changes: a setup ended or a
 	// model was removed.
 	Changed func()
+	// Catalog lists the models this setup offers; nil is the image models.
+	Catalog func() []Model
 	// archive overrides this platform's build; tests set it.
 	archive *Archive
 	// fileURL overrides where model files come from; tests set it.
@@ -87,6 +89,19 @@ type Status struct {
 	Job    *Job          `json:"job,omitempty"`
 }
 
+func (s *Setup) models() []Model {
+	if s.Catalog != nil {
+		return s.Catalog()
+	}
+	return Catalog()
+}
+
+func (s *Setup) lookup(id string) (Model, bool) { return lookupIn(s.models(), id) }
+
+// programMu keeps two setups, such as images and video, from installing
+// the same stable-diffusion.cpp at once.
+var programMu sync.Mutex
+
 func (s *Setup) platform() (Archive, bool) {
 	if s.archive != nil {
 		return *s.archive, true
@@ -113,8 +128,8 @@ func (s *Setup) Status() Status {
 	if s.Memory != nil {
 		memory = s.Memory()
 	}
-	rec := Recommend(memory).ID
-	for _, m := range Catalog() {
+	rec := recommendIn(s.models(), memory).ID
+	for _, m := range s.models() {
 		st.Models = append(st.Models, ModelStatus{Model: m, SizeBytes: m.SizeBytes(), Installed: s.installed(m.ID), Recommended: m.ID == rec})
 	}
 	s.mu.Lock()
@@ -153,7 +168,7 @@ func (s *Setup) ActiveModel() string {
 			return id
 		}
 	}
-	for _, m := range Catalog() {
+	for _, m := range s.models() {
 		if s.installed(m.ID) {
 			return m.ID
 		}
@@ -164,9 +179,9 @@ func (s *Setup) ActiveModel() string {
 // paths returns the active model and its files by role.
 func (s *Setup) paths() (Model, map[string]string, error) {
 	id := s.ActiveModel()
-	m, ok := Lookup(id)
+	m, ok := s.lookup(id)
 	if !ok {
-		return Model{}, nil, errors.New("no image model is installed")
+		return Model{}, nil, errors.New("no model is installed")
 	}
 	out := map[string]string{}
 	for _, f := range m.Files {
@@ -181,9 +196,9 @@ func (s *Setup) Start(id string) error {
 	if why := s.unsupported(); why != "" {
 		return errors.New(why)
 	}
-	m, ok := Lookup(id)
+	m, ok := s.lookup(id)
 	if !ok {
-		return fmt.Errorf("unknown image model %q", id)
+		return fmt.Errorf("unknown model %q", id)
 	}
 	need := int64(0)
 	if !s.installed(id) {
@@ -281,6 +296,13 @@ func (s *Setup) install(ctx context.Context, j *job, m Model, program bool, arch
 }
 
 func (s *Setup) installProgram(ctx context.Context, archive Archive, add func(int64)) error {
+	programMu.Lock()
+	defer programMu.Unlock()
+	if s.CLI() != "" {
+		// The other setup installed it meanwhile.
+		add(archive.Size)
+		return nil
+	}
 	dir := filepath.Join(s.ProgramDir, Release)
 	if err := os.MkdirAll(s.ProgramDir, 0o755); err != nil {
 		return err
@@ -317,8 +339,8 @@ func (s *Setup) Cancel() {
 
 // Remove deletes an installed model to free its space.
 func (s *Setup) Remove(id string) error {
-	if _, ok := Lookup(id); !ok {
-		return fmt.Errorf("unknown image model %q", id)
+	if _, ok := s.lookup(id); !ok {
+		return fmt.Errorf("unknown model %q", id)
 	}
 	s.mu.Lock()
 	busy := s.job != nil && s.job.running && s.job.model == id

@@ -225,6 +225,19 @@ var rules = []rule{
 			}
 			return false, nil, "No image model or image tool is installed. Adding a tool source that generates images, on the Tools page, would add it."
 		}},
+	{"video_generation", "Make videos", regexp.MustCompile(`(?i)\b(generat|creat|make|render|animat|produc)\w*\b.*\b(videos?|clips?|animations?|movies?|footage)\b`),
+		func(s Snapshot) (bool, []string, string) {
+			v := toolsWhere(s, toolID("video."))
+			if len(v) > 0 {
+				return true, v, "A clip of a few seconds takes several minutes."
+			}
+			for _, t := range s.Tools {
+				if t.Enabled && t.ID == "video.generate" && t.Unavailable != "" {
+					return false, nil, strings.ToUpper(t.Unavailable[:1]) + t.Unavailable[1:] + "."
+				}
+			}
+			return false, nil, "No video model or video tool is installed."
+		}},
 	{"vision", "Understand images", regexp.MustCompile(`(?i)\b(see|read|understand|describe|look at|analy[sz]e)\b.*\b(images?|pictures?|photos?|screenshots?)\b`),
 		func(s Snapshot) (bool, []string, string) {
 			v := modelsWhere(s, func(m Model) bool { return m.Vision })

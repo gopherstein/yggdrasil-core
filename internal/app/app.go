@@ -134,6 +134,8 @@ type App struct {
 	portable []remotetools.Portable
 	// Images makes and edits images on this computer (Gungnir §17).
 	Images *imagegen.Setup
+	// Video makes short clips on this computer (Gungnir §27).
+	Video *imagegen.Setup
 	// health turns computer and model health changes into notifications.
 	health *healthNotices
 	// runs maps a conversation id to its running turn, so Stop can cancel it.
@@ -666,6 +668,10 @@ func New(opts Options) (*App, error) {
 	a.registerPortable(&imagegen.EditTool{Engine: images, Store: a.Artifacts})
 	a.registerPlaces(cfg)
 	a.API.BindImages(a.Images)
+	a.Video = a.newVideoSetup(cfg)
+	videos := &imagegen.Engine{Setup: a.Video, WorkDir: filepath.Join(cfg.DataDir, "video-jobs"), What: "video generation"}
+	a.registerPortable(&imagegen.VideoTool{Engine: videos, Store: a.Artifacts})
+	a.API.BindVideo(a.Video)
 	a.Training = a.newTrainingService()
 	if err := a.Training.Recover(context.Background()); err != nil {
 		return nil, fmt.Errorf("training: %w", err)

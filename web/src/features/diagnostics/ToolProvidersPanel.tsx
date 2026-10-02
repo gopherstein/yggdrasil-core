@@ -4,7 +4,7 @@ import { api } from '@/lib/api'
 import type { ToolProvider } from '@/types/api'
 
 /** The tools shown; each is named at providers.tools.<id> in the catalog. */
-const TOOLS = ['image.generate', 'image.edit', 'speech.transcribe', 'speech.synthesize'] as const
+const TOOLS = ['image.generate', 'image.edit', 'video.generate', 'speech.transcribe', 'speech.synthesize'] as const
 
 const TONE: Record<ToolProvider['state'], string> = {
   healthy: 'text-success',

@@ -22,7 +22,7 @@ What lives there:
 | --- | --- |
 | `config.json` | The values below. Written with mode `0600`. |
 | `yggdrasil.db` | SQLite: models, profiles, chats, memories, settings, automations, specialized AIs and their examples, knowledge indexes and vectors, run records, notifications, API key hashes, paired computers. |
-| `models/` | Installed GGUF model files, and image models in `models/images/`, one folder per model. |
+| `models/` | Installed GGUF model files, and image and video models in `models/images/` and `models/video/`, one folder per model. |
 | `runtimes/llamacpp/` | `llama-server` and the other llama.cpp programs. |
 | `runtimes/python/` | `uv`, a private Python, and the environments for training (`envs/trainer-mlx`, `envs/trainer-peft`), text recognition (`envs/ocr`), running code (`envs/code`), and speech (`envs/speech`), each installed the first time it is needed. |
 | `runtimes/sdcpp/` | stable-diffusion.cpp, one folder per release, installed by image generation setup. |
@@ -31,7 +31,7 @@ What lives there:
 | `knowledge/` | Copies of pasted and uploaded knowledge, and `ocr-cache/` (recognized text of scanned PDFs). |
 | `training/` | Trained adapters (`adapters/`), exported GGUF files (`exports/`), job working files (`jobs/`, removed when a job ends), and downloaded training weights (`hf-cache/`). |
 | `code-runs/` | Each code run's working folder, deleted when the run ends. |
-| `image-jobs/` | Each image's working files, deleted when the image is made. |
+| `image-jobs/`, `video-jobs/` | Each image's or clip's working files, deleted when it is made. |
 | `logs/` | `daemon.log` (JSON) and llama-server logs. |
 | `secrets/` | This computer's identity (`node-<id>.key`, `.pub`), and credentials: `connector-<service>.json`, `mcp-<source>.json`, `knowledge-<source>`, `notify-<destination>`. Directory mode `0700`, files `0600`. |
 

@@ -29,11 +29,18 @@ type Model struct {
 	// get the smaller model recommended.
 	MemoryBytes int64  `json:"memory_bytes"`
 	Files       []File `json:"files"`
-	// Edits says whether it can change an image from an instruction.
+	// Edits says whether it can change an image from an instruction, or,
+	// for a video model, animate one.
 	Edits bool `json:"edits"`
-	// Steps and CFG are its sampling defaults.
-	Steps int     `json:"-"`
-	CFG   float64 `json:"-"`
+	// Kind is image or video.
+	Kind string `json:"kind"`
+	// Steps and CFG are its sampling defaults; FlowShift, Frames, and FPS
+	// are a video model's.
+	Steps     int     `json:"-"`
+	CFG       float64 `json:"-"`
+	FlowShift float64 `json:"-"`
+	Frames    int     `json:"-"`
+	FPS       int     `json:"-"`
 }
 
 // SizeBytes is the total download.
@@ -50,6 +57,9 @@ var revisions = map[string]string{
 	"leejet/FLUX.2-klein-4B-GGUF":            "3b1f5a9dc3abb32238b053aeb3d823c30afdacbd",
 	"black-forest-labs/FLUX.2-small-decoder": "a3efc24f613ef42d9428af62fdbd6f5fd8856c4a",
 	"unsloth/Qwen3-4B-GGUF":                  "22c9fc8a8c7700b76a1789366280a6a5a1ad1120",
+	"QuantStack/Wan2.2-TI2V-5B-GGUF":         "57437632ddd08bdcbd1508c866aa22e126ed51d2",
+	"city96/umt5-xxl-encoder-gguf":           "b535255bee98c2b0a59ea7c0ae2dcd0c6657b3b7",
+	"Comfy-Org/Wan_2.2_ComfyUI_Repackaged":   "ee6f4a40737a995bf5818954cfce6d59443b0f04",
 }
 
 var vae = File{Role: "vae", Repo: "black-forest-labs/FLUX.2-small-decoder", Path: "full_encoder_small_decoder.safetensors",
@@ -61,7 +71,7 @@ var vae = File{Role: "vae", Repo: "black-forest-labs/FLUX.2-small-decoder", Path
 func Catalog() []Model {
 	return []Model{
 		{
-			ID: "flux2-klein-4b", Name: "FLUX.2 [klein] 4B",
+			ID: "flux2-klein-4b", Name: "FLUX.2 [klein] 4B", Kind: "image",
 			Description: "Makes and edits images in a few steps. Fits most computers with 16 GB of memory.",
 			License:     "Apache-2.0", MemoryBytes: 12 << 30, Edits: true, Steps: 4, CFG: 1,
 			Files: []File{
@@ -73,7 +83,7 @@ func Catalog() []Model {
 			},
 		},
 		{
-			ID: "flux2-klein-4b-q8", Name: "FLUX.2 [klein] 4B, high quality",
+			ID: "flux2-klein-4b-q8", Name: "FLUX.2 [klein] 4B, high quality", Kind: "image",
 			Description: "The same model with more detail, for computers with 24 GB of memory or more.",
 			License:     "Apache-2.0", MemoryBytes: 20 << 30, Edits: true, Steps: 4, CFG: 1,
 			Files: []File{
@@ -87,9 +97,30 @@ func Catalog() []Model {
 	}
 }
 
-// Lookup returns a catalog model by id.
-func Lookup(id string) (Model, bool) {
-	for _, m := range Catalog() {
+// VideoCatalog lists the video models setup offers. Wan 2.2 TI2V 5B makes
+// a short clip from a description or brings an image to life; it and its
+// parts are Apache 2.0 and need no account to download.
+func VideoCatalog() []Model {
+	return []Model{{
+		ID: "wan2.2-ti2v-5b", Name: "Wan 2.2 TI2V 5B", Kind: "video",
+		Description: "Makes short clips from a description, or from an image. Needs about 16 GB of memory; a clip takes minutes.",
+		License:     "Apache-2.0", MemoryBytes: 16 << 30, Edits: true, Steps: 20, CFG: 6, FlowShift: 3, Frames: 33, FPS: 16,
+		Files: []File{
+			{Role: "diffusion", Repo: "QuantStack/Wan2.2-TI2V-5B-GGUF", Path: "Wan2.2-TI2V-5B-Q4_K_M.gguf",
+				Size: 3433116000, SHA256: "95b19697b7f98e65b0a543640e9ca7b4dfec32e2a6e3731e8e10708be52655e2"},
+			{Role: "t5xxl", Repo: "city96/umt5-xxl-encoder-gguf", Path: "umt5-xxl-encoder-Q4_K_M.gguf",
+				Size: 3655145312, SHA256: "17cf97a5bbbc60a646d6105b832b6f657ce904a8a1ad970e4b59df0c67584a40"},
+			{Role: "vae", Repo: "Comfy-Org/Wan_2.2_ComfyUI_Repackaged", Path: "split_files/vae/wan2.2_vae.safetensors",
+				Size: 1409400960, SHA256: "e40321bd36b9709991dae2530eb4ac303dd168276980d3e9bc4b6e2b75fed156"},
+		},
+	}}
+}
+
+// Lookup returns an image model by id.
+func Lookup(id string) (Model, bool) { return lookupIn(Catalog(), id) }
+
+func lookupIn(list []Model, id string) (Model, bool) {
+	for _, m := range list {
 		if m.ID == id {
 			return m, true
 		}
@@ -97,10 +128,11 @@ func Lookup(id string) (Model, bool) {
 	return Model{}, false
 }
 
-// Recommend picks the model for a computer with this much memory: the
-// largest it is comfortable with, else the smallest.
-func Recommend(memoryBytes int64) Model {
-	list := Catalog()
+// Recommend picks the image model for a computer with this much memory:
+// the largest it is comfortable with, else the smallest.
+func Recommend(memoryBytes int64) Model { return recommendIn(Catalog(), memoryBytes) }
+
+func recommendIn(list []Model, memoryBytes int64) Model {
 	best := list[0]
 	for _, m := range list {
 		if m.MemoryBytes <= memoryBytes && m.MemoryBytes > best.MemoryBytes {

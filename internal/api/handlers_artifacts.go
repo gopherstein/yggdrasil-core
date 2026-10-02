@@ -135,7 +135,7 @@ func (s *Server) handleArtifactContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	disposition := "attachment"
-	if r.URL.Query().Get("inline") == "1" && (a.Kind == "pdf" || a.Kind == "image" || a.Kind == "audio") {
+	if r.URL.Query().Get("inline") == "1" && (a.Kind == "pdf" || a.Kind == "image" || a.Kind == "audio" || a.Kind == "video") {
 		disposition = "inline"
 	}
 	w.Header().Set("Content-Type", a.MimeType)

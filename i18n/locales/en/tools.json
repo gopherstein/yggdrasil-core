@@ -64,6 +64,15 @@
       "disabled": "turned off"
     }
   },
+  "video": {
+    "title": "Video generation",
+    "unsupported": "Videos can't be made on this computer: {{reason}}.",
+    "ready": "Ask for a short clip, or attach an image and ask to bring it to life. Clips are made on this computer with {{model}} and take several minutes; nothing is sent anywhere.",
+    "notSetUp": "Video generation isn't set up yet. Setup downloads stable-diffusion.cpp from GitHub, if image generation hasn't, and a video model from Hugging Face; after that, clips are made on this computer, offline.",
+    "makesAndEdits": " · makes clips, and brings images to life",
+    "makes": " · makes clips",
+    "setUp": "Set up video generation"
+  },
   "images": {
     "title": "Image generation",
     "unsupported": "Images can't be made on this computer: {{reason}}.",
