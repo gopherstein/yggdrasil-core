@@ -65,6 +65,8 @@ jobs:
             dist/*.rpm
             dist/*.tar.gz
             dist/SHA256SUMS.txt
+            scripts/install.sh
+            scripts/install.ps1
       # Homebrew and apt serve stable releases. A pre-release (a tag with a
       # suffix such as -beta.1) must not replace what their users install.
       - name: Open the Homebrew formula pull request

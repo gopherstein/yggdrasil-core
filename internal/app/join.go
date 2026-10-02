@@ -84,6 +84,10 @@ func (a *App) admitJoining(ctx context.Context, node join.JoiningNode) (string, 
 	return name, a.Pairing.Trust(ctx, node.ID, name, node.Address, []byte(node.PublicKeyPEM))
 }
 
+// installerBase is where the install scripts are: attached to each
+// release (#40).
+const installerBase = "https://github.com/yeixio/yggdrasil-core/releases/latest/download"
+
 // errNotReachable is a computer other computers cannot reach.
 var errNotReachable = contracts.Errorf("JOIN_NOT_REACHABLE", nil,
 	"other computers can't reach this one: turn on Find other computers (discovery_enabled) and restart Yggdrasil")
@@ -119,6 +123,10 @@ func (a *App) CreateJoinToken(ctx context.Context, ttl time.Duration) (api.JoinT
 	created := api.JoinTokenCreated{
 		Token: raw, Server: server, Fingerprint: fp,
 		Command: fmt.Sprintf("yggctl join --server %s --token %s --fingerprint %s", server, raw, fp),
+		InstallCommand: fmt.Sprintf("curl -fsSL %s/install.sh | sh -s -- join --server %s --token %s --fingerprint %s",
+			installerBase, server, raw, fp),
+		WindowsCommand: fmt.Sprintf("& ([scriptblock]::Create((irm %s/install.ps1))) join -Server %s -Token %s -Fingerprint %s",
+			installerBase, server, raw, fp),
 	}
 	created.ID, created.CreatedAt, created.ExpiresAt, created.Status = t.ID, t.CreatedAt, t.ExpiresAt, t.Status
 	return created, nil

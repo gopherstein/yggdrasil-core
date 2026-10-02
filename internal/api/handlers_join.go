@@ -34,6 +34,10 @@ type JoinTokenCreated struct {
 	Server      string `json:"server"`
 	Fingerprint string `json:"fingerprint"`
 	Command     string `json:"command"`
+	// InstallCommand installs Yggdrasil on a Linux or macOS computer that
+	// doesn't have it yet, then joins; WindowsCommand does so in PowerShell.
+	InstallCommand string `json:"install_command"`
+	WindowsCommand string `json:"windows_command"`
 }
 
 // JoinRequest joins this computer to a network.

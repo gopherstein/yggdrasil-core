@@ -63,6 +63,12 @@ jobs:
             echo "$unformatted"
             exit 1
           fi
+      - name: Installer scripts
+        # shellcheck and pwsh come with the Ubuntu runner.
+        run: |
+          shellcheck --shell=sh scripts/install.sh
+          sh -n scripts/install.sh
+          pwsh -NoProfile -Command '$errors = $null; [System.Management.Automation.Language.Parser]::ParseFile("scripts/install.ps1", [ref]$null, [ref]$errors) | Out-Null; if ($errors) { $errors | ForEach-Object { Write-Error $_.ToString() }; exit 1 }'
       - name: Vet
         run: go vet ./...
       - name: Lint
@@ -93,6 +99,31 @@ jobs:
           path: coverage.out
           retention-days: 1
           if-no-files-found: error
+
+  installer:
+    # install.sh on a real Ubuntu with systemd: the .deb from a local
+    # release, the service, and install-and-join with a join token (#40).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.26.x"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - name: Build the Linux amd64 package
+        run: |
+          go install github.com/goreleaser/nfpm/v2/cmd/nfpm@v2.41.3
+          export PATH="$(go env GOPATH)/bin:$PATH"
+          ONLY=linux-amd64 VERSION=0.0.0-ci ./scripts/build/package-core-release.sh
+      - name: Install and join
+        run: |
+          shellcheck scripts/test-install.sh
+          ./scripts/test-install.sh
 
   coverage-badge:
     needs: go

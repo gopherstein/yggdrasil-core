@@ -41,6 +41,16 @@ For a server or any computer you reach over SSH, without mDNS or a screen, join 
 
 2. On the new computer, with Yggdrasil running, run that command. The two computers trust each other from then on, and the new one shows on the Computers page and takes work from Norn like any paired computer.
 
+   If Yggdrasil isn't installed there yet, use the second command `join-token create` prints instead. It installs Yggdrasil, starts it as a service, and joins:
+
+   ```text
+   curl -fsSL https://github.com/yeixio/yggdrasil-core/releases/latest/download/install.sh | sh -s -- join --server … --token … --fingerprint …
+   ```
+
+   On Linux it installs the release's `.deb` (apt) or `.rpm` (dnf, yum, rpm) and the `yggdrasil` systemd service, using `sudo` when not run as root. On macOS it installs the headless archive in `~/.local/lib/yggdrasil` with a launchd agent, or with `sudo` in `/usr/local/lib/yggdrasil` with a launchd daemon that runs as the person who ran `sudo`, for a Mac nobody is logged in to. Each download is checked against the release's `SHA256SUMS.txt`, and a Yggdrasil that is already installed and running is left as it is. Windows has the same in PowerShell, from `install.ps1`, which installs in `%LOCALAPPDATA%\Programs\Yggdrasil` and starts at sign-in with a scheduled task.
+
+   `YGGDRASIL_VERSION` installs a particular release instead of the latest. Without `join`, the scripts only install.
+
 The token lasts 15 minutes (`--ttl` up to `24h`) and works once. `yggctl join-token list` shows recent tokens, and `yggctl join-token revoke <id>` stops an unused one. Only a proof key derived from the token is stored, and the token is never logged.
 
 How the join stays safe over Bifrost's plain HTTP:

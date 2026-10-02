@@ -1458,7 +1458,9 @@ paths:
                       token: {type: string, description: "ygj_…, shown only now"}
                       server: {type: string, description: This computer's Bifrost address, host:port}
                       fingerprint: {type: string, description: "sha256: of this computer's public key"}
-                      command: {type: string}
+                      command: {type: string, description: "yggctl join … for a computer with Yggdrasil installed"}
+                      install_command: {type: string, description: "Installs Yggdrasil on Linux or macOS, then joins"}
+                      windows_command: {type: string, description: "The same in PowerShell"}
         "409":
           description: Other computers can't reach this one
     get:

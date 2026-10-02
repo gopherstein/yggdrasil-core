@@ -102,7 +102,8 @@ func TestJoinTokenCommands(t *testing.T) {
 		"POST /api/v1/join-tokens": func(w http.ResponseWriter, r *http.Request) {
 			_ = json.NewDecoder(r.Body).Decode(&ttl)
 			reply(201, map[string]any{"id": "abcd1234", "status": "active", "expires_at": now.Add(30 * time.Minute),
-				"command": "yggctl join --server 10.0.0.5:7332 --token ygj_x --fingerprint sha256:y"})(w, r)
+				"command":         "yggctl join --server 10.0.0.5:7332 --token ygj_x --fingerprint sha256:y",
+				"install_command": "curl -fsSL https://example/install.sh | sh -s -- join --server 10.0.0.5:7332"})(w, r)
 		},
 		"GET /api/v1/join-tokens": reply(200, []map[string]any{
 			{"id": "abcd1234", "status": "active", "created_at": now.Add(-2 * time.Minute), "expires_at": now.Add(13 * time.Minute)},
@@ -116,7 +117,8 @@ func TestJoinTokenCommands(t *testing.T) {
 	if err := joinTokenCommand([]string{"create", "--ttl", "30m"}, c, &out, clock); err != nil {
 		t.Fatal(err)
 	}
-	if ttl["ttl_minutes"] != 30 || !strings.Contains(out.String(), "  yggctl join --server 10.0.0.5:7332") || !strings.Contains(out.String(), "expires in 30m and can be used once") {
+	if ttl["ttl_minutes"] != 30 || !strings.Contains(out.String(), "  yggctl join --server 10.0.0.5:7332") || !strings.Contains(out.String(), "expires in 30m and can be used once") ||
+		!strings.Contains(out.String(), "this installs it and joins (Linux, macOS):\n\n  curl -fsSL https://example/install.sh") {
 		t.Fatalf("create sent %v, printed:\n%s", ttl, out.String())
 	}
 	out.Reset()

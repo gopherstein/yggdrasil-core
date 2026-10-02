@@ -183,6 +183,8 @@ type joinToken struct {
 	Server      string     `json:"server,omitempty"`
 	Fingerprint string     `json:"fingerprint,omitempty"`
 	Command     string     `json:"command,omitempty"`
+	Install     string     `json:"install_command,omitempty"`
+	Windows     string     `json:"windows_command,omitempty"`
 }
 
 func joinTokenCommand(args []string, c daemonClient, out io.Writer, now func() time.Time) error {
@@ -211,8 +213,14 @@ func joinTokenCommand(args []string, c daemonClient, out io.Writer, now func() t
 		if *output == "json" {
 			return writeJSON(out, t)
 		}
-		fmt.Fprintf(out, "Join a computer to this Yggdrasil network. On that computer, run:\n\n  %s\n\nThis token expires in %s and can be used once (ID %s).\n",
-			t.Command, roundDuration(t.ExpiresAt.Sub(now())), t.ID)
+		fmt.Fprintf(out, "Join a computer to this Yggdrasil network. On that computer, run:\n\n  %s\n", t.Command)
+		if t.Install != "" {
+			fmt.Fprintf(out, "\nIf Yggdrasil isn't installed there yet, this installs it and joins (Linux, macOS):\n\n  %s\n", t.Install)
+		}
+		if t.Windows != "" {
+			fmt.Fprintf(out, "\nOn Windows, in PowerShell:\n\n  %s\n", t.Windows)
+		}
+		fmt.Fprintf(out, "\nThis token expires in %s and can be used once (ID %s).\n", roundDuration(t.ExpiresAt.Sub(now())), t.ID)
 		return nil
 	case "list":
 		var list []joinToken

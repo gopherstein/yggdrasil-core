@@ -122,15 +122,18 @@ package_windows() {
   rm -rf "$stage"
 }
 
-package_linux amd64 amd64 x86_64
-package_linux arm64 arm64 aarch64
-package_darwin arm64
-package_darwin amd64
-package_windows amd64
+# ONLY builds one target, such as linux-amd64, for the installer test in CI.
+want() { [[ -z "${ONLY:-}" || "${ONLY}" == "$1" ]]; }
+if want linux-amd64; then package_linux amd64 amd64 x86_64; fi
+if want linux-arm64; then package_linux arm64 arm64 aarch64; fi
+if want darwin-arm64; then package_darwin arm64; fi
+if want darwin-amd64; then package_darwin amd64; fi
+if want windows-amd64; then package_windows amd64; fi
 
 (
   cd dist
   : > SHA256SUMS.txt
+  shopt -s nullglob
   for file in *.deb *.rpm *.tar.gz; do
     if command -v sha256sum >/dev/null 2>&1; then
       hash="$(sha256sum "$file" | awk '{print $1}')"

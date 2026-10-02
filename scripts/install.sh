@@ -1,0 +1,260 @@
+#!/bin/sh
+# Install Yggdrasil Core and, optionally, join a network (#40).
+#
+#   curl -fsSL https://github.com/yeixio/yggdrasil-core/releases/latest/download/install.sh | sh
+#   curl -fsSL https://github.com/yeixio/yggdrasil-core/releases/latest/download/install.sh | \
+#     sh -s -- join --server 192.168.1.10:7332 --token ygj_… --fingerprint sha256:…
+#
+# Linux: the release's .deb (apt) or .rpm (dnf, yum), which run Yggdrasil as
+# a systemd service. macOS: the release's headless archive in
+# /usr/local/lib/yggdrasil (or ~/.local/lib/yggdrasil without sudo), run by
+# launchd. Each download is checked against the release's SHA256SUMS.txt.
+# An installed Yggdrasil that is running is left as it is.
+#
+# Environment:
+#   YGGDRASIL_VERSION      a release such as 1.5.0 (default: the latest)
+#   YGGDRASIL_RELEASE_URL  where the release files are (overrides the version)
+#   YGGDRASIL_URL          the daemon's API (default http://127.0.0.1:7331)
+#   YGGDRASIL_PREFIX       macOS install directory
+#   YGGDRASIL_NO_SERVICE=1 install files only; do not register or start a service
+set -eu
+
+REPO="yeixio/yggdrasil-core"
+API="${YGGDRASIL_URL:-http://127.0.0.1:7331}"
+
+say() { printf '%s\n' "$*"; }
+ok() { printf '\342\234\223 %s\n' "$*"; }
+die() {
+	printf 'Install failed: %s\n' "$*" >&2
+	exit 1
+}
+
+usage() {
+	cat <<'EOF'
+usage: install.sh [join --server <host:port> --token <ygj_…> --fingerprint <sha256:…>]
+Installs Yggdrasil Core, starts it as a service, and with join, joins this
+computer to the network that made the join command.
+EOF
+}
+
+joining=0
+if [ "$#" -gt 0 ]; then
+	case "$1" in
+	join)
+		joining=1
+		shift
+		;;
+	-h | --help | help)
+		usage
+		exit 0
+		;;
+	*)
+		usage >&2
+		exit 2
+		;;
+	esac
+fi
+
+if [ -n "${YGGDRASIL_RELEASE_URL:-}" ]; then
+	BASE="${YGGDRASIL_RELEASE_URL%/}"
+elif [ -n "${YGGDRASIL_VERSION:-}" ]; then
+	BASE="https://github.com/${REPO}/releases/download/v${YGGDRASIL_VERSION#v}"
+else
+	BASE="https://github.com/${REPO}/releases/latest/download"
+fi
+
+# Run as root when needed, through sudo when not root already.
+as_root() {
+	if [ "$(id -u)" -eq 0 ]; then
+		"$@"
+	elif command -v sudo >/dev/null 2>&1; then
+		sudo "$@"
+	else
+		die "this step needs root, and sudo isn't available: run the command as root"
+	fi
+}
+
+fetch() { # url dest
+	if command -v curl >/dev/null 2>&1; then
+		curl -fsSL --retry 3 -o "$2" "$1"
+	elif command -v wget >/dev/null 2>&1; then
+		wget -q -O "$2" "$1"
+	else
+		die "neither curl nor wget is installed"
+	fi
+}
+
+sha256() {
+	if command -v sha256sum >/dev/null 2>&1; then
+		sha256sum "$1" | awk '{print $1}'
+	elif command -v shasum >/dev/null 2>&1; then
+		shasum -a 256 "$1" | awk '{print $1}'
+	else
+		die "neither sha256sum nor shasum is installed, so the download can't be checked"
+	fi
+}
+
+healthy() {
+	if command -v curl >/dev/null 2>&1; then
+		curl -fsS -m 2 "${API}/api/v1/health" >/dev/null 2>&1
+	else
+		wget -q -T 2 -O /dev/null "${API}/api/v1/health" >/dev/null 2>&1
+	fi
+}
+
+wait_healthy() {
+	i=0
+	while [ "$i" -lt 60 ]; do
+		if healthy; then
+			return 0
+		fi
+		i=$((i + 1))
+		sleep 1
+	done
+	return 1
+}
+
+os="$(uname -s)"
+case "$(uname -m)" in
+x86_64 | amd64) arch="amd64" ;;
+aarch64 | arm64) arch="arm64" ;;
+*) die "this computer's processor ($(uname -m)) isn't one Yggdrasil is built for" ;;
+esac
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT INT TERM
+
+# download_release <pattern>: download the one release file matching an
+# extended regular expression, checked against SHA256SUMS.txt, and print its
+# path.
+download_release() {
+	fetch "${BASE}/SHA256SUMS.txt" "$tmp/SHA256SUMS.txt" || die "couldn't download the release list from ${BASE}"
+	line="$(grep -E "  ($1)\$" "$tmp/SHA256SUMS.txt" | head -n 1 || true)"
+	[ -n "$line" ] || die "the release has no file for this computer (${os} ${arch})"
+	want="${line%% *}"
+	name="${line##* }"
+	say "Downloading ${name}..." >&2
+	fetch "${BASE}/${name}" "$tmp/${name}" || die "couldn't download ${BASE}/${name}"
+	got="$(sha256 "$tmp/${name}")"
+	[ "$got" = "$want" ] || die "${name} doesn't match its checksum (expected ${want}, got ${got}); nothing was installed"
+	printf '%s\n' "$tmp/${name}"
+}
+
+start_service_linux() {
+	[ "${YGGDRASIL_NO_SERVICE:-}" = "1" ] && return 0
+	if command -v systemctl >/dev/null 2>&1; then
+		as_root systemctl daemon-reload || true
+		as_root systemctl enable --now yggdrasil.service >/dev/null 2>&1 || as_root systemctl restart yggdrasil.service
+	fi
+}
+
+install_linux() {
+	if command -v apt-get >/dev/null 2>&1 && command -v dpkg >/dev/null 2>&1; then
+		pkg="$(download_release "yggdrasil_[0-9][^ ]*_${arch}\.deb")"
+		as_root apt-get install -y "$pkg" >/dev/null || die "apt-get couldn't install ${pkg##*/}"
+	elif command -v rpm >/dev/null 2>&1; then
+		rarch="x86_64"
+		[ "$arch" = "arm64" ] && rarch="aarch64"
+		pkg="$(download_release "yggdrasil-[0-9][^ ]*\.${rarch}\.rpm")"
+		if command -v dnf >/dev/null 2>&1; then
+			as_root dnf install -y "$pkg" >/dev/null || die "dnf couldn't install ${pkg##*/}"
+		elif command -v yum >/dev/null 2>&1; then
+			as_root yum install -y "$pkg" >/dev/null || die "yum couldn't install ${pkg##*/}"
+		else
+			as_root rpm -U --replacepkgs "$pkg" || die "rpm couldn't install ${pkg##*/}"
+		fi
+	else
+		die "this Linux has neither apt nor rpm; see https://github.com/${REPO}#install to build from source"
+	fi
+	start_service_linux
+}
+
+install_macos() {
+	if [ -n "${YGGDRASIL_PREFIX:-}" ]; then
+		prefix="$YGGDRASIL_PREFIX"
+		bindir="${YGGDRASIL_BIN_DIR:-$prefix/bin}"
+	elif [ "$(id -u)" -eq 0 ]; then
+		prefix="/usr/local/lib/yggdrasil"
+		bindir="/usr/local/bin"
+	else
+		prefix="$HOME/.local/lib/yggdrasil"
+		bindir="$HOME/.local/bin"
+	fi
+	archive="$(download_release "yggdrasil-[0-9][^ ]*-darwin-${arch}-headless\.tar\.gz")"
+	tar -xzf "$archive" -C "$tmp"
+	src="$(find "$tmp" -maxdepth 1 -type d -name 'yggdrasil-*-headless' | head -n 1)"
+	[ -n "$src" ] || die "the archive didn't have the expected folder"
+	mkdir -p "$prefix" "$bindir"
+	rm -rf "$prefix.new"
+	cp -R "$src" "$prefix.new"
+	rm -rf "$prefix"
+	mv "$prefix.new" "$prefix"
+	# Downloaded with curl, so not quarantined; clear it anyway for archives
+	# fetched by a browser.
+	xattr -dr com.apple.quarantine "$prefix" 2>/dev/null || true
+	ln -sf "$prefix/yggdrasil-daemon" "$bindir/yggdrasil-daemon"
+	ln -sf "$prefix/yggctl" "$bindir/yggctl"
+	YGGCTL="$prefix/yggctl"
+	[ "${YGGDRASIL_NO_SERVICE:-}" = "1" ] && return 0
+
+	label="io.yeix.yggdrasil"
+	if [ "$(id -u)" -eq 0 ]; then
+		# A server with nobody logged in: a system daemon that runs as the
+		# person who ran sudo, so its data stays in their home folder.
+		plist="/Library/LaunchDaemons/${label}.plist"
+		user="${SUDO_USER:-root}"
+		home="$(dscl . -read "/Users/${user}" NFSHomeDirectory 2>/dev/null | awk '{print $2}')"
+		[ -n "$home" ] || home="/var/root"
+		user_key="<key>UserName</key><string>${user}</string>"
+		env_home="<key>HOME</key><string>${home}</string>"
+		domain="system"
+	else
+		plist="$HOME/Library/LaunchAgents/${label}.plist"
+		user_key=""
+		env_home=""
+		domain="gui/$(id -u)"
+		mkdir -p "$HOME/Library/LaunchAgents"
+	fi
+	cat >"$plist" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>${label}</string>
+  ${user_key}
+  <key>ProgramArguments</key><array><string>${prefix}/yggdrasil-daemon</string></array>
+  <key>EnvironmentVariables</key><dict><key>YGGDRASIL_WEB_UI_DIR</key><string>${prefix}/web</string>${env_home}</dict>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+</dict>
+</plist>
+EOF
+	launchctl bootout "$domain/$label" >/dev/null 2>&1 || true
+	if ! launchctl bootstrap "$domain" "$plist" 2>/dev/null; then
+		# Over SSH there is no login window to start an agent in.
+		[ "$domain" = "system" ] && die "launchd couldn't start Yggdrasil"
+		launchctl bootstrap "user/$(id -u)" "$plist" || die "launchd couldn't start Yggdrasil; run this with sudo on a computer nobody is logged in to"
+	fi
+}
+
+YGGCTL="yggctl"
+if command -v yggctl >/dev/null 2>&1 && healthy; then
+	ok "Yggdrasil Core is already installed and running"
+else
+	case "$os" in
+	Linux) install_linux ;;
+	Darwin) install_macos ;;
+	*) die "this script installs on Linux and macOS; on Windows use install.ps1" ;;
+	esac
+	ok "Yggdrasil Core installed"
+	if [ "${YGGDRASIL_NO_SERVICE:-}" != "1" ] || [ "$joining" -eq 1 ]; then
+		say "Waiting for Yggdrasil to start..."
+		wait_healthy || die "Yggdrasil didn't start within a minute; see its log (journalctl -u yggdrasil on Linux, ~/Library/Application Support/Yggdrasil/logs on macOS) and try again"
+		ok "Yggdrasil Core is running"
+	fi
+fi
+
+if [ "$joining" -eq 1 ]; then
+	YGGDRASIL_URL="$API" exec "$YGGCTL" join "$@"
+fi
+say "Open ${API} or run yggctl to use it."
