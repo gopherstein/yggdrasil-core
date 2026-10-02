@@ -65,6 +65,13 @@ type Source struct {
 	// LocalOnly keeps the source on this computer: a turn that uses its
 	// passages is never sent to a paired computer (§63).
 	LocalOnly bool `json:"local_only"`
+	// Language is the language most of the source's passages are written
+	// in, detected on this computer when it was indexed (multilingual spec
+	// §19), and Languages every language found, with its passage count.
+	// A question in another language still finds it by meaning when a
+	// multilingual embedding model is installed.
+	Language  string           `json:"language,omitempty"`
+	Languages []SourceLanguage `json:"languages,omitempty"`
 	// Remote says how a database or API source is reached, without its
 	// credentials.
 	Remote *Remote `json:"remote,omitempty"`
@@ -434,6 +441,7 @@ func (s *Store) refreshLocked(ctx context.Context, id string) error {
 		return errors.Join(sigErr, readErr)
 	}
 	chunks := chunkDocuments(docs)
+	languages := passageLanguages(chunks)
 
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
@@ -481,8 +489,8 @@ func (s *Store) refreshLocked(ctx context.Context, id string) error {
 	}
 	now := fmtTime(s.now().UTC())
 	if _, err := tx.ExecContext(ctx, `
-		UPDATE knowledge_sources SET status=?, error=NULL, chunk_count=?, signature=?, refreshed_at=?, updated_at=?
-		WHERE id=?`, StatusReady, len(chunks), sig, now, now, id); err != nil {
+		UPDATE knowledge_sources SET status=?, error=NULL, chunk_count=?, signature=?, refreshed_at=?, updated_at=?, languages_json=?
+		WHERE id=?`, StatusReady, len(chunks), sig, now, now, languagesJSON(languages), id); err != nil {
 		return err
 	}
 	if err := tx.Commit(); err != nil {
@@ -559,7 +567,7 @@ type scanner interface{ Scan(...any) error }
 
 // sourceColumns are the columns scanSource reads. The vector count is per
 // source, from the model most of its vectors came from.
-const sourceColumns = `id, name, kind, path, status, error, chunk_count, created_at, updated_at, refreshed_at, local_only, remote_json,
+const sourceColumns = `id, name, kind, path, status, error, chunk_count, created_at, updated_at, refreshed_at, local_only, remote_json, languages_json,
 	(SELECT COUNT(*) FROM knowledge_vectors v WHERE v.source_id = knowledge_sources.id
 	 AND v.model = (SELECT model FROM knowledge_vectors w WHERE w.source_id = knowledge_sources.id GROUP BY model ORDER BY COUNT(*) DESC LIMIT 1)),
 	(SELECT model FROM knowledge_vectors w WHERE w.source_id = knowledge_sources.id GROUP BY model ORDER BY COUNT(*) DESC LIMIT 1)`
@@ -567,11 +575,14 @@ const sourceColumns = `id, name, kind, path, status, error, chunk_count, created
 func scanSource(row scanner) (Source, error) {
 	var src Source
 	var kind, created, updated string
-	var path, errText, refreshed, embModel, remoteJSON sql.NullString
+	var path, errText, refreshed, embModel, remoteJSON, langJSON sql.NullString
 	var localOnly int
 	if err := row.Scan(&src.ID, &src.Name, &kind, &path, &src.Status, &errText, &src.ChunkCount, &created, &updated, &refreshed, &localOnly,
-		&remoteJSON, &src.EmbeddedCount, &embModel); err != nil {
+		&remoteJSON, &langJSON, &src.EmbeddedCount, &embModel); err != nil {
 		return Source{}, err
+	}
+	if langJSON.Valid && json.Unmarshal([]byte(langJSON.String), &src.Languages) == nil && len(src.Languages) > 0 {
+		src.Language = src.Languages[0].Language
 	}
 	if remoteJSON.Valid {
 		var r Remote

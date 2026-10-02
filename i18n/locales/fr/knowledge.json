@@ -110,5 +110,8 @@
     "indexing": "Indexation…",
     "connect": "Connecter",
     "manage": "Gérez les sources, modifiez le contenu collé et testez des recherches sur la page <link>Connaissances</link>."
+  },
+  "languages": {
+    "crossNote": "Cette source est en {{source}}. Les questions en {{yours}} la trouvent par le sens une fois qu'un modèle d'embedding multilingue, comme BGE-M3, est installé depuis la page Modèles ; d'ici là, par les mots qu'elles ont en commun."
   }
 }

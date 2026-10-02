@@ -967,6 +967,10 @@ export interface KnowledgeSource {
   // made them. Zero until an embedding model is installed.
   embedded_count?: number
   embedding_model?: string
+  /** The language most passages are in, detected on the computer (spec §19). */
+  language?: string
+  /** Every language found, with how many passages are in it, most first. */
+  languages?: { language: string; passages: number }[]
   /** Never sent to a paired computer (spec §63). */
   local_only?: boolean
   remote?: KnowledgeRemote

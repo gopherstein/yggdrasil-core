@@ -80,6 +80,11 @@ func (k *knowledgeModels) pick(ctx context.Context, role string) (contracts.Mode
 		if list[i].Dynamic != list[j].Dynamic {
 			return !list[i].Dynamic
 		}
+		// A multilingual model finds passages across languages (multilingual
+		// spec §19), so the one rated in the most languages is used.
+		if len(list[i].Languages) != len(list[j].Languages) {
+			return len(list[i].Languages) > len(list[j].Languages)
+		}
 		return list[i].ID < list[j].ID
 	})
 	return list[0], true

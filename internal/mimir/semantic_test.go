@@ -26,6 +26,8 @@ var concepts = map[string]int{
 	"tire": 1, "tires": 1, "tyre": 1, "tyres": 1,
 	"snow": 2, "winter": 2, "blizzak": 2, "ice": 2,
 	"refund": 3, "refunds": 3, "return": 3, "returns": 3, "money": 3,
+	// The same ideas in Spanish, as a multilingual model would place them.
+	"garantía": 0, "cubre": 0, "neumático": 1, "neumáticos": 1, "reembolso": 3, "devolución": 3,
 }
 
 const fakeDims = 64

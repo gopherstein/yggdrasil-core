@@ -616,6 +616,66 @@
       "languages": [
         { "language": "en", "level": "good", "confidence": "high", "sources": ["model_card"] }
       ]
+    },
+    {
+      "id": "bge-m3-q8",
+      "display_name": "BGE-M3",
+      "summary": "Multilingual embedding model. Lets knowledge and memory search find passages by meaning in more than 100 languages, such as a Spanish question finding an English document. It does not chat.",
+      "family": "bge-m3",
+      "variant": "Q8_0",
+      "parameters": "568M",
+      "size_bytes": 634553760,
+      "memory_needed_bytes": 1200000000,
+      "context": 8192,
+      "capabilities": {
+        "tool_calling": false,
+        "vision": false,
+        "coding": false
+      },
+      "source": {
+        "url": "https://huggingface.co/gpustack/bge-m3-GGUF/resolve/main/bge-m3-Q8_0.gguf",
+        "sha256": "950f4a8e5e19477a6d3c26d2f162233c20002c601f75e4b002e3239997821167",
+        "format": "gguf"
+      },
+      "purpose": [
+        "knowledge"
+      ],
+      "tags": [
+        "embedding",
+        "multilingual"
+      ],
+      "runtime": [
+        "llamacpp"
+      ],
+      "support_role": "embedding",
+      "languages": [
+        { "language": "en", "level": "good", "confidence": "high", "sources": ["model_card", "benchmark"] },
+        { "language": "de", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "es", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "fr", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "it", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "pt", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "nl", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "pl", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "ru", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "uk", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "ja", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "ko", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "zh-Hans", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "zh-Hant", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "ar", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "he", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "hi", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "th", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "vi", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "id", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "tr", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "sv", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "da", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "nb", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "fi", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] },
+        { "language": "cs", "level": "good", "confidence": "medium", "sources": ["model_card", "benchmark"] }
+      ]
     }
   ]
 }

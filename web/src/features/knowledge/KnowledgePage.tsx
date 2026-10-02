@@ -7,7 +7,7 @@ import { isBinaryUpload, readUpload, UPLOAD_ACCEPT } from '@/lib/upload'
 import type { KnowledgeSource } from '@/types/api'
 import { errorText } from '@/features/train/display'
 import { RealmKicker } from '@/components/ui/Realm'
-import { meaningNote } from './semantic'
+import { crossLanguageNote, meaningNote, sourceLanguages } from './semantic'
 import { refreshNote, sourceBadge, sourceWhere } from './remote'
 import { RemoteSourceForm } from './RemoteSourceForm'
 import { formatDateTime } from '@/i18n/format'
@@ -53,7 +53,10 @@ export function KnowledgePage() {
 }
 
 function SourceRow({ source, onChanged }: { source: KnowledgeSource; onChanged: () => void }) {
-  const { t } = useTranslation('knowledge')
+  const { t, i18n } = useTranslation('knowledge')
+  const models = useQuery({ queryKey: ['models'], queryFn: () => api.getModels(), staleTime: 60_000 })
+  const languages = sourceLanguages(source)
+  const crossNote = crossLanguageNote(source, i18n.language, models.data ?? [])
   const [draft, setDraft] = useState<string | null>(null)
   const open = useMutation({
     mutationFn: () => api.knowledgeContent(source.id),
@@ -84,12 +87,14 @@ function SourceRow({ source, onChanged }: { source: KnowledgeSource; onChanged: 
           <p className="mt-0.5 break-anywhere text-xs text-ink-muted">
             {sourceWhere(source)} · {t('row.passages', { count: source.chunk_count })}
             {source.refreshed_at && ` · ${t('row.indexed', { when: formatDateTime(source.refreshed_at) })}`}
+            {languages && ` · ${languages}`}
           </p>
           {source.kind === 'path' && (
             <p className="mt-0.5 text-xs text-ink-faint">{t('row.watches')}</p>
           )}
           {refreshNote(source) && <p className="mt-0.5 text-xs text-ink-faint">{refreshNote(source)}</p>}
           {meaningNote(source) && <p className="mt-0.5 text-xs text-ink-faint">{meaningNote(source)}</p>}
+          {crossNote && <p className="mt-0.5 text-xs text-ink-faint">{crossNote}</p>}
           {source.error && <p className="mt-1 text-xs text-danger">{source.error}</p>}
         </div>
         <div className="flex shrink-0 gap-1.5">

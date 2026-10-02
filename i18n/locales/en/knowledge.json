@@ -106,5 +106,8 @@
     "indexing": "Indexing…",
     "connect": "Connect",
     "manage": "Manage sources, edit pasted content, and try searches on the <link>Knowledge</link> page."
+  },
+  "languages": {
+    "crossNote": "This source is in {{source}}. Questions in {{yours}} find it by meaning once a multilingual embedding model, such as BGE-M3, is installed from the Models page; until then, by matching words."
   }
 }
