@@ -275,7 +275,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			conversationID: conversationID,
 			taskID:         task.ID,
 			turnPrompt:     message,
-			trace:          &turnTrace{runID: task.ID, notice: routeNotice},
+			trace:          &turnTrace{runID: task.ID, notice: routeNotice, lang: a.appLanguage(ctx)},
 			startedAt:      turnStart,
 			attachments:    attached,
 		}
@@ -359,7 +359,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 							}(eventsCh)
 							break
 						}
-						if next, step, notice, ok := a.fallback(ctx, failedID, evt.Error, profile.Orchestration.FallbackModels); ok {
+						if next, step, notice, ok := a.fallback(ctx, env.trace.lang, failedID, evt.Error, profile.Orchestration.FallbackModels); ok {
 							run.Retried()
 							run.Strategy("Answered on another model after " + a.modelName(failedID) + " failed")
 							a.Logger.Warn("chat model failed; retrying on another model", "failed", failedID, "next", next.ID, "error", evt.Error)
@@ -448,7 +448,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			}
 		}
 		if full != "" {
-			env.trace.noticeIfNone(a.smallModelNotice(ctx, env.trace.dataKind(), env.modelID(), routeReason != ""))
+			env.trace.noticeIfNone(a.smallModelNotice(ctx, env.trace.lang, env.trace.dataKind(), env.modelID(), routeReason != ""))
 		}
 		if ctx.Err() != nil {
 			// Stopped after the model finished speaking but before the turn
@@ -1057,8 +1057,8 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 		case simple.EventVerified:
 			issues, _ := payload["issues"].(int)
 			fixed, _ := payload["fixed"].(int)
-			remaining, _ := payload["remaining"].(string)
-			e.trace.verified(issues, fixed, remaining)
+			figures, _ := payload["figures"].([]string)
+			e.trace.verified(issues, fixed, figures)
 		case simple.EventUnconfirmedAction:
 			e.trace.unconfirmedAction()
 		}

@@ -101,7 +101,7 @@ func (e automationExecutor) execute(ctx context.Context, automation automations.
 			modelOverride: modelID,
 			taskID:        automation.ID,
 			turnPrompt:    automation.Prompt,
-			trace:         &turnTrace{},
+			trace:         &turnTrace{lang: e.app.appLanguage(ctx)},
 			// Results in the automation's response language (§22).
 			responseLanguage: automation.ResponseLanguage,
 		},

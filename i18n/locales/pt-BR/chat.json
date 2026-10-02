@@ -425,6 +425,19 @@
     "toolFailures": "{{count}} com falha"
   },
   "notices": {
-    "languageWeak": "{{model}} pode escrever em {{language}} pior do que em inglês, e nenhum modelo instalado que caiba faz isso melhor. Na página Modelos você encontra modelos bem avaliados em {{language}}."
+    "languageWeak": "{{model}} pode escrever em {{language}} pior do que em inglês, e nenhum modelo instalado que caiba faz isso melhor. Na página Modelos você encontra modelos bem avaliados em {{language}}.",
+    "unconfirmedFigures": "O Yggdrasil não conseguiu confirmar {{figures}} nas fontes. Confira antes de confiar nisso.",
+    "listSeparator": ", ",
+    "listAnd": "{{first}} e {{last}}",
+    "nothingChanged": "Nada foi alterado: nenhuma ferramenta foi executada para isso, diga o que disser a resposta.",
+    "stoppedTimeLimit": "Parou no limite de tempo deste perfil antes de a resposta terminar.",
+    "stopped": "Parou antes de a resposta terminar.",
+    "fallbackSmaller": "{{failed}} não conseguiu responder, então o modelo menor {{model}} respondeu no lugar. Esta resposta pode ser menos detalhada.",
+    "smallModelFiles": "{{model}} é um modelo pequeno e pode confundir números e detalhes dos seus arquivos. Confira-os na fonte.",
+    "smallModelFilesChoose": "{{model}} é um modelo pequeno e pode confundir números e detalhes dos seus arquivos. Confira-os na fonte. Para perguntas como esta, escolha {{larger}} ou Automático em Modelo.",
+    "smallModelFilesInstall": "{{model}} é um modelo pequeno e pode confundir números e detalhes dos seus arquivos. Confira-os na fonte. Um modelo maior da página Modelos será mais confiável.",
+    "smallModelKnowledge": "{{model}} é um modelo pequeno e pode confundir números e detalhes do seu conhecimento. Confira-os na fonte.",
+    "smallModelKnowledgeChoose": "{{model}} é um modelo pequeno e pode confundir números e detalhes do seu conhecimento. Confira-os na fonte. Para perguntas como esta, escolha {{larger}} ou Automático em Modelo.",
+    "smallModelKnowledgeInstall": "{{model}} é um modelo pequeno e pode confundir números e detalhes do seu conhecimento. Confira-os na fonte. Um modelo maior da página Modelos será mais confiável."
   }
 }
