@@ -92,6 +92,9 @@ type Input struct {
 	Share bool `json:"share"`
 	// Observations includes how the model runs here in a shared rating.
 	Observations bool `json:"observations"`
+	// Language is the language the model was used in, such as es, when the
+	// person says (multilingual spec §23); "" when they don't.
+	Language string `json:"language,omitempty"`
 }
 
 // View is a person's rating of one model and what sharing it would send.
@@ -99,10 +102,12 @@ type View struct {
 	ModelID string `json:"model_id"`
 	// Rateable is false when the model cannot be compared with others'
 	// ratings; Reason says why. It can still be rated on this computer.
-	Rateable  bool       `json:"rateable"`
-	Reason    string     `json:"reason,omitempty"`
-	Stars     int        `json:"stars,omitempty"`
-	Tags      []string   `json:"tags"`
+	Rateable bool     `json:"rateable"`
+	Reason   string   `json:"reason,omitempty"`
+	Stars    int      `json:"stars,omitempty"`
+	Tags     []string `json:"tags"`
+	// Language is the language the rating is for, or "".
+	Language  string     `json:"language,omitempty"`
 	Shared    bool       `json:"shared"`
 	SharedAt  *time.Time `json:"shared_at,omitempty"`
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
@@ -179,6 +184,7 @@ func (s *Service) shares(ctx context.Context, m contracts.Model) (*Shares, error
 type row struct {
 	stars     int
 	tags      []string
+	language  string
 	remoteKey string
 	shareObs  bool
 	sharedAt  *time.Time
@@ -190,8 +196,8 @@ func (s *Service) load(ctx context.Context, id string) (*row, error) {
 	var tags string
 	var key, shared sql.NullString
 	var updated string
-	err := s.DB.QueryRowContext(ctx, `SELECT stars, tags, remote_key, share_observations, shared_at, updated_at FROM model_ratings WHERE model_id = ?`, id).
-		Scan(&r.stars, &tags, &key, &r.shareObs, &shared, &updated)
+	err := s.DB.QueryRowContext(ctx, `SELECT stars, tags, language, remote_key, share_observations, shared_at, updated_at FROM model_ratings WHERE model_id = ?`, id).
+		Scan(&r.stars, &tags, &r.language, &key, &r.shareObs, &shared, &updated)
 	if errors.Is(err, sql.ErrNoRows) {
 		return nil, nil
 	}
@@ -227,7 +233,7 @@ func (s *Service) Get(ctx context.Context, modelID string) (View, error) {
 		return View{}, err
 	}
 	if r != nil {
-		v.Stars, v.Tags, v.Shared, v.SharedAt = r.stars, r.tags, r.remoteKey != "", r.sharedAt
+		v.Stars, v.Tags, v.Language, v.Shared, v.SharedAt = r.stars, r.tags, r.language, r.remoteKey != "", r.sharedAt
 		v.ShareObservations = r.shareObs && v.Shared
 		v.UpdatedAt = &r.updatedAt
 		if v.Tags == nil {
@@ -298,6 +304,11 @@ func (s *Service) Put(ctx context.Context, modelID string, in Input) (View, erro
 	if !validInput(in) {
 		return View{}, ErrStars
 	}
+	lang, ok := RatingLanguage(in.Language)
+	if !ok {
+		return View{}, ErrLanguage
+	}
+	in.Language = lang
 	m, ok := s.model(ctx, modelID)
 	if !ok {
 		return View{}, ErrNoModel
@@ -315,10 +326,10 @@ func (s *Service) Put(ctx context.Context, modelID string, in Input) (View, erro
 	tags, _ := json.Marshal(in.Tags)
 	now := s.now().UTC().Format(time.RFC3339)
 	if _, err := s.DB.ExecContext(ctx, `
-		INSERT INTO model_ratings (model_id, stars, tags, share_observations, updated_at) VALUES (?, ?, ?, ?, ?)
-		ON CONFLICT(model_id) DO UPDATE SET stars = excluded.stars, tags = excluded.tags,
+		INSERT INTO model_ratings (model_id, stars, tags, language, share_observations, updated_at) VALUES (?, ?, ?, ?, ?, ?)
+		ON CONFLICT(model_id) DO UPDATE SET stars = excluded.stars, tags = excluded.tags, language = excluded.language,
 			share_observations = excluded.share_observations, updated_at = excluded.updated_at`,
-		modelID, in.Stars, string(tags), in.Share && in.Observations, now); err != nil {
+		modelID, in.Stars, string(tags), in.Language, in.Share && in.Observations, now); err != nil {
 		return View{}, err
 	}
 	prev, err := s.load(ctx, modelID)
@@ -347,7 +358,7 @@ func (s *Service) share(ctx context.Context, modelID string, sh *Shares, in Inpu
 	if err != nil {
 		return err
 	}
-	r := Rating{SchemaVersion: 1, ClientID: client, Stars: in.Stars, Tags: in.Tags, AppVersion: appVersion(s.AppVersion),
+	r := Rating{SchemaVersion: 1, ClientID: client, Stars: in.Stars, Tags: in.Tags, AppVersion: appVersion(s.AppVersion), Language: in.Language,
 		Model:    model{ID: sh.Model.ID, Format: sh.Model.Format, Quantization: sh.Model.Quantization},
 		Runtime:  runtime{Type: sh.Model.Runtime, Backend: sh.Model.Backend},
 		Hardware: sh.Hardware}
@@ -355,6 +366,9 @@ func (s *Service) share(ctx context.Context, modelID string, sh *Shares, in Inpu
 		r.Tags = nil
 	}
 	detail := "Shared a " + itoa(in.Stars) + "-star rating of " + sh.Model.ID + " " + sh.Model.Quantization + " on " + sh.Hardware.Key()
+	if in.Language != "" {
+		detail += ", used in " + in.Language
+	}
 	if in.Observations {
 		if r.Observations, err = s.Observe(ctx, modelID); err != nil {
 			return err
@@ -416,10 +430,12 @@ type Community struct {
 }
 
 // ModelCommunity is one model's community ratings: from hardware like this
-// computer's, and from everyone who runs it the same way.
+// computer's, from everyone who runs it the same way, and from everyone by
+// the language they used it in.
 type ModelCommunity struct {
-	Similar *Stats `json:"similar,omitempty"`
-	Overall *Stats `json:"overall,omitempty"`
+	Similar   *Stats          `json:"similar,omitempty"`
+	Overall   *Stats          `json:"overall,omitempty"`
+	Languages []LanguageStats `json:"languages,omitempty"`
 }
 
 // Community returns everyone's ratings of the models here, downloading the
@@ -471,7 +487,7 @@ func lookup(snap Snapshot, id Identity, h Hardware, hok bool) (ModelCommunity, b
 		if e.Model != id.ID || e.Format != id.Format || e.Quantization != id.Quantization || e.Runtime != id.Runtime || e.Backend != id.Backend {
 			continue
 		}
-		var mc ModelCommunity
+		mc := ModelCommunity{Languages: e.Languages}
 		for i := range e.Cohorts {
 			if e.Cohorts[i].Tier == "global" {
 				st := e.Cohorts[i]

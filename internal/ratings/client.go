@@ -31,6 +31,8 @@ type Rating struct {
 	Tags          []string      `json:"tags,omitempty"`
 	Observations  *Observations `json:"observations,omitempty"`
 	AppVersion    string        `json:"app_version,omitempty"`
+	// Language is the language the model was used in, when the person said.
+	Language string `json:"language,omitempty"`
 }
 
 type model struct {
@@ -59,6 +61,8 @@ type Snapshot struct {
 		Runtime      string  `json:"runtime"`
 		Backend      string  `json:"backend"`
 		Cohorts      []Stats `json:"cohorts"`
+		// Languages are the configuration's ratings by language.
+		Languages []LanguageStats `json:"languages,omitempty"`
 	} `json:"models"`
 }
 

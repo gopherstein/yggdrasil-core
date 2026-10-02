@@ -2,9 +2,6 @@ package ratings
 
 import (
 	"context"
-	"database/sql"
-	"encoding/json"
-	"errors"
 
 	"github.com/yeixio/yggdrasil-core/internal/models"
 )
@@ -18,20 +15,9 @@ var confidenceWeight = map[string]float64{"early": 0.5, "community": 1}
 // everyone's. They come from the summary already kept, so asking never
 // sends anything; with community ratings off there are none.
 func (s *Service) Signals(ctx context.Context) (map[string]models.CommunitySignal, error) {
-	if on, err := s.Settings.GetBool(ctx, SettingShow, false); err != nil || !on {
+	snap, ok, err := s.kept(ctx)
+	if !ok || err != nil {
 		return nil, err
-	}
-	var body string
-	err := s.DB.QueryRowContext(ctx, `SELECT body FROM ratings_summary WHERE id = 1`).Scan(&body)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	var snap Snapshot
-	if err := json.Unmarshal([]byte(body), &snap); err != nil {
-		return nil, nil
 	}
 	inv, err := s.Hardware(ctx)
 	if err != nil {

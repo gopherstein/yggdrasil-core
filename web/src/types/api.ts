@@ -1428,6 +1428,8 @@ export interface ModelRating {
   /** Absent when not rated. */
   stars?: number
   tags: RatingTag[]
+  /** The language the model was used in, such as es (multilingual spec §23); absent when not said. */
+  language?: string
   shared: boolean
   shared_at?: string
   updated_at?: string
@@ -1480,7 +1482,17 @@ export interface CommunityRatings {
   generated_at?: string
   source?: string
   error?: string
-  models: Record<string, { similar?: RatingStats; overall?: RatingStats }>
+  models: Record<string, { similar?: RatingStats; overall?: RatingStats; languages?: LanguageRatingStats[] }>
+}
+
+/** A model's ratings given for one language, from everyone who runs it the same way: never split by hardware. */
+export interface LanguageRatingStats {
+  /** A base tag such as es, or zh-Hans or zh-Hant. */
+  language: string
+  ratings: number
+  average: number
+  weighted_score: number
+  confidence: 'limited' | 'early' | 'community'
 }
 
 /** One time data left this computer (spec §63). */

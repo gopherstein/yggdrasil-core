@@ -80,6 +80,7 @@ func (a *App) chooseAuto(ctx context.Context, message string, data bool, lang st
 	if len(usable) == 0 {
 		usable = all
 	}
+	usable = a.withLanguageRatings(ctx, usable, lang)
 	kind := huginn.Classify(message)
 	if data && kind == huginn.Chat {
 		kind = huginn.Research

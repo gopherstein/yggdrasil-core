@@ -242,6 +242,9 @@
     "stars_many": "{{count}} estrelas",
     "stars_other": "{{count}} estrelas",
     "tagsLabel": "Por quê? (opcional)",
+    "languageLabel": "Idioma em que você usou",
+    "languageNone": "Prefiro não dizer",
+    "languageQuestion": "Quão bem funcionou para você em {{language}}?",
     "tags": {
       "great_responses": "Ótimas respostas",
       "fast": "Rápido",
@@ -265,6 +268,7 @@
       "ratingValue": "As estrelas e os motivos acima",
       "model": "Modelo",
       "hardware": "Classe do computador",
+      "language": "Idioma",
       "memory": "memória {{type}}, {{gb}} GB",
       "id": "ID da avaliação",
       "idValue": "Um ID aleatório para você alterar ou remover sua avaliação; não é gerado a partir do seu computador",
@@ -285,6 +289,7 @@
       "backend": "em computadores com essa memória"
     },
     "overall": "no total",
+    "inLanguage": "em {{language}}",
     "chosenByCommunity": "Escolhido com avaliações de computadores como o seu",
     "confidence": {
       "limited": "Poucos dados",

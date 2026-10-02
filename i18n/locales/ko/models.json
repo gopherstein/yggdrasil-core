@@ -234,6 +234,9 @@
     "starsLabel": "별점",
     "stars_other": "별 {{count}}개",
     "tagsLabel": "이유 (선택)",
+    "languageLabel": "사용한 언어",
+    "languageNone": "밝히지 않음",
+    "languageQuestion": "{{language}}로 사용했을 때 얼마나 잘 작동했나요?",
     "tags": {
       "great_responses": "답변이 훌륭함",
       "fast": "빠름",
@@ -257,6 +260,7 @@
       "ratingValue": "위의 별점과 이유",
       "model": "모델",
       "hardware": "컴퓨터 종류",
+      "language": "언어",
       "memory": "{{type}} 메모리, {{gb}}GB",
       "id": "평가 ID",
       "idValue": "평가를 변경하거나 삭제하기 위한 임의의 ID이며, 컴퓨터 정보로 만들지 않습니다",
@@ -275,6 +279,7 @@
       "backend": "메모리가 비슷한 컴퓨터에서"
     },
     "overall": "전체",
+    "inLanguage": "{{language}}",
     "chosenByCommunity": "비슷한 컴퓨터의 평가를 바탕으로 선택됨",
     "confidence": {
       "limited": "데이터 부족",

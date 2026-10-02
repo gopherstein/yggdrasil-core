@@ -234,6 +234,9 @@
     "starsLabel": "星",
     "stars_other": "星{{count}}つ",
     "tagsLabel": "理由（任意）",
+    "languageLabel": "使った言語",
+    "languageNone": "指定しない",
+    "languageQuestion": "{{language}}ではどのくらいうまく動きましたか？",
     "tags": {
       "great_responses": "回答がすばらしい",
       "fast": "速い",
@@ -257,6 +260,7 @@
       "ratingValue": "上の星と理由",
       "model": "モデル",
       "hardware": "コンピュータの種類",
+      "language": "言語",
       "memory": "{{type}}メモリ、{{gb}} GB",
       "id": "評価ID",
       "idValue": "評価を変更・削除するためのランダムなID。コンピュータの情報からは作られません",
@@ -275,6 +279,7 @@
       "backend": "同程度のメモリのコンピュータで"
     },
     "overall": "全体",
+    "inLanguage": "{{language}}",
     "chosenByCommunity": "同じようなコンピュータの評価をもとに選ばれました",
     "confidence": {
       "limited": "データ不足",

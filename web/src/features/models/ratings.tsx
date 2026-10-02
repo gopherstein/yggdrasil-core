@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { api, ApiError } from '@/lib/api'
-import { RATING_TAGS, useCommunityRatings, useModelRating, useRatingDialog } from './ratingsState'
+import { RATING_TAGS, languageLines, ratingLanguage, ratingLanguages, useCommunityRatings, useModelRating, useRatingDialog } from './ratingsState'
+import { languageName } from './modelPresentation'
 import { formatDecimal, formatLocale, formatMilliseconds, formatNumber, formatPercent, formatTokensPerSecond } from '@/i18n/format'
-import type { ModelRating, RatingObservations, RatingStats, RatingTag } from '@/types/api'
+import type { LanguageRatingStats, ModelRating, RatingObservations, RatingStats, RatingTag } from '@/types/api'
 
 function Stars({ value }: { value: number }) {
   const full = Math.round(value)
@@ -18,14 +19,14 @@ function Stars({ value }: { value: number }) {
 }
 
 /** One line of community ratings: the score, how many, and a label when there are few. */
-function StatsLine({ label, stats }: { label: string; stats: RatingStats }) {
+function StatsLine({ label, stats }: { label: string; stats: RatingStats | LanguageRatingStats }) {
   const { t } = useTranslation('models')
   return (
     <p className="text-xs text-ink-muted">
       <span className="font-medium text-ink tabular-nums">★ {formatDecimal(stats.weighted_score, 1)}</span> {label}
       <span className="text-ink-faint"> · </span>
       <span className="tabular-nums">{t('ratings.count', { count: stats.ratings, formatted: formatNumber(stats.ratings) })}</span>
-      {observedText(stats, t) ? (
+      {'observed' in stats && observedText(stats, t) ? (
         <>
           <span className="text-ink-faint"> · </span>
           <span className="tabular-nums" title={t('ratings.observedHint', { count: stats.observed ?? 0, formatted: formatNumber(stats.observed ?? 0) })}>
@@ -55,24 +56,27 @@ function observationsText(o: RatingObservations, t: TFunction<'models'>): string
 }
 
 /** How a model ran for those in a cohort who shared it: median speed and crash rate. */
-function observedText(stats: RatingStats, t: TFunction<'models'>): string {
-  if (!stats.observed) return ''
+function observedText(stats: RatingStats | LanguageRatingStats, t: TFunction<'models'>): string {
+  if (!('observed' in stats) || !stats.observed) return ''
   const parts: string[] = []
   if (stats.median_tokens_per_second) parts.push(formatTokensPerSecond(stats.median_tokens_per_second))
   if (stats.crash_rate) parts.push(t('ratings.crashRate', { percent: formatPercent(stats.crash_rate) }))
   return new Intl.ListFormat(formatLocale(), { style: 'short', type: 'unit' }).format(parts)
 }
 
-/** Community ratings of a model, from hardware like this computer's and overall, and this person's own. */
+/** Community ratings of a model, from hardware like this computer's, overall, and by language (§23). */
 export function CommunityScore({ modelId }: { modelId: string }) {
-  const { t } = useTranslation('models')
+  const { t, i18n } = useTranslation('models')
   const community = useCommunityRatings().data
   const entry = community?.models?.[modelId]
-  if (!entry?.similar && !entry?.overall) return null
+  if (!entry?.similar && !entry?.overall && !entry?.languages?.length) return null
   return (
     <div className="mt-2 space-y-0.5">
       {entry.similar ? <StatsLine label={t(`ratings.similar.${entry.similar.tier}`)} stats={entry.similar} /> : null}
       {entry.overall ? <StatsLine label={t('ratings.overall')} stats={entry.overall} /> : null}
+      {languageLines(entry.languages, i18n.language).map((l) => (
+        <StatsLine key={l.language} label={t('ratings.inLanguage', { language: languageName(l.language) })} stats={l} />
+      ))}
     </div>
   )
 }
@@ -103,7 +107,7 @@ export function RatingDialogHost() {
 }
 
 function RateModelDialog({ modelId, modelName, onClose }: { modelId: string; modelName: string; onClose: () => void }) {
-  const { t } = useTranslation('models')
+  const { t, i18n } = useTranslation('models')
   const queryClient = useQueryClient()
   const ratingQuery = useModelRating(modelId)
   const rating = ratingQuery.data
@@ -111,12 +115,15 @@ function RateModelDialog({ modelId, modelName, onClose }: { modelId: string; mod
   const [tags, setTags] = useState<RatingTag[]>([])
   const [share, setShare] = useState(false)
   const [observe, setObserve] = useState(false)
+  // A new rating is for the App language; the person can change it, or not say.
+  const [language, setLanguage] = useState(() => ratingLanguage(i18n.language))
   const [error, setError] = useState('')
 
   useEffect(() => {
     if (!rating) return
     setStars(rating.stars ?? 0)
     setTags(rating.tags ?? [])
+    if (rating.stars) setLanguage(rating.language ?? '')
     setShare(rating.shared)
     setObserve(rating.share_observations)
   }, [rating])
@@ -137,7 +144,8 @@ function RateModelDialog({ modelId, modelName, onClose }: { modelId: string; mod
     if (err instanceof ApiError && err.status === 502) refresh()
   }
   const save = useMutation({
-    mutationFn: () => api.putModelRating(modelId, { stars, tags, share: share && Boolean(rating?.rateable), observations: share && observe }),
+    mutationFn: () =>
+      api.putModelRating(modelId, { stars, tags, share: share && Boolean(rating?.rateable), observations: share && observe, language: language || undefined }),
     onSuccess: (next) => {
       refresh(next ?? undefined)
       onClose()
@@ -171,7 +179,24 @@ function RateModelDialog({ modelId, modelName, onClose }: { modelId: string; mod
           <p className="mt-1 text-sm text-ink-muted">{t('ratings.intro')}</p>
         </div>
 
-        <div role="radiogroup" aria-label={t('ratings.starsLabel')} className="flex gap-1">
+        <label className="block text-sm font-medium text-ink">
+          {t('ratings.languageLabel')}
+          <select className="field mt-1 w-full font-normal" value={language} onChange={(e) => setLanguage(e.target.value)}>
+            <option value="">{t('ratings.languageNone')}</option>
+            {[...ratingLanguages, ...(language && !ratingLanguages.includes(language) ? [language] : [])].map((tag) => (
+              <option key={tag} value={tag}>
+                {languageName(tag)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        {language ? <p className="text-sm text-ink">{t('ratings.languageQuestion', { language: languageName(language) })}</p> : null}
+        <div
+          role="radiogroup"
+          aria-label={language ? t('ratings.languageQuestion', { language: languageName(language) }) : t('ratings.starsLabel')}
+          className="flex gap-1"
+        >
           {[1, 2, 3, 4, 5].map((n) => (
             <button
               key={n}
@@ -234,6 +259,7 @@ function RateModelDialog({ modelId, modelName, onClose }: { modelId: string; mod
                     gb: shares.hardware.memory_bucket_gb,
                   })} · ${shares.hardware.platform} ${shares.hardware.architecture}`}
                 />
+                {language ? <SharedRow label={t('ratings.sent.language')} value={languageName(language)} /> : null}
                 <SharedRow label={t('ratings.sent.id')} value={t('ratings.sent.idValue')} />
                 {share && observe && rating?.observations ? (
                   <SharedRow label={t('ratings.sent.observations')} value={observationsText(rating.observations, t)} />

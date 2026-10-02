@@ -238,6 +238,9 @@
     "stars_one": "{{count}} star",
     "stars_other": "{{count}} stars",
     "tagsLabel": "Why? (optional)",
+    "languageLabel": "Language you used it in",
+    "languageNone": "Not saying",
+    "languageQuestion": "How well did it work for you in {{language}}?",
     "tags": {
       "great_responses": "Great answers",
       "fast": "Fast",
@@ -261,6 +264,7 @@
       "ratingValue": "The stars and reasons above",
       "model": "Model",
       "hardware": "Computer class",
+      "language": "Language",
       "memory": "{{type}} memory, {{gb}} GB",
       "id": "Rating ID",
       "idValue": "A random ID, so you can change or remove your rating; not made from your computer",
@@ -280,6 +284,7 @@
       "backend": "on computers with this much memory"
     },
     "overall": "overall",
+    "inLanguage": "in {{language}}",
     "chosenByCommunity": "Chosen with ratings from computers like yours",
     "confidence": {
       "limited": "Limited data",

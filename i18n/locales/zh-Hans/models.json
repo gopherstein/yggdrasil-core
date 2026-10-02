@@ -234,6 +234,9 @@
     "starsLabel": "星级",
     "stars_other": "{{count}} 星",
     "tagsLabel": "原因（可选）",
+    "languageLabel": "你使用的语言",
+    "languageNone": "不说明",
+    "languageQuestion": "它在{{language}}中的表现如何？",
     "tags": {
       "great_responses": "回答出色",
       "fast": "速度快",
@@ -257,6 +260,7 @@
       "ratingValue": "上面的星级和原因",
       "model": "模型",
       "hardware": "电脑类别",
+      "language": "语言",
       "memory": "{{type}}内存，{{gb}} GB",
       "id": "评分 ID",
       "idValue": "一个随机 ID，用于更改或删除你的评分；不由你的电脑信息生成",
@@ -275,6 +279,7 @@
       "backend": "在内存相近的电脑上"
     },
     "overall": "总体",
+    "inLanguage": "{{language}}",
     "chosenByCommunity": "根据类似电脑的评分选出",
     "confidence": {
       "limited": "数据有限",

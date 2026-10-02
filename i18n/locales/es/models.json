@@ -242,6 +242,9 @@
     "stars_many": "{{count}} estrellas",
     "stars_other": "{{count}} estrellas",
     "tagsLabel": "¿Por qué? (opcional)",
+    "languageLabel": "Idioma en el que lo usaste",
+    "languageNone": "Prefiero no decirlo",
+    "languageQuestion": "¿Qué tal te funcionó en {{language}}?",
     "tags": {
       "great_responses": "Respuestas excelentes",
       "fast": "Rápido",
@@ -265,6 +268,7 @@
       "ratingValue": "Las estrellas y los motivos de arriba",
       "model": "Modelo",
       "hardware": "Tipo de equipo",
+      "language": "Idioma",
       "memory": "memoria {{type}}, {{gb}} GB",
       "id": "ID de valoración",
       "idValue": "Un ID aleatorio para que puedas cambiar o quitar tu valoración; no se obtiene de tu equipo",
@@ -285,6 +289,7 @@
       "backend": "en equipos con esta memoria"
     },
     "overall": "en total",
+    "inLanguage": "en {{language}}",
     "chosenByCommunity": "Elegido con valoraciones de equipos como el tuyo",
     "confidence": {
       "limited": "Pocos datos",

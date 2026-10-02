@@ -67,6 +67,15 @@ Optional structured reasons may include:
 - Good tool use
 - Poor tool use
 
+A rating may also say the language the model was used in (multilingual spec §23):
+
+```text
+Language you used it in: Spanish
+How well did it work for you in Spanish?
+```
+
+It starts as the App language, and the person can change it or choose not to say. It is sent only with a shared rating, and the public summary shows a model's ratings by language only with at least 3 of them, for everyone who runs the model the same way, never split by hardware.
+
 Written public reviews are out of scope for V1.
 
 ---

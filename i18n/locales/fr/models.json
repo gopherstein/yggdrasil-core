@@ -242,6 +242,9 @@
     "stars_many": "{{count}} étoiles",
     "stars_other": "{{count}} étoiles",
     "tagsLabel": "Pourquoi ? (facultatif)",
+    "languageLabel": "Langue dans laquelle vous l’avez utilisé",
+    "languageNone": "Ne pas préciser",
+    "languageQuestion": "Comment a-t-il fonctionné pour vous en {{language}} ?",
     "tags": {
       "great_responses": "Excellentes réponses",
       "fast": "Rapide",
@@ -265,6 +268,7 @@
       "ratingValue": "Les étoiles et les raisons ci-dessus",
       "model": "Modèle",
       "hardware": "Catégorie d'ordinateur",
+      "language": "Langue",
       "memory": "mémoire {{type}}, {{gb}} Go",
       "id": "Identifiant de note",
       "idValue": "Un identifiant aléatoire pour modifier ou supprimer votre note ; il n'est pas tiré de votre ordinateur",
@@ -285,6 +289,7 @@
       "backend": "sur des ordinateurs avec autant de mémoire"
     },
     "overall": "au total",
+    "inLanguage": "en {{language}}",
     "chosenByCommunity": "Choisi grâce aux notes d'ordinateurs comme le vôtre",
     "confidence": {
       "limited": "Données limitées",

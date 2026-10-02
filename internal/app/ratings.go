@@ -60,6 +60,32 @@ func (a *App) newRatings(cfg config.Config) *ratings.Service {
 	}
 }
 
+// withLanguageRatings moves the models' levels for lang by how the
+// community rates them in it (multilingual spec §23), so Auto counts them.
+// Nothing changes with community ratings off or no language.
+func (a *App) withLanguageRatings(ctx context.Context, list []contracts.Model, lang string) []contracts.Model {
+	if a.Ratings == nil || lang == "" {
+		return list
+	}
+	byModel, err := a.Ratings.Languages(ctx)
+	if err != nil {
+		a.Logger.Debug("community ratings by language", "error", err)
+		return list
+	}
+	tag, _ := ratings.RatingLanguage(lang)
+	out := make([]contracts.Model, len(list))
+	for i, m := range list {
+		var stats []ratings.LanguageStats
+		for _, st := range byModel[m.ID] {
+			if st.Language == tag {
+				stats = append(stats, st)
+			}
+		}
+		out[i] = ratings.WithLanguageRatings(m, stats)
+	}
+	return out
+}
+
 // communitySignals are community ratings as a recommendation signal (#37),
 // or nil when they are off or there is no summary yet.
 func (a *App) communitySignals(ctx context.Context) map[string]models.CommunitySignal {

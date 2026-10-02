@@ -835,7 +835,7 @@ export const api = {
   getModelRating: (id: string) => request<ModelRating>(`/api/v1/models/${encodeURIComponent(id)}/rating`),
 
   /** Saves a rating; share sends it to the community, false keeps it here and withdraws it if it was shared. */
-  putModelRating: (id: string, body: { stars: number; tags: RatingTag[]; share: boolean; observations?: boolean }) =>
+  putModelRating: (id: string, body: { stars: number; tags: RatingTag[]; share: boolean; observations?: boolean; language?: string }) =>
     request<ModelRating>(`/api/v1/models/${encodeURIComponent(id)}/rating`, { method: 'PUT', body: JSON.stringify(body) }),
 
   deleteModelRating: (id: string) => request<null>(`/api/v1/models/${encodeURIComponent(id)}/rating`, { method: 'DELETE' }),

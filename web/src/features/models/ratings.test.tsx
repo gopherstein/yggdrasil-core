@@ -62,6 +62,9 @@ describe('ratings', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: /Share this rating/ }))
     expect(screen.getByText('apple m4-max · unified memory, 32-64 GB · macos arm64')).toBeInTheDocument()
     expect(screen.getByText('ratings.yggdrasil.yeix.io')).toBeInTheDocument()
+    // A new rating is for the App language, and sharing says so.
+    expect(screen.getByRole('radiogroup', { name: 'How well did it work for you in English?' })).toBeInTheDocument()
+    expect(screen.getByText('Language').nextElementSibling).toHaveTextContent('English')
 
     // How it runs is a second choice, shown before it is made.
     const observe = screen.getByRole('checkbox', { name: /Include how it runs here/ })
@@ -71,7 +74,7 @@ describe('ratings', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Save and share' }))
     await waitFor(() =>
-      expect(api.putModelRating).toHaveBeenCalledWith('qwen', { stars: 4, tags: ['fast'], share: true, observations: true }),
+      expect(api.putModelRating).toHaveBeenCalledWith('qwen', { stars: 4, tags: ['fast'], share: true, observations: true, language: 'en' }),
     )
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
@@ -83,7 +86,42 @@ describe('ratings', () => {
     // How it runs can't be shared without the rating.
     expect(screen.getByRole('checkbox', { name: /Include how it runs here/ })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
-    await waitFor(() => expect(api.putModelRating).toHaveBeenCalledWith('qwen', { stars: 2, tags: [], share: false, observations: false }))
+    await waitFor(() => expect(api.putModelRating).toHaveBeenCalledWith('qwen', { stars: 2, tags: [], share: false, observations: false, language: 'en' }))
+  })
+
+  it('says which language a rating is for, or none', async () => {
+    vi.mocked(api.putModelRating).mockResolvedValue({ ...unrated, stars: 5, language: 'es', ask: false })
+    renderIt(<RateButton modelId="qwen" modelName="Qwen Coder" />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Rate Qwen Coder' }))
+    const language = screen.getByRole('combobox', { name: 'Language you used it in' })
+    // One choice per language ratings collect by: Portuguese once, Chinese in each script.
+    const options = Array.from((language as HTMLSelectElement).options).map((o) => o.value)
+    expect(options.filter((v) => v === 'pt')).toHaveLength(1)
+    expect(options).toEqual(expect.arrayContaining(['', 'es', 'zh-Hans', 'zh-Hant']))
+    expect(options).not.toContain('pt-BR')
+
+    fireEvent.change(language, { target: { value: 'es' } })
+    fireEvent.click(screen.getByRole('radio', { name: '5 stars' }))
+    expect(screen.getByText('How well did it work for you in Spanish?')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(api.putModelRating).toHaveBeenLastCalledWith('qwen', expect.objectContaining({ language: 'es' })))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+
+    vi.mocked(api.putModelRating).mockClear()
+    fireEvent.click(await screen.findByRole('button', { name: /Qwen Coder/ }))
+    fireEvent.change(screen.getByRole('combobox', { name: 'Language you used it in' }), { target: { value: '' } })
+    expect(screen.queryByText(/How well did it work for you/)).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('radio', { name: '3 stars' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(api.putModelRating).toHaveBeenCalledWith('qwen', { stars: 3, tags: [], share: false, observations: false }))
+  })
+
+  it('keeps the language a saved rating gives', async () => {
+    vi.mocked(api.getModelRating).mockResolvedValue({ ...unrated, stars: 4, language: 'ja', ask: false })
+    renderIt(<RateButton modelId="qwen" modelName="Qwen Coder" />)
+    fireEvent.click(await screen.findByRole('button', { name: /Qwen Coder/ }))
+    await waitFor(() => expect(screen.getByRole('combobox', { name: 'Language you used it in' })).toHaveValue('ja'))
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
   })
 
   it('asks after use, and stops when told', async () => {
@@ -111,5 +149,30 @@ describe('ratings', () => {
     expect(screen.getByText('1,200 ratings')).toBeInTheDocument()
     expect(screen.getAllByText('Early ratings')).toHaveLength(1)
     expect(screen.getByText('38.0 tok/s, 2% crashed')).toBeInTheDocument()
+  })
+
+  it('shows ratings by language, the App language first', async () => {
+    vi.mocked(api.getCommunityRatings).mockResolvedValue({
+      enabled: true,
+      models: {
+        qwen: {
+          overall: { tier: 'global', ratings: 40, average: 4.1, weighted_score: 4.1, confidence: 'community' },
+          languages: [
+            { language: 'es', ratings: 30, average: 4.8, weighted_score: 4.7, confidence: 'community' },
+            { language: 'de', ratings: 12, average: 4.2, weighted_score: 4.2, confidence: 'community' },
+            { language: 'ja', ratings: 9, average: 4.1, weighted_score: 4.0, confidence: 'early' },
+            { language: 'en', ratings: 5, average: 3, weighted_score: 3.2, confidence: 'early' },
+          ],
+        },
+      },
+    })
+    const { container } = renderIt(<CommunityScore modelId="qwen" />)
+    expect(await screen.findByText(/in English/)).toBeInTheDocument()
+    expect(Array.from(container.querySelectorAll('p')).map((p) => p.textContent)).toEqual([
+      '★ 4.1 overall · 40 ratings',
+      '★ 3.2 in English · 5 ratingsEarly ratings',
+      '★ 4.7 in Spanish · 30 ratings',
+      '★ 4.2 in German · 12 ratings',
+    ])
   })
 })

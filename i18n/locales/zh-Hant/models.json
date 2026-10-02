@@ -234,6 +234,9 @@
     "starsLabel": "星等",
     "stars_other": "{{count}} 顆星",
     "tagsLabel": "原因（選填）",
+    "languageLabel": "你使用的語言",
+    "languageNone": "不說明",
+    "languageQuestion": "它在{{language}}中的表現如何？",
     "tags": {
       "great_responses": "回答出色",
       "fast": "速度快",
@@ -257,6 +260,7 @@
       "ratingValue": "上方的星等和原因",
       "model": "模型",
       "hardware": "電腦類別",
+      "language": "語言",
       "memory": "{{type}}記憶體，{{gb}} GB",
       "id": "評分 ID",
       "idValue": "一組隨機 ID，用來變更或移除你的評分；不是由你的電腦資訊產生",
@@ -275,6 +279,7 @@
       "backend": "在記憶體相近的電腦上"
     },
     "overall": "整體",
+    "inLanguage": "{{language}}",
     "chosenByCommunity": "根據類似電腦的評分選出",
     "confidence": {
       "limited": "資料有限",

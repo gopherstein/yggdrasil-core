@@ -48,7 +48,7 @@ func writeRatingErr(w http.ResponseWriter, err error) {
 		writeErr(w, http.StatusBadGateway, "RATINGS_UNREACHABLE", err.Error(), nil)
 	case errors.Is(err, ratings.ErrNoModel):
 		writeErr(w, http.StatusNotFound, "MODEL_NOT_FOUND", err.Error(), nil)
-	case errors.Is(err, ratings.ErrStars):
+	case errors.Is(err, ratings.ErrStars), errors.Is(err, ratings.ErrLanguage):
 		writeErr(w, http.StatusBadRequest, "INVALID_RATING", err.Error(), nil)
 	case errors.Is(err, ratings.ErrNotShareable):
 		writeErr(w, http.StatusUnprocessableEntity, "RATING_NOT_SHAREABLE", err.Error(), nil)
