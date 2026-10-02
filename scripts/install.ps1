@@ -16,7 +16,8 @@ param(
     [Parameter(Position = 0)][ValidateSet('install', 'join')][string]$Command = 'install',
     [string]$Server,
     [string]$Token,
-    [string]$Fingerprint
+    [string]$Fingerprint,
+    [string]$Name
 )
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
@@ -125,7 +126,9 @@ if ($installed -and (Test-Healthy)) {
 
 if ($Command -eq 'join') {
     $env:YGGDRASIL_URL = $Api
-    & $Yggctl join --server $Server --token $Token --fingerprint $Fingerprint
+    $joinArgs = @('join', '--server', $Server, '--token', $Token, '--fingerprint', $Fingerprint)
+    if ($Name) { $joinArgs += @('--name', $Name) }
+    & $Yggctl @joinArgs
     exit $LASTEXITCODE
 }
 Write-Host "Open $Api or run yggctl to use it."

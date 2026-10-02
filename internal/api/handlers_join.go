@@ -45,6 +45,8 @@ type JoinRequest struct {
 	Server      string `json:"server"`
 	Token       string `json:"token"`
 	Fingerprint string `json:"fingerprint"`
+	// Name renames this computer as it joins; empty keeps its name.
+	Name string `json:"name,omitempty"`
 }
 
 // NetworkNode is a computer in a network.

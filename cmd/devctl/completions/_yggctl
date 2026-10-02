@@ -31,6 +31,7 @@ _yggctl() {
     join)
       _arguments '--server[address of the computer that made the command]:server:' \
         '--token[join token]:token:' '--fingerprint[that computer'"'"'s fingerprint]:fingerprint:' \
+        '--name[rename this computer as it joins]:name:' '--wait[wait for Yggdrasil to start]:duration:' \
         '--output[output format]:format:(text json)'
       ;;
     join-token)

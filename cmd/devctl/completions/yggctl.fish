@@ -18,6 +18,8 @@ complete -c yggctl -n '__fish_seen_subcommand_from mcp' -l url -r -d 'Yggdrasil 
 complete -c yggctl -n '__fish_seen_subcommand_from join' -l server -r -d 'Address of the computer that made the command'
 complete -c yggctl -n '__fish_seen_subcommand_from join' -l token -r -d 'Join token'
 complete -c yggctl -n '__fish_seen_subcommand_from join' -l fingerprint -r -d "That computer's fingerprint"
+complete -c yggctl -n '__fish_seen_subcommand_from join' -l name -r -d 'Rename this computer as it joins'
+complete -c yggctl -n '__fish_seen_subcommand_from join' -l wait -r -d 'Wait for Yggdrasil to start, such as 60s'
 complete -c yggctl -n '__fish_seen_subcommand_from join-token; and not __fish_seen_subcommand_from create list revoke' -a 'create list revoke'
 complete -c yggctl -n '__fish_seen_subcommand_from join-token' -l ttl -r -d 'How long the token lasts, such as 15m'
 complete -c yggctl -n '__fish_seen_subcommand_from join join-token network leave' -l output -x -a 'text json' -d 'Output format'
