@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-10-02
+
+Stable release of 1.4.0. It contains everything in [1.4.0-beta.1](#140-beta1---2026-10-01), the AI experience platform and the remaining Train Your Own AI items, plus the changes below. Existing API routes, configuration, and data are compatible with 1.3: the changes add routes, optional fields, and database tables, and migrations run automatically. NVIDIA (CUDA) training, PostgreSQL and MySQL knowledge sources, and the Mac App Store sandbox have not been tested on that hardware or in that build. Binaries and the apt repository are not signed.
+
 ### Added
 
 - Documentation for 1.4.0. New [Configuration](docs/configuration.md) (data directory layout, every `config.json` key, environment variable, and setting) and [Command line](docs/cli.md) (`yggdrasil-daemon` flags, the Linux systemd service, and every `yggctl` command) pages. The API reference now lists every route, grouped by area, and every event type. The user guide adds sections on memory, knowledge, tools, notifications, profiles, privacy, and diagnostics.
@@ -19,6 +23,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 ### Fixed
 
 - Chat answers keep their indentation. Nested lists stay nested and code blocks keep their indentation; only extra spaces in the middle of a line are collapsed.
+- The Screenshots workflow passes again. Screenshot validation accepts the lowercase opaque value that ImageMagick 6 on Ubuntu prints, a screen that does not become ready is loaded once more before the run fails, and a failure now prints the page's errors and keeps what the page showed.
 
 ## [1.4.0-beta.1] - 2026-10-01
 

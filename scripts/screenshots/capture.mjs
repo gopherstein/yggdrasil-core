@@ -54,7 +54,18 @@ const ready = new Promise((resolve, reject) => {
   })
 })
 
+// A screen that does not become ready is loaded once more before the run
+// fails: on CI runners a screen occasionally stays blank for the whole wait.
 async function openScreen(page, screen) {
+  try {
+    await loadScreen(page, screen, false)
+  } catch {
+    console.error(`Loading ${screen.id} again`)
+    await loadScreen(page, screen, true)
+  }
+}
+
+async function loadScreen(page, screen, last) {
   const query = new URLSearchParams({ screenshot: '1', screen: screen.id })
   if (screen.query) {
     for (const [key, value] of new URLSearchParams(screen.query)) {
@@ -70,6 +81,7 @@ async function openScreen(page, screen) {
       { timeout: 30_000 },
     )
   } catch (error) {
+    if (!last) throw error
     const text = await page.locator('body').innerText({ timeout: 5_000 }).catch((e) => `(could not read the page: ${e.message})`)
     console.error(`Page text for ${screen.id}:\n${text.slice(0, 1200)}`)
     console.error(`Page errors and console output for ${screen.id}:\n${pageLog.slice(-40).join('\n') || '(none)'}`)
