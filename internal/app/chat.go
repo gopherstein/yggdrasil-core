@@ -98,7 +98,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 	// Auto: Huginn picks the installed model that suits this message. A
 	// question about files or connected knowledge counts as one that needs a
 	// careful answer.
-	routeReason := ""
+	routeReason, routeNotice := "", ""
 	if modelID == huginn.AutoModelID {
 		// A specialized AI trained for exactly this answers first (§61).
 		if id, reason, ok := a.chooseSpecialist(ctx, message); ok {
@@ -107,11 +107,17 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			// The profile's own coding or fast model (§20).
 			modelID, routeReason = id, reason
 		} else {
-			choice, err := a.chooseAuto(ctx, message, a.turnHasData(ctx, conversationID, profile))
+			lang := a.replyLanguage(ctx, conversationID, message, "").Tag
+			choice, err := a.chooseAuto(ctx, message, a.turnHasData(ctx, conversationID, profile), lang)
 			if err != nil {
 				return nil, err
 			}
 			modelID, routeReason = choice.Model.ID, choice.Reason
+			if choice.LanguageWeak {
+				// Nothing installed writes the language well (§16): the
+				// answer is still in it, with a word that it may read less well.
+				routeNotice = a.languageWeakNotice(ctx, choice.Model, lang)
+			}
 		}
 	}
 	// OpenAI /v1 and Chat both may hit presets with empty role model_ids.
@@ -269,7 +275,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			conversationID: conversationID,
 			taskID:         task.ID,
 			turnPrompt:     message,
-			trace:          &turnTrace{runID: task.ID},
+			trace:          &turnTrace{runID: task.ID, notice: routeNotice},
 			startedAt:      turnStart,
 			attachments:    attached,
 		}

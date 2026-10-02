@@ -423,5 +423,8 @@
     "inOut": "{{in}} de entrada / {{out}} de salida",
     "cached": "{{count}} en caché",
     "toolFailures": "{{count}} fallidas"
+  },
+  "notices": {
+    "languageWeak": "Puede que {{model}} escriba en {{language}} peor que en inglés, y ningún modelo instalado que quepa lo hace mejor. En la página Modelos encontrarás modelos con buena valoración en {{language}}."
   }
 }

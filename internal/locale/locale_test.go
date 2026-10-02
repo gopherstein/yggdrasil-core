@@ -50,3 +50,17 @@ func TestT(t *testing.T) {
 		t.Errorf("missing key = %q", got)
 	}
 }
+
+func TestLanguageName(t *testing.T) {
+	cases := map[[2]string]string{
+		{"es", "de"}: "Spanisch",
+		{"es", "en"}: "Spanish",
+		{"ja", "fr"}: "japonais",
+		{"es", ""}:   "Spanish",
+	}
+	for in, want := range cases {
+		if got := LanguageName(in[0], in[1]); got != want {
+			t.Errorf("LanguageName(%q, %q) = %q, want %q", in[0], in[1], got, want)
+		}
+	}
+}

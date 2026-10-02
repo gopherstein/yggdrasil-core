@@ -401,5 +401,8 @@
     "inOut": "입력 {{in}} / 출력 {{out}}",
     "cached": "{{count}}개 캐시됨",
     "toolFailures": "{{count}}개 실패"
+  },
+  "notices": {
+    "languageWeak": "{{model}}은(는) 영어보다 {{language}}를 덜 잘 쓸 수 있고, 설치된 모델 중 이 컴퓨터에 맞으면서 더 잘 쓰는 모델이 없어요. {{language}} 평가가 좋은 모델은 모델 페이지에서 볼 수 있어요."
   }
 }

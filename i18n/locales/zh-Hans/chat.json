@@ -401,5 +401,8 @@
     "inOut": "输入 {{in}} / 输出 {{out}}",
     "cached": "{{count}} 个已缓存",
     "toolFailures": "{{count}} 个失败"
+  },
+  "notices": {
+    "languageWeak": "{{model}} 写{{language}}可能不如写英文好，而已安装且能运行的模型中没有更擅长的。{{language}}评级良好的模型可在“模型”页面找到。"
   }
 }

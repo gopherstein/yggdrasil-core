@@ -23,6 +23,10 @@ const (
 type Choice struct {
 	Model  contracts.Model
 	Reason string
+	// LanguageWeak is set when the model is expected to write the answer's
+	// language materially worse and nothing installed that fits does
+	// better (§16), so the user can be told.
+	LanguageWeak bool
 }
 
 func has(list []string, v string) bool { return slices.Contains(list, v) }
@@ -110,6 +114,15 @@ func Choose(k Kind, installed []contracts.Model, memTotal uint64) (Choice, bool)
 // already-loaded model where one suits; Thorough takes the largest suitable
 // model that fits, even for a quick question.
 func ChooseFor(k Kind, e Effort, installed []contracts.Model, memTotal uint64) (Choice, bool) {
+	return ChooseIn(k, e, "", installed, memTotal)
+}
+
+// ChooseIn is ChooseFor for an answer in lang, a BCP 47 tag such as "es"
+// (§15–16): at each step, a model that writes the language better comes
+// before a larger one, and a loaded model is kept for a quick request only
+// when nothing that fits writes the language better. "" leaves language
+// out of the choice.
+func ChooseIn(k Kind, e Effort, lang string, installed []contracts.Model, memTotal uint64) (Choice, bool) {
 	var models []contracts.Model
 	for _, m := range installed {
 		if m.Installed && !Supporting(m) {
@@ -124,30 +137,53 @@ func ChooseFor(k Kind, e Effort, installed []contracts.Model, memTotal uint64) (
 	if quick {
 		share = quickShare
 	}
+	// A model that writes the answer's language better comes first; among
+	// equals, the larger one.
+	better := func(a, b contracts.Model) bool {
+		if ra, rb := languageRank(a, lang), languageRank(b, lang); ra != rb {
+			return ra > rb
+		}
+		return bigger(a, b)
+	}
+	// The best language rank of a model that fits at all, to tell whether a
+	// weak pick could have been better (§16).
+	bestRank := 0
+	for _, m := range models {
+		if fits(m, memTotal, fullShare) {
+			bestRank = max(bestRank, languageRank(m, lang))
+		}
+	}
 	pick := func(m contracts.Model) (Choice, bool) {
 		reason := fmt.Sprintf("Auto chose %s for %s", Name(m), k.Describe())
+		if lang != "" && !strings.HasPrefix(lang, "en") && languageRank(m, lang) >= rankGood {
+			reason += " in " + languageName(lang)
+		}
 		if e == EffortFast || e == EffortThorough {
 			reason += fmt.Sprintf(" at %s effort", e.Label())
 		}
-		return Choice{Model: m, Reason: reason}, true
+		return Choice{Model: m, Reason: reason, LanguageWeak: WeakIn(m, lang) && languageRank(m, lang) >= bestRank}, true
 	}
 
 	// A quick request goes to a suitable model that is already loaded, so it
-	// is not slowed by loading another.
+	// is not slowed by loading another, unless one that fits writes the
+	// answer's language better.
 	if quick {
-		if m, ok := best(models, func(m contracts.Model) bool { return running(m) && suits(k, m) && fits(m, memTotal, fullShare) }, bigger); ok {
-			return pick(m)
+		if m, ok := best(models, func(m contracts.Model) bool { return running(m) && suits(k, m) && fits(m, memTotal, fullShare) }, better); ok {
+			top, _ := best(models, func(m contracts.Model) bool { return suits(k, m) && fits(m, memTotal, share) }, better)
+			if top.ID == "" || languageRank(m, lang) >= languageRank(top, lang) {
+				return pick(m)
+			}
 		}
 	}
-	if m, ok := best(models, func(m contracts.Model) bool { return suits(k, m) && fits(m, memTotal, share) }, bigger); ok {
+	if m, ok := best(models, func(m contracts.Model) bool { return suits(k, m) && fits(m, memTotal, share) }, better); ok {
 		return pick(m)
 	}
 	// Nothing ideal: any conversational model that fits, then anything that
 	// fits, then the smallest installed model.
-	if m, ok := best(models, func(m contracts.Model) bool { return general(m) && fits(m, memTotal, fullShare) }, bigger); ok {
+	if m, ok := best(models, func(m contracts.Model) bool { return general(m) && fits(m, memTotal, fullShare) }, better); ok {
 		return pick(m)
 	}
-	if m, ok := best(models, func(m contracts.Model) bool { return fits(m, memTotal, fullShare) }, bigger); ok {
+	if m, ok := best(models, func(m contracts.Model) bool { return fits(m, memTotal, fullShare) }, better); ok {
 		return pick(m)
 	}
 	m, _ := best(models, func(contracts.Model) bool { return true }, func(a, b contracts.Model) bool { return a.MemoryNeeded < b.MemoryNeeded })

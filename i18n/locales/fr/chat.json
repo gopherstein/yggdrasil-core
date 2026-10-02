@@ -423,5 +423,8 @@
     "inOut": "{{in}} en entrée / {{out}} en sortie",
     "cached": "{{count}} en cache",
     "toolFailures": "{{count}} en échec"
+  },
+  "notices": {
+    "languageWeak": "{{model}} écrit peut-être moins bien en {{language}} qu'en anglais, et aucun modèle installé qui convient ne le fait mieux. La page Modèles indique les modèles bien notés en {{language}}."
   }
 }

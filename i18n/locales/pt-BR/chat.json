@@ -423,5 +423,8 @@
     "inOut": "{{in}} de entrada / {{out}} de saída",
     "cached": "{{count}} em cache",
     "toolFailures": "{{count}} com falha"
+  },
+  "notices": {
+    "languageWeak": "{{model}} pode escrever em {{language}} pior do que em inglês, e nenhum modelo instalado que caiba faz isso melhor. Na página Modelos você encontra modelos bem avaliados em {{language}}."
   }
 }

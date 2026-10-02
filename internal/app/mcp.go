@@ -124,7 +124,7 @@ func (a *App) mcpSearch(ctx context.Context, query string, limit int) ([]mcp.Pas
 // with the model Auto picks for the request.
 func (a *App) mcpSample(ctx context.Context, system string, msgs []mcp.SampleMessage, maxTokens int) (string, string, error) {
 	last := msgs[len(msgs)-1].Text
-	choice, err := a.chooseAuto(ctx, last, false)
+	choice, err := a.chooseAuto(ctx, last, false, a.replyLanguage(ctx, "", last, "").Tag)
 	if err != nil {
 		return "", "", err
 	}

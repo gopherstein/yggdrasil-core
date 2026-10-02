@@ -9,6 +9,7 @@ import (
 
 	"github.com/yeixio/yggdrasil-core/internal/artifacts"
 	"github.com/yeixio/yggdrasil-core/internal/huginn"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	modelhealth "github.com/yeixio/yggdrasil-core/internal/models/health"
 	"github.com/yeixio/yggdrasil-core/internal/profiles"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
@@ -66,8 +67,10 @@ func (a *App) recentlyFailed(modelID string) bool {
 	return true
 }
 
-// chooseAuto picks the model for a chat set to Auto (spec §12–13).
-func (a *App) chooseAuto(ctx context.Context, message string, data bool) (huginn.Choice, error) {
+// chooseAuto picks the model for a chat set to Auto (spec §12–13). lang is
+// the language the answer is written in (multilingual spec §15–16), or ""
+// to leave it out.
+func (a *App) chooseAuto(ctx context.Context, message string, data bool, lang string) (huginn.Choice, error) {
 	all := a.installedModels(ctx)
 	usable := make([]contracts.Model, 0, len(all))
 	for _, m := range all {
@@ -82,7 +85,7 @@ func (a *App) chooseAuto(ctx context.Context, message string, data bool) (huginn
 	if data && kind == huginn.Chat {
 		kind = huginn.Research
 	}
-	choice, ok := huginn.ChooseFor(kind, huginn.EffortFrom(ctx), usable, a.memoryTotal(ctx))
+	choice, ok := huginn.ChooseIn(kind, huginn.EffortFrom(ctx), lang, usable, a.memoryTotal(ctx))
 	if !ok {
 		return huginn.Choice{}, errNoModel
 	}
@@ -231,4 +234,15 @@ func smallModelNote(dataKind, modelID string, installed []contracts.Model, memTo
 		note += " A larger model from the Models page will be more reliable."
 	}
 	return note
+}
+
+// languageWeakNotice says, in the App language, that the model may write
+// lang less well (multilingual spec §16).
+func (a *App) languageWeakNotice(ctx context.Context, m contracts.Model, lang string) string {
+	app := ""
+	if a.Settings != nil {
+		app, _ = a.Settings.GetString(ctx, "ui_locale", "")
+	}
+	app = locale.Resolve(app)
+	return locale.T(app, "chat:notices.languageWeak", map[string]any{"model": huginn.Name(m), "language": locale.LanguageName(lang, app)})
 }

@@ -16,6 +16,7 @@ import (
 	yggdrasil "github.com/yeixio/yggdrasil-core"
 	"golang.org/x/text/feature/plural"
 	"golang.org/x/text/language"
+	"golang.org/x/text/language/display"
 	"golang.org/x/text/message"
 )
 
@@ -225,4 +226,22 @@ func pluralForm(tag language.Tag, n float64) string {
 		return "many"
 	}
 	return "other"
+}
+
+// LanguageName is a language's name written in another language, such as
+// "Spanisch" for es in de, or the tag when it has none.
+func LanguageName(tag, in string) string {
+	t, err := language.Parse(tag)
+	if err != nil {
+		return tag
+	}
+	if namer := display.Tags(language.Make(Resolve(in))); namer != nil {
+		if name := namer.Name(t); name != "" {
+			return name
+		}
+	}
+	if name := display.English.Tags().Name(t); name != "" {
+		return name
+	}
+	return tag
 }

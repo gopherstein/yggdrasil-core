@@ -73,7 +73,8 @@ func (e automationExecutor) execute(ctx context.Context, automation automations.
 	// connected knowledge, relevant memories, and Huginn's effort budget.
 	modelID := automation.ModelID
 	if modelID == huginn.AutoModelID {
-		choice, err := e.app.chooseAuto(ctx, automation.Prompt, e.app.turnHasData(ctx, "", profile))
+		lang := e.app.replyLanguage(ctx, "", automation.Prompt, automation.ResponseLanguage).Tag
+		choice, err := e.app.chooseAuto(ctx, automation.Prompt, e.app.turnHasData(ctx, "", profile), lang)
 		if err != nil {
 			return automations.Execution{}, err
 		}

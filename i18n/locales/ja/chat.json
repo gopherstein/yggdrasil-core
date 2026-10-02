@@ -401,5 +401,8 @@
     "inOut": "入力{{in}} / 出力{{out}}",
     "cached": "キャッシュ{{count}}件",
     "toolFailures": "{{count}}件失敗"
+  },
+  "notices": {
+    "languageWeak": "{{model}}は英語に比べて{{language}}の文章が劣る可能性があり、インストール済みで動作するモデルの中にこれより得意なものはありません。{{language}}の評価が高いモデルは「モデル」ページで確認できます。"
   }
 }

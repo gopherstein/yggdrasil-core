@@ -412,5 +412,8 @@
     "inOut": "{{in}} in / {{out}} out",
     "cached": "{{count}} cached",
     "toolFailures": "{{count}} failed"
+  },
+  "notices": {
+    "languageWeak": "{{model}} may write {{language}} less well than English, and no installed model that fits writes it better. Models rated good in {{language}} are on the Models page."
   }
 }

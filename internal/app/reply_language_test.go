@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 	"strings"
 	"testing"
 )
@@ -125,5 +126,22 @@ func TestAutomationResponseLanguage(t *testing.T) {
 		if got := run(c.response, c.prompt); !strings.Contains(got, c.want) {
 			t.Errorf("response %q: want %q in\n%s", c.response, c.want, got)
 		}
+	}
+}
+
+// The warning that a model may write a language less well is in the App
+// language (multilingual spec §16).
+func TestLanguageWeakNotice(t *testing.T) {
+	a, _ := memoryApp(t)
+	ctx := context.Background()
+	m := contracts.Model{ID: "gemma", DisplayName: "Gemma 2 9B"}
+	if got := a.languageWeakNotice(ctx, m, "ja"); !strings.Contains(got, "Gemma 2 9B may write Japanese less well") {
+		t.Fatalf("English notice = %q", got)
+	}
+	if err := a.Settings.Set(ctx, "ui_locale", "de"); err != nil {
+		t.Fatal(err)
+	}
+	if got := a.languageWeakNotice(ctx, m, "ja"); !strings.Contains(got, "Japanisch") || strings.Contains(got, "may write") {
+		t.Fatalf("German notice = %q", got)
 	}
 }
