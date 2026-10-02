@@ -233,6 +233,8 @@ Before choosing a model, Auto checks the deployed specialized AIs. A chat goes t
 
 A model can have a `support_role`: `embedding`, `reranker`, or `classifier`. These models serve Yggdrasil instead of chatting. The role comes from the catalog, or, for models installed by URL or from Hugging Face, from the model's name, purpose, or tags. Auto, fallback, and the default model never pick one. A chat that asks for one by id fails with an explanation.
 
+A catalog model's `languages` say how well it writes each language it has a level for (multilingual spec §13–14, §31), best first: `language` (a BCP 47 tag), `level` (`limited`, `fair`, `good`, or `excellent`), `confidence` (`low`, `medium`, or `high`), and `sources` (`model_card`, `maintainer`, `benchmark`, `provider`, `community`, or `local_evaluation`). Levels are coarse on purpose. A language a model has no level for is unknown and left out. The levels in the catalog come from what each model card says it supports, judged by size for languages it lists but doesn't lead with; models installed by URL or from Hugging Face have none yet.
+
 If the model fails before it shows or changes anything, the turn runs once more on another installed model. `chat.model_routed` then has `fallback: true`. The answer's steps say what happened, and `meta.notice` warns when the model that answered is noticeably smaller. A model whose `llama-server` exits while loading fails at once instead of after the 120-second readiness timeout.
 
 ### Effort, plans, checks, and Stop

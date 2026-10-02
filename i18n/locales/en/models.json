@@ -200,6 +200,33 @@
     "usedBy": "Used by: {{profiles}}",
     "openChat": "Open Chat"
   },
+  "languages": {
+    "title": "Languages",
+    "yours": "{{language}}: {{level}}",
+    "notRated": "Not rated for {{language}}",
+    "withMore_one": "{{first}} · {{count}} more language",
+    "withMore_other": "{{first}} · {{count}} more languages",
+    "detail": "{{level}} · {{confidence}} · {{sources}}",
+    "levels": {
+      "limited": "Limited",
+      "fair": "Fair",
+      "good": "Good",
+      "excellent": "Excellent"
+    },
+    "confidence": {
+      "low": "low confidence",
+      "medium": "medium confidence",
+      "high": "high confidence"
+    },
+    "sources": {
+      "model_card": "model card",
+      "maintainer": "Yggdrasil maintainers",
+      "benchmark": "benchmarks",
+      "provider": "provider",
+      "community": "community ratings",
+      "local_evaluation": "tested on this computer"
+    }
+  },
   "ratings": {
     "rate": "Rate",
     "rateLabel": "Rate {{model}}",

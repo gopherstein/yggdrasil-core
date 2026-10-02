@@ -201,6 +201,34 @@
     "usedBy": "Usado por: {{profiles}}",
     "openChat": "Abrir o Chat"
   },
+  "languages": {
+    "title": "Idiomas",
+    "yours": "{{language}}: {{level}}",
+    "notRated": "Sem avaliação para {{language}}",
+    "withMore_one": "{{first}} · mais {{count}} idioma",
+    "withMore_many": "{{first}} · mais {{count}} idiomas",
+    "withMore_other": "{{first}} · mais {{count}} idiomas",
+    "detail": "{{level}} · {{confidence}} · {{sources}}",
+    "levels": {
+      "limited": "Limitado",
+      "fair": "Razoável",
+      "good": "Bom",
+      "excellent": "Excelente"
+    },
+    "confidence": {
+      "low": "confiança baixa",
+      "medium": "confiança média",
+      "high": "confiança alta"
+    },
+    "sources": {
+      "model_card": "ficha do modelo",
+      "maintainer": "equipe do Yggdrasil",
+      "benchmark": "benchmarks",
+      "provider": "provedor",
+      "community": "avaliações da comunidade",
+      "local_evaluation": "testado neste computador"
+    }
+  },
   "ratings": {
     "rate": "Avaliar",
     "rateLabel": "Avaliar {{model}}",

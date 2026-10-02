@@ -200,6 +200,33 @@
     "usedBy": "Genutzt von: {{profiles}}",
     "openChat": "Chat öffnen"
   },
+  "languages": {
+    "title": "Sprachen",
+    "yours": "{{language}}: {{level}}",
+    "notRated": "Keine Bewertung für {{language}}",
+    "withMore_one": "{{first}} · {{count}} weitere Sprache",
+    "withMore_other": "{{first}} · {{count}} weitere Sprachen",
+    "detail": "{{level}} · {{confidence}} · {{sources}}",
+    "levels": {
+      "limited": "Eingeschränkt",
+      "fair": "Ordentlich",
+      "good": "Gut",
+      "excellent": "Ausgezeichnet"
+    },
+    "confidence": {
+      "low": "geringe Sicherheit",
+      "medium": "mittlere Sicherheit",
+      "high": "hohe Sicherheit"
+    },
+    "sources": {
+      "model_card": "Modellkarte",
+      "maintainer": "Yggdrasil-Team",
+      "benchmark": "Benchmarks",
+      "provider": "Anbieter",
+      "community": "Community-Bewertungen",
+      "local_evaluation": "auf diesem Computer getestet"
+    }
+  },
   "ratings": {
     "rate": "Bewerten",
     "rateLabel": "{{model}} bewerten",

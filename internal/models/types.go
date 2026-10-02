@@ -24,6 +24,9 @@ type CatalogEntry struct {
 	SupportRole string `json:"support_role,omitempty"`
 	// Training is set when the model can be specialized with LoRA training.
 	Training *TrainingInfo `json:"training,omitempty"`
+	// Languages are how well the model writes each language it has a level
+	// for (multilingual spec §13–14), with confidence and sources.
+	Languages []contracts.LanguageCapability `json:"languages,omitempty"`
 }
 
 // Supporting reports an embedding, reranker, or classifier model. It serves

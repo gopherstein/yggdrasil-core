@@ -201,6 +201,34 @@
     "usedBy": "Utilisé par : {{profiles}}",
     "openChat": "Ouvrir Discussion"
   },
+  "languages": {
+    "title": "Langues",
+    "yours": "{{language}} : {{level}}",
+    "notRated": "Non évalué pour {{language}}",
+    "withMore_one": "{{first}} · {{count}} autre langue",
+    "withMore_many": "{{first}} · {{count}} autres langues",
+    "withMore_other": "{{first}} · {{count}} autres langues",
+    "detail": "{{level}} · {{confidence}} · {{sources}}",
+    "levels": {
+      "limited": "Limité",
+      "fair": "Correct",
+      "good": "Bon",
+      "excellent": "Excellent"
+    },
+    "confidence": {
+      "low": "confiance faible",
+      "medium": "confiance moyenne",
+      "high": "confiance élevée"
+    },
+    "sources": {
+      "model_card": "fiche du modèle",
+      "maintainer": "équipe d'Yggdrasil",
+      "benchmark": "benchmarks",
+      "provider": "fournisseur",
+      "community": "notes de la communauté",
+      "local_evaluation": "testé sur cet ordinateur"
+    }
+  },
   "ratings": {
     "rate": "Noter",
     "rateLabel": "Noter {{model}}",

@@ -1,6 +1,6 @@
-import type { FitLabel, Model, ModelFit } from '@/types/api'
+import type { FitLabel, LanguageCapability, Model, ModelFit } from '@/types/api'
 import i18n from '@/i18n'
-import { formatDate, formatNumber, formatRelativeTime } from '@/i18n/format'
+import { formatDate, formatLocale, formatNumber, formatRelativeTime } from '@/i18n/format'
 import { formatBytes } from '@/lib/format'
 
 
@@ -266,4 +266,56 @@ export function largerAlternative(models: Model[], fits: Record<string, ModelFit
   const installed = candidates.filter((m) => m.installed).sort((a, b) => size(b) - size(a))
   if (installed.length > 0) return installed[0]
   return candidates.filter(fitsWell).sort((a, b) => size(b) - size(a))[0] ?? null
+}
+
+/** A language's name in the App language, such as Deutsch or German. */
+export function languageName(tag: string): string {
+  try {
+    return new Intl.DisplayNames([formatLocale()], { type: 'language' }).of(tag) ?? tag
+  } catch {
+    return tag
+  }
+}
+
+/**
+ * The model's level for a language: the same tag, or the same language in
+ * another region (pt-BR for pt). Chinese matches only in the same script.
+ */
+export function languageLevelFor(model: Pick<Model, 'languages'>, tag: string): LanguageCapability | undefined {
+  const langs = model.languages ?? []
+  const exact = langs.find((l) => l.language.toLowerCase() === tag.toLowerCase())
+  if (exact) return exact
+  const base = tag.split('-')[0].toLowerCase()
+  if (base === 'zh') {
+    const script = /hant|tw|hk|mo/i.test(tag) ? 'hant' : 'hans'
+    return langs.find((l) => l.language.toLowerCase() === `zh-${script}`)
+  }
+  return langs.find((l) => l.language.split('-')[0].toLowerCase() === base)
+}
+
+/** One language's level, confidence, and sources, in words. */
+export function languageDetail(l: LanguageCapability): string {
+  return i18n.t('models:languages.detail', {
+    level: i18n.t(`models:languages.levels.${l.level}`),
+    confidence: i18n.t(`models:languages.confidence.${l.confidence}`),
+    sources: l.sources.map((s) => i18n.t(`models:languages.sources.${s}`, { defaultValue: s })).join(', '),
+  })
+}
+
+/**
+ * What a model card says about languages: the model's level in the App
+ * language, and how many others it has one for. title lists them all.
+ */
+export function languageSummary(model: Pick<Model, 'languages'>, appLanguage: string): { text: string; title: string } | null {
+  const langs = model.languages ?? []
+  if (langs.length === 0) return null
+  const tag = appLanguage.startsWith('en-X') || appLanguage.startsWith('ar-X') ? 'en' : appLanguage
+  const yours = languageLevelFor(model, tag)
+  const title = langs.map((l) => `${languageName(l.language)}: ${languageDetail(l)}`).join('\n')
+  const others = langs.filter((l) => l !== yours).length
+  const head = yours
+    ? i18n.t('models:languages.yours', { language: languageName(yours.language), level: i18n.t(`models:languages.levels.${yours.level}`) })
+    : i18n.t('models:languages.notRated', { language: languageName(tag) })
+  const text = others > 0 ? i18n.t('models:languages.withMore', { first: head, count: others }) : head
+  return { text, title }
 }

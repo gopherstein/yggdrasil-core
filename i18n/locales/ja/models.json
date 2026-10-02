@@ -199,6 +199,32 @@
     "usedBy": "使用中：{{profiles}}",
     "openChat": "チャットを開く"
   },
+  "languages": {
+    "title": "言語",
+    "yours": "{{language}}：{{level}}",
+    "notRated": "{{language}}の評価はありません",
+    "withMore_other": "{{first}} · ほか{{count}}言語",
+    "detail": "{{level}} · {{confidence}} · {{sources}}",
+    "levels": {
+      "limited": "限定的",
+      "fair": "まずまず",
+      "good": "良好",
+      "excellent": "優秀"
+    },
+    "confidence": {
+      "low": "信頼度：低",
+      "medium": "信頼度：中",
+      "high": "信頼度：高"
+    },
+    "sources": {
+      "model_card": "モデルカード",
+      "maintainer": "Yggdrasilのメンテナー",
+      "benchmark": "ベンチマーク",
+      "provider": "提供元",
+      "community": "コミュニティの評価",
+      "local_evaluation": "このコンピュータでテスト済み"
+    }
+  },
   "ratings": {
     "rate": "評価",
     "rateLabel": "{{model}}を評価",
