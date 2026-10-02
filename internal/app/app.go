@@ -157,9 +157,12 @@ type App struct {
 	// python manages the private Python environments for training and OCR.
 	python *pyenv.Manager
 
-	hw         *hardware.Detector
-	advertiser *discovery.Advertiser
-	internal   *nodes.InternalServer
+	hw *hardware.Detector
+	// discoveryMu guards advertiser, which settings changes, renames, and
+	// shutdown replace or stop from different requests.
+	discoveryMu sync.Mutex
+	advertiser  *discovery.Advertiser
+	internal    *nodes.InternalServer
 
 	stubInference bool
 
@@ -850,11 +853,13 @@ func (a *App) Start(ctx context.Context) error {
 
 	if cfg.DiscoveryEnabled || len(cfg.StaticPeers) > 0 {
 		if cfg.DiscoveryEnabled {
-			adv, err := discovery.StartAdvertise(cfg, true)
+			adv, err := startAdvertise(cfg, true)
 			if err != nil {
 				a.Logger.Warn("mdns advertise failed", "error", err)
 			} else {
+				a.discoveryMu.Lock()
 				a.advertiser = adv
+				a.discoveryMu.Unlock()
 			}
 		}
 		a.wg.Add(1)
@@ -957,9 +962,12 @@ func (a *App) Shutdown(ctx context.Context) error {
 	if a.cancel != nil {
 		a.cancel()
 	}
+	a.discoveryMu.Lock()
 	if a.advertiser != nil {
 		a.advertiser.Stop()
+		a.advertiser = nil
 	}
+	a.discoveryMu.Unlock()
 	if a.Lifecycle != nil {
 		a.Lifecycle.Halt()
 	}
@@ -1236,20 +1244,8 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 }
 
 func (a *App) reloadDiscovery() {
-	if a.advertiser != nil {
-		a.advertiser.Stop()
-		a.advertiser = nil
-	}
 	_ = a.syncInternalBind()
-	cfg := a.Config.Get()
-	if cfg.DiscoveryEnabled {
-		adv, err := discovery.StartAdvertise(cfg, true)
-		if err != nil {
-			a.Logger.Warn("mdns advertise failed after settings change", "error", err)
-		} else {
-			a.advertiser = adv
-		}
-	}
+	a.restartAdvertiser()
 	if a.Nodes != nil {
 		go func() {
 			ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
@@ -1257,6 +1253,30 @@ func (a *App) reloadDiscovery() {
 			_ = a.Nodes.RefreshDiscovery(ctx)
 		}()
 	}
+}
+
+// startAdvertise announces this computer on mDNS; tests replace it.
+var startAdvertise = discovery.StartAdvertise
+
+// restartAdvertiser announces this computer on mDNS again from the current
+// config, such as after a rename, or stops when discovery is off.
+func (a *App) restartAdvertiser() {
+	a.discoveryMu.Lock()
+	defer a.discoveryMu.Unlock()
+	if a.advertiser != nil {
+		a.advertiser.Stop()
+		a.advertiser = nil
+	}
+	cfg := a.Config.Get()
+	if !cfg.DiscoveryEnabled {
+		return
+	}
+	adv, err := startAdvertise(cfg, true)
+	if err != nil {
+		a.Logger.Warn("mdns advertise failed after settings change", "error", err)
+		return
+	}
+	a.advertiser = adv
 }
 
 // enableBackgroundWhenScheduled turns on keep_running_in_background when a schedule

@@ -221,6 +221,7 @@ func (a *App) JoinNetwork(ctx context.Context, req api.JoinRequest) (api.JoinRes
 	if err := a.Settings.Set(ctx, networkKey, acc.NetworkID); err != nil {
 		return api.JoinResult{}, err
 	}
+	name = joinedName(name, acc.Name)
 	if name != cfg.NodeName {
 		if err := a.rename(name); err != nil {
 			return api.JoinResult{}, err
@@ -249,6 +250,16 @@ func validName(s string) (string, error) {
 	return s, nil
 }
 
+// joinedName is this computer's name after joining: the one the issuer
+// gave it, which has a suffix such as "-2" when the name was taken, so both
+// computers agree. requested stays when the issuer's name is not usable.
+func joinedName(requested, issued string) string {
+	if n, err := validName(issued); err == nil {
+		return n
+	}
+	return requested
+}
+
 // rename gives this computer a new name and tells the parts that show it.
 func (a *App) rename(name string) error {
 	if err := a.Config.Update(func(c *config.Config) { c.NodeName = name }); err != nil {
@@ -264,9 +275,7 @@ func (a *App) renamed(name string) {
 	if a.Nodes != nil {
 		a.Nodes.SetLocalName(name)
 	}
-	if a.Config.Get().DiscoveryEnabled {
-		a.reloadDiscovery()
-	}
+	a.restartAdvertiser()
 }
 
 // joinError gives a join failure its error code.
