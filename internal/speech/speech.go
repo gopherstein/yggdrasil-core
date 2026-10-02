@@ -29,8 +29,9 @@ var transcribeScript []byte
 //go:embed synthesize.py
 var synthesizeScript []byte
 
-// Requirements are the speech environment's packages.
-var Requirements = []string{"faster-whisper==1.2.1", "piper-tts==1.8.0"}
+// Requirements are the speech environment's packages. PyAV is pinned
+// because 19 removed an argument faster-whisper 1.2.1 passes.
+var Requirements = []string{"faster-whisper==1.2.1", "av==18.0.0", "piper-tts==1.8.0"}
 
 // Spec is the managed Python environment speech runs in.
 func Spec() pyenv.Spec { return pyenv.Spec{Name: "speech", Requirements: Requirements} }
@@ -136,7 +137,9 @@ func (e *Engine) run(ctx context.Context, script []byte, cfg map[string]any, fil
 	cmd := exec.CommandContext(ctx, py, "-u", scriptPath, cfgPath)
 	cmd.Dir = job
 	cmd.Env = append(os.Environ(), e.Python.Env()...)
-	cmd.Env = append(cmd.Env, "HF_HUB_DISABLE_TELEMETRY=1", "HF_HUB_DISABLE_PROGRESS_BARS=1")
+	// Hugging Face's own files (logs, caches) stay with the models, not in
+	// the user's home folder.
+	cmd.Env = append(cmd.Env, "HF_HOME="+filepath.Join(e.Dir, "hf"), "HF_HUB_DISABLE_TELEMETRY=1", "HF_HUB_DISABLE_PROGRESS_BARS=1")
 	cmd.WaitDelay = 5 * time.Second
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout, cmd.Stderr = &stdout, &stderr
