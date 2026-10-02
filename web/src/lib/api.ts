@@ -101,6 +101,7 @@ import type { Upload } from '@/lib/upload'
 export type MediaKind = 'images' | 'video'
 import { hasEventRelay, onRelayedEvent, saveFromDaemon, signInReturnAddress } from '@/lib/desktopBridge'
 import i18n from '@/i18n'
+import { formatLocale } from '@/i18n/format'
 
 /** The service's error envelope: a stable code, its English message, and the values the message needs. */
 interface ServiceError {
@@ -136,7 +137,16 @@ export class ApiError extends Error {
  */
 export function errorText(code: string | undefined, message: string, details?: Record<string, unknown>): string {
   if (!code || !i18n.exists(`errors:${code}`)) return message
-  return i18n.t(`errors:${code}`, { detail: message, ...details })
+  const values: Record<string, unknown> = { detail: message, ...details }
+  // A language comes as a tag, such as ja; it is shown by its name in the App language.
+  if (typeof values.language === 'string' && /^[A-Za-z]{2,3}(-[A-Za-z0-9]+)*$/.test(values.language)) {
+    try {
+      values.language = new Intl.DisplayNames([formatLocale()], { type: 'language' }).of(values.language) ?? values.language
+    } catch {
+      // Keep the tag.
+    }
+  }
+  return i18n.t(`errors:${code}`, values)
 }
 
 function strField(raw: Record<string, unknown>, snake: string, pascal: string): string {

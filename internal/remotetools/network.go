@@ -120,8 +120,10 @@ func policyFrom(ctx context.Context) contracts.NodePolicy {
 // place ranks the computers that can run a tool now. An image goes to a
 // computer whose GPU makes it; otherwise this computer is preferred, since
 // nothing has to travel. The profile's policy keeps calls here, avoids
-// computers, or favors some.
-func (n *Network) place(ctx context.Context, local Portable, wait bool) []candidate {
+// computers, or favors some. With a language, a computer whose provider
+// works in it comes before one whose doesn't (multilingual spec §20); when
+// none does, every computer stays, so the tool can say why.
+func (n *Network) place(ctx context.Context, local Portable, wait bool, lang string) []candidate {
 	policy := policyFrom(ctx)
 	var out []candidate
 	if lp := local.Provider(); lp.Ready() {
@@ -154,6 +156,17 @@ func (n *Network) place(ctx context.Context, local Portable, wait bool) []candid
 			out[i].score += 100
 		}
 	}
+	if lang != "" {
+		var speaks []candidate
+		for _, c := range out {
+			if c.provider.Speaks(lang) {
+				speaks = append(speaks, c)
+			}
+		}
+		if len(speaks) > 0 {
+			out = speaks
+		}
+	}
 	sort.SliceStable(out, func(i, j int) bool { return out[i].score > out[j].score })
 	return out
 }
@@ -182,7 +195,7 @@ func (p *Proxy) Available() (bool, string) {
 	if ready {
 		return true, ""
 	}
-	if len(p.net.place(context.Background(), p.local, false)) > 0 {
+	if len(p.net.place(context.Background(), p.local, false, "")) > 0 {
 		return true, ""
 	}
 	return false, why
@@ -191,7 +204,7 @@ func (p *Proxy) Available() (bool, string) {
 // Execute runs the call on the best computer. When another computer cannot
 // be reached, or turns out not to be ready, the next one is tried.
 func (p *Proxy) Execute(ctx context.Context, args map[string]any) (map[string]any, error) {
-	places := p.net.place(ctx, p.local, true)
+	places := p.net.place(ctx, p.local, true, CallLanguage(args))
 	if len(places) == 0 {
 		_, why := p.local.Available()
 		if why == "" {
