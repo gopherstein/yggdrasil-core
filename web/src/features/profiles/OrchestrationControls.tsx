@@ -87,22 +87,19 @@ export function OrchestrationControls({
   value,
   onChange,
   disabled,
+  only,
 }: {
   value: OrchestrationPolicy
   onChange: (next: OrchestrationPolicy) => void
   disabled?: boolean
+  /** The controls to show; all of them when omitted. */
+  only?: (keyof OrchestrationPolicy)[]
 }) {
   const set = (patch: OrchestrationPolicy) => onChange({ ...value, ...patch })
+  const shown = (key: keyof OrchestrationPolicy) => !only || only.includes(key)
   return (
-    <section className="space-y-3">
-      <div>
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Orchestration</h3>
-        <p className="text-xs text-ink-muted">
-          How this profile works through a request. Default follows the effort each chat chooses.
-        </p>
-      </div>
-      <div className="grid gap-3 sm:grid-cols-2">
-        {SELECTS.map((s) => (
+    <div className="grid gap-3 sm:grid-cols-2">
+        {SELECTS.filter((s) => shown(s.key)).map((s) => (
           <label key={s.key} className="block text-sm" title={s.help}>
             <span className="text-ink-muted">{s.label}</span>
             <select
@@ -120,7 +117,7 @@ export function OrchestrationControls({
             <span className="mt-0.5 block text-xs text-ink-faint">{s.help}</span>
           </label>
         ))}
-        {NUMBERS.map((n) => (
+        {NUMBERS.filter((n) => shown(n.key)).map((n) => (
           <label key={n.key} className="block text-sm" title={n.help}>
             <span className="text-ink-muted">{n.label}</span>
             <input
@@ -137,7 +134,7 @@ export function OrchestrationControls({
             <span className="mt-0.5 block text-xs text-ink-faint">{n.help}</span>
           </label>
         ))}
-      </div>
-    </section>
+    </div>
   )
 }
+

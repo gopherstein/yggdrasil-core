@@ -465,6 +465,7 @@ func New(opts Options) (*App, error) {
 			return profileMgr.Get(ctx, p.ID)
 		},
 		DeleteProfile: profileMgr.Delete,
+		ResetProfile:  profileMgr.ResetPreset,
 		ListRuntimes:  rtMgr.List,
 		InstallRuntime: func(ctx context.Context, id string) error {
 			return rtMgr.Install(ctx, id, runtimes.InstallOptions{})

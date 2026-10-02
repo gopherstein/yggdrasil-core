@@ -116,3 +116,34 @@ func TestNodePolicyValidation(t *testing.T) {
 		t.Fatal("4 retries accepted")
 	}
 }
+
+// A built-in profile can be put back to how Yggdrasil ships it (§24).
+func TestResetPreset(t *testing.T) {
+	db, err := store.Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+	ctx := context.Background()
+	m := NewManager(db.SQL)
+	if err := m.EnsurePresets(ctx); err != nil {
+		t.Fatal(err)
+	}
+	p, _ := m.Get(ctx, PresetProgramming)
+	p.Name = "My coding"
+	p.Orchestration = contracts.OrchestrationPolicy{Strategy: StrategySingle}
+	if err := m.Update(ctx, p); err != nil {
+		t.Fatal(err)
+	}
+	got, err := m.ResetPreset(ctx, PresetProgramming)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Name != "Programming" || got.Orchestration.Strategy != StrategyTeam {
+		t.Fatalf("reset = %q / %q", got.Name, got.Orchestration.Strategy)
+	}
+	custom, _ := m.Create(ctx, Profile{Name: "Mine", OrchestratorID: "simple"})
+	if _, err := m.ResetPreset(ctx, custom.ID); err == nil {
+		t.Fatal("a custom profile was reset")
+	}
+}

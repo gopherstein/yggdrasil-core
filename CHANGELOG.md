@@ -13,7 +13,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 - Model roles. A profile can assign primary, fast, coding, planner, worker, and reviewer models, each with an optional computer. With the chat on Auto, a profile's coding model answers coding requests and its fast model answers quick questions. A fallback order lists the models to try when the answering model fails.
 - Planning: Always asks the planner model to split a request that has no obvious parts.
 - Placement rules per profile. Each paired computer can be Preferred or Never use, and Only this computer keeps every turn here.
+- Profiles & Orchestration. The Profiles page is renamed, and its editor is grouped into Profile, Models, Tools, Memory, Orchestration, and Execution. Each built-in profile has Reset to defaults (`POST /api/v1/profiles/{id}/reset`), and Duplicate now copies a profile's orchestration and knowledge sources.
+- Run details label each role (Planner, Worker 1, Answer, Reviewer), list them in that order, and count the model calls.
 - Retry on another computer. When a model fails before showing anything, the turn runs again with the same model on another online computer that has it, before trying another model. Retries (1–3) sets how many times.
+- The network advertisement (`_localai._tcp`) now says where the API is, as `api_port` in its TXT record. The service's own port is the computer-to-computer port, so an app that finds Yggdrasil on the network, such as the iPhone app, had to assume the default API port.
 
 ### Changed
 
