@@ -157,5 +157,24 @@
     "gigabytes": "{{value}} GB",
     "megabytes": "{{value}} MB",
     "kilobytes": "{{value}} KB"
+  },
+  "providers": {
+    "title": "Tools on each computer",
+    "description": "Images and speech run on whichever paired computer can run them, preferring one whose GPU does the work. Files are sent to it for the job and the result comes back to this chat.",
+    "computer": "Computer",
+    "thisComputer": "this computer",
+    "gpu": "GPU",
+    "tools": {
+      "image.generate": "Make images",
+      "image.edit": "Edit images",
+      "speech.transcribe": "Transcribe",
+      "speech.synthesize": "Read aloud"
+    },
+    "states": {
+      "healthy": "Ready",
+      "installing": "Installing",
+      "failed": "Failed",
+      "unavailable": "Not set up"
+    }
   }
 }
