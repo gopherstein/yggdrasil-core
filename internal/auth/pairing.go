@@ -141,6 +141,9 @@ func (p *PairingManager) Identity() *NodeIdentity { return p.identity }
 
 // StartPairing initiates pairing with a discovered node.
 func (p *PairingManager) StartPairing(remoteNodeID, remoteName, remoteAddr string, remoteCert []byte) (*PairingSession, error) {
+	if err := p.checkSameKey(context.Background(), remoteNodeID, remoteCert); err != nil {
+		return nil, err
+	}
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
@@ -191,6 +194,9 @@ func (p *PairingManager) ReceiveOffer(offer PairingOffer) (*PairingSession, erro
 	}
 	if !verifySignature(offer.FromCertPEM, offer.Signature, offerMessage(offer)) {
 		return nil, fmt.Errorf("pairing offer is not signed by its computer; update Yggdrasil on both computers")
+	}
+	if err := p.checkSameKey(context.Background(), offer.FromNodeID, []byte(offer.FromCertPEM)); err != nil {
+		return nil, err
 	}
 	now := time.Now().UTC()
 	exp, _ := time.Parse(time.RFC3339, offer.ExpiresAt)
@@ -281,7 +287,7 @@ func (p *PairingManager) ApproveByCode(ctx context.Context, code string) (*Pairi
 	cp := cloneSession(s)
 	p.mu.Unlock()
 
-	if err := p.storeTrust(ctx, cp.RemoteNodeID, cp.RemoteName, cp.RemoteAddr, cp.RemoteCert); err != nil {
+	if err := p.storePairedTrust(ctx, cp.RemoteNodeID, cp.RemoteName, cp.RemoteAddr, cp.RemoteCert); err != nil {
 		return nil, err
 	}
 	return cp, nil
@@ -301,7 +307,7 @@ func (p *PairingManager) ApproveSession(ctx context.Context, sessionID string) (
 	s.State = PairingApproved
 	cp := cloneSession(s)
 	p.mu.Unlock()
-	if err := p.storeTrust(ctx, cp.RemoteNodeID, cp.RemoteName, cp.RemoteAddr, cp.RemoteCert); err != nil {
+	if err := p.storePairedTrust(ctx, cp.RemoteNodeID, cp.RemoteName, cp.RemoteAddr, cp.RemoteCert); err != nil {
 		return nil, err
 	}
 	return cp, nil
@@ -344,7 +350,7 @@ func (p *PairingManager) CompleteFromPeer(ctx context.Context, source string, co
 	}
 	cp := cloneSession(s)
 	p.mu.Unlock()
-	if err := p.storeTrust(ctx, cp.RemoteNodeID, cp.RemoteName, complete.FromAddress, cp.RemoteCert); err != nil {
+	if err := p.storePairedTrust(ctx, cp.RemoteNodeID, cp.RemoteName, complete.FromAddress, cp.RemoteCert); err != nil {
 		return nil, err
 	}
 	return cp, nil
@@ -456,6 +462,39 @@ func (p *PairingManager) IsTrusted(ctx context.Context, nodeID string) bool {
 // Trust pairs a computer whose key was verified another way, such as by a
 // one-line join token (#40).
 func (p *PairingManager) Trust(ctx context.Context, nodeID, name, address string, cert []byte) error {
+	return p.storeTrust(ctx, nodeID, name, address, cert)
+}
+
+// ErrPairedWithAnotherKey refuses pairing a computer that is already paired
+// under a different key. Removing it first allows pairing again.
+var ErrPairedWithAnotherKey = errors.New("that computer is already paired with a different key; remove it on the Computers page, then pair again")
+
+// checkSameKey refuses cert for nodeID when nodeID is paired, and not
+// removed, under another key. Pairing never replaces a paired computer's
+// key; the person removes it first.
+func (p *PairingManager) checkSameKey(ctx context.Context, nodeID string, cert []byte) error {
+	var trusted string
+	err := p.db.QueryRowContext(ctx, `
+		SELECT cert_pem FROM node_trust WHERE node_id = ? AND revoked_at IS NULL`, nodeID).Scan(&trusted)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil // not paired, or removed
+	}
+	if err != nil {
+		return err
+	}
+	have, err1 := PublicKeyFromPEM([]byte(trusted))
+	want, err2 := PublicKeyFromPEM(cert)
+	if err1 == nil && err2 == nil && have.Equal(want) {
+		return nil
+	}
+	return ErrPairedWithAnotherKey
+}
+
+// storePairedTrust stores trust from a pairing, refusing a changed key.
+func (p *PairingManager) storePairedTrust(ctx context.Context, nodeID, name, address string, cert []byte) error {
+	if err := p.checkSameKey(ctx, nodeID, cert); err != nil {
+		return err
+	}
 	return p.storeTrust(ctx, nodeID, name, address, cert)
 }
 

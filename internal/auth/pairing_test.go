@@ -315,3 +315,79 @@ func TestTrustRefusesANonKey(t *testing.T) {
 		t.Fatal("trusted something that is not a key")
 	}
 }
+
+// Pairing never replaces a paired computer's key. Removing the computer
+// first allows pairing again, and re-pairing with the same key is fine.
+func TestPairingRefusesAChangedKey(t *testing.T) {
+	ctx := context.Background()
+	a, b := newPairingPeer(t, "node-a"), newPairingPeer(t, "node-b")
+	impostor := newPairingPeer(t, "node-x")
+	if err := a.pm.Trust(ctx, "node-b", "B", "", b.id.CertPEM); err != nil {
+		t.Fatal(err)
+	}
+	if err := b.pm.Trust(ctx, "node-a", "A", "", a.id.CertPEM); err != nil {
+		t.Fatal(err)
+	}
+
+	// An offer claiming to be A, with another key, is refused by B.
+	s, err := impostor.pm.StartPairing("node-b", "B", "", b.id.CertPEM)
+	if err != nil {
+		t.Fatal(err)
+	}
+	o := PairingOffer{SessionID: s.ID, FromNodeID: "node-a", ToNodeID: "node-b", FromName: "A",
+		FromCertPEM: string(impostor.id.CertPEM), Code: s.Code, ExpiresAt: s.ExpiresAt.Format(time.RFC3339)}
+	impostor.pm.SignOffer(&o)
+	if _, err := b.pm.ReceiveOffer(o); !errors.Is(err, ErrPairedWithAnotherKey) {
+		t.Fatalf("offer with a changed key: %v", err)
+	}
+
+	// A starting pairing toward "B" at a key that is not B's is refused.
+	if _, err := a.pm.StartPairing("node-b", "B", "", impostor.id.CertPEM); !errors.Is(err, ErrPairedWithAnotherKey) {
+		t.Fatalf("start with a changed key: %v", err)
+	}
+
+	// The same key pairs again.
+	_, same := offerFrom(t, a, b)
+	if _, err := b.pm.ReceiveOffer(same); err != nil {
+		t.Fatalf("same key: %v", err)
+	}
+
+	// After removing A, B accepts the new key.
+	if err := b.pm.RevokeTrust(ctx, "node-a"); err != nil {
+		t.Fatal(err)
+	}
+	o.SessionID = randomID()
+	o.Code = "123456"
+	if o.Code == same.Code {
+		o.Code = "654321"
+	}
+	impostor.pm.SignOffer(&o)
+	got, err := b.pm.ReceiveOffer(o)
+	if err != nil {
+		t.Fatalf("after removal: %v", err)
+	}
+	if _, err := b.pm.ApproveSession(ctx, got.ID); err != nil {
+		t.Fatal(err)
+	}
+	trusted, _ := b.pm.TrustedCertPEM(ctx, "node-a")
+	if string(trusted) != string(impostor.id.CertPEM) {
+		t.Fatal("new key not stored after removal")
+	}
+}
+
+// Approval re-checks the key, in case the computer was paired another way
+// while the offer waited.
+func TestApproveRefusesAKeyThatChangedWhileWaiting(t *testing.T) {
+	ctx := context.Background()
+	a, b, other := newPairingPeer(t, "node-a"), newPairingPeer(t, "node-b"), newPairingPeer(t, "node-o")
+	s, o := offerFrom(t, a, b)
+	if _, err := b.pm.ReceiveOffer(o); err != nil {
+		t.Fatal(err)
+	}
+	if err := b.pm.Trust(ctx, "node-a", "A", "", other.id.CertPEM); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := b.pm.ApproveSession(ctx, s.ID); !errors.Is(err, ErrPairedWithAnotherKey) {
+		t.Fatalf("approve: %v", err)
+	}
+}
