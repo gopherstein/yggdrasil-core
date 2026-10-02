@@ -22,6 +22,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/auth"
 	"github.com/yeixio/yggdrasil-core/internal/automations"
 	"github.com/yeixio/yggdrasil-core/internal/benchmark"
+	"github.com/yeixio/yggdrasil-core/internal/browser"
 	"github.com/yeixio/yggdrasil-core/internal/cache"
 	"github.com/yeixio/yggdrasil-core/internal/codeexec"
 	"github.com/yeixio/yggdrasil-core/internal/config"
@@ -136,6 +137,8 @@ type App struct {
 	Images *imagegen.Setup
 	// Video makes short clips on this computer (Gungnir §27).
 	Video *imagegen.Setup
+	// browser runs each chat's isolated browser (Gungnir §26).
+	browser *browser.Manager
 	// health turns computer and model health changes into notifications.
 	health *healthNotices
 	// runs maps a conversation id to its running turn, so Stop can cancel it.
@@ -667,6 +670,7 @@ func New(opts Options) (*App, error) {
 	a.registerPortable(&imagegen.GenerateTool{Engine: images, Store: a.Artifacts})
 	a.registerPortable(&imagegen.EditTool{Engine: images, Store: a.Artifacts})
 	a.registerPlaces(cfg)
+	a.registerBrowser(cfg)
 	a.API.BindImages(a.Images)
 	a.Video = a.newVideoSetup(cfg)
 	videos := &imagegen.Engine{Setup: a.Video, WorkDir: filepath.Join(cfg.DataDir, "video-jobs"), What: "video generation"}
@@ -919,6 +923,9 @@ func (a *App) Shutdown(ctx context.Context) error {
 	}
 	if a.Lifecycle != nil {
 		a.Lifecycle.Halt()
+	}
+	if a.browser != nil {
+		a.browser.CloseAll()
 	}
 
 	// Unload models first so llama-server children exit before HTTP shutdown.

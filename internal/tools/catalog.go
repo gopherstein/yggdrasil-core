@@ -22,6 +22,8 @@ const (
 	CapImage = "image"
 	// CapVideo makes short clips (Gungnir §27).
 	CapVideo = "video"
+	// CapBrowser uses web pages in an isolated browser (Gungnir §26).
+	CapBrowser = "browser"
 )
 
 // Definition is one registered tool: built in, from a connected service,
@@ -85,6 +87,13 @@ func BuiltinCatalog() []Definition {
 		{ID: "places.details", Name: "Place Details", Description: "Look up one place from places.search by its id, such as node/3430732134: address, opening hours, phone, and website.", Capability: CapInternet, Source: "builtin", Schema: `{"id":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskRead},
 		{ID: "maps.route", Name: "Directions", Description: "Turn-by-turn directions between two places (names, addresses, or lat,lon) with OpenStreetMap: distance in km and miles, minutes, and steps. \"mode\" is driving (default), walking, or cycling.", Capability: CapInternet, Source: "builtin", Schema: `{"from":"string","to":"string","mode":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskRead},
 		{ID: "maps.distance", Name: "Distance", Description: "How far apart two places are, in a straight line and by road or path, and how long it takes. \"mode\" is driving (default), walking, or cycling.", Capability: CapInternet, Source: "builtin", Schema: `{"from":"string","to":"string","mode":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskRead},
+		{ID: "browser.open", Name: "Open Page in Browser", Description: "Open a web page in an isolated browser for this chat (a fresh profile, never the user's own), when a page needs JavaScript or interaction; for simply reading a page, internet.open is faster. Returns the page's text and its links, buttons, and fields, each with a ref for browser.click and browser.type.", Capability: CapBrowser, Source: "builtin", Schema: `{"url":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskRead, Level: LevelReadExternal},
+		{ID: "browser.click", Name: "Click in Browser", Description: "Click a link or button on the open page by its ref, and return the page after. The user approves clicks.", Capability: CapBrowser, Source: "builtin", Schema: `{"ref":"integer"}`, DefaultPolicy: PolicyAsk, Risk: RiskWrite},
+		{ID: "browser.type", Name: "Type in Browser", Description: "Type text into a field on the open page by its ref; \"submit\" presses Enter after. Never passwords, payment details, or codes: those fields are refused, and the user enters them. The user approves typing.", Capability: CapBrowser, Source: "builtin", Schema: `{"ref":"integer","text":"string","submit":"boolean"}`, DefaultPolicy: PolicyAsk, Risk: RiskWrite},
+		{ID: "browser.extract", Name: "Read Page", Description: "Read more of the open page: \"what\" is text (default, the whole page), links, or tables.", Capability: CapBrowser, Source: "builtin", Schema: `{"what":"string"}`, DefaultPolicy: PolicyAllow, Risk: RiskRead, Level: LevelReadExternal},
+		{ID: "browser.download", Name: "Download from Browser", Description: "Download a file the open page links to (\"ref\" of the link, or its \"url\"), keeping the page's sign-in, into this chat, up to 25 MB. The user approves downloads.", Capability: CapBrowser, Source: "builtin", Schema: `{"ref":"integer","url":"string"}`, DefaultPolicy: PolicyAsk, Risk: RiskWrite, Outputs: []string{OutputFile}},
+		{ID: "browser.screenshot", Name: "Screenshot Page", Description: "Attach a picture of what the open page shows, for the user to see.", Capability: CapBrowser, Source: "builtin", Schema: `{}`, DefaultPolicy: PolicyAllow, Risk: RiskRead, Level: LevelReadExternal, Outputs: []string{OutputImage}},
+		{ID: "browser.close", Name: "Close Browser", Description: "Close this chat's browser and forget its pages and sign-ins.", Capability: CapBrowser, Source: "builtin", Schema: `{}`, DefaultPolicy: PolicyAllow, Risk: RiskRead},
 		{ID: "internet.open", Name: "Open Web Page", Description: "Open a web page and return readable text.", Capability: CapInternet, Source: "builtin", Schema: `{"url":"string"}`, DefaultPolicy: PolicyAllow, Risk: "read"},
 		{ID: "filesystem.search", Name: "Find Files", Description: "Search file names in the workspace.", Capability: CapFiles, Source: "builtin", Schema: `{"query":"string"}`, DefaultPolicy: PolicyAllow, Risk: "read"},
 		{ID: "filesystem.read", Name: "Read File", Description: "Read a file in the workspace.", Capability: CapFiles, Source: "builtin", Schema: `{"path":"string"}`, DefaultPolicy: PolicyAllow, Risk: "read"},

@@ -31,6 +31,7 @@ What lives there:
 | `knowledge/` | Copies of pasted and uploaded knowledge, and `ocr-cache/` (recognized text of scanned PDFs). |
 | `training/` | Trained adapters (`adapters/`), exported GGUF files (`exports/`), job working files (`jobs/`, removed when a job ends), and downloaded training weights (`hf-cache/`). |
 | `code-runs/` | Each code run's working folder, deleted when the run ends. |
+| `browser/` | Each chat's temporary browser profile, deleted when its browser closes. |
 | `image-jobs/`, `video-jobs/` | Each image's or clip's working files, deleted when it is made. |
 | `logs/` | `daemon.log` (JSON) and llama-server logs. |
 | `secrets/` | This computer's identity (`node-<id>.key`, `.pub`), and credentials: `connector-<service>.json`, `mcp-<source>.json`, `knowledge-<source>`, `notify-<destination>`. Directory mode `0700`, files `0600`. |

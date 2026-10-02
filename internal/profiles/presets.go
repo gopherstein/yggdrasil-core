@@ -84,6 +84,13 @@ func defaultToolPolicies() []contracts.ToolPolicy {
 func generalToolPolicies() []contracts.ToolPolicy {
 	return []contracts.ToolPolicy{
 		{ToolID: "internet.search", Policy: "allow"},
+		{ToolID: "browser.open", Policy: "allow"},
+		{ToolID: "browser.extract", Policy: "allow"},
+		{ToolID: "browser.screenshot", Policy: "allow"},
+		{ToolID: "browser.close", Policy: "allow"},
+		{ToolID: "browser.click", Policy: "ask"},
+		{ToolID: "browser.type", Policy: "ask"},
+		{ToolID: "browser.download", Policy: "ask"},
 		{ToolID: "places.search", Policy: "allow"},
 		{ToolID: "places.details", Policy: "allow"},
 		{ToolID: "maps.route", Policy: "allow"},
@@ -114,6 +121,13 @@ func generalToolPolicies() []contracts.ToolPolicy {
 func codingToolPolicies() []contracts.ToolPolicy {
 	return []contracts.ToolPolicy{
 		{ToolID: "internet.search", Policy: "allow"},
+		{ToolID: "browser.open", Policy: "allow"},
+		{ToolID: "browser.extract", Policy: "allow"},
+		{ToolID: "browser.screenshot", Policy: "allow"},
+		{ToolID: "browser.close", Policy: "allow"},
+		{ToolID: "browser.click", Policy: "ask"},
+		{ToolID: "browser.type", Policy: "ask"},
+		{ToolID: "browser.download", Policy: "ask"},
 		{ToolID: "places.search", Policy: "allow"},
 		{ToolID: "places.details", Policy: "allow"},
 		{ToolID: "maps.route", Policy: "allow"},
@@ -144,6 +158,13 @@ func codingToolPolicies() []contracts.ToolPolicy {
 func researchToolPolicies() []contracts.ToolPolicy {
 	return []contracts.ToolPolicy{
 		{ToolID: "internet.search", Policy: "allow"},
+		{ToolID: "browser.open", Policy: "allow"},
+		{ToolID: "browser.extract", Policy: "allow"},
+		{ToolID: "browser.screenshot", Policy: "allow"},
+		{ToolID: "browser.close", Policy: "allow"},
+		{ToolID: "browser.click", Policy: "ask"},
+		{ToolID: "browser.type", Policy: "ask"},
+		{ToolID: "browser.download", Policy: "ask"},
 		{ToolID: "places.search", Policy: "allow"},
 		{ToolID: "places.details", Policy: "allow"},
 		{ToolID: "maps.route", Policy: "allow"},

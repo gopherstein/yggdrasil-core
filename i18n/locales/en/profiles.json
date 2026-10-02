@@ -170,6 +170,10 @@
       "label": "Images",
       "description": "Make and edit images on this computer, once image generation is set up"
     },
+    "browser": {
+      "label": "Browser",
+      "description": "Use web pages in an isolated browser; clicking, typing, and downloading ask first"
+    },
     "video": {
       "label": "Video",
       "description": "Make short clips on this computer, once video generation is set up"

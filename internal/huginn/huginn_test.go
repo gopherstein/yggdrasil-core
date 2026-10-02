@@ -215,6 +215,12 @@ func TestToolsFor(t *testing.T) {
 			t.Errorf("%q offered %v, want %s", msg, got, want)
 		}
 	}
+	browse := []string{"browser.open", "browser.click", "browser.type", "internet.search"}
+	for _, msg := range []string{"Go to example.com and click the pricing link", "Fill out the contact form on their website", "Take a screenshot of the page"} {
+		if got := ToolsFor(Chat, msg, browse); !has(got, "browser.open", "browser.click") {
+			t.Errorf("%q offered %v", msg, got)
+		}
+	}
 	film := []string{"video.generate", "image.generate"}
 	for _, msg := range []string{"Make a short video of waves on a beach", "Animate this photo", "Bring this picture to life"} {
 		if got := ToolsFor(Chat, msg, film); !has(got, "video.generate") {

@@ -305,6 +305,25 @@ func (t *turnTrace) tool(toolID string, args, result map[string]any) {
 	case "terminal":
 		t.untrusted = true
 		t.addStep("command", "Ran a command on this computer")
+	case "browser.open", "browser.click", "browser.type", "browser.extract", "browser.download", "browser.screenshot":
+		// Pages are written by other people, so they are data, not
+		// instructions (§58).
+		t.untrusted = true
+		page := firstNonEmpty(str(result, "title"), hostOf(str(result, "url")), hostOf(str(args, "url")))
+		switch toolID {
+		case "browser.open":
+			t.addStep("browser", "Opened "+page+" in the browser")
+		case "browser.click":
+			t.addStep("browser", "Clicked on the page, now "+page)
+		case "browser.type":
+			t.addStep("browser", "Typed into "+page)
+		case "browser.download":
+			t.addStep("browser", "Downloaded "+str(result, "name"))
+		case "browser.screenshot":
+			t.addStep("browser", "Took a screenshot of the page")
+		default:
+			t.addStep("browser", "Read "+page)
+		}
 	case "places.search", "places.details", "maps.route", "maps.distance":
 		// Place names and details are written by map contributors, so they
 		// are data, not instructions (§58).

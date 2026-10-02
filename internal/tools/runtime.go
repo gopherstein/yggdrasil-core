@@ -60,6 +60,8 @@ var timeouts = map[string]time.Duration{
 	CapSpeech: 15 * time.Minute,
 	// An image on a slow computer; the image's own limit stops it sooner.
 	CapImage: 25 * time.Minute,
+	// A page action waits for the page to settle; its own limit is 45 seconds.
+	CapBrowser: 90 * time.Second,
 	// A clip on a slow computer; its own limit stops it sooner.
 	CapVideo: 80 * time.Minute,
 }

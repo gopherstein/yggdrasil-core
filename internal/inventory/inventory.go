@@ -225,6 +225,19 @@ var rules = []rule{
 			}
 			return false, nil, "No image model or image tool is installed. Adding a tool source that generates images, on the Tools page, would add it."
 		}},
+	{"browser", "Use websites", regexp.MustCompile(`(?i)\b(browser|click|fill (in|out)|sign (up|in)|log ?in|websites?|web pages?)\b`),
+		func(s Snapshot) (bool, []string, string) {
+			v := toolsWhere(s, toolID("browser."))
+			if len(v) > 0 {
+				return true, v, "In an isolated browser with a fresh profile; clicking, typing, and downloading ask first, and passwords and payment details are never typed."
+			}
+			for _, t := range s.Tools {
+				if t.Enabled && t.ID == "browser.open" && t.Unavailable != "" {
+					return false, nil, strings.ToUpper(t.Unavailable[:1]) + t.Unavailable[1:] + "."
+				}
+			}
+			return false, nil, "The browser is turned off for this profile."
+		}},
 	{"video_generation", "Make videos", regexp.MustCompile(`(?i)\b(generat|creat|make|render|animat|produc)\w*\b.*\b(videos?|clips?|animations?|movies?|footage)\b`),
 		func(s Snapshot) (bool, []string, string) {
 			v := toolsWhere(s, toolID("video."))

@@ -39,6 +39,26 @@ The capability names `document.create`, `pdf.create`, and `spreadsheet.create` r
 
 `spreadsheet.analyze` summarizes a spreadsheet (`.xlsx`, `.csv`, or `.tsv`) attached to or made in the chat, by name or id. For each sheet it returns the number of rows and the first five. For each column it returns the type (number, date, text, or empty), how many cells are filled, and, for numbers, the minimum, maximum, average, and total; for other columns, how many distinct values there are and the most common ones. It reads up to 10 sheets, 50 columns, and 200,000 rows, so an answer can use a whole file that would not fit in the prompt. It is offered when a message mentions a spreadsheet, CSV, Excel, a workbook, or a sheet.
 
+## Browser
+
+The browser tools use web pages that need JavaScript or interaction, in an isolated browser. For simply reading a page, `internet.open` is faster. They are the Browser capability, and are not in offline profiles.
+
+| Tool | What it does | Default |
+| --- | --- | --- |
+| `browser.open` | Opens an address and returns the page's text and its links, buttons, and fields, each with a `ref` | Allow |
+| `browser.extract` | Reads more of the open page: its whole text, its links, or its tables | Allow |
+| `browser.screenshot` | Attaches a picture of what the page shows | Allow |
+| `browser.click` | Clicks a link or button by `ref` and returns the page after | Ask |
+| `browser.type` | Types into a field by `ref`, and with `submit` presses Enter | Ask |
+| `browser.download` | Brings a file the page links to into the chat, up to 25 MB, keeping the page's sign-in | Ask |
+| `browser.close` | Closes the chat's browser and forgets its pages | Allow |
+
+- **The browser:** a Chromium-based browser already on this computer (Google Chrome, Microsoft Edge, Chromium, or Brave), run headless. Nothing is downloaded. Without one, the tools say what to install. The Mac App Store build cannot start one.
+- **Isolation:** each chat has its own browser with a fresh, temporary profile. It never uses your own profile, sign-ins, saved passwords, or extensions, and it saves nothing to your computer. A chat's browser closes after 10 idle minutes, with `browser.close`, or when Yggdrasil stops, and its profile is deleted. At most three run at once.
+- **This computer and the local network are off limits:** every request a page makes, including redirects and resources, is checked as it happens. Requests for loopback, private, link-local, and other non-public addresses, and for names such as `localhost` or `*.local`, are refused. Downloads check again at connect time.
+- **Sensitive fields:** password, payment, and one-time-code fields are marked on the page and refused for typing; the person enters those themselves. Pages are treated as data, not instructions, so a turn that used them asks before changing anything.
+- **Privacy:** each page opened, including where a click or a search leads, and each download is recorded in What left this computer.
+
 ## Places and directions
 
 Four tools answer questions about places with [OpenStreetMap](https://www.openstreetmap.org/) data. They are part of the Internet capability, level 2, allowed by default, and not in offline profiles. They are offered when a message asks for something near somewhere, directions, how far, or opening hours.
