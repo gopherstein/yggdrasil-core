@@ -15,7 +15,8 @@ func TestLoadFailed(t *testing.T) {
 	if !errors.Is(err, ErrLoadFailed) || !errors.Is(err, cause) {
 		t.Fatal("LoadFailed does not match both ErrLoadFailed and its cause")
 	}
-	if errors.Is(context.Canceled, ErrLoadFailed) || LoadFailed(nil) != nil {
+	var canceled error = context.Canceled
+	if errors.Is(canceled, ErrLoadFailed) || LoadFailed(nil) != nil {
 		t.Fatal("LoadFailed marks what it should not")
 	}
 }
