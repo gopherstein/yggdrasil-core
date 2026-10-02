@@ -8,8 +8,10 @@ ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$ROOT"
 
 VERSION="${VERSION:-0.1.0-dev}"
-# Debian revision treats "-" as the package revision separator.
-PKG_VERSION="${VERSION/-/~}"
+# Debian revision treats "-" as the package revision separator, so a
+# pre-release such as 1.4.0-beta.1 is 1.4.0~beta.1. sed, not ${VERSION/-/~}:
+# bash 5.2 tilde-expands that "~" to the home directory.
+PKG_VERSION="$(printf '%s' "$VERSION" | sed 's/-/~/')"
 COMMIT="$(git rev-parse --short HEAD 2>/dev/null || echo unknown)"
 DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 LDFLAGS="-X github.com/yeixio/yggdrasil-core/internal/version.Version=${VERSION} -X github.com/yeixio/yggdrasil-core/internal/version.Commit=${COMMIT} -X github.com/yeixio/yggdrasil-core/internal/version.BuildDate=${DATE}"
