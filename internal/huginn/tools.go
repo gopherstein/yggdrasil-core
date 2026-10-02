@@ -137,11 +137,13 @@ func ToolsFor(k Kind, message string, available []string) []string {
 // without naming it (§32).
 var serviceCues = map[string]*regexp.Regexp{
 	"github":        regexp.MustCompile(`(?i)\b(git ?hub|issues?|pull requests?|PRs?)\b`),
+	"email":         regexp.MustCompile(`(?i)\b(e-?mails?|inbox|mail|messages? from|unread|newsletters?|replies|reply to)\b`),
+	"calendar":      regexp.MustCompile(`(?i)\b(calendar|schedule|meetings?|appointments?|events?|agenda|free (time|on|at|this|next|tomorrow)|busy|available|availability|book (a|an|time)|reschedule|tomorrow|this week|next week)\b`),
 	"homeassistant": regexp.MustCompile(`(?i)(\bhome ?assistant\b|\b(lights?|lamps?|thermostat|heating|switch(es)?|sensors?|garage door|front door|locks?|fans?|blinds)\b)`),
 }
 
 // cueAction is a message asking to change something rather than to know.
-var cueAction = regexp.MustCompile(`(?i)\b(turn|switch|set|dim|brighten|open|close|lock|unlock|start|stop|toggle|activate|run|comment|reply|respond|post|write|add|reopen|label|assign|tell them)\b`)
+var cueAction = regexp.MustCompile(`(?i)\b(turn|switch|set|dim|brighten|open|close|lock|unlock|start|stop|toggle|activate|run|comment|reply|respond|post|write|add|reopen|label|assign|tell them|send|draft|archive|schedule|book|reschedule|move|cancel|create|put)\b`)
 
 func aboutService(service, message string) bool {
 	lower := strings.ToLower(message)

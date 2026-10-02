@@ -186,7 +186,7 @@ func (m *Manager) Connect(ctx context.Context, id string, values map[string]stri
 	}
 	account, err := s.Check(ctx, m.client, cred)
 	if err != nil {
-		return Status{}, fmt.Errorf("could not connect to %s: %w", s.Name(), sanitizeErr(err, cred))
+		return Status{}, fmt.Errorf("could not connect to %s: %w", s.Name(), sanitizeErr(err, secretsOnly(s, cred)))
 	}
 	raw, err := json.Marshal(cred)
 	if err != nil {
@@ -271,7 +271,7 @@ func (m *Manager) Check(ctx context.Context, id string) (Status, error) {
 	account, checkErr := s.Check(ctx, m.client, cred)
 	status, msg := StatusConnected, any(nil)
 	if checkErr != nil {
-		status, msg = StatusError, sanitizeErr(checkErr, cred).Error()
+		status, msg = StatusError, sanitizeErr(checkErr, secretsOnly(s, cred)).Error()
 	}
 	if _, err := m.db.ExecContext(ctx, `UPDATE connections SET checked_at = ?, status = ?, error = ?, account = CASE WHEN ? = '' THEN account ELSE ? END WHERE service_id = ?`,
 		m.now().UTC().Format(time.RFC3339Nano), status, msg, account, account, id); err != nil {
@@ -392,7 +392,7 @@ func (t *connectedTool) Execute(ctx context.Context, args map[string]any) (map[s
 	}
 	out, err := t.tool.Run(ctx, t.m.client, cred, args)
 	if err != nil {
-		return nil, sanitizeErr(err, cred)
+		return nil, sanitizeErr(err, secretsOnly(t.service, cred))
 	}
 	if t.tool.Learn != nil && len(args) == 0 {
 		// A full read keeps the vocabulary current, such as a new device.
@@ -400,10 +400,23 @@ func (t *connectedTool) Execute(ctx context.Context, args map[string]any) (map[s
 		t.m.setCuesLocked(context.WithoutCancel(ctx), t.service, t.tool.Learn(out))
 		t.m.mu.Unlock()
 	}
-	return sanitize(out, cred).(map[string]any), nil
+	return sanitize(out, secretsOnly(t.service, cred)).(map[string]any), nil
 }
 
 // secretValues are the values a result must never contain.
+// secretsOnly keeps a credential's secret fields, such as a token or
+// password. Others, such as an email address or a server, may appear in
+// results and stay readable.
+func secretsOnly(s Service, cred Credential) Credential {
+	out := Credential{}
+	for _, f := range s.Fields() {
+		if f.Secret && cred[f.Key] != "" {
+			out[f.Key] = cred[f.Key]
+		}
+	}
+	return out
+}
+
 func secretValues(cred Credential) []string {
 	var out []string
 	for _, v := range cred {

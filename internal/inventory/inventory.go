@@ -239,7 +239,7 @@ var rules = []rule{
 			if len(v) > 0 {
 				return true, v, "Sending asks first."
 			}
-			return false, nil, "No email service is connected. Adding a tool source for your mail provider, on the Tools page, would add it."
+			return false, nil, "No email is connected. Connecting Email in Settings → Connected services, with your mail server and an app password, would add it."
 		}},
 	{"calendar", "Use a calendar", regexp.MustCompile(`(?i)\bcalendar\b`),
 		func(s Snapshot) (bool, []string, string) {
@@ -247,7 +247,7 @@ var rules = []rule{
 			if len(v) > 0 {
 				return true, v, ""
 			}
-			return false, nil, "No calendar is connected. Adding a tool source for your calendar, on the Tools page, would add it."
+			return false, nil, "No calendar is connected. Connecting Calendar in Settings → Connected services, with your CalDAV address and an app password, would add it."
 		}},
 	{"github", "Use GitHub", regexp.MustCompile(`(?i)\bgit ?hub\b`),
 		func(s Snapshot) (bool, []string, string) {

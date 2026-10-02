@@ -55,7 +55,7 @@ func (a *App) recordToolEgress(ctx context.Context, toolID string, args map[stri
 // text such as a comment's body.
 func connectorDetail(action string, args map[string]any) string {
 	var parts []string
-	for _, k := range []string{"query", "repo", "number", "entity_id", "filter", "domain", "service"} {
+	for _, k := range []string{"query", "repo", "number", "entity_id", "filter", "domain", "service", "from", "to", "id", "uid", "title"} {
 		if v, ok := args[k]; ok {
 			if s := strings.TrimSpace(anyString(v)); s != "" {
 				parts = append(parts, k+": "+s)

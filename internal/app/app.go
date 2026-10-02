@@ -300,7 +300,7 @@ func New(opts Options) (*App, error) {
 	}
 	// Connected services add tools; their credentials stay in the secrets
 	// directory and are added only when a tool runs (§32).
-	a.Connectors = connectors.NewManager(db.SQL, secrets, toolReg, connectors.GitHub{}, connectors.HomeAssistant{})
+	a.Connectors = connectors.NewManager(db.SQL, secrets, toolReg, connectors.GitHub{}, connectors.HomeAssistant{}, connectors.Email{}, connectors.Calendar{})
 	if err := a.Connectors.Load(context.Background()); err != nil {
 		logger.Warn("load connected services", "error", err)
 	}

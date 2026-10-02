@@ -308,7 +308,13 @@ Chat, automations, knowledge indexing, benchmarks, and training share this compu
 
 ## Connected services
 
-Connected services add tools. Today they are GitHub (`github.search`, `github.issue`, `github.comment`) and Home Assistant (`homeassistant.states`, `homeassistant.call`).
+Connected services add tools. Today they are:
+- GitHub (`github.search`, `github.issue`, `github.comment`).
+- Home Assistant (`homeassistant.states`, `homeassistant.call`).
+- Email over IMAP and SMTP (`email.search`, `email.read`, `email.draft`, `email.send`, `email.archive`).
+- Calendar over CalDAV (`calendar.search`, `calendar.availability`, `calendar.create`, `calendar.update`, `calendar.cancel`).
+
+Email and Calendar sign in with an app password. See [Tools](tools.md#email-and-calendar).
 - **Connecting:** `PUT /connectors/{id}` checks the values with the service before storing anything, and returns the account it connected as. A blank secret field keeps the stored value.
 - **Storage:** credentials are stored in the `secrets` directory of the data directory, not in the database. They are added to a request only when a tool runs, so they are never part of model context, events, or tool arguments.
 - **Responses:** the API never returns a secret value; `values` shows a stored token as its last four characters only. Results and errors are scrubbed of any credential value before the model sees them.

@@ -258,3 +258,13 @@ func TestHomeAssistant(t *testing.T) {
 		}
 	}
 }
+
+// Only secret fields are redacted from results: the user's own address or
+// server stays readable.
+func TestSecretsOnly(t *testing.T) {
+	cred := Credential{"address": "me@example.org", "password": "hunter2-app", "imap": "imap.example.org"}
+	got := sanitize(map[string]any{"to": "me@example.org", "note": "signed in with hunter2-app"}, secretsOnly(Email{}, cred)).(map[string]any)
+	if got["to"] != "me@example.org" || got["note"] != "signed in with [redacted]" {
+		t.Fatalf("sanitized %v", got)
+	}
+}

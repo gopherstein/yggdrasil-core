@@ -40,7 +40,7 @@ Nothing leaves because the daemon started. Traffic is sent only when a feature t
 | Install a model from a URL | The host in that URL |
 | Places and directions (`places.search`, `places.details`, `maps.route`, `maps.distance`) | OpenStreetMap's public services, or your own (see `places_*` in configuration): Nominatim with the place or address asked about, Overpass with the kind of place and the point searched around, and the router with the two points. They run only when the profile allows the Internet capability. Each request is recorded; a repeat within the hour is answered from memory and sends nothing. |
 | Web search and page reads (`internet.search`, `internet.open`) | DuckDuckGo's public HTML search, then the pages opened. They run only when the profile allows them. A repeat within 15 minutes (searches) or 30 minutes (pages) is answered from the cache and sends nothing. |
-| Connected services (GitHub, Home Assistant) | That service, with the credential you stored, when one of its tools runs |
+| Connected services (GitHub, Home Assistant, Email, Calendar) | That service, with the credential you stored, when one of its tools runs. Email and Calendar talk only to the mail and CalDAV servers you entered. |
 | MCP tool sources | That server, when one of its tools runs |
 | Database and web API knowledge | The database or URL you connected, when it is refreshed |
 | First training run | The `astral-sh/uv` GitHub release, Python builds uv fetches, and pinned packages from PyPI |

@@ -163,7 +163,40 @@ Tool support is one of native, compatible, limited, or unsupported. Catalog mode
 
 ## Connected services
 
-GitHub (`github.search`, `github.issue`, `github.comment`) and Home Assistant (`homeassistant.states`, `homeassistant.call`) are connected in Settings → Connected services. Their tools join the registry with `source` `connector:<id>`. The stored credential is added only when a tool runs, so it is never part of model context, events, or tool arguments, and results are scrubbed of it before the model sees them. See [API](api.md#connected-services).
+GitHub (`github.search`, `github.issue`, `github.comment`), Home Assistant (`homeassistant.states`, `homeassistant.call`), Email, and Calendar are connected in Settings → Connected services. Their tools join the registry with `source` `connector:<id>`. The stored credential is added only when a tool runs, so it is never part of model context, events, or tool arguments, and results are scrubbed of it before the model sees them. See [API](api.md#connected-services).
+
+### Email and calendar
+
+Email and Calendar connect to your own accounts with an app password, not your account password, over standard protocols. No Google or Microsoft sign-in app is involved.
+
+**Email** uses IMAP to read and SMTP to send. It works with Fastmail, iCloud, Proton Mail Bridge, Nextcloud, your own server, and Gmail or Outlook where app passwords are allowed.
+
+| Tool | What it does | Default |
+| --- | --- | --- |
+| `email.search` | Newest messages first, by text, sender, recent days, or unread, in a folder (INBOX by default). Returns ids such as `INBOX/1234`. | Allow |
+| `email.read` | One message's sender, recipients, date, text (plain text preferred, or HTML made readable, up to 20,000 characters), and attachment names. It is not marked read. | Allow |
+| `email.draft` | Saves a plain-text message to Drafts, or a reply threaded under a message (`reply_to`) | Ask |
+| `email.send` | Sends a plain-text message or threaded reply from your address. A copy is saved to Sent, except on Gmail, which saves its own. | Ask |
+| `email.archive` | Moves a message to the Archive folder | Ask |
+
+- **Encryption:** port 993 (IMAP) and 465 (SMTP) use TLS from the start, and other ports must offer STARTTLS. A server on this computer, such as Proton Mail Bridge, may use its own certificate or no encryption.
+- **Folders:** Drafts, Sent, and Archive are found by their special-use flags, then by their usual names.
+- **No deleting:** nothing is deleted. On a server without MOVE, archiving copies the message and marks the original deleted, without expunging the folder.
+
+**Calendar** uses CalDAV: Fastmail (`https://caldav.fastmail.com`), iCloud (`https://caldav.icloud.com`), Nextcloud (`https://your-server/remote.php/dav`), Radicale, and others. The address can be the server, where calendars are found through the account's calendar home, or one calendar.
+
+| Tool | What it does | Default |
+| --- | --- | --- |
+| `calendar.search` | Events, soonest first, in a range (default the next week), by text or calendar. Repeating events are listed by occurrence: the server expands them. | Allow |
+| `calendar.availability` | Busy times, and free times within working hours (default 09:00 to 17:00) at least 30 minutes long and still ahead. Events marked free don't count. | Allow |
+| `calendar.create` | Adds an event with a start and an end or length, or all day | Ask |
+| `calendar.update` | Changes an event's title, time, location, or description, keeping attendees, alarms, and everything else. Moving the start keeps its length. Repeating events can't be changed here. | Ask |
+| `calendar.cancel` | Removes an event. Invited people are not notified. | Ask |
+
+- **Version checks:** changes send the event's ETag, so an event changed elsewhere since it was read is not overwritten; the tool says to look it up again.
+- **Times** are in this computer's time zone unless given with an offset.
+
+Both services join the connected-service rules. The app password is stored apart from the database and added only when a tool runs, and results are scrubbed of it. Messages and invitations are treated as data, not instructions, so a turn that read them asks before changing anything. Each call is recorded in What left this computer. They are offered when a message is about mail (inbox, email, messages from…) or the calendar (meeting, schedule, free, tomorrow…), and the tools that change something only when the message asks for a change.
 
 ## MCP tool sources
 

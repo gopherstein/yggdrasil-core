@@ -215,6 +215,20 @@ func TestToolsFor(t *testing.T) {
 			t.Errorf("%q offered %v, want %s", msg, got, want)
 		}
 	}
+	mailCal := []string{"email.search", "email.read", "email.send", "calendar.search", "calendar.availability", "calendar.create"}
+	for msg, want := range map[string]string{
+		"Anything new in my inbox from Sam?":    "email.search",
+		"Reply to Alice's message":              "email.send",
+		"Am I free tomorrow afternoon?":         "calendar.availability",
+		"Schedule a meeting with Sam on Friday": "calendar.create",
+	} {
+		if got := ToolsFor(Chat, msg, mailCal); !has(got, want) {
+			t.Errorf("%q offered %v, want %s", msg, got, want)
+		}
+	}
+	if got := ToolsFor(Chat, "What is a prime number?", mailCal); len(got) != 0 {
+		t.Errorf("plain question offered %v", got)
+	}
 	maps := []string{"places.search", "places.details", "maps.route", "maps.distance"}
 	for _, msg := range []string{"Find coffee near me in Juneau", "Directions from the airport to downtown", "How far is Anchorage from Juneau?", "Is the pharmacy open now?"} {
 		if got := ToolsFor(Chat, msg, maps); !has(got, "places.search", "maps.route") {
