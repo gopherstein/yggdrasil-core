@@ -116,7 +116,8 @@ func (t *SynthesizeTool) Run(ctx context.Context, job remotetools.Job) (remoteto
 	text, _ := job.Args["text"].(string)
 	voice, _ := job.Args["voice"].(string)
 	name, _ := job.Args["name"].(string)
-	data, seconds, err := t.Engine.Synthesize(ctx, text, voice)
+	language, _ := job.Args["language"].(string)
+	data, seconds, err := t.Engine.SynthesizeIn(ctx, text, voice, strings.TrimSpace(language))
 	if err != nil {
 		return remotetools.Output{}, err
 	}

@@ -161,6 +161,8 @@
       "installing": "インストール中",
       "failed": "失敗",
       "unavailable": "未設定"
-    }
+    },
+    "languages_other": "{{count}}言語",
+    "autoDetect": "言語を自動判別"
   }
 }

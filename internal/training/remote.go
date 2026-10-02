@@ -83,6 +83,9 @@ type remoteRun struct {
 	cancel   context.CancelFunc
 	adapter  string
 	finished time.Time
+	// deleted means the coordinator removed the run while it was still
+	// running, so the run removes its own files when it stops.
+	deleted bool
 }
 
 func (r *remoteRun) snapshot() RemoteRunStatus {
@@ -210,6 +213,9 @@ func (s *Service) handleDeleteRun(w http.ResponseWriter, r *http.Request) {
 	delete(s.remote, id)
 	s.mu.Unlock()
 	if run != nil {
+		run.mu.Lock()
+		run.deleted = true
+		run.mu.Unlock()
 		run.cancel()
 	}
 	_ = os.RemoveAll(s.remoteDir(id))
@@ -255,6 +261,14 @@ func (s *Service) StartRemoteRun(req RemoteRunRequest) error {
 		defer s.wg.Done()
 		defer cancel()
 		s.executeRemote(ctx, run, req, trainer)
+		// A delete that arrived while the run was stopping may have raced
+		// its last writes.
+		run.mu.Lock()
+		deleted := run.deleted
+		run.mu.Unlock()
+		if deleted {
+			_ = os.RemoveAll(s.remoteDir(req.ID))
+		}
 	}()
 	return nil
 }
@@ -402,6 +416,9 @@ var (
 	remoteLostAfter    = 90 * time.Second
 )
 
+// remoteSendTimeout bounds sending a run's examples, which a cancel waits for.
+const remoteSendTimeout = 2 * time.Minute
+
 // runOnPeer sends a run to job.NodeID, follows it, and downloads the adapter
 // to adapterOut.
 func (s *Service) runOnPeer(ctx context.Context, job Job, req RemoteRunRequest, adapterOut string,
@@ -431,8 +448,15 @@ func (s *Service) runOnPeer(ctx context.Context, job Job, req RemoteRunRequest, 
 
 	setState(StatePreparing, "Sending examples to "+name)
 	body, _ := json.Marshal(req)
-	resp, err := peer.Do(ctx, http.MethodPost, "/internal/v1/training/runs", bytes.NewReader(body))
+	// The trainer computer may start the run before its reply arrives, so a
+	// cancel must not abandon the request: only the reply says whether there
+	// is a run to stop.
+	sctx, sendDone := context.WithTimeout(context.WithoutCancel(ctx), remoteSendTimeout)
+	resp, err := peer.Do(sctx, http.MethodPost, "/internal/v1/training/runs", bytes.NewReader(body))
 	if err != nil {
+		sendDone()
+		// The run may have started even though the reply was lost.
+		cleanup()
 		if ctx.Err() != nil {
 			return RunResult{}, ErrCancelled
 		}
@@ -440,8 +464,13 @@ func (s *Service) runOnPeer(ctx context.Context, job Job, req RemoteRunRequest, 
 	}
 	err = decodePeer(resp, nil)
 	resp.Body.Close()
+	sendDone()
 	if err != nil {
 		return RunResult{}, fmt.Errorf("%s refused the run: %w", name, err)
+	}
+	if ctx.Err() != nil {
+		cleanup()
+		return RunResult{}, ErrCancelled
 	}
 
 	lastContact := time.Now()

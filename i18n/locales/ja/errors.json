@@ -113,6 +113,7 @@
   "SETTINGS_UPDATE_FAILED": "設定を更新できませんでした。",
   "SETUP_REFUSED": "{{detail}}",
   "SPEECH_FAILED": "{{detail}}",
+  "SPEECH_NO_VOICE": "{{language}}を読み上げる音声はまだありません。",
   "SPEECH_UNAVAILABLE": "{{detail}}",
   "SSE_UNSUPPORTED": "ここではストリーミングに対応していません。",
   "START_FAILED": "{{detail}}",

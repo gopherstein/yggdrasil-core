@@ -113,6 +113,7 @@
   "SETTINGS_UPDATE_FAILED": "설정을 업데이트할 수 없어요.",
   "SETUP_REFUSED": "{{detail}}",
   "SPEECH_FAILED": "{{detail}}",
+  "SPEECH_NO_VOICE": "아직 {{language}}를 읽어 줄 음성이 없어요.",
   "SPEECH_UNAVAILABLE": "{{detail}}",
   "SSE_UNSUPPORTED": "여기서는 스트리밍을 지원하지 않아요.",
   "START_FAILED": "{{detail}}",

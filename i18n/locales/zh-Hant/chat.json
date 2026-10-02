@@ -309,6 +309,11 @@
     "generic": {
       "title": "發生錯誤",
       "body": "Yggdrasil 無法完成這則回覆。請稍後再試一次。"
+    },
+    "trainingMemory": {
+      "busy": "訓練正在使用這台電腦，因此沒有足夠的記憶體執行此模型。",
+      "busyNamed": "訓練「{{name}}」正在使用這台電腦，因此沒有足夠的記憶體執行此模型。",
+      "advice": "請等訓練完成後再試、選擇較小的模型，或在「訓練」頁面取消訓練。"
     }
   },
   "modelFailure": {
@@ -377,6 +382,11 @@
     "gone": "這次執行已不再有紀錄。",
     "loadFailed": "無法載入這次執行。",
     "run": "執行",
+    "status": {
+      "completed": "已完成",
+      "failed": "失敗",
+      "stopped": "已停止"
+    },
     "strategy": "策略",
     "effort": "投入程度",
     "modelCalls": "模型呼叫",

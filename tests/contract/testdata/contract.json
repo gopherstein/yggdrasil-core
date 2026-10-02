@@ -1,5 +1,5 @@
 {
-  "version": "1.4",
+  "version": "1.5",
   "types": {
     "ActivityStep": [
       "kind",
@@ -122,6 +122,8 @@
       "conversation_id",
       "effort",
       "error",
+      "error_code",
+      "error_details",
       "id",
       "latency_ms",
       "models",

@@ -394,6 +394,10 @@ export interface ToolProvider {
   reason?: string
   /** A GPU does the work. */
   accelerated: boolean
+  /** Languages it works in, such as de, when they matter (speech); none means any. */
+  languages?: string[]
+  /** It tells the language by itself, as Whisper does. */
+  auto_detect?: boolean
 }
 
 /** A computer's providers for tools that can run on any paired computer. */
@@ -1514,7 +1518,10 @@ export interface RunTrace {
   strategy: string[]
   effort?: string
   status: 'completed' | 'failed' | 'stopped'
+  /** The English text; error_code and error_details show it in the App language. */
   error?: string
+  error_code?: string
+  error_details?: Record<string, unknown>
   started_at: string
   completed_at?: string
   latency_ms?: number

@@ -309,6 +309,11 @@
     "generic": {
       "title": "出了点问题",
       "body": "Yggdrasil 无法完成这条回复。请稍后重试。"
+    },
+    "trainingMemory": {
+      "busy": "训练正在使用这台电脑，因此没有足够的内存运行此模型。",
+      "busyNamed": "训练“{{name}}”正在使用这台电脑，因此没有足够的内存运行此模型。",
+      "advice": "请等训练完成后重试、选择更小的模型，或在“训练”页面取消训练。"
     }
   },
   "modelFailure": {
@@ -377,6 +382,11 @@
     "gone": "这次运行已不再有记录。",
     "loadFailed": "无法加载这次运行。",
     "run": "运行",
+    "status": {
+      "completed": "已完成",
+      "failed": "失败",
+      "stopped": "已停止"
+    },
     "strategy": "策略",
     "effort": "投入程度",
     "modelCalls": "模型调用",

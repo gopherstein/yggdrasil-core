@@ -89,7 +89,15 @@ func (e *Engine) provider(tool, name string) remotetools.Provider {
 	if ok, why := e.Available(); !ok {
 		return remotetools.Provider{Tool: tool, Name: name, State: remotetools.Unavailable, Reason: why}
 	}
-	return remotetools.Provider{Tool: tool, Name: name, State: remotetools.Healthy}
+	p := remotetools.Provider{Tool: tool, Name: name, State: remotetools.Healthy}
+	// The languages each works in (multilingual spec §20).
+	switch tool {
+	case "speech.transcribe":
+		p.Languages, p.AutoDetect = whisperLanguages, true
+	case "speech.synthesize":
+		p.Languages = voiceLanguages()
+	}
+	return p
 }
 
 // Segment is a timed part of a transcript.
@@ -214,7 +222,15 @@ type audioResult struct {
 }
 
 // Synthesize reads text aloud and returns a WAV file and its length.
+//
+// Without a voice, the voice is the one for the language the text is written
+// in (multilingual spec §20), so a German answer is read by a German voice.
 func (e *Engine) Synthesize(ctx context.Context, text, voice string) ([]byte, float64, error) {
+	return e.SynthesizeIn(ctx, text, voice, "")
+}
+
+// SynthesizeIn is Synthesize with the text's language, when it is known.
+func (e *Engine) SynthesizeIn(ctx context.Context, text, voice, language string) ([]byte, float64, error) {
 	text = strings.TrimSpace(text)
 	if text == "" {
 		return nil, 0, fmt.Errorf("text required")
@@ -222,8 +238,9 @@ func (e *Engine) Synthesize(ctx context.Context, text, voice string) ([]byte, fl
 	if n := len([]rune(text)); n > maxTextRunes {
 		return nil, 0, fmt.Errorf("the text is longer than %d characters", maxTextRunes)
 	}
-	if voice == "" {
-		voice = DefaultVoice
+	voice, err := voiceFor(text, voice, language)
+	if err != nil {
+		return nil, 0, err
 	}
 	if !voiceRe.MatchString(voice) {
 		return nil, 0, fmt.Errorf("%q is not a Piper voice name, such as %s", voice, DefaultVoice)
@@ -231,7 +248,7 @@ func (e *Engine) Synthesize(ctx context.Context, text, voice string) ([]byte, fl
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	var r audioResult
-	err := e.run(ctx, synthesizeScript,
+	err = e.run(ctx, synthesizeScript,
 		map[string]any{"text": text, "voice": voice, "voices_dir": filepath.Join(e.Dir, "voices"), "out": "speech.wav"}, nil, &r)
 	return r.data, r.Seconds, err
 }

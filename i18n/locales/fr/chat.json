@@ -319,6 +319,11 @@
     "generic": {
       "title": "Un problème est survenu",
       "body": "Yggdrasil n'a pas pu terminer cette réponse. Réessayez dans un instant."
+    },
+    "trainingMemory": {
+      "busy": "Un entraînement utilise cet ordinateur, il n'y avait donc pas assez de mémoire pour ce modèle.",
+      "busyNamed": "L'entraînement « {{name}} » utilise cet ordinateur, il n'y avait donc pas assez de mémoire pour ce modèle.",
+      "advice": "Réessayez quand l'entraînement sera terminé, choisissez un modèle plus petit ou annulez l'entraînement sur la page Entraîner."
     }
   },
   "modelFailure": {
@@ -391,6 +396,11 @@
     "gone": "Cette exécution n'est plus enregistrée.",
     "loadFailed": "Impossible de charger l'exécution.",
     "run": "Exécution",
+    "status": {
+      "completed": "Terminée",
+      "failed": "Échec",
+      "stopped": "Arrêtée"
+    },
     "strategy": "Stratégie",
     "effort": "Effort",
     "modelCalls": "Appels au modèle",

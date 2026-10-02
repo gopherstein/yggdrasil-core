@@ -12,11 +12,11 @@ import (
 
 func TestChatExplainsTrainingOnThisComputer(t *testing.T) {
 	a := &App{Share: share.New(0)}
-	if _, ok := a.trainingNow(); ok {
+	if _, ok := a.trainingStep("en"); ok {
 		t.Fatal("training reported with none running")
 	}
 	oom := modelhealth.Encode(modelhealth.Failure{LikelyMemoryPressure: true, ModelID: "big"})
-	if got := a.explainWhileTraining(oom); got != oom {
+	if got := a.explainWhileTraining("en", oom); got != oom {
 		t.Fatal("error rewritten with no training running")
 	}
 
@@ -25,44 +25,50 @@ func TestChatExplainsTrainingOnThisComputer(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer w.Done()
-	busy, ok := a.trainingNow()
-	if !ok || busy != `Training "Tire shop" is using this computer` {
-		t.Fatalf("busy = %q", busy)
+	if step, _ := a.trainingStep("en"); step != `Training “Tire shop” is using this computer, so this answer may be slower.` {
+		t.Fatalf("step = %q", step)
 	}
 	w.SetRemaining(12*time.Minute + 10*time.Second)
 	if step, _ := a.trainingStep("en"); step != `Training “Tire shop” is using this computer, so this answer may be slower. About 12 minutes left.` {
 		t.Fatalf("step = %q", step)
 	}
-	if busy, _ = a.trainingNow(); !strings.HasSuffix(busy, "(about 12 minutes left)") {
-		t.Fatalf("busy = %q", busy)
-	}
 
 	// A memory failure keeps its structure but says why and when to retry.
-	got := a.explainWhileTraining(oom)
+	got := a.explainWhileTraining("en", oom)
 	f, isHealth := modelhealth.Parse(got)
-	if !isHealth || f.ModelID != "big" || !strings.HasPrefix(f.Message, `Training "Tire shop" is using this computer (about 12 minutes left), so there was not enough memory`) {
+	if !isHealth || f.ModelID != "big" || f.Message != `Training “Tire shop” is using this computer, so there was not enough memory for this model. About 12 minutes left. Try again when training finishes, choose a smaller model, or cancel training on the Train page.` {
 		t.Fatalf("explained = %q", got)
 	}
-	if got := a.explainWhileTraining("llama-server: failed to allocate buffer"); !strings.Contains(got, "Try again when training finishes") {
-		t.Fatalf("plain error = %q", got)
+	// A plain error becomes a memory failure, so clients show the sentence.
+	f, isHealth = modelhealth.Parse(a.explainWhileTraining("en", "llama-server: failed to allocate buffer"))
+	if !isHealth || !f.LikelyMemoryPressure || !strings.Contains(f.Message, "Try again when training finishes") {
+		t.Fatalf("plain error = %+v", f)
+	}
+	// In the App language.
+	f, _ = modelhealth.Parse(a.explainWhileTraining("de", oom))
+	if f.Message != `Das Training „Tire shop“ nutzt diesen Computer, deshalb war nicht genug Speicher für dieses Modell frei. Noch etwa 12 Minuten. Versuche es erneut, wenn das Training fertig ist, wähle ein kleineres Modell oder brich das Training auf der Seite „Trainieren“ ab.` {
+		t.Fatalf("German = %q", f.Message)
 	}
 	// Other failures are left alone.
-	if got := a.explainWhileTraining("connection refused"); got != "connection refused" {
+	if got := a.explainWhileTraining("en", "connection refused"); got != "connection refused" {
 		t.Fatalf("unrelated error = %q", got)
 	}
 }
 
-func TestAboutLeft(t *testing.T) {
+func TestTimeLeft(t *testing.T) {
 	g := share.New(0)
 	w, _ := g.Enter(context.Background(), share.Training, "", nil)
 	defer w.Done()
+	if len(timeLeft(w)) != 0 {
+		t.Fatal("no estimate yet")
+	}
 	for d, want := range map[time.Duration]string{
-		20 * time.Second: " (less than a minute left)",
-		70 * time.Second: " (about 1 minute left)",
-		3 * time.Hour:    " (about 3 hours left)",
+		20 * time.Second: "Less than a minute left.",
+		70 * time.Second: "About 1 minute left.",
+		3 * time.Hour:    "About 3 hours left.",
 	} {
 		w.SetRemaining(d)
-		if got := aboutLeft(w); got != want {
+		if got := timeLeft(w)[0].Render("en"); got != want {
 			t.Errorf("%v: %q, want %q", d, got, want)
 		}
 	}

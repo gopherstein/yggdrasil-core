@@ -1,11 +1,13 @@
 package app
 
 import (
+	"errors"
 	"testing"
 	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/orchestrator/builtin/simple"
 	"github.com/yeixio/yggdrasil-core/internal/runlog"
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 	"github.com/yeixio/yggdrasil-core/pkg/pluginapi"
 )
 
@@ -25,7 +27,7 @@ func TestRunTraceFromStreamAndEvents(t *testing.T) {
 	traceEvent(c, simple.EventVerified, map[string]any{"issues": 1, "fixed": 1})
 	// The stream is consumed; give the wrapper's goroutine a moment to record.
 	time.Sleep(20 * time.Millisecond)
-	r := c.Finish(runlog.StatusCompleted, "")
+	r := c.Finish(runlog.StatusCompleted, nil)
 	if text != "Hi!" || len(r.Models) != 1 || r.Models[0].CachedTokens != 30 || r.Models[0].FirstTokenMs < 1000 || r.Models[0].TokPerSec != 55 {
 		t.Fatalf("text=%q models=%+v", text, r.Models)
 	}
@@ -45,9 +47,28 @@ func TestRunTraceInAppLanguage(t *testing.T) {
 	traceEvent(c, simple.EventPlanCreated, map[string]any{"steps": []string{"a", "b", "c"}, "parallel": true})
 	traceEvent(c, simple.EventEffort, map[string]any{"effort": "thorough"})
 	c.Note("otherModel", map[string]any{"model": "Qwen 14B"})
-	r := c.Finish(runlog.StatusCompleted, "")
+	r := c.Finish(runlog.StatusCompleted, nil)
 	if r.Effort != "Gründlich" || len(r.Strategy) != 2 || r.Strategy[0] != "3 Teile parallel bearbeitet" ||
 		r.Strategy[1] != "Mit einem anderen Modell geantwortet, nachdem Qwen 14B fehlgeschlagen ist" {
+		t.Fatalf("run = %+v", r)
+	}
+}
+
+// A failed run keeps its error's stable code, so clients show it in the App
+// language (multilingual spec §10).
+func TestRunErrorHasItsCode(t *testing.T) {
+	r := runlog.New("r", "", "", "chat").Finish(runlog.StatusFailed, codedChatError("llama-server: failed to allocate buffer"))
+	if r.Error != "llama-server: failed to allocate buffer" || r.ErrorCode != "OUT_OF_MEMORY" {
+		t.Fatalf("run = %+v", r)
+	}
+	r = runlog.New("r", "", "", "chat").Finish(runlog.StatusFailed, codedError(contracts.NewError("MODEL_NOT_INSTALLED", map[string]any{"model_id": "qwen"}, errors.New("model qwen is not installed"))))
+	if r.ErrorCode != "MODEL_NOT_INSTALLED" || r.ErrorDetails["model_id"] != "qwen" {
+		t.Fatalf("run = %+v", r)
+	}
+	if r := runlog.New("r", "", "", "chat").Finish(runlog.StatusFailed, codedError(errors.New("something odd"))); r.Error != "something odd" || r.ErrorCode != "" {
+		t.Fatalf("run = %+v", r)
+	}
+	if r := runlog.New("r", "", "", "chat").Finish(runlog.StatusCompleted, nil); r.Error != "" || r.ErrorCode != "" {
 		t.Fatalf("run = %+v", r)
 	}
 }

@@ -8,8 +8,11 @@ package remotetools
 
 import (
 	"context"
+	"strings"
 
 	"github.com/yeixio/yggdrasil-core/internal/tools"
+
+	"github.com/yeixio/yggdrasil-core/internal/replylang"
 )
 
 // Protocol is the remote tool protocol version. A peer that does not
@@ -74,6 +77,42 @@ type Provider struct {
 	Reason string `json:"reason,omitempty"`
 	// Accelerated means a GPU does the work, which matters for images.
 	Accelerated bool `json:"accelerated"`
+	// Languages are the languages the provider works in, as base BCP 47
+	// tags such as "de", when they matter, such as for speech (multilingual
+	// spec §20). Empty means any language, or not known.
+	Languages []string `json:"languages,omitempty"`
+	// AutoDetect means the provider tells the language itself, such as
+	// Whisper hearing which language is spoken.
+	AutoDetect bool `json:"auto_detect,omitempty"`
+}
+
+// Speaks reports whether the provider works in lang ("" is any language).
+// A provider that lists no languages is taken to work in any.
+func (p Provider) Speaks(lang string) bool {
+	if lang == "" || len(p.Languages) == 0 {
+		return true
+	}
+	base, _, _ := strings.Cut(strings.ToLower(lang), "-")
+	for _, l := range p.Languages {
+		if lb, _, _ := strings.Cut(strings.ToLower(l), "-"); lb == base {
+			return true
+		}
+	}
+	return false
+}
+
+// CallLanguage is the language a tool call works in: its "language"
+// argument, or the language of its "text", detected on this computer.
+func CallLanguage(args map[string]any) string {
+	if l, _ := args["language"].(string); strings.TrimSpace(l) != "" {
+		return strings.TrimSpace(l)
+	}
+	if text, _ := args["text"].(string); text != "" {
+		if tag, ok := replylang.Detect(text); ok {
+			return tag
+		}
+	}
+	return ""
 }
 
 // Ready reports a provider that can run the tool now.

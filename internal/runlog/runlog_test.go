@@ -36,7 +36,7 @@ func TestCollectAndStore(t *testing.T) {
 	c.Verified(2, 1)
 	c.Retried()
 	c.Context(800, 8192)
-	r := c.Finish(StatusCompleted, "")
+	r := c.Finish(StatusCompleted, nil)
 
 	if len(r.Strategy) != 1 || r.Effort != "Balanced" || r.Workers != 3 || !r.Parallel || r.Retries != 1 ||
 		r.VerificationPasses != 1 || r.VerificationFixed != 1 || r.ContextTokens != 800 || r.CompletedAt == nil {

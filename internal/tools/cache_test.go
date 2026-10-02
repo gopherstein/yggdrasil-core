@@ -50,7 +50,7 @@ func TestRegistryServesRepeatsFromCache(t *testing.T) {
 	if tool.calls != 1 || observed != 1 {
 		t.Fatalf("calls=%d observed=%d", tool.calls, observed)
 	}
-	if got := run.Finish(runlog.StatusCompleted, "").CacheHits["internet.search"]; got != 2 {
+	if got := run.Finish(runlog.StatusCompleted, nil).CacheHits["internet.search"]; got != 2 {
 		t.Fatalf("cache hits = %d", got)
 	}
 	if acts := r.Recent(); acts[len(acts)-1].Status != "cached" {
