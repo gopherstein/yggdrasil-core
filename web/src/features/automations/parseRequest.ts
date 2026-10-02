@@ -1,4 +1,8 @@
+import i18n from '@/i18n'
 import type { AutomationCondition, AutomationNotification, AutomationSchedule } from '@/types/api'
+
+// The parser reads English requests ("every morning at 8"); what it shows the
+// person, such as schedules, notes, and errors, is in the App language.
 
 export interface ParsedAutomation {
   name: string
@@ -9,6 +13,11 @@ export interface ParsedAutomation {
 }
 
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const
+
+/** A weekday's name in the App language: 0 is Sunday. */
+export function weekdayName(index: number): string {
+  return i18n.t(`automations:weekdays.${index}`)
+}
 
 const PRICE_INSTRUCTION =
   'Include a JSON object in the result with the numeric price, for example {"price": 420}.'
@@ -49,10 +58,10 @@ export function localTimeZone(): string {
 export function parseAutomationRequest(text: string, now: Date, timeZone: string): ParsedAutomation {
   const original = text.trim()
   if (!original) {
-    throw new Error('Describe the automation.')
+    throw new Error(i18n.t('automations:parse.describe'))
   }
   if (!timeZone) {
-    throw new Error('A time zone is required.')
+    throw new Error(i18n.t('automations:parse.timeZone'))
   }
   const normalized = original.toLowerCase().replace(/\s+/g, ' ')
   const schedule = parseSchedule(normalized, now, timeZone)
@@ -69,35 +78,40 @@ export function parseAutomationRequest(text: string, now: Date, timeZone: string
 export function scheduleLabel(schedule: AutomationSchedule): string {
   switch (schedule.kind) {
     case 'once':
-      return schedule.at ? `Once at ${formatWhen(schedule.at, schedule.time_zone)}` : 'Once'
+      return schedule.at
+        ? i18n.t('automations:schedule.onceAt', { when: formatWhen(schedule.at, schedule.time_zone) })
+        : i18n.t('automations:schedule.once')
     case 'daily':
-      return `Every day at ${clockLabel(schedule.hour ?? 0, schedule.minute ?? 0)}`
+      return i18n.t('automations:schedule.daily', { time: clockLabel(schedule.hour ?? 0, schedule.minute ?? 0) })
     case 'weekly':
-      return `Every ${WEEKDAYS[schedule.weekday ?? 0]} at ${clockLabel(schedule.hour ?? 0, schedule.minute ?? 0)}`
+      return i18n.t('automations:schedule.weekly', {
+        day: weekdayName(schedule.weekday ?? 0),
+        time: clockLabel(schedule.hour ?? 0, schedule.minute ?? 0),
+      })
     case 'interval':
       return intervalLabel(schedule.every_seconds ?? 0)
     default:
-      return 'Scheduled'
+      return i18n.t('automations:schedule.scheduled')
   }
 }
 
 export function notificationLabel(notification: AutomationNotification): string {
   switch (notification.mode) {
     case 'none':
-      return 'Store the result only'
+      return i18n.t('automations:notify.none')
     case 'change':
-      return 'Notify when the result changes'
+      return i18n.t('automations:notify.change')
     case 'condition':
       return conditionLabel(notification.condition)
     default:
-      return 'Notify every time'
+      return i18n.t('automations:notify.always')
   }
 }
 
 export function formatWhen(iso: string | undefined, timeZone: string): string {
-  if (!iso) return 'Not scheduled'
+  if (!iso) return i18n.t('automations:time.notScheduled')
   const date = new Date(iso)
-  if (Number.isNaN(date.getTime())) return 'Not scheduled'
+  if (Number.isNaN(date.getTime())) return i18n.t('automations:time.notScheduled')
   return new Intl.DateTimeFormat(undefined, {
     timeZone: timeZone || 'UTC',
     dateStyle: 'medium',
@@ -118,7 +132,7 @@ export function civilInputValue(iso: string | undefined, timeZone: string): stri
 export function civilToISO(value: string, timeZone: string): string {
   const match = value.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/)
   if (!match) {
-    throw new Error('Choose a date and time.')
+    throw new Error(i18n.t('automations:parse.chooseDateTime'))
   }
   return instantInZone(
     Number(match[1]),
@@ -141,7 +155,7 @@ function parseSchedule(text: string, now: Date, timeZone: string): { schedule: A
     const clock = parseClock(text)
     const hour = clock?.hour ?? 8
     const minute = clock?.minute ?? 0
-    if (!clock) notes.push('No time was given, so this runs at 8:00 AM.')
+    if (!clock) notes.push(i18n.t('automations:parse.noTime8'))
     return {
       schedule: { kind: 'weekly', time_zone: timeZone, hour, minute, weekday },
       notes,
@@ -166,13 +180,13 @@ function parseSchedule(text: string, now: Date, timeZone: string): { schedule: A
     const clock = parseClock(text)
     const hour = clock?.hour ?? 9
     const minute = clock?.minute ?? 0
-    if (!clock) notes.push('No time was given, so this runs at 9:00 AM.')
+    if (!clock) notes.push(i18n.t('automations:parse.noTime9'))
     const today = zonedParts(now, timeZone)
     const day = /\btoday\b/.test(text) && !/\btomorrow\b/.test(text) ? today : addDays(today, 1)
     const at = instantInZone(day.year, day.month, day.day, hour, minute, timeZone)
     return { schedule: { kind: 'once', time_zone: timeZone, at: at.toISOString() }, notes }
   }
-  throw new Error('Describe when it should run, for example “every morning at 8:00 AM”.')
+  throw new Error(i18n.t('automations:parse.describeWhen'))
 }
 
 function parseInterval(text: string): number | null {
@@ -205,10 +219,10 @@ function isDaily(text: string): boolean {
 }
 
 function namedDaypart(text: string): { hour: number; minute: number; note: string } {
-  if (/\bevening\b/.test(text)) return { hour: 18, minute: 0, note: 'Evening means 6:00 PM unless you set another time.' }
-  if (/\bnight\b/.test(text)) return { hour: 21, minute: 0, note: 'Night means 9:00 PM unless you set another time.' }
-  if (/\bafternoon\b/.test(text)) return { hour: 15, minute: 0, note: 'Afternoon means 3:00 PM unless you set another time.' }
-  return { hour: 8, minute: 0, note: 'Morning means 8:00 AM unless you set another time.' }
+  if (/\bevening\b/.test(text)) return { hour: 18, minute: 0, note: i18n.t('automations:parse.evening') }
+  if (/\bnight\b/.test(text)) return { hour: 21, minute: 0, note: i18n.t('automations:parse.night') }
+  if (/\bafternoon\b/.test(text)) return { hour: 15, minute: 0, note: i18n.t('automations:parse.afternoon') }
+  return { hour: 8, minute: 0, note: i18n.t('automations:parse.morning') }
 }
 
 function parseClock(text: string): { hour: number; minute: number } | null {
@@ -228,7 +242,7 @@ function clockFrom(hour: number, minute: number, pm: boolean): { hour: number; m
   let next = hour % 12
   if (pm) next += 12
   if (minute > 59 || hour > 12 || hour < 1) {
-    throw new Error('That time is not valid.')
+    throw new Error(i18n.t('automations:parse.badTime'))
   }
   return { hour: next, minute }
 }
@@ -288,16 +302,16 @@ function automationName(original: string, notification: AutomationNotification):
   const condition = notification.condition
   if (notification.mode === 'condition' && condition?.kind === 'threshold') {
     const amount = formatAmount(condition.value ?? 0)
-    return condition.op === 'above' ? `Price above ${amount}` : `Price below ${amount}`
+    return i18n.t(condition.op === 'above' ? 'automations:names.priceAbove' : 'automations:names.priceBelow', { amount })
   }
   if (condition?.kind === 'available') {
-    return /\bstock\b/i.test(original) ? 'Stock check' : 'Availability check'
+    return /\bstock\b/i.test(original) ? i18n.t('automations:names.stock') : i18n.t('automations:names.availability')
   }
-  if (condition?.kind === 'significant') return 'Significance check'
-  if (/\breleases?\b/i.test(original)) return 'Release check'
-  if (/\bresearch\b/i.test(original)) return 'Research'
+  if (condition?.kind === 'significant') return i18n.t('automations:names.significance')
+  if (/\breleases?\b/i.test(original)) return i18n.t('automations:names.release')
+  if (/\bresearch\b/i.test(original)) return i18n.t('automations:names.research')
   const cleaned = original.replace(/\s+/g, ' ').trim()
-  if (!cleaned) return 'Scheduled task'
+  if (!cleaned) return i18n.t('automations:names.scheduled')
   const short = cleaned.length > 48 ? `${cleaned.slice(0, 48).trim()}…` : cleaned
   return short.charAt(0).toUpperCase() + short.slice(1)
 }
@@ -352,35 +366,39 @@ function formatAmount(value: number): string {
 }
 
 function conditionLabel(condition: AutomationCondition | undefined): string {
-  if (!condition) return 'Notify on a condition'
+  if (!condition) return i18n.t('automations:notify.condition')
   if (condition.kind === 'threshold') {
-    return `Notify when the price is ${condition.op === 'above' ? 'above' : 'below'} ${formatAmount(condition.value ?? 0)}`
+    return i18n.t(condition.op === 'above' ? 'automations:notify.priceAbove' : 'automations:notify.priceBelow', {
+      amount: formatAmount(condition.value ?? 0),
+    })
   }
-  if (condition.kind === 'available') return 'Notify when it becomes available'
-  return 'Notify when the result is significant'
+  if (condition.kind === 'available') return i18n.t('automations:notify.available')
+  return i18n.t('automations:notify.significant')
 }
 
 function intervalLabel(seconds: number): string {
-  if (seconds <= 0) return 'On an interval'
+  if (seconds <= 0) return i18n.t('automations:schedule.onInterval')
   if (seconds % 86400 === 0) {
     const days = seconds / 86400
-    return days === 1 ? 'Every day' : `Every ${days} days`
+    return days === 1 ? i18n.t('automations:schedule.everyDay') : i18n.t('automations:schedule.days', { count: days })
   }
   if (seconds % 3600 === 0) {
     const hours = seconds / 3600
-    return hours === 1 ? 'Every hour' : `Every ${hours} hours`
+    return hours === 1 ? i18n.t('automations:schedule.everyHour') : i18n.t('automations:schedule.hours', { count: hours })
   }
   if (seconds % 60 === 0) {
     const minutes = seconds / 60
-    return minutes === 1 ? 'Every minute' : `Every ${minutes} minutes`
+    return minutes === 1 ? i18n.t('automations:schedule.everyMinute') : i18n.t('automations:schedule.minutes', { count: minutes })
   }
-  return `Every ${seconds} seconds`
+  return i18n.t('automations:schedule.seconds', { count: seconds })
 }
 
 function clockLabel(hour: number, minute: number): string {
-  const meridiem = hour >= 12 ? 'PM' : 'AM'
-  const shown = hour % 12 === 0 ? 12 : hour % 12
-  return `${shown}:${String(minute).padStart(2, '0')} ${meridiem}`
+  return i18n.t('automations:time.clock', {
+    hour: hour % 12 === 0 ? 12 : hour % 12,
+    minute: String(minute).padStart(2, '0'),
+    meridiem: i18n.t(hour >= 12 ? 'automations:time.pm' : 'automations:time.am'),
+  })
 }
 
 interface CivilParts {

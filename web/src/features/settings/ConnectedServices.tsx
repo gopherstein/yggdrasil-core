@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { api } from '@/lib/api'
 import type { Connector } from '@/types/api'
 
 const KEY = ['connectors'] as const
 
 function errorText(err: unknown): string {
-  return err instanceof Error ? err.message : 'Something went wrong.'
+  return err instanceof Error ? err.message : i18n.t('services:generic')
 }
 
 /**
@@ -16,16 +18,14 @@ function errorText(err: unknown): string {
  * when they run.
  */
 export function ConnectedServices() {
+  const { t } = useTranslation('services')
   const query = useQuery({ queryKey: KEY, queryFn: () => api.listConnectors(), retry: false })
   const services = query.data ?? []
   return (
     <section className="card space-y-4">
       <div>
-        <h2 className="section-title">Connected services</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          Let the AI read and act in services you use. Tokens stay on this computer, outside the AI&apos;s view; it only
-          sees what the service returns. Reading is allowed, and changes ask you first.
-        </p>
+        <h2 className="section-title">{t('title')}</h2>
+        <p className="mt-1 text-sm text-ink-muted">{t('description')}</p>
       </div>
       {query.isError && <p className="text-sm text-danger">{errorText(query.error)}</p>}
       {services.map((service) => (
@@ -36,6 +36,7 @@ export function ConnectedServices() {
 }
 
 function ServiceRow({ service }: { service: Connector }) {
+  const { t } = useTranslation('services')
   const queryClient = useQueryClient()
   const [editing, setEditing] = useState(false)
   const [values, setValues] = useState<Record<string, string>>({})
@@ -68,9 +69,9 @@ function ServiceRow({ service }: { service: Connector }) {
 
   const statusLine = service.connected
     ? service.status === 'error'
-      ? `Needs attention: ${service.error ?? 'the last check failed'}`
-      : `Connected as ${service.account || service.name}`
-    : 'Not connected'
+      ? t('needsAttention', { error: service.error ?? t('lastCheckFailed') })
+      : t('connectedAs', { account: service.account || service.name })
+    : t('notConnected')
 
   return (
     <div className="rounded-lg border border-line/60 p-3">
@@ -86,10 +87,10 @@ function ServiceRow({ service }: { service: Connector }) {
           {service.connected && !editing && (
             <>
               <button type="button" className="btn-secondary px-3 py-1.5 text-xs" disabled={check.isPending} onClick={() => check.mutate()}>
-                {check.isPending ? 'Checking…' : 'Check'}
+                {check.isPending ? t('checking') : t('check')}
               </button>
               <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={() => setEditing(true)}>
-                Change
+                {t('change')}
               </button>
               <button
                 type="button"
@@ -97,13 +98,13 @@ function ServiceRow({ service }: { service: Connector }) {
                 disabled={disconnect.isPending}
                 onClick={() => disconnect.mutate()}
               >
-                Disconnect
+                {t('disconnect')}
               </button>
             </>
           )}
           {!service.connected && !editing && (
             <button type="button" className="btn-primary px-3 py-1.5 text-xs" onClick={() => setEditing(true)}>
-              Connect
+              {t('connect')}
             </button>
           )}
         </div>
@@ -124,14 +125,14 @@ function ServiceRow({ service }: { service: Connector }) {
               <label key={field.key} className="block text-sm">
                 <span className="text-ink-muted">
                   {field.label}
-                  {field.optional && <span className="text-ink-faint"> (optional)</span>}
+                  {field.optional && <span className="text-ink-faint">{t('optional')}</span>}
                 </span>
                 <input
                   className="field mt-1 w-full"
                   type={field.secret ? 'password' : 'text'}
                   autoComplete="off"
                   spellCheck={false}
-                  placeholder={field.secret && stored ? `Stored (${stored}). Leave blank to keep it.` : field.placeholder}
+                  placeholder={field.secret && stored ? t('stored', { value: stored }) : field.placeholder}
                   defaultValue={field.secret ? '' : stored ?? ''}
                   onChange={(e) => setValues((v) => ({ ...v, [field.key]: e.target.value }))}
                 />
@@ -141,7 +142,7 @@ function ServiceRow({ service }: { service: Connector }) {
           })}
           <div className="flex gap-2">
             <button type="submit" className="btn-primary px-3 py-1.5 text-xs" disabled={connect.isPending}>
-              {connect.isPending ? 'Checking…' : service.connected ? 'Save' : 'Connect'}
+              {connect.isPending ? t('checking') : service.connected ? t('save') : t('connect')}
             </button>
             <button
               type="button"
@@ -152,7 +153,7 @@ function ServiceRow({ service }: { service: Connector }) {
                 setError('')
               }}
             >
-              Cancel
+              {t('cancel')}
             </button>
           </div>
         </form>
@@ -160,7 +161,11 @@ function ServiceRow({ service }: { service: Connector }) {
       {error && <p className="mt-2 text-xs text-danger">{error}</p>}
       {service.connected && service.tools.length > 0 && (
         <p className="mt-2 text-xs text-ink-faint">
-          Tools: {service.tools.map((t) => `${t.name}${t.default_policy === 'ask' ? ' (asks first)' : ''}`).join(', ')}
+          {t('tools', {
+            tools: service.tools
+              .map((tool) => (tool.default_policy === 'ask' ? t('asksFirst', { name: tool.name }) : tool.name))
+              .join(', '),
+          })}
         </p>
       )}
     </div>

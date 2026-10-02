@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { api, forgetApiKey, rememberApiKey, storedApiKey } from '@/lib/api'
 import { formatLastUsed } from '@/features/models/modelPresentation'
@@ -28,7 +30,7 @@ async function probeLocalApi(lanEnabled: boolean): Promise<ApiProbeResult> {
         healthOk: false,
         openaiOk: false,
         openaiStatus: null,
-        detail: 'Health check responded, but the service is not ready.',
+        detail: i18n.t('apiAccess:probe.notReady'),
       }
     }
   } catch {
@@ -36,7 +38,7 @@ async function probeLocalApi(lanEnabled: boolean): Promise<ApiProbeResult> {
       healthOk: false,
       openaiOk: false,
       openaiStatus: null,
-      detail: 'Could not reach the API on this computer.',
+      detail: i18n.t('apiAccess:probe.unreachable'),
     }
   }
 
@@ -55,7 +57,7 @@ async function probeLocalApi(lanEnabled: boolean): Promise<ApiProbeResult> {
       healthOk,
       openaiOk: false,
       openaiStatus: null,
-      detail: 'Service is up, but the OpenAI-compatible endpoint did not respond.',
+      detail: i18n.t('apiAccess:probe.openaiDown'),
     }
   }
 
@@ -63,14 +65,14 @@ async function probeLocalApi(lanEnabled: boolean): Promise<ApiProbeResult> {
     ? openaiStatus === 200 || openaiStatus === 401
     : openaiStatus === 200
 
-  let detail = 'Local check passed.'
+  let detail = i18n.t('apiAccess:probe.passed')
   if (!openaiOk) {
     detail =
       openaiStatus != null
-        ? `OpenAI endpoint returned HTTP ${openaiStatus}.`
-        : 'OpenAI endpoint did not respond.'
+        ? i18n.t('apiAccess:probe.openaiStatus', { status: openaiStatus })
+        : i18n.t('apiAccess:probe.openaiNoResponse')
   } else if (lanEnabled && openaiStatus === 401) {
-    detail = 'Responding. Other devices need a valid API key.'
+    detail = i18n.t('apiAccess:probe.needsKey')
   }
 
   return { healthOk, openaiOk, openaiStatus, detail }
@@ -96,6 +98,7 @@ function maskPrefix(prefix: string): string {
 }
 
 export function ApiAccessPage() {
+  const { t } = useTranslation('apiAccess')
   const queryClient = useQueryClient()
   const advancedMode = useUIStore((s) => s.advancedMode)
   const [newKeyName, setNewKeyName] = useState('')
@@ -105,7 +108,7 @@ export function ApiAccessPage() {
   const [probeTick, setProbeTick] = useState(0)
   const [lanConfirmOpen, setLanConfirmOpen] = useState(false)
   const [browserHasKey, setBrowserHasKey] = useState(() => Boolean(storedApiKey()))
-  const [dialogKeyName, setDialogKeyName] = useState('This computer')
+  const [dialogKeyName, setDialogKeyName] = useState(() => t('lan.defaultKeyName'))
   const [docsOpen, setDocsOpen] = useState(false)
   const [showCreate, setShowCreate] = useState(false)
 
@@ -209,8 +212,8 @@ export function ApiAccessPage() {
       : 'fail'
 
   const serviceLabel =
-    probeState === 'ok' ? 'Running' : probeState === 'fail' ? 'Not responding' : 'Checking…'
-  const accessLabel = lanEnabled ? 'Local network' : 'This computer only'
+    probeState === 'ok' ? t('service.running') : probeState === 'fail' ? t('service.notResponding') : t('service.checking')
+  const accessLabel = lanEnabled ? t('service.localNetwork') : t('service.thisComputer')
   const authRequired = lanEnabled || listensBeyondLoopback(bindHost)
 
   const copyText = async (field: string, value: string) => {
@@ -240,23 +243,21 @@ export function ApiAccessPage() {
     <div className="mx-auto w-full max-w-2xl min-w-0 space-y-6">
       <header className="page-header">
         <RealmKicker />
-        <h1 className="page-title">API Access</h1>
-        <p className="page-subtitle">
-          Where Yggdrasil&apos;s API is reachable, and how it is secured.
-        </p>
+        <h1 className="page-title">{t('page.title')}</h1>
+        <p className="page-subtitle">{t('page.subtitle')}</p>
       </header>
 
       {(settingsQuery.isLoading || keysQuery.isLoading) && (
-        <LoadingSpinner label="Loading API settings…" />
+        <LoadingSpinner label={t('page.loading')} />
       )}
 
       <section className="card space-y-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="section-title">Service</h2>
+            <h2 className="section-title">{t('service.title')}</h2>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex items-center gap-2">
-                <dt className="text-ink-muted">API service</dt>
+                <dt className="text-ink-muted">{t('service.api')}</dt>
                 <dd className="flex items-center gap-2 font-medium text-ink">
                   <span
                     className={[
@@ -273,21 +274,19 @@ export function ApiAccessPage() {
                 </dd>
               </div>
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                <dt className="text-ink-muted">Access</dt>
+                <dt className="text-ink-muted">{t('service.access')}</dt>
                 <dd className="font-medium text-ink">{accessLabel}</dd>
               </div>
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                <dt className="text-ink-muted">Authentication</dt>
-                <dd className="font-medium text-ink">
-                  {authRequired ? 'API key required' : 'Not required on this computer'}
-                </dd>
+                <dt className="text-ink-muted">{t('service.auth')}</dt>
+                <dd className="font-medium text-ink">{authRequired ? t('service.keyRequired') : t('service.notRequired')}</dd>
               </div>
             </dl>
             {probeQuery.isError || probeState === 'fail' ? (
               <p className="mt-2 text-sm text-danger">
                 {probeQuery.isError
-                  ? 'Could not check the API — is the local service running?'
-                  : (probe?.detail ?? 'API check failed.')}
+                  ? t('probe.checkFailed')
+                  : (probe?.detail ?? t('probe.failed'))}
               </p>
             ) : probe?.detail && probeState === 'ok' && lanEnabled ? (
               <p className="mt-2 text-xs text-ink-muted">{probe.detail}</p>
@@ -299,28 +298,28 @@ export function ApiAccessPage() {
             onClick={runTest}
             disabled={probeQuery.isFetching}
           >
-            {probeQuery.isFetching ? 'Testing…' : 'Test API'}
+            {probeQuery.isFetching ? t('service.testing') : t('service.test')}
           </button>
         </div>
 
         <div className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">
-            Endpoint
-          </p>
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">{t('service.endpoint')}</p>
           <CopyField
             value={localEndpoint}
             copied={copiedField === 'local-endpoint'}
             onCopy={() => void copyText('local-endpoint', localEndpoint)}
           />
           <p className="text-xs text-ink-muted">
-            Local address:{' '}
-            <span className="font-mono text-ink">{friendlyLocal}</span>
+            <Trans
+              t={t}
+              i18nKey="service.localAddress"
+              values={{ address: friendlyLocal }}
+              components={{ mono: <span className="font-mono text-ink" /> }}
+            />
           </p>
           {lanEnabled && (
             <div className="space-y-1 pt-1">
-              <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">
-                LAN endpoint
-              </p>
+              <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">{t('service.lanEndpoint')}</p>
               {lanEndpoint ? (
                 <CopyField
                   value={lanEndpoint}
@@ -329,11 +328,12 @@ export function ApiAccessPage() {
                 />
               ) : (
                 <p className="text-sm text-ink-muted">
-                  Use this computer&apos;s LAN IP with port{' '}
-                  <span className="font-mono text-ink">{port}</span>
-                  {' '}
-                  (for example <span className="font-mono text-ink">http://192.168.x.x:{port}/v1</span>
-                  ).
+                  <Trans
+                    t={t}
+                    i18nKey="service.lanHint"
+                    values={{ port }}
+                    components={{ mono: <span className="font-mono text-ink" /> }}
+                  />
                 </p>
               )}
             </div>
@@ -346,17 +346,19 @@ export function ApiAccessPage() {
           onClick={() => setDocsOpen((o) => !o)}
           aria-expanded={docsOpen}
         >
-          {docsOpen ? 'Hide API documentation' : 'API documentation'}
+          {docsOpen ? t('service.hideDocs') : t('service.docs')}
         </button>
         {docsOpen && (
           <div className="rounded-lg bg-raised/60 px-4 py-3 text-sm text-ink-muted">
             <p>
-              Yggdrasil exposes an OpenAI-compatible API at{' '}
-              <span className="font-mono text-ink">/v1</span>. Point clients at the endpoint
-              above and send{' '}
-              <span className="font-mono text-ink">Authorization: Bearer &lt;api-key&gt;</span>{' '}
-              when Yggdrasil is reachable from other computers. `/api/v1` and `/v1` both
-              require that header. A key does not encrypt plain HTTP.
+              <Trans
+                t={t}
+                i18nKey="service.docsBody"
+                components={{
+                  mono: <span className="font-mono text-ink" />,
+                  header: <span className="font-mono text-ink">Authorization: Bearer &lt;api-key&gt;</span>,
+                }}
+              />
             </p>
             <pre className="mt-3 overflow-x-auto rounded-md bg-canvas px-3 py-2 font-mono text-[11px] text-ink">
               {`curl ${localEndpoint}/models \\
@@ -371,15 +373,11 @@ export function ApiAccessPage() {
       <section className="card space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="section-title">Local network access</h2>
-            <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-              {lanEnabled
-                ? 'Devices on your local network can connect using an API key.'
-                : 'Only apps on this computer can use Yggdrasil’s API.'}
-            </p>
+            <h2 className="section-title">{t('lan.title')}</h2>
+            <p className="mt-1 text-sm leading-relaxed text-ink-muted">{lanEnabled ? t('lan.on') : t('lan.off')}</p>
           </div>
           <Toggle
-            label="Local network access"
+            label={t('lan.title')}
             checked={lanEnabled}
             disabled={updateSettingsMutation.isPending}
             onChange={() => requestLanEnable(!lanEnabled)}
@@ -388,28 +386,20 @@ export function ApiAccessPage() {
 
         {lanEnabled && activeKeys.length === 0 && (
           <div className="rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-ink">
-            Network access is on, but there are no API keys yet. Create a key before connecting
-            from another device.
+            {t('lan.noKeys')}
           </div>
         )}
 
         {lanEnabled && (
-          <p className="text-xs text-ink-faint">
-            After changing network access, fully quit and reopen Yggdrasil so the server rebinds.
-            An API key is required for every connection once the listener is no longer loopback.
-            A key does not encrypt traffic on plain HTTP. Test API only checks this computer —
-            not reachability from other devices.
-          </p>
+          <p className="text-xs text-ink-faint">{t('lan.restart')}</p>
         )}
       </section>
 
       <section className="card space-y-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="section-title">API keys</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Credentials for apps and devices that talk to Yggdrasil.
-            </p>
+            <h2 className="section-title">{t('keys.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('keys.description')}</p>
           </div>
           {!showCreate && (
             <button
@@ -417,7 +407,7 @@ export function ApiAccessPage() {
               className="btn-primary px-3 py-1.5 text-xs"
               onClick={() => setShowCreate(true)}
             >
-              Create API key
+              {t('keys.create')}
             </button>
           )}
         </div>
@@ -425,16 +415,14 @@ export function ApiAccessPage() {
         {showCreate && (
           <div className="space-y-3 rounded-lg border border-line bg-raised/40 px-4 py-3">
             <div>
-              <h3 className="text-sm font-semibold text-ink">Create API key</h3>
-              <p className="mt-1 text-sm text-ink-muted">
-                Give this key a name so you know what uses it.
-              </p>
+              <h3 className="text-sm font-semibold text-ink">{t('keys.create')}</h3>
+              <p className="mt-1 text-sm text-ink-muted">{t('keys.createHint')}</p>
             </div>
             <input
               type="text"
               value={newKeyName}
               onChange={(e) => setNewKeyName(e.target.value)}
-              placeholder="VS Code"
+              placeholder={t('keys.namePlaceholder')}
               className="field w-full"
               autoFocus
             />
@@ -445,7 +433,7 @@ export function ApiAccessPage() {
                 disabled={createKeyMutation.isPending || !newKeyName.trim()}
                 onClick={() => createKeyMutation.mutate(newKeyName.trim())}
               >
-                {createKeyMutation.isPending ? 'Creating…' : 'Create key'}
+                {createKeyMutation.isPending ? t('keys.creating') : t('keys.createKey')}
               </button>
               <button
                 type="button"
@@ -455,7 +443,7 @@ export function ApiAccessPage() {
                   setNewKeyName('')
                 }}
               >
-                Cancel
+                {t('keys.cancel')}
               </button>
             </div>
           </div>
@@ -464,7 +452,7 @@ export function ApiAccessPage() {
         {revealedSecret && (
           <div className="rounded-lg border border-primary/30 bg-primary-soft px-4 py-3">
             <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">
-              Copy this secret now — it won&apos;t be shown again
+              {t('keys.copyNow')}
             </p>
             <code className="mt-2 block break-all font-mono text-sm text-ink">
               {revealedSecret}
@@ -474,13 +462,13 @@ export function ApiAccessPage() {
               className="btn-secondary mt-3 px-3 py-1.5 text-xs"
               onClick={() => void copyText('secret', revealedSecret)}
             >
-              {copiedField === 'secret' ? 'Copied!' : 'Copy secret'}
+              {copiedField === 'secret' ? t('keys.copiedBang') : t('keys.copySecret')}
             </button>
           </div>
         )}
 
         {activeKeys.length === 0 && !keysQuery.isLoading && (
-          <p className="text-sm text-ink-muted">No API keys yet.</p>
+          <p className="text-sm text-ink-muted">{t('keys.none')}</p>
         )}
 
         {activeKeys.length > 0 && (
@@ -490,13 +478,10 @@ export function ApiAccessPage() {
                 <div className="min-w-0">
                   <p className="font-medium text-ink">{key.name}</p>
                   <p className="mt-0.5 text-xs text-ink-muted">
-                    Created{' '}
-                    {new Date(key.created_at).toLocaleDateString(undefined, {
-                      month: 'short',
-                      day: 'numeric',
+                    {t('keys.meta', {
+                      created: new Date(key.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                      lastUsed: formatLastUsed(key.last_used_at),
                     })}
-                    {' · '}
-                    Last used {formatLastUsed(key.last_used_at)}
                   </p>
                   <p className="mt-1 font-mono text-xs text-ink-faint">
                     {maskPrefix(key.prefix)}
@@ -509,7 +494,7 @@ export function ApiAccessPage() {
                       className="btn-secondary px-3 py-1.5 text-xs"
                       onClick={() => void copyText(`key-${key.id}`, revealedSecret)}
                     >
-                      {copiedField === `key-${key.id}` ? 'Copied!' : 'Copy'}
+                      {copiedField === `key-${key.id}` ? t('keys.copiedBang') : t('keys.copy')}
                     </button>
                   ) : null}
                   <button
@@ -517,32 +502,24 @@ export function ApiAccessPage() {
                     className="btn-secondary px-3 py-1.5 text-xs"
                     disabled={rotateKeyMutation.isPending}
                     onClick={() => {
-                      if (
-                        window.confirm(
-                          `Rotate “${key.name}”? The old secret stops working immediately.`,
-                        )
-                      ) {
+                      if (window.confirm(t('keys.confirmRotate', { name: key.name }))) {
                         rotateKeyMutation.mutate(key.id)
                       }
                     }}
                   >
-                    Rotate
+                    {t('keys.rotate')}
                   </button>
                   <button
                     type="button"
                     className="btn-secondary px-3 py-1.5 text-xs"
                     disabled={deleteKeyMutation.isPending}
                     onClick={() => {
-                      if (
-                        window.confirm(
-                          `Revoke “${key.name}”? Apps using this key will lose access.`,
-                        )
-                      ) {
+                      if (window.confirm(t('keys.confirmRevoke', { name: key.name }))) {
                         deleteKeyMutation.mutate(key.id)
                       }
                     }}
                   >
-                    Revoke
+                    {t('keys.revoke')}
                   </button>
                 </div>
                 <KeyPermissions apiKey={key} />
@@ -554,20 +531,20 @@ export function ApiAccessPage() {
 
       {advancedMode && settings && (
         <section className="card space-y-3">
-          <h2 className="section-title">Advanced</h2>
+          <h2 className="section-title">{t('advanced.title')}</h2>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between gap-3">
-              <dt className="text-ink-muted">Bind address</dt>
+              <dt className="text-ink-muted">{t('advanced.bind')}</dt>
               <dd className="font-mono text-ink">
                 {bindHost}:{port}
               </dd>
             </div>
             <div className="flex justify-between gap-3">
-              <dt className="text-ink-muted">Port</dt>
+              <dt className="text-ink-muted">{t('advanced.port')}</dt>
               <dd className="font-mono text-ink">{port}</dd>
             </div>
             <div className="flex justify-between gap-3">
-              <dt className="text-ink-muted">Configured host</dt>
+              <dt className="text-ink-muted">{t('advanced.host')}</dt>
               <dd className="font-mono text-ink">{settings.api_host}</dd>
             </div>
           </dl>
@@ -583,24 +560,15 @@ export function ApiAccessPage() {
         >
           <div className="w-full max-w-md rounded-panel border border-line bg-surface p-5 shadow-panel">
             <h2 id="lan-confirm-title" className="font-display text-lg font-semibold text-ink">
-              Allow access from other computers?
+              {t('lan.confirmTitle')}
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              Devices on your local network will be able to connect to Yggdrasil. An API key is
-              required for all remote connections.
-            </p>
-            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              An API key over plain HTTP does not encrypt traffic. Quit and reopen Yggdrasil after
-              enabling this so the server listens on the network.
-            </p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">{t('lan.confirmBody')}</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-muted">{t('lan.confirmHttp')}</p>
             {!browserHasKey && (
               <div className="mt-4 space-y-2">
-                <p className="text-sm text-ink">
-                  Create an API key so this browser can keep connecting after the server rebinds.
-                  The full key is shown only once.
-                </p>
+                <p className="text-sm text-ink">{t('lan.browserKey')}</p>
                 <label className="block text-sm font-medium text-ink" htmlFor="lan-key-name">
-                  Key name
+                  {t('lan.keyName')}
                 </label>
                 <input
                   id="lan-key-name"
@@ -615,7 +583,7 @@ export function ApiAccessPage() {
                   disabled={createKeyMutation.isPending || !dialogKeyName.trim()}
                   onClick={() => createKeyMutation.mutate(dialogKeyName.trim())}
                 >
-                  {createKeyMutation.isPending ? 'Creating…' : 'Create key'}
+                  {createKeyMutation.isPending ? t('keys.creating') : t('keys.createKey')}
                 </button>
               </div>
             )}
@@ -626,7 +594,7 @@ export function ApiAccessPage() {
               <p className="mt-3 text-sm text-warning">
                 {updateSettingsMutation.error instanceof Error
                   ? updateSettingsMutation.error.message
-                  : 'Could not enable network access.'}
+                  : t('lan.enableFailed')}
               </p>
             )}
             <div className="mt-5 flex justify-end gap-2">
@@ -636,7 +604,7 @@ export function ApiAccessPage() {
                 onClick={() => setLanConfirmOpen(false)}
                 disabled={updateSettingsMutation.isPending}
               >
-                Cancel
+                {t('lan.cancel')}
               </button>
               <button
                 type="button"
@@ -646,7 +614,7 @@ export function ApiAccessPage() {
                 }
                 onClick={() => updateSettingsMutation.mutate(true)}
               >
-                {updateSettingsMutation.isPending ? 'Enabling…' : 'Allow access'}
+                {updateSettingsMutation.isPending ? t('lan.enabling') : t('lan.allow')}
               </button>
             </div>
           </div>
@@ -665,13 +633,14 @@ function CopyField({
   copied: boolean
   onCopy: () => void
 }) {
+  const { t } = useTranslation('apiAccess')
   return (
     <div className="flex min-w-0 items-stretch gap-2">
       <code className="field min-w-0 flex-1 truncate py-2 font-mono text-xs text-ink">
         {value}
       </code>
       <button type="button" className="btn-secondary shrink-0 px-3 py-1.5 text-xs" onClick={onCopy}>
-        {copied ? 'Copied' : 'Copy URL'}
+        {copied ? t('service.copied') : t('service.copyUrl')}
       </button>
     </div>
   )

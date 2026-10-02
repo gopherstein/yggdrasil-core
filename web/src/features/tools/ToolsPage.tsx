@@ -1,12 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { api } from '@/lib/api'
-import type { ToolRecord, ToolRun } from '@/types/api'
+import type { ToolRecord } from '@/types/api'
 import { RealmKicker } from '@/components/ui/Realm'
 import { ImageSetupCard } from './ImageSetup'
 import { ToolSources } from './ToolSources'
 
-const FILTERS = ['All', 'Built-in', 'Added', 'Disabled'] as const
+// The filters, in order; each is tools:page.filters.<id> in the catalog.
+const FILTERS = ['all', 'builtin', 'added', 'disabled'] as const
 
 /** Test arguments for a tool: its required fields, left for you to fill. */
 function exampleArgs(tool: ToolRecord): string {
@@ -23,15 +26,18 @@ function exampleArgs(tool: ToolRecord): string {
 
 /** Where a tool comes from, in words. */
 function sourceLabel(source: string): string {
-  if (source === 'builtin') return 'built in'
+  if (source === 'builtin') return i18n.t('tools:source.builtin')
   const [kind, id] = source.split(':')
-  return kind === 'mcp' ? `tool source ${id}` : kind === 'connector' ? `connected service ${id}` : source
+  if (kind === 'mcp') return i18n.t('tools:source.mcp', { id })
+  if (kind === 'connector') return i18n.t('tools:source.connector', { id })
+  return source
 }
 
 export function ToolsPage() {
+  const { t } = useTranslation('tools')
   const queryClient = useQueryClient()
   const [query, setQuery] = useState('')
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]>('All')
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]>('all')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [testArgs, setTestArgs] = useState('{"query":"Juneau AK weather"}')
   const [testOutput, setTestOutput] = useState('')
@@ -46,9 +52,9 @@ export function ToolsPage() {
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase()
     return tools.filter((tool) => {
-      if (filter === 'Built-in' && tool.source !== 'builtin') return false
-      if (filter === 'Added' && tool.source === 'builtin') return false
-      if (filter === 'Disabled' && tool.enabled) return false
+      if (filter === 'builtin' && tool.source !== 'builtin') return false
+      if (filter === 'added' && tool.source === 'builtin') return false
+      if (filter === 'disabled' && tool.enabled) return false
       if (!needle) return true
       return [tool.name, tool.description, tool.capability, tool.source, tool.id]
         .join(' ')
@@ -68,31 +74,27 @@ export function ToolsPage() {
       return api.testTool(selected?.id || '', args)
     },
     onSuccess: (result) => setTestOutput(JSON.stringify(result, null, 2)),
-    onError: (error) => setTestOutput(error instanceof Error ? error.message : 'Test failed'),
+    onError: (error) => setTestOutput(error instanceof Error ? error.message : t('page.testFailed')),
   })
 
   return (
     <div className="page-fill gap-4 overflow-y-auto p-4">
       <div>
         <RealmKicker />
-        <h1 className="font-display text-2xl font-semibold text-ink">Tools</h1>
-        <p className="mt-1 max-w-2xl text-sm text-ink-muted">
-          What the AI can do besides answering: search the web, work with files, and use the apps and services you add.
-        </p>
+        <h1 className="font-display text-2xl font-semibold text-ink">{t('page.title')}</h1>
+        <p className="mt-1 max-w-2xl text-sm text-ink-muted">{t('page.description')}</p>
       </div>
       <ImageSetupCard />
       <ToolSources />
       <div>
-        <h2 className="section-title">All tools</h2>
-        <p className="mt-1 max-w-2xl text-sm text-ink-muted">
-          Every tool, built in or added. Turn one off here to keep it out of every chat.
-        </p>
+        <h2 className="section-title">{t('page.allTitle')}</h2>
+        <p className="mt-1 max-w-2xl text-sm text-ink-muted">{t('page.allDescription')}</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <input
           className="field min-w-[16rem] flex-1"
           value={query}
-          placeholder="Search tools…"
+          placeholder={t('page.search')}
           onChange={(event) => setQuery(event.target.value)}
         />
         {FILTERS.map((item) => (
@@ -102,13 +104,13 @@ export function ToolsPage() {
             className={filter === item ? 'btn-primary px-3 py-1.5 text-xs' : 'btn-secondary px-3 py-1.5 text-xs'}
             onClick={() => setFilter(item)}
           >
-            {item}
+            {t(`page.filters.${item}`)}
           </button>
         ))}
       </div>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)]">
         <ul className="space-y-2">
-          {toolsQuery.isLoading && <li className="text-sm text-ink-muted">Loading tools…</li>}
+          {toolsQuery.isLoading && <li className="text-sm text-ink-muted">{t('page.loading')}</li>}
           {visible.map((tool) => (
             <li key={tool.id}>
               <button
@@ -126,7 +128,7 @@ export function ToolsPage() {
                     <p className="mt-1 text-xs text-ink-muted">{tool.description}</p>
                   </div>
                   <span className={tool.enabled ? 'text-xs text-success' : 'text-xs text-ink-faint'}>
-                    {tool.enabled ? 'Enabled' : 'Disabled'}
+                    {tool.enabled ? t('page.enabled') : t('page.disabled')}
                   </span>
                 </div>
                 <p className="mt-2 text-xs text-ink-faint">
@@ -141,15 +143,17 @@ export function ToolsPage() {
             <h2 className="font-display text-lg font-semibold text-ink">{selected.name}</h2>
             <p className="text-sm text-ink-muted">{selected.description}</p>
             <dl className="space-y-1 text-xs text-ink-muted">
-              <Row label="Source" value={sourceLabel(selected.source)} />
-              <Row label="Capability" value={selected.capability} />
-              <Row label="Permission default" value={selected.default_policy} />
-              {selected.level && <Row label="Level" value={`${selected.level} · ${selected.level_name ?? ''}`} />}
-              {selected.outputs && <Row label="Returns" value={selected.outputs.join(', ')} />}
-              {selected.timeout_seconds ? <Row label="Time limit" value={`${selected.timeout_seconds} s`} /> : null}
-              {selected.requirements && <Row label="Needs" value={needs(selected) || 'Nothing else'} />}
-              {selected.health && <Row label="Health" value={HEALTH[selected.health]} />}
-              <Row label="Profiles" value={selected.profiles.join(', ') || 'None'} />
+              <Row label={t('details.source')} value={sourceLabel(selected.source)} />
+              <Row label={t('details.capability')} value={selected.capability} />
+              <Row label={t('details.permission')} value={selected.default_policy} />
+              {selected.level && <Row label={t('details.level')} value={`${selected.level} · ${selected.level_name ?? ''}`} />}
+              {selected.outputs && <Row label={t('details.returns')} value={selected.outputs.join(', ')} />}
+              {selected.timeout_seconds ? (
+                <Row label={t('details.timeLimit')} value={t('details.seconds', { count: selected.timeout_seconds })} />
+              ) : null}
+              {selected.requirements && <Row label={t('details.needs')} value={needs(selected) || t('details.nothingElse')} />}
+              {selected.health && <Row label={t('details.health')} value={t(`details.healthStates.${selected.health}`)} />}
+              <Row label={t('details.profiles')} value={selected.profiles.join(', ') || t('details.none')} />
             </dl>
             <pre className="log-panel text-xs">{selected.schema}</pre>
             <button
@@ -158,7 +162,7 @@ export function ToolsPage() {
               disabled={toggle.isPending}
               onClick={() => toggle.mutate(selected)}
             >
-              {selected.enabled ? 'Disable' : 'Enable'}
+              {selected.enabled ? t('page.disable') : t('page.enable')}
             </button>
             <RecentCalls toolId={selected.id} />
             {selected.risk === 'read' && (
@@ -174,7 +178,7 @@ export function ToolsPage() {
                   disabled={test.isPending}
                   onClick={() => test.mutate()}
                 >
-                  Test tool
+                  {t('page.test')}
                 </button>
                 {testOutput && <pre className="log-panel max-h-64 text-xs">{testOutput}</pre>}
               </div>
@@ -186,49 +190,41 @@ export function ToolsPage() {
   )
 }
 
-const HEALTH: Record<NonNullable<ToolRecord['health']>, string> = {
-  ok: 'Ready',
-  off: 'Turned off',
-  unavailable: 'Not running',
-}
-
 /** What a tool needs besides itself, in words. */
 function needs(tool: ToolRecord): string {
   const r = tool.requirements
   if (!r) return ''
-  return [r.network && 'internet', r.filesystem && 'files on this computer', r.credentials && 'a stored credential', r.runtime, r.gpu && 'a GPU']
+  return [
+    r.network && i18n.t('tools:details.requirements.network'),
+    r.filesystem && i18n.t('tools:details.requirements.filesystem'),
+    r.credentials && i18n.t('tools:details.requirements.credentials'),
+    r.runtime,
+    r.gpu && i18n.t('tools:details.requirements.gpu'),
+  ]
     .filter(Boolean)
     .join(', ')
 }
 
-const STATUS: Record<ToolRun['status'], string> = {
-  completed: 'ran',
-  cached: 'answered from cache',
-  failed: 'failed',
-  denied: 'not allowed',
-  refused: 'refused',
-  disabled: 'turned off',
-}
-
 /** The tool's latest audited calls (Gungnir §13). */
 function RecentCalls({ toolId }: { toolId: string }) {
+  const { t } = useTranslation('tools')
   const runs = useQuery({ queryKey: ['tool-runs', toolId], queryFn: () => api.listToolRuns(toolId), retry: false })
   const list = runs.data ?? []
   return (
     <div className="space-y-1">
-      <p className="text-xs font-medium text-ink-muted">Recent calls</p>
+      <p className="text-xs font-medium text-ink-muted">{t('calls.title')}</p>
       {list.length === 0 ? (
-        <p className="text-xs text-ink-faint">None recorded.</p>
+        <p className="text-xs text-ink-faint">{t('calls.none')}</p>
       ) : (
         <ul className="space-y-1 text-xs">
           {list.map((run) => (
             <li key={run.id} className="flex justify-between gap-2">
               <span className="min-w-0 truncate text-ink-muted" title={run.error || run.summary}>
-                {new Date(run.at).toLocaleString()} · {STATUS[run.status]}
-                {run.approval === 'you' ? ' (you approved)' : run.approval === 'session' ? ' (allowed for the session)' : ''}
+                {new Date(run.at).toLocaleString()} · {t(`calls.status.${run.status}`)}
+                {run.approval === 'you' ? t('calls.youApproved') : run.approval === 'session' ? t('calls.sessionAllowed') : ''}
                 {run.summary ? ` · ${run.summary}` : ''}
               </span>
-              {run.duration_ms > 0 && <span className="shrink-0 text-ink-faint">{run.duration_ms} ms</span>}
+              {run.duration_ms > 0 && <span className="shrink-0 text-ink-faint">{t('calls.ms', { count: run.duration_ms })}</span>}
             </li>
           ))}
         </ul>

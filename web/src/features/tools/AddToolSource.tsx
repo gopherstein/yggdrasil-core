@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState, type ReactNode } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import type {
   MCPAddRequest,
@@ -14,14 +15,10 @@ import type {
 import { preopenSignInWindow } from '@/lib/desktopBridge'
 import { errorText, linesToMap, openSignIn, SOURCES_KEY, specSummary, splitArgs } from './mcpShared'
 
-const TABS = [
-  { id: 'gallery', label: 'Gallery' },
-  { id: 'paste', label: 'Paste' },
-  { id: 'apps', label: 'From your other apps' },
-  { id: 'custom', label: 'Custom' },
-] as const
+// The tabs, in order; each is tools:add.tabs.<id> in the catalog.
+const TABS = ['gallery', 'paste', 'apps', 'custom'] as const
 
-type TabId = (typeof TABS)[number]['id']
+type TabId = (typeof TABS)[number]
 
 /**
  * Adding a tool source, four ways: pick one from the gallery and answer a
@@ -29,20 +26,18 @@ type TabId = (typeof TABS)[number]['id']
  * servers set up in other apps on this computer, or fill in the form.
  */
 export function AddToolSource({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation('tools')
   const [tab, setTab] = useState<TabId>('gallery')
   const [done, setDone] = useState<MCPAdded | null>(null)
   return (
-    <section className="card space-y-4" aria-label="Add tools">
+    <section className="card space-y-4" aria-label={t('add.title')}>
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="section-title">Add tools</h2>
-          <p className="mt-1 max-w-2xl text-sm text-ink-muted">
-            Tool sources use the Model Context Protocol (MCP), the standard most AI apps share. Their tools work in every
-            chat and automation. Reading is allowed; anything that changes something asks you first.
-          </p>
+          <h2 className="section-title">{t('add.title')}</h2>
+          <p className="mt-1 max-w-2xl text-sm text-ink-muted">{t('add.description')}</p>
         </div>
         <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={onClose}>
-          Close
+          {t('add.close')}
         </button>
       </div>
       {done ? (
@@ -50,16 +45,16 @@ export function AddToolSource({ onClose }: { onClose: () => void }) {
       ) : (
         <>
           <div role="tablist" className="flex flex-wrap gap-1.5">
-            {TABS.map((t) => (
+            {TABS.map((id) => (
               <button
-                key={t.id}
+                key={id}
                 type="button"
                 role="tab"
-                aria-selected={tab === t.id}
-                className={tab === t.id ? 'btn-primary px-3 py-1.5 text-xs' : 'btn-secondary px-3 py-1.5 text-xs'}
-                onClick={() => setTab(t.id)}
+                aria-selected={tab === id}
+                className={tab === id ? 'btn-primary px-3 py-1.5 text-xs' : 'btn-secondary px-3 py-1.5 text-xs'}
+                onClick={() => setTab(id)}
               >
-                {t.label}
+                {t(`add.tabs.${id}`)}
               </button>
             ))}
           </div>
@@ -100,49 +95,47 @@ function useAdd(onAdded: (added: MCPAdded) => void) {
 
 /** Work is the message shown while a source is being added. */
 function Working({ local }: { local: boolean }) {
+  const { t } = useTranslation('tools')
   return (
     <p className="rounded-md bg-info/10 px-2.5 py-2 text-xs leading-relaxed text-ink" role="status">
-      {local
-        ? 'Starting it and listing its tools. The first start downloads it, which can take a minute.'
-        : 'Connecting and listing its tools…'}
+      {local ? t('add.startingLocal') : t('add.connecting')}
     </p>
   )
 }
 
 function AddedNotice({ added, onAnother, onClose }: { added: MCPAdded; onAnother: () => void; onClose: () => void }) {
+  const { t } = useTranslation('tools')
   const s = added.server
-  const reads = s.tools.filter((t) => t.risk === 'read').length
+  const reads = s.tools.filter((tool) => tool.risk === 'read').length
   const changes = s.tools.length - reads
+  const name = { name: <span className="font-semibold" /> }
   return (
     <div className="space-y-3" role="status">
       {added.sign_in_url ? (
         <>
           <p className="text-sm text-ink">
-            <span className="font-semibold">{s.name}</span> needs you to sign in. Finish in the window that opened; its
-            tools appear here when you are done.
+            <Trans t={t} i18nKey="add.needsSignIn" values={{ name: s.name }} components={name} />
           </p>
           <a className="btn-primary px-3 py-1.5 text-xs" href={added.sign_in_url} target="_blank" rel="noreferrer">
-            Open the sign-in again
+            {t('add.openSignIn')}
           </a>
         </>
       ) : (
         <p className="text-sm text-ink">
-          <span className="font-semibold">{s.name}</span> is ready with {s.tools.length} tool
-          {s.tools.length === 1 ? '' : 's'}
-          {s.tools.length > 0 && (
-            <>
-              : {reads} that read{changes > 0 ? `, and ${changes} that change things and ask you first` : ''}
-            </>
-          )}
-          . Ask about it in chat.
+          <Trans
+            t={t}
+            i18nKey={s.tools.length === 0 ? 'add.readyNoTools' : changes > 0 ? 'add.readyChanges' : 'add.readyReads'}
+            values={{ name: s.name, count: s.tools.length, reads, changes }}
+            components={name}
+          />
         </p>
       )}
       <div className="flex gap-2">
         <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={onAnother}>
-          Add another
+          {t('add.another')}
         </button>
         <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={onClose}>
-          Done
+          {t('add.done')}
         </button>
       </div>
     </div>
@@ -150,6 +143,7 @@ function AddedNotice({ added, onAnother, onClose }: { added: MCPAdded; onAnother
 }
 
 function GalleryTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
+  const { t } = useTranslation('tools')
   const gallery = useQuery({ queryKey: ['mcp-gallery'], queryFn: () => api.mcpGallery(), retry: false })
   const [chosen, setChosen] = useState<MCPGalleryEntry | null>(null)
   const groups = useMemo(() => {
@@ -164,7 +158,7 @@ function GalleryTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
   if (gallery.isError) return <p className="text-sm text-danger">{errorText(gallery.error)}</p>
   return (
     <div className="space-y-4">
-      {gallery.isLoading && <p className="text-sm text-ink-muted">Loading the gallery…</p>}
+      {gallery.isLoading && <p className="text-sm text-ink-muted">{t('add.loadingGallery')}</p>}
       {groups.map(([category, entries]) => (
         <div key={category} className="space-y-2">
           <p className="label-caps">{category}</p>
@@ -173,12 +167,12 @@ function GalleryTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
               <button key={e.id} type="button" className="selectable space-y-1.5" onClick={() => setChosen(e)}>
                 <span className="flex flex-wrap items-center gap-1.5">
                   <span className="selectable-title text-sm font-semibold text-ink">{e.name}</span>
-                  {e.added && <span className="status-chip bg-success/15 text-success">Added</span>}
-                  {e.sign_in && <span className="status-chip bg-raised text-ink-muted">Sign in</span>}
-                  {e.missing && <span className="status-chip bg-warning/15 text-warning">Needs {e.missing}</span>}
+                  {e.added && <span className="status-chip bg-success/15 text-success">{t('add.added')}</span>}
+                  {e.sign_in && <span className="status-chip bg-raised text-ink-muted">{t('add.signIn')}</span>}
+                  {e.missing && <span className="status-chip bg-warning/15 text-warning">{t('add.needs', { runtime: e.missing })}</span>}
                 </span>
                 <span className="block text-xs text-ink-muted">{e.description}</span>
-                <span className="block text-[11px] text-ink-faint">{e.remote ? 'Runs on the web' : 'Runs on this computer'}</span>
+                <span className="block text-[11px] text-ink-faint">{e.remote ? t('add.runsWeb') : t('add.runsLocal')}</span>
               </button>
             ))}
           </div>
@@ -189,6 +183,7 @@ function GalleryTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
 }
 
 function GallerySetup({ entry, onBack, onAdded }: { entry: MCPGalleryEntry; onBack: () => void; onAdded: (a: MCPAdded) => void }) {
+  const { t } = useTranslation('tools')
   const [values, setValues] = useState<Record<string, string>>(() =>
     Object.fromEntries(entry.fields.map((f) => [f.key, f.default ?? ''])),
   )
@@ -206,23 +201,20 @@ function GallerySetup({ entry, onBack, onAdded }: { entry: MCPGalleryEntry; onBa
     >
       <div>
         <button type="button" className="text-xs text-ink-muted hover:text-ink" onClick={onBack}>
-          ← Gallery
+          {t('add.backToGallery')}
         </button>
         <h3 className="mt-1 font-display text-lg font-semibold text-ink">{entry.name}</h3>
         <p className="text-sm text-ink-muted">{entry.description}</p>
         {entry.homepage && (
           <a className="text-xs text-primary hover:underline" href={entry.homepage} target="_blank" rel="noreferrer">
-            About this server
+            {t('add.about')}
           </a>
         )}
       </div>
       {entry.missing && <MissingRuntime name={entry.missing} />}
       {entry.setup && <p className="rounded-md bg-info/10 px-2.5 py-2 text-xs leading-relaxed text-ink">{entry.setup}</p>}
       {entry.sign_in && (
-        <p className="text-xs text-ink-muted">
-          A window opens for you to sign in to {entry.name} and choose what Yggdrasil may use. Your sign-in stays on this
-          computer.
-        </p>
+        <p className="text-xs text-ink-muted">{t('add.signInNote', { name: entry.name })}</p>
       )}
       {entry.fields.map((f) => (
         <FieldInput key={f.key} field={f} value={values[f.key] ?? ''} onChange={(v) => setValues((cur) => ({ ...cur, [f.key]: v }))} />
@@ -230,17 +222,20 @@ function GallerySetup({ entry, onBack, onAdded }: { entry: MCPGalleryEntry; onBa
       {add.isPending && <Working local={!entry.remote} />}
       {add.isError && <p className="text-xs text-danger">{errorText(add.error)}</p>}
       <button type="submit" className="btn-primary px-3 py-1.5 text-xs" disabled={add.isPending}>
-        {add.isPending ? 'Adding…' : entry.sign_in ? `Sign in and add ${entry.name}` : `Add ${entry.name}`}
+        {add.isPending
+          ? t('add.adding')
+          : t(entry.sign_in ? 'add.signInAndAdd' : 'add.addName', { name: entry.name })}
       </button>
     </form>
   )
 }
 
 function FieldInput({ field, value, onChange }: { field: MCPField; value: string; onChange: (v: string) => void }) {
+  const { t } = useTranslation('tools')
   const label = (
     <span className="text-ink-muted">
       {field.label}
-      {field.optional && <span className="text-ink-faint"> (optional)</span>}
+      {field.optional && <span className="text-ink-faint">{t('add.optional')}</span>}
     </span>
   )
   return (
@@ -270,53 +265,39 @@ function FieldInput({ field, value, onChange }: { field: MCPField; value: string
   )
 }
 
+const RUNTIME_HELP: Record<string, { key: string; href: string }> = {
+  'Node.js': { key: 'add.installNode', href: 'https://nodejs.org' },
+  uv: { key: 'add.installUv', href: 'https://docs.astral.sh/uv/' },
+  Docker: { key: 'add.installDocker', href: 'https://www.docker.com/products/docker-desktop/' },
+}
+
 function MissingRuntime({ name }: { name: string }) {
-  const help: Record<string, ReactNode> = {
-    'Node.js': (
-      <>
-        Install Node.js from{' '}
-        <a className="underline" href="https://nodejs.org" target="_blank" rel="noreferrer">
-          nodejs.org
-        </a>{' '}
-        (or run <code>brew install node</code>), then add it.
-      </>
-    ),
-    uv: (
-      <>
-        Install uv from{' '}
-        <a className="underline" href="https://docs.astral.sh/uv/" target="_blank" rel="noreferrer">
-          docs.astral.sh/uv
-        </a>{' '}
-        (or run <code>brew install uv</code>), then add it.
-      </>
-    ),
-    Docker: (
-      <>
-        Install and start{' '}
-        <a className="underline" href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noreferrer">
-          Docker Desktop
-        </a>
-        , then add it.
-      </>
-    ),
-  }
+  const { t } = useTranslation('tools')
+  const help = RUNTIME_HELP[name]
+  const how: ReactNode = help ? (
+    <Trans
+      t={t}
+      i18nKey={help.key}
+      components={{ link: <a className="underline" href={help.href} target="_blank" rel="noreferrer" />, code: <code /> }}
+    />
+  ) : (
+    t('add.installGeneric', { runtime: name })
+  )
   return (
     <p className="rounded-md bg-warning/10 px-2.5 py-2 text-xs leading-relaxed text-ink">
-      This runs on this computer and needs {name}, which is not installed. {help[name] ?? `Install ${name}, then add it.`}
+      {t('add.missing', { runtime: name })} {how}
     </p>
   )
 }
 
 function PasteTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
+  const { t } = useTranslation('tools')
   const [text, setText] = useState('')
   const parse = useMutation({ mutationFn: () => api.parseMCP(text) })
   return (
     <div className="space-y-3">
       <label className="block text-sm">
-        <span className="text-ink-muted">
-          Paste what a server&apos;s instructions say: its JSON settings for any app, its web address, or the command that
-          runs it.
-        </span>
+        <span className="text-ink-muted">{t('add.pasteLabel')}</span>
         <textarea
           className="field mt-1 min-h-32 w-full font-mono text-xs"
           value={text}
@@ -334,7 +315,7 @@ function PasteTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
         disabled={!text.trim() || parse.isPending}
         onClick={() => parse.mutate()}
       >
-        {parse.isPending ? 'Reading…' : 'Read it'}
+        {parse.isPending ? t('add.reading') : t('add.read')}
       </button>
       {parse.isError && <p className="text-xs text-danger">{errorText(parse.error)}</p>}
       {parse.data?.map((p, i) => <ParsedServer key={`${p.spec.name}-${i}`} parsed={p} onAdded={onAdded} />)}
@@ -344,6 +325,7 @@ function PasteTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
 
 /** One server read from pasted text, with what it still needs. */
 function ParsedServer({ parsed, onAdded }: { parsed: MCPParsed; onAdded: (a: MCPAdded) => void }) {
+  const { t } = useTranslation('tools')
   const [name, setName] = useState(parsed.spec.name)
   const [values, setValues] = useState<Record<string, string>>({})
   const add = useAdd(onAdded)
@@ -358,7 +340,7 @@ function ParsedServer({ parsed, onAdded }: { parsed: MCPParsed; onAdded: (a: MCP
       }}
     >
       <label className="block text-sm">
-        <span className="text-ink-muted">Name</span>
+        <span className="text-ink-muted">{t('add.name')}</span>
         <input className="field mt-1 w-full" value={name} onChange={(e) => setName(e.target.value)} />
       </label>
       <p className="break-anywhere font-mono text-[11px] text-ink-faint">{specSummary(parsed.spec)}</p>
@@ -367,7 +349,7 @@ function ParsedServer({ parsed, onAdded }: { parsed: MCPParsed; onAdded: (a: MCP
       {add.isPending && <Working local={local} />}
       {add.isError && <p className="text-xs text-danger">{errorText(add.error)}</p>}
       <button type="submit" className="btn-primary px-3 py-1.5 text-xs" disabled={add.isPending || missingValues || !name.trim()}>
-        {add.isPending ? 'Adding…' : `Add ${name || 'it'}`}
+        {add.isPending ? t('add.adding') : name ? t('add.addName', { name }) : t('add.addIt')}
       </button>
     </form>
   )
@@ -382,10 +364,11 @@ function NeedsInputs({
   values: Record<string, string>
   setValues: (fn: (cur: Record<string, string>) => Record<string, string>) => void
 }) {
+  const { t } = useTranslation('tools')
   if (needs.length === 0) return null
   return (
     <div className="space-y-2">
-      <p className="text-xs text-ink-muted">Fill in what the instructions left for you to add:</p>
+      <p className="text-xs text-ink-muted">{t('add.fillIn')}</p>
       {needs.map((n) => (
         <label key={n.key} className="block text-sm">
           <span className="font-mono text-xs text-ink-muted">{n.label}</span>
@@ -400,35 +383,30 @@ function NeedsInputs({
         </label>
       ))}
       {needs.some((n) => n.secret) && (
-        <p className="text-[11px] text-ink-faint">Secrets are kept on this computer, outside the AI&apos;s view.</p>
+        <p className="text-[11px] text-ink-faint">{t('add.secretsKept')}</p>
       )}
     </div>
   )
 }
 
 function AppsTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
+  const { t } = useTranslation('tools')
   const found = useQuery({ queryKey: ['mcp-import'], queryFn: () => api.mcpImportCandidates(), retry: false })
   const groups = useMemo(() => {
     const out = new Map<string, MCPImportCandidate[]>()
     for (const c of found.data ?? []) out.set(c.app_name, [...(out.get(c.app_name) ?? []), c])
     return [...out.entries()]
   }, [found.data])
-  if (found.isLoading) return <p className="text-sm text-ink-muted">Looking at your other apps…</p>
+  if (found.isLoading) return <p className="text-sm text-ink-muted">{t('add.lookingApps')}</p>
   if (found.isError) return <p className="text-sm text-danger">{errorText(found.error)}</p>
   if (groups.length === 0) {
     return (
-      <p className="text-sm text-ink-muted">
-        No MCP servers were found in Claude Desktop, Claude Code, Cursor, VS Code, Windsurf, Gemini CLI, or LM Studio on
-        this computer.
-      </p>
+      <p className="text-sm text-ink-muted">{t('add.noneFound')}</p>
     )
   }
   return (
     <div className="space-y-4">
-      <p className="text-sm text-ink-muted">
-        Servers you already set up in other apps. Adding one copies its settings; its secrets go straight to Yggdrasil&apos;s
-        secret store.
-      </p>
+      <p className="text-sm text-ink-muted">{t('add.appsIntro')}</p>
       {groups.map(([app, list]) => (
         <div key={app} className="space-y-2">
           <p className="label-caps">{app}</p>
@@ -442,6 +420,7 @@ function AppsTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
 }
 
 function ImportRow({ candidate, onAdded }: { candidate: MCPImportCandidate; onAdded: (a: MCPAdded) => void }) {
+  const { t } = useTranslation('tools')
   const [values, setValues] = useState<Record<string, string>>({})
   const add = useAdd(onAdded)
   const needs = candidate.needs ?? []
@@ -453,7 +432,7 @@ function ImportRow({ candidate, onAdded }: { candidate: MCPImportCandidate; onAd
           <p className="break-anywhere font-mono text-[11px] text-ink-faint">{specSummary(candidate.spec)}</p>
         </div>
         {candidate.added ? (
-          <span className="status-chip bg-success/15 text-success">Added</span>
+          <span className="status-chip bg-success/15 text-success">{t('add.added')}</span>
         ) : (
           <button
             type="button"
@@ -463,7 +442,7 @@ function ImportRow({ candidate, onAdded }: { candidate: MCPImportCandidate; onAd
               add.mutate({ body: { import: { app: candidate.app, name: candidate.spec.name }, values } })
             }
           >
-            {add.isPending ? 'Adding…' : 'Add'}
+            {add.isPending ? t('add.adding') : t('add.add')}
           </button>
         )}
       </div>
@@ -476,6 +455,7 @@ function ImportRow({ candidate, onAdded }: { candidate: MCPImportCandidate; onAd
 }
 
 function CustomTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
+  const { t } = useTranslation('tools')
   const [where, setWhere] = useState<'local' | 'remote'>('local')
   const [name, setName] = useState('')
   const [command, setCommand] = useState('')
@@ -500,7 +480,7 @@ function CustomTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
         add.mutate({ body: { spec } })
       }}
     >
-      <div className="flex gap-1.5" role="radiogroup" aria-label="Where it runs">
+      <div className="flex gap-1.5" role="radiogroup" aria-label={t('add.where')}>
         {(['local', 'remote'] as const).map((w) => (
           <button
             key={w}
@@ -510,18 +490,18 @@ function CustomTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
             className={where === w ? 'btn-primary px-3 py-1.5 text-xs' : 'btn-secondary px-3 py-1.5 text-xs'}
             onClick={() => setWhere(w)}
           >
-            {w === 'local' ? 'Runs on this computer' : 'On the web'}
+            {w === 'local' ? t('add.local') : t('add.remote')}
           </button>
         ))}
       </div>
       <label className="block text-sm">
-        <span className="text-ink-muted">Name</span>
-        <input className="field mt-1 w-full" value={name} placeholder="My tools" onChange={(e) => setName(e.target.value)} />
+        <span className="text-ink-muted">{t('add.name')}</span>
+        <input className="field mt-1 w-full" value={name} placeholder={t('add.namePlaceholder')} onChange={(e) => setName(e.target.value)} />
       </label>
       {where === 'local' ? (
         <>
           <label className="block text-sm">
-            <span className="text-ink-muted">Command</span>
+            <span className="text-ink-muted">{t('add.command')}</span>
             <input
               className="field mt-1 w-full font-mono text-xs"
               value={command}
@@ -532,7 +512,8 @@ function CustomTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
           </label>
           <label className="block text-sm">
             <span className="text-ink-muted">
-              Environment variables <span className="text-ink-faint">(optional, one KEY=value per line)</span>
+              {t('add.env')}
+              <span className="text-ink-faint">{t('add.envHint')}</span>
             </span>
             <textarea
               className="field mt-1 min-h-16 w-full font-mono text-xs"
@@ -546,7 +527,7 @@ function CustomTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
       ) : (
         <>
           <label className="block text-sm">
-            <span className="text-ink-muted">Address</span>
+            <span className="text-ink-muted">{t('add.address')}</span>
             <input
               className="field mt-1 w-full font-mono text-xs"
               value={url}
@@ -557,7 +538,8 @@ function CustomTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
           </label>
           <label className="block text-sm">
             <span className="text-ink-muted">
-              Headers <span className="text-ink-faint">(optional, one Name: value per line)</span>
+              {t('add.headers')}
+              <span className="text-ink-faint">{t('add.headersHint')}</span>
             </span>
             <textarea
               className="field mt-1 min-h-16 w-full font-mono text-xs"
@@ -569,17 +551,18 @@ function CustomTab({ onAdded }: { onAdded: (a: MCPAdded) => void }) {
           </label>
           <label className="block text-sm">
             <span className="text-ink-muted">
-              Sign-in client ID <span className="text-ink-faint">(only if the service gave you one)</span>
+              {t('add.clientId')}
+              <span className="text-ink-faint">{t('add.clientIdHint')}</span>
             </span>
             <input className="field mt-1 w-full" value={clientID} onChange={(e) => setClientID(e.target.value)} />
           </label>
         </>
       )}
-      <p className="text-[11px] text-ink-faint">Keys, tokens, passwords, and headers are kept on this computer, outside the AI&apos;s view.</p>
+      <p className="text-[11px] text-ink-faint">{t('add.keptHere')}</p>
       {add.isPending && <Working local={where === 'local'} />}
       {add.isError && <p className="text-xs text-danger">{errorText(add.error)}</p>}
       <button type="submit" className="btn-primary px-3 py-1.5 text-xs" disabled={!ready || add.isPending}>
-        {add.isPending ? 'Adding…' : 'Add'}
+        {add.isPending ? t('add.adding') : t('add.add')}
       </button>
     </form>
   )

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { AIProfile, Automation, AutomationInput, AutomationSchedule, Model, ToolRecord } from '@/types/api'
 import { api } from '@/lib/api'
 import { canChat } from '@/features/models/modelPresentation'
@@ -14,17 +15,11 @@ import {
   resultProse,
   scheduleLabel,
   visibleTask,
+  weekdayName,
 } from './parseRequest'
 
-const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-
-const NOTIFY_CHOICES: { mode: AutomationInput['notification']['mode']; label: string }[] = [
-  { mode: 'condition', label: 'When the condition is true' },
-  { mode: 'change', label: 'When the result changes' },
-  { mode: 'always', label: 'Every time it runs' },
-  { mode: 'failure', label: 'Only when it fails' },
-  { mode: 'none', label: "Don't notify me" },
-]
+// The notify choices, in order; each is automations:form.notifyChoices.<mode> in the catalog.
+const NOTIFY_CHOICES: AutomationInput['notification']['mode'][] = ['condition', 'change', 'always', 'failure', 'none']
 
 interface AutomationFormProps {
   profiles: AIProfile[]
@@ -39,6 +34,7 @@ interface AutomationFormProps {
 }
 
 export function AutomationForm({ profiles, models, tools, initial, seedDescription = '', pending, error, onCancel, onSubmit }: AutomationFormProps) {
+  const { t } = useTranslation('automations')
   const advanced = useUIStore((state) => state.advancedMode) && new URLSearchParams(window.location.search).get('simple') !== '1'
   const advancedRef = useRef<HTMLDetailsElement>(null)
   const zone = initial?.schedule.time_zone || localTimeZone()
@@ -75,9 +71,9 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
       setNotes(parsed.notes)
       setParseError('')
     } catch (err) {
-      setParseError(err instanceof Error ? err.message : 'That description could not be read.')
+      setParseError(err instanceof Error ? err.message : t('parse.unreadable'))
     }
-  }, [seedDescription, zone])
+  }, [seedDescription, zone, t])
 
   useEffect(() => {
     if (profileID && profiles.some((profile) => profile.id === profileID)) return
@@ -114,13 +110,13 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
       setNotes(parsed.notes)
       setParseError('')
     } catch (err) {
-      setParseError(err instanceof Error ? err.message : 'That description could not be read.')
+      setParseError(err instanceof Error ? err.message : t('parse.unreadable'))
     }
   }
 
   function draft(notification = currentNotification()): AutomationInput {
     return {
-      name: name.trim() || 'Automation',
+      name: name.trim() || t('names.fallback'),
       prompt: composePrompt(task, notification),
       profile_id: profileID,
       model_id: modelID,
@@ -152,7 +148,7 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
     try {
       setPreview(await api.previewAutomation(draft()))
     } catch (err) {
-      setPreviewError(err instanceof Error ? err.message : 'The test could not run.')
+      setPreviewError(err instanceof Error ? err.message : t('form.testCouldNotRun'))
     } finally {
       setTesting(false)
     }
@@ -169,20 +165,20 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
       }}
     >
       <div>
-        <h2 className="font-display text-lg font-semibold text-ink">{initial ? 'Edit automation' : 'New automation'}</h2>
-        <p className="mt-1 text-sm text-ink-muted">Tell Yggdrasil what you want it to do.</p>
+        <h2 className="font-display text-lg font-semibold text-ink">{initial ? t('form.editTitle') : t('form.newTitle')}</h2>
+        <p className="mt-1 text-sm text-ink-muted">{t('form.intro')}</p>
       </div>
       <label className="block space-y-1 text-sm">
-        <span className="text-ink-muted">Describe what you want</span>
+        <span className="text-ink-muted">{t('form.describe')}</span>
         <textarea
           className="field min-h-24 w-full"
           value={description}
-          placeholder="Every morning at 8:00 AM, check this product and tell me if the price is below $500."
+          placeholder={t('form.describePlaceholder')}
           onChange={(event) => setDescription(event.target.value)}
         />
       </label>
       <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={applyDescription}>
-        Set up automation
+        {t('form.setUp')}
       </button>
       {parseError && <p className="text-sm text-danger">{parseError}</p>}
       {notes.map((note) => (
@@ -191,73 +187,68 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
         </p>
       ))}
       <label className="block space-y-1 text-sm">
-        <span className="text-ink-muted">Name</span>
+        <span className="text-ink-muted">{t('form.name')}</span>
         <input className="field w-full" value={name} onChange={(event) => setName(event.target.value)} required />
       </label>
       <label className="block space-y-1 text-sm">
-        <span className="text-ink-muted">Task</span>
+        <span className="text-ink-muted">{t('form.task')}</span>
         <textarea className="field min-h-28 w-full" value={task} onChange={(event) => setTask(event.target.value)} required />
       </label>
       <div>
-        <p className="text-sm text-ink-muted">Schedule</p>
+        <p className="text-sm text-ink-muted">{t('form.schedule')}</p>
         <p className="mt-1 text-sm text-ink">{summary}</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block space-y-1 text-sm">
-          <span className="text-ink-muted">Repeats</span>
+          <span className="text-ink-muted">{t('form.repeats')}</span>
           <select
             className="field w-full"
             value={schedule.kind}
             onChange={(event) => setSchedule(changeKind(schedule, event.target.value as AutomationSchedule['kind']))}
           >
-            <option value="daily">Every day</option>
-            <option value="weekly">Every week</option>
-            <option value="interval">On an interval</option>
-            <option value="once">Once</option>
+            <option value="daily">{t('form.kinds.daily')}</option>
+            <option value="weekly">{t('form.kinds.weekly')}</option>
+            <option value="interval">{t('form.kinds.interval')}</option>
+            <option value="once">{t('form.kinds.once')}</option>
           </select>
         </label>
         <ScheduleFields schedule={schedule} onChange={setSchedule} />
       </div>
       <fieldset className="space-y-2">
-        <legend className="text-sm text-ink-muted">Notify me</legend>
+        <legend className="text-sm text-ink-muted">{t('form.notifyMe')}</legend>
         {NOTIFY_CHOICES.map((choice) => (
-          <label key={choice.mode} className="flex items-center gap-2 text-sm text-ink">
-            <input
-              type="radio"
-              name="notify"
-              checked={mode === choice.mode}
-              onChange={() => setMode(choice.mode)}
-            />
-            {choice.label}
+          <label key={choice} className="flex items-center gap-2 text-sm text-ink">
+            <input type="radio" name="notify" checked={mode === choice} onChange={() => setMode(choice)} />
+            {t(`form.notifyChoices.${choice}`)}
           </label>
         ))}
-        <p className="text-xs text-ink-faint">Notices go to the bell in Yggdrasil and, if Settings allow, to this computer's notifications.</p>
+        <p className="text-xs text-ink-faint">{t('form.noticesGo')}</p>
       </fieldset>
       {mode === 'condition' && (
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="block space-y-1 text-sm">
-            <span className="text-ink-muted">Condition</span>
+            <span className="text-ink-muted">{t('form.condition')}</span>
             <select
               className="field w-full"
               value={conditionKind}
               onChange={(event) => setConditionKind(event.target.value as 'threshold' | 'available' | 'significant')}
             >
-              <option value="threshold">Price</option>
-              <option value="available">Becomes available</option>
-              <option value="significant">Significant result</option>
+              <option value="threshold">{t('form.conditions.threshold')}</option>
+              <option value="available">{t('form.conditions.available')}</option>
+              <option value="significant">{t('form.conditions.significant')}</option>
             </select>
           </label>
           {conditionKind === 'threshold' && (
             <>
               <label className="block space-y-1 text-sm">
-                <span className="text-ink-muted">Price is</span>
+                <span className="text-ink-muted">{t('form.priceIs')}</span>
                 <select className="field w-full" value={op} onChange={(event) => setOp(event.target.value as 'below' | 'above')}>
-                  <option value="below">below</option>
-                  <option value="above">above</option>
+                  <option value="below">{t('form.below')}</option>
+                  <option value="above">{t('form.above')}</option>
                 </select>
               </label>
               <label className="block space-y-1 text-sm sm:col-span-2">
-                <span className="text-ink-muted">Amount</span>
+                <span className="text-ink-muted">{t('form.amount')}</span>
                 <input className="field w-full" inputMode="decimal" value={value} onChange={(event) => setValue(event.target.value)} required />
               </label>
             </>
@@ -265,13 +256,13 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
         </div>
       )}
       <p className="text-sm text-ink">{notificationLabel(previewNotification(mode, conditionKind, op, value))}</p>
-      {installed.length === 0 && <p className="text-sm text-danger">Install a model before creating an automation.</p>}
+      {installed.length === 0 && <p className="text-sm text-danger">{t('form.installModel')}</p>}
       <details ref={advancedRef} className="space-y-3">
-        <summary className="cursor-pointer text-sm text-ink-muted">Advanced</summary>
+        <summary className="cursor-pointer text-sm text-ink-muted">{t('form.advanced')}</summary>
         <label className="block space-y-1 text-sm">
-          <span className="text-ink-muted">Profile</span>
+          <span className="text-ink-muted">{t('form.profile')}</span>
           <select className="field w-full" value={profileID} onChange={(event) => setProfileID(event.target.value)}>
-            {profiles.length === 0 && <option value="">No profiles yet</option>}
+            {profiles.length === 0 && <option value="">{t('form.noProfiles')}</option>}
             {profiles.map((profile) => (
               <option key={profile.id} value={profile.id}>
                 {profile.name}
@@ -280,10 +271,10 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
           </select>
         </label>
         <label className="block space-y-1 text-sm">
-          <span className="text-ink-muted">Model</span>
+          <span className="text-ink-muted">{t('form.model')}</span>
           <select className="field w-full" value={modelID} onChange={(event) => setModelID(event.target.value)} required>
-            {installed.length === 0 && <option value="">Install a model first</option>}
-            {installed.length > 0 && <option value="auto">Auto (Yggdrasil picks for each run)</option>}
+            {installed.length === 0 && <option value="">{t('form.installFirst')}</option>}
+            {installed.length > 0 && <option value="auto">{t('form.auto')}</option>}
             {installed.map((model) => (
               <option key={model.id} value={model.id}>
                 {model.display_name || model.id}
@@ -292,7 +283,7 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
           </select>
         </label>
         <label className="block space-y-1 text-sm">
-          <span className="text-ink-muted">Time zone</span>
+          <span className="text-ink-muted">{t('form.timeZone')}</span>
           <input
             className="field w-full"
             value={schedule.time_zone}
@@ -301,17 +292,11 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
           />
         </label>
         {mode === 'condition' && (
-          <p className="text-xs text-ink-faint">
-            Yggdrasil checks the result against this condition. The task itself stays in ordinary language.
-          </p>
+          <p className="text-xs text-ink-faint">{t('form.conditionHint')}</p>
         )}
         <fieldset className="space-y-2">
-          <legend className="text-sm text-ink-muted">Tools it may use while you're away</legend>
-          <p className="text-xs text-ink-faint">
-            Approve what this automation needs now; nobody will be around to answer later. If it reaches a tool you
-            didn't approve, it skips it and you get a notification. Leave everything unchecked to use only the read-only
-            tools the profile allows.
-          </p>
+          <legend className="text-sm text-ink-muted">{t('form.tools')}</legend>
+          <p className="text-xs text-ink-faint">{t('form.toolsHint')}</p>
           <div className="grid gap-2 sm:grid-cols-2">
             {lookTools.map((tool) => (
               <label key={tool.id} className="flex items-start gap-2 text-sm text-ink">
@@ -334,8 +319,8 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
           </div>
           {changeTools.length > 0 && (
             <div className="rounded-lg border border-warning/30 bg-warning/5 p-3">
-              <p className="text-xs font-medium text-ink">These change things on this computer</p>
-              <p className="mb-2 text-xs text-ink-faint">Approve one only if this automation needs it. It will run without asking.</p>
+              <p className="text-xs font-medium text-ink">{t('form.changeTools')}</p>
+              <p className="mb-2 text-xs text-ink-faint">{t('form.changeToolsHint')}</p>
             <div className="grid gap-2 sm:grid-cols-2">
               {changeTools.map((tool) => (
                 <label key={tool.id} className="flex items-start gap-2 text-sm text-ink">
@@ -363,22 +348,22 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
       {previewError && <p className="text-sm text-danger">{previewError}</p>}
       {preview && (
         <div className="rounded-lg bg-raised/50 p-3 text-sm">
-          <p className="font-medium text-ink">{testing ? 'Testing automation…' : preview.error ? 'The test did not finish' : preview.would_notify ? 'A notice would be sent' : 'A notice would not be sent'}</p>
+          <p className="font-medium text-ink">{testing ? t('form.testing') : preview.error ? t('form.testFailed') : preview.would_notify ? t('form.wouldNotify') : t('form.wouldNotNotify')}</p>
           {resultProse(preview.result) && <p className="mt-2 whitespace-pre-wrap text-ink-muted">{resultProse(preview.result)}</p>}
           {preview.error && <p className="mt-2 text-danger">{preview.error}</p>}
         </div>
       )}
-      {testing && !preview && <p className="text-sm text-ink-muted">Testing automation…</p>}
+      {testing && !preview && <p className="text-sm text-ink-muted">{t('form.testing')}</p>}
       {error && <p className="text-sm text-danger">{error}</p>}
       <div className="flex flex-wrap gap-2">
         <button type="button" className="btn-secondary px-3 py-1.5 text-xs" disabled={testing || pending || !modelID || !task.trim()} onClick={() => void testDraft()}>
-          {testing ? 'Testing…' : 'Test run'}
+          {testing ? t('form.testingShort') : t('form.testRun')}
         </button>
         <button type="submit" className="btn-primary px-3 py-1.5 text-xs" disabled={pending || testing || profiles.length === 0 || !modelID || !task.trim()}>
-          {pending ? 'Saving…' : initial ? 'Save changes' : 'Create automation'}
+          {pending ? t('form.saving') : initial ? t('form.saveChanges') : t('form.create')}
         </button>
         <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={onCancel}>
-          Cancel
+          {t('form.cancel')}
         </button>
       </div>
     </form>
@@ -392,12 +377,13 @@ function ScheduleFields({
   schedule: AutomationSchedule
   onChange: (schedule: AutomationSchedule) => void
 }) {
+  const { t } = useTranslation('automations')
   if (schedule.kind === 'interval') {
     const { amount, unit } = splitInterval(schedule.every_seconds ?? 6 * 3600)
     return (
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block space-y-1 text-sm">
-          <span className="text-ink-muted">Every</span>
+          <span className="text-ink-muted">{t('form.every')}</span>
           <input
             className="field w-full"
             type="number"
@@ -407,7 +393,7 @@ function ScheduleFields({
           />
         </label>
         <label className="block space-y-1 text-sm">
-          <span className="text-ink-muted">Unit</span>
+          <span className="text-ink-muted">{t('form.unit')}</span>
           <select
             className="field w-full"
             value={unit}
@@ -416,9 +402,9 @@ function ScheduleFields({
               onChange({ ...schedule, every_seconds: amount * unitSeconds(next) })
             }}
           >
-            <option value="minutes">minutes</option>
-            <option value="hours">hours</option>
-            <option value="days">days</option>
+            <option value="minutes">{t('form.units.minutes')}</option>
+            <option value="hours">{t('form.units.hours')}</option>
+            <option value="days">{t('form.units.days')}</option>
           </select>
         </label>
       </div>
@@ -427,7 +413,7 @@ function ScheduleFields({
   if (schedule.kind === 'once') {
     return (
       <label className="block space-y-1 text-sm">
-        <span className="text-ink-muted">When</span>
+        <span className="text-ink-muted">{t('form.when')}</span>
         <input
           className="field w-full"
           type="datetime-local"
@@ -441,7 +427,7 @@ function ScheduleFields({
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       <label className="block space-y-1 text-sm">
-        <span className="text-ink-muted">Time</span>
+        <span className="text-ink-muted">{t('form.time')}</span>
         <input
           className="field w-full"
           type="time"
@@ -455,15 +441,15 @@ function ScheduleFields({
       </label>
       {schedule.kind === 'weekly' && (
         <label className="block space-y-1 text-sm">
-          <span className="text-ink-muted">Day</span>
+          <span className="text-ink-muted">{t('form.day')}</span>
           <select
             className="field w-full"
             value={schedule.weekday ?? 1}
             onChange={(event) => onChange({ ...schedule, weekday: Number(event.target.value) })}
           >
-            {WEEKDAYS.map((day, index) => (
-              <option key={day} value={index}>
-                {day}
+            {[0, 1, 2, 3, 4, 5, 6].map((index) => (
+              <option key={index} value={index}>
+                {weekdayName(index)}
               </option>
             ))}
           </select>

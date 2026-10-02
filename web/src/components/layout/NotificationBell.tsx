@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+import i18n from '@/i18n'
 import { api } from '@/lib/api'
 import { subscribeEvents } from '@/lib/events'
 import type { AppNotification, NotificationCategory, NotificationList } from '@/types/api'
-import { CATEGORY_LABEL, deliveryNote } from '@/features/settings/notificationLabels'
+import { CATEGORIES, categoryLabel, deliveryNote } from '@/features/settings/notificationLabels'
 
 const KEY = ['notifications'] as const
 const WIDTH = 352
@@ -20,11 +22,11 @@ const SEVERITY_DOT: Record<AppNotification['severity'], string> = {
 
 function ago(iso: string): string {
   const seconds = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 1000))
-  if (seconds < 60) return 'just now'
+  if (seconds < 60) return i18n.t('notifications:bell.justNow')
   const minutes = Math.round(seconds / 60)
-  if (minutes < 60) return `${minutes} min ago`
+  if (minutes < 60) return i18n.t('notifications:bell.minutesAgo', { count: minutes })
   const hours = Math.round(minutes / 60)
-  if (hours < 24) return `${hours} h ago`
+  if (hours < 24) return i18n.t('notifications:bell.hoursAgo', { count: hours })
   return new Date(iso).toLocaleDateString()
 }
 
@@ -34,6 +36,7 @@ function ago(iso: string): string {
  * closed are here too. It refreshes when the daemon announces a new one.
  */
 export function NotificationBell() {
+  const { t } = useTranslation('notifications')
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
@@ -50,7 +53,7 @@ export function NotificationBell() {
     retry: false,
   })
   const all = query.data?.notifications ?? []
-  const present = (Object.keys(CATEGORY_LABEL) as NotificationCategory[]).filter((c) => all.some((n) => n.category === c))
+  const present = CATEGORIES.filter((c) => all.some((n) => n.category === c))
   const notifications = category ? all.filter((n) => n.category === category) : all
   const unread = query.data?.unread ?? 0
 
@@ -112,8 +115,8 @@ export function NotificationBell() {
       }
     }
     const onDown = (e: MouseEvent) => {
-      const t = e.target as Node
-      if (!panel.current?.contains(t) && !button.current?.contains(t)) setOpen(false)
+      const target = e.target as Node
+      if (!panel.current?.contains(target) && !button.current?.contains(target)) setOpen(false)
     }
     document.addEventListener('keydown', onKey)
     document.addEventListener('mousedown', onDown)
@@ -137,7 +140,7 @@ export function NotificationBell() {
         ref={button}
         type="button"
         className="relative rounded-md p-1.5 text-ink-muted transition-colors hover:bg-raised hover:text-ink"
-        aria-label={unread > 0 ? `Notifications, ${unread} unread` : 'Notifications'}
+        aria-label={unread > 0 ? t('bell.labelUnread', { count: unread }) : t('bell.label')}
         aria-expanded={open}
         aria-haspopup="dialog"
         onClick={() => setOpen((v) => !v)}
@@ -158,23 +161,23 @@ export function NotificationBell() {
           <div
             ref={panel}
             role="dialog"
-            aria-label="Notifications"
+            aria-label={t('bell.title')}
             className="fixed z-50 flex max-h-[70vh] flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-lg"
             style={{ left: place?.left ?? EDGE, top: place?.top ?? EDGE, width: Math.min(WIDTH, window.innerWidth - EDGE * 2) }}
           >
             <div className="flex items-center justify-between gap-2 border-b border-line/60 px-4 py-3">
               <div>
-                <p className="text-sm font-semibold text-ink">Notifications</p>
+                <p className="text-sm font-semibold text-ink">{t('bell.title')}</p>
                 <p className="text-[11px] text-ink-faint">Gjallarhorn</p>
               </div>
               {unread > 0 && (
                 <button type="button" className="text-xs text-primary hover:underline" onClick={() => markRead.mutate([])}>
-                  Mark all read
+                  {t('bell.markAllRead')}
                 </button>
               )}
             </div>
             {present.length > 1 && (
-              <div className="flex flex-wrap gap-1 border-b border-line/60 px-3 py-2" role="group" aria-label="Filter by category">
+              <div className="flex flex-wrap gap-1 border-b border-line/60 px-3 py-2" role="group" aria-label={t('bell.filter')}>
                 {(['', ...present] as ('' | NotificationCategory)[]).map((c) => (
                   <button
                     key={c || 'all'}
@@ -186,7 +189,7 @@ export function NotificationBell() {
                     ].join(' ')}
                     onClick={() => setCategory(c)}
                   >
-                    {c ? CATEGORY_LABEL[c] : 'All'}
+                    {c ? categoryLabel(c) : t('bell.all')}
                   </button>
                 ))}
               </div>
@@ -194,7 +197,7 @@ export function NotificationBell() {
             <ul className="min-h-0 flex-1 overflow-y-auto">
               {notifications.length === 0 && (
                 <li className="px-4 py-8 text-center text-sm text-ink-faint">
-                  Nothing yet. Finished automations, downloads, and anything that needs you will show up here.
+                  {t('bell.empty')}
                 </li>
               )}
               {notifications.map((n) => (
@@ -203,19 +206,19 @@ export function NotificationBell() {
                   <button type="button" className="min-w-0 flex-1 text-left" onClick={() => openItem(n)}>
                     <p className={['text-sm text-ink', n.read_at ? '' : 'font-semibold'].join(' ')}>
                       {n.title}
-                      {(n.repeat_count ?? 1) > 1 && <span className="font-normal text-ink-muted"> · {n.repeat_count} times</span>}
+                      {(n.repeat_count ?? 1) > 1 && <span className="font-normal text-ink-muted"> · {t('bell.times', { count: n.repeat_count })}</span>}
                     </p>
                     {n.body && <p className="mt-0.5 line-clamp-3 text-xs text-ink-muted">{n.body}</p>}
                     <p className="mt-1 text-[11px] text-ink-faint">
                       {ago(n.created_at)}
                       {deliveryNote(n) && <span> · {deliveryNote(n)}</span>}
-                      {!n.read_at && <span className="sr-only"> · unread</span>}
+                      {!n.read_at && <span className="sr-only"> · {t('bell.unread')}</span>}
                     </p>
                   </button>
                   <button
                     type="button"
                     className="self-start rounded p-1 text-ink-faint opacity-60 hover:bg-raised hover:text-ink group-hover:opacity-100"
-                    aria-label={`Dismiss ${n.title}`}
+                    aria-label={t('bell.dismiss', { title: n.title })}
                     onClick={() => dismiss.mutate(n.id)}
                   >
                     ×

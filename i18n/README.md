@@ -18,6 +18,11 @@ i18n/
     models.json             the Models page and what Chat says about a model
     computers.json          the Computers page
     performance.json        the Performance page
+    automations.json        Automations and their schedules
+    notifications.json      the bell, desktop notices, and email, push, and webhooks
+    tools.json              the Tools page and tool sources
+    services.json           connected services
+    apiAccess.json          the API Access page
 ```
 
 The desktop app's shell copies this folder when it builds and reads

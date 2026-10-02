@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import i18n from '@/i18n'
 import { api } from '@/lib/api'
 import { subscribeEvents } from '@/lib/events'
 
@@ -91,20 +92,20 @@ export function NotificationHost() {
       onEvent: (event) => {
         if (!ready.current) return
         if (notifyTask && event.type === 'task.completed') {
-          void sendNotice('Task finished', 'Yggdrasil finished a background task.')
+          void sendNotice(i18n.t('notifications:desktop.taskFinished'), i18n.t('notifications:desktop.taskFinishedBody'))
         }
         if (notifyTask && event.type === 'task.failed') {
           const msg =
             (event.payload?.error as string | undefined) ||
-            'A background task failed.'
-          void sendNotice('Task failed', msg)
+            i18n.t('notifications:desktop.taskFailedBody')
+          void sendNotice(i18n.t('notifications:desktop.taskFailed'), msg)
         }
         if (notifyPeer && event.type === 'node.offline') {
           const name =
             (event.payload?.name as string | undefined) ||
             (event.payload?.node_name as string | undefined) ||
-            'A paired computer'
-          void sendNotice('Computer offline', `${name} is no longer responding.`)
+            i18n.t('notifications:desktop.pairedComputer')
+          void sendNotice(i18n.t('notifications:desktop.computerOffline'), i18n.t('notifications:desktop.computerOfflineBody', { name }))
         }
       },
     })

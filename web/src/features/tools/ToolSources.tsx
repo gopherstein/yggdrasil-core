@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Toggle } from '@/components/ui/Toggle'
 import { api } from '@/lib/api'
@@ -14,6 +15,7 @@ import { errorText, openSignIn, quoteArg, SOURCES_KEY, specSummary, splitArgs, s
  * install what it needs.
  */
 export function ToolSources() {
+  const { t } = useTranslation('tools')
   const queryClient = useQueryClient()
   const [adding, setAdding] = useState(false)
   const sources = useQuery({
@@ -39,15 +41,12 @@ export function ToolSources() {
     <div className="space-y-3">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className="section-title">Tool sources</h2>
-          <p className="mt-1 max-w-2xl text-sm text-ink-muted">
-            Apps and services the AI can use, from the gallery or any MCP server. Ones on this computer start when a tool
-            is needed and stop when idle.
-          </p>
+          <h2 className="section-title">{t('sources.title')}</h2>
+          <p className="mt-1 max-w-2xl text-sm text-ink-muted">{t('sources.description')}</p>
         </div>
         {!adding && (
           <button type="button" className="btn-primary px-3 py-1.5 text-xs" onClick={() => setAdding(true)}>
-            Add tools
+            {t('sources.add')}
           </button>
         )}
       </div>
@@ -59,8 +58,7 @@ export function ToolSources() {
           className="card-outline w-full text-left text-sm text-ink-muted hover:bg-raised/40"
           onClick={() => setAdding(true)}
         >
-          No tool sources yet. Add Notion, Linear, a browser, folders on this computer, or any MCP server — most take one
-          click.
+          {t('sources.empty')}
         </button>
       )}
       <ul className="space-y-2">
@@ -110,6 +108,7 @@ function useSourceMutations(source: MCPServer) {
 }
 
 function SourceCard({ source }: { source: MCPServer }) {
+  const { t } = useTranslation('tools')
   const [open, setOpen] = useState(false)
   const m = useSourceMutations(source)
   const status = statusOf(source)
@@ -121,7 +120,7 @@ function SourceCard({ source }: { source: MCPServer }) {
           <span className="flex items-center gap-2">
             <span className={['h-2 w-2 shrink-0 rounded-full', toneClass[status.tone]].join(' ')} aria-hidden />
             <span className="truncate font-medium text-ink">{source.name}</span>
-            <span className="text-[11px] text-ink-faint">{source.where === 'remote' ? 'on the web' : 'on this computer'}</span>
+            <span className="text-[11px] text-ink-faint">{source.where === 'remote' ? t('sources.onWeb') : t('sources.onComputer')}</span>
           </span>
           {source.description && <span className="mt-0.5 block text-xs text-ink-muted">{source.description}</span>}
           <span className={['mt-1 block text-xs', status.tone === 'bad' ? 'text-danger' : 'text-ink-faint'].join(' ')}>
@@ -130,7 +129,7 @@ function SourceCard({ source }: { source: MCPServer }) {
         </button>
         <Toggle
           checked={source.enabled}
-          label={source.enabled ? `Turn off ${source.name}` : `Turn on ${source.name}`}
+          label={t(source.enabled ? 'sources.turnOff' : 'sources.turnOn', { name: source.name })}
           disabled={m.update.isPending}
           onChange={() => m.update.mutate({ enabled: !source.enabled })}
         />
@@ -140,15 +139,15 @@ function SourceCard({ source }: { source: MCPServer }) {
         <div className="flex flex-wrap gap-2">
           {source.status === 'sign_in' && (
             <button type="button" className="btn-primary px-3 py-1.5 text-xs" disabled={m.signIn.isPending} onClick={startSignIn}>
-              Sign in to {source.name}
+              {t('sources.signInTo', { name: source.name })}
             </button>
           )}
           <button type="button" className="btn-secondary px-3 py-1.5 text-xs" disabled={m.check.isPending} onClick={() => m.check.mutate()}>
-            {m.check.isPending ? 'Checking…' : 'Check again'}
+            {m.check.isPending ? t('sources.checking') : t('sources.checkAgain')}
           </button>
           {source.status === 'error' && (
             <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={() => setOpen(true)}>
-              See the log
+              {t('sources.seeLog')}
             </button>
           )}
         </div>
@@ -162,6 +161,7 @@ function SourceCard({ source }: { source: MCPServer }) {
 type Mutations = ReturnType<typeof useSourceMutations>
 
 function SourceDetails({ source, m, onSignIn }: { source: MCPServer; m: Mutations; onSignIn: () => void }) {
+  const { t } = useTranslation('tools')
   const [editing, setEditing] = useState(false)
   const [confirmRemove, setConfirmRemove] = useState(false)
   const [keywords, setKeywords] = useState(source.keywords.join(', '))
@@ -169,37 +169,37 @@ function SourceDetails({ source, m, onSignIn }: { source: MCPServer; m: Mutation
     <div className="space-y-4 border-t border-line/50 pt-3">
       {source.tools.length > 0 && (
         <div className="space-y-1.5">
-          <p className="label-caps">Tools</p>
+          <p className="label-caps">{t('sources.tools')}</p>
           <ul className="divide-y divide-line/40">
-            {source.tools.map((t) => (
-              <li key={t.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-1.5">
+            {source.tools.map((tool) => (
+              <li key={tool.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-1.5">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-ink">
-                    {t.name}{' '}
-                    <span className={['status-chip', t.risk === 'read' ? 'bg-raised text-ink-muted' : 'bg-warning/15 text-warning'].join(' ')}>
-                      {t.risk === 'read' ? 'reads' : 'changes things'}
+                    {tool.name}{' '}
+                    <span className={['status-chip', tool.risk === 'read' ? 'bg-raised text-ink-muted' : 'bg-warning/15 text-warning'].join(' ')}>
+                      {tool.risk === 'read' ? t('sources.reads') : t('sources.changes')}
                     </span>
                   </p>
-                  {t.description && <p className="line-clamp-2 text-xs text-ink-faint">{t.description}</p>}
+                  {tool.description && <p className="line-clamp-2 text-xs text-ink-faint">{tool.description}</p>}
                 </div>
-                {t.remote_name && (
+                {tool.remote_name && (
                   <label className="flex items-center gap-1.5 text-xs text-ink-muted">
                     <input
                       type="checkbox"
-                      checked={t.policy === 'ask'}
+                      checked={tool.policy === 'ask'}
                       disabled={m.update.isPending}
                       onChange={(e) =>
-                        m.update.mutate({ policies: { [t.remote_name]: e.target.checked ? 'ask' : 'allow' } })
+                        m.update.mutate({ policies: { [tool.remote_name]: e.target.checked ? 'ask' : 'allow' } })
                       }
                     />
-                    Ask first
+                    {t('sources.askFirst')}
                   </label>
                 )}
                 <Toggle
-                  checked={t.enabled}
-                  label={t.enabled ? `Turn off ${t.name}` : `Turn on ${t.name}`}
+                  checked={tool.enabled}
+                  label={t(tool.enabled ? 'sources.turnOff' : 'sources.turnOn', { name: tool.name })}
                   disabled={m.toggleTool.isPending}
-                  onChange={() => m.toggleTool.mutate({ id: t.id, enabled: !t.enabled })}
+                  onChange={() => m.toggleTool.mutate({ id: tool.id, enabled: !tool.enabled })}
                 />
               </li>
             ))}
@@ -208,17 +208,17 @@ function SourceDetails({ source, m, onSignIn }: { source: MCPServer; m: Mutation
       )}
 
       <div className="space-y-2">
-        <p className="label-caps">When the AI uses it</p>
+        <p className="label-caps">{t('sources.whenUsed')}</p>
         <SettingRow
-          title="Offer it in every chat"
-          help="Normally it is offered when a message mentions it or its subject. Turn on for tools you want always at hand."
+          title={t('sources.alwaysOffer')}
+          help={t('sources.alwaysOfferHelp')}
           checked={source.always_offer}
           disabled={m.update.isPending}
           onChange={() => m.update.mutate({ always_offer: !source.always_offer })}
         />
         <SettingRow
-          title="Let it ask your AI for help"
-          help="Some servers ask the AI to summarize or write as part of a tool. It uses a model on your computers."
+          title={t('sources.sampling')}
+          help={t('sources.samplingHelp')}
           checked={source.allow_sampling}
           disabled={m.update.isPending}
           onChange={() => m.update.mutate({ allow_sampling: !source.allow_sampling })}
@@ -231,11 +231,11 @@ function SourceDetails({ source, m, onSignIn }: { source: MCPServer; m: Mutation
           }}
         >
           <label className="block min-w-[14rem] flex-1 text-sm">
-            <span className="text-ink-muted">Words that mean a message is about it</span>
-            <input className="field mt-1 w-full" value={keywords} placeholder="invoices, customers" onChange={(e) => setKeywords(e.target.value)} />
+            <span className="text-ink-muted">{t('sources.keywords')}</span>
+            <input className="field mt-1 w-full" value={keywords} placeholder={t('sources.keywordsPlaceholder')} onChange={(e) => setKeywords(e.target.value)} />
           </label>
           <button type="submit" className="btn-secondary px-3 py-1.5 text-xs" disabled={m.update.isPending}>
-            Save
+            {t('sources.save')}
           </button>
         </form>
       </div>
@@ -244,13 +244,13 @@ function SourceDetails({ source, m, onSignIn }: { source: MCPServer; m: Mutation
       <SourceLog id={source.id} />
 
       <div className="space-y-2">
-        <p className="label-caps">Connection</p>
+        <p className="label-caps">{t('sources.connection')}</p>
         <p className="break-anywhere font-mono text-[11px] text-ink-muted">{specSummary(source)}</p>
         {(source.env.length > 0 || source.headers.length > 0) && (
           <ul className="font-mono text-[11px] text-ink-faint">
             {[...source.env, ...source.headers].map((v) => (
               <li key={v.key}>
-                {v.key} = {v.value || '(blank)'}
+                {v.key} = {v.value || t('sources.blank')}
               </li>
             ))}
           </ul>
@@ -262,33 +262,33 @@ function SourceDetails({ source, m, onSignIn }: { source: MCPServer; m: Mutation
         )}
         <div className="flex flex-wrap gap-2">
           <button type="button" className="btn-secondary px-3 py-1.5 text-xs" disabled={m.check.isPending} onClick={() => m.check.mutate()}>
-            {m.check.isPending ? 'Checking…' : 'Check'}
+            {m.check.isPending ? t('sources.checking') : t('sources.check')}
           </button>
           <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={() => setEditing((v) => !v)}>
-            {editing ? 'Cancel editing' : 'Edit'}
+            {editing ? t('sources.cancelEdit') : t('sources.edit')}
           </button>
           {source.where === 'remote' &&
             (source.signed_in ? (
               <button type="button" className="btn-secondary px-3 py-1.5 text-xs" disabled={m.signOut.isPending} onClick={() => m.signOut.mutate()}>
-                Sign out
+                {t('sources.signOut')}
               </button>
             ) : (
               <button type="button" className="btn-secondary px-3 py-1.5 text-xs" disabled={m.signIn.isPending} onClick={onSignIn}>
-                Sign in
+                {t('sources.signIn')}
               </button>
             ))}
           {confirmRemove ? (
             <>
               <button type="button" className="btn-danger px-3 py-1.5 text-xs" disabled={m.remove.isPending} onClick={() => m.remove.mutate()}>
-                Remove {source.name} and its tools
+                {t('sources.removeAll', { name: source.name })}
               </button>
               <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={() => setConfirmRemove(false)}>
-                Keep it
+                {t('sources.keep')}
               </button>
             </>
           ) : (
             <button type="button" className="btn-danger px-3 py-1.5 text-xs" onClick={() => setConfirmRemove(true)}>
-              Remove
+              {t('sources.remove')}
             </button>
           )}
         </div>
@@ -324,6 +324,7 @@ function SettingRow({
 
 /** A source's ready-made prompts, which start a chat. */
 function Prompts({ source }: { source: MCPServer }) {
+  const { t } = useTranslation('tools')
   const navigate = useNavigate()
   const prompts = useQuery({ queryKey: ['mcp-prompts', source.id], queryFn: () => api.mcpServerPrompts(source.id), retry: false })
   const [chosen, setChosen] = useState<MCPPrompt | null>(null)
@@ -335,7 +336,7 @@ function Prompts({ source }: { source: MCPServer }) {
   if (!prompts.data?.length) return null
   return (
     <div className="space-y-2">
-      <p className="label-caps">Ready-made prompts</p>
+      <p className="label-caps">{t('sources.prompts')}</p>
       <div className="flex flex-wrap gap-1.5">
         {prompts.data.map((p) => (
           <button
@@ -365,7 +366,7 @@ function Prompts({ source }: { source: MCPServer }) {
             <label key={a.name} className="block text-sm">
               <span className="text-ink-muted">
                 {a.description || a.name}
-                {!a.required && <span className="text-ink-faint"> (optional)</span>}
+                {!a.required && <span className="text-ink-faint">{t('sources.optional')}</span>}
               </span>
               <input className="field mt-1 w-full" value={args[a.name] ?? ''} onChange={(e) => setArgs((c) => ({ ...c, [a.name]: e.target.value }))} />
             </label>
@@ -375,7 +376,7 @@ function Prompts({ source }: { source: MCPServer }) {
             className="btn-primary px-3 py-1.5 text-xs"
             disabled={use.isPending || (chosen.arguments ?? []).some((a) => a.required && !args[a.name]?.trim())}
           >
-            Start a chat with it
+            {t('sources.startChat')}
           </button>
         </form>
       )}
@@ -385,17 +386,18 @@ function Prompts({ source }: { source: MCPServer }) {
 }
 
 function SourceLog({ id }: { id: string }) {
+  const { t } = useTranslation('tools')
   const [open, setOpen] = useState(false)
   const logs = useQuery({ queryKey: ['mcp-logs', id], queryFn: () => api.mcpServerLogs(id), enabled: open, refetchInterval: open ? 4000 : false })
   return (
     <div className="space-y-1.5">
       <button type="button" className="label-caps hover:text-ink" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-        {open ? '▾' : '▸'} Log
+        {open ? '▾' : '▸'} {t('sources.log')}
       </button>
       {open && (
         <pre className="log-panel max-h-56 text-[11px]">
           {(logs.data ?? []).length === 0
-            ? 'Nothing yet.'
+            ? t('sources.logEmpty')
             : (logs.data ?? []).map((l) => `${new Date(l.at).toLocaleTimeString()}  ${l.level.padEnd(6)} ${l.text}`).join('\n')}
         </pre>
       )}
@@ -405,6 +407,7 @@ function SourceLog({ id }: { id: string }) {
 
 /** Changing a source's command, address, or values. Secrets left blank are kept. */
 function EditSource({ source, onDone }: { source: MCPServer; onDone: () => void }) {
+  const { t } = useTranslation('tools')
   const queryClient = useQueryClient()
   const [name, setName] = useState(source.name)
   // Secret arguments show masked and keep their place; left as they are,
@@ -442,17 +445,17 @@ function EditSource({ source, onDone }: { source: MCPServer; onDone: () => void 
       }}
     >
       <label className="block text-sm">
-        <span className="text-ink-muted">Name</span>
+        <span className="text-ink-muted">{t('sources.name')}</span>
         <input className="field mt-1 w-full" value={name} onChange={(e) => setName(e.target.value)} />
       </label>
       {source.where === 'remote' ? (
         <label className="block text-sm">
-          <span className="text-ink-muted">Address</span>
+          <span className="text-ink-muted">{t('sources.address')}</span>
           <input className="field mt-1 w-full font-mono text-xs" value={url} onChange={(e) => setURL(e.target.value)} />
         </label>
       ) : (
         <label className="block text-sm">
-          <span className="text-ink-muted">Command</span>
+          <span className="text-ink-muted">{t('sources.command')}</span>
           <input className="field mt-1 w-full font-mono text-xs" value={command} spellCheck={false} onChange={(e) => setCommand(e.target.value)} />
         </label>
       )}
@@ -463,7 +466,7 @@ function EditSource({ source, onDone }: { source: MCPServer; onDone: () => void 
             className="field mt-1 w-full"
             type={v.secret ? 'password' : 'text'}
             autoComplete="off"
-            placeholder={v.secret ? `Stored (${v.value}). Leave blank to keep it.` : undefined}
+            placeholder={v.secret ? t('sources.stored', { value: v.value }) : undefined}
             value={values[v.key] ?? ''}
             onChange={(e) => setValues((c) => ({ ...c, [v.key]: e.target.value }))}
           />
@@ -476,7 +479,7 @@ function EditSource({ source, onDone }: { source: MCPServer; onDone: () => void 
             className="field mt-1 w-full"
             type="password"
             autoComplete="off"
-            placeholder={`Stored (${v.value}). Leave blank to keep it.`}
+            placeholder={t('sources.stored', { value: v.value })}
             value={values[`header:${v.key}`] ?? ''}
             onChange={(e) => setValues((c) => ({ ...c, [`header:${v.key}`]: e.target.value }))}
           />
@@ -484,7 +487,7 @@ function EditSource({ source, onDone }: { source: MCPServer; onDone: () => void 
       ))}
       {save.isError && <p className="text-xs text-danger">{errorText(save.error)}</p>}
       <button type="submit" className="btn-primary px-3 py-1.5 text-xs" disabled={save.isPending}>
-        {save.isPending ? 'Checking…' : 'Save and check'}
+        {save.isPending ? t('sources.checking') : t('sources.saveAndCheck')}
       </button>
     </form>
   )

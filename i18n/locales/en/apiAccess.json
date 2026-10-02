@@ -1,0 +1,123 @@
+{
+  "page": {
+    "title": "API Access",
+    "subtitle": "Where Yggdrasil's API is reachable, and how it is secured.",
+    "loading": "Loading API settings…"
+  },
+  "probe": {
+    "notReady": "Health check responded, but the service is not ready.",
+    "unreachable": "Could not reach the API on this computer.",
+    "openaiDown": "Service is up, but the OpenAI-compatible endpoint did not respond.",
+    "passed": "Local check passed.",
+    "openaiStatus": "OpenAI endpoint returned HTTP {{status}}.",
+    "openaiNoResponse": "OpenAI endpoint did not respond.",
+    "needsKey": "Responding. Other devices need a valid API key.",
+    "checkFailed": "Could not check the API — is the local service running?",
+    "failed": "API check failed."
+  },
+  "service": {
+    "title": "Service",
+    "api": "API service",
+    "running": "Running",
+    "notResponding": "Not responding",
+    "checking": "Checking…",
+    "access": "Access",
+    "localNetwork": "Local network",
+    "thisComputer": "This computer only",
+    "auth": "Authentication",
+    "keyRequired": "API key required",
+    "notRequired": "Not required on this computer",
+    "testing": "Testing…",
+    "test": "Test API",
+    "endpoint": "Endpoint",
+    "localAddress": "Local address: <mono>{{address}}</mono>",
+    "lanEndpoint": "LAN endpoint",
+    "lanHint": "Use this computer's LAN IP with port <mono>{{port}}</mono> (for example <mono>http://192.168.x.x:{{port}}/v1</mono>).",
+    "hideDocs": "Hide API documentation",
+    "docs": "API documentation",
+    "docsBody": "Yggdrasil exposes an OpenAI-compatible API at <mono>/v1</mono>. Point clients at the endpoint above and send <header/> when Yggdrasil is reachable from other computers. `/api/v1` and `/v1` both require that header. A key does not encrypt plain HTTP.",
+    "copied": "Copied",
+    "copyUrl": "Copy URL"
+  },
+  "lan": {
+    "title": "Local network access",
+    "on": "Devices on your local network can connect using an API key.",
+    "off": "Only apps on this computer can use Yggdrasil’s API.",
+    "noKeys": "Network access is on, but there are no API keys yet. Create a key before connecting from another device.",
+    "restart": "After changing network access, fully quit and reopen Yggdrasil so the server rebinds. An API key is required for every connection once the listener is no longer loopback. A key does not encrypt traffic on plain HTTP. Test API only checks this computer — not reachability from other devices.",
+    "confirmTitle": "Allow access from other computers?",
+    "confirmBody": "Devices on your local network will be able to connect to Yggdrasil. An API key is required for all remote connections.",
+    "confirmHttp": "An API key over plain HTTP does not encrypt traffic. Quit and reopen Yggdrasil after enabling this so the server listens on the network.",
+    "browserKey": "Create an API key so this browser can keep connecting after the server rebinds. The full key is shown only once.",
+    "keyName": "Key name",
+    "defaultKeyName": "This computer",
+    "enableFailed": "Could not enable network access.",
+    "cancel": "Cancel",
+    "enabling": "Enabling…",
+    "allow": "Allow access"
+  },
+  "keys": {
+    "title": "API keys",
+    "description": "Credentials for apps and devices that talk to Yggdrasil.",
+    "create": "Create API key",
+    "createHint": "Give this key a name so you know what uses it.",
+    "namePlaceholder": "VS Code",
+    "creating": "Creating…",
+    "createKey": "Create key",
+    "cancel": "Cancel",
+    "copyNow": "Copy this secret now — it won't be shown again",
+    "copiedBang": "Copied!",
+    "copySecret": "Copy secret",
+    "none": "No API keys yet.",
+    "meta": "Created {{created}} · Last used {{lastUsed}}",
+    "copy": "Copy",
+    "confirmRotate": "Rotate “{{name}}”? The old secret stops working immediately.",
+    "rotate": "Rotate",
+    "confirmRevoke": "Revoke “{{name}}”? Apps using this key will lose access.",
+    "revoke": "Revoke"
+  },
+  "advanced": {
+    "title": "Advanced",
+    "bind": "Bind address",
+    "port": "Port",
+    "host": "Configured host"
+  },
+  "permissions": {
+    "summary": "What this key may use",
+    "memories": "Your memories",
+    "knowledge": "Connected knowledge",
+    "tools": "Tools",
+    "use": {
+      "never": "Never",
+      "on_request": "When the request asks",
+      "always": "Always"
+    },
+    "toolChoices": {
+      "profile": "What the profile allows",
+      "read_only": "Read-only tools",
+      "none": "No tools"
+    },
+    "placement": "May choose where requests run",
+    "note": "Requests can ask for less, never more. Over the network these limits always apply; on this computer they apply when the app sends this key.",
+    "saveFailed": "Could not save."
+  },
+  "share": {
+    "title": "Use Yggdrasil in other AI apps",
+    "description": "Apps that support MCP can ask your local AI, list its models, and search your connected knowledge. Answers stay on your computers, and the local AI only uses tools that read.",
+    "other": "Other apps",
+    "settings": "{{language}} settings",
+    "copied": "Copied",
+    "copy": "Copy",
+    "needsKey": "Yggdrasil is open to your network, so apps need an API key. Create one below and put it where the settings say <key/>. The key's permissions apply.",
+    "keyPlaceholder": "<your API key>",
+    "where": {
+      "claudeDesktop": "In Claude Desktop, open Settings → Developer → Edit Config, add this, and restart Claude.",
+      "claudeCode": "Run this in a terminal.",
+      "cursor": "Add this to ~/.cursor/mcp.json (Cursor Settings → MCP → Add new global MCP server).",
+      "vscode": "Run \"MCP: Open User Configuration\" from the Command Palette and add this.",
+      "other": "Apps that connect to MCP servers by address use Streamable HTTP at this address. Apps that start a program use the command instead."
+    },
+    "otherText": "Address: {{url}}\nCommand: {{command}}",
+    "otherHeader": "\nHeader:  Authorization: Bearer {{key}}"
+  }
+}

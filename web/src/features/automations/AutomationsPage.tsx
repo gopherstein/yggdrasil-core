@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
+import i18n from '@/i18n'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { api, ApiError } from '@/lib/api'
 import { subscribeEvents } from '@/lib/events'
@@ -15,6 +17,7 @@ const screenshotSentence =
   'Every morning at 8:00 AM, check this product and tell me if the price is below $500.'
 
 export function AutomationsPage() {
+  const { t } = useTranslation('automations')
   const queryClient = useQueryClient()
   const [searchParams, setSearchParams] = useSearchParams()
   const [selectedID, setSelectedID] = useState<string | null>(() => searchParams.get('id'))
@@ -99,7 +102,7 @@ export function AutomationsPage() {
       if (saved?.id) setSelectedID(saved.id)
       refresh()
     },
-    onError: (error) => setFormError(error instanceof ApiError ? error.message : 'Could not save the automation.'),
+    onError: (error) => setFormError(error instanceof ApiError ? error.message : t('page.saveFailed')),
   })
 
   const pause = useMutation({
@@ -124,10 +127,8 @@ export function AutomationsPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <RealmKicker />
-          <h1 className="font-display text-2xl font-semibold text-ink">Automations</h1>
-          <p className="mt-1 max-w-2xl text-sm text-ink-muted">
-            Automations run in the background, even when this window is closed. Schedule a recurring task, or have Yggdrasil tell you when something changes.
-          </p>
+          <h1 className="font-display text-2xl font-semibold text-ink">{t('page.title')}</h1>
+          <p className="mt-1 max-w-2xl text-sm text-ink-muted">{t('page.description')}</p>
         </div>
         <button
           type="button"
@@ -139,7 +140,7 @@ export function AutomationsPage() {
             setFormError('')
           }}
         >
-          New automation
+          {t('page.new')}
         </button>
       </div>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,32rem)]">
@@ -148,8 +149,8 @@ export function AutomationsPage() {
             <input
               className="field min-w-40 flex-1"
               value={query}
-              placeholder="Search"
-              aria-label="Search automations"
+              placeholder={t('page.search')}
+              aria-label={t('page.searchLabel')}
               onChange={(event) => setQuery(event.target.value)}
             />
             {(['all', 'active', 'paused', 'attention'] as const).map((key) => (
@@ -159,21 +160,21 @@ export function AutomationsPage() {
                 className={filter === key ? 'btn-primary px-3 py-1.5 text-xs' : 'btn-secondary px-3 py-1.5 text-xs'}
                 onClick={() => setFilter(key)}
               >
-                {key === 'all' ? 'All' : key === 'active' ? 'Active' : key === 'paused' ? 'Paused' : 'Needs attention'}
+                {t(`page.filters.${key}`)}
               </button>
             ))}
           </div>
-          {listQuery.isLoading && <p className="text-sm text-ink-muted">Loading automations…</p>}
-          {listQuery.isError && <p className="text-sm text-danger">Automations could not be loaded.</p>}
+          {listQuery.isLoading && <p className="text-sm text-ink-muted">{t('page.loading')}</p>}
+          {listQuery.isError && <p className="text-sm text-danger">{t('page.loadFailed')}</p>}
           {!listQuery.isLoading && (listQuery.data ?? []).length === 0 && !creating && (
             <EmptyState
               mascot="idle"
-              title="No automations yet"
-              description="Describe a recurring check, such as a morning price or a Friday release summary, and Yggdrasil will run it on that schedule."
+              title={t('page.emptyTitle')}
+              description={t('page.emptyDescription')}
             />
           )}
           {!listQuery.isLoading && (listQuery.data ?? []).length > 0 && items.length === 0 && (
-            <p className="text-sm text-ink-muted">No automations match.</p>
+            <p className="text-sm text-ink-muted">{t('page.noMatches')}</p>
           )}
           <ul className="space-y-2">
             {items.map((item) => (
@@ -197,9 +198,10 @@ export function AutomationsPage() {
                   </div>
                   <p className="mt-1 text-xs text-ink-muted">{scheduleLabel(item.schedule)}</p>
                   <p className="mt-2 text-xs text-ink-faint">
-                    Last {compactWhen(item.last_run_at, item.schedule.time_zone)}
-                    {' · Next '}
-                    {compactWhen(item.next_run_at, item.schedule.time_zone)}
+                    {t('page.lastNext', {
+                      last: compactWhen(item.last_run_at, item.schedule.time_zone),
+                      next: compactWhen(item.next_run_at, item.schedule.time_zone),
+                    })}
                   </p>
                   {resultProse(item.last_result) && <p className="mt-2 line-clamp-2 text-sm text-ink-muted">{resultProse(item.last_result)}</p>}
                 </button>
@@ -242,13 +244,13 @@ export function AutomationsPage() {
                 setFormError('')
               }}
               onDelete={() => {
-                if (window.confirm(`Delete “${detail.name}”? Its history is removed too.`)) {
+                if (window.confirm(t('page.confirmDelete', { name: detail.name }))) {
                   remove.mutate(detail.id)
                 }
               }}
             />
           ) : (
-            <div className="card text-sm text-ink-muted">Select an automation to see its history, or create one.</div>
+            <div className="card text-sm text-ink-muted">{t('page.selectHint')}</div>
           )}
         </aside>
       </div>
@@ -275,6 +277,7 @@ function Detail({
   onEdit: () => void
   onDelete: () => void
 }) {
+  const { t } = useTranslation('automations')
   const zone = detail.schedule.time_zone
   return (
     <div className="card space-y-4">
@@ -285,41 +288,41 @@ function Detail({
         </div>
         <div className="mt-4 space-y-3 text-sm">
           <div>
-            <p className="text-xs tracking-wide text-ink-faint">Schedule</p>
+            <p className="text-xs tracking-wide text-ink-faint">{t('detail.schedule')}</p>
             <p className="text-ink">{scheduleLabel(detail.schedule)}</p>
-            <p className="text-ink-muted">Next {compactWhen(detail.next_run_at, zone)}</p>
+            <p className="text-ink-muted">{t('detail.next', { when: compactWhen(detail.next_run_at, zone) })}</p>
           </div>
           <div>
-            <p className="text-xs tracking-wide text-ink-faint">Task</p>
+            <p className="text-xs tracking-wide text-ink-faint">{t('detail.task')}</p>
             <p className="whitespace-pre-wrap text-ink">{visibleTask(detail.prompt)}</p>
           </div>
           <div>
-            <p className="text-xs tracking-wide text-ink-faint">Notification</p>
+            <p className="text-xs tracking-wide text-ink-faint">{t('detail.notification')}</p>
             <p className="text-ink">{notificationLabel(detail.notification)}</p>
-            <p className="text-ink-muted">{detail.notification.mode === 'none' ? 'Stored on this computer' : 'On this computer'}</p>
+            <p className="text-ink-muted">{detail.notification.mode === 'none' ? t('detail.storedHere') : t('detail.onThisComputer')}</p>
           </div>
         </div>
         {detail.last_error && <p className="mt-3 text-sm text-danger">{detail.last_error}</p>}
       </div>
       <div className="flex flex-wrap gap-2">
         <button type="button" className="btn-primary px-3 py-1.5 text-xs" disabled={running} onClick={onRun}>
-          {running ? 'Running…' : 'Run now'}
+          {running ? t('detail.running') : t('detail.runNow')}
         </button>
         <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={onToggle}>
-          {detail.enabled ? 'Pause' : 'Resume'}
+          {detail.enabled ? t('detail.pause') : t('detail.resume')}
         </button>
         <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={onEdit}>
-          Edit
+          {t('detail.edit')}
         </button>
         <button type="button" className="btn-danger px-3 py-1.5 text-xs" onClick={onDelete}>
-          Delete
+          {t('detail.delete')}
         </button>
       </div>
       {runError && <p className="text-sm text-danger">{runError}</p>}
       <div>
-        <h3 className="text-sm font-medium text-ink">History</h3>
+        <h3 className="text-sm font-medium text-ink">{t('detail.history')}</h3>
         {detail.history.length === 0 ? (
-          <p className="mt-2 text-sm text-ink-muted">This automation has not run yet.</p>
+          <p className="mt-2 text-sm text-ink-muted">{t('detail.notRunYet')}</p>
         ) : (
           <ul className="mt-2 space-y-3">
             {detail.history.map((run, index) => (
@@ -355,6 +358,7 @@ function HistoryRow({
   previousNotified?: boolean
   models: Model[]
 }) {
+  const { t } = useTranslation('automations')
   const notice = explainRun(notification, run, previous, previousNotified)
   const prose = resultProse(run.result)
   const modelName = models.find((model) => model.id === run.model_id)?.display_name || run.model_id
@@ -369,14 +373,14 @@ function HistoryRow({
       {notice.detail && <p className="mt-1 text-sm text-ink-muted">{notice.detail}</p>}
       {run.error && <p className="mt-2 text-sm text-danger">{run.error}</p>}
       <details className="mt-2">
-        <summary className="cursor-pointer text-xs text-ink-faint">Details</summary>
+        <summary className="cursor-pointer text-xs text-ink-faint">{t('run.details')}</summary>
         <div className="mt-2 space-y-1 text-xs text-ink-faint">
-          <p>Scheduled {clockDetail(run.occurrence_at, zone)}</p>
-          {run.started_at && <p>Started {clockDetail(run.started_at, zone)}</p>}
-          {run.finished_at && <p>Finished {clockDetail(run.finished_at, zone)}</p>}
-          {modelName && <p>Model {modelName}</p>}
-          {run.node_id && <p>Computer {run.node_id}</p>}
-          {run.attempt > 1 && <p>Attempt {run.attempt}</p>}
+          <p>{t('run.scheduled', { when: clockDetail(run.occurrence_at, zone) })}</p>
+          {run.started_at && <p>{t('run.started', { when: clockDetail(run.started_at, zone) })}</p>}
+          {run.finished_at && <p>{t('run.finished', { when: clockDetail(run.finished_at, zone) })}</p>}
+          {modelName && <p>{t('run.model', { model: modelName })}</p>}
+          {run.node_id && <p>{t('run.computer', { computer: run.node_id })}</p>}
+          {run.attempt > 1 && <p>{t('run.attempt', { n: run.attempt })}</p>}
         </div>
       </details>
     </li>
@@ -384,8 +388,9 @@ function HistoryRow({
 }
 
 function StatusPill({ item }: { item: Pick<Automation, 'enabled' | 'last_status' | 'consecutive_failures'> }) {
+  const { t } = useTranslation('automations')
   const failed = item.last_status === 'failed' || item.consecutive_failures > 0
-  const label = !item.enabled ? 'Paused' : failed ? 'Failed' : 'Enabled'
+  const label = !item.enabled ? t('pill.paused') : failed ? t('pill.failed') : t('pill.enabled')
   const mark = !item.enabled ? 'Ⅱ' : failed ? '!' : '●'
   return (
     <span className={failed ? 'text-xs text-danger' : item.enabled ? 'text-xs text-success' : 'text-xs text-ink-faint'}>
@@ -406,15 +411,15 @@ function matchesAutomation(item: Automation, query: string, filter: 'all' | 'act
 function statusLabel(status: string | undefined): string {
   switch (status) {
     case 'succeeded':
-      return 'Succeeded'
+      return i18n.t('automations:run.status.succeeded')
     case 'failed':
-      return 'Failed'
+      return i18n.t('automations:run.status.failed')
     case 'retrying':
-      return 'Retrying'
+      return i18n.t('automations:run.status.retrying')
     case 'running':
     case 'claimed':
-      return 'Running'
+      return i18n.t('automations:run.status.running')
     default:
-      return 'Not run yet'
+      return i18n.t('automations:run.status.notRun')
   }
 }

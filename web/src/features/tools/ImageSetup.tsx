@@ -1,10 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { api } from '@/lib/api'
 import type { ImageSetup } from '@/types/api'
 
 function gb(bytes: number): string {
-  return `${(bytes / 1e9).toFixed(1)} GB`
+  return i18n.t('tools:images.gigabytes', { value: (bytes / 1e9).toFixed(1) })
 }
 
 /**
@@ -12,6 +14,7 @@ function gb(bytes: number): string {
  * the download, and remove models to free space.
  */
 export function ImageSetupCard() {
+  const { t } = useTranslation('tools')
   const queryClient = useQueryClient()
   const [choice, setChoice] = useState<string | null>(null)
   const setupQuery = useQuery({
@@ -53,30 +56,28 @@ export function ImageSetupCard() {
     <section className="card space-y-3" aria-labelledby="image-setup-title">
       <div>
         <h2 id="image-setup-title" className="section-title">
-          Image generation
+          {t('images.title')}
         </h2>
         <p className="mt-1 max-w-2xl text-sm text-ink-muted">
           {!status.supported
-            ? `Images can't be made on this computer: ${status.unsupported}.`
+            ? t('images.unsupported', { reason: status.unsupported })
             : status.ready && active
-              ? `Ask for an image, or attach one and ask for a change. Images are made on this computer with ${active.name}; nothing is sent anywhere.`
-              : "Image generation isn't set up yet. Setup downloads stable-diffusion.cpp from GitHub and a model from Hugging Face; after that, images are made on this computer, offline."}
+              ? t('images.ready', { model: active.name })
+              : t('images.notSetUp')}
         </p>
       </div>
 
       {status.supported && running && job ? (
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs text-ink-muted">
-            <span>{job.stage === 'program' ? 'Installing stable-diffusion.cpp…' : 'Downloading the model…'}</span>
-            <span className="tabular-nums">
-              {gb(job.done_bytes)} of {gb(job.total_bytes)}
-            </span>
+            <span>{job.stage === 'program' ? t('images.installingProgram') : t('images.downloadingModel')}</span>
+            <span className="tabular-nums">{t('images.progress', { done: gb(job.done_bytes), total: gb(job.total_bytes) })}</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-raised" role="progressbar" aria-valuenow={percent} aria-valuemin={0} aria-valuemax={100}>
             <div className="h-full bg-primary transition-[width] duration-500" style={{ width: `${percent}%` }} />
           </div>
           <button type="button" className="btn-secondary px-3 py-1.5 text-xs" disabled={cancel.isPending} onClick={() => cancel.mutate()}>
-            Stop
+            {t('images.stop')}
           </button>
         </div>
       ) : null}
@@ -98,20 +99,20 @@ export function ImageSetupCard() {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-ink">
                   {model.name}
-                  {model.recommended ? <span className="ml-2 text-xs font-normal text-success">Recommended for this computer</span> : null}
-                  {model.id === status.active ? <span className="ml-2 text-xs font-normal text-ink-faint">In use</span> : null}
+                  {model.recommended ? <span className="ml-2 text-xs font-normal text-success">{t('images.recommended')}</span> : null}
+                  {model.id === status.active ? <span className="ml-2 text-xs font-normal text-ink-faint">{t('images.inUse')}</span> : null}
                 </p>
                 <p className="mt-0.5 text-xs text-ink-muted">{model.description}</p>
                 <p className="mt-0.5 text-xs text-ink-faint">
                   {gb(model.size_bytes)} · {model.license}
-                  {model.edits ? ' · makes and edits images' : ' · makes images'}
+                  {model.edits ? t('images.makesAndEdits') : t('images.makes')}
                 </p>
               </div>
               {model.installed ? (
                 <span className="flex gap-2">
                   {model.id !== status.active ? (
                     <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={() => start.mutate(model.id)}>
-                      Use
+                      {t('images.use')}
                     </button>
                   ) : null}
                   <button
@@ -120,7 +121,7 @@ export function ImageSetupCard() {
                     disabled={remove.isPending}
                     onClick={() => remove.mutate(model.id)}
                   >
-                    Remove
+                    {t('images.remove')}
                   </button>
                 </span>
               ) : null}
@@ -131,7 +132,7 @@ export function ImageSetupCard() {
 
       {status.supported && !running && selected && !status.models.find((m) => m.id === selected)?.installed ? (
         <button type="button" className="btn-primary px-4 py-2 text-sm" disabled={start.isPending} onClick={() => start.mutate(selected)}>
-          {status.ready ? 'Download this model' : 'Set up image generation'}
+          {status.ready ? t('images.download') : t('images.setUp')}
         </button>
       ) : null}
 

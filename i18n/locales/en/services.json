@@ -1,0 +1,20 @@
+{
+  "title": "Connected services",
+  "description": "Let the AI read and act in services you use. Tokens stay on this computer, outside the AI's view; it only sees what the service returns. Reading is allowed, and changes ask you first.",
+  "generic": "Something went wrong.",
+  "needsAttention": "Needs attention: {{error}}",
+  "lastCheckFailed": "the last check failed",
+  "connectedAs": "Connected as {{account}}",
+  "notConnected": "Not connected",
+  "checking": "Checking…",
+  "check": "Check",
+  "change": "Change",
+  "disconnect": "Disconnect",
+  "connect": "Connect",
+  "optional": " (optional)",
+  "stored": "Stored ({{value}}). Leave blank to keep it.",
+  "save": "Save",
+  "cancel": "Cancel",
+  "tools": "Tools: {{tools}}",
+  "asksFirst": "{{name}} (asks first)"
+}

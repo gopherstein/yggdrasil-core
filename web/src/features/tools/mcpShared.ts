@@ -1,10 +1,11 @@
+import i18n from '@/i18n'
 import { isDesktopShell, openExternal } from '@/lib/desktopBridge'
 import type { MCPServer, MCPSpec } from '@/types/api'
 
 export const SOURCES_KEY = ['mcp-servers'] as const
 
 export function errorText(err: unknown): string {
-  return err instanceof Error ? err.message : 'Something went wrong.'
+  return err instanceof Error ? err.message : i18n.t('tools:status.generic')
 }
 
 /**
@@ -60,13 +61,16 @@ export type Tone = 'ok' | 'warn' | 'bad' | 'idle'
 
 /** What a source's status line says, in plain words. */
 export function statusOf(s: MCPServer): { text: string; tone: Tone } {
-  if (s.status === 'off') return { text: 'Off', tone: 'idle' }
-  if (s.status === 'sign_in') return { text: 'Sign in to use it', tone: 'warn' }
-  if (s.status === 'error') return { text: s.error ? `Needs attention: ${s.error}` : 'Needs attention', tone: 'bad' }
-  if (s.missing) return { text: `Needs ${s.missing} on this computer`, tone: 'warn' }
-  const count = `${s.tools.length} tool${s.tools.length === 1 ? '' : 's'}`
-  if (s.where === 'remote') return { text: `Ready · ${count}`, tone: 'ok' }
-  return { text: s.running ? `Running · ${count}` : `Ready · ${count} · starts when needed`, tone: 'ok' }
+  if (s.status === 'off') return { text: i18n.t('tools:status.off'), tone: 'idle' }
+  if (s.status === 'sign_in') return { text: i18n.t('tools:status.signIn'), tone: 'warn' }
+  if (s.status === 'error') {
+    const text = s.error ? i18n.t('tools:status.needsAttentionError', { error: s.error }) : i18n.t('tools:status.needsAttention')
+    return { text, tone: 'bad' }
+  }
+  if (s.missing) return { text: i18n.t('tools:status.needsRuntime', { runtime: s.missing }), tone: 'warn' }
+  const tools = i18n.t('tools:status.tools', { count: s.tools.length })
+  if (s.where === 'remote') return { text: i18n.t('tools:status.readyRemote', { tools }), tone: 'ok' }
+  return { text: i18n.t(s.running ? 'tools:status.running' : 'tools:status.readyLocal', { tools }), tone: 'ok' }
 }
 
 export const toneClass: Record<Tone, string> = {
