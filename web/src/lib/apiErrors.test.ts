@@ -64,14 +64,14 @@ describe('streamChat', () => {
       stream('event: error_code\ndata: {"code":"OUT_OF_MEMORY","message":"out of memory"}\n\nevent: error\ndata: out of memory\n\n'),
     )
     const onError = vi.fn()
-    await streamChat({ body: { message: 'hi' }, onToken: () => {}, onError })
+    await streamChat({ body: { conversation_id: 'c1', message: 'hi' }, onToken: () => {}, onError })
     expect(onError).toHaveBeenCalledWith('out of memory', 'OUT_OF_MEMORY')
   })
 
   it('works with a service that sends no code', async () => {
     vi.stubGlobal('fetch', stream('event: error\ndata: out of memory\n\n'))
     const onError = vi.fn()
-    await streamChat({ body: { message: 'hi' }, onToken: () => {}, onError })
+    await streamChat({ body: { conversation_id: 'c1', message: 'hi' }, onToken: () => {}, onError })
     expect(onError).toHaveBeenCalledWith('out of memory', undefined)
   })
 })
