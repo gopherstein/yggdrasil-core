@@ -90,6 +90,8 @@ Settings are stored in `yggdrasil.db`. The app's Settings page shows them, and `
 | Setting | Default | Meaning |
 | --- | --- | --- |
 | `ui_locale` | empty | **App language**, as a BCP 47 tag such as `es` or `pt-BR`. Empty follows each device's system language. The web UI, the desktop app, and the iPhone app read it, so they agree. `en-XA` is the pseudo-locale for testing translations. |
+| `assistant_language_mode` | `auto` | **Assistant language**: the language answers are written in. `auto` answers in the language you write in, or the conversation's for a short message; `app` answers in the App language; `language` answers in `assistant_language`. A language asked for in a message, such as "answer in English", always wins. Detection runs on this computer. |
+| `assistant_language` | empty | The language answers are written in with `assistant_language_mode` `language`, as a BCP 47 tag such as `de`. |
 | `advanced_mode` | `false` | Shows Profiles, Tools, and API Access, per-tool permissions, and run details |
 | `model_lifecycle` | `automatic` | `automatic` unloads models that sit idle; `manual` leaves them loaded until you stop them |
 | `idle_unload_minutes` | `15` | Minutes before an idle model is unloaded; `0` never unloads |

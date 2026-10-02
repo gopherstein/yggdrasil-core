@@ -32,6 +32,10 @@
       "partial": "Traduction partielle. Ce qui n'est pas encore traduit s'affiche en anglais.",
       "community": "Traduit par la communauté Yggdrasil."
     },
+    "assistantLanguage": "Langue de l'assistant",
+    "assistantAuto": "Détection automatique : la langue dans laquelle vous écrivez",
+    "assistantApp": "Comme la langue de l'app",
+    "assistantHint": "La langue dans laquelle les réponses sont écrites. Vous pouvez toujours en demander une autre dans un message, par exemple « réponds en anglais ».",
     "saved": "Enregistré.",
     "saveFailed": "Impossible d'enregistrer la langue : {{error}}"
   },

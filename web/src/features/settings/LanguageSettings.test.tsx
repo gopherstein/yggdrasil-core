@@ -67,3 +67,35 @@ describe('LanguageSettings', () => {
     expect(document.documentElement.lang).toBe('en-XA')
   })
 })
+
+describe('assistant language', () => {
+  it('offers auto-detect, the App language, and languages by their own names', async () => {
+    renderIt()
+    const select = await screen.findByRole('combobox', { name: 'Assistant language' })
+    await waitFor(() => expect(select).toBeEnabled())
+    expect(select).toHaveValue(':auto')
+    const options = [...select.querySelectorAll('option')].map((o) => o.textContent)
+    expect(options.slice(0, 2)).toEqual(['Auto-detect: the language you write in', 'Same as the App language'])
+    expect(options).toContain('Deutsch')
+    expect(options).toContain('日本語')
+  })
+
+  it('saves a chosen language, or a mode', async () => {
+    renderIt()
+    const select = await screen.findByRole('combobox', { name: 'Assistant language' })
+    await waitFor(() => expect(select).toBeEnabled())
+    fireEvent.change(select, { target: { value: 'de' } })
+    await waitFor(() =>
+      expect(api.updateSettings).toHaveBeenCalledWith({ assistant_language_mode: 'language', assistant_language: 'de' }),
+    )
+    fireEvent.change(select, { target: { value: ':app' } })
+    await waitFor(() => expect(api.updateSettings).toHaveBeenCalledWith({ assistant_language_mode: 'app' }))
+  })
+
+  it('shows the saved choice', async () => {
+    vi.mocked(api.getSettings).mockResolvedValue({ ui_locale: '', assistant_language_mode: 'language', assistant_language: 'fr' } as SettingsView)
+    renderIt()
+    const select = await screen.findByRole('combobox', { name: 'Assistant language' })
+    await waitFor(() => expect(select).toHaveValue('fr'))
+  })
+})

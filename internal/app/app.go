@@ -49,6 +49,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/profiles"
 	"github.com/yeixio/yggdrasil-core/internal/pyenv"
 	"github.com/yeixio/yggdrasil-core/internal/remotetools"
+	"github.com/yeixio/yggdrasil-core/internal/replylang"
 	"github.com/yeixio/yggdrasil-core/internal/runlog"
 	"github.com/yeixio/yggdrasil-core/internal/runtimes"
 	"github.com/yeixio/yggdrasil-core/internal/runtimes/external"
@@ -960,6 +961,11 @@ func (a *App) settingsView(ctx context.Context) (contracts.SettingsView, error) 
 	toolGit, _ := a.Settings.GetString(ctx, "tool_git", "ask")
 	launchAtLogin, _ := a.Settings.GetBool(ctx, "launch_at_login", false)
 	uiLocale, _ := a.Settings.GetString(ctx, "ui_locale", "")
+	assistantMode, _ := a.Settings.GetString(ctx, "assistant_language_mode", replylang.ModeAuto)
+	assistantLanguage, _ := a.Settings.GetString(ctx, "assistant_language", "")
+	if assistantMode == "" {
+		assistantMode = replylang.ModeAuto
+	}
 	if defaultExec == "" {
 		defaultExec = "automatic"
 	}
@@ -988,6 +994,8 @@ func (a *App) settingsView(ctx context.Context) (contracts.SettingsView, error) 
 		LaunchAtLogin:           launchAtLogin,
 		DiscoveryNeedsRestart:   a.discoveryNeedsRestart,
 		UILocale:                uiLocale,
+		AssistantLanguageMode:   assistantMode,
+		AssistantLanguage:       assistantLanguage,
 	}, nil
 }
 
@@ -1083,6 +1091,23 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 			return contracts.Errorf("INVALID_LOCALE", nil, "ui_locale must be a language tag such as en or es-MX, or empty for the system language")
 		}
 		if err := a.Settings.Set(ctx, "ui_locale", v); err != nil {
+			return err
+		}
+	}
+	if v, ok := patch["assistant_language_mode"].(string); ok {
+		if !replylang.ValidMode(v) {
+			return contracts.Errorf("INVALID_SETTING", map[string]any{"setting": "assistant_language_mode", "value": v},
+				"assistant_language_mode must be auto, app, or language")
+		}
+		if err := a.Settings.Set(ctx, "assistant_language_mode", v); err != nil {
+			return err
+		}
+	}
+	if v, ok := patch["assistant_language"].(string); ok {
+		if !validLocale(v) {
+			return contracts.Errorf("INVALID_LOCALE", nil, "assistant_language must be a language tag such as de or pt-BR")
+		}
+		if err := a.Settings.Set(ctx, "assistant_language", v); err != nil {
 			return err
 		}
 	}

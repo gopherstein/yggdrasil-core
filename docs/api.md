@@ -335,6 +335,8 @@ MCP tool sources add tools the same way, with `source` `mcp:<source>`; secrets a
 
 Personalization shapes how answers look in every chat, automation, and API request. It has four choices: `length` (`brief`, `balanced`, `detailed`), `tone` (`friendly`, `neutral`, `direct`), `format` (`prose`, `lists`), and `units` (`metric`, `imperial`). It also has two short notes, `about_me` and `instructions`, of up to 1,500 characters each. It is stored as a setting and added to the model's instructions as style guidance, after a specialized AI's own instructions. It is kept apart from permissions: what a tool may do comes only from profiles and Settings. A personalization note or a memory that tries to grant a permission is refused with 400, for example "you can always push without asking" or "don't ask before running commands". The refusal says where permissions are set. A memory that states a preference, such as "I use the terminal a lot", is saved and changes no policy.
 
+**Answer language.** Every chat, automation, and API request is answered in one language, decided on this computer (multilingual spec §11–12): a language the message asks for, such as "answer in English" or "antworte auf Deutsch", always wins. Then the `assistant_language_mode` setting decides: `auto` (the default) answers in the language the message is written in, or the conversation's recent language when the message is too short to tell; `language` answers in `assistant_language`; `app` answers in the App language (`ui_locale`). After that come this computer's language and English. Code, commands, file names, and quoted text keep their language.
+
 ## Privacy and run records
 
 Each run records what left this computer.

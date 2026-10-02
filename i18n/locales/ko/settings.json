@@ -32,6 +32,10 @@
       "partial": "일부만 번역되었어요. 아직 번역되지 않은 부분은 영어로 표시돼요.",
       "community": "Yggdrasil 커뮤니티에서 번역했어요."
     },
+    "assistantLanguage": "어시스턴트 언어",
+    "assistantAuto": "자동 감지: 내가 쓰는 언어",
+    "assistantApp": "앱 언어와 같게",
+    "assistantHint": "답변을 쓰는 언어예요. 메시지에서 “영어로 답해 줘”처럼 언제든 다른 언어를 요청할 수 있어요.",
     "saved": "저장했어요.",
     "saveFailed": "언어를 저장할 수 없어요: {{error}}"
   },

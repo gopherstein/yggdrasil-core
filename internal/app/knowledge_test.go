@@ -34,7 +34,7 @@ func TestTurnInstructionsRetrieveProfileKnowledge(t *testing.T) {
 		profile:      profiles.Profile{KnowledgeSources: []string{src.ID}},
 		instructions: "You are Tire Bot."}
 	// Trusted instructions and untrusted knowledge are kept apart (§58).
-	if got := env.TurnInstructions(ctx, "price for 225/45R17?"); got != "You are Tire Bot." {
+	if got := env.TurnInstructions(ctx, "price for 225/45R17?"); !strings.HasPrefix(got, "You are Tire Bot.") || strings.Contains(got, "189.99") {
 		t.Fatalf("instructions = %q", got)
 	}
 	ref := env.ReferenceMaterial(ctx, "price for 225/45R17?")

@@ -32,6 +32,10 @@
       "partial": "部分翻譯。尚未翻譯的內容會以英文顯示。",
       "community": "由 Yggdrasil 社群翻譯。"
     },
+    "assistantLanguage": "助理語言",
+    "assistantAuto": "自動偵測：你書寫所用的語言",
+    "assistantApp": "與 App 語言相同",
+    "assistantHint": "回答所用的語言。你隨時可以在訊息中要求換一種語言，例如「用英文回答」。",
     "saved": "已儲存。",
     "saveFailed": "無法儲存語言：{{error}}"
   },

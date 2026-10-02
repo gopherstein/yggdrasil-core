@@ -32,6 +32,10 @@
       "partial": "部分已翻译。尚未翻译的内容以英文显示。",
       "community": "由 Yggdrasil 社区翻译。"
     },
+    "assistantLanguage": "助手语言",
+    "assistantAuto": "自动检测：你书写所用的语言",
+    "assistantApp": "与应用语言相同",
+    "assistantHint": "回答所用的语言。你随时可以在消息中要求换一种语言，例如“用英文回答”。",
     "saved": "已保存。",
     "saveFailed": "无法保存语言：{{error}}"
   },

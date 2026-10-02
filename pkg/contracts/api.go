@@ -696,6 +696,14 @@ type SettingsView struct {
 	// UILocale is the app language as a BCP 47 tag, such as "es-MX", or ""
 	// to follow each device's system language (multilingual spec §6–7, §30).
 	UILocale string `json:"ui_locale"`
+	// AssistantLanguageMode is the language answers are written in (§11,
+	// §30): "auto", the language the person writes in (the default); "app",
+	// the App language; or "language", AssistantLanguage. A language asked
+	// for in a message always wins.
+	AssistantLanguageMode string `json:"assistant_language_mode"`
+	// AssistantLanguage is the BCP 47 tag answers are written in with
+	// AssistantLanguageMode "language", such as "de".
+	AssistantLanguage string `json:"assistant_language"`
 }
 
 // Recommendation explains a recommended model setup.

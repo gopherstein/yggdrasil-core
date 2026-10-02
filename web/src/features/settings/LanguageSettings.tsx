@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { applyLanguage, availableLanguages, languages, pseudoLocale, pseudoRtlLocale, resolveLanguage, systemLanguages } from '@/i18n'
 import { api } from '@/lib/api'
 import { useUIStore } from '@/stores/uiStore'
+import { AssistantLanguage } from './AssistantLanguage'
 
 /** The App language (spec §7): System default, or a language from the catalog. */
 export function LanguageSettings() {
@@ -60,6 +61,7 @@ export function LanguageSettings() {
           {t('language.saveFailed', { error: save.error instanceof Error ? save.error.message : String(save.error) })}
         </p>
       ) : null}
+      <AssistantLanguage />
     </section>
   )
 }

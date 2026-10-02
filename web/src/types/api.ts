@@ -474,8 +474,14 @@ export interface SettingsView {
   discovery_needs_restart?: boolean
   /** App language as a BCP 47 tag, or '' to follow each device's system language. */
   ui_locale?: string
+  /** auto (the language the person writes in), app (the App language), or language (assistant_language). */
+  assistant_language_mode?: AssistantLanguageMode
+  /** The language answers are written in with assistant_language_mode language, such as de. */
+  assistant_language?: string
   memory_enabled?: boolean
 }
+
+export type AssistantLanguageMode = 'auto' | 'app' | 'language'
 
 export interface Recommendation {
   purpose: string
@@ -634,6 +640,8 @@ export interface ToolRequestedPayload {
 
 export interface SettingsPatch {
   ui_locale?: string
+  assistant_language_mode?: AssistantLanguageMode
+  assistant_language?: string
   memory_enabled?: boolean
   node_name?: string
   lan_api_enabled?: boolean

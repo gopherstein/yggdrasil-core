@@ -1162,6 +1162,13 @@ func (e *chatExecEnv) TurnInstructions(ctx context.Context, prompt string) strin
 		if block := e.app.personalBlock(ctx); block != "" {
 			parts = append(parts, block)
 		}
+		// The language to answer in (multilingual spec §11), from the
+		// person's own message: a worker's prompt in a plan is the planner's.
+		message := e.turnPrompt
+		if strings.TrimSpace(message) == "" {
+			message = prompt
+		}
+		parts = append(parts, e.app.replyLanguage(ctx, e.conversationID, message).Instruction())
 	}
 	// What Yggdrasil can do comes from its own inventory (§37).
 	if e.capabilities != "" {
