@@ -1,0 +1,237 @@
+{
+  "page": {
+    "title": "Impostazioni",
+    "subtitle": "Come deve comportarsi Yggdrasil su questo computer.",
+    "loading": "Caricamento delle impostazioni…"
+  },
+  "groups": {
+    "general": "Generali",
+    "ai": "Comportamento dell'IA",
+    "network": "Rete e accesso",
+    "privacy": "Privacy e sicurezza",
+    "storage": "Spazio di archiviazione",
+    "about": "Informazioni",
+    "danger": "Zona pericolosa"
+  },
+  "appearance": {
+    "title": "Aspetto",
+    "description": "Scegli chiaro, scuro o segui il sistema.",
+    "dark": "Scuro",
+    "light": "Chiaro",
+    "system": "Sistema"
+  },
+  "language": {
+    "title": "Lingua",
+    "description": "La lingua di menu, pulsanti e messaggi di Yggdrasil su ogni computer e telefono con cui lo usi. Ogni dispositivo può seguire la propria lingua di sistema.",
+    "appLanguage": "Lingua dell'app",
+    "systemDefault": "Predefinita di sistema ({{language}})",
+    "pseudo": "Pseudo-lingua (per testare le traduzioni)",
+    "pseudoRtl": "Pseudo-lingua da destra a sinistra (per testare il layout)",
+    "status": {
+      "machine": "Tradotta automaticamente, quindi alcune frasi potrebbero suonare strane finché una persona non le rivede.",
+      "partial": "Tradotta in parte. Ciò che non è ancora tradotto viene mostrato in inglese.",
+      "community": "Tradotta dalla community di Yggdrasil."
+    },
+    "saved": "Salvata.",
+    "saveFailed": "Impossibile salvare la lingua: {{error}}"
+  },
+  "personalization": {
+    "title": "Personalizzazione",
+    "description": "Come devono apparire le risposte, in ogni chat e automazione. Questo influisce solo sullo stile. Ciò che l'IA può fare si imposta in Permessi degli strumenti, e niente qui o in Memoria può cambiarlo.",
+    "length": {
+      "label": "Lunghezza delle risposte",
+      "brief": "Breve",
+      "balanced": "Equilibrata",
+      "detailed": "Dettagliata"
+    },
+    "tone": {
+      "label": "Tono",
+      "friendly": "Amichevole",
+      "neutral": "Neutro",
+      "direct": "Diretto"
+    },
+    "format": {
+      "label": "Formato",
+      "prose": "Paragrafi",
+      "lists": "Elenchi"
+    },
+    "units": {
+      "label": "Unità",
+      "metric": "Metriche",
+      "imperial": "Imperiali"
+    },
+    "noPreference": "Nessuna preferenza",
+    "aboutYou": "Su di te",
+    "aboutYouPlaceholder": "Sono un ingegnere backend a Juneau. Il mio progetto principale è un servizio in Go.",
+    "instructions": "Altro su come rispondere",
+    "instructionsPlaceholder": "Mostra esempi di codice in Go. Cita le fonti alla fine.",
+    "save": "Salva",
+    "saving": "Salvataggio…",
+    "saved": "Salvato",
+    "saveFailed": "Impossibile salvare."
+  },
+  "background": {
+    "title": "Continua l'esecuzione in background",
+    "description": "Chiudendo la finestra, Chat, l'API e le tue pianificazioni continuano a funzionare. Resta attivo finché esiste una pianificazione."
+  },
+  "launchAtLogin": {
+    "title": "Apri all'accesso",
+    "description": "Avvia Yggdrasil automaticamente quando accedi a questo computer."
+  },
+  "defaultProfile": {
+    "title": "Profilo predefinito",
+    "description": "Usato quando inizi una nuova chat.",
+    "automatic": "Automatico"
+  },
+  "runOn": {
+    "title": "Esegui le chat su",
+    "description": "Dove eseguire il lavoro per impostazione predefinita all'interno del tuo team.",
+    "automatic": "Automatico",
+    "local": "Questo computer",
+    "ask": "Chiedi ogni volta"
+  },
+  "lifecycle": {
+    "title": "Ciclo di vita dei modelli",
+    "description": "Automatico mantiene i modelli pronti dopo la chat. Manuale lascia a te Avvia e Arresta.",
+    "automatic": "Automatico",
+    "manual": "Manuale",
+    "idleUnload": "Scarica i modelli inattivi dopo",
+    "idleUnloadHint": "Libera memoria quando un modello non viene usato da un po'. Usa 0 per tenere i modelli caricati.",
+    "minutes": "minuti"
+  },
+  "downloads": {
+    "title": "Scarica modelli",
+    "description": "Quando un profilo ha bisogno di un modello non ancora installato.",
+    "ask": "Chiedi prima",
+    "automatic": "Automatico"
+  },
+  "advanced": {
+    "title": "Modalità avanzata",
+    "description": "Mostra ID dei modelli, dettagli dell'API, Profili, log e altri controlli per utenti esperti."
+  },
+  "discovery": {
+    "title": "Trova altri computer",
+    "description": "Rendi visibile questo computer e cerca altre installazioni di Yggdrasil sulla tua rete.",
+    "needsRestart": "La rete è stata aggiornata. Riavvia Yggdrasil affinché gli altri computer possano raggiungere completamente questo.",
+    "restartManually": "Esci completamente da Yggdrasil, poi riaprilo per finire di applicare le impostazioni di rete.",
+    "restartNow": "Riavvia ora",
+    "status": "Stato: <strong>{{state}}</strong>"
+  },
+  "onOff": {
+    "on": "Attivo",
+    "off": "Disattivo"
+  },
+  "api": {
+    "title": "Accesso API",
+    "description": "Come le app e gli altri dispositivi possono comunicare con Yggdrasil.",
+    "local": "API locale",
+    "lan": "API LAN",
+    "manage": "Gestisci accesso API"
+  },
+  "notifications": {
+    "title": "Notifiche",
+    "description": "Avvisi per i lavori lunghi e la connettività del team.",
+    "taskFinish": "Avvisa quando le attività terminano",
+    "peerOffline": "Avvisa quando un computer associato va offline"
+  },
+  "toolPermissions": {
+    "title": "Permessi degli strumenti",
+    "description": "Regole predefinite su cosa può fare l'IA su questo computer.",
+    "terminal": "Comandi del terminale",
+    "fileWrites": "Scrittura di file",
+    "git": "Operazioni Git",
+    "ask": "Chiedi",
+    "allowSession": "Consenti per la sessione",
+    "allow": "Consenti",
+    "deny": "Nega"
+  },
+  "history": {
+    "title": "Cronologia",
+    "description": "Controlla cosa conserva Yggdrasil su questo computer.",
+    "saveChats": "Salva la cronologia delle chat",
+    "saveTasks": "Salva la cronologia delle attività",
+    "confirmClear": "Eliminare tutta la cronologia delle chat su questo computer? L'operazione non può essere annullata.",
+    "clear": "Cancella la cronologia delle chat",
+    "clearing": "Cancellazione…"
+  },
+  "whatLeft": {
+    "title": "Cosa è uscito da questo computer",
+    "description": "Yggdrasil lavora su questo computer. Queste sono le volte in cui una chat, un'automazione o un'app ha inviato qualcosa altrove: ricerche e pagine web, ricerche su mappe, computer associati e servizi collegati. Segna ricordi o conoscenza come “Solo questo computer” per tenere qui le chat che li usano.",
+    "nothing": "Negli ultimi 30 giorni non è uscito nulla da questo computer.",
+    "summary": "Negli ultimi 30 giorni: {{list}}.",
+    "summaryItem": "{{kind}} {{count}}",
+    "kinds": {
+      "web_search": "Ricerca web",
+      "web_page": "Pagina web",
+      "places": "Mappe e luoghi",
+      "paired_computer": "Computer associato",
+      "external_server": "Server esterno",
+      "connector": "Servizio collegato",
+      "notification": "Notifica"
+    },
+    "kindsLower": {
+      "web_search": "ricerca web",
+      "web_page": "pagina web",
+      "places": "mappe e luoghi",
+      "paired_computer": "computer associato",
+      "external_server": "server esterno",
+      "connector": "servizio collegato",
+      "notification": "notifica"
+    },
+    "sources": {
+      "chat": "Chat",
+      "api": "API",
+      "automation": "Automazione",
+      "training": "Addestramento"
+    },
+    "keepFor": "Conserva i registri delle esecuzioni per",
+    "retention": {
+      "days_one": "{{count}} giorno",
+      "days_many": "{{count}} giorni",
+      "days_other": "{{count}} giorni",
+      "year": "1 anno",
+      "forever": "Conservali"
+    },
+    "delete": "Elimina ora i registri delle esecuzioni",
+    "confirmDelete": "Eliminare ora i registri delle esecuzioni? Verranno rimossi i prompt e i risultati degli strumenti salvati dalle esecuzioni passate, oltre a questo elenco. Le chat non vengono eliminate.",
+    "deleted": "Eliminati {{tasks}} registri di esecuzione, {{automations}} risultati di automazioni e {{entries}} voci qui sotto.",
+    "footnote": "I registri delle esecuzioni contengono i prompt e i risultati degli strumenti delle esecuzioni passate. Le chat vengono conservate o meno in base a Cronologia qui sotto. Ogni automazione conserva il suo ultimo risultato, con cui “avvisa quando il risultato cambia” effettua il confronto."
+  },
+  "storage": {
+    "folders": "Cartelle dei dati",
+    "data": "Dati",
+    "models": "Modelli",
+    "runtimes": "Runtime",
+    "logs": "Log",
+    "showInFinder": "Mostra nel Finder",
+    "openFolder": "Apri cartella",
+    "opened": "Aperta",
+    "copyPath": "Copia il percorso qui sotto",
+    "pending": "Comparirà quando Yggdrasil sarà in esecuzione",
+    "limit": "Spazio massimo per i modelli",
+    "limitDescription": "Limite indicativo per i modelli scaricati su questo computer.",
+    "unlimited": "Illimitato"
+  },
+  "about": {
+    "tagline": "Pannello di controllo per l'IA locale",
+    "versionUnavailable": "Versione non disponibile",
+    "build": "Build {{commit}}",
+    "source": "Codice sorgente corrispondente",
+    "thisComputer": "Questo computer",
+    "service": "Servizio",
+    "unavailable": "Non disponibile",
+    "diagnostics": "Apri diagnostica"
+  },
+  "reset": {
+    "title": "Ripristina applicazione",
+    "description": "Ripristina le impostazioni predefinite e riavvia la configurazione iniziale. Cancella chat, profili personalizzati, attività e chiavi API.",
+    "button": "Ripristina impostazioni e dati dell'app…",
+    "warningKeep": "L'operazione non può essere annullata. Ripeterai la configurazione iniziale. I modelli e i runtime scaricati verranno mantenuti.",
+    "warningDelete": "L'operazione non può essere annullata. Ripeterai la configurazione iniziale. Verranno eliminati anche i modelli scaricati.",
+    "deleteModels": "Elimina anche i modelli scaricati",
+    "confirm": "Sì, ripristina",
+    "resetting": "Ripristino…",
+    "cancel": "Annulla",
+    "failed": "Impossibile ripristinare l'applicazione. Riprova."
+  }
+}

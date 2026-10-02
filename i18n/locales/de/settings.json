@@ -1,0 +1,236 @@
+{
+  "page": {
+    "title": "Einstellungen",
+    "subtitle": "Wie sich Yggdrasil auf diesem Computer verhalten soll.",
+    "loading": "Einstellungen werden geladen …"
+  },
+  "groups": {
+    "general": "Allgemein",
+    "ai": "KI-Verhalten",
+    "network": "Netzwerk & Zugriff",
+    "privacy": "Datenschutz & Sicherheit",
+    "storage": "Speicher",
+    "about": "Über",
+    "danger": "Gefahrenbereich"
+  },
+  "appearance": {
+    "title": "Erscheinungsbild",
+    "description": "Wähle hell, dunkel oder wie das System.",
+    "dark": "Dunkel",
+    "light": "Hell",
+    "system": "System"
+  },
+  "language": {
+    "title": "Sprache",
+    "description": "Die Sprache von Menüs, Tasten und Meldungen in Yggdrasil auf jedem Computer und Handy, die du damit nutzt. Jedes Gerät kann seiner eigenen Systemsprache folgen.",
+    "appLanguage": "App-Sprache",
+    "systemDefault": "Systemstandard ({{language}})",
+    "pseudo": "Pseudo-Sprache (zum Testen von Übersetzungen)",
+    "pseudoRtl": "Rechts-nach-links-Pseudo-Sprache (zum Testen des Layouts)",
+    "status": {
+      "machine": "Maschinell übersetzt, daher können manche Formulierungen seltsam klingen, bis ein Mensch sie geprüft hat.",
+      "partial": "Teilweise übersetzt. Was noch nicht übersetzt ist, erscheint auf Englisch.",
+      "community": "Übersetzt von der Yggdrasil-Community."
+    },
+    "saved": "Gespeichert.",
+    "saveFailed": "Die Sprache konnte nicht gespeichert werden: {{error}}"
+  },
+  "personalization": {
+    "title": "Personalisierung",
+    "description": "Wie Antworten aussehen sollen, in jedem Chat und jeder Automation. Das betrifft nur den Stil. Was die KI tun darf, wird unter „Werkzeugberechtigungen“ festgelegt, und nichts hier oder im Gedächtnis kann das ändern.",
+    "length": {
+      "label": "Antwortlänge",
+      "brief": "Kurz",
+      "balanced": "Ausgewogen",
+      "detailed": "Ausführlich"
+    },
+    "tone": {
+      "label": "Tonfall",
+      "friendly": "Freundlich",
+      "neutral": "Neutral",
+      "direct": "Direkt"
+    },
+    "format": {
+      "label": "Format",
+      "prose": "Absätze",
+      "lists": "Listen"
+    },
+    "units": {
+      "label": "Einheiten",
+      "metric": "Metrisch",
+      "imperial": "Imperial"
+    },
+    "noPreference": "Keine Vorliebe",
+    "aboutYou": "Über dich",
+    "aboutYouPlaceholder": "Ich bin Backend-Entwickler in Hamburg. Mein Hauptprojekt ist ein Go-Dienst.",
+    "instructions": "Sonstiges zur Art der Antworten",
+    "instructionsPlaceholder": "Zeig Codebeispiele in Go. Nenne am Ende die Quellen.",
+    "save": "Speichern",
+    "saving": "Wird gespeichert …",
+    "saved": "Gespeichert",
+    "saveFailed": "Konnte nicht gespeichert werden."
+  },
+  "background": {
+    "title": "Im Hintergrund weiterlaufen",
+    "description": "Wenn du das Fenster schließt, laufen Chat, API und deine Zeitpläne weiter. Das bleibt an, solange ein Zeitplan existiert."
+  },
+  "launchAtLogin": {
+    "title": "Beim Anmelden starten",
+    "description": "Yggdrasil automatisch starten, wenn du dich an diesem Computer anmeldest."
+  },
+  "defaultProfile": {
+    "title": "Standardprofil",
+    "description": "Wird verwendet, wenn du einen neuen Chat startest.",
+    "automatic": "Automatisch"
+  },
+  "runOn": {
+    "title": "Chats ausführen auf",
+    "description": "Wo Arbeit in deinem Team standardmäßig laufen soll.",
+    "automatic": "Automatisch",
+    "local": "Dieser Computer",
+    "ask": "Jedes Mal fragen"
+  },
+  "lifecycle": {
+    "title": "Modell-Lebenszyklus",
+    "description": "„Automatisch“ hält Modelle nach dem Chat bereit. Bei „Manuell“ startest und stoppst du sie selbst.",
+    "automatic": "Automatisch",
+    "manual": "Manuell",
+    "idleUnload": "Ungenutzte Modelle entladen nach",
+    "idleUnloadHint": "Gibt Speicher frei, wenn ein Modell eine Weile nicht genutzt wurde. 0 hält Modelle geladen.",
+    "minutes": "Minuten"
+  },
+  "downloads": {
+    "title": "Modelle laden",
+    "description": "Wenn ein Profil ein Modell braucht, das noch nicht installiert ist.",
+    "ask": "Vorher fragen",
+    "automatic": "Automatisch"
+  },
+  "advanced": {
+    "title": "Expertenmodus",
+    "description": "Zeigt Modell-IDs, API-Details, Profile, Protokolle und weitere Optionen für Fortgeschrittene."
+  },
+  "discovery": {
+    "title": "Andere Computer finden",
+    "description": "Diesen Computer im Netzwerk anzeigen und nach anderen Yggdrasil-Installationen suchen.",
+    "needsRestart": "Die Netzwerkeinstellungen wurden geändert. Starte Yggdrasil neu, damit andere Computer diesen vollständig erreichen.",
+    "restartManually": "Beende Yggdrasil vollständig und öffne es erneut, um die Netzwerkeinstellungen zu übernehmen.",
+    "restartNow": "Jetzt neu starten",
+    "status": "Status: <strong>{{state}}</strong>"
+  },
+  "onOff": {
+    "on": "An",
+    "off": "Aus"
+  },
+  "api": {
+    "title": "API-Zugriff",
+    "description": "Wie Apps und andere Geräte mit Yggdrasil sprechen können.",
+    "local": "Lokale API",
+    "lan": "LAN-API",
+    "manage": "API-Zugriff verwalten"
+  },
+  "notifications": {
+    "title": "Mitteilungen",
+    "description": "Hinweise zu lang laufender Arbeit und zur Verbindung im Team.",
+    "taskFinish": "Benachrichtigen, wenn Aufgaben fertig sind",
+    "peerOffline": "Benachrichtigen, wenn ein gekoppelter Computer offline geht"
+  },
+  "toolPermissions": {
+    "title": "Werkzeugberechtigungen",
+    "description": "Standardregeln dafür, was die KI auf diesem Computer tun darf.",
+    "terminal": "Terminalbefehle",
+    "fileWrites": "Dateien schreiben",
+    "git": "Git-Vorgänge",
+    "ask": "Fragen",
+    "allowSession": "Für Sitzung erlauben",
+    "allow": "Erlauben",
+    "deny": "Ablehnen"
+  },
+  "history": {
+    "title": "Verlauf",
+    "description": "Lege fest, was Yggdrasil auf diesem Computer aufbewahrt.",
+    "saveChats": "Chatverlauf speichern",
+    "saveTasks": "Aufgabenverlauf speichern",
+    "confirmClear": "Gesamten Chatverlauf auf diesem Computer löschen? Das kann nicht rückgängig gemacht werden.",
+    "clear": "Chatverlauf löschen",
+    "clearing": "Wird gelöscht …"
+  },
+  "whatLeft": {
+    "title": "Was diesen Computer verlassen hat",
+    "description": "Yggdrasil arbeitet auf diesem Computer. Hier siehst du, wann ein Chat, eine Automation oder eine App etwas nach außen gesendet hat: Websuchen und Webseiten, Kartenabfragen, gekoppelte Computer und verbundene Dienste. Markiere Erinnerungen oder Wissen als „Nur dieser Computer“, damit Chats, die sie nutzen, hier bleiben.",
+    "nothing": "In den letzten 30 Tagen hat nichts diesen Computer verlassen.",
+    "summary": "In den letzten 30 Tagen: {{list}}.",
+    "summaryItem": "{{kind}} {{count}}",
+    "kinds": {
+      "web_search": "Websuche",
+      "web_page": "Webseite",
+      "places": "Karten und Orte",
+      "paired_computer": "Gekoppelter Computer",
+      "external_server": "Externer Server",
+      "connector": "Verbundener Dienst",
+      "notification": "Mitteilung"
+    },
+    "kindsLower": {
+      "web_search": "Websuche",
+      "web_page": "Webseite",
+      "places": "Karten und Orte",
+      "paired_computer": "gekoppelter Computer",
+      "external_server": "externer Server",
+      "connector": "verbundener Dienst",
+      "notification": "Mitteilung"
+    },
+    "sources": {
+      "chat": "Chat",
+      "api": "API",
+      "automation": "Automation",
+      "training": "Training"
+    },
+    "keepFor": "Durchlaufprotokolle aufbewahren für",
+    "retention": {
+      "days_one": "{{count}} Tag",
+      "days_other": "{{count}} Tage",
+      "year": "1 Jahr",
+      "forever": "Immer aufbewahren"
+    },
+    "delete": "Durchlaufprotokolle jetzt löschen",
+    "confirmDelete": "Durchlaufprotokolle jetzt löschen? Dadurch werden gespeicherte Prompts und Werkzeugergebnisse früherer Durchläufe sowie diese Liste entfernt. Chats werden nicht gelöscht.",
+    "deleted": "{{tasks}} Durchlaufprotokolle, {{automations}} Automationsergebnisse und {{entries}} Einträge unten gelöscht.",
+    "footnote": "Durchlaufprotokolle enthalten Prompts und Werkzeugergebnisse früherer Durchläufe. Ob Chats aufbewahrt werden, legst du unten unter „Verlauf“ fest. Jede Automation behält ihr letztes Ergebnis, mit dem „Benachrichtigen, wenn sich das Ergebnis ändert“ vergleicht."
+  },
+  "storage": {
+    "folders": "Datenordner",
+    "data": "Daten",
+    "models": "Modelle",
+    "runtimes": "Laufzeiten",
+    "logs": "Protokolle",
+    "showInFinder": "Im Finder zeigen",
+    "openFolder": "Ordner öffnen",
+    "opened": "Geöffnet",
+    "copyPath": "Pfad unten kopieren",
+    "pending": "Erscheint, wenn Yggdrasil läuft",
+    "limit": "Maximaler Modellspeicher",
+    "limitDescription": "Weiche Grenze für geladene Modelle auf diesem Computer.",
+    "unlimited": "Unbegrenzt"
+  },
+  "about": {
+    "tagline": "Lokale KI-Steuerzentrale",
+    "versionUnavailable": "Version nicht verfügbar",
+    "build": "Build {{commit}}",
+    "source": "Zugehöriger Quellcode",
+    "thisComputer": "Dieser Computer",
+    "service": "Dienst",
+    "unavailable": "Nicht verfügbar",
+    "diagnostics": "Diagnose öffnen"
+  },
+  "reset": {
+    "title": "App zurücksetzen",
+    "description": "Standardwerte wiederherstellen und die Einrichtung neu starten. Löscht Chats, eigene Profile, Aufgaben und API-Schlüssel.",
+    "button": "Einstellungen und App-Daten zurücksetzen …",
+    "warningKeep": "Das kann nicht rückgängig gemacht werden. Du durchläufst die Einrichtung erneut. Geladene Modelle und Laufzeiten bleiben erhalten.",
+    "warningDelete": "Das kann nicht rückgängig gemacht werden. Du durchläufst die Einrichtung erneut. Geladene Modelle werden ebenfalls gelöscht.",
+    "deleteModels": "Auch geladene Modelle löschen",
+    "confirm": "Ja, zurücksetzen",
+    "resetting": "Wird zurückgesetzt …",
+    "cancel": "Abbrechen",
+    "failed": "Die App konnte nicht zurückgesetzt werden. Versuche es erneut."
+  }
+}

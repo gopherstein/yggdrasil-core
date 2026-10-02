@@ -1,0 +1,20 @@
+{
+  "title": "Verbundene Dienste",
+  "description": "Lass die KI in Diensten lesen und handeln, die du nutzt. Tokens bleiben auf diesem Computer, außerhalb der Sicht der KI; sie sieht nur, was der Dienst zurückgibt. Lesen ist erlaubt, Änderungen fragen dich vorher.",
+  "generic": "Etwas ist schiefgelaufen.",
+  "needsAttention": "Erfordert Aufmerksamkeit: {{error}}",
+  "lastCheckFailed": "die letzte Prüfung ist fehlgeschlagen",
+  "connectedAs": "Verbunden als {{account}}",
+  "notConnected": "Nicht verbunden",
+  "checking": "Wird geprüft …",
+  "check": "Prüfen",
+  "change": "Ändern",
+  "disconnect": "Trennen",
+  "connect": "Verbinden",
+  "optional": " (optional)",
+  "stored": "Gespeichert ({{value}}). Leer lassen, um es zu behalten.",
+  "save": "Speichern",
+  "cancel": "Abbrechen",
+  "tools": "Werkzeuge: {{tools}}",
+  "asksFirst": "{{name}} (fragt vorher)"
+}

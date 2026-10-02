@@ -1,0 +1,84 @@
+{
+  "about": "À propos de {{name}}",
+  "close": "Fermer",
+  "inYggdrasil": "Dans Yggdrasil",
+  "mascot": {
+    "label": "À propos de Ratatoskr",
+    "kind": "La mascotte d'Yggdrasil",
+    "story": "Dans les mythes, Ratatoskr est l'écureuil qui monte et descend le long de l'Arbre-Monde, portant les messages entre l'aigle perché au sommet et le dragon Níðhöggr tapi dans les racines. On dit qu'il aimait semer un peu la zizanie en chemin.",
+    "here": "Ici, il fait le même travail : il porte vos demandes entre vos apps et les modèles de vos ordinateurs. Il réfléchit pendant qu'une réponse s'écrit, se réjouit quand quelque chose se termine, et fait la sieste quand aucun modèle n'est chargé."
+  },
+  "logo": {
+    "label": "À propos de l'emblème d'Yggdrasil",
+    "kind": "L'Arbre-Monde",
+    "story": "Yggdrasil est le grand frêne au centre du cosmos nordique. Ses branches s'étendent au-dessus des cieux, ses racines plongent jusqu'à trois puits, et les neuf mondes sont suspendus parmi ses rameaux.",
+    "here": "L'emblème dessine l'arbre en pistes de circuit imprimé, ses racines et ses branches se terminant par des nœuds, comme les ordinateurs qu'Yggdrasil relie en un seul système."
+  },
+  "realms": {
+    "chat": {
+      "meaning": "Discussion est l'endroit où vos messages sont portés jusqu'aux modèles de vos ordinateurs, et où les réponses vous reviennent.",
+      "story": "Ratatoskr est l'écureuil qui monte et descend le tronc d'Yggdrasil, portant les messages entre l'aigle au sommet de l'arbre et le dragon Níðhöggr qui en ronge les racines.",
+      "rune": "Ansuz, la rune de la parole"
+    },
+    "automations": {
+      "meaning": "Les Nornes veillent sur ce qui doit advenir, et sur le moment où cela advient. Norn exécute le travail planifié.",
+      "story": "Les trois Nornes, Urðr, Verðandi et Skuld, vivent près du puits d'Urðr, sous Yggdrasil. Elles arrosent les racines de l'arbre et façonnent ce qui fut, ce qui est et ce qui sera.",
+      "rune": "Jera, la rune de l'année qui tourne"
+    },
+    "models": {
+      "meaning": "Ymir est le premier géant, à partir duquel le monde fut créé. Les modèles sont le socle de tout le reste.",
+      "story": "Au commencement était Ymir, le premier des géants. Lorsqu'il fut tué, les dieux bâtirent le monde à partir de lui : la terre de sa chair, les montagnes de ses os et le ciel de son crâne.",
+      "rune": "Uruz, la rune de la force brute"
+    },
+    "train": {
+      "meaning": "Brokkr est le forgeron qui façonna Mjölnir. Ici, vous forgez votre propre IA.",
+      "story": "Brokkr et son frère Sindri étaient des forgerons nains. À la suite d'un pari avec Loki, ils forgèrent Mjölnir, le marteau de Thor, Brokkr actionnant le soufflet alors même qu'une mouche le piquait.",
+      "rune": "Kenaz, la rune de la torche et du savoir-faire"
+    },
+    "knowledge": {
+      "meaning": "Mimir garde le puits de la sagesse. Mimir rend vos connaissances consultables.",
+      "story": "Mímir gardait le puits de la sagesse sous l'une des racines d'Yggdrasil. Odin donna un œil pour y boire une gorgée, et après la mort de Mímir, il conserva sa tête pour qu'elle continue à le conseiller.",
+      "rune": "Laguz, la rune de l'eau et du puits"
+    },
+    "memory": {
+      "meaning": "Muninn, le corbeau de la mémoire d'Odin, garde ce que vous demandez à Yggdrasil de retenir.",
+      "story": "Huginn et Muninn, Pensée et Mémoire, sont les corbeaux d'Odin. Chaque matin, ils survolent le monde et reviennent lui raconter ce qu'ils ont vu. Odin disait craindre par-dessus tout que Muninn ne revienne pas.",
+      "rune": "Othala, la rune de ce que l'on garde"
+    },
+    "nodes": {
+      "meaning": "Bifrost est le pont arc-en-ciel entre les mondes. Il relie vos ordinateurs.",
+      "story": "Bifröst est le pont arc-en-ciel ardent qui relie Midgard, le monde des hommes, à Asgard, la demeure des dieux. Heimdall monte la garde à son extrémité.",
+      "rune": "Raidho, la rune du voyage"
+    },
+    "performance": {
+      "meaning": "Sleipnir est le cheval à huit jambes d'Odin, le plus rapide de tous.",
+      "story": "Sleipnir est le cheval gris à huit jambes d'Odin, le plus rapide de tous les coursiers. Il porte Odin à travers le ciel et la mer, et le mena même un jour jusqu'à Hel et retour.",
+      "rune": "Ehwaz, la rune du cheval"
+    },
+    "diagnostics": {
+      "meaning": "Heimdall veille sur le pont et rien ne lui échappe. Il veille sur l'état du système.",
+      "story": "Heimdall est le guetteur des dieux. Il a besoin de moins de sommeil qu'un oiseau, voit à cent lieues de nuit et entend l'herbe pousser. Au Ragnarök, il sonnera du Gjallarhorn.",
+      "rune": "Algiz, la rune de la protection"
+    },
+    "profiles": {
+      "meaning": "Odin envoie ses corbeaux. Les profils décident de la façon dont l'assistant pense et de ce qu'il peut faire.",
+      "story": "Odin est le Père de tout. Il resta pendu neuf nuits à Yggdrasil pour obtenir les runes, donna un œil pour la sagesse, et envoie chaque jour ses corbeaux par-dessus le monde.",
+      "rune": "Mannaz, la rune du soi"
+    },
+    "tools": {
+      "meaning": "Gungnir est la lance d'Odin, qui ne manque jamais sa cible. Les outils sont la façon dont l'assistant agit.",
+      "story": "Gungnir est la lance d'Odin, forgée par les nains appelés les fils d'Ivaldi. Quelle que soit la cible visée, elle ne la manque jamais.",
+      "rune": "Tiwaz, la rune en forme de lance"
+    },
+    "api-access": {
+      "meaning": "Valgrind est la porte du Valhalla. Les clés API décident qui peut entrer.",
+      "story": "Valgrind est l'antique porte qui se dresse devant le Valhalla. Elle est sacrée et ancienne, et rares sont ceux qui savent comment se ferme son verrou.",
+      "rune": "Thurisaz, la rune de la porte"
+    },
+    "settings": {
+      "meaning": "Forseti règle chaque différend avec équité. Les paramètres sont les règles que suit Yggdrasil.",
+      "story": "Forseti, fils de Baldr, siège à Glitnir, une salle aux piliers d'or et au toit d'argent. Tous ceux qui lui soumettent un différend repartent réconciliés.",
+      "rune": "Isa, la rune de l'immobilité"
+    }
+  }
+}

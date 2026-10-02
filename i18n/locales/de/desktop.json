@@ -1,0 +1,20 @@
+{
+  "menu": {
+    "quitApp": "Yggdrasil beenden",
+    "file": "Ablage",
+    "quit": "Beenden"
+  },
+  "tray": {
+    "tooltip": "Yggdrasil läuft im Hintergrund",
+    "open": "Yggdrasil öffnen",
+    "openHint": "Hauptfenster anzeigen",
+    "stop": "Hintergrunddienst stoppen",
+    "stopHint": "Lokalen KI-Dienst stoppen und beenden"
+  },
+  "lifecycle": {
+    "closingTitle": "Yggdrasil wird beendet",
+    "stopping": "Lokaler KI-Dienst wird gestoppt …",
+    "backgroundMenuBar": "Yggdrasil läuft weiter in der Menüleiste",
+    "backgroundTray": "Yggdrasil läuft weiter im Infobereich"
+  }
+}

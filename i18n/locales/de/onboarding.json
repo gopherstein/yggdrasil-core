@@ -1,0 +1,76 @@
+{
+  "header": {
+    "welcome": "Willkommen",
+    "lede": "Mit dieser App läuft KI privat auf deinen eigenen Computern."
+  },
+  "hardware": {
+    "title": "Dieser Computer",
+    "description": "Erkannte Hardware für lokale Inferenz.",
+    "detecting": "Hardware wird erkannt …",
+    "processor": "Prozessor",
+    "cores_one": "{{count}} Kern",
+    "cores_other": "{{count}} Kerne",
+    "memory": "Arbeitsspeicher",
+    "graphics": "Grafik",
+    "system": "System",
+    "unavailable": "Hardwaredetails erscheinen, sobald das App-Backend läuft. Du kannst die Einrichtung jetzt fortsetzen."
+  },
+  "question": "Wobei soll dir deine KI helfen?",
+  "purposes": {
+    "general": {
+      "title": "Allgemeiner Assistent",
+      "description": "Alltagsfragen, Hilfe beim Schreiben und Gespräche, die lokal bleiben."
+    },
+    "coding": {
+      "title": "Programmieren",
+      "description": "Hilfe beim Code, die automatisch alle gekoppelten Computer nutzen kann, wenn dort Modelle installiert sind."
+    },
+    "research": {
+      "title": "Recherche",
+      "description": "Lange Texte lesen, zusammenfassen und sorgfältig durchdenken."
+    },
+    "custom": {
+      "title": "Eigene",
+      "description": "Wähle Modelle und Orchestrierung selbst im Expertenmodus."
+    }
+  },
+  "continue": "Weiter",
+  "finding": "Einrichtung wird gesucht …",
+  "recommendFailed": "Keine Empfehlung erhalten.",
+  "recommend": {
+    "badge": "Empfohlen",
+    "title": "Empfohlen für {{purpose}}",
+    "download": "{{size}} Download",
+    "storage": "Geschätzter Speicherplatz",
+    "memory": "Geschätzter aktiver Arbeitsspeicher",
+    "install": "Empfehlung installieren",
+    "skip": "Später",
+    "back": "Zurück"
+  },
+  "roles": {
+    "coordinator": "Koordinator",
+    "worker": "Helfer",
+    "reviewer": "Prüfer",
+    "researcher": "Rechercheur",
+    "assistant": "Assistent"
+  },
+  "install": {
+    "runtime": "Lokale Modell-Laufzeit wird installiert …",
+    "model": "{{model}} wird installiert …",
+    "downloading": "{{model}} wird geladen … {{percent}}",
+    "profile": "Dein KI-Profil wird erstellt …",
+    "conversation": "Dein erstes Gespräch wird vorbereitet …",
+    "chatTitle": "{{profile}}-Chat",
+    "working": "Wird installiert …",
+    "complete": "{{percent}} abgeschlossen",
+    "keepOpen": "Große Modelle zu laden kann einige Minuten dauern. Lass dieses Fenster geöffnet.",
+    "failed": "Installation fehlgeschlagen.",
+    "downloadFailed": "Laden des Modells fehlgeschlagen.",
+    "noProfileId": "Das Profil wurde erstellt, aber es wurde keine ID zurückgegeben."
+  },
+  "ready": {
+    "title": "Alles bereit",
+    "description": "Deine empfohlene Einrichtung ist installiert. Chatte jetzt mit deiner lokalen KI.",
+    "start": "Chat starten"
+  }
+}

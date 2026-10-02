@@ -1,0 +1,58 @@
+{
+  "tagline": "Pannello di controllo per l'IA locale",
+  "nav": {
+    "label": "Principale",
+    "main": "Principale",
+    "system": "Sistema",
+    "chat": "Chat",
+    "automations": "Automazioni",
+    "models": "Modelli",
+    "train": "Addestra",
+    "knowledge": "Conoscenza",
+    "memory": "Memoria",
+    "computers": "Computer",
+    "performance": "Prestazioni",
+    "diagnostics": "Diagnostica",
+    "profiles": "Profili e orchestrazione",
+    "tools": "Strumenti",
+    "apiAccess": "Accesso API",
+    "settings": "Impostazioni"
+  },
+  "status": {
+    "starting": "Avvio…",
+    "unavailable": "Servizio non disponibile",
+    "noModel": "Nessun modello",
+    "ready": "Pronto",
+    "unavailableHint": "Il servizio locale di Yggdrasil non risponde.",
+    "noModelHint": "Installa un modello in Modelli per iniziare a chattare.",
+    "readyHint": "Il servizio locale è pronto."
+  },
+  "subsystems": {
+    "title": "Sistema",
+    "bifrostHint": "Rilevamento dei computer e rete",
+    "computersNone": "Nessun computer",
+    "computersConnected_one": "{{count}} computer collegato",
+    "computersConnected_many": "{{count}} computer collegati",
+    "computersConnected_other": "{{count}} computer collegati",
+    "nornHint": "Norn distribuisce il lavoro tra i tuoi computer",
+    "nornAutomatic": "Automatico",
+    "mimirHint": "Conoscenza e memoria locali",
+    "mimirReady": "Pronto"
+  },
+  "boot": {
+    "starting": "Avvio di Yggdrasil",
+    "preparing": "Preparazione del tuo servizio di IA locale",
+    "unavailable": "Servizio non disponibile",
+    "unavailableBody": "Il servizio locale di Yggdrasil non ha ancora risposto. Attendi un momento e riprova; se continua a succedere, controlla Diagnostica dopo il caricamento dell'app.",
+    "retrying": "Nuovo tentativo…",
+    "tryAgain": "Riprova",
+    "keyRequired": "Chiave API richiesta",
+    "keyBody": "Questo daemon di Yggdrasil è in ascolto anche oltre questo computer. Inserisci una chiave API per continuare. Una chiave non cifra il traffico su HTTP semplice.",
+    "continue": "Continua"
+  },
+  "units": {
+    "ms": "{{value}} ms",
+    "seconds": "{{value}} s",
+    "tokPerSec": "{{value}} tok/s"
+  }
+}

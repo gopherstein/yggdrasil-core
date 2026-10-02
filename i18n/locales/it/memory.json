@@ -1,0 +1,43 @@
+{
+  "page": {
+    "title": "Memoria",
+    "description": "Le cose che hai chiesto a Yggdrasil di ricordare. Appartengono a Yggdrasil, non a un singolo modello, quindi restano tra una chat e l'altra, dopo i riavvii e i cambi di modello. Vengono usati solo i ricordi pertinenti alla domanda, e restano su questo computer. Scrivi “Ricorda che …” in qualsiasi chat per aggiungerne uno.",
+    "useInChats": "Usa la memoria nelle chat",
+    "off": "La memoria è disattivata. Le chat non usano ciò che è salvato qui, e non viene eliminato nulla.",
+    "loading": "Caricamento…",
+    "emptyTitle": "Ancora nessun ricordo",
+    "emptyDescription": "Di' a Yggdrasil le cose che vale la pena conservare, come “Ricorda che preferisco le unità metriche” o “Ricorda che questo progetto usa Go.”"
+  },
+  "categories": {
+    "identity": "Su di te",
+    "preferences": "Preferenze",
+    "projects": "Progetti",
+    "technical": "Tecnico",
+    "interests": "Interessi",
+    "people": "Persone",
+    "other": "Altro"
+  },
+  "add": {
+    "label": "Aggiungi un ricordo",
+    "placeholder": "Preferisco risposte brevi con esempi",
+    "category": "Categoria",
+    "chooseForMe": "Scegli tu",
+    "button": "Aggiungi"
+  },
+  "row": {
+    "text": "Testo del ricordo",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "fromChat": "L'hai chiesto in una chat",
+    "addedHere": "Aggiunto qui",
+    "category": "Categoria",
+    "edit": "Modifica",
+    "pause": "Sospendi",
+    "useAgain": "Usa di nuovo",
+    "localOnly": "Solo questo computer",
+    "localOnlyOn": "Solo questo computer ✓",
+    "localOnlyHint": "Non inviare mai questo ricordo a un computer associato. Le chat che lo usano vengono eseguite qui.",
+    "delete": "Elimina",
+    "deleteLabel": "Elimina ricordo: {{content}}"
+  }
+}

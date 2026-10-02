@@ -1,0 +1,77 @@
+{
+  "header": {
+    "welcome": "Benvenuto",
+    "lede": "Questa app può eseguire l'IA in modo privato sui tuoi computer."
+  },
+  "hardware": {
+    "title": "Questo computer",
+    "description": "Hardware rilevato per l'inferenza locale.",
+    "detecting": "Rilevamento dell'hardware…",
+    "processor": "Processore",
+    "cores_one": "{{count}} core",
+    "cores_many": "{{count}} core",
+    "cores_other": "{{count}} core",
+    "memory": "Memoria",
+    "graphics": "Grafica",
+    "system": "Sistema",
+    "unavailable": "I dettagli dell'hardware appariranno quando il backend dell'app sarà in esecuzione. Puoi continuare la configurazione adesso."
+  },
+  "question": "Cosa vorresti che facesse la tua IA?",
+  "purposes": {
+    "general": {
+      "title": "Assistente generale",
+      "description": "Domande quotidiane, aiuto nella scrittura e conversazioni che restano in locale."
+    },
+    "coding": {
+      "title": "Programmazione",
+      "description": "Aiuto con il codice che può usare automaticamente tutti i tuoi computer associati quando vi sono installati dei modelli."
+    },
+    "research": {
+      "title": "Ricerca",
+      "description": "Letture lunghe, riassunti e ragionamenti accurati."
+    },
+    "custom": {
+      "title": "Personalizzato",
+      "description": "Scegli tu modelli e orchestrazione in modalità avanzata."
+    }
+  },
+  "continue": "Continua",
+  "finding": "Ricerca di una configurazione…",
+  "recommendFailed": "Impossibile ottenere un consiglio.",
+  "recommend": {
+    "badge": "Consigliato",
+    "title": "Consigliato per {{purpose}}",
+    "download": "Download di {{size}}",
+    "storage": "Spazio stimato",
+    "memory": "Memoria attiva stimata",
+    "install": "Installa la configurazione consigliata",
+    "skip": "Salta per ora",
+    "back": "Indietro"
+  },
+  "roles": {
+    "coordinator": "Coordinatore",
+    "worker": "Esecutore",
+    "reviewer": "Revisore",
+    "researcher": "Ricercatore",
+    "assistant": "Assistente"
+  },
+  "install": {
+    "runtime": "Installazione del runtime dei modelli locali…",
+    "model": "Installazione di {{model}}…",
+    "downloading": "Download di {{model}}… {{percent}}",
+    "profile": "Creazione del tuo profilo IA…",
+    "conversation": "Preparazione della tua prima conversazione…",
+    "chatTitle": "Chat di {{profile}}",
+    "working": "Installazione…",
+    "complete": "{{percent}} completato",
+    "keepOpen": "Il download di modelli grandi può richiedere diversi minuti. Tieni aperta questa finestra.",
+    "failed": "Installazione non riuscita.",
+    "downloadFailed": "Download del modello non riuscito.",
+    "noProfileId": "Il profilo è stato creato ma non è stato restituito alcun ID."
+  },
+  "ready": {
+    "title": "È tutto pronto",
+    "description": "La configurazione consigliata è installata. Inizia a chattare con la tua IA locale.",
+    "start": "Inizia a chattare"
+  }
+}

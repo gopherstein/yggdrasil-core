@@ -1,0 +1,75 @@
+{
+  "header": {
+    "welcome": "欢迎",
+    "lede": "这个应用可以在你自己的电脑上私密地运行 AI。"
+  },
+  "hardware": {
+    "title": "这台电脑",
+    "description": "检测到的本地推理硬件。",
+    "detecting": "正在检测硬件…",
+    "processor": "处理器",
+    "cores_other": "{{count}} 核",
+    "memory": "内存",
+    "graphics": "显卡",
+    "system": "系统",
+    "unavailable": "应用后端运行后会显示硬件详情。你现在可以继续设置。"
+  },
+  "question": "你希望你的 AI 做什么？",
+  "purposes": {
+    "general": {
+      "title": "通用助手",
+      "description": "日常问答、写作帮助，以及本地优先的对话。"
+    },
+    "coding": {
+      "title": "编程",
+      "description": "代码帮助；在已配对的电脑上安装了模型后，可以自动使用所有这些电脑。"
+    },
+    "research": {
+      "title": "研究",
+      "description": "长篇阅读、总结和严谨推理。"
+    },
+    "custom": {
+      "title": "自定义",
+      "description": "在高级模式下自行选择模型和编排方式。"
+    }
+  },
+  "continue": "继续",
+  "finding": "正在寻找合适的配置…",
+  "recommendFailed": "无法获取推荐。",
+  "recommend": {
+    "badge": "推荐",
+    "title": "为“{{purpose}}”推荐",
+    "download": "下载 {{size}}",
+    "storage": "预计存储空间",
+    "memory": "预计占用内存",
+    "install": "安装推荐配置",
+    "skip": "暂时跳过",
+    "back": "返回"
+  },
+  "roles": {
+    "coordinator": "协调者",
+    "worker": "执行者",
+    "reviewer": "审核者",
+    "researcher": "研究者",
+    "assistant": "助手"
+  },
+  "install": {
+    "runtime": "正在安装本地模型运行时…",
+    "model": "正在安装 {{model}}…",
+    "downloading": "正在下载 {{model}}… {{percent}}",
+    "profile": "正在创建你的 AI 配置…",
+    "conversation": "正在准备你的第一次对话…",
+    "chatTitle": "{{profile}} 聊天",
+    "working": "正在安装…",
+    "complete": "已完成 {{percent}}",
+    "keepOpen": "大型模型下载可能需要几分钟。请保持此窗口打开。",
+    "failed": "安装失败。",
+    "downloadFailed": "模型下载失败。",
+    "noProfileId": "配置已创建，但没有返回 ID。"
+  },
+  "ready": {
+    "title": "一切就绪",
+    "description": "推荐配置已安装。开始与你的本地 AI 聊天吧。",
+    "start": "开始聊天"
+  }
+}

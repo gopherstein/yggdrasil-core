@@ -1,0 +1,75 @@
+{
+  "header": {
+    "welcome": "歡迎",
+    "lede": "這個 App 可以在你自己的電腦上私密地執行 AI。"
+  },
+  "hardware": {
+    "title": "這台電腦",
+    "description": "偵測到可用於本機推論的硬體。",
+    "detecting": "正在偵測硬體…",
+    "processor": "處理器",
+    "cores_other": "{{count}} 核心",
+    "memory": "記憶體",
+    "graphics": "顯示卡",
+    "system": "系統",
+    "unavailable": "App 後端開始執行後，就會顯示硬體詳細資訊。你現在可以繼續設定。"
+  },
+  "question": "你希望你的 AI 做些什麼？",
+  "purposes": {
+    "general": {
+      "title": "一般助理",
+      "description": "日常問題、寫作協助，以及以本機為優先的對話。"
+    },
+    "coding": {
+      "title": "程式設計",
+      "description": "程式碼協助；當你配對的電腦上安裝了模型時，會自動運用所有這些電腦。"
+    },
+    "research": {
+      "title": "研究",
+      "description": "長篇閱讀、摘要和縝密推理。"
+    },
+    "custom": {
+      "title": "自訂",
+      "description": "在進階模式中自行挑選模型與協作編排方式。"
+    }
+  },
+  "continue": "繼續",
+  "finding": "正在尋找合適的配置…",
+  "recommendFailed": "無法取得建議。",
+  "recommend": {
+    "badge": "建議",
+    "title": "適合「{{purpose}}」的建議配置",
+    "download": "下載大小 {{size}}",
+    "storage": "預估儲存空間",
+    "memory": "預估使用中記憶體",
+    "install": "安裝建議配置",
+    "skip": "暫時略過",
+    "back": "返回"
+  },
+  "roles": {
+    "coordinator": "協調者",
+    "worker": "工作者",
+    "reviewer": "審查者",
+    "researcher": "研究者",
+    "assistant": "助理"
+  },
+  "install": {
+    "runtime": "正在安裝本機模型執行環境…",
+    "model": "正在安裝 {{model}}…",
+    "downloading": "正在下載 {{model}}… {{percent}}",
+    "profile": "正在建立你的 AI 設定檔…",
+    "conversation": "正在準備你的第一段對話…",
+    "chatTitle": "{{profile}} 聊天",
+    "working": "正在安裝…",
+    "complete": "已完成 {{percent}}",
+    "keepOpen": "大型模型可能需要幾分鐘才能下載完成。請保持這個視窗開啟。",
+    "failed": "安裝失敗。",
+    "downloadFailed": "模型下載失敗。",
+    "noProfileId": "已建立設定檔，但沒有傳回 ID。"
+  },
+  "ready": {
+    "title": "一切就緒",
+    "description": "建議配置已安裝完成。開始和你的本機 AI 聊天吧。",
+    "start": "開始聊天"
+  }
+}

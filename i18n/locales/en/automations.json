@@ -82,10 +82,7 @@
     "withDuration": "{{when}} · {{duration}}",
     "seconds": "{{s}}s",
     "minutes": "{{m}}m",
-    "minutesSeconds": "{{m}}m {{s}}s",
-    "clock": "{{hour}}:{{minute}} {{meridiem}}",
-    "am": "AM",
-    "pm": "PM"
+    "minutesSeconds": "{{m}}m {{s}}s"
   },
   "weekdays": {
     "0": "Sunday",
@@ -152,6 +149,7 @@
     "intro": "Tell Yggdrasil what you want it to do.",
     "describe": "Describe what you want",
     "describePlaceholder": "Every morning at 8:00 AM, check this product and tell me if the price is below $500.",
+    "englishOnly": "Automations read requests written in English for now, like the example in the box.",
     "setUp": "Set up automation",
     "name": "Name",
     "task": "Task",

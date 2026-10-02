@@ -63,10 +63,21 @@ function readStored(): string {
   }
 }
 
+/** A tag's script, such as Hant for zh-TW, or '' when Intl can't tell. */
+function scriptOf(tag: string): string {
+  try {
+    return new Intl.Locale(tag).maximize().script ?? ''
+  } catch {
+    return ''
+  }
+}
+
 /**
  * Picks the language to show. A saved App language wins; otherwise the first
- * of the system's languages that has a catalog, matched exactly or by base
- * language (de-AT → de); otherwise English.
+ * of the system's languages that has a catalog, matched exactly, by base
+ * language (de-AT → de), by script (zh-TW → zh-Hant), or by another region in
+ * the same script (pt-PT → pt-BR, never Simplified for Traditional Chinese);
+ * otherwise English.
  */
 export function resolveLanguage(saved: string, system: readonly string[], available: readonly string[] = availableLanguages): string {
   if (pseudoLocales.includes(saved)) return saved
@@ -74,8 +85,14 @@ export function resolveLanguage(saved: string, system: readonly string[], availa
   const match = (tag: string): string | null => {
     const exact = lower.indexOf(tag.toLowerCase())
     if (exact >= 0) return available[exact]
-    const base = lower.indexOf(tag.split('-')[0].toLowerCase())
-    return base >= 0 ? available[base] : null
+    const language = tag.split('-')[0].toLowerCase()
+    const base = lower.indexOf(language)
+    if (base >= 0) return available[base]
+    const script = scriptOf(tag)
+    const byScript = lower.indexOf(`${language}-${script.toLowerCase()}`)
+    if (script && byScript >= 0) return available[byScript]
+    const sibling = available.find((a) => a.split('-')[0].toLowerCase() === language && scriptOf(a) === script)
+    return sibling ?? null
   }
   if (saved) {
     const found = match(saved)

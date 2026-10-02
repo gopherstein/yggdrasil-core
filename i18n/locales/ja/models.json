@@ -1,0 +1,202 @@
+{
+  "page": {
+    "title": "モデル",
+    "subtitle": "インストールするものを選びましょう。Yggdrasilはお使いのハードウェアに合うモデルをおすすめします。",
+    "loading": "モデルライブラリを読み込んでいます…",
+    "search": "モデルを検索…",
+    "emptyTitle": "厳選モデルがありません",
+    "emptyDescription": "ローカルカタログが空です。「すべてのモデルを見る」からHugging Faceのモデルをインストールしてみてください。",
+    "ready": "{{model}}のダウンロードが完了し、使用できるようになりました。",
+    "readyFallback": "モデル",
+    "dismiss": "閉じる"
+  },
+  "tabs": {
+    "discover": "見つける",
+    "installed": "インストール済み",
+    "running": "実行中"
+  },
+  "target": {
+    "label": "対象：",
+    "aria": "モデルのおすすめ対象のコンピュータ",
+    "thisComputer": "このコンピュータ",
+    "all": "すべてのコンピュータ",
+    "computer": "コンピュータ",
+    "clusterView": "クラスタ表示 · {{running}}",
+    "running_other": "{{count}}個のモデルが実行中",
+    "allHint": "ペアリングしたすべてのコンピュータにインストールできます。おすすめは引き続き、適合度の高いものを優先します。",
+    "basedOn": "おすすめは{{name}}のハードウェアに基づいています。",
+    "manage": "コンピュータを管理",
+    "useAnother": "別のコンピュータを使う",
+    "hardwareUnavailable": "ハードウェアの詳細を取得できません",
+    "unifiedMemory": "ユニファイドメモリ{{size}}",
+    "memory": "メモリ{{size}}"
+  },
+  "discover": {
+    "recommended": "おすすめ",
+    "recommendedHint": "選択したコンピュータに合う厳選モデルです。用途を優先しています。",
+    "browseAll": "すべてのモデルを見る",
+    "noRecommendations": "まだおすすめはありません。",
+    "noMatches": "この検索に一致する厳選モデルはありません。"
+  },
+  "categories": {
+    "coding": "コーディング",
+    "general": "汎用アシスタント",
+    "reasoning": "推論",
+    "vision": "画像認識",
+    "fast": "小型・高速",
+    "large": "大規模モデル"
+  },
+  "fit": {
+    "excellent": "最適",
+    "good": "適合",
+    "tight": "ぎりぎり",
+    "heavy": "動作が遅い可能性あり",
+    "unsupported": "非対応",
+    "unknown": "適合度不明"
+  },
+  "install": {
+    "install": "インストール",
+    "anyway": "それでもインストール",
+    "unsupported": "非対応",
+    "downloading": "ダウンロード中…",
+    "installing": "インストール中…",
+    "installed": "インストール済み",
+    "progress": "{{percent}} · {{done}} / {{total}}"
+  },
+  "speed": {
+    "measured": "実測 {{value}} tok/s",
+    "estimated": "推定 約{{value}} tok/s",
+    "tokPerSec": "{{value}} tok/s"
+  },
+  "memory": {
+    "approximate": "約{{range}}",
+    "unified": "ユニファイドメモリ{{size}}",
+    "plain": "メモリ{{size}}",
+    "needed": "約{{size}}"
+  },
+  "status": {
+    "running": "実行中",
+    "downloading": "ダウンロード中",
+    "installed": "インストール済み",
+    "notInstalled": "未インストール"
+  },
+  "lastUsed": {
+    "never": "なし",
+    "justNow": "たった今"
+  },
+  "tags": {
+    "context": "{{count}}Kコンテキスト"
+  },
+  "tools": {
+    "webSummary": "ローカルツールを使用 · Webを取得可能",
+    "webDetail": "承認すれば、ファイルの読み取り、gitの使用、ターミナルコマンドの実行ができます。curlのようなコマンドでWeb上の情報を調べられます。専用のブラウザはありません。",
+    "blockedSummary": "ローカルツールを使用 · このプロファイルではWebをブロック",
+    "blockedDetail": "このモデルはターミナルコマンドを実行できますが、現在のアシスタントプロファイルではターミナルがオフになっているため、Webページを取得できません。",
+    "chatSummary": "チャットのみ · Webアクセスなし",
+    "chatDetail": "モデル自身の知識で答えます。ターミナルコマンドを実行できないため、Web上の情報は調べられません。"
+  },
+  "chips": {
+    "coding": "コーディング",
+    "tools": "ツール",
+    "reasoning": "推論",
+    "vision": "画像認識",
+    "fast": "高速",
+    "general": "汎用"
+  },
+  "support": {
+    "embedding": "埋め込みモデル：ナレッジの検索を補助します。チャットはできません",
+    "reranker": "リランカー：検索結果を並べ替えます。チャットはできません",
+    "classifier": "分類器：リクエストを振り分けます。チャットはできません"
+  },
+  "bestFor": {
+    "coding": "プログラミングに最適",
+    "reasoning": "慎重な推論に最適",
+    "vision": "画像やドキュメントに最適",
+    "fast": "素早い回答に最適",
+    "large": "難しい問題に最適",
+    "everyday": "日常使いのローカルアシスタント"
+  },
+  "small": {
+    "note": "小型で高速ですが、特にファイルやナレッジに関して、事実や数値を取り違えることがあります。データに関する質問には、より大きなモデルのほうが信頼できます。",
+    "installedOther": "{{model}}がインストールされています。そのような質問では、チャットでそのモデルか「自動」を選んでください。",
+    "fitsOther": "{{model}}はこのコンピュータで動作します。",
+    "installOther": "{{model}}をインストール"
+  },
+  "capability": {
+    "noWeb": "現在の構成ではWebへのリアルタイムアクセスは利用できません。",
+    "noTools": "{{model}}はツールを使えないため、それを調べられません。下にあるようなツール対応モデルに切り替えてください。",
+    "noLocalTools": "{{model}}はローカルツールを使わないため、ファイルの読み取り、コマンドの実行、gitの操作を代行できません。",
+    "noVision": "{{model}}は画像を見ることができません。"
+  },
+  "card": {
+    "details": "詳細",
+    "hideDetails": "詳細を隠す",
+    "modelSize": "モデルサイズ",
+    "quantization": "量子化",
+    "unknown": "不明",
+    "runtimeMemory": "推定実行時メモリ",
+    "context": "設定されたコンテキスト",
+    "machineMemory": "マシンのメモリ",
+    "available": "現在の空き",
+    "expected": "想定される動作",
+    "gpu": "GPU",
+    "recommendations": "おすすめ",
+    "onYourComputers": "あなたのコンピュータ上",
+    "bestMachine": "最適なマシン：{{name}}",
+    "family": "モデルファミリー",
+    "parameters": "パラメータ",
+    "format": "フォーマット",
+    "runtime": "ランタイム",
+    "modelId": "モデルID"
+  },
+  "tightFit": {
+    "label": "ぎりぎり",
+    "hint": "このコンピュータの空きメモリの大部分を使うため、不安定になる場合があります。",
+    "title": "このモデルはこのコンピュータでは不安定になる可能性があります",
+    "body": "{{model}}はこのコンピュータで利用できるメモリの大部分を使用します。負荷の高い作業や大きなコンテキストサイズでは、動作が遅くなったり、応答しなくなったり、システムが不安定になったりする場合があります。",
+    "advice": "Yggdrasilは、OSやグラフィックス用にもっとメモリを残しておくことをおすすめします。",
+    "cancel": "キャンセル",
+    "install": "それでもインストール"
+  },
+  "browse": {
+    "title": "すべてのモデルを見る",
+    "description": "Yggdrasilがローカルで実行できるモデルをHugging Faceで検索します。インストール先は上で選択したコンピュータです。",
+    "close": "閉じる",
+    "placeholder": "モデルを検索…",
+    "search": "検索",
+    "searching": "Hugging Faceを検索しています…",
+    "failed": "Hugging Faceに接続できませんでした。ネットワークを確認してもう一度お試しください。",
+    "install": "インストール",
+    "installFailed": "インストールに失敗しました"
+  },
+  "installedTab": {
+    "empty": "インストール済みのモデルはまだありません。「見つける」からインストールすると、ここに表示されます。",
+    "runningOn": "{{computer}}で実行中",
+    "downloading": "ダウンロード中… {{percent}}",
+    "installedOn": "{{where}}にインストール済み",
+    "thisComputer": "このコンピュータ",
+    "usedBy": "{{profiles}}が使用中",
+    "lastUsed": "最終使用：{{when}}",
+    "chat": "チャット",
+    "start": "開始",
+    "installElsewhere": "他のコンピュータにインストール",
+    "installing": "インストール中…",
+    "moreActions": "{{model}}のその他の操作",
+    "stop": "停止",
+    "remove": "削除"
+  },
+  "runningTab": {
+    "empty": "現在読み込まれているモデルはありません。必要なときにチャットが自動で起動します。",
+    "active": "アクティブなモデル",
+    "inUse": " · 約{{size}}使用中",
+    "ofHost": "（このコンピュータの{{size}}中）",
+    "runningOn": "{{computer}}で実行中",
+    "stop": "停止",
+    "memory": "メモリ",
+    "memoryUnavailable": "メモリ使用量を取得できません",
+    "speed": "速度",
+    "speedUnavailable": "速度を取得できません",
+    "usedBy": "使用中：{{profiles}}",
+    "openChat": "チャットを開く"
+  }
+}

@@ -1,0 +1,364 @@
+{
+  "page": {
+    "title": "プロファイルとオーケストレーション",
+    "subtitle": "プロファイルは保存されたアシスタントです。リクエストの処理方法、モデル、ツール、メモリ、コンピュータをまとめたものです。",
+    "hint": "チャットで選ぶか、自分で作成してください。",
+    "create": "プロファイルを作成",
+    "createTitle": "新しいプロファイルを作成",
+    "loading": "プロファイルを読み込んでいます…",
+    "loadFailed": "プロファイルを読み込めませんでした。ローカルデーモンは実行中ですか？",
+    "emptyTitle": "プロファイルはまだありません",
+    "emptyDescription": "プロファイルを作成して、アシスタントの動き方をチャットに伝えましょう。",
+    "noneInFilter": "この絞り込みに該当するプロファイルはありません。",
+    "filter": "プロファイルを絞り込む",
+    "filters": {
+      "all": "すべて",
+      "builtin": "組み込み",
+      "custom": "カスタム"
+    }
+  },
+  "create": {
+    "title": "プロファイルを作成",
+    "startFrom": "元にするもの：",
+    "startingWith": "<strong>{{name}}</strong>を元に作成します。作成後に名前の変更や細かな調整ができます。",
+    "creating": "作成中…",
+    "create": "作成",
+    "cancel": "キャンセル",
+    "copyName": "{{name}}（コピー）",
+    "options": {
+      "general": {
+        "label": "汎用アシスタント",
+        "description": "日常の質問とローカル優先のチャットに。"
+      },
+      "coding": {
+        "label": "プログラミング",
+        "description": "コンピュータをまたぐAIチームでコーディングを手伝います。"
+      },
+      "research": {
+        "label": "リサーチ",
+        "description": "長文の読解と慎重な推論に。"
+      },
+      "blank": {
+        "label": "空白",
+        "description": "空の状態から始めて、役割、ツール、コンピュータを自分で設定します。"
+      }
+    }
+  },
+  "purposes": {
+    "general": "日常の会話",
+    "coding": "プログラミングとコーディング支援",
+    "research": "リサーチと長文の読解",
+    "custom": "カスタム構成"
+  },
+  "card": {
+    "rename": "プロファイル名を変更",
+    "builtin": "組み込み",
+    "custom": "カスタム",
+    "automaticSelection": "コンピュータの自動選択",
+    "customSelection": "コンピュータのカスタム選択",
+    "tools_other": "ツール{{count}}個",
+    "askFirst": " · {{count}}個は事前に確認",
+    "noTools": "有効なツールはありません",
+    "more": "ほか{{count}}件",
+    "useInChat": "チャットで使う",
+    "close": "閉じる",
+    "edit": "編集",
+    "hideDetails": "詳細を隠す",
+    "details": "詳細",
+    "moreActions": "{{name}}のその他の操作",
+    "howItWorks": "仕組み",
+    "computerSelection": "コンピュータの選択",
+    "selectionDetail": "{{title}}。{{detail}}",
+    "strategy": "戦略：<strong>{{strategy}}</strong>",
+    "thisMachine": "{{name}}（このマシン）"
+  },
+  "menu": {
+    "duplicate": "複製",
+    "rename": "名前を変更",
+    "confirmReset": "「{{name}}」をYggdrasilの出荷時の状態に戻しますか？加えた変更は失われます。",
+    "reset": "デフォルトに戻す",
+    "confirmDelete": "「{{name}}」を削除しますか？この操作は取り消せません。",
+    "delete": "削除"
+  },
+  "strategies": {
+    "auto": {
+      "label": "自動",
+      "detail": "Yggdrasilが判断します。簡単な質問には1つのモデルで答え、複数のパートがあるリクエストは計画を立てて確認します。"
+    },
+    "single": {
+      "label": "単一モデル",
+      "detail": "計画を立てず、1つのモデルがすべてのリクエストに答えます。"
+    },
+    "planned": {
+      "label": "プランナー＋ワーカー",
+      "detail": "複数のパートがあるリクエストは、回答を書く前に必ずパートごとに処理します。"
+    },
+    "team": {
+      "label": "チーム",
+      "detail": "プランナーが各リクエストを分割し、ワーカーが各パートを処理し（可能なら他のコンピュータで）、レビュアーが回答を確認します。簡単な質問にはそのまま直接答えます。"
+    },
+    "teamTitle": "AIチーム",
+    "automaticTitle": "自動",
+    "withStrategy": "{{title}} · 戦略：{{strategy}}"
+  },
+  "computers": {
+    "prefer_local": {
+      "title": "このコンピュータを優先",
+      "short": "このコンピュータ優先",
+      "detail": "まずこのマシンでの実行を試みます。ここにモデルがインストールされていない場合は、ペアリングしたコンピュータを使います。"
+    },
+    "manual": {
+      "title": "カスタム",
+      "short": "カスタム",
+      "detail": "役割ごとの固定設定に従って配置します。特定のステップを特定のマシンで実行したい場合に最適です。"
+    },
+    "automatic": {
+      "title": "自動",
+      "short": "自動",
+      "detail": "各ステップを、すでにモデルがあるペアリング済みのコンピュータに配置します。IPやポートの設定は不要です。"
+    }
+  },
+  "chips": {
+    "files": "ファイル",
+    "git": "Git",
+    "terminal": "ターミナル",
+    "ok": "{{label}} ✓",
+    "ask": "{{label}} 確認"
+  },
+  "roles": {
+    "role": "役割",
+    "assistant": "メイン",
+    "fast": "高速",
+    "coding": "コーディング",
+    "planner": "プランナー",
+    "worker": "ワーカー",
+    "reviewer": "レビュアー",
+    "numbered": "{{role}} {{n}}",
+    "automaticModel": "モデルを自動選択",
+    "pinnedComputer": "固定したコンピュータ",
+    "automaticComputer": "コンピュータを自動選択",
+    "hint": "{{model}} · {{computer}}",
+    "help": {
+      "assistant": "回答を書きます。「自動」ではチャットで選んだモデルを使います。",
+      "fast": "チャットが「自動」のとき、簡単な質問に答えます。",
+      "coding": "チャットが「自動」のとき、コーディングの依頼に答えます。",
+      "planner": "リクエストをパートに分割します。",
+      "worker": "計画の1つのパートを処理します。パートは複数のコンピュータで同時に実行できます。",
+      "reviewer": "回答があなたに表示される前に確認します。",
+      "other": "このプロファイルのワークフローにある名前付きのステップです。"
+    }
+  },
+  "capabilities": {
+    "internet": {
+      "label": "インターネット",
+      "description": "Webから最新の情報を検索して読み、場所や経路を調べます"
+    },
+    "files": {
+      "label": "ファイル",
+      "description": "ワークスペース内のファイルを探し、読み、書き込みます"
+    },
+    "code": {
+      "label": "コードの実行",
+      "description": "計算、分析、グラフ作成のためにサンドボックスでPythonを実行します。事前に確認します"
+    },
+    "speech": {
+      "label": "音声",
+      "description": "このコンピュータで音声を文字起こしし、テキストを読み上げます"
+    },
+    "images": {
+      "label": "画像",
+      "description": "画像生成を設定すると、このコンピュータで画像を作成・編集します"
+    },
+    "video": {
+      "label": "動画",
+      "description": "動画生成を設定すると、このコンピュータで短いクリップを作成します"
+    },
+    "shell": {
+      "label": "シェル",
+      "description": "このコンピュータでコマンドを実行します"
+    },
+    "git": {
+      "label": "Git",
+      "description": "リポジトリを調べ、コミットやプッシュを行います"
+    }
+  },
+  "tools": {
+    "internet": {
+      "search": {
+        "label": "Web検索",
+        "description": "公開されているWebを検索し、タイトル、リンク、抜粋を返します。"
+      },
+      "open": {
+        "label": "Webページを開く",
+        "description": "URLを開き、読みやすいテキストを返します。"
+      }
+    },
+    "filesystem": {
+      "search": {
+        "label": "ファイルを探す",
+        "description": "ワークスペース内のファイルを名前で探します。"
+      },
+      "read": {
+        "label": "ファイルを読む",
+        "description": "アシスタントがYggdrasilのワークスペース内のファイルを開き、実際の内容を引用・要約できるようにします。"
+      },
+      "write": {
+        "label": "ファイルに書き込む",
+        "description": "アシスタントがワークスペース内のファイルを作成・更新できるようにします。"
+      }
+    },
+    "terminal": {
+      "label": "ターミナル",
+      "description": "このコンピュータでシェルコマンドを実行します。"
+    },
+    "git": {
+      "status": {
+        "label": "Git status",
+        "description": "変更されたファイルを表示し、アシスタントが作業ツリーの状態を把握できるようにします。"
+      },
+      "diff": {
+        "label": "Git diff",
+        "description": "実際のコードの変更を表示し、アシスタントがパッチをレビュー・説明できるようにします。"
+      },
+      "log": {
+        "label": "Git log",
+        "description": "ワークスペースの最近のコミットを表示します。"
+      },
+      "show": {
+        "label": "Git show",
+        "description": "1つのコミットを表示します。"
+      },
+      "add": {
+        "label": "Git add",
+        "description": "ファイルをコミット用にステージします。コミットの準備を手伝ってほしいときに便利です。"
+      },
+      "commit": {
+        "label": "Git commit",
+        "description": "ローカルのgitコミットを作成します。"
+      },
+      "push": {
+        "label": "Git push",
+        "description": "コミットをリモートにプッシュします。"
+      }
+    }
+  },
+  "policies": {
+    "deny": {
+      "label": "拒否",
+      "description": "このプロファイルでは使用できません。"
+    },
+    "ask": {
+      "label": "毎回確認",
+      "description": "使用するたびにチャット内で確認を表示します。"
+    },
+    "allow-for-session": {
+      "label": "セッションごとに1回確認",
+      "description": "初回に確認し、アプリを再起動するまでその選択を記憶します。"
+    },
+    "allow": {
+      "label": "常に許可",
+      "description": "確認せずに実行します。よく使う低リスクのツールに最適です。"
+    }
+  },
+  "editor": {
+    "profile": "プロファイル",
+    "name": "名前",
+    "namePlaceholder": "例：プログラミング",
+    "models": "モデル",
+    "modelsHint": "「自動」ではチャットで選んだモデルを使います。",
+    "model": "モデル",
+    "automatic": "自動",
+    "computer": "コンピュータ",
+    "fallback": "フォールバックの順序",
+    "fallbackHint": "回答するモデルが失敗したときに順番に試します。これらの後は、Yggdrasilがインストール済みの別のモデルを選びます。",
+    "none": "なし",
+    "tools": "ツール",
+    "on": "オン",
+    "off": "オフ",
+    "individualTools": "個別のツール",
+    "memory": "メモリ",
+    "memoryHint": "このプロファイルのチャットでは、質問ごとにこれらのソースを検索し、一致する抜粋を使います。",
+    "orchestration": "オーケストレーション",
+    "strategy": "戦略",
+    "execution": "実行",
+    "computerSelection": "コンピュータの選択",
+    "selectionOptions": {
+      "automatic": "自動：モデルがすでにある場所に配置",
+      "prefer_local": "このコンピュータを優先",
+      "manual": "カスタム：「モデル」で設定したコンピュータを使用"
+    },
+    "localOnly": "このコンピュータのみ：ペアリングしたコンピュータは使わない",
+    "allowed": "許可",
+    "preferred": "優先",
+    "never": "使用しない",
+    "save": "プロファイルを保存",
+    "cancel": "キャンセル"
+  },
+  "controls": {
+    "default": "デフォルト",
+    "effort": {
+      "label": "推論レベル",
+      "help": "チャットで処理の深さが「自動」のときに使われます。",
+      "fast": "高速",
+      "balanced": "標準",
+      "thorough": "徹底"
+    },
+    "planning": {
+      "label": "計画",
+      "help": "複数のパートがあるリクエストをパートごとに処理します。「常に」では、明確なパートのないリクエストも分割します。",
+      "on": "リクエストにパートがあるとき",
+      "always": "常に",
+      "off": "計画しない"
+    },
+    "parallel": {
+      "label": "並列処理",
+      "help": "独立したパートを並列で調べます。",
+      "on": "並列",
+      "off": "1つずつ"
+    },
+    "verification": {
+      "label": "検証",
+      "help": "回答する前に、数値をソースと照合します。",
+      "off": "オフ",
+      "check": "確認して報告",
+      "correct": "確認して1回修正",
+      "thorough": "確認して2回修正"
+    },
+    "memory": {
+      "label": "メモリ",
+      "help": "このプロファイルのチャットで、保存されたメモリを使います。",
+      "off": "このプロファイルではオフ"
+    },
+    "fallback": {
+      "label": "フォールバック",
+      "help": "選んだモデルが失敗したときに、別のモデルで回答します。",
+      "off": "代わりに失敗を表示"
+    },
+    "max_workers": {
+      "label": "ワーカー",
+      "help": "計画内のパートの最大数（2〜8）。"
+    },
+    "max_tool_calls": {
+      "label": "ツール呼び出し",
+      "help": "1ターンでのツール呼び出しの最大数（1〜50）。"
+    },
+    "retries": {
+      "label": "再試行",
+      "help": "モデルが失敗した後の試行回数（1〜3）：まず別のコンピュータで同じモデル、次に別のモデルを使います。"
+    },
+    "timeout_seconds": {
+      "label": "制限時間（秒）",
+      "help": "これより長くかかるターンを停止します（10〜3600）。"
+    },
+    "context_share": {
+      "label": "コンテキスト予算",
+      "help": "以前のメッセージが使えるコンテキストウィンドウの最大割合（0.1〜0.9）。"
+    }
+  },
+  "orchestrators": {
+    "title": "オーケストレーター",
+    "description": "モデルとツールを連携させる、差し替え可能なオーケストレーションエンジンです。",
+    "emptyTitle": "オーケストレーターの管理は近日対応予定です",
+    "emptyDescription": "組み込みやプラグインのオーケストレーターを、詳細モードでここから設定できるようになります。"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "page": {
+    "title": "メモリ",
+    "description": "Yggdrasilに覚えておくよう頼んだことです。メモリは特定のモデルではなくYggdrasilに属するため、チャットや再起動、モデルの変更をまたいで引き継がれます。質問に関係するメモリだけが使われ、このコンピュータの外には出ません。チャットで「…を覚えておいて」と言うと追加できます。",
+    "useInChats": "チャットでメモリを使う",
+    "off": "メモリはオフです。ここに保存された内容はチャットで使われませんが、削除されることもありません。",
+    "loading": "読み込み中…",
+    "emptyTitle": "まだ何も覚えていません",
+    "emptyDescription": "残しておきたいことをYggdrasilに伝えましょう。たとえば「メートル法の単位が好みだと覚えておいて」や「このプロジェクトはGoを使っていると覚えておいて」などです。"
+  },
+  "categories": {
+    "identity": "あなたについて",
+    "preferences": "好み",
+    "projects": "プロジェクト",
+    "technical": "技術",
+    "interests": "興味・関心",
+    "people": "人物",
+    "other": "その他"
+  },
+  "add": {
+    "label": "メモリを追加",
+    "placeholder": "例を交えた短い回答が好みです",
+    "category": "カテゴリ",
+    "chooseForMe": "自動で選ぶ",
+    "button": "追加"
+  },
+  "row": {
+    "text": "メモリの内容",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "fromChat": "チャットで依頼",
+    "addedHere": "ここで追加",
+    "category": "カテゴリ",
+    "edit": "編集",
+    "pause": "一時停止",
+    "useAgain": "再び使う",
+    "localOnly": "このコンピュータのみ",
+    "localOnlyOn": "このコンピュータのみ ✓",
+    "localOnlyHint": "このメモリをペアリングしたコンピュータに送信しません。これを使うチャットはこのコンピュータで実行されます。",
+    "delete": "削除",
+    "deleteLabel": "メモリを削除：{{content}}"
+  }
+}

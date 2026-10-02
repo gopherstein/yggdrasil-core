@@ -1,0 +1,123 @@
+{
+  "page": {
+    "title": "APIアクセス",
+    "subtitle": "YggdrasilのAPIにどこからアクセスできるか、どのように保護されているか。",
+    "loading": "API設定を読み込んでいます…"
+  },
+  "probe": {
+    "notReady": "ヘルスチェックは応答しましたが、サービスの準備ができていません。",
+    "unreachable": "このコンピュータのAPIに接続できませんでした。",
+    "openaiDown": "サービスは稼働していますが、OpenAI互換エンドポイントが応答しませんでした。",
+    "passed": "ローカルチェックに合格しました。",
+    "openaiStatus": "OpenAIエンドポイントがHTTP {{status}}を返しました。",
+    "openaiNoResponse": "OpenAIエンドポイントが応答しませんでした。",
+    "needsKey": "応答しています。他のデバイスには有効なAPIキーが必要です。",
+    "checkFailed": "APIを確認できませんでした。ローカルサービスは実行中ですか？",
+    "failed": "APIチェックに失敗しました。"
+  },
+  "service": {
+    "title": "サービス",
+    "api": "APIサービス",
+    "running": "実行中",
+    "notResponding": "応答なし",
+    "checking": "確認中…",
+    "access": "アクセス",
+    "localNetwork": "ローカルネットワーク",
+    "thisComputer": "このコンピュータのみ",
+    "auth": "認証",
+    "keyRequired": "APIキーが必要",
+    "notRequired": "このコンピュータでは不要",
+    "testing": "テスト中…",
+    "test": "APIをテスト",
+    "endpoint": "エンドポイント",
+    "localAddress": "ローカルアドレス：<mono>{{address}}</mono>",
+    "lanEndpoint": "LANエンドポイント",
+    "lanHint": "このコンピュータのLAN IPとポート<mono>{{port}}</mono>を使用します（例：<mono>http://192.168.x.x:{{port}}/v1</mono>）。",
+    "hideDocs": "APIドキュメントを隠す",
+    "docs": "APIドキュメント",
+    "docsBody": "Yggdrasilは<mono>/v1</mono>でOpenAI互換のAPIを提供しています。クライアントの接続先を上のエンドポイントに設定し、Yggdrasilに他のコンピュータからアクセスできる場合は<header/>を送信してください。`/api/v1`と`/v1`はどちらもこのヘッダーが必要です。キーを使っても通常のHTTPは暗号化されません。",
+    "copied": "コピーしました",
+    "copyUrl": "URLをコピー"
+  },
+  "lan": {
+    "title": "ローカルネットワークアクセス",
+    "on": "ローカルネットワーク上のデバイスはAPIキーを使って接続できます。",
+    "off": "YggdrasilのAPIを使えるのはこのコンピュータ上のアプリだけです。",
+    "noKeys": "ネットワークアクセスはオンですが、APIキーがまだありません。別のデバイスから接続する前にキーを作成してください。",
+    "restart": "ネットワークアクセスを変更したら、Yggdrasilを完全に終了してから開き直し、サーバを再バインドしてください。待ち受けがループバック以外になると、すべての接続にAPIキーが必要になります。通常のHTTPでは、キーを使っても通信は暗号化されません。「APIをテスト」はこのコンピュータだけを確認し、他のデバイスからの到達性は確認しません。",
+    "confirmTitle": "他のコンピュータからのアクセスを許可しますか？",
+    "confirmBody": "ローカルネットワーク上のデバイスがYggdrasilに接続できるようになります。リモートからの接続にはすべてAPIキーが必要です。",
+    "confirmHttp": "通常のHTTPでは、APIキーを使っても通信は暗号化されません。これを有効にした後、サーバがネットワークで待ち受けるようYggdrasilを終了して開き直してください。",
+    "browserKey": "サーバの再バインド後もこのブラウザが接続し続けられるよう、APIキーを作成してください。キー全体が表示されるのは一度だけです。",
+    "keyName": "キーの名前",
+    "defaultKeyName": "このコンピュータ",
+    "enableFailed": "ネットワークアクセスを有効にできませんでした。",
+    "cancel": "キャンセル",
+    "enabling": "有効にしています…",
+    "allow": "アクセスを許可"
+  },
+  "keys": {
+    "title": "APIキー",
+    "description": "Yggdrasilと通信するアプリやデバイス用の認証情報です。",
+    "create": "APIキーを作成",
+    "createHint": "何が使っているか分かるよう、キーに名前を付けてください。",
+    "namePlaceholder": "VS Code",
+    "creating": "作成中…",
+    "createKey": "キーを作成",
+    "cancel": "キャンセル",
+    "copyNow": "このシークレットを今すぐコピーしてください。再表示されません",
+    "copiedBang": "コピーしました！",
+    "copySecret": "シークレットをコピー",
+    "none": "APIキーはまだありません。",
+    "meta": "作成：{{created}} · 最終使用：{{lastUsed}}",
+    "copy": "コピー",
+    "confirmRotate": "「{{name}}」をローテーションしますか？古いシークレットはすぐに使えなくなります。",
+    "rotate": "ローテーション",
+    "confirmRevoke": "「{{name}}」を無効にしますか？このキーを使っているアプリはアクセスできなくなります。",
+    "revoke": "無効にする"
+  },
+  "advanced": {
+    "title": "詳細",
+    "bind": "バインドアドレス",
+    "port": "ポート",
+    "host": "設定されたホスト"
+  },
+  "permissions": {
+    "summary": "このキーで使えるもの",
+    "memories": "あなたのメモリ",
+    "knowledge": "接続したナレッジ",
+    "tools": "ツール",
+    "use": {
+      "never": "使わない",
+      "on_request": "リクエストで求められたとき",
+      "always": "常に使う"
+    },
+    "toolChoices": {
+      "profile": "プロファイルで許可されたもの",
+      "read_only": "読み取り専用のツール",
+      "none": "ツールなし"
+    },
+    "placement": "リクエストの実行場所を選べる",
+    "note": "リクエストはこれより少なく求めることはできますが、多く求めることはできません。ネットワーク経由では常にこの制限が適用されます。このコンピュータでは、アプリがこのキーを送信したときに適用されます。",
+    "saveFailed": "保存できませんでした。"
+  },
+  "share": {
+    "title": "他のAIアプリでYggdrasilを使う",
+    "description": "MCPに対応したアプリは、ローカルAIに質問したり、モデルを一覧表示したり、接続したナレッジを検索したりできます。回答はあなたのコンピュータの中にとどまり、ローカルAIは読み取り用のツールだけを使います。",
+    "other": "その他のアプリ",
+    "settings": "{{language}}の設定",
+    "copied": "コピーしました",
+    "copy": "コピー",
+    "needsKey": "Yggdrasilはネットワークに公開されているため、アプリにはAPIキーが必要です。下で作成し、設定内の<key/>の位置に入れてください。キーの権限が適用されます。",
+    "keyPlaceholder": "<your API key>",
+    "where": {
+      "claudeDesktop": "Claude Desktopで「設定 → 開発者 → 構成を編集」を開き、これを追加してClaudeを再起動してください。",
+      "claudeCode": "ターミナルでこれを実行してください。",
+      "cursor": "これを~/.cursor/mcp.jsonに追加してください（Cursor Settings → MCP → Add new global MCP server）。",
+      "vscode": "コマンドパレットから「MCP: Open User Configuration」を実行し、これを追加してください。",
+      "other": "アドレスでMCPサーバに接続するアプリは、このアドレスでStreamable HTTPを使います。プログラムを起動するアプリは代わりにコマンドを使います。"
+    },
+    "otherText": "アドレス：{{url}}\nコマンド：{{command}}",
+    "otherHeader": "\nヘッダー：Authorization: Bearer {{key}}"
+  }
+}

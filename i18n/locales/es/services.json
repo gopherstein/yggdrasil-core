@@ -1,0 +1,20 @@
+{
+  "title": "Servicios conectados",
+  "description": "Permite que la IA lea y actúe en los servicios que usas. Los tokens se quedan en esta computadora, fuera de la vista de la IA; solo ve lo que devuelve el servicio. La lectura está permitida y los cambios te piden confirmación primero.",
+  "generic": "Algo salió mal.",
+  "needsAttention": "Requiere atención: {{error}}",
+  "lastCheckFailed": "falló la última comprobación",
+  "connectedAs": "Conectado como {{account}}",
+  "notConnected": "No conectado",
+  "checking": "Comprobando…",
+  "check": "Comprobar",
+  "change": "Cambiar",
+  "disconnect": "Desconectar",
+  "connect": "Conectar",
+  "optional": " (opcional)",
+  "stored": "Guardado ({{value}}). Déjalo en blanco para conservarlo.",
+  "save": "Guardar",
+  "cancel": "Cancelar",
+  "tools": "Herramientas: {{tools}}",
+  "asksFirst": "{{name}} (pregunta primero)"
+}

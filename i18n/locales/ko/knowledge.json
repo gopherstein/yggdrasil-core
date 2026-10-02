@@ -1,0 +1,106 @@
+{
+  "page": {
+    "title": "지식",
+    "description": "Mimir는 카탈로그, 가격, 정책, 문서를 검색할 수 있게 보관해요. 프로필이나 전문 AI가 소스를 사용하면 각 질문에 맞는 구절이 함께 전달돼요. 파일을 편집하면 다음 질문부터 변경 내용이 반영돼요. 다시 학습할 필요가 없어요.",
+    "loading": "불러오는 중…",
+    "emptyTitle": "연결된 지식 없음",
+    "emptyDescription": "이 컴퓨터의 파일이나 폴더를 연결하거나, 내용을 붙여 넣거나, 데이터베이스나 웹 API에서 읽어 오세요. PDF, Excel, CSV, TSV, JSON, JSONL, Markdown, 텍스트, HTML 파일을 사용할 수 있어요."
+  },
+  "badge": {
+    "linked": "연결됨",
+    "database": "데이터베이스",
+    "api": "웹 API",
+    "copy": "사본"
+  },
+  "meaning": {
+    "full": "단어 일치뿐 아니라 의미로도 검색할 수 있어요.",
+    "partial": "의미로 검색 가능: 지금까지 구절 {{total}}개 중 {{embedded}}개."
+  },
+  "refresh": {
+    "days_other": "{{count}}일",
+    "hours_other": "{{count}}시간",
+    "minutes_other": "{{count}}분",
+    "note": "질문에 사용될 때 데이터가 {{every}}보다 오래되었거나 다시 색인하면 다시 가져와요."
+  },
+  "row": {
+    "failed": "실패",
+    "passages_other": "구절 {{count}}개",
+    "indexed": "{{when}} 색인됨",
+    "watches": "파일이 변경되면 자동으로 다시 색인해요.",
+    "edit": "편집",
+    "indexing": "색인하는 중…",
+    "reindex": "다시 색인",
+    "localOnlyHint": "이 소스의 구절을 페어링된 컴퓨터로 보내지 않아요. 이 소스를 사용하는 채팅은 이 컴퓨터에서 실행돼요.",
+    "localOnly": "이 컴퓨터에서만",
+    "localOnlyOn": "이 컴퓨터에서만 ✓",
+    "confirmDisconnect": "{{name}}의 연결을 해제할까요? 이 소스를 사용하는 프로필과 AI에서 더 이상 볼 수 없어요. 파일은 삭제되지 않아요.",
+    "disconnect": "연결 해제",
+    "editLabel": "{{name}} 편집",
+    "saveHint": "저장하면 소스를 다시 색인해요. 채팅과 전문 AI는 다음 질문부터 변경 내용을 반영해요.",
+    "saving": "저장하는 중…",
+    "save": "저장",
+    "cancel": "취소"
+  },
+  "add": {
+    "title": "지식 연결",
+    "modes": {
+      "path": "파일 또는 폴더",
+      "text": "업로드 또는 붙여넣기",
+      "database": "데이터베이스",
+      "api": "웹 API"
+    },
+    "path": "이 컴퓨터의 경로",
+    "pathHint": "Yggdrasil이 그 위치에서 바로 읽고 편집 내용을 자동으로 반영해요.",
+    "chooseFile": "파일 선택",
+    "pastePlaceholder": "텍스트, Markdown 또는 CSV를 붙여 넣으세요",
+    "content": "내용",
+    "name": "이름(선택 사항)",
+    "indexing": "색인하는 중…",
+    "connect": "연결"
+  },
+  "remote": {
+    "database": "데이터베이스",
+    "sqlite": "SQLite 파일",
+    "file": "이 컴퓨터의 파일",
+    "connection": "연결 문자열",
+    "connectionHint": "읽기만 가능한 계정을 사용하세요. 데이터베이스와 별도로 저장되며 다시 표시되지 않아요.",
+    "query": "쿼리",
+    "queryHint": "SELECT 하나만 사용하세요. 읽기 전용으로 실행되므로 Yggdrasil이 데이터베이스를 변경하지 않아요. 각 행이 하나의 구절이 돼요.",
+    "url": "URL",
+    "urlHint": "JSON, CSV 또는 텍스트. 객체 목록은 항목마다 하나의 구절이 돼요.",
+    "items": "응답 안의 목록(선택 사항)",
+    "header": "헤더",
+    "value": "값(선택 사항)",
+    "refresh": "다시 가져오는 기준 시간",
+    "refreshChoices": {
+      "m5": "5분",
+      "m15": "15분",
+      "h1": "1시간",
+      "h6": "6시간",
+      "d1": "1일"
+    },
+    "name": "이름(선택 사항)",
+    "connecting": "연결하는 중…",
+    "connect": "연결"
+  },
+  "search": {
+    "title": "질문해 보기",
+    "description": "질문 하나가 채팅에 어떤 구절을 가져오는지 확인해 보세요.",
+    "placeholder": "225/45R17 재고 있나요?",
+    "question": "질문",
+    "search": "검색",
+    "nothing": "일치하는 항목이 없어요."
+  },
+  "picker": {
+    "none": "연결된 지식이 없어요.",
+    "disconnect": "{{name}} 연결 해제",
+    "remove": "제거",
+    "connectExisting": "기존 지식 연결",
+    "connectExistingOption": "기존 지식 연결…",
+    "pathPlaceholder": "또는 ~/Documents/catalog 같은 파일이나 폴더",
+    "path": "파일 또는 폴더 경로",
+    "indexing": "색인하는 중…",
+    "connect": "연결",
+    "manage": "<link>지식</link> 페이지에서 소스를 관리하고, 붙여 넣은 내용을 편집하고, 검색을 시험해 보세요."
+  }
+}

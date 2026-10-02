@@ -1,0 +1,235 @@
+{
+  "page": {
+    "title": "設定",
+    "subtitle": "このコンピュータでのYggdrasilの動作を設定します。",
+    "loading": "設定を読み込んでいます…"
+  },
+  "groups": {
+    "general": "一般",
+    "ai": "AIの動作",
+    "network": "ネットワークとアクセス",
+    "privacy": "プライバシーとセキュリティ",
+    "storage": "ストレージ",
+    "about": "情報",
+    "danger": "危険な操作"
+  },
+  "appearance": {
+    "title": "外観",
+    "description": "ライト、ダーク、またはシステムに合わせるかを選びます。",
+    "dark": "ダーク",
+    "light": "ライト",
+    "system": "システム"
+  },
+  "language": {
+    "title": "言語",
+    "description": "Yggdrasilを使うすべてのコンピュータとスマートフォンで、メニュー、ボタン、メッセージに使われる言語です。各デバイスでそれぞれのシステム言語に合わせることもできます。",
+    "appLanguage": "アプリの言語",
+    "systemDefault": "システムのデフォルト（{{language}}）",
+    "pseudo": "疑似ロケール（翻訳のテスト用）",
+    "pseudoRtl": "右から左の疑似ロケール（レイアウトのテスト用）",
+    "status": {
+      "machine": "機械翻訳のため、人が確認するまで一部の表現が不自然な場合があります。",
+      "partial": "一部のみ翻訳されています。未翻訳の部分は英語で表示されます。",
+      "community": "Yggdrasilコミュニティによる翻訳です。"
+    },
+    "saved": "保存しました。",
+    "saveFailed": "言語を保存できませんでした：{{error}}"
+  },
+  "personalization": {
+    "title": "パーソナライズ",
+    "description": "すべてのチャットと自動化での回答の見せ方です。ここで決まるのはスタイルだけです。AIに許可される操作は「ツールの権限」で設定し、ここやメモリの内容で変えることはできません。",
+    "length": {
+      "label": "回答の長さ",
+      "brief": "簡潔",
+      "balanced": "標準",
+      "detailed": "詳細"
+    },
+    "tone": {
+      "label": "口調",
+      "friendly": "親しみやすい",
+      "neutral": "中立",
+      "direct": "率直"
+    },
+    "format": {
+      "label": "形式",
+      "prose": "段落",
+      "lists": "リスト"
+    },
+    "units": {
+      "label": "単位",
+      "metric": "メートル法",
+      "imperial": "ヤード・ポンド法"
+    },
+    "noPreference": "指定なし",
+    "aboutYou": "あなたについて",
+    "aboutYouPlaceholder": "ジュノー在住のバックエンドエンジニアです。メインのプロジェクトはGoのサービスです。",
+    "instructions": "回答の仕方についてのその他の希望",
+    "instructionsPlaceholder": "コード例はGoで示してください。最後に出典を挙げてください。",
+    "save": "保存",
+    "saving": "保存中…",
+    "saved": "保存しました",
+    "saveFailed": "保存できませんでした。"
+  },
+  "background": {
+    "title": "バックグラウンドで実行を続ける",
+    "description": "ウインドウを閉じても、チャット、API、スケジュールは実行を続けます。スケジュールがある間はオンのままです。"
+  },
+  "launchAtLogin": {
+    "title": "ログイン時に起動",
+    "description": "このコンピュータにサインインしたときにYggdrasilを自動で起動します。"
+  },
+  "defaultProfile": {
+    "title": "デフォルトのプロファイル",
+    "description": "新しいチャットを始めるときに使われます。",
+    "automatic": "自動"
+  },
+  "runOn": {
+    "title": "チャットの実行場所",
+    "description": "チーム内でデフォルトで作業を実行する場所です。",
+    "automatic": "自動",
+    "local": "このコンピュータ",
+    "ask": "毎回確認"
+  },
+  "lifecycle": {
+    "title": "モデルのライフサイクル",
+    "description": "「自動」ではチャット後もモデルを待機状態に保ちます。「手動」では開始と停止をあなたが行います。",
+    "automatic": "自動",
+    "manual": "手動",
+    "idleUnload": "アイドル状態のモデルを解放するまでの時間",
+    "idleUnloadHint": "しばらく使われていないモデルのメモリを解放します。0にするとモデルを読み込んだままにします。",
+    "minutes": "分"
+  },
+  "downloads": {
+    "title": "モデルのダウンロード",
+    "description": "プロファイルがまだインストールされていないモデルを必要とするとき。",
+    "ask": "事前に確認",
+    "automatic": "自動"
+  },
+  "advanced": {
+    "title": "詳細モード",
+    "description": "モデルID、APIの詳細、プロファイル、ログなど、上級者向けの項目を表示します。"
+  },
+  "discovery": {
+    "title": "他のコンピュータを探す",
+    "description": "このコンピュータをネットワーク上に公開し、他のYggdrasilを探します。",
+    "needsRestart": "ネットワーク設定が更新されました。他のコンピュータからこのコンピュータに完全に接続できるよう、Yggdrasilを再起動してください。",
+    "restartManually": "ネットワーク設定の適用を完了するには、Yggdrasilを完全に終了してから開き直してください。",
+    "restartNow": "今すぐ再起動",
+    "status": "状態：<strong>{{state}}</strong>"
+  },
+  "onOff": {
+    "on": "オン",
+    "off": "オフ"
+  },
+  "api": {
+    "title": "APIアクセス",
+    "description": "アプリや他のデバイスがYggdrasilと通信する方法です。",
+    "local": "ローカルAPI",
+    "lan": "LAN API",
+    "manage": "APIアクセスを管理"
+  },
+  "notifications": {
+    "title": "通知",
+    "description": "時間のかかる作業やチームの接続状態についての通知です。",
+    "taskFinish": "タスクが完了したら通知",
+    "peerOffline": "ペアリングしたコンピュータがオフラインになったら通知"
+  },
+  "toolPermissions": {
+    "title": "ツールの権限",
+    "description": "このコンピュータでAIに許可する操作のデフォルトのルールです。",
+    "terminal": "ターミナルコマンド",
+    "fileWrites": "ファイルの書き込み",
+    "git": "Gitの操作",
+    "ask": "確認する",
+    "allowSession": "セッション中は許可",
+    "allow": "許可",
+    "deny": "拒否"
+  },
+  "history": {
+    "title": "履歴",
+    "description": "Yggdrasilがこのコンピュータに保存する内容を管理します。",
+    "saveChats": "チャット履歴を保存",
+    "saveTasks": "タスク履歴を保存",
+    "confirmClear": "このコンピュータのチャット履歴をすべて削除しますか？この操作は取り消せません。",
+    "clear": "チャット履歴を消去",
+    "clearing": "消去中…"
+  },
+  "whatLeft": {
+    "title": "このコンピュータから送信されたもの",
+    "description": "Yggdrasilはこのコンピュータ上で動作します。ここに表示されるのは、チャット、自動化、アプリが外部に何かを送信した記録です（Web検索やWebページ、地図の検索、ペアリングしたコンピュータ、連携サービス）。メモリやナレッジを「このコンピュータのみ」に設定すると、それを使うチャットはこのコンピュータ内で実行されます。",
+    "nothing": "過去30日間、このコンピュータから送信されたものはありません。",
+    "summary": "過去30日間：{{list}}。",
+    "summaryItem": "{{kind}} {{count}}件",
+    "kinds": {
+      "web_search": "Web検索",
+      "web_page": "Webページ",
+      "places": "地図と場所",
+      "paired_computer": "ペアリングしたコンピュータ",
+      "external_server": "外部サーバ",
+      "connector": "連携サービス",
+      "notification": "通知"
+    },
+    "kindsLower": {
+      "web_search": "Web検索",
+      "web_page": "Webページ",
+      "places": "地図と場所",
+      "paired_computer": "ペアリングしたコンピュータ",
+      "external_server": "外部サーバ",
+      "connector": "連携サービス",
+      "notification": "通知"
+    },
+    "sources": {
+      "chat": "チャット",
+      "api": "API",
+      "automation": "自動化",
+      "training": "トレーニング"
+    },
+    "keepFor": "実行記録の保存期間",
+    "retention": {
+      "days_other": "{{count}}日",
+      "year": "1年",
+      "forever": "無期限"
+    },
+    "delete": "今すぐ実行記録を削除",
+    "confirmDelete": "今すぐ実行記録を削除しますか？過去の実行で保存されたプロンプトとツールの結果、およびこのリストが削除されます。チャットは削除されません。",
+    "deleted": "実行記録{{tasks}}件、自動化の結果{{automations}}件、下のエントリ{{entries}}件を削除しました。",
+    "footnote": "実行記録には過去の実行のプロンプトとツールの結果が含まれます。チャットを残すかどうかは下の「履歴」で決まります。各自動化は最新の結果を保持し、「結果が変わったら通知」はそれと比較します。"
+  },
+  "storage": {
+    "folders": "データディレクトリ",
+    "data": "データ",
+    "models": "モデル",
+    "runtimes": "ランタイム",
+    "logs": "ログ",
+    "showInFinder": "Finderで表示",
+    "openFolder": "フォルダを開く",
+    "opened": "開きました",
+    "copyPath": "下のパスをコピーしてください",
+    "pending": "Yggdrasilの実行中に表示されます",
+    "limit": "モデルの最大保存容量",
+    "limitDescription": "このコンピュータにダウンロードするモデルの目安となる上限です。",
+    "unlimited": "無制限"
+  },
+  "about": {
+    "tagline": "ローカルAIコントロールプレーン",
+    "versionUnavailable": "バージョンを取得できません",
+    "build": "ビルド {{commit}}",
+    "source": "対応するソースコード",
+    "thisComputer": "このコンピュータ",
+    "service": "サービス",
+    "unavailable": "利用不可",
+    "diagnostics": "診断を開く"
+  },
+  "reset": {
+    "title": "アプリケーションをリセット",
+    "description": "デフォルトに戻し、初期設定をやり直します。チャット、カスタムプロファイル、タスク、APIキーが消去されます。",
+    "button": "設定とアプリのデータをリセット…",
+    "warningKeep": "この操作は取り消せません。初期設定をもう一度行います。ダウンロード済みのモデルとランタイムは残ります。",
+    "warningDelete": "この操作は取り消せません。初期設定をもう一度行います。ダウンロード済みのモデルも削除されます。",
+    "deleteModels": "ダウンロード済みのモデルも削除",
+    "confirm": "リセットする",
+    "resetting": "リセット中…",
+    "cancel": "キャンセル",
+    "failed": "アプリケーションをリセットできませんでした。もう一度お試しください。"
+  }
+}

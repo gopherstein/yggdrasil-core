@@ -1,0 +1,192 @@
+{
+  "page": {
+    "title": "État d'Yggdrasil",
+    "attention": "Un élément requiert votre attention.",
+    "mostly": "Globalement en bon état : un point est à vérifier.",
+    "normal": "Tout fonctionne normalement.",
+    "creating": "Création…",
+    "export": "Exporter les diagnostics",
+    "exportHint": "Crée un paquet de dépannage. Les secrets en sont exclus.",
+    "overall": "État général",
+    "allOk": "✓ Tous les systèmes sont opérationnels",
+    "needsAttention": "⚠ Action requise",
+    "checkBelow": "⚠ Vérifiez les éléments ci-dessous",
+    "checking": "Vérification…",
+    "refresh": "Actualiser",
+    "tip": "Astuce : installez un modèle dans Modèles avant de discuter.",
+    "bundleCreated": "Paquet de diagnostics créé",
+    "bundleAt": "Paquet de diagnostics créé dans <path>{{path}}</path>",
+    "bundleShare": "Paquet de diagnostics créé. Vous pouvez partager ce fichier lorsque vous demandez de l'aide.",
+    "bundleFailed": "Impossible de créer le paquet de diagnostics. Vérifiez que le daemon est en cours d'exécution."
+  },
+  "checked": {
+    "never": "Pas encore vérifié",
+    "justNow": "Vérifié à l'instant",
+    "at": "Dernière vérification {{when}}"
+  },
+  "ago": {
+    "justNow": "à l'instant",
+    "minutes_one": "{{count}} minute",
+    "minutes_many": "{{count}} minutes",
+    "minutes_other": "{{count}} minutes",
+    "hours_one": "{{count}} heure",
+    "hours_many": "{{count}} heures",
+    "hours_other": "{{count}} heures",
+    "days_one": "{{count}} jour",
+    "days_many": "{{count}} jours",
+    "days_other": "{{count}} jours"
+  },
+  "rows": {
+    "working": "En cours…",
+    "retry": "Réessayer",
+    "openSettings": "Ouvrir Paramètres",
+    "viewDetails": "Voir les détails",
+    "openModels": "Ouvrir Modèles",
+    "openComputers": "Ouvrir Ordinateurs",
+    "manageModels": "Gérer les modèles",
+    "apiSettings": "Réglages de l'API",
+    "healthy": "Opérationnel",
+    "unavailable": "Indisponible",
+    "control": {
+      "label": "Service de contrôle",
+      "notResponding": "Ne répond pas",
+      "message": "Le service Yggdrasil local est injoignable. Quittez puis rouvrez l'app, ou vérifiez que le daemon est en cours d'exécution."
+    },
+    "runtime": {
+      "label": "Moteur d'exécution des modèles",
+      "needsAttention": "Action requise",
+      "notResponding": "Le moteur d'exécution local des modèles ne répond pas.",
+      "notSetUp": "Non configuré",
+      "installModel": "Installez un modèle pour terminer la configuration du moteur d'exécution.",
+      "idle": "Inactif",
+      "running_one": "{{count}} modèle en cours d'exécution",
+      "running_many": "{{count}} modèles en cours d'exécution",
+      "running_other": "{{count}} modèles en cours d'exécution"
+    },
+    "database": {
+      "label": "Base de données locale"
+    },
+    "bifrost": {
+      "label": "Réseau Bifrost",
+      "offline_one": "{{count}} ordinateur hors ligne",
+      "offline_many": "{{count}} ordinateurs hors ligne",
+      "offline_other": "{{count}} ordinateurs hors ligne",
+      "silentFor_one": "{{names}} ne répond plus depuis {{ago}}.",
+      "silentFor_many": "{{names}} ne répondent plus depuis {{ago}}.",
+      "silentFor_other": "{{names}} ne répondent plus depuis {{ago}}.",
+      "silent_one": "{{names}} ne répond pas.",
+      "silent_many": "{{names}} ne répondent pas.",
+      "silent_other": "{{names}} ne répondent pas.",
+      "connected_one": "{{count}} ordinateur connecté",
+      "connected_many": "{{count}} ordinateurs connectés",
+      "connected_other": "{{count}} ordinateurs connectés",
+      "none": "Aucun ordinateur trouvé",
+      "noneHint": "Ajoutez un autre ordinateur ou vérifiez Rechercher d'autres ordinateurs dans Paramètres."
+    },
+    "storage": {
+      "label": "Stockage",
+      "available": "{{size}} disponibles",
+      "modelsUse": "Les modèles occupent environ {{size}} sur cet ordinateur.",
+      "freeUp": "Libérez de l'espace disque avant d'installer d'autres modèles."
+    },
+    "api": {
+      "label": "API",
+      "lan": "LAN activé",
+      "local": "Local uniquement",
+      "lanHint": "Les autres appareils de votre réseau peuvent joindre l'API lorsqu'ils sont autorisés."
+    }
+  },
+  "env": {
+    "title": "Environnement",
+    "version": "Version",
+    "apiBind": "Adresse d'écoute de l'API",
+    "node": "Nœud",
+    "dataDir": "Dossier des données"
+  },
+  "logs": {
+    "hide": "Masquer les journaux",
+    "view": "Voir les journaux",
+    "files": "Fichiers journaux",
+    "live": "En direct",
+    "loading": "Chargement des journaux…",
+    "none": "Aucun fichier journal pour l'instant. Ils apparaissent une fois que l'app a démarré et effectué du travail.",
+    "kinds": {
+      "daemon": "App",
+      "runtime": "Moteur d'exécution des modèles",
+      "other": "Autre"
+    },
+    "kindsAdvanced": {
+      "daemon": "Daemon",
+      "runtime": "Moteur d'exécution"
+    },
+    "select": "Sélectionnez un journal",
+    "selectHint": "Choisissez un fichier journal à gauche pour examiner sa sortie récente.",
+    "recent": "Affichage de la partie la plus récente de ce fichier",
+    "full": "Fichier complet",
+    "copied": "Copié",
+    "copyFailed": "Échec de la copie",
+    "copy": "Copier",
+    "reading": "Lecture du journal…",
+    "readFailed": "Impossible de lire ce journal. Il a peut-être été archivé ou supprimé.",
+    "empty": "(vide)"
+  },
+  "tools": {
+    "title": "Activité des outils",
+    "none": "Aucun appel d'outil pour l'instant dans cette session."
+  },
+  "caches": {
+    "title": "Caches",
+    "description": "Ce qu'Yggdrasil conserve pour répondre plus vite aux demandes répétées. Les caches personnels restent sur cet ordinateur et sont effacés avec l'historique des exécutions. Les mots de passe et les clés ne sont jamais mis en cache.",
+    "by": "Par {{key}}",
+    "keptUntil": "conservé jusqu'à invalidation",
+    "keptFor": "conservé {{ttl}}",
+    "clearedWhen": " ; effacé quand {{invalidation}}",
+    "entries_one": "{{count}} entrée",
+    "entries_many": "{{count}} entrées",
+    "entries_other": "{{count}} entrées",
+    "hitsMisses": " · {{hits}} succès · {{misses}} échecs",
+    "clear": "Effacer"
+  },
+  "abilities": {
+    "title": "Ce qu'Yggdrasil sait faire",
+    "description": "D'après ce qui est installé, en ligne et connecté en ce moment. Discussion répond à des questions comme « Peux-tu générer une image ? » à partir de cette liste.",
+    "available": " (disponible)",
+    "notAvailable": " (non disponible)",
+    "via": "Via {{via}}. ",
+    "summary": "{{models}} · {{computers}} · {{tools}} · {{services}} · {{providers}} · {{files}}",
+    "models_one": "{{count}} modèle installé",
+    "models_many": "{{count}} modèles installés",
+    "models_other": "{{count}} modèles installés",
+    "computers": "{{online}} ordinateurs sur {{total}} en ligne",
+    "tools_one": "{{count}} outil",
+    "tools_many": "{{count}} outils",
+    "tools_other": "{{count}} outils",
+    "services_one": "{{count}} service connecté",
+    "services_many": "{{count}} services connectés",
+    "services_other": "{{count}} services connectés",
+    "providers": "{{healthy}} fournisseurs sur {{total}} prêts",
+    "files_one": "{{count}} fichier ({{size}})",
+    "files_many": "{{count}} fichiers ({{size}})",
+    "files_other": "{{count}} fichiers ({{size}})"
+  },
+  "providers": {
+    "title": "Outils sur chaque ordinateur",
+    "description": "Les images et la voix sont traitées par l'ordinateur jumelé capable de le faire, de préférence celui dont le GPU fait le travail. Les fichiers lui sont envoyés pour la tâche, et le résultat revient dans cette discussion.",
+    "computer": "Ordinateur",
+    "thisComputer": "cet ordinateur",
+    "gpu": "GPU",
+    "tools": {
+      "image.generate": "Créer des images",
+      "image.edit": "Modifier des images",
+      "video.generate": "Créer des vidéos",
+      "speech.transcribe": "Transcrire",
+      "speech.synthesize": "Lire à voix haute"
+    },
+    "states": {
+      "healthy": "Prêt",
+      "installing": "Installation",
+      "failed": "Échec",
+      "unavailable": "Non configuré"
+    }
+  }
+}

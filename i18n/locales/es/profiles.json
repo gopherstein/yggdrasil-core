@@ -1,0 +1,366 @@
+{
+  "page": {
+    "title": "Perfiles y orquestación",
+    "subtitle": "Un perfil es un asistente guardado: cómo resuelve las solicitudes, sus modelos, herramientas, memoria y computadoras.",
+    "hint": "Elige uno en el chat o crea el tuyo.",
+    "create": "Crear perfil",
+    "createTitle": "Crear un perfil nuevo",
+    "loading": "Cargando perfiles…",
+    "loadFailed": "No se pudieron cargar los perfiles. ¿Está en ejecución el daemon local?",
+    "emptyTitle": "Todavía no hay perfiles",
+    "emptyDescription": "Crea un perfil para indicarle al chat cómo debe trabajar tu asistente.",
+    "noneInFilter": "No hay perfiles con este filtro.",
+    "filter": "Filtrar perfiles",
+    "filters": {
+      "all": "Todos",
+      "builtin": "Integrados",
+      "custom": "Personalizados"
+    }
+  },
+  "create": {
+    "title": "Crear perfil",
+    "startFrom": "Empezar desde:",
+    "startingWith": "Se empieza con <strong>{{name}}</strong>. Puedes cambiarle el nombre y ajustarlo después de crearlo.",
+    "creating": "Creando…",
+    "create": "Crear",
+    "cancel": "Cancelar",
+    "copyName": "{{name}} (copia)",
+    "options": {
+      "general": {
+        "label": "Asistente general",
+        "description": "Preguntas cotidianas y chat local primero."
+      },
+      "coding": {
+        "label": "Programación",
+        "description": "Ayuda con código con un equipo de IA repartido entre tus computadoras."
+      },
+      "research": {
+        "label": "Investigación",
+        "description": "Lectura de textos largos y razonamiento cuidadoso."
+      },
+      "blank": {
+        "label": "En blanco",
+        "description": "Empieza vacío y define tú mismo los roles, las herramientas y las computadoras."
+      }
+    }
+  },
+  "purposes": {
+    "general": "Conversación cotidiana",
+    "coding": "Programación y ayuda con código",
+    "research": "Investigación y lectura de textos largos",
+    "custom": "Configuración personalizada"
+  },
+  "card": {
+    "rename": "Cambiar el nombre del perfil",
+    "builtin": "Integrado",
+    "custom": "Personalizado",
+    "automaticSelection": "Selección automática de computadoras",
+    "customSelection": "Selección personalizada de computadoras",
+    "tools_one": "{{count}} herramienta",
+    "tools_many": "{{count}} herramientas",
+    "tools_other": "{{count}} herramientas",
+    "askFirst": " · {{count}} preguntan primero",
+    "noTools": "No hay herramientas activadas",
+    "more": "+{{count}} más",
+    "useInChat": "Usar en el chat",
+    "close": "Cerrar",
+    "edit": "Editar",
+    "hideDetails": "Ocultar detalles",
+    "details": "Detalles",
+    "moreActions": "Más acciones para {{name}}",
+    "howItWorks": "Cómo funciona",
+    "computerSelection": "Selección de computadoras",
+    "selectionDetail": "{{title}}. {{detail}}",
+    "strategy": "Estrategia: <strong>{{strategy}}</strong>",
+    "thisMachine": "{{name}} (esta máquina)"
+  },
+  "menu": {
+    "duplicate": "Duplicar",
+    "rename": "Cambiar nombre",
+    "confirmReset": "¿Restablecer “{{name}}” a como viene en Yggdrasil? Se perderán los cambios que le hiciste.",
+    "reset": "Restablecer valores predeterminados",
+    "confirmDelete": "¿Eliminar “{{name}}”? Esta acción no se puede deshacer.",
+    "delete": "Eliminar"
+  },
+  "strategies": {
+    "auto": {
+      "label": "Automática",
+      "detail": "Yggdrasil decide: las preguntas rápidas usan un solo modelo, y las solicitudes con varias partes se planifican y se revisan."
+    },
+    "single": {
+      "label": "Un solo modelo",
+      "detail": "Un modelo responde todas las solicitudes, sin plan."
+    },
+    "planned": {
+      "label": "Planificador + trabajadores",
+      "detail": "Las solicitudes con varias partes siempre se resuelven por partes antes de escribir la respuesta."
+    },
+    "team": {
+      "label": "Equipo",
+      "detail": "Un planificador divide cada solicitud, los trabajadores hacen las partes (en otras computadoras cuando pueden) y un revisor comprueba la respuesta. Las preguntas rápidas se siguen respondiendo directamente."
+    },
+    "teamTitle": "Equipo de IA",
+    "automaticTitle": "Automática",
+    "withStrategy": "{{title}} · Estrategia: {{strategy}}"
+  },
+  "computers": {
+    "prefer_local": {
+      "title": "Preferir esta computadora",
+      "short": "Esta computadora primero",
+      "detail": "Intenta ejecutar primero en esta máquina. Recurre a una computadora vinculada cuando un modelo no está instalado aquí."
+    },
+    "manual": {
+      "title": "Personalizada",
+      "short": "Personalizada",
+      "detail": "Usa las computadoras fijadas a cada rol para decidir dónde se ejecuta. Ideal cuando quieres un paso concreto en una máquina concreta."
+    },
+    "automatic": {
+      "title": "Automática",
+      "short": "Automática",
+      "detail": "Coloca cada paso en la computadora vinculada que ya tenga el modelo. Sin configurar IP ni puertos."
+    }
+  },
+  "chips": {
+    "files": "Archivos",
+    "git": "Git",
+    "terminal": "Terminal",
+    "ok": "{{label}} ✓",
+    "ask": "{{label}}: preguntar"
+  },
+  "roles": {
+    "role": "Rol",
+    "assistant": "Principal",
+    "fast": "Rápido",
+    "coding": "Programación",
+    "planner": "Planificador",
+    "worker": "Trabajador",
+    "reviewer": "Revisor",
+    "numbered": "{{role}} {{n}}",
+    "automaticModel": "Modelo automático",
+    "pinnedComputer": "Computadora fijada",
+    "automaticComputer": "Computadora automática",
+    "hint": "{{model}} · {{computer}}",
+    "help": {
+      "assistant": "Escribe la respuesta. Automático usa el modelo elegido en el chat.",
+      "fast": "Responde las preguntas rápidas cuando el chat está en Automático.",
+      "coding": "Responde las solicitudes de programación cuando el chat está en Automático.",
+      "planner": "Divide una solicitud en partes.",
+      "worker": "Trabaja en una parte de un plan. Las partes pueden ejecutarse en distintas computadoras al mismo tiempo.",
+      "reviewer": "Revisa la respuesta antes de que la veas.",
+      "other": "Un paso con nombre en el flujo de trabajo de este perfil."
+    }
+  },
+  "capabilities": {
+    "internet": {
+      "label": "Internet",
+      "description": "Busca y lee información actual en la web, y encuentra lugares e indicaciones"
+    },
+    "files": {
+      "label": "Archivos",
+      "description": "Busca, lee y escribe archivos en el espacio de trabajo"
+    },
+    "code": {
+      "label": "Ejecutar código",
+      "description": "Ejecuta Python en un entorno aislado para cálculos, análisis y gráficos; pregunta primero"
+    },
+    "speech": {
+      "label": "Voz",
+      "description": "Transcribe audio y lee texto en voz alta, en esta computadora"
+    },
+    "images": {
+      "label": "Imágenes",
+      "description": "Crea y edita imágenes en esta computadora, una vez configurada la generación de imágenes"
+    },
+    "video": {
+      "label": "Video",
+      "description": "Crea clips cortos en esta computadora, una vez configurada la generación de video"
+    },
+    "shell": {
+      "label": "Shell",
+      "description": "Ejecuta comandos en esta computadora"
+    },
+    "git": {
+      "label": "Git",
+      "description": "Inspecciona el repositorio y hace commit o push"
+    }
+  },
+  "tools": {
+    "internet": {
+      "search": {
+        "label": "Búsqueda web",
+        "description": "Busca en la web pública y devuelve títulos, enlaces y fragmentos de texto."
+      },
+      "open": {
+        "label": "Abrir página web",
+        "description": "Abre una URL y devuelve el texto legible."
+      }
+    },
+    "filesystem": {
+      "search": {
+        "label": "Buscar archivos",
+        "description": "Busca archivos en el espacio de trabajo por nombre."
+      },
+      "read": {
+        "label": "Leer archivo",
+        "description": "Permite que el asistente abra archivos de tu espacio de trabajo de Yggdrasil para citar o resumir su contenido real."
+      },
+      "write": {
+        "label": "Escribir archivo",
+        "description": "Permite que el asistente cree o actualice archivos en el espacio de trabajo."
+      }
+    },
+    "terminal": {
+      "label": "Terminal",
+      "description": "Ejecuta comandos de shell en esta computadora."
+    },
+    "git": {
+      "status": {
+        "label": "Git status",
+        "description": "Muestra qué archivos cambiaron para que el asistente pueda analizar tu árbol de trabajo."
+      },
+      "diff": {
+        "label": "Git diff",
+        "description": "Muestra los cambios de código reales para que el asistente pueda revisar o explicar un parche."
+      },
+      "log": {
+        "label": "Git log",
+        "description": "Muestra los commits recientes del espacio de trabajo."
+      },
+      "show": {
+        "label": "Git show",
+        "description": "Muestra un commit."
+      },
+      "add": {
+        "label": "Git add",
+        "description": "Prepara archivos para el commit. Útil cuando quieres ayuda para preparar un commit."
+      },
+      "commit": {
+        "label": "Git commit",
+        "description": "Crea un commit de git local."
+      },
+      "push": {
+        "label": "Git push",
+        "description": "Envía los commits al repositorio remoto."
+      }
+    }
+  },
+  "policies": {
+    "deny": {
+      "label": "Denegar",
+      "description": "Nunca está disponible para este perfil."
+    },
+    "ask": {
+      "label": "Preguntar cada vez",
+      "description": "Muestra una confirmación en el chat antes de cada uso."
+    },
+    "allow-for-session": {
+      "label": "Preguntar una vez por sesión",
+      "description": "Pregunta la primera vez y luego lo recuerda hasta que reinicies la app."
+    },
+    "allow": {
+      "label": "Permitir siempre",
+      "description": "Se ejecuta sin preguntar. Ideal para herramientas de bajo riesgo que usas a menudo."
+    }
+  },
+  "editor": {
+    "profile": "Perfil",
+    "name": "Nombre",
+    "namePlaceholder": "p. ej., Programación",
+    "models": "Modelos",
+    "modelsHint": "Automático usa el modelo elegido en el chat.",
+    "model": "Modelo",
+    "automatic": "Automático",
+    "computer": "Computadora",
+    "fallback": "Orden de respaldo",
+    "fallbackHint": "Se prueban en orden cuando falla el modelo que responde. Después de estos, Yggdrasil elige otro modelo instalado.",
+    "none": "Ninguno",
+    "tools": "Herramientas",
+    "on": "Activado",
+    "off": "Desactivado",
+    "individualTools": "Herramientas individuales",
+    "memory": "Memoria",
+    "memoryHint": "Los chats con este perfil buscan en estas fuentes en cada pregunta y usan los fragmentos que coinciden.",
+    "orchestration": "Orquestación",
+    "strategy": "Estrategia",
+    "execution": "Ejecución",
+    "computerSelection": "Selección de computadoras",
+    "selectionOptions": {
+      "automatic": "Automática: ejecutar donde ya está el modelo",
+      "prefer_local": "Preferir esta computadora",
+      "manual": "Personalizada: usar las computadoras definidas en Modelos"
+    },
+    "localOnly": "Solo esta computadora: nunca usar computadoras vinculadas",
+    "allowed": "Permitida",
+    "preferred": "Preferida",
+    "never": "No usar nunca",
+    "save": "Guardar perfil",
+    "cancel": "Cancelar"
+  },
+  "controls": {
+    "default": "Predeterminado",
+    "effort": {
+      "label": "Nivel de razonamiento",
+      "help": "Se usa cuando un chat deja el esfuerzo en Automático.",
+      "fast": "Rápido",
+      "balanced": "Equilibrado",
+      "thorough": "Minucioso"
+    },
+    "planning": {
+      "label": "Planificación",
+      "help": "Resuelve por partes las solicitudes que tienen varias partes. Siempre también divide las solicitudes sin partes evidentes.",
+      "on": "Cuando una solicitud tiene partes",
+      "always": "Siempre",
+      "off": "No planificar nunca"
+    },
+    "parallel": {
+      "label": "Paralelismo",
+      "help": "Consulta las partes independientes al mismo tiempo.",
+      "on": "En paralelo",
+      "off": "Una a la vez"
+    },
+    "verification": {
+      "label": "Verificación",
+      "help": "Comprueba las cifras con las fuentes antes de responder.",
+      "off": "Desactivada",
+      "check": "Comprobar e informar",
+      "correct": "Comprobar y corregir una vez",
+      "thorough": "Comprobar y corregir dos veces"
+    },
+    "memory": {
+      "label": "Memoria",
+      "help": "Usa los recuerdos persistentes en los chats de este perfil.",
+      "off": "Desactivada para este perfil"
+    },
+    "fallback": {
+      "label": "Respaldo",
+      "help": "Responde con otro modelo cuando falla el elegido.",
+      "off": "Mostrar el error"
+    },
+    "max_workers": {
+      "label": "Trabajadores",
+      "help": "Máximo de partes en un plan (2–8)."
+    },
+    "max_tool_calls": {
+      "label": "Llamadas a herramientas",
+      "help": "Máximo de llamadas a herramientas en un turno (1–50)."
+    },
+    "retries": {
+      "label": "Reintentos",
+      "help": "Intentos después de que falla un modelo (1–3): el mismo modelo en otra computadora y luego otro modelo."
+    },
+    "timeout_seconds": {
+      "label": "Límite de tiempo (s)",
+      "help": "Detiene un turno que dure más (10–3600)."
+    },
+    "context_share": {
+      "label": "Presupuesto de contexto",
+      "help": "Parte máxima de la ventana que pueden usar los mensajes anteriores (0.1–0.9)."
+    }
+  },
+  "orchestrators": {
+    "title": "Orquestadores",
+    "description": "Motores de orquestación intercambiables que coordinan modelos y herramientas.",
+    "emptyTitle": "La administración de orquestadores llegará pronto",
+    "emptyDescription": "Los orquestadores integrados y de plugins se podrán configurar aquí en el modo avanzado."
+  }
+}

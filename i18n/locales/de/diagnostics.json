@@ -1,0 +1,179 @@
+{
+  "page": {
+    "title": "Zustand von Yggdrasil",
+    "attention": "Etwas braucht deine Aufmerksamkeit.",
+    "mostly": "Weitgehend in Ordnung – eine Sache solltest du dir ansehen.",
+    "normal": "Alles funktioniert normal.",
+    "creating": "Wird erstellt …",
+    "export": "Diagnose exportieren",
+    "exportHint": "Erstellt ein Paket zur Fehlersuche. Geheimnisse sind nicht enthalten.",
+    "overall": "Gesamtstatus",
+    "allOk": "✓ Alle Systeme laufen",
+    "needsAttention": "⚠ Erfordert Aufmerksamkeit",
+    "checkBelow": "⚠ Punkte unten prüfen",
+    "checking": "Wird geprüft …",
+    "refresh": "Aktualisieren",
+    "tip": "Tipp: Installiere unter „Modelle“ ein Modell, bevor du chattest.",
+    "bundleCreated": "Diagnosepaket erstellt",
+    "bundleAt": "Diagnosepaket erstellt unter <path>{{path}}</path>",
+    "bundleShare": "Diagnosepaket erstellt. Du kannst diese Datei teilen, wenn du um Hilfe bittest.",
+    "bundleFailed": "Diagnosepaket konnte nicht erstellt werden. Prüfe, ob der Daemon läuft."
+  },
+  "checked": {
+    "never": "Noch nicht geprüft",
+    "justNow": "Gerade eben geprüft",
+    "at": "Zuletzt geprüft {{when}}"
+  },
+  "ago": {
+    "justNow": "gerade eben",
+    "minutes_one": "{{count}} Minute",
+    "minutes_other": "{{count}} Minuten",
+    "hours_one": "{{count}} Stunde",
+    "hours_other": "{{count}} Stunden",
+    "days_one": "{{count}} Tag",
+    "days_other": "{{count}} Tage"
+  },
+  "rows": {
+    "working": "Wird ausgeführt …",
+    "retry": "Wiederholen",
+    "openSettings": "Einstellungen öffnen",
+    "viewDetails": "Details anzeigen",
+    "openModels": "Modelle öffnen",
+    "openComputers": "Computer öffnen",
+    "manageModels": "Modelle verwalten",
+    "apiSettings": "API-Einstellungen",
+    "healthy": "In Ordnung",
+    "unavailable": "Nicht verfügbar",
+    "control": {
+      "label": "Steuerdienst",
+      "notResponding": "Antwortet nicht",
+      "message": "Der lokale Yggdrasil-Dienst ist nicht erreichbar. Beende die App und öffne sie erneut, oder prüfe, ob der Daemon läuft."
+    },
+    "runtime": {
+      "label": "Modell-Laufzeit",
+      "needsAttention": "Erfordert Aufmerksamkeit",
+      "notResponding": "Die lokale Modell-Laufzeit antwortet nicht.",
+      "notSetUp": "Nicht eingerichtet",
+      "installModel": "Installiere ein Modell, um die Laufzeit fertig einzurichten.",
+      "idle": "Leerlauf",
+      "running_one": "{{count}} Modell aktiv",
+      "running_other": "{{count}} Modelle aktiv"
+    },
+    "database": {
+      "label": "Lokale Datenbank"
+    },
+    "bifrost": {
+      "label": "Bifrost-Netzwerk",
+      "offline_one": "{{count}} Computer offline",
+      "offline_other": "{{count}} Computer offline",
+      "silentFor_one": "{{names}} hat seit {{ago}} nicht geantwortet.",
+      "silentFor_other": "{{names}} haben seit {{ago}} nicht geantwortet.",
+      "silent_one": "{{names}} antwortet nicht.",
+      "silent_other": "{{names}} antworten nicht.",
+      "connected_one": "{{count}} Computer verbunden",
+      "connected_other": "{{count}} Computer verbunden",
+      "none": "Keine Computer gefunden",
+      "noneHint": "Füge einen weiteren Computer hinzu oder prüfe „Andere Computer finden“ in den Einstellungen."
+    },
+    "storage": {
+      "label": "Speicherplatz",
+      "available": "{{size}} verfügbar",
+      "modelsUse": "Modelle belegen etwa {{size}} auf diesem Computer.",
+      "freeUp": "Gib Speicherplatz frei, bevor du weitere Modelle installierst."
+    },
+    "api": {
+      "label": "API",
+      "lan": "LAN aktiviert",
+      "local": "Nur lokal",
+      "lanHint": "Andere Geräte in deinem Netzwerk können die API mit Berechtigung erreichen."
+    }
+  },
+  "env": {
+    "title": "Umgebung",
+    "version": "Version",
+    "apiBind": "API-Bindung",
+    "node": "Knoten",
+    "dataDir": "Datenordner"
+  },
+  "logs": {
+    "hide": "Protokolle ausblenden",
+    "view": "Protokolle anzeigen",
+    "files": "Protokolldateien",
+    "live": "Live",
+    "loading": "Protokolle werden geladen …",
+    "none": "Noch keine Protokolldateien. Sie erscheinen, wenn die App gestartet ist und gearbeitet hat.",
+    "kinds": {
+      "daemon": "App",
+      "runtime": "Modell-Laufzeit",
+      "other": "Andere"
+    },
+    "kindsAdvanced": {
+      "daemon": "Daemon",
+      "runtime": "Laufzeit"
+    },
+    "select": "Protokoll auswählen",
+    "selectHint": "Wähle links eine Protokolldatei, um die letzten Ausgaben anzusehen.",
+    "recent": "Der neueste Teil dieser Datei wird angezeigt",
+    "full": "Ganze Datei",
+    "copied": "Kopiert",
+    "copyFailed": "Kopieren fehlgeschlagen",
+    "copy": "Kopieren",
+    "reading": "Protokoll wird gelesen …",
+    "readFailed": "Dieses Protokoll konnte nicht gelesen werden. Es wurde möglicherweise rotiert oder entfernt.",
+    "empty": "(leer)"
+  },
+  "tools": {
+    "title": "Werkzeugaktivität",
+    "none": "In dieser Sitzung noch keine Werkzeugaufrufe."
+  },
+  "caches": {
+    "title": "Caches",
+    "description": "Was Yggdrasil aufbewahrt, um Wiederholungen schneller zu beantworten. Persönliche Caches bleiben auf diesem Computer und werden mit den Durchlaufprotokollen gelöscht. Passwörter und Schlüssel werden nie zwischengespeichert.",
+    "by": "Nach {{key}}",
+    "keptUntil": "aufbewahrt bis zur Ungültigkeit",
+    "keptFor": "aufbewahrt {{ttl}}",
+    "clearedWhen": "; geleert, wenn {{invalidation}}",
+    "entries_one": "{{count}} Eintrag",
+    "entries_other": "{{count}} Einträge",
+    "hitsMisses": " · {{hits}} Treffer · {{misses}} Fehlgriffe",
+    "clear": "Leeren"
+  },
+  "abilities": {
+    "title": "Was Yggdrasil kann",
+    "description": "Ausgehend davon, was gerade installiert, online und verbunden ist. Der Chat beantwortet Fragen wie „Kannst du ein Bild erzeugen?“ anhand dieser Liste.",
+    "available": " (verfügbar)",
+    "notAvailable": " (nicht verfügbar)",
+    "via": "Über {{via}}. ",
+    "summary": "{{models}} · {{computers}} · {{tools}} · {{services}} · {{providers}} · {{files}}",
+    "models_one": "{{count}} Modell installiert",
+    "models_other": "{{count}} Modelle installiert",
+    "computers": "{{online}} von {{total}} Computern online",
+    "tools_one": "{{count}} Werkzeug",
+    "tools_other": "{{count}} Werkzeuge",
+    "services_one": "{{count}} verbundener Dienst",
+    "services_other": "{{count}} verbundene Dienste",
+    "providers": "{{healthy}} von {{total}} Anbietern bereit",
+    "files_one": "{{count}} Datei ({{size}})",
+    "files_other": "{{count}} Dateien ({{size}})"
+  },
+  "providers": {
+    "title": "Werkzeuge auf jedem Computer",
+    "description": "Bilder und Sprache laufen auf dem gekoppelten Computer, der sie ausführen kann, bevorzugt auf einem, dessen GPU die Arbeit übernimmt. Dateien werden für die Aufgabe dorthin gesendet und das Ergebnis kommt in diesen Chat zurück.",
+    "computer": "Computer",
+    "thisComputer": "dieser Computer",
+    "gpu": "GPU",
+    "tools": {
+      "image.generate": "Bilder erstellen",
+      "image.edit": "Bilder bearbeiten",
+      "video.generate": "Videos erstellen",
+      "speech.transcribe": "Transkribieren",
+      "speech.synthesize": "Vorlesen"
+    },
+    "states": {
+      "healthy": "Bereit",
+      "installing": "Wird installiert",
+      "failed": "Fehlgeschlagen",
+      "unavailable": "Nicht eingerichtet"
+    }
+  }
+}

@@ -1,0 +1,384 @@
+{
+  "explainer": "Training bringt deiner KI bei, wie sie ihre Aufgabe erledigt. Verbundenes Wissen liefert ihr die aktuellen Informationen, die sie dafür braucht.",
+  "generic": "Etwas ist schiefgelaufen.",
+  "uses": {
+    "training": {
+      "label": "Training",
+      "description": "Lehrt, wie geantwortet wird. Fest im Modell verankert."
+    },
+    "knowledge": {
+      "label": "Wissen",
+      "description": "Wird bei Bedarf nachgeschlagen. Bleibt aktuell, wenn du es bearbeitest."
+    },
+    "both": {
+      "label": "Beides",
+      "description": "Beispiele lehren das Muster, die Fakten bleiben verbunden."
+    }
+  },
+  "presets": {
+    "quick": {
+      "label": "Schnell",
+      "description": "Ein kurzer Durchlauf, um die Idee zu prüfen. Gut für Tonfall und Format."
+    },
+    "balanced": {
+      "label": "Ausgewogen",
+      "description": "Der Standard. Lernt Abläufe und Fachbegriffe aus deinen Beispielen."
+    },
+    "quality": {
+      "label": "Höchste Qualität",
+      "description": "Längeres Training auf allen Schichten. Braucht mehr Beispiele, Speicher und Zeit."
+    }
+  },
+  "flags": {
+    "empty": {
+      "label": "Leer",
+      "help": "Hat weder Frage noch Antwort."
+    },
+    "no_answer": {
+      "label": "Keine Antwort",
+      "help": "Der letzte Beitrag ist keine Antwort, es gibt also nichts zu lernen."
+    },
+    "duplicate": {
+      "label": "Duplikat",
+      "help": "Identisch mit einem früheren Beispiel. Nur das erste Exemplar wird trainiert."
+    },
+    "too_long": {
+      "label": "Zu lang",
+      "help": "Länger, als das Modell trainieren kann. Kürze es oder teile es auf."
+    },
+    "short_answer": {
+      "label": "Kurze Antwort",
+      "help": "Eine Antwort aus einem Wort lehrt wenig. Sie wird trotzdem trainiert."
+    },
+    "volatile_facts": {
+      "label": "Veränderliche Fakten",
+      "help": "Nennt einen Preis, Lagerbestand oder eine Artikelnummer. Das Modell könnte sich einen Wert merken, der sich später ändert. Halte solche Fakten im Wissen."
+    }
+  },
+  "flagCount": {
+    "empty": "{{count}} leer",
+    "no_answer": "{{count}} ohne Antwort",
+    "duplicate": "{{count}} Duplikat",
+    "too_long": "{{count}} zu lang",
+    "short_answer": "{{count}} kurze Antwort",
+    "volatile_facts": "{{count}} veränderliche Fakten"
+  },
+  "states": {
+    "queued": "In Warteschlange",
+    "preparing_dataset": "Wird vorbereitet",
+    "loading_model": "Modell wird geladen",
+    "training": "Training",
+    "exporting": "Wird exportiert",
+    "evaluating": "Wird getestet",
+    "complete": "Abgeschlossen",
+    "failed": "Fehlgeschlagen",
+    "cancelled": "Abgebrochen"
+  },
+  "fit": {
+    "comfortable": "Passt",
+    "tight": "Passt knapp",
+    "too_large": "Zu groß",
+    "unsupported": "Nicht unterstützt"
+  },
+  "duration": {
+    "s": "{{s}} s",
+    "m": "{{m}} min",
+    "ms": "{{m}} min {{s}} s",
+    "h": "{{h}} h",
+    "hm": "{{h}} h {{m}} min"
+  },
+  "steps": {
+    "describe": "Beschreiben",
+    "base": "Basismodell",
+    "material": "Material",
+    "examples": "Beispiele",
+    "plan": "Prüfen",
+    "train": "Trainieren",
+    "test": "Testen",
+    "deploy": "Bereitstellen"
+  },
+  "page": {
+    "title": "Trainiere deine eigene KI",
+    "description": "Baue einen kleinen Assistenten, der eine Aufgabe gut beherrscht. Zeig ihm mit Beispielen, wie er antworten soll, und verbinde die Informationen, die er braucht. Du musst nicht wissen, wie Modelle trainiert werden.",
+    "settingUpExample": "Beispiel wird eingerichtet …",
+    "tryExample": "Beispiel ausprobieren",
+    "build": "Neue KI bauen",
+    "loading": "Wird geladen …",
+    "nothing": "Noch nichts gebaut.",
+    "emptyTitle": "Baue eine spezialisierte KI",
+    "emptyDescription": "Beschreibe die Aufgabe, füge Beispiele guter Antworten hinzu und verbinde die Daten, die sie nachschlagen soll. Yggdrasil empfiehlt ein Basismodell, trainiert es auf diesem Computer und lässt dich es vor der Nutzung mit dem Original vergleichen.",
+    "exampleHint": "Das Beispiel nutzt einen fiktiven Reifenhändler, damit du zuerst echte Daten siehst.",
+    "exampleBadge": "Beispiel",
+    "deployed": "Bereitgestellt · Revision {{revision}}",
+    "notDeployed": "Nicht bereitgestellt",
+    "newTitle": "Was soll deine KI tun?",
+    "newDescription": "Beschreibe die Aufgabe in ein, zwei Sätzen, so wie du sie einer neuen Mitarbeiterin oder einem neuen Mitarbeiter erklären würdest.",
+    "name": "Name",
+    "namePlaceholder": "Assistent für Reifenhandel",
+    "job": "Die Aufgabe",
+    "jobPlaceholder": "Beantworte Kundenfragen zu Reifen. Frag nach Baujahr, Marke und Modell des Fahrzeugs, erkläre die Passform und empfiehl Reifen, die wir auf Lager haben.",
+    "creating": "Wird erstellt …",
+    "continue": "Weiter",
+    "cancel": "Abbrechen",
+    "base": "Basis: {{model}}",
+    "noBase": "Noch kein Basismodell",
+    "buildSteps": "Schritte",
+    "done": "erledigt"
+  },
+  "example": {
+    "title": "In diesem Beispiel",
+    "describe": "Dieses Beispiel ist ein Assistent für einen Reifenhändler. Yggdrasil hat die Anweisungen aus der Beschreibung entworfen. Bearbeite, was du willst; trainiert wird erst, wenn du auf „Trainieren“ klickst.",
+    "base": "Yggdrasil hat das kleinste Modell gewählt, das sich auf diesem Computer bequem trainieren lässt und geschäftliche Nutzung erlaubt. Kleinere Modelle trainieren in Minuten.",
+    "material": "Drei Dateien wurden hinzugefügt, und Yggdrasil hat jede eingeordnet. Die Chats wurden zu Training, weil sie zeigen, wie geantwortet wird. Der Lagerbestand wurde zu Wissen, weil sich Preise und Bestände ändern. Die Richtlinien wurden zu Wissen, weil der Assistent sie wörtlich zitieren soll. Öffne „Beispieldateien ansehen“, um sie zu lesen.",
+    "examples": "Drei Beispiele sind absichtlich fehlerhaft. Das Duplikat und die Frage ohne Antwort werden automatisch ausgelassen. Die Antwort mit einem Preis wird trotzdem trainiert, deshalb ist sie markiert. Versuche, sie auszuschließen.",
+    "plan": "Das Beispiel nutzt „Schnell“, daher dauert das Training nur wenige Minuten. Alles unter „Bleibt verbunden“ wird bei jeder Frage durchsucht, statt eintrainiert zu werden.",
+    "train": "Sieh zu, wie der Trainingsverlust sinkt, während das Modell die Beispiele lernt. Ein niedriger Verlust bedeutet, dass es sie gut nachahmt, nicht, dass seine Antworten richtig sind. Das prüft der nächste Schritt.",
+    "test": "Vergleiche die Spalten. Die spezialisierten Antworten sollten nach dem Fahrzeug fragen und mit Tread Right Tires unterschreiben. Achte auch auf erfundene Details, etwa eine Reifengröße, die plausibel klingt, aber falsch ist: Ein kleines Modell lernt Stil gut und Fakten schlecht, deshalb gehören Preise und Größen ins Wissen. Füge einen Testprompt wie „Was kostet der Pilot Sport 4?“ hinzu, um verbundenes Wissen in Aktion zu sehen.",
+    "deploy": "Frag sie nach dem Bereitstellen im Chat nach dem Preis eines Reifens. Öffne dann „Wissen“, bearbeite den Lagerbestand und frag erneut. Die Antwort ändert sich ohne neues Training. Lösche das Beispiel im Schritt „Beschreiben“, wenn du fertig bist."
+  },
+  "concepts": {
+    "training": "Training",
+    "trainingTitle": "Trainiere, wie sich deine KI verhält",
+    "trainingBody": "Beispiele guter Antworten lehren ihre Rolle, deine Fachbegriffe, die Fragen, die sie stellen soll, die Schritte, denen sie folgt, ihren Tonfall und wie sie Antworten formatiert.",
+    "trainingUse": "Geeignet: Chatverläufe, Frage-Antwort-Paare, Beispielantworten.",
+    "knowledge": "Wissen",
+    "knowledgeTitle": "Verbinde, was deine KI weiß",
+    "knowledgeBody": "Informationen, die sich ändern oder exakt bleiben müssen, werden bei Bedarf nachgeschlagen: Lagerbestand, Preise, Artikelnummern, Kataloge, Richtlinien und Dokumente. Bearbeite sie jederzeit ohne neues Training.",
+    "knowledgeUse": "Geeignet: Tabellen, CSV-Exporte, Produktlisten, Richtliniendokumente.",
+    "how": "So funktioniert es",
+    "lora": "<strong>LoRA</strong> trainiert einen kleinen Zusatz (einen Adapter), statt das ganze Modell zu verändern. Das Originalmodell bleibt unberührt und verfügbar. <strong>QLoRA</strong> macht dasselbe mit einer komprimierten Kopie des Modells, damit es in weniger Speicher passt.",
+    "rag": "<strong>Verbundenes Wissen</strong> ist Retrieval: Vor jeder Antwort durchsucht Yggdrasil deine Quellen nach den zur Frage passenden Textstellen und gibt sie dem Modell. Das nennt man oft RAG, Retrieval-Augmented Generation.",
+    "epoch": "Eine <strong>Epoche</strong> ist ein Durchgang über alle deine Beispiele. Der Trainingsverlust misst, wie genau das Modell deine Beispiele wiedergibt. Ein niedrigerer Verlust allein bedeutet keine besseren Antworten, deshalb testest du vor dem Bereitstellen."
+  },
+  "samples": {
+    "see": "Beispieldateien ansehen",
+    "description": "So sieht gutes Material aus. Lade eine Datei als Vorlage für deine eigenen Daten.",
+    "hide": "Ausblenden",
+    "preview": "Vorschau",
+    "download": "Laden",
+    "moreLines": "… {{count}} weitere Zeilen"
+  },
+  "describe": {
+    "title": "KI beschreiben",
+    "description": "Die Anweisungen werden mit jeder Nachricht gesendet und jedem Trainingsbeispiel hinzugefügt, damit die KI sie so lernt, wie sie sie später nutzt.",
+    "name": "Name",
+    "job": "Die Aufgabe",
+    "instructions": "Anweisungen",
+    "instructionsHint": "Wenn du die Anweisungen nach dem Training änderst, trainiere am besten erneut, damit die Beispiele dazu passen.",
+    "saveContinue": "Speichern und weiter",
+    "continue": "Weiter",
+    "confirmDelete": "{{name}} löschen? Seine Beispiele, trainierten Revisionen und das Wissen aus seinem Material werden entfernt.",
+    "delete": "Löschen"
+  },
+  "base": {
+    "title": "Basismodell wählen",
+    "description": "Kleinere Modelle trainieren und antworten schneller. Ob das Training passt, wird getrennt vom Betrieb des Modells geprüft, weil Training ein Vielfaches an Speicher braucht.",
+    "checking": "Prüfe, was dieser Computer trainieren kann …",
+    "recommended": "Empfohlen",
+    "selected": "Ausgewählt",
+    "installed": "Installiert",
+    "memory": " · Training braucht etwa {{size}}",
+    "download": " · lädt einmalig {{size}}",
+    "notInstalled": "{{model}} ist nicht installiert. Das Training funktioniert ohne, aber zum Testen und Nutzen des Ergebnisses brauchst du es. <link>Unter „Modelle“ installieren</link>.",
+    "continue": "Weiter"
+  },
+  "material": {
+    "add": "Material hinzufügen",
+    "filePaste": "Datei oder Einfügen",
+    "chats": "Gespeicherte Chats",
+    "continue": "Weiter",
+    "tooLarge": "Diese Datei ist größer als 20 MB. Verbinde sie stattdessen unter „Wissen“, dort wird sie direkt von der Festplatte gelesen.",
+    "chooseFile": "Datei wählen",
+    "pasteHint": "oder unten einfügen. JSONL-Chats, Frage-Antwort-Tabellen, CSV, Excel, PDF, Markdown und Text funktionieren.",
+    "ready": "{{filename}} ist bereit.",
+    "readsPdf": "Yggdrasil liest den Text, um die Datei einzuordnen.",
+    "readsSheet": "Yggdrasil liest das erste Blatt, um die Datei einzuordnen.",
+    "clear": "Leeren",
+    "placeholder": "Q: Eine Frage, die deine KI beantworten soll\nA: Die Antwort, die sie geben soll\n\nQ: …",
+    "label": "Material",
+    "recommends": "Yggdrasil empfiehlt",
+    "examplesFound_one": "{{count}} Beispiel gefunden",
+    "examplesFound_other": "{{count}} Beispiele gefunden",
+    "useFor": "Material nutzen für",
+    "recommendedTag": " (empfohlen)",
+    "adding": "Wird hinzugefügt …",
+    "addMaterial": "Material hinzufügen",
+    "chatsHint": "Wähle Chats mit Antworten, wie du sie dir wünschst. Jeder wird zu einem Trainingsbeispiel, das du im nächsten Schritt bearbeiten kannst.",
+    "noChats": "Keine gespeicherten Chats.",
+    "untitledChat": "Chat ohne Titel",
+    "addChats_one": "{{count}} Chat hinzufügen",
+    "addChats_other": "{{count}} Chats hinzufügen",
+    "addChatsNone": "Chats hinzufügen",
+    "list": "Material",
+    "recommendedUse": "empfohlen: {{use}}",
+    "examples_one": "{{count}} Beispiel",
+    "examples_other": "{{count}} Beispiele",
+    "connected": "Als Wissen verbunden",
+    "confirmRemove": "{{name}} entfernen? Seine Beispiele und das verbundene Wissen werden ebenfalls entfernt.",
+    "remove": "Entfernen"
+  },
+  "examples": {
+    "title": "Beispiele prüfen",
+    "willTrain": "<strong>{{usable}}</strong> von {{total}} werden trainiert",
+    "filters": {
+      "all": "Alle",
+      "flagged": "Markiert",
+      "excluded": "Ausgeschlossen"
+    },
+    "loading": "Beispiele werden geladen …",
+    "showMore": "Mehr anzeigen (noch {{count}})",
+    "continue": "Weiter",
+    "excluded": "Ausgeschlossen",
+    "turns": "{{count}} Beiträge",
+    "q": "F",
+    "a": "A",
+    "empty": "leer",
+    "noAnswer": "keine Antwort",
+    "answer": "Antwort",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "editAnswer": "Antwort bearbeiten",
+    "include": "Einschließen",
+    "exclude": "Ausschließen",
+    "delete": "Löschen",
+    "writeTitle": "Beispiel schreiben",
+    "writeDescription": "Zeig eine Frage und die gewünschte Antwort. Schreib, wie Fakten genutzt werden, nicht die Fakten selbst.",
+    "questionPlaceholder": "Kundenfrage",
+    "question": "Frage",
+    "answerPlaceholder": "Die gewünschte Antwort",
+    "add": "Beispiel hinzufügen"
+  },
+  "plan": {
+    "willTrain": "Wird trainiert",
+    "examples_one": "<strong>{{count}}</strong> Beispiel lehrt, wie geantwortet wird.",
+    "examples_other": "<strong>{{count}}</strong> Beispiele lehren, wie geantwortet wird.",
+    "base": "Basismodell: {{model}}",
+    "notChosen": "nicht gewählt",
+    "connected": "Bleibt verbunden",
+    "connectedHint": "Wird bei jeder Frage nachgeschlagen. Später ohne neues Training bearbeitbar.",
+    "effort": "Trainingsaufwand",
+    "where": "Wo trainiert wird",
+    "estimating": "Wird geschätzt …",
+    "starting": "Startet …",
+    "train": "Revision {{revision}} trainieren",
+    "thisComputer": "dieser Computer",
+    "nornPicked": "Von Norn gewählt",
+    "trainHere": "Stattdessen hier trainieren",
+    "memory": "Speicher",
+    "memoryOf": "{{needed}} von {{available}}",
+    "download": "Download",
+    "none": "Keiner",
+    "disk": "Festplatte",
+    "time": "Dauer, ungefähr",
+    "advanced": "Erweiterte Einstellungen",
+    "advancedHint": "Lass ein Feld leer, um die Vorgabe ({{preset}}) zu nutzen. Hier festgelegte Werte gelten auch dann, wenn sie nicht in den Speicher passen.",
+    "presetSummary": "{{method}}, {{iters}} Schritte",
+    "method": "Methode",
+    "presetMethod": "Vorgabe ({{method}})",
+    "lora": "LoRA, Basis in voller Genauigkeit",
+    "qlora": "QLoRA, 4-Bit-Basis",
+    "fields": {
+      "epochs": {
+        "label": "Epochen",
+        "help": "Durchgänge über alle Beispiele."
+      },
+      "rank": {
+        "label": "LoRA-Rang",
+        "help": "Kapazität des Adapters. Höher lernt mehr und braucht mehr Speicher."
+      },
+      "layers": {
+        "label": "Schichten",
+        "help": "Wie viele der letzten Schichten trainiert werden. -1 trainiert alle."
+      },
+      "learning_rate": {
+        "label": "Lernrate",
+        "help": "Schrittweite. Zu hoch, und das Basismodell vergisst."
+      },
+      "batch_size": {
+        "label": "Batchgröße",
+        "help": "Beispiele pro Schritt."
+      },
+      "max_seq_length": {
+        "label": "Max. Tokens",
+        "help": "Längstes Beispiel, in Tokens."
+      }
+    },
+    "saveAdvanced": "Erweiterte Einstellungen speichern",
+    "usePreset": "Vorgabe nutzen"
+  },
+  "train": {
+    "none": "Noch kein Training. Prüfe den Plan und starte das Training.",
+    "compare": "Mit dem Basismodell vergleichen",
+    "earlier": "Frühere Durchläufe",
+    "revision": "Revision {{revision}}",
+    "on": "Auf {{computer}} mit {{backend}} · {{method}} · {{epochs}} Epochen",
+    "cancelling": "Wird abgebrochen …",
+    "cancel": "Abbrechen",
+    "stages": "Trainingsphasen",
+    "failed": "{{error}} Temporäre Dateien wurden entfernt. Das Basismodell wurde nicht verändert.",
+    "failedDefault": "Training fehlgeschlagen.",
+    "cancelled": "Abgebrochen. Temporäre Dateien wurden entfernt.",
+    "step": "Schritt {{iter}} von {{iters}}",
+    "downloaded": "{{done}} von {{total}} geladen",
+    "elapsed": "Vergangen",
+    "remaining": "Verbleibend",
+    "about": "etwa {{time}}",
+    "epoch": "Epoche",
+    "epochOf": "{{epoch}} von {{epochs}}",
+    "speed": "Tempo",
+    "tokensPerSec": "{{count}} Tokens/s",
+    "trainingLoss": "Trainingsverlust",
+    "validationLoss": "Validierungsverlust",
+    "peakMemory": "Spitzenspeicher",
+    "lossNote": "Der Verlust zeigt, wie genau das Modell deine Beispiele wiedergibt. Ein niedrigerer Wert garantiert keine besseren Antworten, vergleiche also die Ergebnisse vor dem Bereitstellen."
+  },
+  "test": {
+    "first": "Trainiere zuerst eine Revision. Dann vergleichst du sie hier mit dem Basismodell.",
+    "title": "Mit dem Basismodell vergleichen",
+    "revision": "Revision",
+    "deployedTag": " (bereitgestellt)",
+    "description": "Beide Seiten bekommen dieselben Anweisungen und dasselbe verbundene Wissen, der Unterschied ist also das, was das Training hinzugefügt hat. Die Standard-Testprompts sind Fragen, die nicht trainiert wurden.",
+    "prompts": "Testprompts, einer pro Zeile",
+    "comparing": "Wird verglichen …",
+    "again": "Erneut ausführen",
+    "run": "Vergleich starten",
+    "save": "Prompts speichern",
+    "results": "Ergebnisse",
+    "running": "Läuft",
+    "failed": "Fehlgeschlagen",
+    "base": "Basis",
+    "specialized": "Spezialisiert",
+    "continue": "Weiter zum Bereitstellen"
+  },
+  "deploy": {
+    "title": "Bereitstellen",
+    "description": "Eine bereitgestellte KI erscheint im Modellmenü des Chats und in der API. Sie hält Basismodell, Adapter-Revision, Anweisungen und verbundenes Wissen zusammen. Das Basismodell bleibt eigenständig verfügbar.",
+    "first": "Trainiere und teste zuerst eine Revision.",
+    "revision": "Revision {{revision}}",
+    "deployed": "Bereitgestellt",
+    "meta": "{{examples}} Beispiele · {{method}} · {{date}}",
+    "valLoss": " · Validierungsverlust {{loss}}",
+    "compareFirst": "Zuerst vergleichen",
+    "undeploy": "Zurückziehen",
+    "switch": "Zu dieser Revision wechseln",
+    "deploy": "Bereitstellen",
+    "use": "Nutzen",
+    "useBody": "Wähle im Chat <name>{{name}}</name> aus dem Modellmenü. <link>Chat öffnen</link>. In anderen Programmen nutzt du die Modell-ID <id>{{id}}</id>:",
+    "runsHere": "Sie läuft auf diesem Computer, wo ihr Adapter gespeichert ist. Neues Training erstellt eine neue Revision; diese hier antwortet weiter, bis du die neue bereitstellst."
+  },
+  "export": {
+    "title": "Als GGUF-Datei exportieren",
+    "description": "Führe Revision {{revision}} mit ihrem Basismodell zu einer Datei zusammen, die llama.cpp, LM Studio, Ollama und andere GGUF-Werkzeuge laden können. Die Datei ist etwa so groß wie das Basismodell. Anweisungen und verbundenes Wissen bleiben in Yggdrasil.",
+    "exporting": "Wird exportiert …",
+    "upTo": "bis zu {{size}}",
+    "failed": "Der Export ist fehlgeschlagen: {{error}}",
+    "saving": "Wird gespeichert …",
+    "download": "{{filename}} laden",
+    "savedTo": "Gespeichert unter {{path}}",
+    "deleteFile": "Datei löschen",
+    "tryAgain": "Erneut versuchen",
+    "export": "Exportieren",
+    "cancel": "Abbrechen",
+    "instructions": "Anweisungen für den System-Prompt"
+  }
+}

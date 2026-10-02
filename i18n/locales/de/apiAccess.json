@@ -1,0 +1,123 @@
+{
+  "page": {
+    "title": "API-Zugriff",
+    "subtitle": "Wo die API von Yggdrasil erreichbar ist und wie sie geschützt ist.",
+    "loading": "API-Einstellungen werden geladen …"
+  },
+  "probe": {
+    "notReady": "Der Zustandscheck hat geantwortet, aber der Dienst ist nicht bereit.",
+    "unreachable": "Die API auf diesem Computer ist nicht erreichbar.",
+    "openaiDown": "Der Dienst läuft, aber der OpenAI-kompatible Endpunkt hat nicht geantwortet.",
+    "passed": "Lokaler Check bestanden.",
+    "openaiStatus": "Der OpenAI-Endpunkt hat HTTP {{status}} zurückgegeben.",
+    "openaiNoResponse": "Der OpenAI-Endpunkt hat nicht geantwortet.",
+    "needsKey": "Antwortet. Andere Geräte brauchen einen gültigen API-Schlüssel.",
+    "checkFailed": "Die API konnte nicht geprüft werden – läuft der lokale Dienst?",
+    "failed": "API-Check fehlgeschlagen."
+  },
+  "service": {
+    "title": "Dienst",
+    "api": "API-Dienst",
+    "running": "Läuft",
+    "notResponding": "Antwortet nicht",
+    "checking": "Wird geprüft …",
+    "access": "Zugriff",
+    "localNetwork": "Lokales Netzwerk",
+    "thisComputer": "Nur dieser Computer",
+    "auth": "Authentifizierung",
+    "keyRequired": "API-Schlüssel erforderlich",
+    "notRequired": "Auf diesem Computer nicht nötig",
+    "testing": "Wird getestet …",
+    "test": "API testen",
+    "endpoint": "Endpunkt",
+    "localAddress": "Lokale Adresse: <mono>{{address}}</mono>",
+    "lanEndpoint": "LAN-Endpunkt",
+    "lanHint": "Verwende die LAN-IP dieses Computers mit Port <mono>{{port}}</mono> (zum Beispiel <mono>http://192.168.x.x:{{port}}/v1</mono>).",
+    "hideDocs": "API-Dokumentation ausblenden",
+    "docs": "API-Dokumentation",
+    "docsBody": "Yggdrasil stellt unter <mono>/v1</mono> eine OpenAI-kompatible API bereit. Richte Clients auf den Endpunkt oben aus und sende <header/>, wenn Yggdrasil von anderen Computern aus erreichbar ist. `/api/v1` und `/v1` verlangen beide diesen Header. Ein Schlüssel verschlüsselt einfaches HTTP nicht.",
+    "copied": "Kopiert",
+    "copyUrl": "URL kopieren"
+  },
+  "lan": {
+    "title": "Zugriff im lokalen Netzwerk",
+    "on": "Geräte in deinem lokalen Netzwerk können sich mit einem API-Schlüssel verbinden.",
+    "off": "Nur Apps auf diesem Computer können die API von Yggdrasil nutzen.",
+    "noKeys": "Der Netzwerkzugriff ist an, aber es gibt noch keine API-Schlüssel. Erstelle einen Schlüssel, bevor du dich von einem anderen Gerät verbindest.",
+    "restart": "Beende Yggdrasil nach einer Änderung des Netzwerkzugriffs vollständig und öffne es erneut, damit sich der Server neu bindet. Sobald der Listener nicht mehr nur auf Loopback lauscht, ist für jede Verbindung ein API-Schlüssel nötig. Ein Schlüssel verschlüsselt den Datenverkehr über einfaches HTTP nicht. „API testen“ prüft nur diesen Computer, nicht die Erreichbarkeit von anderen Geräten.",
+    "confirmTitle": "Zugriff von anderen Computern erlauben?",
+    "confirmBody": "Geräte in deinem lokalen Netzwerk können sich dann mit Yggdrasil verbinden. Für alle entfernten Verbindungen ist ein API-Schlüssel nötig.",
+    "confirmHttp": "Ein API-Schlüssel über einfaches HTTP verschlüsselt den Datenverkehr nicht. Beende Yggdrasil nach dem Aktivieren und öffne es erneut, damit der Server im Netzwerk lauscht.",
+    "browserKey": "Erstelle einen API-Schlüssel, damit sich dieser Browser auch nach dem Neubinden des Servers verbinden kann. Der vollständige Schlüssel wird nur einmal angezeigt.",
+    "keyName": "Name des Schlüssels",
+    "defaultKeyName": "Dieser Computer",
+    "enableFailed": "Netzwerkzugriff konnte nicht aktiviert werden.",
+    "cancel": "Abbrechen",
+    "enabling": "Wird aktiviert …",
+    "allow": "Zugriff erlauben"
+  },
+  "keys": {
+    "title": "API-Schlüssel",
+    "description": "Zugangsdaten für Apps und Geräte, die mit Yggdrasil sprechen.",
+    "create": "API-Schlüssel erstellen",
+    "createHint": "Gib diesem Schlüssel einen Namen, damit du weißt, was ihn nutzt.",
+    "namePlaceholder": "VS Code",
+    "creating": "Wird erstellt …",
+    "createKey": "Schlüssel erstellen",
+    "cancel": "Abbrechen",
+    "copyNow": "Kopiere dieses Geheimnis jetzt – es wird nicht wieder angezeigt",
+    "copiedBang": "Kopiert!",
+    "copySecret": "Geheimnis kopieren",
+    "none": "Noch keine API-Schlüssel.",
+    "meta": "Erstellt {{created}} · Zuletzt genutzt {{lastUsed}}",
+    "copy": "Kopieren",
+    "confirmRotate": "„{{name}}“ erneuern? Das alte Geheimnis funktioniert sofort nicht mehr.",
+    "rotate": "Erneuern",
+    "confirmRevoke": "„{{name}}“ widerrufen? Apps mit diesem Schlüssel verlieren den Zugriff.",
+    "revoke": "Widerrufen"
+  },
+  "advanced": {
+    "title": "Erweitert",
+    "bind": "Bind-Adresse",
+    "port": "Port",
+    "host": "Konfigurierter Host"
+  },
+  "permissions": {
+    "summary": "Was dieser Schlüssel nutzen darf",
+    "memories": "Deine Erinnerungen",
+    "knowledge": "Verbundenes Wissen",
+    "tools": "Werkzeuge",
+    "use": {
+      "never": "Nie",
+      "on_request": "Wenn die Anfrage es verlangt",
+      "always": "Immer"
+    },
+    "toolChoices": {
+      "profile": "Was das Profil erlaubt",
+      "read_only": "Nur lesende Werkzeuge",
+      "none": "Keine Werkzeuge"
+    },
+    "placement": "Darf wählen, wo Anfragen laufen",
+    "note": "Anfragen können weniger verlangen, nie mehr. Über das Netzwerk gelten diese Grenzen immer; auf diesem Computer gelten sie, wenn die App diesen Schlüssel sendet.",
+    "saveFailed": "Konnte nicht gespeichert werden."
+  },
+  "share": {
+    "title": "Yggdrasil in anderen KI-Apps nutzen",
+    "description": "Apps mit MCP-Unterstützung können deine lokale KI fragen, ihre Modelle auflisten und dein verbundenes Wissen durchsuchen. Antworten bleiben auf deinen Computern, und die lokale KI nutzt nur Werkzeuge, die lesen.",
+    "other": "Andere Apps",
+    "settings": "{{language}}-Einstellungen",
+    "copied": "Kopiert",
+    "copy": "Kopieren",
+    "needsKey": "Yggdrasil ist für dein Netzwerk geöffnet, daher brauchen Apps einen API-Schlüssel. Erstelle unten einen und setze ihn dort ein, wo in den Einstellungen <key/> steht. Die Berechtigungen des Schlüssels gelten.",
+    "keyPlaceholder": "<dein API-Schlüssel>",
+    "where": {
+      "claudeDesktop": "Öffne in Claude Desktop Einstellungen → Entwickler → Konfiguration bearbeiten, füge dies hinzu und starte Claude neu.",
+      "claudeCode": "Führe dies in einem Terminal aus.",
+      "cursor": "Füge dies zu ~/.cursor/mcp.json hinzu (Cursor-Einstellungen → MCP → Add new global MCP server).",
+      "vscode": "Führe „MCP: Open User Configuration“ in der Befehlspalette aus und füge dies hinzu.",
+      "other": "Apps, die sich per Adresse mit MCP-Servern verbinden, nutzen Streamable HTTP unter dieser Adresse. Apps, die ein Programm starten, nutzen stattdessen den Befehl."
+    },
+    "otherText": "Adresse: {{url}}\nBefehl: {{command}}",
+    "otherHeader": "\nHeader:  Authorization: Bearer {{key}}"
+  }
+}

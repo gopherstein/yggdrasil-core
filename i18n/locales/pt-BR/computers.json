@@ -1,0 +1,130 @@
+{
+  "page": {
+    "title": "Sua equipe Yggdrasil",
+    "titleAdvanced": "Seu cluster de IA",
+    "subtitle": "Estes computadores trabalham juntos como um único sistema de IA. Adicione uma máquina e depois implante modelos onde eles couberem.",
+    "find": "Encontrar computadores",
+    "scanning": "Procurando…",
+    "looking": "Procurando computadores…",
+    "emptyTitle": "Monte sua equipe de IA",
+    "emptyDescription": "Instale o Yggdrasil em outro computador da sua rede e ele aparecerá aqui automaticamente."
+  },
+  "status": {
+    "team": "Status da equipe",
+    "cluster": "Status do cluster",
+    "computers_one": "{{count}} computador",
+    "computers_many": "{{count}} computadores",
+    "computers_other": "{{count}} computadores",
+    "combinedMemory": " · {{size}} de memória combinada",
+    "modelsRunning_one": " · {{count}} modelo em execução",
+    "modelsRunning_many": " · {{count}} modelos em execução",
+    "modelsRunning_other": " · {{count}} modelos em execução",
+    "bestAt": "Melhor em"
+  },
+  "errors": {
+    "action": "Não foi possível concluir essa ação",
+    "network": "Permita Rede Local / Firewall para o Yggdrasil nos dois computadores e mantenha Encontrar outros computadores ativado em Configurações.",
+    "generic": "Algo deu errado",
+    "claimFailed": "Não foi possível carregar a oferta de pareamento para esse código"
+  },
+  "pairing": {
+    "waiting": "Aguardando aprovação",
+    "pairingWith": "Pareando com <name>{{name}}</name>. Naquele computador, abra Computadores e aprove a solicitação recebida.",
+    "otherComputer": "o outro computador",
+    "code": "Código: <code>{{code}}</code>",
+    "incoming": "Solicitações recebidas",
+    "offerCode": "Código <code>{{code}}</code>",
+    "approve": "Aprovar"
+  },
+  "nearby": {
+    "title": "Disponíveis para adicionar",
+    "description": "O Yggdrasil encontrou estes computadores na sua rede."
+  },
+  "fleet": {
+    "title": "Sua equipe Yggdrasil",
+    "titleAdvanced": "Seu cluster",
+    "moves": "O trabalho é distribuído por esta equipe automaticamente.",
+    "movesAdvanced": "O trabalho é distribuído por este cluster automaticamente.",
+    "alone": "Por enquanto, este é o único computador da equipe.",
+    "installModels": "Instalar modelos",
+    "openChat": "Abrir o Chat"
+  },
+  "membership": {
+    "local": "Este computador",
+    "paired": "Pareado",
+    "nearby": "Disponível para parear",
+    "offline": "Offline"
+  },
+  "online": {
+    "online": "Online",
+    "offline": "Offline",
+    "checking": "Verificando…"
+  },
+  "hardware": {
+    "unavailable": "Detalhes do hardware indisponíveis",
+    "unified": "{{size}} de memória unificada",
+    "vram": "{{size}} de VRAM",
+    "ram": "{{size}} de RAM",
+    "memory": "{{size}} de memória"
+  },
+  "abilities": {
+    "general": "Geral",
+    "coding": "Programação",
+    "reasoning": "Raciocínio",
+    "vision": "Visão",
+    "tools": "Ferramentas",
+    "fast": "Rápido",
+    "large": "Modelos grandes"
+  },
+  "card": {
+    "nearbyHint": "Na sua rede e pronto para entrar nesta equipe.",
+    "running": "Em execução: <strong>{{models}}</strong>",
+    "models_one": "{{count}} modelo",
+    "models_many": "{{count}} modelos",
+    "models_other": "{{count}} modelos",
+    "availableFor": "Disponível para:",
+    "partOfTeam": "Faz parte desta equipe",
+    "disk": "Disco",
+    "diskFree": "{{free}} livres de {{total}}",
+    "diskLow": "Pouco espaço livre para mais modelos",
+    "modelsHere": "Modelos neste computador",
+    "modelsHereCount": "Modelos neste computador ({{count}})",
+    "noModels": "Nenhum ainda. Implante abaixo ou abra Modelos.",
+    "remove": "Remover",
+    "removing": "Removendo…",
+    "noAddress": "Ainda sem endereço. Tente Encontrar computadores",
+    "connecting": "Conectando…",
+    "addToTeam": "Adicionar à equipe",
+    "codePlaceholder": "Código",
+    "codeFor": "Código de pareamento para {{name}}",
+    "approving": "Aprovando…",
+    "approveCode": "Aprovar com código",
+    "hideDetails": "Ocultar detalhes",
+    "manage": "Gerenciar",
+    "moreActions": "Mais ações para {{name}}",
+    "removeFromTeam": "Remover da equipe"
+  },
+  "deploy": {
+    "title": "Implantar um modelo",
+    "description": "Instale um modelo em um computador ou em vários de uma vez. O Yggdrasil verifica o espaço livre em disco antes de começar.",
+    "model": "Modelo",
+    "chooseModel": "Escolha um modelo…",
+    "modelSize": "{{model}} ({{size}})",
+    "computers": "Computadores",
+    "selectMissing": "Selecionar todos que precisam",
+    "thisComputer": "{{name}} (este computador)",
+    "installed": "Instalado",
+    "free": "{{size}} livres",
+    "alreadyOn": "Já está em {{names}}.",
+    "notEnoughDisk": "Espaço em disco insuficiente",
+    "conflict": "{{name}}: precisa de {{needed}}, tem {{available}} livres",
+    "tryAnyway": "Tentar mesmo assim (o download pode falhar nesses computadores)",
+    "deploying": "Implantando…",
+    "deployTo_one": "Implantar em {{count}} computador",
+    "deployTo_many": "Implantar em {{count}} computadores",
+    "deployTo_other": "Implantar em {{count}} computadores",
+    "deployToName": "Implantar em {{name}}",
+    "deploy": "Implantar",
+    "downloadSize": "Tamanho do download ~{{size}}"
+  }
+}

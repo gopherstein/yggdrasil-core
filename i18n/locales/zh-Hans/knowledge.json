@@ -1,0 +1,106 @@
+{
+  "page": {
+    "title": "知识库",
+    "description": "Mimir 让目录、价格、政策和文档都可以被搜索。当某个配置或专用 AI 使用某个来源时，与每个问题匹配的段落会被提供给它。编辑文件后，下一个问题就能看到变化，无需重新训练。",
+    "loading": "正在加载…",
+    "emptyTitle": "尚未连接知识库",
+    "emptyDescription": "连接这台电脑上的文件或文件夹、粘贴内容，或从数据库或 Web API 读取。支持 PDF、Excel、CSV、TSV、JSON、JSONL、Markdown、文本和 HTML 文件。"
+  },
+  "badge": {
+    "linked": "已链接",
+    "database": "数据库",
+    "api": "Web API",
+    "copy": "副本"
+  },
+  "meaning": {
+    "full": "可按含义搜索，而不仅仅是匹配字词。",
+    "partial": "可按含义搜索：目前已处理 {{embedded}}/{{total}} 个段落。"
+  },
+  "refresh": {
+    "days_other": "{{count}} 天",
+    "hours_other": "{{count}} 小时",
+    "minutes_other": "{{count}} 分钟",
+    "note": "当问题用到它且数据已超过 {{every}}，或在重新索引时，会重新获取。"
+  },
+  "row": {
+    "failed": "失败",
+    "passages_other": "{{count}} 个段落",
+    "indexed": "索引于 {{when}}",
+    "watches": "文件变化时会自动重新索引。",
+    "edit": "编辑",
+    "indexing": "正在索引…",
+    "reindex": "重新索引",
+    "localOnlyHint": "绝不将此来源的段落发送到已配对的电脑。使用它的聊天会在这里运行。",
+    "localOnly": "仅限这台电脑",
+    "localOnlyOn": "仅限这台电脑 ✓",
+    "confirmDisconnect": "断开 {{name}}？使用它的配置和 AI 将无法再看到它。你的文件不会被删除。",
+    "disconnect": "断开连接",
+    "editLabel": "编辑 {{name}}",
+    "saveHint": "保存会重新索引此来源。聊天和专用 AI 在下一个问题时就会看到变化。",
+    "saving": "正在保存…",
+    "save": "保存",
+    "cancel": "取消"
+  },
+  "add": {
+    "title": "连接知识库",
+    "modes": {
+      "path": "文件或文件夹",
+      "text": "上传或粘贴",
+      "database": "数据库",
+      "api": "Web API"
+    },
+    "path": "这台电脑上的路径",
+    "pathHint": "Yggdrasil 会直接在原位置读取，并自动获取修改。",
+    "chooseFile": "选择文件",
+    "pastePlaceholder": "粘贴文本、Markdown 或 CSV",
+    "content": "内容",
+    "name": "名称（可选）",
+    "indexing": "正在索引…",
+    "connect": "连接"
+  },
+  "remote": {
+    "database": "数据库",
+    "sqlite": "SQLite 文件",
+    "file": "这台电脑上的文件",
+    "connection": "连接字符串",
+    "connectionHint": "请使用只有读取权限的账户。它与数据库分开保存，不会再次显示。",
+    "query": "查询",
+    "queryHint": "一条 SELECT 语句。它以只读方式运行，因此 Yggdrasil 绝不会更改数据库。每一行都会成为一个段落。",
+    "url": "URL",
+    "urlHint": "JSON、CSV 或文本。对象列表中的每一项都会成为一个段落。",
+    "items": "响应中的列表（可选）",
+    "header": "请求头",
+    "value": "值（可选）",
+    "refresh": "超过以下时间后重新获取",
+    "refreshChoices": {
+      "m5": "5 分钟",
+      "m15": "15 分钟",
+      "h1": "1 小时",
+      "h6": "6 小时",
+      "d1": "1 天"
+    },
+    "name": "名称（可选）",
+    "connecting": "正在连接…",
+    "connect": "连接"
+  },
+  "search": {
+    "title": "试着提问",
+    "description": "看看一个问题会把哪些段落带入聊天。",
+    "placeholder": "225/45R17 的轮胎有货吗？",
+    "question": "问题",
+    "search": "搜索",
+    "nothing": "没有匹配的内容。"
+  },
+  "picker": {
+    "none": "尚未连接知识库。",
+    "disconnect": "断开 {{name}}",
+    "remove": "移除",
+    "connectExisting": "连接现有知识库",
+    "connectExistingOption": "连接现有知识库…",
+    "pathPlaceholder": "或文件、文件夹，例如 ~/Documents/catalog",
+    "path": "文件或文件夹路径",
+    "indexing": "正在索引…",
+    "connect": "连接",
+    "manage": "在<link>知识库</link>页面管理来源、编辑粘贴的内容并尝试搜索。"
+  }
+}

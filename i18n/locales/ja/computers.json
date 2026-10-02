@@ -1,0 +1,122 @@
+{
+  "page": {
+    "title": "Yggdrasilチーム",
+    "titleAdvanced": "AIクラスタ",
+    "subtitle": "これらのコンピュータは1つのAIシステムとして連携します。マシンを追加し、適したところにモデルをデプロイしましょう。",
+    "find": "コンピュータを探す",
+    "scanning": "スキャン中…",
+    "looking": "コンピュータを探しています…",
+    "emptyTitle": "AIチームを作りましょう",
+    "emptyDescription": "ネットワーク上の別のコンピュータにYggdrasilをインストールすると、ここに自動で表示されます。"
+  },
+  "status": {
+    "team": "チームの状態",
+    "cluster": "クラスタの状態",
+    "computers_other": "コンピュータ{{count}}台",
+    "combinedMemory": " · 合計メモリ{{size}}",
+    "modelsRunning_other": " · {{count}}個のモデルが実行中",
+    "bestAt": "得意分野"
+  },
+  "errors": {
+    "action": "その操作を完了できませんでした",
+    "network": "両方のコンピュータでYggdrasilのローカルネットワーク／ファイアウォールのアクセスを許可し、設定の「他のコンピュータを探す」をオンのままにしてください。",
+    "generic": "問題が発生しました",
+    "claimFailed": "そのコードのペアリング情報を読み込めませんでした"
+  },
+  "pairing": {
+    "waiting": "承認を待っています",
+    "pairingWith": "<name>{{name}}</name>とペアリングしています。そのコンピュータで「コンピュータ」を開き、受信したリクエストを承認してください。",
+    "otherComputer": "相手のコンピュータ",
+    "code": "コード：<code>{{code}}</code>",
+    "incoming": "受信したリクエスト",
+    "offerCode": "コード <code>{{code}}</code>",
+    "approve": "承認"
+  },
+  "nearby": {
+    "title": "追加できるコンピュータ",
+    "description": "Yggdrasilがネットワーク上でこれらのコンピュータを見つけました。"
+  },
+  "fleet": {
+    "title": "Yggdrasilチーム",
+    "titleAdvanced": "クラスタ",
+    "moves": "作業はこのチーム内で自動的に振り分けられます。",
+    "movesAdvanced": "作業はこのクラスタ内で自動的に振り分けられます。",
+    "alone": "今のところ、チームにいるのはこのコンピュータだけです。",
+    "installModels": "モデルをインストール",
+    "openChat": "チャットを開く"
+  },
+  "membership": {
+    "local": "このコンピュータ",
+    "paired": "ペアリング済み",
+    "nearby": "ペアリング可能",
+    "offline": "オフライン"
+  },
+  "online": {
+    "online": "オンライン",
+    "offline": "オフライン",
+    "checking": "確認中…"
+  },
+  "hardware": {
+    "unavailable": "ハードウェアの詳細を取得できません",
+    "unified": "ユニファイドメモリ{{size}}",
+    "vram": "VRAM {{size}}",
+    "ram": "RAM {{size}}",
+    "memory": "メモリ{{size}}"
+  },
+  "abilities": {
+    "general": "汎用",
+    "coding": "コーディング",
+    "reasoning": "推論",
+    "vision": "画像認識",
+    "tools": "ツール",
+    "fast": "高速",
+    "large": "大規模モデル"
+  },
+  "card": {
+    "nearbyHint": "ネットワーク上にあり、このチームに参加できます。",
+    "running": "実行中：<strong>{{models}}</strong>",
+    "models_other": "モデル{{count}}個",
+    "availableFor": "対応できる用途：",
+    "partOfTeam": "このチームのメンバー",
+    "disk": "ディスク",
+    "diskFree": "{{total}}中{{free}}空き",
+    "diskLow": "モデルを追加するための空き容量が不足しています",
+    "modelsHere": "このコンピュータのモデル",
+    "modelsHereCount": "このコンピュータのモデル（{{count}}）",
+    "noModels": "まだありません。下でデプロイするか、「モデル」を開いてください。",
+    "remove": "削除",
+    "removing": "削除中…",
+    "noAddress": "まだアドレスがありません。「コンピュータを探す」をお試しください",
+    "connecting": "接続中…",
+    "addToTeam": "チームに追加",
+    "codePlaceholder": "コード",
+    "codeFor": "{{name}}のペアリングコード",
+    "approving": "承認中…",
+    "approveCode": "コードで承認",
+    "hideDetails": "詳細を隠す",
+    "manage": "管理",
+    "moreActions": "{{name}}のその他の操作",
+    "removeFromTeam": "チームから削除"
+  },
+  "deploy": {
+    "title": "モデルをデプロイ",
+    "description": "1台または複数のコンピュータに一度にモデルをインストールします。開始前にYggdrasilがディスクの空き容量を確認します。",
+    "model": "モデル",
+    "chooseModel": "モデルを選択…",
+    "modelSize": "{{model}}（{{size}}）",
+    "computers": "コンピュータ",
+    "selectMissing": "未インストールのものをすべて選択",
+    "thisComputer": "{{name}}（このコンピュータ）",
+    "installed": "インストール済み",
+    "free": "{{size}}空き",
+    "alreadyOn": "{{names}}にはインストール済みです。",
+    "notEnoughDisk": "ディスクの空き容量が不足しています",
+    "conflict": "{{name}}：{{needed}}必要ですが、空きは{{available}}です",
+    "tryAnyway": "それでも試す（これらのコンピュータではダウンロードに失敗する可能性があります）",
+    "deploying": "デプロイ中…",
+    "deployTo_other": "{{count}}台のコンピュータにデプロイ",
+    "deployToName": "{{name}}にデプロイ",
+    "deploy": "デプロイ",
+    "downloadSize": "ダウンロードサイズ 約{{size}}"
+  }
+}

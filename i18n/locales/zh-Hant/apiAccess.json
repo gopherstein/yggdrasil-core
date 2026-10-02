@@ -1,0 +1,123 @@
+{
+  "page": {
+    "title": "API 存取",
+    "subtitle": "可在哪裡連線到 Yggdrasil 的 API，以及如何保護它。",
+    "loading": "正在載入 API 設定…"
+  },
+  "probe": {
+    "notReady": "健康檢查有回應，但服務尚未就緒。",
+    "unreachable": "無法連線到這台電腦上的 API。",
+    "openaiDown": "服務正在執行，但與 OpenAI 相容的端點沒有回應。",
+    "passed": "本機檢查通過。",
+    "openaiStatus": "OpenAI 端點傳回 HTTP {{status}}。",
+    "openaiNoResponse": "OpenAI 端點沒有回應。",
+    "needsKey": "有回應。其他裝置需要有效的 API 金鑰。",
+    "checkFailed": "無法檢查 API。本機服務是否正在執行？",
+    "failed": "API 檢查失敗。"
+  },
+  "service": {
+    "title": "服務",
+    "api": "API 服務",
+    "running": "執行中",
+    "notResponding": "沒有回應",
+    "checking": "正在檢查…",
+    "access": "存取範圍",
+    "localNetwork": "區域網路",
+    "thisComputer": "僅限這台電腦",
+    "auth": "驗證",
+    "keyRequired": "需要 API 金鑰",
+    "notRequired": "在這台電腦上不需要",
+    "testing": "正在測試…",
+    "test": "測試 API",
+    "endpoint": "端點",
+    "localAddress": "本機位址：<mono>{{address}}</mono>",
+    "lanEndpoint": "LAN 端點",
+    "lanHint": "使用這台電腦的 LAN IP 加上連接埠 <mono>{{port}}</mono>（例如 <mono>http://192.168.x.x:{{port}}/v1</mono>）。",
+    "hideDocs": "隱藏 API 說明文件",
+    "docs": "API 說明文件",
+    "docsBody": "Yggdrasil 在 <mono>/v1</mono> 提供與 OpenAI 相容的 API。請將用戶端指向上方的端點；當其他電腦可以連線到 Yggdrasil 時，請傳送 <header/>。`/api/v1` 和 `/v1` 都需要這個標頭。金鑰並不會將一般 HTTP 加密。",
+    "copied": "已拷貝",
+    "copyUrl": "拷貝 URL"
+  },
+  "lan": {
+    "title": "區域網路存取",
+    "on": "區域網路上的裝置可以使用 API 金鑰連線。",
+    "off": "只有這台電腦上的 App 可以使用 Yggdrasil 的 API。",
+    "noKeys": "網路存取已開啟，但還沒有任何 API 金鑰。請先建立金鑰，再從其他裝置連線。",
+    "restart": "變更網路存取後，請完全結束並重新打開 Yggdrasil，讓伺服器重新綁定位址。當監聽位址不再是 loopback 時，每個連線都需要 API 金鑰。在一般 HTTP 連線上，金鑰並不會將傳輸內容加密。「測試 API」只會檢查這台電腦，不會檢查其他裝置能否連線。",
+    "confirmTitle": "要允許其他電腦存取嗎？",
+    "confirmBody": "區域網路上的裝置將可以連線到 Yggdrasil。所有遠端連線都需要 API 金鑰。",
+    "confirmHttp": "透過一般 HTTP 使用 API 金鑰並不會將傳輸內容加密。啟用後請結束並重新打開 Yggdrasil，讓伺服器在網路上監聽。",
+    "browserKey": "建立一把 API 金鑰，讓這個瀏覽器在伺服器重新綁定後仍能繼續連線。完整金鑰只會顯示一次。",
+    "keyName": "金鑰名稱",
+    "defaultKeyName": "這台電腦",
+    "enableFailed": "無法啟用網路存取。",
+    "cancel": "取消",
+    "enabling": "正在啟用…",
+    "allow": "允許存取"
+  },
+  "keys": {
+    "title": "API 金鑰",
+    "description": "供與 Yggdrasil 溝通的 App 和裝置使用的憑證。",
+    "create": "建立 API 金鑰",
+    "createHint": "為這把金鑰取個名稱，方便你知道是誰在使用它。",
+    "namePlaceholder": "VS Code",
+    "creating": "正在建立…",
+    "createKey": "建立金鑰",
+    "cancel": "取消",
+    "copyNow": "請立即拷貝這個密鑰，之後將不會再顯示",
+    "copiedBang": "已拷貝！",
+    "copySecret": "拷貝密鑰",
+    "none": "還沒有任何 API 金鑰。",
+    "meta": "建立於 {{created}} · 上次使用 {{lastUsed}}",
+    "copy": "拷貝",
+    "confirmRotate": "要更換「{{name}}」嗎？舊的密鑰會立即失效。",
+    "rotate": "更換",
+    "confirmRevoke": "要撤銷「{{name}}」嗎？使用這把金鑰的 App 將失去存取權。",
+    "revoke": "撤銷"
+  },
+  "advanced": {
+    "title": "進階",
+    "bind": "綁定位址",
+    "port": "連接埠",
+    "host": "設定的主機"
+  },
+  "permissions": {
+    "summary": "這把金鑰可以使用的項目",
+    "memories": "你的記憶",
+    "knowledge": "已連接的知識",
+    "tools": "工具",
+    "use": {
+      "never": "永不",
+      "on_request": "請求要求時",
+      "always": "一律"
+    },
+    "toolChoices": {
+      "profile": "依設定檔允許的範圍",
+      "read_only": "唯讀工具",
+      "none": "不使用工具"
+    },
+    "placement": "可選擇請求在哪裡執行",
+    "note": "請求只能要求更少，不能要求更多。透過網路時一律套用這些限制；在這台電腦上，則在 App 傳送這把金鑰時套用。",
+    "saveFailed": "無法儲存。"
+  },
+  "share": {
+    "title": "在其他 AI App 中使用 Yggdrasil",
+    "description": "支援 MCP 的 App 可以詢問你的本機 AI、列出它的模型，並搜尋你已連接的知識。回答會留在你的電腦上，而且本機 AI 只會使用讀取類的工具。",
+    "other": "其他 App",
+    "settings": "{{language}} 設定",
+    "copied": "已拷貝",
+    "copy": "拷貝",
+    "needsKey": "Yggdrasil 已對你的網路開放，因此 App 需要 API 金鑰。請在下方建立一把，並放在設定中標示 <key/> 的位置。金鑰的權限會套用。",
+    "keyPlaceholder": "<你的 API 金鑰>",
+    "where": {
+      "claudeDesktop": "在 Claude Desktop 中，打開「設定」→「開發者」→「編輯設定」，加入以下內容，然後重新啟動 Claude。",
+      "claudeCode": "在終端機中執行以下指令。",
+      "cursor": "將以下內容加入 ~/.cursor/mcp.json（Cursor 設定 → MCP → 新增全域 MCP 伺服器）。",
+      "vscode": "從命令選擇區執行「MCP: Open User Configuration」，然後加入以下內容。",
+      "other": "依位址連線到 MCP 伺服器的 App，請使用這個位址的 Streamable HTTP。會啟動程式的 App 則改用指令。"
+    },
+    "otherText": "位址：{{url}}\n指令：{{command}}",
+    "otherHeader": "\n標頭：  Authorization: Bearer {{key}}"
+  }
+}

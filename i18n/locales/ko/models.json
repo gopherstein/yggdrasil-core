@@ -1,0 +1,202 @@
+{
+  "page": {
+    "title": "모델",
+    "subtitle": "설치할 모델을 선택하세요. Yggdrasil이 하드웨어에 맞는 모델을 추천해요.",
+    "loading": "모델 라이브러리를 불러오는 중…",
+    "search": "모델 검색…",
+    "emptyTitle": "엄선된 모델 없음",
+    "emptyDescription": "로컬 카탈로그가 비어 있어요. 모든 모델 둘러보기에서 Hugging Face의 모델을 설치해 보세요.",
+    "ready": "{{model}} 다운로드가 끝났으며 사용할 준비가 되었어요.",
+    "readyFallback": "모델",
+    "dismiss": "닫기"
+  },
+  "tabs": {
+    "discover": "찾아보기",
+    "installed": "설치됨",
+    "running": "실행 중"
+  },
+  "target": {
+    "label": "대상 컴퓨터:",
+    "aria": "모델 추천 기준 컴퓨터",
+    "thisComputer": "이 컴퓨터",
+    "all": "모든 컴퓨터",
+    "computer": "컴퓨터",
+    "clusterView": "클러스터 보기 · {{running}}",
+    "running_other": "모델 {{count}}개 실행 중",
+    "allHint": "페어링된 모든 컴퓨터에 설치할 수 있어요. 추천은 여전히 잘 맞는 모델을 우선해요.",
+    "basedOn": "{{name}}의 하드웨어를 기준으로 추천해요.",
+    "manage": "컴퓨터 관리",
+    "useAnother": "다른 컴퓨터 사용",
+    "hardwareUnavailable": "하드웨어 정보 없음",
+    "unifiedMemory": "통합 메모리 {{size}}",
+    "memory": "메모리 {{size}}"
+  },
+  "discover": {
+    "recommended": "추천",
+    "recommendedHint": "선택한 컴퓨터에 맞는 엄선된 모델이에요. 용도를 우선으로 골랐어요.",
+    "browseAll": "모든 모델 둘러보기",
+    "noRecommendations": "아직 추천할 모델이 없어요.",
+    "noMatches": "이 검색과 일치하는 엄선된 모델이 없어요."
+  },
+  "categories": {
+    "coding": "코딩",
+    "general": "일반 어시스턴트",
+    "reasoning": "추론",
+    "vision": "비전",
+    "fast": "작고 빠른 모델",
+    "large": "대형 모델"
+  },
+  "fit": {
+    "excellent": "아주 잘 맞음",
+    "good": "잘 맞음",
+    "tight": "빠듯함",
+    "heavy": "느릴 수 있음",
+    "unsupported": "지원되지 않음",
+    "unknown": "적합도 알 수 없음"
+  },
+  "install": {
+    "install": "설치",
+    "anyway": "그래도 설치",
+    "unsupported": "지원되지 않음",
+    "downloading": "다운로드하는 중…",
+    "installing": "설치하는 중…",
+    "installed": "설치됨",
+    "progress": "{{percent}} · {{done}} / {{total}}"
+  },
+  "speed": {
+    "measured": "측정값 {{value}} tok/s",
+    "estimated": "예상 약 {{value}} tok/s",
+    "tokPerSec": "{{value}} tok/s"
+  },
+  "memory": {
+    "approximate": "약 {{range}}",
+    "unified": "통합 메모리 {{size}}",
+    "plain": "메모리 {{size}}",
+    "needed": "약 {{size}}"
+  },
+  "status": {
+    "running": "실행 중",
+    "downloading": "다운로드 중",
+    "installed": "설치됨",
+    "notInstalled": "설치되지 않음"
+  },
+  "lastUsed": {
+    "never": "사용한 적 없음",
+    "justNow": "방금"
+  },
+  "tags": {
+    "context": "{{count}}K 컨텍스트"
+  },
+  "tools": {
+    "webSummary": "로컬 도구 사용 · 웹에서 가져오기 가능",
+    "webDetail": "승인하면 파일을 읽고, git을 사용하고, 터미널 명령을 실행할 수 있어요. curl 같은 명령으로 웹에서 정보를 찾아볼 수 있어요. 별도의 브라우저는 없어요.",
+    "blockedSummary": "로컬 도구 사용 · 이 프로필에서 웹 차단됨",
+    "blockedDetail": "이 모델은 터미널 명령을 실행할 수 있지만 현재 어시스턴트 프로필에서 터미널이 꺼져 있어 웹 페이지를 가져올 수 없어요.",
+    "chatSummary": "채팅 전용 · 웹 액세스 없음",
+    "chatDetail": "모델 자체의 지식으로 답해요. 터미널 명령을 실행할 수 없으므로 웹에서 정보를 찾아볼 수 없어요."
+  },
+  "chips": {
+    "coding": "코딩",
+    "tools": "도구",
+    "reasoning": "추론",
+    "vision": "비전",
+    "fast": "빠름",
+    "general": "일반"
+  },
+  "support": {
+    "embedding": "임베딩 모델: 지식 검색을 돕고, 채팅하지는 않아요",
+    "reranker": "리랭커: 검색 결과의 순서를 정하고, 채팅하지는 않아요",
+    "classifier": "분류기: 요청을 분류하고, 채팅하지는 않아요"
+  },
+  "bestFor": {
+    "coding": "프로그래밍에 적합",
+    "reasoning": "신중한 추론에 적합",
+    "vision": "이미지와 문서에 적합",
+    "fast": "빠른 답변에 적합",
+    "large": "어려운 문제에 적합",
+    "everyday": "일상용 로컬 어시스턴트"
+  },
+  "small": {
+    "note": "작고 빠르지만, 특히 내 파일과 지식에 관한 사실과 숫자를 혼동할 수 있어요. 내 데이터에 관한 질문에는 더 큰 모델이 더 정확해요.",
+    "installedOther": "{{model}}이(가) 설치되어 있어요. 그런 질문에는 채팅에서 이 모델이나 자동을 선택하세요.",
+    "fitsOther": "{{model}}은(는) 이 컴퓨터에 맞아요.",
+    "installOther": "{{model}} 설치"
+  },
+  "capability": {
+    "noWeb": "현재 구성에서는 실시간 웹 액세스를 사용할 수 없어요.",
+    "noTools": "{{model}}은(는) 도구를 사용할 수 없어서 찾아볼 수 없어요. 아래와 같이 도구를 사용할 수 있는 모델로 전환하세요.",
+    "noLocalTools": "{{model}}은(는) 로컬 도구를 사용하지 않으므로 파일을 읽거나, 명령을 실행하거나, git을 대신 사용할 수 없어요.",
+    "noVision": "{{model}}은(는) 이미지를 볼 수 없어요."
+  },
+  "card": {
+    "details": "세부 정보",
+    "hideDetails": "세부 정보 숨기기",
+    "modelSize": "모델 크기",
+    "quantization": "양자화",
+    "unknown": "알 수 없음",
+    "runtimeMemory": "예상 실행 메모리",
+    "context": "설정된 컨텍스트",
+    "machineMemory": "컴퓨터 메모리",
+    "available": "현재 사용 가능",
+    "expected": "예상 동작",
+    "gpu": "GPU",
+    "recommendations": "추천",
+    "onYourComputers": "내 컴퓨터에서",
+    "bestMachine": "가장 적합한 컴퓨터: {{name}}",
+    "family": "모델 계열",
+    "parameters": "매개변수",
+    "format": "형식",
+    "runtime": "런타임",
+    "modelId": "모델 ID"
+  },
+  "tightFit": {
+    "label": "빠듯함",
+    "hint": "이 컴퓨터에서 사용 가능한 메모리를 대부분 사용하므로 덜 안정적일 수 있어요.",
+    "title": "이 모델은 이 컴퓨터에서 불안정할 수 있어요",
+    "body": "{{model}}은(는) 이 컴퓨터에서 사용 가능한 메모리를 대부분 사용해요. 작업량이 많거나 컨텍스트가 크면 느려지거나, 응답이 멈추거나, 시스템이 불안정해질 수 있어요.",
+    "advice": "Yggdrasil은 운영 체제와 그래픽을 위해 메모리를 더 남겨 두기를 권장해요.",
+    "cancel": "취소",
+    "install": "그래도 설치"
+  },
+  "browse": {
+    "title": "모든 모델 둘러보기",
+    "description": "Yggdrasil이 로컬에서 실행할 수 있는 모델을 Hugging Face에서 검색해요. 위에서 선택한 컴퓨터에 설치돼요.",
+    "close": "닫기",
+    "placeholder": "모델 검색…",
+    "search": "검색",
+    "searching": "Hugging Face 검색하는 중…",
+    "failed": "Hugging Face에 연결할 수 없어요. 네트워크를 확인하고 다시 시도하세요.",
+    "install": "설치",
+    "installFailed": "설치 실패"
+  },
+  "installedTab": {
+    "empty": "아직 설치된 모델이 없어요. 찾아보기에서 설치하면 여기에 표시돼요.",
+    "runningOn": "{{computer}}에서 실행 중",
+    "downloading": "다운로드하는 중… {{percent}}",
+    "installedOn": "{{where}}에 설치됨",
+    "thisComputer": "이 컴퓨터",
+    "usedBy": "{{profiles}}에서 사용 중",
+    "lastUsed": "마지막 사용: {{when}}",
+    "chat": "채팅",
+    "start": "시작",
+    "installElsewhere": "다른 컴퓨터에 설치",
+    "installing": "설치하는 중…",
+    "moreActions": "{{model}}에 대한 추가 작업",
+    "stop": "중지",
+    "remove": "제거"
+  },
+  "runningTab": {
+    "empty": "지금 불러온 모델이 없어요. 필요할 때 채팅에서 자동으로 시작해요.",
+    "active": "활성 모델",
+    "inUse": " · 약 {{size}} 사용 중",
+    "ofHost": " / 이 컴퓨터의 {{size}}",
+    "runningOn": "{{computer}}에서 실행 중",
+    "stop": "중지",
+    "memory": "메모리",
+    "memoryUnavailable": "메모리 사용량 정보 없음",
+    "speed": "속도",
+    "speedUnavailable": "속도 정보 없음",
+    "usedBy": "사용 중인 프로필: {{profiles}}",
+    "openChat": "채팅 열기"
+  }
+}

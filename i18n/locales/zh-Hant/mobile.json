@@ -1,0 +1,353 @@
+{
+  "app": {
+    "starting": "正在啟動 Yggdrasil",
+    "back": "返回",
+    "close": "關閉",
+    "cancel": "取消",
+    "dismiss": "關閉",
+    "loading": "正在載入",
+    "save": "儲存"
+  },
+  "tabs": {
+    "chat": "聊天",
+    "computers": "電腦",
+    "models": "模型",
+    "settings": "設定"
+  },
+  "screens": {
+    "connect": "連線",
+    "chat": "聊天"
+  },
+  "units": {
+    "megabytes": "{{value}} MB",
+    "gigabytes": "{{value}} GB"
+  },
+  "connection": {
+    "enterAddress": "請輸入執行 Yggdrasil 的電腦位址。",
+    "couldNotReach": "無法連線到 Yggdrasil。",
+    "unreachable": "無法連線到那台電腦上的 Yggdrasil。請使用相同的 Wi-Fi 網路，並在那台電腦上開啟 API 的 LAN 存取。",
+    "keyRejected": "這把 API 金鑰被拒絕。請在那台電腦的「API 存取」中建立金鑰，然後貼到這裡。",
+    "dropped": "與 Yggdrasil 的連線已中斷。",
+    "chatFailed": "聊天失敗。",
+    "requestFailed": "請求失敗"
+  },
+  "connect": {
+    "title": "連線到電腦",
+    "subtitle": "手機會使用已在執行你的模型的電腦。請在那台電腦上打開「API 存取」，允許在區域網路上使用 API，並建立一把金鑰。",
+    "address": "電腦位址",
+    "addressPlaceholder": "192.168.1.20",
+    "apiKey": "API 金鑰",
+    "apiKeyPlaceholder": "貼上金鑰",
+    "connect": "連線",
+    "connecting": "正在連線",
+    "notReady": "Yggdrasil 有回應，但尚未就緒。"
+  },
+  "discovery": {
+    "onThisNetwork": "在這個網路上",
+    "useAddress": "使用這台電腦的位址",
+    "version": "Yggdrasil {{version}}",
+    "looking": "正在這個網路上尋找電腦…",
+    "lookingLabel": "正在這個網路上尋找電腦",
+    "none": "找不到任何電腦。請在你的電腦上啟動 Yggdrasil 並使用相同的 Wi-Fi，或輸入它的位址。",
+    "localNetworkDenied": "Yggdrasil 沒有權限在你的網路上尋找電腦。請在「設定」>「隱私權與安全性」>「區域網路」中允許。",
+    "listFailed": "無法列出這個網路上的電腦。你仍可以在下方輸入位址。"
+  },
+  "computers": {
+    "title": "電腦",
+    "subtitle": "你所連線的電腦可以連到的電腦，以及它們是否在線上。",
+    "disconnected": "連線到執行 Yggdrasil 的電腦，即可和它的模型聊天並查看它的其他電腦。",
+    "enterAddress": "輸入位址",
+    "loading": "正在載入電腦",
+    "none": "從這個連線看不到任何電腦。",
+    "unnamed": "電腦",
+    "thisConnection": "目前的連線",
+    "meta": "{{platform}} · {{status}}",
+    "metaPaired": "{{platform}} · {{status}} · 已配對",
+    "status": {
+      "online": "線上",
+      "offline": "離線",
+      "degraded": "效能降低"
+    }
+  },
+  "models": {
+    "title": "模型",
+    "onComputer": "在你的電腦上",
+    "connectFirst": "連線到一台電腦，即可查看上面安裝的模型。",
+    "loading": "正在載入模型",
+    "noneInstalled": "那台電腦上還沒有安裝任何模型。",
+    "status": {
+      "installed": "已安裝",
+      "loaded": "已載入",
+      "downloading": "正在下載"
+    },
+    "support": {
+      "embedding": "輔助模型 · 依語意搜尋知識",
+      "reranker": "輔助模型 · 為段落排序，找出最佳結果",
+      "classifier": "輔助模型 · 協助「自動」分派請求",
+      "other": "輔助模型"
+    }
+  },
+  "phoneModels": {
+    "heading": "在這部 iPhone 上",
+    "copy": "這些是 Yggdrasil 目錄中較小的模型。檔案會下載到這部手機上並保存在這裡。",
+    "meta": "{{parameters}} · {{size}}",
+    "chat": "聊天",
+    "remove": "移除",
+    "install": "安裝",
+    "installing": "正在安裝 {{percent}}",
+    "tooLarge": "對這部手機來說太大",
+    "installFailed": "無法安裝這個模型。",
+    "noPlace": "這部手機沒有可以儲存模型的位置。",
+    "noSpace": "這部手機沒有足夠的可用儲存空間來存放這個模型。",
+    "downloadIncomplete": "模型下載未完成。",
+    "summaries": {
+      "qwen2-5-coder-1-5b-q4": "速度非常快的程式設計助理，適合快速編輯和小型工作。",
+      "llama-3-2-1b-q4": "超小型的一般助理，適合追求極速與低記憶體用量時使用。",
+      "llama-3-2-3b-q4": "均衡的日常助理，支援長上下文。",
+      "phi-3-5-mini-q4": "Microsoft 的精簡模型，擅長推理和輕度程式設計。",
+      "gemma-2-2b-q4": "Google 的小型模型，適合反應靈敏的日常聊天。",
+      "qwen2-5-3b-q4": "能力不錯的中型一般模型，支援工具呼叫。",
+      "deepseek-r1-distill-1-5b-q4": "從 DeepSeek R1 蒸餾而來的輕量推理模型。"
+    }
+  },
+  "onboarding": {
+    "welcome": "歡迎使用",
+    "lede": "這個 App 可以在這部 iPhone 上私密地執行 AI。",
+    "thisIPhone": "這部 iPhone",
+    "hardware": "偵測到可用於本機推論的硬體。",
+    "device": "裝置",
+    "memory": "記憶體",
+    "system": "系統",
+    "question": "你希望你的 AI 做些什麼？",
+    "purposes": {
+      "general": {
+        "title": "一般助理",
+        "description": "日常問題、寫作協助，以及以本機為優先的對話。"
+      },
+      "coding": {
+        "title": "程式設計",
+        "description": "在這部 iPhone 上進行快速編輯和小型工作的程式碼協助。"
+      },
+      "research": {
+        "title": "研究",
+        "description": "摘要和縝密推理，完全在這部手機上執行。"
+      },
+      "custom": {
+        "title": "自訂",
+        "description": "從適合這部 iPhone 的模型中自行挑選。"
+      }
+    },
+    "continue": "繼續",
+    "recommended": "建議",
+    "recommendedFor": "適合「{{purpose}}」的建議配置",
+    "modelFacts": "{{parameters}} · 下載大小 {{download}} · 約使用 {{memory}} 記憶體",
+    "install": "安裝建議配置",
+    "tooLarge": "這個模型需要的記憶體超過這部 iPhone 能提供的量。",
+    "chooseOther": "選擇其他模型",
+    "installing": "正在安裝 {{model}}",
+    "downloaded": "已下載 {{percent}}",
+    "keepOpen": "大型模型可能需要幾分鐘才能下載完成。請保持 Yggdrasil 開啟。",
+    "ready": "一切就緒",
+    "installed": "{{model}} 已安裝完成。開始和你的本機 AI 聊天吧。",
+    "startChatting": "開始聊天"
+  },
+  "settings": {
+    "title": "設定",
+    "subtitle": "你安裝在這部 iPhone 上的模型會留在這部 iPhone 上。與已連線電腦的聊天會留在那台電腦上。",
+    "thisIPhone": "這部 iPhone",
+    "whereChatsRun": "聊天執行位置",
+    "onDevice": "在你安裝模型後，於這部裝置上執行",
+    "computer": "電腦",
+    "connectedComputer": "已連線的電腦",
+    "notConnected": "未連線",
+    "coreVersion": "那台電腦上的 Yggdrasil",
+    "updateCore": "請將那台電腦上的 Yggdrasil 更新到 1.4 或以上版本，才能查看回答來源、助理做了什麼、即時進度和投入程度。",
+    "jobsKeepRunning": "關閉這個 App 並不會停止那台電腦上已在執行的工作。",
+    "forget": "忘記這台電腦",
+    "connect": "連線到電腦",
+    "about": "關於",
+    "version": "版本 {{version}}",
+    "aboutCopy": "連結各個國度的世界之樹。Yggdrasil 將你的 App 連結到你電腦上和這部 iPhone 上的模型。",
+    "dangerZone": "危險區域",
+    "resetTitle": "重置這部 iPhone",
+    "resetCopy": "恢復歡迎設定畫面。會清除這部 iPhone 上的聊天，並忘記已連線的電腦。",
+    "resetButton": "重置設定和 App 資料…",
+    "resetDeletesModels": "這個動作無法復原。已下載的模型也會被刪除。",
+    "resetKeepsModels": "這個動作無法復原。已下載的模型會保留。",
+    "alsoDeleteModels": "同時刪除已下載的模型",
+    "resetting": "正在重置…",
+    "confirmReset": "是，重置",
+    "resetFailed": "無法重置 Yggdrasil。"
+  },
+  "language": {
+    "title": "語言",
+    "appLanguage": "App 語言",
+    "automatic": "自動（{{language}}）",
+    "automaticHint": "跟隨已連線電腦的 App 語言；如果沒有，則使用這部 iPhone 的語言。",
+    "choose": "選擇 App 的語言",
+    "pseudo": "虛擬語系（en-XA）"
+  },
+  "chat": {
+    "history": "聊天紀錄",
+    "newChat": "新聊天",
+    "chats": "聊天",
+    "search": "搜尋",
+    "rename": "重新命名",
+    "renameChat": "重新命名聊天",
+    "delete": "刪除",
+    "deleteChat": "刪除聊天",
+    "computer": "電腦",
+    "newOnComputer": "在這台電腦上開始新聊天",
+    "untitled": "聊天",
+    "model": "模型",
+    "chooseModel": "選擇模型",
+    "loading": "正在載入聊天",
+    "placeholder": "傳訊息給 Yggdrasil",
+    "send": "傳送",
+    "sending": "正在傳送",
+    "stop": "停止",
+    "working": "正在處理…",
+    "thinkingOnPhone": "正在這部 iPhone 上思考…",
+    "installFirst": "安裝模型後即可在這部 iPhone 上聊天。",
+    "setUpModel": "設定模型",
+    "modelMissing": "這部手機上沒有安裝該模型。",
+    "interrupted": "回應已中斷",
+    "couldNotRun": "這部手機無法執行該模型。",
+    "noProfile": "那台電腦還沒有任何設定檔。請先在 Mac App 中建立一個。",
+    "noChatPlace": "這部 iPhone 沒有可以儲存聊天的位置。",
+    "speed": "{{generated}} tok/s",
+    "speedWithPrompt": "{{generated}} tok/s · 提示 {{prompt}} tok/s",
+    "groups": {
+      "today": "今天",
+      "yesterday": "昨天",
+      "week": "過去 7 天",
+      "month": "過去 30 天",
+      "older": "更早"
+    },
+    "empty": {
+      "title": "有什麼我可以幫你的？",
+      "phone": "和這部 iPhone 上的 AI 對話。你寫的任何內容都不會離開這部手機。",
+      "computer": "Yggdrasil 會挑選合適的模型和電腦，需要時查詢資料，並顯示它使用了哪些內容。"
+    },
+    "unsent": {
+      "notSent": "未傳送",
+      "retry": "重試",
+      "retryLabel": "再次傳送",
+      "edit": "編輯",
+      "editLabel": "編輯訊息"
+    },
+    "approval": {
+      "title": "要允許 {{tool}} 嗎？",
+      "fallback": "這個工具想在你的電腦上執行。",
+      "wantsToRun": "{{tool}} 想要執行。",
+      "wantsToRunSummary": "{{tool}} 想要執行：{{summary}}",
+      "deny": "拒絕",
+      "allowOnce": "允許一次"
+    }
+  },
+  "effort": {
+    "title": "投入程度",
+    "label": "投入程度：{{effort}}",
+    "hint": "選擇回覆要多謹慎",
+    "auto": {
+      "label": "自動",
+      "hint": "由 Yggdrasil 決定：簡單的問題保持快速，大型或涉及資料的問題會更加謹慎處理。"
+    },
+    "fast": {
+      "label": "快速",
+      "hint": "一次回答完成，不做規劃，也不進行第二次檢查。"
+    },
+    "balanced": {
+      "label": "平衡",
+      "hint": "為大型請求做規劃，查詢資料時會閱讀一個網頁，並修正一次數據。"
+    },
+    "thorough": {
+      "label": "徹底",
+      "hint": "閱讀更多網頁，使用可容納的最大模型，並檢查兩次數據。"
+    }
+  },
+  "answer": {
+    "files": "檔案",
+    "filesHint": "在產生檔案的電腦上打開檔案。",
+    "sources": "來源",
+    "source": "來源",
+    "opensInSafari": "在 Safari 中打開",
+    "steps_other": "我做了什麼 · {{count}} 個步驟"
+  },
+  "tools": {
+    "internet": {
+      "search": "網路搜尋",
+      "open": "打開網頁"
+    },
+    "filesystem": {
+      "search": "尋找檔案",
+      "read": "讀取檔案",
+      "write": "寫入檔案"
+    },
+    "terminal": "終端機",
+    "git": {
+      "commit": "Git commit",
+      "push": "Git push"
+    },
+    "unnamed": "工具"
+  },
+  "progress": {
+    "searchingWeb": "正在搜尋網路…",
+    "searchingWebFor": "正在網路上搜尋「{{query}}」…",
+    "readingPage": "正在閱讀網頁…",
+    "readingHost": "正在閱讀 {{host}}…",
+    "readingFile": "正在讀取檔案…",
+    "searchingFiles": "正在搜尋本機檔案…",
+    "runningCommand": "正在執行指令…",
+    "checkingGit": "正在檢查 git…",
+    "usingTool": "正在使用 {{tool}}…",
+    "checkedKnowledge": "已檢查你的知識…",
+    "yourKnowledge": "你的知識",
+    "foundPassages_other": "在 {{source}} 中找到 {{count}} 個段落…",
+    "foundPassagesMore_other": "在 {{source}} 及另外 {{more}} 個來源中找到 {{count}} 個段落…",
+    "checkingSources": "正在檢查來源…",
+    "toolFailed": "{{tool}} 失敗",
+    "waitingForPermission": "正在等待權限：{{tool}}",
+    "switchingTo": "正在切換到 {{model}}…",
+    "using": "正在使用 {{model}}…",
+    "workingThrough_other": "正在處理 {{count}} 個部分…",
+    "planning": "正在規劃…",
+    "workingOn": "正在處理：{{step}}…",
+    "puttingTogether": "正在彙整…",
+    "verifying": "正在對照來源檢查數據…",
+    "writingFile": "正在寫入檔案…",
+    "writingNamed": "正在撰寫 {{name}}…",
+    "loadingModel": "正在載入模型…",
+    "loadingModelOn": "正在 {{node}} 上載入模型…",
+    "generating": "正在產生回應…",
+    "generatingOn": "正在 {{node}} 上生成…"
+  },
+  "realms": {
+    "about": "{{norse}}。{{rune}}。關於這個名稱",
+    "chat": {
+      "meaning": "在「聊天」中，你的訊息會被送到這部 iPhone 或你電腦上的模型，再把回答帶回來。",
+      "story": "Ratatoskr 是一隻在 Yggdrasil 樹幹上跑上跑下的松鼠，在樹頂的老鷹與啃咬樹根的巨龍 Níðhöggr 之間傳遞訊息。",
+      "runeName": "Ansuz，言語的符文"
+    },
+    "models": {
+      "meaning": "Ymir 是最初的巨人，世界由他而生。模型則是其他一切的基礎。",
+      "story": "太初之時有 Ymir，他是第一位巨人。他被殺後，眾神用他的身體造出世界：以他的血肉造成大地，以他的骨頭造成山脈，以他的頭骨造成天空。",
+      "runeName": "Uruz，原始力量的符文"
+    },
+    "computers": {
+      "meaning": "Bifrost 是連接各個世界的彩虹橋。它連接你的電腦。",
+      "story": "Bifröst 是一座燃燒的彩虹橋，連接人類的世界 Midgard 與眾神的家園 Asgard。Heimdall 在橋的盡頭守望。",
+      "runeName": "Raidho，旅程的符文"
+    },
+    "connect": {
+      "meaning": "Valgrind 是 Valhalla 的大門。API 金鑰決定誰可以進入。",
+      "story": "Valgrind 是矗立在 Valhalla 前方的古老大門。它神聖而古老，很少有人知道它的門閂是如何扣上的。",
+      "runeName": "Thurisaz，門的符文"
+    },
+    "settings": {
+      "meaning": "Forseti 公正地裁決每一件事。設定就是 Yggdrasil 遵守的規則。",
+      "story": "Baldr 之子 Forseti 坐鎮於 Glitnir，那是一座以黃金為柱、白銀為頂的殿堂。每個帶著紛爭來找他的人，離開時都已和解。",
+      "runeName": "Isa，靜止的符文"
+    }
+  }
+}

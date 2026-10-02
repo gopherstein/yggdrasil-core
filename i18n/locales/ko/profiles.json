@@ -1,0 +1,364 @@
+{
+  "page": {
+    "title": "프로필 및 오케스트레이션",
+    "subtitle": "프로필은 저장된 어시스턴트예요. 요청을 처리하는 방식, 모델, 도구, 메모리, 컴퓨터를 담고 있어요.",
+    "hint": "채팅에서 선택하거나 직접 만드세요.",
+    "create": "프로필 만들기",
+    "createTitle": "새 프로필 만들기",
+    "loading": "프로필을 불러오는 중…",
+    "loadFailed": "프로필을 불러올 수 없어요. 로컬 데몬이 실행 중인가요?",
+    "emptyTitle": "아직 프로필이 없어요",
+    "emptyDescription": "프로필을 만들어 채팅에서 어시스턴트가 어떻게 작동할지 정하세요.",
+    "noneInFilter": "이 필터에 해당하는 프로필이 없어요.",
+    "filter": "프로필 필터",
+    "filters": {
+      "all": "전체",
+      "builtin": "기본 제공",
+      "custom": "사용자 지정"
+    }
+  },
+  "create": {
+    "title": "프로필 만들기",
+    "startFrom": "시작 템플릿:",
+    "startingWith": "<strong>{{name}}</strong>에서 시작해요. 만든 후에 이름을 바꾸고 세부 조정할 수 있어요.",
+    "creating": "만드는 중…",
+    "create": "만들기",
+    "cancel": "취소",
+    "copyName": "{{name}}(사본)",
+    "options": {
+      "general": {
+        "label": "일반 어시스턴트",
+        "description": "일상적인 질문과 로컬 우선 채팅."
+      },
+      "coding": {
+        "label": "프로그래밍",
+        "description": "여러 컴퓨터에 걸친 AI 팀이 돕는 코딩."
+      },
+      "research": {
+        "label": "리서치",
+        "description": "긴 글 읽기와 신중한 추론."
+      },
+      "blank": {
+        "label": "빈 프로필",
+        "description": "빈 상태에서 시작해 역할, 도구, 컴퓨터를 직접 설정해요."
+      }
+    }
+  },
+  "purposes": {
+    "general": "일상 대화",
+    "coding": "프로그래밍 및 코딩 도움",
+    "research": "리서치 및 긴 글 읽기",
+    "custom": "사용자 지정 설정"
+  },
+  "card": {
+    "rename": "프로필 이름 변경",
+    "builtin": "기본 제공",
+    "custom": "사용자 지정",
+    "automaticSelection": "자동 컴퓨터 선택",
+    "customSelection": "사용자 지정 컴퓨터 선택",
+    "tools_other": "도구 {{count}}개",
+    "askFirst": " · {{count}}개는 먼저 물어봄",
+    "noTools": "사용 중인 도구 없음",
+    "more": "+{{count}}개 더",
+    "useInChat": "채팅에서 사용",
+    "close": "닫기",
+    "edit": "편집",
+    "hideDetails": "세부 정보 숨기기",
+    "details": "세부 정보",
+    "moreActions": "{{name}}에 대한 추가 작업",
+    "howItWorks": "작동 방식",
+    "computerSelection": "컴퓨터 선택",
+    "selectionDetail": "{{title}}. {{detail}}",
+    "strategy": "전략: <strong>{{strategy}}</strong>",
+    "thisMachine": "{{name}}(이 컴퓨터)"
+  },
+  "menu": {
+    "duplicate": "복제",
+    "rename": "이름 변경",
+    "confirmReset": "“{{name}}”을(를) Yggdrasil 기본 상태로 재설정할까요? 변경한 내용은 사라져요.",
+    "reset": "기본값으로 재설정",
+    "confirmDelete": "“{{name}}”을(를) 삭제할까요? 이 작업은 되돌릴 수 없어요.",
+    "delete": "삭제"
+  },
+  "strategies": {
+    "auto": {
+      "label": "자동",
+      "detail": "Yggdrasil이 결정해요. 간단한 질문은 모델 하나가 답하고, 여러 부분으로 된 요청은 계획을 세우고 검토해요."
+    },
+    "single": {
+      "label": "단일 모델",
+      "detail": "계획 없이 모델 하나가 모든 요청에 답해요."
+    },
+    "planned": {
+      "label": "플래너 + 워커",
+      "detail": "여러 부분으로 된 요청은 답변을 작성하기 전에 항상 부분별로 처리해요."
+    },
+    "team": {
+      "label": "팀",
+      "detail": "플래너가 각 요청을 나누고, 워커가 각 부분을 처리하며(가능하면 다른 컴퓨터에서), 검토자가 답변을 확인해요. 간단한 질문은 여전히 바로 답해요."
+    },
+    "teamTitle": "AI 팀",
+    "automaticTitle": "자동",
+    "withStrategy": "{{title}} · 전략: {{strategy}}"
+  },
+  "computers": {
+    "prefer_local": {
+      "title": "이 컴퓨터 우선",
+      "short": "이 컴퓨터 우선",
+      "detail": "먼저 이 컴퓨터에서 실행을 시도해요. 여기에 모델이 설치되어 있지 않으면 페어링된 컴퓨터를 사용해요."
+    },
+    "manual": {
+      "title": "사용자 지정",
+      "short": "사용자 지정",
+      "detail": "역할별로 고정한 컴퓨터를 사용해요. 특정 단계를 특정 컴퓨터에서 실행하고 싶을 때 적합해요."
+    },
+    "automatic": {
+      "title": "자동",
+      "short": "자동",
+      "detail": "각 단계를 이미 모델이 있는 페어링된 컴퓨터에 배치해요. IP나 포트를 설정할 필요가 없어요."
+    }
+  },
+  "chips": {
+    "files": "파일",
+    "git": "Git",
+    "terminal": "터미널",
+    "ok": "{{label}} ✓",
+    "ask": "{{label}} 묻기"
+  },
+  "roles": {
+    "role": "역할",
+    "assistant": "기본",
+    "fast": "빠름",
+    "coding": "코딩",
+    "planner": "플래너",
+    "worker": "워커",
+    "reviewer": "검토자",
+    "numbered": "{{role}} {{n}}",
+    "automaticModel": "자동 모델",
+    "pinnedComputer": "고정된 컴퓨터",
+    "automaticComputer": "자동 컴퓨터",
+    "hint": "{{model}} · {{computer}}",
+    "help": {
+      "assistant": "답변을 작성해요. 자동으로 설정하면 채팅에서 선택한 모델을 사용해요.",
+      "fast": "채팅이 자동으로 설정되어 있을 때 간단한 질문에 답해요.",
+      "coding": "채팅이 자동으로 설정되어 있을 때 코딩 요청에 답해요.",
+      "planner": "요청을 여러 부분으로 나눠요.",
+      "worker": "계획의 한 부분을 처리해요. 여러 부분을 서로 다른 컴퓨터에서 동시에 실행할 수 있어요.",
+      "reviewer": "답변을 보여 드리기 전에 확인해요.",
+      "other": "이 프로필 워크플로의 이름 있는 단계예요."
+    }
+  },
+  "capabilities": {
+    "internet": {
+      "label": "인터넷",
+      "description": "웹에서 최신 정보를 검색해 읽고, 장소와 길을 찾아요"
+    },
+    "files": {
+      "label": "파일",
+      "description": "작업 공간에서 파일을 찾고, 읽고, 써요"
+    },
+    "code": {
+      "label": "코드 실행",
+      "description": "계산, 분석, 차트를 위해 샌드박스에서 Python을 실행해요. 먼저 물어봐요"
+    },
+    "speech": {
+      "label": "음성",
+      "description": "이 컴퓨터에서 오디오를 받아쓰고 텍스트를 소리 내어 읽어요"
+    },
+    "images": {
+      "label": "이미지",
+      "description": "이미지 생성을 설정하면 이 컴퓨터에서 이미지를 만들고 편집해요"
+    },
+    "video": {
+      "label": "동영상",
+      "description": "동영상 생성을 설정하면 이 컴퓨터에서 짧은 클립을 만들어요"
+    },
+    "shell": {
+      "label": "셸",
+      "description": "이 컴퓨터에서 명령을 실행해요"
+    },
+    "git": {
+      "label": "Git",
+      "description": "저장소를 살펴보고, 커밋하거나 푸시해요"
+    }
+  },
+  "tools": {
+    "internet": {
+      "search": {
+        "label": "웹 검색",
+        "description": "공개 웹을 검색하고 제목, 링크, 요약을 반환해요."
+      },
+      "open": {
+        "label": "웹 페이지 열기",
+        "description": "URL을 열고 읽을 수 있는 텍스트를 반환해요."
+      }
+    },
+    "filesystem": {
+      "search": {
+        "label": "파일 찾기",
+        "description": "작업 공간에서 이름으로 파일을 찾아요."
+      },
+      "read": {
+        "label": "파일 읽기",
+        "description": "어시스턴트가 Yggdrasil 작업 공간의 파일을 열어 실제 내용을 인용하거나 요약할 수 있게 해요."
+      },
+      "write": {
+        "label": "파일 쓰기",
+        "description": "어시스턴트가 작업 공간에서 파일을 만들거나 업데이트할 수 있게 해요."
+      }
+    },
+    "terminal": {
+      "label": "터미널",
+      "description": "이 컴퓨터에서 셸 명령을 실행해요."
+    },
+    "git": {
+      "status": {
+        "label": "Git status",
+        "description": "어떤 파일이 변경되었는지 보여 줘서 어시스턴트가 작업 트리를 파악할 수 있게 해요."
+      },
+      "diff": {
+        "label": "Git diff",
+        "description": "실제 코드 변경 사항을 보여 줘서 어시스턴트가 패치를 검토하거나 설명할 수 있게 해요."
+      },
+      "log": {
+        "label": "Git log",
+        "description": "작업 공간의 최근 커밋을 보여 줘요."
+      },
+      "show": {
+        "label": "Git show",
+        "description": "커밋 하나를 보여 줘요."
+      },
+      "add": {
+        "label": "Git add",
+        "description": "커밋할 파일을 스테이징해요. 커밋 준비에 도움이 필요할 때 유용해요."
+      },
+      "commit": {
+        "label": "Git commit",
+        "description": "로컬 git 커밋을 만들어요."
+      },
+      "push": {
+        "label": "Git push",
+        "description": "커밋을 원격 저장소로 푸시해요."
+      }
+    }
+  },
+  "policies": {
+    "deny": {
+      "label": "거부",
+      "description": "이 프로필에서는 절대 사용할 수 없어요."
+    },
+    "ask": {
+      "label": "매번 묻기",
+      "description": "사용할 때마다 채팅에서 확인을 요청해요."
+    },
+    "allow-for-session": {
+      "label": "세션당 한 번 묻기",
+      "description": "처음에 물어본 후 앱을 다시 시작할 때까지 기억해요."
+    },
+    "allow": {
+      "label": "항상 허용",
+      "description": "묻지 않고 실행해요. 자주 사용하는 위험이 낮은 도구에 적합해요."
+    }
+  },
+  "editor": {
+    "profile": "프로필",
+    "name": "이름",
+    "namePlaceholder": "예: 프로그래밍",
+    "models": "모델",
+    "modelsHint": "자동으로 설정하면 채팅에서 선택한 모델을 사용해요.",
+    "model": "모델",
+    "automatic": "자동",
+    "computer": "컴퓨터",
+    "fallback": "대체 순서",
+    "fallbackHint": "답변하는 모델이 실패하면 순서대로 시도해요. 그 후에는 Yggdrasil이 설치된 다른 모델을 선택해요.",
+    "none": "없음",
+    "tools": "도구",
+    "on": "켬",
+    "off": "끔",
+    "individualTools": "개별 도구",
+    "memory": "메모리",
+    "memoryHint": "이 프로필의 채팅은 질문할 때마다 이 소스를 검색하고 일치하는 구절을 사용해요.",
+    "orchestration": "오케스트레이션",
+    "strategy": "전략",
+    "execution": "실행",
+    "computerSelection": "컴퓨터 선택",
+    "selectionOptions": {
+      "automatic": "자동 — 모델이 이미 있는 곳에 배치",
+      "prefer_local": "이 컴퓨터 우선",
+      "manual": "사용자 지정 — 모델에서 설정한 컴퓨터 사용"
+    },
+    "localOnly": "이 컴퓨터에서만 — 페어링된 컴퓨터를 사용하지 않음",
+    "allowed": "허용",
+    "preferred": "우선",
+    "never": "사용 안 함",
+    "save": "프로필 저장",
+    "cancel": "취소"
+  },
+  "controls": {
+    "default": "기본값",
+    "effort": {
+      "label": "추론 수준",
+      "help": "채팅에서 노력 수준을 자동으로 둘 때 사용해요.",
+      "fast": "빠르게",
+      "balanced": "균형 있게",
+      "thorough": "꼼꼼하게"
+    },
+    "planning": {
+      "label": "계획",
+      "help": "여러 부분으로 된 요청을 부분별로 처리해요. 항상으로 설정하면 뚜렷한 부분이 없는 요청도 나눠요.",
+      "on": "요청에 여러 부분이 있을 때",
+      "always": "항상",
+      "off": "계획하지 않음"
+    },
+    "parallel": {
+      "label": "병렬 처리",
+      "help": "독립적인 부분을 동시에 찾아봐요.",
+      "on": "동시에",
+      "off": "하나씩"
+    },
+    "verification": {
+      "label": "검증",
+      "help": "답하기 전에 수치를 소스와 대조해 확인해요.",
+      "off": "끔",
+      "check": "확인하고 보고",
+      "correct": "확인하고 한 번 수정",
+      "thorough": "확인하고 두 번 수정"
+    },
+    "memory": {
+      "label": "메모리",
+      "help": "이 프로필의 채팅에서 저장된 메모리를 사용해요.",
+      "off": "이 프로필에서는 끔"
+    },
+    "fallback": {
+      "label": "대체",
+      "help": "선택한 모델이 실패하면 다른 모델로 답해요.",
+      "off": "대신 실패 표시"
+    },
+    "max_workers": {
+      "label": "워커",
+      "help": "계획당 최대 부분 수(2–8)."
+    },
+    "max_tool_calls": {
+      "label": "도구 호출",
+      "help": "한 턴당 최대 도구 호출 수(1–50)."
+    },
+    "retries": {
+      "label": "재시도",
+      "help": "모델이 실패한 후 시도 횟수(1–3): 다른 컴퓨터의 같은 모델, 그다음 다른 모델."
+    },
+    "timeout_seconds": {
+      "label": "시간 제한(초)",
+      "help": "이보다 오래 걸리는 턴을 중지해요(10–3600)."
+    },
+    "context_share": {
+      "label": "컨텍스트 예산",
+      "help": "이전 메시지가 사용할 수 있는 컨텍스트 창의 최대 비율(0.1–0.9)."
+    }
+  },
+  "orchestrators": {
+    "title": "오케스트레이터",
+    "description": "모델과 도구를 조율하는 교체 가능한 오케스트레이션 엔진이에요.",
+    "emptyTitle": "오케스트레이터 관리 기능이 곧 제공돼요",
+    "emptyDescription": "고급 모드에서 기본 제공 및 플러그인 오케스트레이터를 여기서 설정할 수 있게 될 거예요."
+  }
+}

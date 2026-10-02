@@ -1,0 +1,20 @@
+{
+  "title": "연결된 서비스",
+  "description": "AI가 사용 중인 서비스를 읽고 작업할 수 있게 해요. 토큰은 AI가 볼 수 없는 곳인 이 컴퓨터에 보관되며, AI는 서비스가 돌려준 내용만 볼 수 있어요. 읽기는 허용되고, 변경은 먼저 물어봐요.",
+  "generic": "문제가 발생했어요.",
+  "needsAttention": "확인 필요: {{error}}",
+  "lastCheckFailed": "마지막 확인에 실패했어요",
+  "connectedAs": "{{account}}(으)로 연결됨",
+  "notConnected": "연결되지 않음",
+  "checking": "확인하는 중…",
+  "check": "확인",
+  "change": "변경",
+  "disconnect": "연결 해제",
+  "connect": "연결",
+  "optional": " (선택 사항)",
+  "stored": "저장됨({{value}}). 유지하려면 비워 두세요.",
+  "save": "저장",
+  "cancel": "취소",
+  "tools": "도구: {{tools}}",
+  "asksFirst": "{{name}} (먼저 물어봄)"
+}

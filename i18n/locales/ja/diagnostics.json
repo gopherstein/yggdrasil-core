@@ -1,0 +1,166 @@
+{
+  "page": {
+    "title": "Yggdrasilの状態",
+    "attention": "対応が必要な項目があります。",
+    "mostly": "おおむね正常です。1つ確認が必要な項目があります。",
+    "normal": "すべて正常に動作しています。",
+    "creating": "作成中…",
+    "export": "診断情報を書き出す",
+    "exportHint": "トラブルシューティング用のバンドルを作成します。シークレットは含まれません。",
+    "overall": "全体の状態",
+    "allOk": "✓ すべてのシステムが正常に稼働中",
+    "needsAttention": "⚠ 対応が必要",
+    "checkBelow": "⚠ 下の項目を確認してください",
+    "checking": "確認中…",
+    "refresh": "更新",
+    "tip": "ヒント：チャットの前に「モデル」でモデルをインストールしてください。",
+    "bundleCreated": "診断バンドルを作成しました",
+    "bundleAt": "診断バンドルを<path>{{path}}</path>に作成しました",
+    "bundleShare": "診断バンドルを作成しました。サポートを依頼するときにこのファイルを共有できます。",
+    "bundleFailed": "診断バンドルを作成できませんでした。デーモンが実行中か確認してください。"
+  },
+  "checked": {
+    "never": "まだ確認していません",
+    "justNow": "最終確認：たった今",
+    "at": "最終確認：{{when}}"
+  },
+  "ago": {
+    "justNow": "たった今",
+    "minutes_other": "{{count}}分",
+    "hours_other": "{{count}}時間",
+    "days_other": "{{count}}日"
+  },
+  "rows": {
+    "working": "処理中…",
+    "retry": "再試行",
+    "openSettings": "設定を開く",
+    "viewDetails": "詳細を表示",
+    "openModels": "モデルを開く",
+    "openComputers": "コンピュータを開く",
+    "manageModels": "モデルを管理",
+    "apiSettings": "API設定",
+    "healthy": "正常",
+    "unavailable": "利用不可",
+    "control": {
+      "label": "制御サービス",
+      "notResponding": "応答なし",
+      "message": "ローカルのYggdrasilサービスに接続できません。アプリを終了して開き直すか、デーモンが実行中か確認してください。"
+    },
+    "runtime": {
+      "label": "モデルランタイム",
+      "needsAttention": "対応が必要",
+      "notResponding": "ローカルのモデルランタイムが応答していません。",
+      "notSetUp": "未設定",
+      "installModel": "モデルをインストールしてランタイムのセットアップを完了してください。",
+      "idle": "アイドル",
+      "running_other": "{{count}}個のモデルが実行中"
+    },
+    "database": {
+      "label": "ローカルデータベース"
+    },
+    "bifrost": {
+      "label": "Bifrostネットワーク",
+      "offline_other": "{{count}}台のコンピュータがオフライン",
+      "silentFor_other": "{{names}}は{{ago}}応答していません。",
+      "silent_other": "{{names}}が応答していません。",
+      "connected_other": "{{count}}台のコンピュータが接続中",
+      "none": "コンピュータが見つかりません",
+      "noneHint": "別のコンピュータを追加するか、設定の「他のコンピュータを探す」を確認してください。"
+    },
+    "storage": {
+      "label": "ストレージ",
+      "available": "{{size}}利用可能",
+      "modelsUse": "このコンピュータではモデルが約{{size}}を使用しています。",
+      "freeUp": "モデルを追加する前にディスクの空き容量を確保してください。"
+    },
+    "api": {
+      "label": "API",
+      "lan": "LAN有効",
+      "local": "ローカルのみ",
+      "lanHint": "許可されていれば、ネットワーク上の他のデバイスからAPIにアクセスできます。"
+    }
+  },
+  "env": {
+    "title": "環境",
+    "version": "バージョン",
+    "apiBind": "APIバインド",
+    "node": "ノード",
+    "dataDir": "データディレクトリ"
+  },
+  "logs": {
+    "hide": "ログを隠す",
+    "view": "ログを表示",
+    "files": "ログファイル",
+    "live": "ライブ",
+    "loading": "ログを読み込んでいます…",
+    "none": "ログファイルはまだありません。アプリが起動して処理を行うと表示されます。",
+    "kinds": {
+      "daemon": "アプリ",
+      "runtime": "モデルランタイム",
+      "other": "その他"
+    },
+    "kindsAdvanced": {
+      "daemon": "デーモン",
+      "runtime": "ランタイム"
+    },
+    "select": "ログを選択",
+    "selectHint": "左のログファイルを選ぶと、最近の出力を確認できます。",
+    "recent": "このファイルの最新部分を表示しています",
+    "full": "ファイル全体",
+    "copied": "コピーしました",
+    "copyFailed": "コピーに失敗しました",
+    "copy": "コピー",
+    "reading": "ログを読み込んでいます…",
+    "readFailed": "このログを読み込めませんでした。ローテーションまたは削除された可能性があります。",
+    "empty": "（空）"
+  },
+  "tools": {
+    "title": "ツールのアクティビティ",
+    "none": "このセッションではまだツールが呼び出されていません。"
+  },
+  "caches": {
+    "title": "キャッシュ",
+    "description": "繰り返しの質問に速く答えるためにYggdrasilが保持しているものです。個人用のキャッシュはこのコンピュータにとどまり、実行記録と一緒に消去されます。パスワードやキーがキャッシュされることはありません。",
+    "by": "キー：{{key}}",
+    "keptUntil": "無効化されるまで保持",
+    "keptFor": "{{ttl}}保持",
+    "clearedWhen": "、{{invalidation}}ときに消去",
+    "entries_other": "{{count}}件",
+    "hitsMisses": " · ヒット{{hits}}件 · ミス{{misses}}件",
+    "clear": "消去"
+  },
+  "abilities": {
+    "title": "Yggdrasilにできること",
+    "description": "現在インストール済み、オンライン、接続済みのものに基づいています。チャットでは「画像を生成できますか？」のような質問にこのリストをもとに答えます。",
+    "available": "（利用可能）",
+    "notAvailable": "（利用不可）",
+    "via": "{{via}}経由。",
+    "summary": "{{models}} · {{computers}} · {{tools}} · {{services}} · {{providers}} · {{files}}",
+    "models_other": "{{count}}個のモデルがインストール済み",
+    "computers": "{{total}}台中{{online}}台のコンピュータがオンライン",
+    "tools_other": "ツール{{count}}個",
+    "services_other": "連携サービス{{count}}件",
+    "providers": "{{total}}個中{{healthy}}個のプロバイダが準備完了",
+    "files_other": "ファイル{{count}}個（{{size}}）"
+  },
+  "providers": {
+    "title": "各コンピュータのツール",
+    "description": "画像や音声は、実行できるペアリング済みのコンピュータで処理され、GPUで処理できるものが優先されます。処理のためにファイルがそのコンピュータに送られ、結果がこのチャットに戻ってきます。",
+    "computer": "コンピュータ",
+    "thisComputer": "このコンピュータ",
+    "gpu": "GPU",
+    "tools": {
+      "image.generate": "画像を作成",
+      "image.edit": "画像を編集",
+      "video.generate": "動画を作成",
+      "speech.transcribe": "文字起こし",
+      "speech.synthesize": "読み上げ"
+    },
+    "states": {
+      "healthy": "準備完了",
+      "installing": "インストール中",
+      "failed": "失敗",
+      "unavailable": "未設定"
+    }
+  }
+}

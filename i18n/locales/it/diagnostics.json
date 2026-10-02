@@ -1,0 +1,192 @@
+{
+  "page": {
+    "title": "Stato di Yggdrasil",
+    "attention": "Qualcosa richiede attenzione.",
+    "mostly": "Quasi tutto a posto: c'è una cosa da controllare.",
+    "normal": "Tutto funziona normalmente.",
+    "creating": "Creazione…",
+    "export": "Esporta diagnostica",
+    "exportHint": "Crea un pacchetto per la risoluzione dei problemi. I segreti sono esclusi.",
+    "overall": "Stato generale",
+    "allOk": "✓ Tutti i sistemi funzionano",
+    "needsAttention": "⚠ Richiede attenzione",
+    "checkBelow": "⚠ Controlla le voci qui sotto",
+    "checking": "Controllo…",
+    "refresh": "Aggiorna",
+    "tip": "Suggerimento: installa un modello in Modelli prima di chattare.",
+    "bundleCreated": "Pacchetto di diagnostica creato",
+    "bundleAt": "Pacchetto di diagnostica creato in <path>{{path}}</path>",
+    "bundleShare": "Pacchetto di diagnostica creato. Puoi condividere questo file quando chiedi aiuto.",
+    "bundleFailed": "Impossibile creare il pacchetto di diagnostica. Controlla che il daemon sia in esecuzione."
+  },
+  "checked": {
+    "never": "Non ancora controllato",
+    "justNow": "Ultimo controllo: proprio ora",
+    "at": "Ultimo controllo: {{when}}"
+  },
+  "ago": {
+    "justNow": "proprio ora",
+    "minutes_one": "{{count}} minuto",
+    "minutes_many": "{{count}} minuti",
+    "minutes_other": "{{count}} minuti",
+    "hours_one": "{{count}} ora",
+    "hours_many": "{{count}} ore",
+    "hours_other": "{{count}} ore",
+    "days_one": "{{count}} giorno",
+    "days_many": "{{count}} giorni",
+    "days_other": "{{count}} giorni"
+  },
+  "rows": {
+    "working": "In corso…",
+    "retry": "Riprova",
+    "openSettings": "Apri Impostazioni",
+    "viewDetails": "Mostra dettagli",
+    "openModels": "Apri Modelli",
+    "openComputers": "Apri Computer",
+    "manageModels": "Gestisci modelli",
+    "apiSettings": "Impostazioni API",
+    "healthy": "Funzionante",
+    "unavailable": "Non disponibile",
+    "control": {
+      "label": "Servizio di controllo",
+      "notResponding": "Non risponde",
+      "message": "Il servizio locale di Yggdrasil non è raggiungibile. Esci dall'app e riaprila, oppure controlla che il daemon sia in esecuzione."
+    },
+    "runtime": {
+      "label": "Runtime dei modelli",
+      "needsAttention": "Richiede attenzione",
+      "notResponding": "Il runtime dei modelli locali non risponde.",
+      "notSetUp": "Non configurato",
+      "installModel": "Installa un modello per completare la configurazione del runtime.",
+      "idle": "Inattivo",
+      "running_one": "{{count}} modello in esecuzione",
+      "running_many": "{{count}} modelli in esecuzione",
+      "running_other": "{{count}} modelli in esecuzione"
+    },
+    "database": {
+      "label": "Database locale"
+    },
+    "bifrost": {
+      "label": "Rete Bifrost",
+      "offline_one": "{{count}} computer offline",
+      "offline_many": "{{count}} computer offline",
+      "offline_other": "{{count}} computer offline",
+      "silentFor_one": "{{names}} non risponde da {{ago}}.",
+      "silentFor_many": "{{names}} non rispondono da {{ago}}.",
+      "silentFor_other": "{{names}} non rispondono da {{ago}}.",
+      "silent_one": "{{names}} non risponde.",
+      "silent_many": "{{names}} non rispondono.",
+      "silent_other": "{{names}} non rispondono.",
+      "connected_one": "{{count}} computer collegato",
+      "connected_many": "{{count}} computer collegati",
+      "connected_other": "{{count}} computer collegati",
+      "none": "Nessun computer trovato",
+      "noneHint": "Aggiungi un altro computer o controlla Trova altri computer nelle Impostazioni."
+    },
+    "storage": {
+      "label": "Spazio di archiviazione",
+      "available": "{{size}} disponibili",
+      "modelsUse": "I modelli occupano circa {{size}} su questo computer.",
+      "freeUp": "Libera spazio su disco prima di installare altri modelli."
+    },
+    "api": {
+      "label": "API",
+      "lan": "LAN attiva",
+      "local": "Solo locale",
+      "lanHint": "Gli altri dispositivi della tua rete possono raggiungere l'API se autorizzati."
+    }
+  },
+  "env": {
+    "title": "Ambiente",
+    "version": "Versione",
+    "apiBind": "Indirizzo API",
+    "node": "Nodo",
+    "dataDir": "Cartella dei dati"
+  },
+  "logs": {
+    "hide": "Nascondi log",
+    "view": "Mostra log",
+    "files": "File di log",
+    "live": "In tempo reale",
+    "loading": "Caricamento dei log…",
+    "none": "Ancora nessun file di log. Compaiono dopo che l'app si è avviata e ha svolto del lavoro.",
+    "kinds": {
+      "daemon": "App",
+      "runtime": "Runtime dei modelli",
+      "other": "Altro"
+    },
+    "kindsAdvanced": {
+      "daemon": "Daemon",
+      "runtime": "Runtime"
+    },
+    "select": "Seleziona un log",
+    "selectHint": "Scegli un file di log a sinistra per esaminare l'output recente.",
+    "recent": "Viene mostrata la parte più recente di questo file",
+    "full": "File completo",
+    "copied": "Copiato",
+    "copyFailed": "Copia non riuscita",
+    "copy": "Copia",
+    "reading": "Lettura del log…",
+    "readFailed": "Impossibile leggere questo log. Potrebbe essere stato ruotato o rimosso.",
+    "empty": "(vuoto)"
+  },
+  "tools": {
+    "title": "Attività degli strumenti",
+    "none": "Ancora nessuna chiamata a strumenti in questa sessione."
+  },
+  "caches": {
+    "title": "Cache",
+    "description": "Ciò che Yggdrasil conserva per rispondere più in fretta alle richieste ripetute. Le cache personali restano su questo computer e vengono svuotate insieme ai registri delle esecuzioni. Password e chiavi non vengono mai memorizzate nella cache.",
+    "by": "Per {{key}}",
+    "keptUntil": "conservata finché non viene invalidata",
+    "keptFor": "conservata {{ttl}}",
+    "clearedWhen": "; svuotata quando {{invalidation}}",
+    "entries_one": "{{count}} voce",
+    "entries_many": "{{count}} voci",
+    "entries_other": "{{count}} voci",
+    "hitsMisses": " · {{hits}} riscontri · {{misses}} mancati",
+    "clear": "Svuota"
+  },
+  "abilities": {
+    "title": "Cosa sa fare Yggdrasil",
+    "description": "In base a ciò che è installato, online e collegato in questo momento. La chat risponde a domande come “Puoi generare un'immagine?” usando questo elenco.",
+    "available": " (disponibile)",
+    "notAvailable": " (non disponibile)",
+    "via": "Tramite {{via}}. ",
+    "summary": "{{models}} · {{computers}} · {{tools}} · {{services}} · {{providers}} · {{files}}",
+    "models_one": "{{count}} modello installato",
+    "models_many": "{{count}} modelli installati",
+    "models_other": "{{count}} modelli installati",
+    "computers": "{{online}} computer online su {{total}}",
+    "tools_one": "{{count}} strumento",
+    "tools_many": "{{count}} strumenti",
+    "tools_other": "{{count}} strumenti",
+    "services_one": "{{count}} servizio collegato",
+    "services_many": "{{count}} servizi collegati",
+    "services_other": "{{count}} servizi collegati",
+    "providers": "{{healthy}} fornitori pronti su {{total}}",
+    "files_one": "{{count}} file ({{size}})",
+    "files_many": "{{count}} file ({{size}})",
+    "files_other": "{{count}} file ({{size}})"
+  },
+  "providers": {
+    "title": "Strumenti su ogni computer",
+    "description": "Immagini e voce vengono eseguite su qualunque computer associato in grado di farlo, preferendo quello in cui lavora la GPU. I file gli vengono inviati per il lavoro e il risultato torna in questa chat.",
+    "computer": "Computer",
+    "thisComputer": "questo computer",
+    "gpu": "GPU",
+    "tools": {
+      "image.generate": "Crea immagini",
+      "image.edit": "Modifica immagini",
+      "video.generate": "Crea video",
+      "speech.transcribe": "Trascrivi",
+      "speech.synthesize": "Leggi ad alta voce"
+    },
+    "states": {
+      "healthy": "Pronto",
+      "installing": "Installazione",
+      "failed": "Non riuscito",
+      "unavailable": "Non configurato"
+    }
+  }
+}

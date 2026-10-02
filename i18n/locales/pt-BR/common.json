@@ -1,0 +1,58 @@
+{
+  "tagline": "Painel de controle de IA local",
+  "nav": {
+    "label": "Principal",
+    "main": "Principal",
+    "system": "Sistema",
+    "chat": "Chat",
+    "automations": "Automações",
+    "models": "Modelos",
+    "train": "Treinar",
+    "knowledge": "Conhecimento",
+    "memory": "Memória",
+    "computers": "Computadores",
+    "performance": "Desempenho",
+    "diagnostics": "Diagnóstico",
+    "profiles": "Perfis e orquestração",
+    "tools": "Ferramentas",
+    "apiAccess": "Acesso à API",
+    "settings": "Configurações"
+  },
+  "status": {
+    "starting": "Iniciando…",
+    "unavailable": "Serviço indisponível",
+    "noModel": "Nenhum modelo",
+    "ready": "Pronto",
+    "unavailableHint": "O serviço local do Yggdrasil não está respondendo.",
+    "noModelHint": "Instale um modelo em Modelos para começar a conversar.",
+    "readyHint": "O serviço local está pronto."
+  },
+  "subsystems": {
+    "title": "Sistema",
+    "bifrostHint": "Descoberta de computadores e rede",
+    "computersNone": "Nenhum computador",
+    "computersConnected_one": "{{count}} computador conectado",
+    "computersConnected_many": "{{count}} computadores conectados",
+    "computersConnected_other": "{{count}} computadores conectados",
+    "nornHint": "A Norn distribui o trabalho entre seus computadores",
+    "nornAutomatic": "Automático",
+    "mimirHint": "Conhecimento e memória locais",
+    "mimirReady": "Pronto"
+  },
+  "boot": {
+    "starting": "Iniciando o Yggdrasil",
+    "preparing": "Preparando seu serviço de IA local",
+    "unavailable": "Serviço indisponível",
+    "unavailableBody": "O serviço local do Yggdrasil ainda não respondeu. Aguarde um momento e tente novamente. Se isso continuar acontecendo, confira o Diagnóstico depois que o app carregar.",
+    "retrying": "Tentando novamente…",
+    "tryAgain": "Tentar novamente",
+    "keyRequired": "Chave de API necessária",
+    "keyBody": "Este daemon do Yggdrasil está acessível além deste computador. Digite uma chave de API para continuar. Uma chave não criptografa o tráfego em HTTP simples.",
+    "continue": "Continuar"
+  },
+  "units": {
+    "ms": "{{value}} ms",
+    "seconds": "{{value}} s",
+    "tokPerSec": "{{value}} tok/s"
+  }
+}

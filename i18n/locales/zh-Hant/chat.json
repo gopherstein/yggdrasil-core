@@ -1,0 +1,405 @@
+{
+  "landing": {
+    "title": "有什麼我可以幫你的？",
+    "subtitle": "和你的本機 AI 對話。Yggdrasil 會自動挑選合適的資源。",
+    "try": "試試看：",
+    "suggestions": {
+      "explain": {
+        "label": "解釋一個主題",
+        "prompt": "用兩段簡短的文字解釋什麼是 mutex。"
+      },
+      "code": {
+        "label": "幫我寫程式",
+        "prompt": "幫我寫一個簡潔的 Go 函式，以退避方式重試 HTTP 請求。"
+      },
+      "plan": {
+        "label": "規劃一件事",
+        "prompt": "幫我用三個簡短段落規劃一趟週末旅行的行程大綱。"
+      }
+    }
+  },
+  "header": {
+    "history": "歷史紀錄",
+    "newChat": "新聊天",
+    "untitledChat": "聊天",
+    "assistant": "助理",
+    "delete": "刪除",
+    "deleteChat": "刪除聊天",
+    "latest": "最新"
+  },
+  "composer": {
+    "placeholder": "問 Yggdrasil 任何問題…",
+    "message": "訊息",
+    "attach": "附加檔案",
+    "attachHint": "附加文件、試算表、PDF 或程式碼檔案",
+    "profile": "設定檔",
+    "profileHint": "要使用哪種助理風格",
+    "assistantProfile": "助理設定檔",
+    "runOn": "執行位置",
+    "choose": "選擇…",
+    "automatic": "自動",
+    "thisComputer": "這台電腦",
+    "runOnAutomatic": "Norn 會選擇最合適的可用電腦。",
+    "runOnLocal": "只在這台電腦上執行。",
+    "model": "模型",
+    "modelHint": "由哪個已安裝的模型回答這個聊天",
+    "noModel": "沒有安裝模型",
+    "auto": "自動",
+    "models": "模型",
+    "specialized": "專用 AI",
+    "effort": "投入程度",
+    "send": "傳送",
+    "stop": "停止",
+    "autoHint": "「自動」會為每則訊息挑選一個已安裝的模型",
+    "autoLastUsed": "自動 · 上次使用 {{model}}",
+    "autoPicks": "自動 · 為每則訊息挑選模型",
+    "web": "網路",
+    "noModelAsk": "尚未安裝模型。傳送時會先詢問是否下載。",
+    "noModelDownload": "尚未安裝模型。傳送時會自動下載。",
+    "openModels": "打開模型",
+    "chooseRunOn": "傳送前請先選擇<strong>執行位置</strong>（設定 → 聊天執行位置）。"
+  },
+  "effort": {
+    "auto": {
+      "label": "自動",
+      "hint": "由 Yggdrasil 決定：簡單的問題保持快速，大型或涉及資料的問題會更加謹慎處理。"
+    },
+    "fast": {
+      "label": "快速",
+      "hint": "一次回答完成，不做規劃，也不進行第二次檢查。"
+    },
+    "balanced": {
+      "label": "平衡",
+      "hint": "為大型請求做規劃，查詢資料時會閱讀一個網頁，並修正一次數據。"
+    },
+    "thorough": {
+      "label": "徹底",
+      "hint": "閱讀更多網頁，使用可容納的最大模型，並檢查兩次數據。"
+    }
+  },
+  "memory": {
+    "on": "記憶已開啟",
+    "off": "記憶已關閉",
+    "onHint": "這個聊天會使用你請 Yggdrasil 記住的內容。按一下即可讓這個聊天不使用記憶。",
+    "offHint": "這個聊天的記憶已關閉。已儲存的記憶不會在這裡使用，也不會被刪除。",
+    "disabledHint": "所有聊天的記憶都已關閉。請在「記憶」頁面中開啟。"
+  },
+  "send": {
+    "waitForFiles": "請等檔案加入完成後再傳送。",
+    "summarizeFile_other": "請摘要這些檔案。",
+    "chooseRunOn": "請選擇這個聊天的執行位置：「自動」或「這台電腦」。",
+    "downloadFailed": "無法為這個聊天下載模型。",
+    "installFirst": "請先安裝模型，然後再試一次。",
+    "startFailed": "無法開始對話。",
+    "noReply": "模型在回覆前就停止了。Yggdrasil 已將它停止，並清理失敗的程序。",
+    "couldNotRespond": "模型無法回應。",
+    "unreachable": "無法連線到本機 AI。請查看「診斷」以取得詳細資訊。",
+    "generationFailed": "產生回應時發生錯誤。",
+    "confirmDownload": "要下載「{{model}}」以繼續聊天嗎？你可以在「設定」→「下載模型」中變更這項設定。",
+    "deleteFailed": "無法刪除這個聊天。"
+  },
+  "attachments": {
+    "unsupported": "Yggdrasil 目前還無法讀取這種類型的檔案",
+    "tooLarge": "檔案大小上限為 25 MB",
+    "addFailed": "無法加入這個檔案。",
+    "adding": "正在加入…",
+    "remove": "移除 {{name}}",
+    "download": "下載 {{name}}",
+    "downloading": "正在下載…",
+    "downloadFailed": "下載失敗。",
+    "loading": "正在載入…",
+    "audioFailed": "無法載入音訊。",
+    "imageFailed": "無法載入圖片。",
+    "videoFailed": "無法載入影片。",
+    "notAvailable": "無法使用",
+    "play": "播放",
+    "meta": "{{kind}} · {{size}}",
+    "kinds": {
+      "spreadsheet": "試算表",
+      "pdf": "PDF",
+      "document": "文件",
+      "code": "程式碼",
+      "image": "圖片",
+      "audio": "音訊",
+      "video": "影片",
+      "other": "檔案"
+    }
+  },
+  "status": {
+    "starting": "正在啟動…",
+    "working": "正在處理…",
+    "workingLabel": "處理中",
+    "downloadingModel": "正在下載模型…",
+    "toolAllowedSession": "已在本次工作階段允許工具…",
+    "toolAllowed": "已允許工具…",
+    "toolDenied": "已拒絕工具，將在不使用它的情況下繼續…",
+    "waitingForPermission": "正在等待權限：{{tool}}",
+    "checkingSources": "正在檢查來源…",
+    "toolFailed": "{{tool}} 失敗",
+    "roleOn": "{{role}} 在 {{computer}} 上…",
+    "roleRunning": "{{role}} 執行中…",
+    "switchingTo": "正在切換到 {{model}}…",
+    "using": "正在使用 {{model}}…",
+    "verifying": "正在對照來源檢查數據…",
+    "workingThrough_other": "正在處理 {{count}} 個部分…",
+    "workingOn": "正在處理：{{step}}…",
+    "puttingTogether": "正在彙整…",
+    "writingNamed": "正在撰寫 {{name}}…",
+    "writingFile": "正在寫入檔案…",
+    "searchingWebFor": "正在網路上搜尋「{{query}}」…",
+    "searchingWeb": "正在搜尋網路…",
+    "loadingRoleOn": "正在 {{computer}} 上載入 {{role}}…",
+    "loadingModelOn": "正在 {{computer}} 上載入模型…",
+    "loadingModel": "正在載入模型…",
+    "roleGeneratingOn": "{{role}} 正在 {{computer}} 上生成…",
+    "generatingOn": "正在 {{computer}} 上生成…",
+    "generating": "正在產生回應…",
+    "foundPassages_other": "在 {{source}} 中找到 {{count}} 個段落…",
+    "foundPassagesMore_other": "在 {{source}} 及另外 {{more}} 個來源中找到 {{count}} 個段落…",
+    "yourKnowledge": "你的知識",
+    "checkedKnowledge": "已檢查你的知識…",
+    "readingHost": "正在閱讀 {{host}}…",
+    "readingPage": "正在閱讀網頁…",
+    "readingFile": "正在讀取檔案…",
+    "searchingFiles": "正在搜尋本機檔案…",
+    "readingSpreadsheet": "正在讀取試算表…",
+    "creatingFile": "正在建立檔案…",
+    "runningCode": "正在沙盒中執行程式碼…",
+    "runningCommand": "正在執行指令…",
+    "checkingGit": "正在檢查 git…",
+    "usingTool": "正在使用 {{tool}}…"
+  },
+  "tools": {
+    "names": {
+      "internet": {
+        "search": "網路搜尋",
+        "open": "打開網頁"
+      },
+      "filesystem": {
+        "search": "尋找檔案",
+        "read": "讀取檔案",
+        "write": "寫入檔案"
+      },
+      "files": {
+        "create": "建立檔案"
+      },
+      "spreadsheet": {
+        "analyze": "分析試算表"
+      },
+      "code": {
+        "execute": "執行程式碼"
+      },
+      "terminal": "終端機",
+      "git": {
+        "status": "Git status",
+        "diff": "Git diff",
+        "log": "Git log",
+        "show": "Git show",
+        "add": "Git add",
+        "commit": "Git commit",
+        "push": "Git push"
+      }
+    },
+    "unnamed": "工具",
+    "noArguments": "沒有參數",
+    "argumentsUnavailable": "無法取得參數",
+    "noDetails": "沒有其他詳細資訊",
+    "permissionTitle": "要允許 {{tool}} 嗎？",
+    "permissionReason": "助理需要使用本機工具才能繼續。",
+    "allowOnce": "允許一次",
+    "allowSession": "在本次工作階段允許",
+    "deny": "拒絕",
+    "decideFailed": "無法記錄工具權限的選擇。",
+    "failed": "{{tool}} 失敗",
+    "retry": "重試",
+    "used_other": "使用了 {{count}} 個工具",
+    "completed": "已完成",
+    "completedIn": "在 {{ms}} ms 內完成",
+    "traceFailed": "失敗"
+  },
+  "transcript": {
+    "plan": "計畫",
+    "onComputer": "在 <computer>{{computer}}</computer> 上",
+    "interrupted": "回應已中斷"
+  },
+  "roles": {
+    "role": "角色",
+    "answer": "回答",
+    "planner": "規劃者",
+    "reviewer": "審查者",
+    "worker": "工作者 {{n}}"
+  },
+  "deleteDialog": {
+    "title": "要刪除這個聊天嗎？",
+    "body": "「{{title}}」將被永久移除。",
+    "untitled": "未命名",
+    "cancel": "取消",
+    "delete": "刪除",
+    "deleting": "正在刪除…"
+  },
+  "history": {
+    "label": "聊天紀錄",
+    "title": "聊天",
+    "pin": "釘選",
+    "pinned": "已釘選",
+    "pinSidebar": "釘選歷史紀錄側邊欄",
+    "unpinSidebar": "取消釘選歷史紀錄側邊欄",
+    "close": "關閉歷史紀錄",
+    "search": "搜尋聊天",
+    "searchPlaceholder": "搜尋…",
+    "loading": "正在載入聊天…",
+    "empty": "還沒有以前的對話。",
+    "startNew": "開始新聊天",
+    "noMatches": "沒有符合的聊天。",
+    "untitled": "未命名",
+    "actionsFor": "{{title}} 的動作",
+    "chat": "聊天",
+    "rename": "重新命名",
+    "unpin": "取消釘選",
+    "delete": "刪除",
+    "groups": {
+      "pinned": "已釘選",
+      "today": "今天",
+      "yesterday": "昨天",
+      "week": "過去 7 天",
+      "month": "過去 30 天",
+      "older": "更早"
+    }
+  },
+  "errors": {
+    "tryAgain": "再試一次",
+    "startNew": "開始新聊天",
+    "openModels": "打開模型",
+    "openComputers": "打開電腦",
+    "details": "詳細資訊",
+    "hideDetails": "隱藏詳細資訊",
+    "notResponding": {
+      "title": "Yggdrasil 沒有回應",
+      "body": "本機服務已停止回應。如果這是桌面 App，請結束並重新打開，然後再試一次。"
+    },
+    "engineMissing": {
+      "title": "尚未安裝 AI 引擎",
+      "body": "請從「模型」安裝，然後再次傳送訊息。"
+    },
+    "noModel": {
+      "title": "沒有就緒的模型",
+      "body": "請安裝或選擇一個模型，然後再試一次。"
+    },
+    "tooLong": {
+      "title": "這段對話對模型來說太長了",
+      "body": "請開始新聊天，或選擇能容納更多文字的模型。"
+    },
+    "outOfMemory": {
+      "title": "記憶體不足，無法執行這個模型",
+      "body": "請關閉其他 App 或選擇較小的模型，然後再試一次。"
+    },
+    "offline": {
+      "title": "你正在使用的一台電腦已離線",
+      "body": "請開啟那台電腦並打開 Yggdrasil，或在這台電腦上執行這個聊天。"
+    },
+    "connection": {
+      "title": "無法連線到模型",
+      "body": "模型已停止回應。這通常是暫時的。"
+    },
+    "serverError": {
+      "title": "模型遇到問題",
+      "body": "請再試一次。如果問題持續發生，請改用其他模型。"
+    },
+    "didNotWork": "操作沒有成功",
+    "generic": {
+      "title": "發生錯誤",
+      "body": "Yggdrasil 無法完成這則回覆。請稍後再試一次。"
+    }
+  },
+  "modelFailure": {
+    "retry": "重試",
+    "chooseOther": "使用其他助理或模型",
+    "details": "詳細資訊",
+    "hideDetails": "隱藏詳細資訊",
+    "reason": "原因：{{value}}",
+    "runtime": "執行環境：{{value}}",
+    "computer": "電腦：{{value}}",
+    "exitCode": "結束代碼：{{value}}",
+    "lastProbe": "上次健康檢查：{{value}}"
+  },
+  "capability": {
+    "enableInternet": "啟用網際網路",
+    "installed": "已安裝",
+    "notInstalled": "未安裝",
+    "useModel": "使用這個模型",
+    "viewInModels": "在「模型」中檢視"
+  },
+  "setup": {
+    "details": "{{name}} · 下載大小 {{size}} · 在 {{node}} 上",
+    "thisComputer": "這台電腦",
+    "install": "設定",
+    "installing": "正在安裝…",
+    "downloading": "正在下載… {{done}} / {{total}}",
+    "stop": "停止",
+    "ready": "{{label}} 已設定完成。",
+    "continue": "繼續",
+    "continuing": "已設定完成。正在完成你的請求…"
+  },
+  "readAloud": {
+    "button": "朗讀",
+    "hint": "在這台電腦上朗讀這則回答",
+    "busy": "正在朗讀…（第一次使用時會下載語音）",
+    "failed": "無法朗讀。"
+  },
+  "context": {
+    "usage": "上下文用量",
+    "full": "上下文已使用 {{percent}}",
+    "percentFull": "已使用 {{percent}}",
+    "title": "上下文",
+    "used": "{{used}} / {{limit}} token",
+    "usedEstimated": "約 {{used}} / {{limit}} token",
+    "limit": "{{limit}} token",
+    "summarized_other": "最舊的 {{count}} 則訊息已改以摘要形式傳送，讓對話能夠容納。每則訊息仍會保存。",
+    "empty": "傳送一則訊息，即可查看這個聊天使用了多少模型記憶體。",
+    "rows": {
+      "instructions": "指示",
+      "tools": "工具",
+      "conversation": "對話",
+      "toolResults": "工具結果"
+    }
+  },
+  "answer": {
+    "files": "檔案",
+    "sources": "來源",
+    "memory": "記憶",
+    "remembered": "已記住",
+    "steps_other": "我做了什麼（{{count}} 個步驟）"
+  },
+  "run": {
+    "details": "執行詳細資訊",
+    "gone": "這次執行已不再有紀錄。",
+    "loadFailed": "無法載入這次執行。",
+    "run": "執行",
+    "strategy": "策略",
+    "effort": "投入程度",
+    "modelCalls": "模型呼叫",
+    "workers": "工作者",
+    "workersParallel_other": "{{count}} 個並行",
+    "workersInOrder_other": "{{count}} 個依序",
+    "tools": "工具",
+    "computers": "電腦",
+    "cacheHits": "快取命中",
+    "verification": "驗證",
+    "verificationNone": "無",
+    "verificationPasses_other": "{{count}} 次檢查",
+    "verificationIssues": "{{issues}} 個問題，已修正 {{fixed}} 個",
+    "retries": "重試",
+    "context": "上下文",
+    "contextTokens": "{{tokens}} token",
+    "contextTokensOf": "{{tokens}} / {{limit}} token",
+    "latency": "延遲",
+    "beforeModel": "（模型開始前 {{time}}）",
+    "onComputer": "在 {{computer}} 上",
+    "calls_other": "{{count}} 次呼叫",
+    "load": "載入 {{time}}",
+    "firstToken": "首個 token {{time}}",
+    "inOut": "輸入 {{in}} / 輸出 {{out}}",
+    "cached": "{{count}} 個已快取",
+    "toolFailures": "{{count}} 個失敗"
+  }
+}

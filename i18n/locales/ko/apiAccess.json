@@ -1,0 +1,123 @@
+{
+  "page": {
+    "title": "API 액세스",
+    "subtitle": "Yggdrasil API에 접속할 수 있는 위치와 보안 방식이에요.",
+    "loading": "API 설정을 불러오는 중…"
+  },
+  "probe": {
+    "notReady": "상태 확인에 응답했지만 서비스가 준비되지 않았어요.",
+    "unreachable": "이 컴퓨터의 API에 연결할 수 없어요.",
+    "openaiDown": "서비스는 실행 중이지만 OpenAI 호환 엔드포인트가 응답하지 않았어요.",
+    "passed": "로컬 확인을 통과했어요.",
+    "openaiStatus": "OpenAI 엔드포인트가 HTTP {{status}}을(를) 반환했어요.",
+    "openaiNoResponse": "OpenAI 엔드포인트가 응답하지 않았어요.",
+    "needsKey": "응답하고 있어요. 다른 기기에서는 유효한 API 키가 필요해요.",
+    "checkFailed": "API를 확인할 수 없어요. 로컬 서비스가 실행 중인가요?",
+    "failed": "API 확인에 실패했어요."
+  },
+  "service": {
+    "title": "서비스",
+    "api": "API 서비스",
+    "running": "실행 중",
+    "notResponding": "응답 없음",
+    "checking": "확인하는 중…",
+    "access": "액세스",
+    "localNetwork": "로컬 네트워크",
+    "thisComputer": "이 컴퓨터에서만",
+    "auth": "인증",
+    "keyRequired": "API 키 필요",
+    "notRequired": "이 컴퓨터에서는 필요 없음",
+    "testing": "테스트하는 중…",
+    "test": "API 테스트",
+    "endpoint": "엔드포인트",
+    "localAddress": "로컬 주소: <mono>{{address}}</mono>",
+    "lanEndpoint": "LAN 엔드포인트",
+    "lanHint": "이 컴퓨터의 LAN IP와 포트 <mono>{{port}}</mono>을(를) 사용하세요(예: <mono>http://192.168.x.x:{{port}}/v1</mono>).",
+    "hideDocs": "API 문서 숨기기",
+    "docs": "API 문서",
+    "docsBody": "Yggdrasil은 <mono>/v1</mono>에서 OpenAI 호환 API를 제공해요. 클라이언트가 위의 엔드포인트를 사용하도록 설정하고, 다른 컴퓨터에서 Yggdrasil에 접속할 수 있을 때는 <header/>을(를) 보내세요. `/api/v1`과 `/v1` 모두 이 헤더가 필요해요. 키는 일반 HTTP를 암호화하지 않아요.",
+    "copied": "복사됨",
+    "copyUrl": "URL 복사"
+  },
+  "lan": {
+    "title": "로컬 네트워크 액세스",
+    "on": "로컬 네트워크의 기기가 API 키로 연결할 수 있어요.",
+    "off": "이 컴퓨터의 앱만 Yggdrasil API를 사용할 수 있어요.",
+    "noKeys": "네트워크 액세스가 켜져 있지만 아직 API 키가 없어요. 다른 기기에서 연결하기 전에 키를 만드세요.",
+    "restart": "네트워크 액세스를 변경한 후에는 서버가 다시 바인딩되도록 Yggdrasil을 완전히 종료했다가 다시 여세요. 리스너가 더 이상 루프백이 아니면 모든 연결에 API 키가 필요해요. 일반 HTTP에서는 키가 트래픽을 암호화하지 않아요. API 테스트는 이 컴퓨터만 확인하며, 다른 기기에서 접속할 수 있는지는 확인하지 않아요.",
+    "confirmTitle": "다른 컴퓨터의 액세스를 허용할까요?",
+    "confirmBody": "로컬 네트워크의 기기가 Yggdrasil에 연결할 수 있게 돼요. 모든 원격 연결에는 API 키가 필요해요.",
+    "confirmHttp": "일반 HTTP에서 사용하는 API 키는 트래픽을 암호화하지 않아요. 이 기능을 켠 후 서버가 네트워크에서 접속을 받도록 Yggdrasil을 종료했다가 다시 여세요.",
+    "browserKey": "서버가 다시 바인딩된 후에도 이 브라우저가 계속 연결할 수 있도록 API 키를 만드세요. 전체 키는 한 번만 표시돼요.",
+    "keyName": "키 이름",
+    "defaultKeyName": "이 컴퓨터",
+    "enableFailed": "네트워크 액세스를 켤 수 없어요.",
+    "cancel": "취소",
+    "enabling": "켜는 중…",
+    "allow": "액세스 허용"
+  },
+  "keys": {
+    "title": "API 키",
+    "description": "Yggdrasil과 통신하는 앱과 기기의 자격 증명이에요.",
+    "create": "API 키 만들기",
+    "createHint": "어디에서 사용하는 키인지 알 수 있도록 이름을 지정하세요.",
+    "namePlaceholder": "VS Code",
+    "creating": "만드는 중…",
+    "createKey": "키 만들기",
+    "cancel": "취소",
+    "copyNow": "지금 이 비밀 키를 복사하세요. 다시 표시되지 않아요",
+    "copiedBang": "복사됨!",
+    "copySecret": "비밀 키 복사",
+    "none": "아직 API 키가 없어요.",
+    "meta": "생성: {{created}} · 마지막 사용: {{lastUsed}}",
+    "copy": "복사",
+    "confirmRotate": "“{{name}}”을(를) 교체할까요? 이전 비밀 키는 즉시 작동을 멈춰요.",
+    "rotate": "교체",
+    "confirmRevoke": "“{{name}}”을(를) 해지할까요? 이 키를 사용하는 앱은 액세스 권한을 잃게 돼요.",
+    "revoke": "해지"
+  },
+  "advanced": {
+    "title": "고급",
+    "bind": "바인드 주소",
+    "port": "포트",
+    "host": "설정된 호스트"
+  },
+  "permissions": {
+    "summary": "이 키가 사용할 수 있는 항목",
+    "memories": "내 메모리",
+    "knowledge": "연결된 지식",
+    "tools": "도구",
+    "use": {
+      "never": "사용 안 함",
+      "on_request": "요청할 때",
+      "always": "항상"
+    },
+    "toolChoices": {
+      "profile": "프로필에서 허용하는 도구",
+      "read_only": "읽기 전용 도구",
+      "none": "도구 없음"
+    },
+    "placement": "요청을 실행할 위치 선택 가능",
+    "note": "요청은 이보다 적게 요구할 수는 있지만 더 많이 요구할 수는 없어요. 네트워크를 통한 요청에는 이 제한이 항상 적용되며, 이 컴퓨터에서는 앱이 이 키를 보낼 때 적용돼요.",
+    "saveFailed": "저장할 수 없어요."
+  },
+  "share": {
+    "title": "다른 AI 앱에서 Yggdrasil 사용",
+    "description": "MCP를 지원하는 앱은 로컬 AI에 질문하고, 모델 목록을 보고, 연결된 지식을 검색할 수 있어요. 답변은 내 컴퓨터에 머물며, 로컬 AI는 읽기 도구만 사용해요.",
+    "other": "기타 앱",
+    "settings": "{{language}} 설정",
+    "copied": "복사됨",
+    "copy": "복사",
+    "needsKey": "Yggdrasil이 네트워크에 열려 있으므로 앱에 API 키가 필요해요. 아래에서 키를 만들어 설정의 <key/> 위치에 넣으세요. 키의 권한이 적용돼요.",
+    "keyPlaceholder": "<내 API 키>",
+    "where": {
+      "claudeDesktop": "Claude Desktop에서 설정 → 개발자 → 구성 편집을 열고 이 내용을 추가한 다음 Claude를 다시 시작하세요.",
+      "claudeCode": "터미널에서 이 명령을 실행하세요.",
+      "cursor": "~/.cursor/mcp.json에 이 내용을 추가하세요(Cursor 설정 → MCP → 새 전역 MCP 서버 추가).",
+      "vscode": "명령 팔레트에서 \"MCP: Open User Configuration\"을 실행하고 이 내용을 추가하세요.",
+      "other": "주소로 MCP 서버에 연결하는 앱은 이 주소의 Streamable HTTP를 사용해요. 프로그램을 실행하는 앱은 대신 명령을 사용해요."
+    },
+    "otherText": "주소: {{url}}\n명령: {{command}}",
+    "otherHeader": "\n헤더:  Authorization: Bearer {{key}}"
+  }
+}

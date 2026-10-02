@@ -1,0 +1,353 @@
+{
+  "app": {
+    "starting": "Yggdrasilを起動しています",
+    "back": "戻る",
+    "close": "閉じる",
+    "cancel": "キャンセル",
+    "dismiss": "閉じる",
+    "loading": "読み込み中",
+    "save": "保存"
+  },
+  "tabs": {
+    "chat": "チャット",
+    "computers": "コンピュータ",
+    "models": "モデル",
+    "settings": "設定"
+  },
+  "screens": {
+    "connect": "接続",
+    "chat": "チャット"
+  },
+  "units": {
+    "megabytes": "{{value}} MB",
+    "gigabytes": "{{value}} GB"
+  },
+  "connection": {
+    "enterAddress": "Yggdrasilを実行しているコンピュータのアドレスを入力してください。",
+    "couldNotReach": "Yggdrasilに接続できませんでした。",
+    "unreachable": "そのコンピュータのYggdrasilに接続できません。同じWi-Fiネットワークを使い、そのコンピュータでAPIのLANアクセスをオンにしてください。",
+    "keyRejected": "そのAPIキーは拒否されました。コンピュータの「APIアクセス」でキーを作成し、ここに貼り付けてください。",
+    "dropped": "Yggdrasilとの接続が切れました。",
+    "chatFailed": "チャットに失敗しました。",
+    "requestFailed": "リクエストに失敗しました"
+  },
+  "connect": {
+    "title": "コンピュータに接続",
+    "subtitle": "このスマートフォンは、すでにモデルを実行しているコンピュータを使います。そのコンピュータで「APIアクセス」を開き、ローカルネットワークでのAPIを許可して、キーを作成してください。",
+    "address": "コンピュータのアドレス",
+    "addressPlaceholder": "192.168.1.20",
+    "apiKey": "APIキー",
+    "apiKeyPlaceholder": "キーを貼り付け",
+    "connect": "接続",
+    "connecting": "接続中",
+    "notReady": "Yggdrasilは応答しましたが、準備ができていません。"
+  },
+  "discovery": {
+    "onThisNetwork": "このネットワーク上",
+    "useAddress": "このコンピュータのアドレスを使います",
+    "version": "Yggdrasil {{version}}",
+    "looking": "このネットワーク上のコンピュータを探しています…",
+    "lookingLabel": "このネットワーク上のコンピュータを探しています",
+    "none": "コンピュータが見つかりません。コンピュータでYggdrasilを起動して同じWi-Fiを使うか、アドレスを入力してください。",
+    "localNetworkDenied": "Yggdrasilにネットワーク上のコンピュータを探す許可がありません。「設定 > プライバシーとセキュリティ > ローカルネットワーク」で許可してください。",
+    "listFailed": "このネットワーク上のコンピュータを一覧表示できませんでした。下でアドレスを入力することはできます。"
+  },
+  "computers": {
+    "title": "コンピュータ",
+    "subtitle": "接続したコンピュータからアクセスできるコンピュータと、そのオンライン状態です。",
+    "disconnected": "Yggdrasilを実行しているコンピュータに接続すると、そのモデルとチャットしたり、ほかのコンピュータを確認したりできます。",
+    "enterAddress": "アドレスを入力",
+    "loading": "コンピュータを読み込み中",
+    "none": "この接続から見えるコンピュータはありません。",
+    "unnamed": "コンピュータ",
+    "thisConnection": "この接続",
+    "meta": "{{platform}} · {{status}}",
+    "metaPaired": "{{platform}} · {{status}} · ペアリング済み",
+    "status": {
+      "online": "オンライン",
+      "offline": "オフライン",
+      "degraded": "機能低下"
+    }
+  },
+  "models": {
+    "title": "モデル",
+    "onComputer": "コンピュータ上",
+    "connectFirst": "コンピュータに接続すると、そこにインストールされているモデルを確認できます。",
+    "loading": "モデルを読み込み中",
+    "noneInstalled": "そのコンピュータにはまだモデルがインストールされていません。",
+    "status": {
+      "installed": "インストール済み",
+      "loaded": "読み込み済み",
+      "downloading": "ダウンロード中"
+    },
+    "support": {
+      "embedding": "補助モデル · ナレッジを意味で検索",
+      "reranker": "補助モデル · 最適な抜粋を順位付け",
+      "classifier": "補助モデル · 「自動」のリクエスト振り分けを補助",
+      "other": "補助モデル"
+    }
+  },
+  "phoneModels": {
+    "heading": "このiPhone上",
+    "copy": "Yggdrasilカタログの小さめのモデルです。ファイルはこのスマートフォンにダウンロードされ、ここに保存されます。",
+    "meta": "{{parameters}} · {{size}}",
+    "chat": "チャット",
+    "remove": "削除",
+    "install": "インストール",
+    "installing": "インストール中 {{percent}}",
+    "tooLarge": "このスマートフォンには大きすぎます",
+    "installFailed": "モデルをインストールできませんでした。",
+    "noPlace": "このスマートフォンにはモデルを保存する場所がありません。",
+    "noSpace": "このスマートフォンには、そのモデルに必要な空き容量がありません。",
+    "downloadIncomplete": "モデルのダウンロードが完了しませんでした。",
+    "summaries": {
+      "qwen2-5-coder-1-5b-q4": "ちょっとした編集や小さな作業向けの、非常に高速なコーディングアシスタント。",
+      "llama-3-2-1b-q4": "速度を最優先し、メモリを抑えたいときの超小型汎用アシスタント。",
+      "llama-3-2-3b-q4": "長いコンテキストに対応した、バランスのよい日常向けアシスタント。",
+      "phi-3-5-mini-q4": "推論や軽いコーディングが得意な、Microsoftのコンパクトなモデル。",
+      "gemma-2-2b-q4": "日常のチャットにきびきび応える、Googleの小型モデル。",
+      "qwen2-5-3b-q4": "ツール呼び出しに対応した、実力のある中型の汎用モデル。",
+      "deepseek-r1-distill-1-5b-q4": "DeepSeek R1から蒸留した軽量な推論モデル。"
+    }
+  },
+  "onboarding": {
+    "welcome": "ようこそ",
+    "lede": "このアプリでは、このiPhone上でプライベートにAIを実行できます。",
+    "thisIPhone": "このiPhone",
+    "hardware": "ローカル推論用に検出されたハードウェアです。",
+    "device": "デバイス",
+    "memory": "メモリ",
+    "system": "システム",
+    "question": "AIに何をしてほしいですか？",
+    "purposes": {
+      "general": {
+        "title": "汎用アシスタント",
+        "description": "日常の質問や文章作成の手伝い、ローカル優先の会話に。"
+      },
+      "coding": {
+        "title": "プログラミング",
+        "description": "このiPhone上で、ちょっとした編集や小さな作業のコーディングを手伝います。"
+      },
+      "research": {
+        "title": "リサーチ",
+        "description": "要約と慎重な推論。すべてこのスマートフォン上で実行されます。"
+      },
+      "custom": {
+        "title": "カスタム",
+        "description": "このiPhoneで動作するモデルの中から自分で選びます。"
+      }
+    },
+    "continue": "続ける",
+    "recommended": "おすすめ",
+    "recommendedFor": "{{purpose}}向けのおすすめ",
+    "modelFacts": "{{parameters}} · ダウンロード{{download}} · メモリ約{{memory}}",
+    "install": "おすすめの構成をインストール",
+    "tooLarge": "このモデルには、このiPhoneで確保できる以上のメモリが必要です。",
+    "chooseOther": "別のモデルを選ぶ",
+    "installing": "{{model}}をインストールしています",
+    "downloaded": "{{percent}}ダウンロード済み",
+    "keepOpen": "大きなモデルのダウンロードには数分かかることがあります。Yggdrasilは開いたままにしてください。",
+    "ready": "準備ができました",
+    "installed": "{{model}}がインストールされました。ローカルAIとチャットを始めましょう。",
+    "startChatting": "チャットを始める"
+  },
+  "settings": {
+    "title": "設定",
+    "subtitle": "このiPhoneにインストールしたモデルは、このiPhoneから出ません。接続したコンピュータとのチャットは、そのコンピュータにとどまります。",
+    "thisIPhone": "このiPhone",
+    "whereChatsRun": "チャットの実行場所",
+    "onDevice": "モデルをインストールした後、このデバイス上で",
+    "computer": "コンピュータ",
+    "connectedComputer": "接続中のコンピュータ",
+    "notConnected": "未接続",
+    "coreVersion": "そのコンピュータのYggdrasil",
+    "updateCore": "回答のソース、アシスタントが実行した内容、リアルタイムの進行状況、処理の深さを表示するには、そのコンピュータのYggdrasilを1.4以降にアップデートしてください。",
+    "jobsKeepRunning": "このアプリを閉じても、そのコンピュータですでに実行中のジョブは停止しません。",
+    "forget": "このコンピュータの登録を解除",
+    "connect": "コンピュータに接続",
+    "about": "情報",
+    "version": "バージョン {{version}}",
+    "aboutCopy": "世界と世界をつなぐ世界樹。Yggdrasilは、あなたのアプリを、コンピュータやこのiPhone上のモデルにつなぎます。",
+    "dangerZone": "危険な操作",
+    "resetTitle": "このiPhoneをリセット",
+    "resetCopy": "初期設定の状態に戻します。このiPhoneのチャットを消去し、接続したコンピュータの登録を解除します。",
+    "resetButton": "設定とアプリのデータをリセット…",
+    "resetDeletesModels": "この操作は取り消せません。ダウンロード済みのモデルも削除されます。",
+    "resetKeepsModels": "この操作は取り消せません。ダウンロード済みのモデルは残ります。",
+    "alsoDeleteModels": "ダウンロード済みのモデルも削除",
+    "resetting": "リセット中…",
+    "confirmReset": "リセットする",
+    "resetFailed": "Yggdrasilをリセットできませんでした。"
+  },
+  "language": {
+    "title": "言語",
+    "appLanguage": "アプリの言語",
+    "automatic": "自動（{{language}}）",
+    "automaticHint": "接続したコンピュータの「アプリの言語」に合わせます。設定がない場合はこのiPhoneの言語に合わせます。",
+    "choose": "アプリの言語を選択",
+    "pseudo": "疑似ロケール（en-XA）"
+  },
+  "chat": {
+    "history": "チャット履歴",
+    "newChat": "新しいチャット",
+    "chats": "チャット",
+    "search": "検索",
+    "rename": "名前を変更",
+    "renameChat": "チャットの名前を変更",
+    "delete": "削除",
+    "deleteChat": "チャットを削除",
+    "computer": "コンピュータ",
+    "newOnComputer": "このコンピュータで新しいチャット",
+    "untitled": "チャット",
+    "model": "モデル",
+    "chooseModel": "モデルを選択",
+    "loading": "チャットを読み込み中",
+    "placeholder": "Yggdrasilにメッセージを送信",
+    "send": "送信",
+    "sending": "送信中",
+    "stop": "停止",
+    "working": "処理中…",
+    "thinkingOnPhone": "このiPhoneで考えています…",
+    "installFirst": "このiPhoneでチャットするにはモデルをインストールしてください。",
+    "setUpModel": "モデルを設定",
+    "modelMissing": "そのモデルはこのスマートフォンにインストールされていません。",
+    "interrupted": "応答が中断されました",
+    "couldNotRun": "このスマートフォンではモデルを実行できませんでした。",
+    "noProfile": "そのコンピュータにはまだプロファイルがありません。まずMacアプリで作成してください。",
+    "noChatPlace": "このiPhoneにはチャットを保存する場所がありません。",
+    "speed": "{{generated}} tok/s",
+    "speedWithPrompt": "{{generated}} tok/s · プロンプト {{prompt}} tok/s",
+    "groups": {
+      "today": "今日",
+      "yesterday": "昨日",
+      "week": "過去7日間",
+      "month": "過去30日間",
+      "older": "それ以前"
+    },
+    "empty": {
+      "title": "何をお手伝いしましょうか？",
+      "phone": "このiPhone上のAIと話しましょう。書いた内容がこのiPhoneの外に出ることはありません。",
+      "computer": "Yggdrasilが適切なモデルとコンピュータを選び、必要に応じて調べものをし、何を使ったかを表示します。"
+    },
+    "unsent": {
+      "notSent": "未送信",
+      "retry": "再試行",
+      "retryLabel": "もう一度送信",
+      "edit": "編集",
+      "editLabel": "メッセージを編集"
+    },
+    "approval": {
+      "title": "{{tool}}を許可しますか？",
+      "fallback": "このツールがコンピュータ上で実行しようとしています。",
+      "wantsToRun": "{{tool}}が実行しようとしています。",
+      "wantsToRunSummary": "{{tool}}が実行しようとしています：{{summary}}",
+      "deny": "拒否",
+      "allowOnce": "1回だけ許可"
+    }
+  },
+  "effort": {
+    "title": "処理の深さ",
+    "label": "処理の深さ：{{effort}}",
+    "hint": "返信にどれだけ手間をかけるかを選びます",
+    "auto": {
+      "label": "自動",
+      "hint": "Yggdrasilが判断します。簡単な質問は素早く、大きな質問やデータに関する質問はより丁寧に処理します。"
+    },
+    "fast": {
+      "label": "高速",
+      "hint": "計画や見直しをせず、一度で回答します。"
+    },
+    "balanced": {
+      "label": "標準",
+      "hint": "大きな依頼は計画を立て、調べものではページを読み、数値を一度修正します。"
+    },
+    "thorough": {
+      "label": "徹底",
+      "hint": "より多くのページを読み、動作する最大のモデルを使い、数値を2回確認します。"
+    }
+  },
+  "answer": {
+    "files": "ファイル",
+    "filesHint": "ファイルは作成したコンピュータ上で開いてください。",
+    "sources": "ソース",
+    "source": "ソース",
+    "opensInSafari": "Safariで開きます",
+    "steps_other": "実行した内容 · {{count}}ステップ"
+  },
+  "tools": {
+    "internet": {
+      "search": "Web検索",
+      "open": "ページを開く"
+    },
+    "filesystem": {
+      "search": "ファイルを探す",
+      "read": "ファイルを読む",
+      "write": "ファイルに書き込む"
+    },
+    "terminal": "ターミナル",
+    "git": {
+      "commit": "Git commit",
+      "push": "Git push"
+    },
+    "unnamed": "ツール"
+  },
+  "progress": {
+    "searchingWeb": "Webを検索しています…",
+    "searchingWebFor": "Webで「{{query}}」を検索しています…",
+    "readingPage": "ページを読んでいます…",
+    "readingHost": "{{host}}を読んでいます…",
+    "readingFile": "ファイルを読んでいます…",
+    "searchingFiles": "ローカルファイルを検索しています…",
+    "runningCommand": "コマンドを実行しています…",
+    "checkingGit": "gitを確認しています…",
+    "usingTool": "{{tool}}を使用しています…",
+    "checkedKnowledge": "ナレッジを確認しました…",
+    "yourKnowledge": "あなたのナレッジ",
+    "foundPassages_other": "{{source}}で{{count}}件の抜粋が見つかりました…",
+    "foundPassagesMore_other": "{{source}}とほか{{more}}件で{{count}}件の抜粋が見つかりました…",
+    "checkingSources": "ソースを確認しています…",
+    "toolFailed": "{{tool}}が失敗しました",
+    "waitingForPermission": "許可を待っています：{{tool}}",
+    "switchingTo": "{{model}}に切り替えています…",
+    "using": "{{model}}を使用しています…",
+    "workingThrough_other": "{{count}}個のパートを処理しています…",
+    "planning": "計画しています…",
+    "workingOn": "処理中：{{step}}…",
+    "puttingTogether": "まとめています…",
+    "verifying": "数値をソースと照合しています…",
+    "writingFile": "ファイルを書いています…",
+    "writingNamed": "{{name}}を書いています…",
+    "loadingModel": "モデルを読み込んでいます…",
+    "loadingModelOn": "{{node}}でモデルを読み込んでいます…",
+    "generating": "応答を生成しています…",
+    "generatingOn": "{{node}}で生成しています…"
+  },
+  "realms": {
+    "about": "{{norse}}。{{rune}}。この名前について",
+    "chat": {
+      "meaning": "チャットは、あなたのメッセージをこのiPhoneやコンピュータ上のモデルへ運び、答えを持ち帰る場所です。",
+      "story": "Ratatoskrは、Yggdrasilの幹を上へ下へと駆け回り、木の頂にいる鷲と、根をかじる竜Níðhöggrのあいだで伝言を運ぶリスです。",
+      "runeName": "Ansuz、言葉のルーン"
+    },
+    "models": {
+      "meaning": "Ymirは最初の巨人で、世界は彼から作られました。モデルは、ほかのすべてを支える土台です。",
+      "story": "はじめにYmirがいました。最初の巨人です。彼が倒されると、神々は彼の体から世界を作りました。肉から大地を、骨から山々を、頭蓋骨から空を。",
+      "runeName": "Uruz、原初の力のルーン"
+    },
+    "computers": {
+      "meaning": "Bifrostは世界と世界をつなぐ虹の橋です。あなたのコンピュータをつなぎます。",
+      "story": "Bifröstは、人の世界Midgardと神々の住むAsgardをつなぐ、燃える虹の橋です。その端ではHeimdallが見張りをしています。",
+      "runeName": "Raidho、旅のルーン"
+    },
+    "connect": {
+      "meaning": "ValgrindはValhallaの門です。APIキーが、誰が入れるかを決めます。",
+      "story": "ValgrindはValhallaの前に立つ古の門です。神聖で古く、その錠の掛け方を知る者はわずかです。",
+      "runeName": "Thurisaz、門のルーン"
+    },
+    "settings": {
+      "meaning": "Forsetiはあらゆる争いを公正に裁きます。設定は、Yggdrasilが守るルールです。",
+      "story": "Baldrの息子Forsetiは、金の柱と銀の屋根を持つ館Glitnirに座しています。争いを持ち込んだ者は皆、和解して帰っていきます。",
+      "runeName": "Isa、静けさのルーン"
+    }
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "page": {
+    "title": "ナレッジ",
+    "description": "Mimirはカタログ、価格、ポリシー、ドキュメントを検索できる状態に保ちます。プロファイルや特化型AIがソースを使うと、質問ごとに一致する抜粋が追加されます。ファイルを編集すれば、次の質問から変更が反映されます。再トレーニングは不要です。",
+    "loading": "読み込み中…",
+    "emptyTitle": "ナレッジが接続されていません",
+    "emptyDescription": "このコンピュータ上のファイルやフォルダを接続するか、内容を貼り付けるか、データベースやWeb APIから読み込みます。PDF、Excel、CSV、TSV、JSON、JSONL、Markdown、テキスト、HTMLファイルに対応しています。"
+  },
+  "badge": {
+    "linked": "リンク",
+    "database": "データベース",
+    "api": "Web API",
+    "copy": "コピー"
+  },
+  "meaning": {
+    "full": "語句の一致だけでなく、意味でも検索できます。",
+    "partial": "意味で検索できます：現在{{total}}件中{{embedded}}件の抜粋。"
+  },
+  "refresh": {
+    "days_other": "{{count}}日",
+    "hours_other": "{{count}}時間",
+    "minutes_other": "{{count}}分",
+    "note": "質問で使われたときにデータが{{every}}より古い場合、または再インデックス時に再取得します。"
+  },
+  "row": {
+    "failed": "失敗",
+    "passages_other": "抜粋{{count}}件",
+    "indexed": "{{when}}にインデックス作成",
+    "watches": "ファイルが変更されると自動で再インデックスします。",
+    "edit": "編集",
+    "indexing": "インデックス作成中…",
+    "reindex": "再インデックス",
+    "localOnlyHint": "このソースの抜粋をペアリングしたコンピュータに送信しません。これを使うチャットはこのコンピュータで実行されます。",
+    "localOnly": "このコンピュータのみ",
+    "localOnlyOn": "このコンピュータのみ ✓",
+    "confirmDisconnect": "{{name}}の接続を解除しますか？これを使っているプロファイルやAIからは見えなくなります。ファイルは削除されません。",
+    "disconnect": "接続解除",
+    "editLabel": "{{name}}を編集",
+    "saveHint": "保存するとソースが再インデックスされます。チャットや特化型AIには次の質問から変更が反映されます。",
+    "saving": "保存中…",
+    "save": "保存",
+    "cancel": "キャンセル"
+  },
+  "add": {
+    "title": "ナレッジを接続",
+    "modes": {
+      "path": "ファイルまたはフォルダ",
+      "text": "アップロードまたは貼り付け",
+      "database": "データベース",
+      "api": "Web API"
+    },
+    "path": "このコンピュータ上のパス",
+    "pathHint": "Yggdrasilはその場所から直接読み込み、編集を自動で反映します。",
+    "chooseFile": "ファイルを選択",
+    "pastePlaceholder": "テキスト、Markdown、CSVを貼り付け",
+    "content": "内容",
+    "name": "名前（任意）",
+    "indexing": "インデックス作成中…",
+    "connect": "接続"
+  },
+  "remote": {
+    "database": "データベース",
+    "sqlite": "SQLiteファイル",
+    "file": "このコンピュータ上のファイル",
+    "connection": "接続文字列",
+    "connectionHint": "読み取り専用のアカウントを使ってください。接続文字列はデータベースとは別に保存され、再表示されません。",
+    "query": "クエリ",
+    "queryHint": "SELECT文を1つ指定します。読み取り専用で実行されるため、Yggdrasilがデータベースを変更することはありません。各行が1つの抜粋になります。",
+    "url": "URL",
+    "urlHint": "JSON、CSV、またはテキスト。オブジェクトのリストは項目ごとに1つの抜粋になります。",
+    "items": "レスポンス内のリスト（任意）",
+    "header": "ヘッダー",
+    "value": "値（任意）",
+    "refresh": "次より古くなったら再取得",
+    "refreshChoices": {
+      "m5": "5分",
+      "m15": "15分",
+      "h1": "1時間",
+      "h6": "6時間",
+      "d1": "1日"
+    },
+    "name": "名前（任意）",
+    "connecting": "接続中…",
+    "connect": "接続"
+  },
+  "search": {
+    "title": "質問を試す",
+    "description": "質問したときに、どの抜粋がチャットに取り込まれるかを確認できます。",
+    "placeholder": "225/45R17の在庫はありますか？",
+    "question": "質問",
+    "search": "検索",
+    "nothing": "一致するものはありませんでした。"
+  },
+  "picker": {
+    "none": "ナレッジが接続されていません。",
+    "disconnect": "{{name}}の接続を解除",
+    "remove": "削除",
+    "connectExisting": "既存のナレッジを接続",
+    "connectExistingOption": "既存のナレッジを接続…",
+    "pathPlaceholder": "またはファイルやフォルダ（例：~/Documents/catalog）",
+    "path": "ファイルまたはフォルダのパス",
+    "indexing": "インデックス作成中…",
+    "connect": "接続",
+    "manage": "ソースの管理、貼り付けた内容の編集、検索のテストは<link>ナレッジ</link>ページで行えます。"
+  }
+}

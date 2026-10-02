@@ -1,0 +1,43 @@
+{
+  "page": {
+    "title": "Mémoire",
+    "description": "Ce que vous avez demandé à Yggdrasil de retenir. Ces souvenirs appartiennent à Yggdrasil, pas à un modèle en particulier : ils sont conservés d'une discussion à l'autre, après un redémarrage ou un changement de modèle. Seuls les souvenirs utiles à une question sont utilisés, et ils restent sur cet ordinateur. Dites « Souviens-toi que … » dans n'importe quelle discussion pour en ajouter un.",
+    "useInChats": "Utiliser la mémoire dans les discussions",
+    "off": "La mémoire est désactivée. Les discussions n'utilisent pas ce qui est enregistré ici, et rien n'est supprimé.",
+    "loading": "Chargement…",
+    "emptyTitle": "Aucun souvenir pour l'instant",
+    "emptyDescription": "Dites à Yggdrasil ce qui mérite d'être retenu, par exemple « Souviens-toi que je préfère les unités métriques » ou « Souviens-toi que ce projet utilise Go. »"
+  },
+  "categories": {
+    "identity": "À propos de vous",
+    "preferences": "Préférences",
+    "projects": "Projets",
+    "technical": "Technique",
+    "interests": "Centres d'intérêt",
+    "people": "Personnes",
+    "other": "Autre"
+  },
+  "add": {
+    "label": "Ajouter un souvenir",
+    "placeholder": "Je préfère des réponses courtes avec des exemples",
+    "category": "Catégorie",
+    "chooseForMe": "Choisir pour moi",
+    "button": "Ajouter"
+  },
+  "row": {
+    "text": "Texte du souvenir",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "fromChat": "Demandé dans une discussion",
+    "addedHere": "Ajouté ici",
+    "category": "Catégorie",
+    "edit": "Modifier",
+    "pause": "Suspendre",
+    "useAgain": "Réutiliser",
+    "localOnly": "Cet ordinateur uniquement",
+    "localOnlyOn": "Cet ordinateur uniquement ✓",
+    "localOnlyHint": "Ne jamais envoyer ce souvenir à un ordinateur jumelé. Les discussions qui l'utilisent s'exécutent ici.",
+    "delete": "Supprimer",
+    "deleteLabel": "Supprimer le souvenir : {{content}}"
+  }
+}

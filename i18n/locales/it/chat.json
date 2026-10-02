@@ -1,0 +1,427 @@
+{
+  "landing": {
+    "title": "Come posso aiutarti?",
+    "subtitle": "Parla con la tua IA locale. Yggdrasil sceglie automaticamente le risorse giuste.",
+    "try": "Prova:",
+    "suggestions": {
+      "explain": {
+        "label": "Spiega un argomento",
+        "prompt": "Spiega cos'è un mutex in due brevi paragrafi."
+      },
+      "code": {
+        "label": "Aiutami a programmare",
+        "prompt": "Aiutami a scrivere una funzione Go pulita che ripete una richiesta HTTP con backoff."
+      },
+      "plan": {
+        "label": "Organizza qualcosa",
+        "prompt": "Aiutami a delineare l'itinerario di un viaggio nel weekend in tre brevi sezioni."
+      }
+    }
+  },
+  "header": {
+    "history": "Cronologia",
+    "newChat": "Nuova chat",
+    "untitledChat": "Chat",
+    "assistant": "Assistente",
+    "delete": "Elimina",
+    "deleteChat": "Elimina chat",
+    "latest": "Più recente"
+  },
+  "composer": {
+    "placeholder": "Chiedi qualsiasi cosa a Yggdrasil…",
+    "message": "Messaggio",
+    "attach": "Allega file",
+    "attachHint": "Allega un documento, un foglio di calcolo, un PDF o un file di codice",
+    "profile": "Profilo",
+    "profileHint": "Quale stile di assistente usare",
+    "assistantProfile": "Profilo assistente",
+    "runOn": "Esegui su",
+    "choose": "Scegli…",
+    "automatic": "Automatico",
+    "thisComputer": "Questo computer",
+    "runOnAutomatic": "Norn sceglie il miglior computer disponibile.",
+    "runOnLocal": "Esegui solo su questo computer.",
+    "model": "Modello",
+    "modelHint": "Quale modello installato risponde in questa chat",
+    "noModel": "Nessun modello installato",
+    "auto": "Automatico",
+    "models": "Modelli",
+    "specialized": "IA specializzate",
+    "effort": "Impegno",
+    "send": "Invia",
+    "stop": "Interrompi",
+    "autoHint": "Automatico sceglie un modello installato per ogni messaggio",
+    "autoLastUsed": "Automatico · ultimo usato {{model}}",
+    "autoPicks": "Automatico · sceglie un modello per ogni messaggio",
+    "web": "Web",
+    "noModelAsk": "Ancora nessun modello installato: all'invio ti verrà chiesto prima di scaricarne uno.",
+    "noModelDownload": "Ancora nessun modello installato: all'invio ne verrà scaricato uno automaticamente.",
+    "openModels": "Apri Modelli",
+    "chooseRunOn": "Scegli <strong>Esegui su</strong> prima di inviare (Impostazioni → Esegui le chat su)."
+  },
+  "effort": {
+    "auto": {
+      "label": "Automatico",
+      "hint": "Decide Yggdrasil: le domande rapide restano veloci, quelle grandi o sui dati ricevono più cura."
+    },
+    "fast": {
+      "label": "Veloce",
+      "hint": "Risponde in un'unica volta, senza pianificazione né seconda passata."
+    },
+    "balanced": {
+      "label": "Equilibrato",
+      "hint": "Pianifica le richieste grandi, legge una pagina quando cerca informazioni e corregge i dati una volta."
+    },
+    "thorough": {
+      "label": "Approfondito",
+      "hint": "Legge più pagine, usa il modello più grande che ci sta e controlla i dati due volte."
+    }
+  },
+  "memory": {
+    "on": "Memoria attiva",
+    "off": "Memoria disattivata",
+    "onHint": "Questa chat usa ciò che hai chiesto a Yggdrasil di ricordare. Fai clic per escludere la memoria da questa chat.",
+    "offHint": "La memoria è disattivata per questa chat. I ricordi salvati non vengono usati qui e non vengono eliminati.",
+    "disabledHint": "La memoria è disattivata per tutte le chat. Attivala dalla pagina Memoria."
+  },
+  "send": {
+    "waitForFiles": "Attendi che i file finiscano di essere aggiunti, poi invia.",
+    "summarizeFile_one": "Riassumi questo file.",
+    "summarizeFile_many": "Riassumi questi file.",
+    "summarizeFile_other": "Riassumi questi file.",
+    "chooseRunOn": "Scegli dove eseguire questa chat: Automatico o Questo computer.",
+    "downloadFailed": "Impossibile scaricare un modello per questa chat.",
+    "installFirst": "Installa prima un modello, poi riprova.",
+    "startFailed": "Impossibile avviare una conversazione.",
+    "noReply": "Il modello si è fermato prima di poter rispondere. Yggdrasil lo ha arrestato e ha ripulito il processo non riuscito.",
+    "couldNotRespond": "Il modello non è riuscito a rispondere.",
+    "unreachable": "Impossibile raggiungere l'IA locale. Controlla Diagnostica per i dettagli.",
+    "generationFailed": "Qualcosa è andato storto durante la generazione di una risposta.",
+    "confirmDownload": "Scaricare “{{model}}” per continuare la chat? Puoi cambiare questa scelta in Impostazioni → Scarica modelli.",
+    "deleteFailed": "Impossibile eliminare questa chat."
+  },
+  "attachments": {
+    "unsupported": "Yggdrasil non sa ancora leggere questo tipo di file",
+    "tooLarge": "I file possono arrivare fino a 25 MB",
+    "addFailed": "Impossibile aggiungere il file.",
+    "adding": "Aggiunta…",
+    "remove": "Rimuovi {{name}}",
+    "download": "Scarica {{name}}",
+    "downloading": "Download…",
+    "downloadFailed": "Download non riuscito.",
+    "loading": "Caricamento…",
+    "audioFailed": "Impossibile caricare l'audio.",
+    "imageFailed": "Impossibile caricare l'immagine.",
+    "videoFailed": "Impossibile caricare il video.",
+    "notAvailable": "Non disponibile",
+    "play": "Riproduci",
+    "meta": "{{kind}} · {{size}}",
+    "kinds": {
+      "spreadsheet": "Foglio di calcolo",
+      "pdf": "PDF",
+      "document": "Documento",
+      "code": "Codice",
+      "image": "Immagine",
+      "audio": "Audio",
+      "video": "Video",
+      "other": "File"
+    }
+  },
+  "status": {
+    "starting": "Avvio…",
+    "working": "Elaborazione…",
+    "workingLabel": "Elaborazione",
+    "downloadingModel": "Download del modello…",
+    "toolAllowedSession": "Strumento consentito per questa sessione…",
+    "toolAllowed": "Strumento consentito…",
+    "toolDenied": "Strumento negato: si continua senza…",
+    "waitingForPermission": "In attesa del permesso: {{tool}}",
+    "checkingSources": "Controllo delle fonti…",
+    "toolFailed": "{{tool}} non riuscito",
+    "roleOn": "{{role}} su {{computer}}…",
+    "roleRunning": "{{role}} in esecuzione…",
+    "switchingTo": "Passaggio a {{model}}…",
+    "using": "Uso di {{model}}…",
+    "verifying": "Verifica dei dati rispetto alle fonti…",
+    "workingThrough_one": "Elaborazione di {{count}} parte…",
+    "workingThrough_many": "Elaborazione di {{count}} parti…",
+    "workingThrough_other": "Elaborazione di {{count}} parti…",
+    "workingOn": "In corso: {{step}}…",
+    "puttingTogether": "Composizione della risposta…",
+    "writingNamed": "Scrittura di {{name}}…",
+    "writingFile": "Scrittura del file…",
+    "searchingWebFor": "Ricerca sul web di “{{query}}”…",
+    "searchingWeb": "Ricerca sul web…",
+    "loadingRoleOn": "Caricamento di {{role}} su {{computer}}…",
+    "loadingModelOn": "Caricamento del modello su {{computer}}…",
+    "loadingModel": "Caricamento del modello…",
+    "roleGeneratingOn": "{{role}} sta generando su {{computer}}…",
+    "generatingOn": "Generazione su {{computer}}…",
+    "generating": "Generazione della risposta…",
+    "foundPassages_one": "Trovato {{count}} passaggio in {{source}}…",
+    "foundPassages_many": "Trovati {{count}} passaggi in {{source}}…",
+    "foundPassages_other": "Trovati {{count}} passaggi in {{source}}…",
+    "foundPassagesMore_one": "Trovato {{count}} passaggio in {{source}} e in altre {{more}}…",
+    "foundPassagesMore_many": "Trovati {{count}} passaggi in {{source}} e in altre {{more}}…",
+    "foundPassagesMore_other": "Trovati {{count}} passaggi in {{source}} e in altre {{more}}…",
+    "yourKnowledge": "la tua conoscenza",
+    "checkedKnowledge": "Conoscenza controllata…",
+    "readingHost": "Lettura di {{host}}…",
+    "readingPage": "Lettura di una pagina…",
+    "readingFile": "Lettura di un file…",
+    "searchingFiles": "Ricerca nei file locali…",
+    "readingSpreadsheet": "Lettura del foglio di calcolo…",
+    "creatingFile": "Creazione del file…",
+    "runningCode": "Esecuzione del codice nella sandbox…",
+    "runningCommand": "Esecuzione del comando…",
+    "checkingGit": "Controllo di git…",
+    "usingTool": "Uso di {{tool}}…"
+  },
+  "tools": {
+    "names": {
+      "internet": {
+        "search": "Ricerca web",
+        "open": "Apri pagina"
+      },
+      "filesystem": {
+        "search": "Trova file",
+        "read": "Leggi file",
+        "write": "Scrivi file"
+      },
+      "files": {
+        "create": "Crea file"
+      },
+      "spreadsheet": {
+        "analyze": "Analizza foglio di calcolo"
+      },
+      "code": {
+        "execute": "Esegui codice"
+      },
+      "terminal": "Terminale",
+      "git": {
+        "status": "Git status",
+        "diff": "Git diff",
+        "log": "Git log",
+        "show": "Git show",
+        "add": "Git add",
+        "commit": "Git commit",
+        "push": "Git push"
+      }
+    },
+    "unnamed": "Strumento",
+    "noArguments": "Nessun argomento",
+    "argumentsUnavailable": "Argomenti non disponibili",
+    "noDetails": "Nessun dettaglio aggiuntivo",
+    "permissionTitle": "Consentire {{tool}}?",
+    "permissionReason": "L'assistente vuole usare uno strumento locale per continuare.",
+    "allowOnce": "Consenti una volta",
+    "allowSession": "Consenti per la sessione",
+    "deny": "Nega",
+    "decideFailed": "Impossibile registrare la scelta sul permesso dello strumento.",
+    "failed": "{{tool}} non riuscito",
+    "retry": "Riprova",
+    "used_one": "Usato {{count}} strumento",
+    "used_many": "Usati {{count}} strumenti",
+    "used_other": "Usati {{count}} strumenti",
+    "completed": "Completato",
+    "completedIn": "Completato in {{ms}} ms",
+    "traceFailed": "Non riuscito"
+  },
+  "transcript": {
+    "plan": "Piano",
+    "onComputer": "su <computer>{{computer}}</computer>",
+    "interrupted": "Risposta interrotta"
+  },
+  "roles": {
+    "role": "Ruolo",
+    "answer": "Risposta",
+    "planner": "Pianificatore",
+    "reviewer": "Revisore",
+    "worker": "Esecutore {{n}}"
+  },
+  "deleteDialog": {
+    "title": "Eliminare questa chat?",
+    "body": "“{{title}}” verrà rimossa definitivamente.",
+    "untitled": "Senza titolo",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "deleting": "Eliminazione…"
+  },
+  "history": {
+    "label": "Cronologia delle chat",
+    "title": "Chat",
+    "pin": "Fissa",
+    "pinned": "Fissata",
+    "pinSidebar": "Fissa la barra laterale della cronologia",
+    "unpinSidebar": "Sblocca la barra laterale della cronologia",
+    "close": "Chiudi la cronologia",
+    "search": "Cerca nelle chat",
+    "searchPlaceholder": "Cerca…",
+    "loading": "Caricamento delle chat…",
+    "empty": "Ancora nessuna conversazione precedente.",
+    "startNew": "Inizia una nuova chat",
+    "noMatches": "Nessuna chat corrispondente.",
+    "untitled": "Senza titolo",
+    "actionsFor": "Azioni per {{title}}",
+    "chat": "chat",
+    "rename": "Rinomina",
+    "unpin": "Non fissare più",
+    "delete": "Elimina",
+    "groups": {
+      "pinned": "Fissate",
+      "today": "Oggi",
+      "yesterday": "Ieri",
+      "week": "Ultimi 7 giorni",
+      "month": "Ultimi 30 giorni",
+      "older": "Meno recenti"
+    }
+  },
+  "errors": {
+    "tryAgain": "Riprova",
+    "startNew": "Inizia una nuova chat",
+    "openModels": "Apri Modelli",
+    "openComputers": "Apri Computer",
+    "details": "Dettagli",
+    "hideDetails": "Nascondi dettagli",
+    "notResponding": {
+      "title": "Yggdrasil non risponde",
+      "body": "Il servizio locale ha smesso di rispondere. Se è l'app desktop, chiudila e riaprila, poi riprova."
+    },
+    "engineMissing": {
+      "title": "Il motore di IA non è ancora installato",
+      "body": "Installalo da Modelli, poi invia di nuovo il messaggio."
+    },
+    "noModel": {
+      "title": "Nessun modello è pronto",
+      "body": "Installa o scegli un modello, poi riprova."
+    },
+    "tooLong": {
+      "title": "Questa conversazione è troppo lunga per il modello",
+      "body": "Inizia una nuova chat, oppure scegli un modello che possa contenere più testo."
+    },
+    "outOfMemory": {
+      "title": "Memoria insufficiente per questo modello",
+      "body": "Chiudi altre app o scegli un modello più piccolo, poi riprova."
+    },
+    "offline": {
+      "title": "Un computer che stai usando è offline",
+      "body": "Accendilo e apri Yggdrasil su di esso, oppure esegui questa chat su questo computer."
+    },
+    "connection": {
+      "title": "Impossibile raggiungere il modello",
+      "body": "Il modello ha smesso di rispondere. Di solito è un problema temporaneo."
+    },
+    "serverError": {
+      "title": "Il modello ha riscontrato un problema",
+      "body": "Riprova. Se continua a succedere, prova un altro modello."
+    },
+    "didNotWork": "Non ha funzionato",
+    "generic": {
+      "title": "Qualcosa è andato storto",
+      "body": "Yggdrasil non è riuscito a completare la risposta. Riprova tra un momento."
+    }
+  },
+  "modelFailure": {
+    "retry": "Riprova",
+    "chooseOther": "Usa un altro assistente/modello",
+    "details": "Dettagli",
+    "hideDetails": "Nascondi dettagli",
+    "reason": "Motivo: {{value}}",
+    "runtime": "Runtime: {{value}}",
+    "computer": "Computer: {{value}}",
+    "exitCode": "Codice di uscita: {{value}}",
+    "lastProbe": "Ultimo controllo di stato: {{value}}"
+  },
+  "capability": {
+    "enableInternet": "Attiva Internet",
+    "installed": "Installato",
+    "notInstalled": "Non installato",
+    "useModel": "Usa questo modello",
+    "viewInModels": "Mostra in Modelli"
+  },
+  "setup": {
+    "details": "{{name}} · download di {{size}} · su {{node}}",
+    "thisComputer": "questo computer",
+    "install": "Configura",
+    "installing": "Installazione…",
+    "downloading": "Download… {{done}} di {{total}}",
+    "stop": "Interrompi",
+    "ready": "{{label}} è configurato.",
+    "continue": "Continua",
+    "continuing": "Configurato. Completamento della tua richiesta…"
+  },
+  "readAloud": {
+    "button": "Leggi ad alta voce",
+    "hint": "Leggi questa risposta ad alta voce su questo computer",
+    "busy": "Lettura ad alta voce… (la prima volta viene scaricata una voce)",
+    "failed": "Impossibile leggerla ad alta voce."
+  },
+  "context": {
+    "usage": "Uso del contesto",
+    "full": "Contesto pieno al {{percent}}",
+    "percentFull": "Pieno al {{percent}}",
+    "title": "Contesto",
+    "used": "{{used}} / {{limit}} token",
+    "usedEstimated": "~{{used}} / {{limit}} token",
+    "limit": "{{limit}} token",
+    "summarized_one": "Il messaggio più vecchio è stato inviato come riassunto per far stare la conversazione nel contesto. Tutti i messaggi restano salvati.",
+    "summarized_many": "I {{count}} messaggi più vecchi sono stati inviati come riassunto per far stare la conversazione nel contesto. Tutti i messaggi restano salvati.",
+    "summarized_other": "I {{count}} messaggi più vecchi sono stati inviati come riassunto per far stare la conversazione nel contesto. Tutti i messaggi restano salvati.",
+    "empty": "Invia un messaggio per vedere quanta parte della memoria di questo modello sta usando la chat.",
+    "rows": {
+      "instructions": "Istruzioni",
+      "tools": "Strumenti",
+      "conversation": "Conversazione",
+      "toolResults": "Risultati degli strumenti"
+    }
+  },
+  "answer": {
+    "files": "File",
+    "sources": "Fonti",
+    "memory": "Memoria",
+    "remembered": "Memorizzato",
+    "steps_one": "Cosa ho fatto ({{count}} passaggio)",
+    "steps_many": "Cosa ho fatto ({{count}} passaggi)",
+    "steps_other": "Cosa ho fatto ({{count}} passaggi)"
+  },
+  "run": {
+    "details": "Dettagli dell'esecuzione",
+    "gone": "Questa esecuzione non è più registrata.",
+    "loadFailed": "Impossibile caricare l'esecuzione.",
+    "run": "Esecuzione",
+    "strategy": "Strategia",
+    "effort": "Impegno",
+    "modelCalls": "Chiamate al modello",
+    "workers": "Esecutori",
+    "workersParallel_one": "{{count}} in parallelo",
+    "workersParallel_many": "{{count}} in parallelo",
+    "workersParallel_other": "{{count}} in parallelo",
+    "workersInOrder_one": "{{count}} in sequenza",
+    "workersInOrder_many": "{{count}} in sequenza",
+    "workersInOrder_other": "{{count}} in sequenza",
+    "tools": "Strumenti",
+    "computers": "Computer",
+    "cacheHits": "Riscontri nella cache",
+    "verification": "Verifica",
+    "verificationNone": "nessuna",
+    "verificationPasses_one": "{{count}} passata",
+    "verificationPasses_many": "{{count}} passate",
+    "verificationPasses_other": "{{count}} passate",
+    "verificationIssues": "{{issues}} problemi, {{fixed}} corretti",
+    "retries": "Tentativi",
+    "context": "Contesto",
+    "contextTokens": "{{tokens}} token",
+    "contextTokensOf": "{{tokens}} token su {{limit}}",
+    "latency": "Latenza",
+    "beforeModel": "({{time}} prima del modello)",
+    "onComputer": "su {{computer}}",
+    "calls_one": "{{count}} chiamata",
+    "calls_many": "{{count}} chiamate",
+    "calls_other": "{{count}} chiamate",
+    "load": "caricamento {{time}}",
+    "firstToken": "primo token {{time}}",
+    "inOut": "{{in}} in entrata / {{out}} in uscita",
+    "cached": "{{count}} dalla cache",
+    "toolFailures": "{{count}} non riuscite"
+  }
+}

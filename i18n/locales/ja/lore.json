@@ -1,0 +1,84 @@
+{
+  "about": "{{name}}について",
+  "close": "閉じる",
+  "inYggdrasil": "Yggdrasilでは",
+  "mascot": {
+    "label": "Ratatoskrについて",
+    "kind": "Yggdrasilのマスコット",
+    "story": "神話のRatatoskrは、世界樹を上へ下へと駆け回り、梢にいる鷲と根元にいる竜Níðhöggrのあいだで伝言を運ぶリスです。道すがら、ちょっとした騒ぎを起こすことでも知られていました。",
+    "here": "ここでも同じ役目を担い、あなたのアプリとコンピュータ上のモデルのあいだで依頼を運びます。返事が書かれているあいだは考え込み、何かが終わると喜び、モデルが読み込まれていないときは昼寝をしています。"
+  },
+  "logo": {
+    "label": "Yggdrasilのマークについて",
+    "kind": "世界樹",
+    "story": "Yggdrasilは北欧神話の宇宙の中心に立つ巨大なトネリコの木です。その枝は天を覆い、根は三つの泉に届き、九つの世界がその枝のあいだに広がっています。",
+    "here": "このマークは木を回路のパターンとして描いています。根と枝の先はノードになっていて、Yggdrasilが1つのシステムにつなぐコンピュータを表しています。"
+  },
+  "realms": {
+    "chat": {
+      "meaning": "チャットは、あなたのメッセージをコンピュータ上のモデルへ運び、答えを持ち帰る場所です。",
+      "story": "Ratatoskrは、Yggdrasilの幹を上へ下へと駆け回り、木の頂にいる鷲と、根をかじる竜Níðhöggrのあいだで伝言を運ぶリスです。",
+      "rune": "Ansuz、言葉のルーン"
+    },
+    "automations": {
+      "meaning": "Nornたちは、何がいつ起こるべきかという運命を司ります。Nornはスケジュールされた作業を実行します。",
+      "story": "三人のNorn、Urðr、Verðandi、Skuldは、Yggdrasilの根元にあるUrðrの泉のほとりに住んでいます。彼女たちは木の根に水をやり、過去と現在と未来を形づくります。",
+      "rune": "Jera、巡る一年のルーン"
+    },
+    "models": {
+      "meaning": "Ymirは最初の巨人で、世界は彼から作られました。モデルは、ほかのすべてを支える土台です。",
+      "story": "はじめにYmirがいました。最初の巨人です。彼が倒されると、神々は彼の体から世界を作りました。肉から大地を、骨から山々を、頭蓋骨から空を。",
+      "rune": "Uruz、原初の力のルーン"
+    },
+    "train": {
+      "meaning": "BrokkrはMjölnirを鍛えた鍛冶師です。ここではあなた自身のAIを鍛えます。",
+      "story": "Brokkrと兄弟のSindriはドワーフの鍛冶師でした。Lokiとの賭けで、二人はThorの槌Mjölnirを鍛え上げました。Brokkrはハエに刺されながらもふいごを動かし続けたのです。",
+      "rune": "Kenaz、松明と技のルーン"
+    },
+    "knowledge": {
+      "meaning": "Mimirは知恵の泉を守っています。Mimirはあなたのナレッジを検索できる状態に保ちます。",
+      "story": "MímirはYggdrasilの根の一つの下にある知恵の泉を守っていました。Odinはその水を一口飲むために片目を差し出し、Mímirの死後もその首を手元に置いて、助言を受け続けました。",
+      "rune": "Laguz、水と泉のルーン"
+    },
+    "memory": {
+      "meaning": "Odinの記憶のワタリガラスMuninnが、Yggdrasilに覚えておくよう頼んだことを守ります。",
+      "story": "思考と記憶、HuginnとMuninnはOdinのワタリガラスです。毎朝、二羽は世界の上を飛び回り、戻って見たものをOdinに伝えます。Odinは、Muninnが戻らないことを何より恐れていると語りました。",
+      "rune": "Othala、受け継がれるもののルーン"
+    },
+    "nodes": {
+      "meaning": "Bifrostは世界と世界をつなぐ虹の橋です。あなたのコンピュータをつなぎます。",
+      "story": "Bifröstは、人の世界Midgardと神々の住むAsgardをつなぐ、燃える虹の橋です。その端ではHeimdallが見張りをしています。",
+      "rune": "Raidho、旅のルーン"
+    },
+    "performance": {
+      "meaning": "SleipnirはOdinの八本脚の馬で、誰よりも速く駆けます。",
+      "story": "SleipnirはOdinの八本脚の灰色の馬で、あらゆる駿馬の中で最も速い馬です。Odinを乗せて空と海を越え、一度はHelまで行って戻ってきました。",
+      "rune": "Ehwaz、馬のルーン"
+    },
+    "diagnostics": {
+      "meaning": "Heimdallは橋を見守り、何ひとつ見逃しません。システムの状態を見張っています。",
+      "story": "Heimdallは神々の見張り番です。鳥よりも眠りが短く、夜でも百里先まで見通し、草の伸びる音まで聞き取ります。Ragnarökの時には、Gjallarhornを吹き鳴らします。",
+      "rune": "Algiz、守護のルーン"
+    },
+    "profiles": {
+      "meaning": "Odinはワタリガラスを送り出します。プロファイルは、アシスタントがどう考え、何をしてよいかを決めます。",
+      "story": "Odinは万物の父です。ルーンを得るためにYggdrasilに九夜吊るされ、知恵のために片目を差し出し、毎日ワタリガラスを世界へ送り出しています。",
+      "rune": "Mannaz、自己のルーン"
+    },
+    "tools": {
+      "meaning": "GungnirはOdinの槍で、決して的を外しません。ツールは、アシスタントが行動するための手段です。",
+      "story": "GungnirはOdinの槍で、Ivaldiの息子たちと呼ばれるドワーフが鍛えました。誰に向けて投げられても、決して外れることはありません。",
+      "rune": "Tiwaz、槍の形をしたルーン"
+    },
+    "api-access": {
+      "meaning": "ValgrindはValhallaの門です。APIキーが、誰が入れるかを決めます。",
+      "story": "ValgrindはValhallaの前に立つ古の門です。神聖で古く、その錠の掛け方を知る者はわずかです。",
+      "rune": "Thurisaz、門のルーン"
+    },
+    "settings": {
+      "meaning": "Forsetiはあらゆる争いを公正に裁きます。設定は、Yggdrasilが守るルールです。",
+      "story": "Baldrの息子Forsetiは、金の柱と銀の屋根を持つ館Glitnirに座しています。争いを持ち込んだ者は皆、和解して帰っていきます。",
+      "rune": "Isa、静けさのルーン"
+    }
+  }
+}

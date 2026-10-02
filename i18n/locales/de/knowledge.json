@@ -1,0 +1,110 @@
+{
+  "page": {
+    "title": "Wissen",
+    "description": "Mimir hält Kataloge, Preise, Richtlinien und Dokumente durchsuchbar. Wenn ein Profil oder eine spezialisierte KI eine Quelle nutzt, werden die zu jeder Frage passenden Textstellen hinzugefügt. Bearbeite eine Datei, und die nächste Frage sieht die Änderung. Ohne neues Training.",
+    "loading": "Wird geladen …",
+    "emptyTitle": "Kein Wissen verbunden",
+    "emptyDescription": "Verbinde eine Datei oder einen Ordner auf diesem Computer, füge Inhalte ein oder lies aus einer Datenbank oder Web-API. PDF-, Excel-, CSV-, TSV-, JSON-, JSONL-, Markdown-, Text- und HTML-Dateien funktionieren."
+  },
+  "badge": {
+    "linked": "Verknüpft",
+    "database": "Datenbank",
+    "api": "Web-API",
+    "copy": "Kopie"
+  },
+  "meaning": {
+    "full": "Nach Bedeutung durchsuchbar, nicht nur nach passenden Wörtern.",
+    "partial": "Nach Bedeutung durchsuchbar: bisher {{embedded}} von {{total}} Textstellen."
+  },
+  "refresh": {
+    "days_one": "{{count}} Tag",
+    "days_other": "{{count}} Tage",
+    "hours_one": "{{count}} Stunde",
+    "hours_other": "{{count}} Stunden",
+    "minutes_one": "{{count}} Minute",
+    "minutes_other": "{{count}} Minuten",
+    "note": "Wird neu abgerufen, wenn eine Frage es nutzt und die Daten älter als {{every}} sind, oder bei „Neu indizieren“."
+  },
+  "row": {
+    "failed": "Fehlgeschlagen",
+    "passages_one": "{{count}} Textstelle",
+    "passages_other": "{{count}} Textstellen",
+    "indexed": "indiziert {{when}}",
+    "watches": "Wird automatisch neu indiziert, wenn sich die Dateien ändern.",
+    "edit": "Bearbeiten",
+    "indexing": "Wird indiziert …",
+    "reindex": "Neu indizieren",
+    "localOnlyHint": "Textstellen aus dieser Quelle nie an einen gekoppelten Computer senden. Chats, die sie nutzen, laufen hier.",
+    "localOnly": "Nur dieser Computer",
+    "localOnlyOn": "Nur dieser Computer ✓",
+    "confirmDisconnect": "{{name}} trennen? Profile und KIs, die es nutzen, sehen es dann nicht mehr. Deine Dateien werden nicht gelöscht.",
+    "disconnect": "Trennen",
+    "editLabel": "{{name}} bearbeiten",
+    "saveHint": "Beim Speichern wird die Quelle neu indiziert. Chats und spezialisierte KIs sehen die Änderung bei ihrer nächsten Frage.",
+    "saving": "Wird gespeichert …",
+    "save": "Speichern",
+    "cancel": "Abbrechen"
+  },
+  "add": {
+    "title": "Wissen verbinden",
+    "modes": {
+      "path": "Datei oder Ordner",
+      "text": "Hochladen oder einfügen",
+      "database": "Datenbank",
+      "api": "Web-API"
+    },
+    "path": "Pfad auf diesem Computer",
+    "pathHint": "Yggdrasil liest sie direkt vor Ort und übernimmt Änderungen automatisch.",
+    "chooseFile": "Datei wählen",
+    "pastePlaceholder": "Text, Markdown oder CSV einfügen",
+    "content": "Inhalt",
+    "name": "Name (optional)",
+    "indexing": "Wird indiziert …",
+    "connect": "Verbinden"
+  },
+  "remote": {
+    "database": "Datenbank",
+    "sqlite": "SQLite-Datei",
+    "file": "Datei auf diesem Computer",
+    "connection": "Verbindungs-String",
+    "connectionHint": "Verwende ein Konto, das nur lesen darf. Er wird getrennt von der Datenbank gespeichert und nicht wieder angezeigt.",
+    "query": "Abfrage",
+    "queryHint": "Ein SELECT. Es läuft schreibgeschützt, Yggdrasil ändert die Datenbank also nie. Jede Zeile wird zu einer Textstelle.",
+    "url": "URL",
+    "urlHint": "JSON, CSV oder Text. Aus einer Liste von Objekten wird eine Textstelle pro Eintrag.",
+    "items": "Liste in der Antwort (optional)",
+    "header": "Header",
+    "value": "Wert (optional)",
+    "refresh": "Neu abrufen, wenn älter als",
+    "refreshChoices": {
+      "m5": "5 Minuten",
+      "m15": "15 Minuten",
+      "h1": "1 Stunde",
+      "h6": "6 Stunden",
+      "d1": "1 Tag"
+    },
+    "name": "Name (optional)",
+    "connecting": "Verbindung wird hergestellt …",
+    "connect": "Verbinden"
+  },
+  "search": {
+    "title": "Frage ausprobieren",
+    "description": "Sieh, welche Textstellen eine Frage in den Chat bringen würde.",
+    "placeholder": "Habt ihr 225/45R17 auf Lager?",
+    "question": "Frage",
+    "search": "Suchen",
+    "nothing": "Keine Treffer."
+  },
+  "picker": {
+    "none": "Kein Wissen verbunden.",
+    "disconnect": "{{name}} trennen",
+    "remove": "Entfernen",
+    "connectExisting": "Vorhandenes Wissen verbinden",
+    "connectExistingOption": "Vorhandenes Wissen verbinden …",
+    "pathPlaceholder": "Oder eine Datei bzw. ein Ordner, z. B. ~/Documents/catalog",
+    "path": "Pfad zu Datei oder Ordner",
+    "indexing": "Wird indiziert …",
+    "connect": "Verbinden",
+    "manage": "Verwalte Quellen, bearbeite eingefügte Inhalte und teste Suchen auf der Seite <link>Wissen</link>."
+  }
+}

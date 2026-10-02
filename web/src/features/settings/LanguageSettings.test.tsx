@@ -34,7 +34,25 @@ describe('LanguageSettings', () => {
     const select = await screen.findByRole('combobox', { name: 'App language' })
     await waitFor(() => expect(select).toBeEnabled())
     const options = [...select.querySelectorAll('option')].map((o) => o.textContent)
-    expect(options).toEqual(['System default (English)', 'English'])
+    expect(options).toEqual([
+      'System default (English)',
+      'English',
+      'Deutsch',
+      'Español',
+      'Français',
+      'Italiano',
+      'Português (Brasil)',
+      '日本語',
+      '한국어',
+      '简体中文',
+      '繁體中文',
+    ])
+  })
+
+  it('says when the chosen language is machine translated', async () => {
+    vi.mocked(api.getSettings).mockResolvedValue({ ui_locale: 'de' } as SettingsView)
+    renderIt()
+    expect(await screen.findByText(/^Machine translated/)).toBeInTheDocument()
   })
 
   it('saves the choice on the daemon and shows it at once', async () => {

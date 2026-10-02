@@ -1,0 +1,127 @@
+{
+  "page": {
+    "title": "性能",
+    "subtitle": "你的 AI 此刻在做什么——负载、速度，以及工作如何在你的团队中分配。",
+    "views": "性能视图"
+  },
+  "tabs": {
+    "overview": "概览",
+    "benchmarks": "基准测试",
+    "activity": "活动"
+  },
+  "roles": {
+    "role": "角色",
+    "worker": "执行者 {{n}}",
+    "planner": "规划者",
+    "reviewer": "审核者"
+  },
+  "route": {
+    "multiple": "多台电脑",
+    "thisComputer": "这台电脑"
+  },
+  "metrics": {
+    "speed": "生成速度",
+    "prompt": "提示词处理",
+    "firstResponse": "首次响应",
+    "total": "总响应时间",
+    "teamRun": "团队运行"
+  },
+  "metricsAdvanced": {
+    "speed": "评估 tok/s",
+    "prompt": "提示词评估",
+    "firstResponse": "TTFT",
+    "total": "总计",
+    "teamRun": "跨机器"
+  },
+  "overview": {
+    "loading": "正在检查你的 AI 在做什么…",
+    "memory": "内存",
+    "idle": "空闲",
+    "active": "活跃",
+    "offline": "离线",
+    "unreachable": "目前无法访问。",
+    "idleNoModels": "空闲——未加载模型",
+    "model": "模型",
+    "speed": "速度",
+    "computers_other": "已连接 {{count}} 台电脑",
+    "models_other": "{{count}} 个模型正在运行",
+    "tasks_other": "{{count}} 个活跃任务",
+    "acrossMachines": "跨机器工作",
+    "taskStatus": {
+      "running": "正在运行",
+      "pending": "等待中"
+    },
+    "taskInProgress": "任务进行中",
+    "noComputers": "你的团队中还没有电脑。",
+    "addComputer": "添加电脑",
+    "nothingLoaded": "目前没有加载任何内容。想要比较模型时，请打开<chat>聊天</chat>或运行基准测试。"
+  },
+  "activity": {
+    "generation": "生成",
+    "helpedPeer": "协助了其他电脑",
+    "promptTokPerSec": "提示词 tok/s",
+    "tokensOut": "输出词元",
+    "perRoleAcross": "跨电脑的各角色数据",
+    "perRoleTurn": "本轮的各角色数据",
+    "runs": "运行",
+    "averageOf": "平均{{metric}}",
+    "averageResponse": "平均响应",
+    "crossMachine": "跨机器",
+    "teamRuns": "团队运行",
+    "filterComputer": "按电脑筛选",
+    "computer": "电脑",
+    "filterModel": "按模型筛选",
+    "model": "模型",
+    "filterProfile": "按配置筛选",
+    "profile": "配置",
+    "filterDate": "按日期筛选",
+    "loading": "正在加载活动…",
+    "loadFailed": "无法加载性能历史。Yggdrasil 正在运行吗？",
+    "emptyTitle": "暂无活动",
+    "emptyDescription": "发送几条聊天消息。使用多台电脑的团队轮次会被标记为团队运行。",
+    "noMatches": "没有符合这些筛选条件的运行。"
+  },
+  "benchmark": {
+    "fastest": "最快",
+    "results": "结果",
+    "status": "状态：{{status}}",
+    "statuses": {
+      "pending": "等待中",
+      "running": "正在运行",
+      "completed": "已完成",
+      "failed": "失败",
+      "cancelled": "已取消",
+      "canceled": "已取消"
+    },
+    "winner": "胜出 · {{workload}}",
+    "leading": "领先 · {{workload}}",
+    "hideDetail": "隐藏详细结果",
+    "detail": "详细结果",
+    "model": "模型",
+    "load": "加载",
+    "running": "正在运行基准测试…",
+    "title": "比较模型",
+    "description": "在多个模型上运行相同的提示词，看看哪个模型最适合每种工作。",
+    "chooseModels": "选择模型",
+    "chooseWorkloads": "选择工作负载",
+    "run": "运行基准测试",
+    "step": "{{n}}. {{label}}",
+    "loadingModels": "正在加载模型…",
+    "installFirst": "进行基准测试前，请先在“模型”页面安装至少一个模型。",
+    "selected": "已选择 {{count}}/6",
+    "prompts_other": "{{count}} 个提示词",
+    "warning": "基准测试期间，Yggdrasil 会临时加载和卸载模型。测试期间进行中的聊天可能会变慢。",
+    "runsPerPrompt": "每个提示词的测量次数",
+    "starting": "正在启动…",
+    "cancel": "取消",
+    "estimate": "{{models}} · {{workloads}} · 约 {{minutes}}",
+    "models_other": "{{count}} 个模型",
+    "workloads_other": "{{count}} 个工作负载",
+    "minutes_other": "{{count}} 分钟",
+    "startFailed": "无法启动基准测试。",
+    "recent": "最近的基准测试",
+    "recentHint": "Yggdrasil 运行期间，这些任务会一直保留。",
+    "jobSummary": "{{models}} · {{workloads}} · {{when}}",
+    "winners_other": "{{count}} 个胜出者"
+  }
+}

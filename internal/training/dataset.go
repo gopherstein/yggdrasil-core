@@ -149,7 +149,11 @@ func pairRecord(rec map[string]any) ([]Message, bool) {
 }
 
 func normalizeRole(role string) string {
-	switch strings.ToLower(strings.TrimSpace(role)) {
+	role = strings.ToLower(strings.TrimSpace(role))
+	if r, ok := localizedTurns[role]; ok {
+		return r
+	}
+	switch role {
 	case "user", "human", "customer", "q", "question":
 		return "user"
 	case "assistant", "gpt", "bot", "ai", "model", "agent", "a", "answer":
@@ -157,7 +161,7 @@ func normalizeRole(role string) string {
 	case "system":
 		return "system"
 	default:
-		return strings.ToLower(strings.TrimSpace(role))
+		return role
 	}
 }
 
@@ -206,7 +210,19 @@ func containsWord(words []string, s string) bool {
 	return false
 }
 
-var turnRe = regexp.MustCompile(`(?im)^\s*(q|question|a|answer|user|customer|human|assistant|agent|bot|ai)\s*:\s?`)
+// localizedTurns are the question and answer labels the app's languages
+// suggest when pasting examples, such as P:/R: in Spanish and 问：/答： in
+// Chinese (i18n/locales/<language>/train.json, material.placeholder).
+var localizedTurns = map[string]string{
+	"p": "user", "pregunta": "user", "pergunta": "user", "d": "user", "domanda": "user",
+	"f": "user", "frage": "user", "问": "user", "問": "user", "问题": "user", "問題": "user",
+	"質問": "user", "질문": "user",
+	"r": "assistant", "respuesta": "assistant", "resposta": "assistant", "réponse": "assistant",
+	"reponse": "assistant", "risposta": "assistant", "antwort": "assistant", "答": "assistant",
+	"回答": "assistant", "답": "assistant", "답변": "assistant",
+}
+
+var turnRe = regexp.MustCompile(`(?im)^\s*(q|question|a|answer|user|customer|human|assistant|agent|bot|ai|p|pregunta|pergunta|d|domanda|f|frage|r|respuesta|resposta|réponse|reponse|risposta|antwort|问题|問題|質問|问|問|回答|答|질문|답변|답)\s*[:：]\s?`)
 
 // examplesFromDialog reads pasted "Q:/A:" or "User:/Assistant:" blocks. A new
 // example starts at each user turn that follows an assistant turn, or at a

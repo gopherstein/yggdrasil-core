@@ -1,0 +1,75 @@
+{
+  "header": {
+    "welcome": "ようこそ",
+    "lede": "このアプリでは、自分のコンピュータ上でプライベートにAIを実行できます。"
+  },
+  "hardware": {
+    "title": "このコンピュータ",
+    "description": "ローカル推論用に検出されたハードウェアです。",
+    "detecting": "ハードウェアを検出しています…",
+    "processor": "プロセッサ",
+    "cores_other": "{{count}}コア",
+    "memory": "メモリ",
+    "graphics": "グラフィックス",
+    "system": "システム",
+    "unavailable": "アプリのバックエンドが起動すると、ハードウェアの詳細が表示されます。このままセットアップを続けられます。"
+  },
+  "question": "AIに何をしてほしいですか？",
+  "purposes": {
+    "general": {
+      "title": "汎用アシスタント",
+      "description": "日常の質問や文章作成の手伝い、ローカル優先の会話に。"
+    },
+    "coding": {
+      "title": "プログラミング",
+      "description": "コーディングの手伝い。モデルがインストールされていれば、ペアリングしたすべてのコンピュータを自動で活用できます。"
+    },
+    "research": {
+      "title": "リサーチ",
+      "description": "長文の読解、要約、慎重な推論に。"
+    },
+    "custom": {
+      "title": "カスタム",
+      "description": "詳細モードでモデルとオーケストレーションを自分で選びます。"
+    }
+  },
+  "continue": "続ける",
+  "finding": "構成を探しています…",
+  "recommendFailed": "おすすめを取得できませんでした。",
+  "recommend": {
+    "badge": "おすすめ",
+    "title": "{{purpose}}向けのおすすめ",
+    "download": "ダウンロードサイズ：{{size}}",
+    "storage": "推定ストレージ容量",
+    "memory": "推定使用メモリ",
+    "install": "おすすめの構成をインストール",
+    "skip": "今はスキップ",
+    "back": "戻る"
+  },
+  "roles": {
+    "coordinator": "コーディネーター",
+    "worker": "ワーカー",
+    "reviewer": "レビュアー",
+    "researcher": "リサーチャー",
+    "assistant": "アシスタント"
+  },
+  "install": {
+    "runtime": "ローカルモデルのランタイムをインストールしています…",
+    "model": "{{model}}をインストールしています…",
+    "downloading": "{{model}}をダウンロードしています… {{percent}}",
+    "profile": "AIプロファイルを作成しています…",
+    "conversation": "最初の会話を準備しています…",
+    "chatTitle": "{{profile}}とのチャット",
+    "working": "インストール中…",
+    "complete": "{{percent}}完了",
+    "keepOpen": "大きなモデルのダウンロードには数分かかることがあります。このウインドウは開いたままにしてください。",
+    "failed": "インストールに失敗しました。",
+    "downloadFailed": "モデルのダウンロードに失敗しました。",
+    "noProfileId": "プロファイルは作成されましたが、IDが返されませんでした。"
+  },
+  "ready": {
+    "title": "準備ができました",
+    "description": "おすすめの構成がインストールされました。ローカルAIとチャットを始めましょう。",
+    "start": "チャットを始める"
+  }
+}

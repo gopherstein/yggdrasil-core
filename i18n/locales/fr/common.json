@@ -1,0 +1,58 @@
+{
+  "tagline": "Plan de contrôle d'IA locale",
+  "nav": {
+    "label": "Principal",
+    "main": "Principal",
+    "system": "Système",
+    "chat": "Discussion",
+    "automations": "Automatisations",
+    "models": "Modèles",
+    "train": "Entraîner",
+    "knowledge": "Connaissances",
+    "memory": "Mémoire",
+    "computers": "Ordinateurs",
+    "performance": "Performances",
+    "diagnostics": "Diagnostics",
+    "profiles": "Profils et orchestration",
+    "tools": "Outils",
+    "apiAccess": "Accès API",
+    "settings": "Paramètres"
+  },
+  "status": {
+    "starting": "Démarrage…",
+    "unavailable": "Service indisponible",
+    "noModel": "Aucun modèle",
+    "ready": "Prêt",
+    "unavailableHint": "Le service Yggdrasil local ne répond pas.",
+    "noModelHint": "Installez un modèle dans Modèles pour commencer à discuter.",
+    "readyHint": "Le service local est prêt."
+  },
+  "subsystems": {
+    "title": "Système",
+    "bifrostHint": "Découverte des ordinateurs et réseau",
+    "computersNone": "Aucun ordinateur",
+    "computersConnected_one": "{{count}} ordinateur connecté",
+    "computersConnected_many": "{{count}} ordinateurs connectés",
+    "computersConnected_other": "{{count}} ordinateurs connectés",
+    "nornHint": "Norn répartit le travail entre vos ordinateurs",
+    "nornAutomatic": "Automatique",
+    "mimirHint": "Connaissances et mémoire locales",
+    "mimirReady": "Prêt"
+  },
+  "boot": {
+    "starting": "Démarrage d'Yggdrasil",
+    "preparing": "Préparation de votre service d'IA local",
+    "unavailable": "Service indisponible",
+    "unavailableBody": "Le service Yggdrasil local n'a pas encore répondu. Patientez un instant puis réessayez. Si le problème persiste, consultez Diagnostics une fois l'app chargée.",
+    "retrying": "Nouvelle tentative…",
+    "tryAgain": "Réessayer",
+    "keyRequired": "Clé API requise",
+    "keyBody": "Ce daemon Yggdrasil écoute au-delà de cet ordinateur. Saisissez une clé API pour continuer. Une clé ne chiffre pas le trafic en HTTP simple.",
+    "continue": "Continuer"
+  },
+  "units": {
+    "ms": "{{value}} ms",
+    "seconds": "{{value}} s",
+    "tokPerSec": "{{value}} tok/s"
+  }
+}

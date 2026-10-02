@@ -27,6 +27,11 @@
     "systemDefault": "System default ({{language}})",
     "pseudo": "Pseudo-locale (for testing translations)",
     "pseudoRtl": "Right-to-left pseudo-locale (for testing layout)",
+    "status": {
+      "machine": "Machine translated, so some wording may read oddly until a person reviews it.",
+      "partial": "Partly translated. What isn’t translated yet shows in English.",
+      "community": "Translated by the Yggdrasil community."
+    },
     "saved": "Saved.",
     "saveFailed": "The language could not be saved: {{error}}"
   },
