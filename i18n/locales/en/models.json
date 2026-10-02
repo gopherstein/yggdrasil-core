@@ -35,7 +35,7 @@
   "discover": {
     "recommended": "Recommended",
     "recommendedHint": "Curated picks that fit the selected computer — purpose first.",
-    "browseAll": "Browse all models →",
+    "browseAll": "Browse all models",
     "noRecommendations": "No recommendations available yet.",
     "noMatches": "No curated models match this search."
   },

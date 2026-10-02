@@ -1,8 +1,8 @@
 import i18n, { type FormatterModule, type Resource } from 'i18next'
 import { notifyDesktopLanguage } from '@/lib/desktopBridge'
 import { initReactI18next } from 'react-i18next'
-import { directionOf, languages, pseudoLocale, sourceLanguage } from './languages'
-import { pseudoLocalize } from './pseudo'
+import { directionOf, languages, pseudoLocale, pseudoLocales, pseudoRtlLocale, sourceLanguage } from './languages'
+import { pseudoLocalize, pseudoRtlLocalize } from './pseudo'
 
 // Yggdrasil's UI text comes from the shared catalog in i18n/locales at the
 // repository root (multilingual spec §3–7): one folder per language, one JSON
@@ -44,7 +44,7 @@ const numberFormatter: FormatterModule = {
   format(value, _format, _lng, options) {
     // Anything but a number passes through as it is.
     if (typeof value !== 'number' || rawNumbers.has(String(options?.interpolationkey ?? ''))) return value
-    const locale = i18n.language === pseudoLocale ? sourceLanguage : requestedLocale()
+    const locale = pseudoLocales.includes(i18n.language) ? sourceLanguage : requestedLocale()
     return new Intl.NumberFormat(locale).format(value)
   },
 }
@@ -69,7 +69,7 @@ function readStored(): string {
  * language (de-AT → de); otherwise English.
  */
 export function resolveLanguage(saved: string, system: readonly string[], available: readonly string[] = availableLanguages): string {
-  if (saved === pseudoLocale) return pseudoLocale
+  if (pseudoLocales.includes(saved)) return saved
   const lower = available.map((a) => a.toLowerCase())
   const match = (tag: string): string | null => {
     const exact = lower.indexOf(tag.toLowerCase())
@@ -127,7 +127,8 @@ void i18n
   .use({
     type: 'postProcessor',
     name: 'pseudo',
-    process: (value: string) => (i18n.language === pseudoLocale ? pseudoLocalize(value) : value),
+    process: (value: string) =>
+      i18n.language === pseudoLocale ? pseudoLocalize(value) : i18n.language === pseudoRtlLocale ? pseudoRtlLocalize(value) : value,
   })
   .init({
     resources,
@@ -135,7 +136,7 @@ void i18n
     // Every language, and the en-XA pseudo-locale, ends at English; i18next
     // tries the base language first (es-MX → es).
     fallbackLng: sourceLanguage,
-    supportedLngs: [...availableLanguages, pseudoLocale],
+    supportedLngs: [...availableLanguages, ...pseudoLocales],
     nonExplicitSupportedLngs: true,
     defaultNS: 'common',
     ns: [...new Set(Object.values(resources).flatMap((r) => Object.keys(r)))],
@@ -172,5 +173,5 @@ export async function applyLanguage(saved: string): Promise<void> {
   if (i18n.language !== language) await i18n.changeLanguage(language)
 }
 
-export { languages, pseudoLocale, directionOf }
+export { languages, pseudoLocale, pseudoRtlLocale, directionOf }
 export default i18n

@@ -56,7 +56,7 @@ function DownloadChip({ file }: { file: FileRef }) {
   return (
     <button
       type="button"
-      className="inline-flex max-w-[18rem] items-center gap-2 rounded-lg border border-line/70 bg-surface px-2.5 py-1.5 text-left text-xs text-ink transition hover:border-primary/50"
+      className="inline-flex max-w-[18rem] items-center gap-2 rounded-lg border border-line/70 bg-surface px-2.5 py-1.5 text-start text-xs text-ink transition hover:border-primary/50"
       title={error ?? t('attachments.download', { name: file.name })}
       disabled={busy}
       onClick={async () => {
@@ -231,7 +231,7 @@ export function PendingFileChip({ file, onRemove }: { file: PendingFile; onRemov
       </span>
       <button
         type="button"
-        className="ml-1 shrink-0 rounded px-1 text-ink-faint hover:text-ink"
+        className="ms-1 shrink-0 rounded px-1 text-ink-faint hover:text-ink"
         aria-label={t('attachments.remove', { name: file.name })}
         onClick={onRemove}
       >

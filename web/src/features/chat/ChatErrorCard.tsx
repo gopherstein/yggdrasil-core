@@ -22,7 +22,7 @@ export function ChatErrorCard({
   const e = explainError(raw)
   return (
     <div role="alert" className="flex max-w-[min(42rem,85%)] gap-3 rounded-2xl border border-danger/25 bg-danger/5 px-4 py-3 text-sm">
-      {mascot ? <Ratatoskr state="error" size={48} className="-ml-1 mt-0.5" /> : null}
+      {mascot ? <Ratatoskr state="error" size={48} className="-ms-1 mt-0.5" /> : null}
       <div className="min-w-0 flex-1">
         <p className="font-medium text-ink">{e.title}</p>
         <p className="mt-0.5 text-ink-muted">{e.body}</p>
@@ -48,7 +48,7 @@ export function ChatErrorCard({
             </Link>
           ) : null}
           {e.detail ? (
-            <button type="button" className="ml-auto text-xs text-ink-faint hover:text-ink" onClick={() => setShowDetail((v) => !v)}>
+            <button type="button" className="ms-auto text-xs text-ink-faint hover:text-ink" onClick={() => setShowDetail((v) => !v)}>
               {showDetail ? t('errors.hideDetails') : t('errors.details')}
             </button>
           ) : null}

@@ -21,6 +21,15 @@ export const sourceLanguage = 'en'
 /** Generated from English to find text that is not translated or does not fit (spec §26). */
 export const pseudoLocale = 'en-XA'
 
+/**
+ * Generated from English and written right to left, to find layout that does
+ * not mirror (spec §9, §29). Arabic's direction with English words reversed,
+ * as Android's ar-XB does.
+ */
+export const pseudoRtlLocale = 'ar-XB'
+
+export const pseudoLocales: readonly string[] = [pseudoLocale, pseudoRtlLocale]
+
 // Scripts written right to left. A language not listed in languages.json
 // still gets the right direction, so a partial pack never renders backwards.
 const rtlLanguages = new Set(['ar', 'arc', 'ckb', 'dv', 'fa', 'ha', 'he', 'iw', 'ks', 'ku', 'ps', 'sd', 'ug', 'ur', 'yi'])

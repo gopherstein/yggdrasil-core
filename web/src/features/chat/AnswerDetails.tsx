@@ -79,7 +79,7 @@ function SourceChip({ item, index }: { item: SourceItem; index: number }) {
         {count > 1 ? <span className="shrink-0 text-ink-faint">· {count}</span> : null}
       </button>
       {open && withText.length > 0 ? (
-        <span className="absolute left-0 top-full z-20 mt-1 block max-h-72 w-80 overflow-y-auto rounded-lg border border-line/70 bg-surface p-3 text-xs text-ink-muted shadow-panel">
+        <span className="absolute start-0 top-full z-20 mt-1 block max-h-72 w-80 overflow-y-auto rounded-lg border border-line/70 bg-surface p-3 text-xs text-ink-muted shadow-panel">
           {withText.map((p, i) => (
             <span key={i} className={i > 0 ? 'mt-2 block border-t border-line/50 pt-2' : 'block'}>
               <span className="mb-0.5 block font-medium text-ink">{p.title}</span>
@@ -142,7 +142,7 @@ export function AnswerDetails({ meta }: { meta?: MessageMeta }) {
             {stepsOpen ? '▾' : '▸'} {t('answer.steps', { count: steps.length })}
           </button>
           {stepsOpen ? (
-            <ol className="mt-1.5 space-y-1 pl-4">
+            <ol className="mt-1.5 space-y-1 ps-4">
               {steps.map((s, i) => (
                 <li key={i} className="list-decimal">
                   {s.text}

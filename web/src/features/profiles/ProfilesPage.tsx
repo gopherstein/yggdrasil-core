@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { formatSequence } from '@/i18n/format'
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
@@ -282,7 +283,7 @@ export function ProfilesPage() {
                 type="button"
                 onClick={() => setStartFrom(option.id)}
                 className={[
-                  'selectable text-left',
+                  'selectable text-start',
                   startFrom === option.id ? 'selectable-active' : '',
                 ]
                   .filter(Boolean)
@@ -480,7 +481,7 @@ export function ProfilesPage() {
                   <div className="pt-0.5">
                     {isTeam && roles.length > 1 ? (
                       <p className="text-sm font-medium text-ink">
-                        {roles.map((r) => roleDisplayName(r.role)).join(' → ')}
+                        {formatSequence(roles.map((r) => roleDisplayName(r.role)))}
                       </p>
                     ) : (
                       <p className="text-sm font-medium capitalize text-ink">
@@ -531,7 +532,7 @@ export function ProfilesPage() {
                         ? t('card.hideDetails')
                         : t('card.details')}
                   </button>
-                  <div className="relative ml-auto">
+                  <div className="relative ms-auto">
                     <button
                       type="button"
                       className="rounded-md px-2 py-1.5 text-xs text-ink-faint hover:bg-raised hover:text-ink"
@@ -546,7 +547,7 @@ export function ProfilesPage() {
                     </button>
                     {menuOpenId === profile.id && (
                       <div
-                        className="absolute right-0 top-full z-20 mt-1 min-w-[9.5rem] rounded-lg border border-line bg-surface py-1 shadow-panel"
+                        className="absolute end-0 top-full z-20 mt-1 min-w-[9.5rem] rounded-lg border border-line bg-surface py-1 shadow-panel"
                         role="menu"
                         onClick={(e) => e.stopPropagation()}
                       >
@@ -646,13 +647,13 @@ export function ProfilesPage() {
 function purposeAccentClass(purpose: string): string {
   switch (purpose) {
     case 'coding':
-      return 'border-l-[3px] border-l-primary/50'
+      return 'border-s-[3px] border-s-primary/50'
     case 'research':
-      return 'border-l-[3px] border-l-mimir/45'
+      return 'border-s-[3px] border-s-mimir/45'
     case 'custom':
-      return 'border-l-[3px] border-l-ink-faint/40'
+      return 'border-s-[3px] border-s-ink-faint/40'
     default:
-      return 'border-l-[3px] border-l-accent/40'
+      return 'border-s-[3px] border-s-accent/40'
   }
 }
 
@@ -682,7 +683,7 @@ function MenuItem({
       role="menuitem"
       disabled={disabled}
       className={[
-        'block w-full px-3 py-1.5 text-left text-sm hover:bg-raised disabled:opacity-50',
+        'block w-full px-3 py-1.5 text-start text-sm hover:bg-raised disabled:opacity-50',
         danger ? 'text-danger hover:bg-danger/10' : 'text-ink',
       ].join(' ')}
       onClick={onClick}

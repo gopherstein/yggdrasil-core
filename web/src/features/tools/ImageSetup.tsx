@@ -99,8 +99,8 @@ export function ImageSetupCard() {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-ink">
                   {model.name}
-                  {model.recommended ? <span className="ml-2 text-xs font-normal text-success">{t('images.recommended')}</span> : null}
-                  {model.id === status.active ? <span className="ml-2 text-xs font-normal text-ink-faint">{t('images.inUse')}</span> : null}
+                  {model.recommended ? <span className="ms-2 text-xs font-normal text-success">{t('images.recommended')}</span> : null}
+                  {model.id === status.active ? <span className="ms-2 text-xs font-normal text-ink-faint">{t('images.inUse')}</span> : null}
                 </p>
                 <p className="mt-0.5 text-xs text-ink-muted">{model.description}</p>
                 <p className="mt-0.5 text-xs text-ink-faint">

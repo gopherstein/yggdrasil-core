@@ -148,7 +148,7 @@ export function NotificationBell() {
           <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 min-w-4 rounded-full bg-heimdall px-1 text-center text-[10px] font-semibold leading-4 text-primary-fg tabular-nums">
+          <span className="absolute -end-0.5 -top-0.5 min-w-4 rounded-full bg-heimdall px-1 text-center text-[10px] font-semibold leading-4 text-primary-fg tabular-nums">
             {unread > 99 ? '99+' : unread}
           </span>
         )}
@@ -201,7 +201,7 @@ export function NotificationBell() {
               {notifications.map((n) => (
                 <li key={n.id} className={['group flex gap-3 border-b border-line/40 px-4 py-3 last:border-b-0', n.read_at ? '' : 'bg-primary-soft/40'].join(' ')}>
                   <span className={['mt-1.5 h-2 w-2 shrink-0 rounded-full', SEVERITY_DOT[n.severity] ?? 'bg-info'].join(' ')} aria-hidden />
-                  <button type="button" className="min-w-0 flex-1 text-left" onClick={() => openItem(n)}>
+                  <button type="button" className="min-w-0 flex-1 text-start" onClick={() => openItem(n)}>
                     <p className={['text-sm text-ink', n.read_at ? '' : 'font-semibold'].join(' ')}>
                       {n.title}
                       {(n.repeat_count ?? 1) > 1 && <span className="font-normal text-ink-muted"> · {t('bell.times', { count: n.repeat_count })}</span>}

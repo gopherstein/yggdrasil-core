@@ -26,7 +26,7 @@ export function Toggle({
       <span
         className={[
           'absolute top-0.5 h-6 w-6 rounded-full bg-[#EEF2F6] shadow transition',
-          checked ? 'left-[22px]' : 'left-0.5',
+          checked ? 'start-[22px]' : 'start-0.5',
         ].join(' ')}
       />
     </button>

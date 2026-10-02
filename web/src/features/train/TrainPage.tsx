@@ -131,14 +131,14 @@ function AIListItem({ ai, active, onSelect }: { ai: SpecializedAI; active: boole
   return (
     <button
       type="button"
-      className={['selectable w-full text-left', active ? 'shadow-[inset_0_0_0_1.5px_rgb(var(--rgb-primary))]' : '']
+      className={['selectable w-full text-start', active ? 'shadow-[inset_0_0_0_1.5px_rgb(var(--rgb-primary))]' : '']
         .filter(Boolean)
         .join(' ')}
       onClick={onSelect}
     >
       <p className="font-medium text-ink">
         {ai.name}
-        {ai.example && <span className="status-chip ml-2 bg-info/15 text-info">{t('page.exampleBadge')}</span>}
+        {ai.example && <span className="status-chip ms-2 bg-info/15 text-info">{t('page.exampleBadge')}</span>}
       </p>
       <p className="mt-1 text-xs text-ink-muted">
         {ai.deployed_revision > 0 ? t('page.deployed', { revision: ai.deployed_revision }) : t('page.notDeployed')}

@@ -31,7 +31,7 @@ export function MemoryToggle({
       title={on ? t('memory.onHint') : t('memory.offHint')}
       onClick={() => onChange(on)}
     >
-      <span className={['mr-1.5 inline-block h-1.5 w-1.5 rounded-full', on ? 'bg-norn' : 'bg-line'].join(' ')} aria-hidden />
+      <span className={['me-1.5 inline-block h-1.5 w-1.5 rounded-full', on ? 'bg-norn' : 'bg-line'].join(' ')} aria-hidden />
       {on ? t('memory.on') : t('memory.off')}
     </button>
   )

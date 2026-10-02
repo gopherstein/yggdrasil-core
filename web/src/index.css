@@ -446,6 +446,24 @@
     @apply min-h-0 min-w-0 max-w-full overflow-auto whitespace-pre break-normal rounded-lg bg-canvas p-4 font-mono text-xs leading-relaxed text-ink;
   }
 
+  /*
+   * Code, commands, paths, and logs read left to right in every language
+   * (spec §9). Isolated, so a path in an Arabic sentence keeps its order.
+   */
+  pre,
+  code,
+  kbd,
+  samp,
+  .font-mono {
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  pre,
+  .log-panel {
+    text-align: left;
+  }
+
   .table-scroll {
     @apply max-w-full min-w-0 overflow-x-auto;
   }
@@ -555,10 +573,19 @@
   }
 }
 
+/* The drawer slides in from the side it sits on: the left, or the right in RTL. */
+:root {
+  --ygg-inline-sign: 1;
+}
+
+[dir='rtl'] {
+  --ygg-inline-sign: -1;
+}
+
 @keyframes ygg-chat-drawer {
   from {
     opacity: 0;
-    transform: translateX(-12px);
+    transform: translateX(calc(-12px * var(--ygg-inline-sign)));
   }
   to {
     opacity: 1;

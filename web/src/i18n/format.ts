@@ -1,5 +1,5 @@
 import i18n, { requestedLocale } from './index'
-import { pseudoLocale, sourceLanguage } from './languages'
+import { directionOf, pseudoLocales, sourceLanguage } from './languages'
 
 // Locale-aware formatting through Intl (multilingual spec §8). Never build
 // dates, numbers, or plurals by hand: German writes 1.234,56 and 30.09.2026.
@@ -10,7 +10,15 @@ import { pseudoLocale, sourceLanguage } from './languages'
  * The en-XA pseudo-locale formats as English.
  */
 export function formatLocale(): string {
-  return i18n.language === pseudoLocale ? sourceLanguage : requestedLocale()
+  return pseudoLocales.includes(i18n.language) ? sourceLanguage : requestedLocale()
+}
+
+/**
+ * Joins steps that run in order, such as Planner → Worker, with an arrow that
+ * points the way the App language reads.
+ */
+export function formatSequence(steps: readonly string[]): string {
+  return steps.join(directionOf(i18n.language) === 'rtl' ? ' ← ' : ' → ')
 }
 
 export function formatNumber(value: number, options?: Intl.NumberFormatOptions): string {

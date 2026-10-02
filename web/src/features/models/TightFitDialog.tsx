@@ -17,7 +17,7 @@ export function TightFitDialog({
       onClick={onCancel}
     >
       <div
-        className="card w-full max-w-md space-y-4 border-l-4 border-danger shadow-panel"
+        className="card w-full max-w-md space-y-4 border-s-4 border-danger shadow-panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby="tight-fit-title"

@@ -160,8 +160,8 @@ export function ChatHistoryDrawer({
       className={[
         'chat-history-drawer flex min-h-0 w-[min(20rem,100%)] flex-col bg-surface',
         mode === 'overlay'
-          ? 'absolute inset-y-0 left-0 z-30 border-r border-line/40 shadow-panel animate-chat-drawer'
-          : 'relative z-10 h-full shrink-0 border-r border-line/50',
+          ? 'absolute inset-y-0 start-0 z-30 border-e border-line/40 shadow-panel animate-chat-drawer'
+          : 'relative z-10 h-full shrink-0 border-e border-line/50',
       ].join(' ')}
       role="dialog"
       aria-label={t('history.label')}
@@ -260,7 +260,7 @@ export function ChatHistoryDrawer({
                           title={conversation.title}
                           onClick={() => onSelect(conversation.id)}
                           className={[
-                            'w-full rounded-lg py-2 pl-2.5 pr-9 text-left text-sm transition',
+                            'w-full rounded-lg py-2 ps-2.5 pe-9 text-start text-sm transition',
                             isSelected
                               ? 'bg-primary-soft font-medium text-primary-active'
                               : 'text-ink-muted hover:bg-raised/80 hover:text-ink',
@@ -280,7 +280,7 @@ export function ChatHistoryDrawer({
                             </span>
                           </span>
                         </button>
-                        <div className="absolute right-1 top-1/2 -translate-y-1/2">
+                        <div className="absolute end-1 top-1/2 -translate-y-1/2">
                           <button
                             type="button"
                             className={[
@@ -302,14 +302,14 @@ export function ChatHistoryDrawer({
                           </button>
                           {menuOpenId === conversation.id && (
                             <div
-                              className="absolute right-0 top-full z-40 mt-1 min-w-[8.5rem] rounded-lg border border-line bg-surface py-1 shadow-panel"
+                              className="absolute end-0 top-full z-40 mt-1 min-w-[8.5rem] rounded-lg border border-line bg-surface py-1 shadow-panel"
                               role="menu"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <button
                                 type="button"
                                 role="menuitem"
-                                className="block w-full px-3 py-1.5 text-left text-sm text-ink hover:bg-raised"
+                                className="block w-full px-3 py-1.5 text-start text-sm text-ink hover:bg-raised"
                                 onClick={(e) => {
                                   setMenuOpenId(null)
                                   onRename(conversation)
@@ -321,7 +321,7 @@ export function ChatHistoryDrawer({
                               <button
                                 type="button"
                                 role="menuitem"
-                                className="block w-full px-3 py-1.5 text-left text-sm text-ink hover:bg-raised"
+                                className="block w-full px-3 py-1.5 text-start text-sm text-ink hover:bg-raised"
                                 onClick={(e) => {
                                   setMenuOpenId(null)
                                   onTogglePin(conversation.id)
@@ -333,7 +333,7 @@ export function ChatHistoryDrawer({
                               <button
                                 type="button"
                                 role="menuitem"
-                                className="block w-full px-3 py-1.5 text-left text-sm text-danger hover:bg-danger/10"
+                                className="block w-full px-3 py-1.5 text-start text-sm text-danger hover:bg-danger/10"
                                 onClick={(e) => {
                                   setMenuOpenId(null)
                                   onDelete(conversation, e)

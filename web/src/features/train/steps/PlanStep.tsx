@@ -30,7 +30,7 @@ export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStart
   return (
     <div className="space-y-4">
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="card-outline space-y-2 border-l-4 !border-l-primary p-4">
+        <div className="card-outline space-y-2 border-s-4 !border-s-primary p-4">
           <p className="label-caps text-primary">{t('plan.willTrain')}</p>
           <p className="text-sm text-ink">
             <Trans
@@ -42,7 +42,7 @@ export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStart
           </p>
           <p className="text-xs text-ink-muted">{t('plan.base', { model: view.base_model?.display_name ?? t('plan.notChosen') })}</p>
         </div>
-        <div className="card-outline space-y-2 border-l-4 !border-l-mimir p-4">
+        <div className="card-outline space-y-2 border-s-4 !border-s-mimir p-4">
           <p className="label-caps text-mimir">{t('plan.connected')}</p>
           <KnowledgePicker selected={view.knowledge_sources} disabled={setKnowledge.isPending} onChange={(ids) => setKnowledge.mutate(ids)} />
           {setKnowledge.error && <p className="text-xs text-danger">{errorText(setKnowledge.error)}</p>}
@@ -57,7 +57,7 @@ export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStart
             <button
               key={key}
               type="button"
-              className={['selectable text-left', view.preset === key ? 'shadow-[inset_0_0_0_1.5px_rgb(var(--rgb-primary))]' : ''].join(' ')}
+              className={['selectable text-start', view.preset === key ? 'shadow-[inset_0_0_0_1.5px_rgb(var(--rgb-primary))]' : ''].join(' ')}
               onClick={() => setPreset.mutate(key)}
             >
               <p className="font-medium text-ink">{presetLabel(key)}</p>
@@ -126,7 +126,7 @@ function FitRow({
         <span className={['status-chip', fitTone(fit)].join(' ')}>{fitLabel(fit.label)}</span>
         {chosen && <span className="status-chip bg-norn/15 text-norn">{t('plan.nornPicked')}</span>}
         {!chosen && fit.eligible && (
-          <button type="button" className="btn-secondary ml-auto px-2 py-0.5 text-xs" disabled={!canStart} onClick={onStart}>
+          <button type="button" className="btn-secondary ms-auto px-2 py-0.5 text-xs" disabled={!canStart} onClick={onStart}>
             {t('plan.trainHere')}
           </button>
         )}

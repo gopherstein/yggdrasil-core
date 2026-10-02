@@ -56,7 +56,7 @@ export function DescribeStep({ view, onNext, onDeleted }: { view: SpecializedAIV
         </button>
         <button
           type="button"
-          className="btn-danger ml-auto px-3 py-1.5 text-sm"
+          className="btn-danger ms-auto px-3 py-1.5 text-sm"
           disabled={remove.isPending}
           onClick={() => {
             if (window.confirm(t('describe.confirmDelete', { name: view.name }))) {

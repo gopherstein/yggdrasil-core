@@ -56,7 +56,7 @@ export function ToolSources() {
       {!sources.isLoading && list.length === 0 && !adding && (
         <button
           type="button"
-          className="card-outline w-full text-left text-sm text-ink-muted hover:bg-raised/40"
+          className="card-outline w-full text-start text-sm text-ink-muted hover:bg-raised/40"
           onClick={() => setAdding(true)}
         >
           {t('sources.empty')}
@@ -117,7 +117,7 @@ function SourceCard({ source }: { source: MCPServer }) {
   return (
     <div className="card space-y-3 p-4">
       <div className="flex items-start justify-between gap-3">
-        <button type="button" className="min-w-0 flex-1 text-left" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+        <button type="button" className="min-w-0 flex-1 text-start" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
           <span className="flex items-center gap-2">
             <span className={['h-2 w-2 shrink-0 rounded-full', toneClass[status.tone]].join(' ')} aria-hidden />
             <span className="truncate font-medium text-ink">{source.name}</span>

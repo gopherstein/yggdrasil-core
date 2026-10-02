@@ -168,7 +168,7 @@
     "needs": "Needs {{runtime}}",
     "runsWeb": "Runs on the web",
     "runsLocal": "Runs on this computer",
-    "backToGallery": "← Gallery",
+    "backToGallery": "Gallery",
     "about": "About this server",
     "signInNote": "A window opens for you to sign in to {{name}} and choose what Yggdrasil may use. Your sign-in stays on this computer.",
     "adding": "Adding…",

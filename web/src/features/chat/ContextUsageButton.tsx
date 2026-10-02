@@ -66,7 +66,7 @@ export function ContextUsageButton({
           id={titleId}
           role="dialog"
           aria-label={t('context.usage')}
-          className="absolute bottom-11 right-0 z-20 w-72 rounded-xl border border-line/80 bg-surface p-3 shadow-panel"
+          className="absolute bottom-11 end-0 z-20 w-72 rounded-xl border border-line/80 bg-surface p-3 shadow-panel"
         >
           <div className="flex items-baseline justify-between gap-3">
             <p className="text-sm font-medium text-ink">

@@ -8,13 +8,13 @@ export function ConceptCards({ compact = false }: { compact?: boolean }) {
   return (
     <div className="space-y-3">
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="card-outline space-y-2 border-l-4 !border-l-primary p-4">
+        <div className="card-outline space-y-2 border-s-4 !border-s-primary p-4">
           <p className="label-caps text-primary">{t('concepts.training')}</p>
           <h3 className="font-display text-lg font-semibold text-ink">{t('concepts.trainingTitle')}</h3>
           {!compact && <p className="text-sm text-ink-muted">{t('concepts.trainingBody')}</p>}
           <p className="text-xs text-ink-faint">{t('concepts.trainingUse')}</p>
         </div>
-        <div className="card-outline space-y-2 border-l-4 !border-l-mimir p-4">
+        <div className="card-outline space-y-2 border-s-4 !border-s-mimir p-4">
           <p className="label-caps text-mimir">{t('concepts.knowledge')}</p>
           <h3 className="font-display text-lg font-semibold text-ink">{t('concepts.knowledgeTitle')}</h3>
           {!compact && <p className="text-sm text-ink-muted">{t('concepts.knowledgeBody')}</p>}

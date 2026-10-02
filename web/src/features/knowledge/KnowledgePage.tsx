@@ -210,7 +210,7 @@ function AddSource({ onAdded }: { onAdded: () => void }) {
                   }}
                 />
               </label>
-              {filename && <span className="ml-2 text-xs text-ink-muted">{filename}</span>}
+              {filename && <span className="ms-2 text-xs text-ink-muted">{filename}</span>}
               <textarea className="field min-h-32 w-full font-mono text-xs" value={text} onChange={(e) => setText(e.target.value)} placeholder={t('add.pastePlaceholder')} aria-label={t('add.content')} />
             </>
           )}

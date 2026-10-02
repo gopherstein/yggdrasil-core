@@ -444,7 +444,7 @@ export function DiagnosticsPage() {
             <p className="page-subtitle">{headline}</p>
           </div>
         </div>
-        <div className="shrink-0 text-right">
+        <div className="shrink-0 text-end">
           <button
             type="button"
             className="btn-primary"
@@ -453,7 +453,7 @@ export function DiagnosticsPage() {
           >
             {diagnosticsMutation.isPending ? t('page.creating') : t('page.export')}
           </button>
-          <p className="mt-1.5 max-w-[14rem] text-left text-[11px] text-ink-faint sm:text-right">{t('page.exportHint')}</p>
+          <p className="mt-1.5 max-w-[14rem] text-start text-[11px] text-ink-faint sm:text-end">{t('page.exportHint')}</p>
         </div>
       </header>
 
@@ -596,7 +596,7 @@ export function DiagnosticsPage() {
                     type="button"
                     onClick={() => setSelectedName(entry.name)}
                     className={[
-                      'w-full min-w-0 rounded-lg px-3 py-2 text-left transition',
+                      'w-full min-w-0 rounded-lg px-3 py-2 text-start transition',
                       selectedName === entry.name
                         ? 'bg-raised text-ink'
                         : 'text-ink-muted hover:bg-raised',

@@ -19,7 +19,7 @@ function MemoryBar({ percent }: { percent: number }) {
           style={{ width: `${percent}%` }}
         />
       </div>
-      <span className="w-10 shrink-0 text-right text-xs tabular-nums text-ink">{formatPercent(percent / 100)}</span>
+      <span className="w-10 shrink-0 text-end text-xs tabular-nums text-ink">{formatPercent(percent / 100)}</span>
     </div>
   )
 }

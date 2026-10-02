@@ -119,7 +119,7 @@ export function LoreButton({
                 </div>
                 <button
                   type="button"
-                  className="-mr-1 -mt-1 rounded px-1.5 text-lg leading-none text-ink-faint hover:text-ink"
+                  className="-me-1 -mt-1 rounded px-1.5 text-lg leading-none text-ink-faint hover:text-ink"
                   aria-label={t('close')}
                   onClick={() => {
                     setOpen(false)

@@ -115,7 +115,7 @@ function DestinationRow({ destination: d }: { destination: NotificationDestinati
         <div className="min-w-0">
           <p className="text-sm font-medium text-ink">
             {d.name} <span className="text-xs font-normal text-ink-faint">{t(`destinations.kinds.${d.kind}`)}</span>
-            {!d.enabled && <span className="ml-1 text-xs font-normal text-ink-faint">{t('destinations.off')}</span>}
+            {!d.enabled && <span className="ms-1 text-xs font-normal text-ink-faint">{t('destinations.off')}</span>}
           </p>
           <p className="mt-0.5 break-all text-xs text-ink-muted">{summary(d)}</p>
         </div>

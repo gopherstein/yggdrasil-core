@@ -163,7 +163,7 @@ function MemoryRow({ memory, categories, onChanged }: { memory: MemoryItem; cate
         </form>
       ) : (
         <div className="flex flex-wrap items-center gap-2">
-          <p className="min-w-[12rem] flex-1 text-sm text-ink">{memory.content}</p>
+          <p dir="auto" className="min-w-[12rem] flex-1 text-sm text-ink">{memory.content}</p>
           <span className="text-xs text-ink-faint">
             {memory.source_type === 'explicit' ? t('row.fromChat') : t('row.addedHere')} ·{' '}
             {formatDate(memory.updated_at)}

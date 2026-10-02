@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { applyLanguage, availableLanguages, languages, pseudoLocale, resolveLanguage, systemLanguages } from '@/i18n'
+import { applyLanguage, availableLanguages, languages, pseudoLocale, pseudoRtlLocale, resolveLanguage, systemLanguages } from '@/i18n'
 import { api } from '@/lib/api'
 import { useUIStore } from '@/stores/uiStore'
 
@@ -44,6 +44,11 @@ export function LanguageSettings() {
             </option>
           ))}
           {advancedMode || saved === pseudoLocale ? <option value={pseudoLocale}>{t('language.pseudo')}</option> : null}
+          {advancedMode || saved === pseudoRtlLocale ? (
+            <option value={pseudoRtlLocale} dir="rtl">
+              {t('language.pseudoRtl')}
+            </option>
+          ) : null}
         </select>
       </label>
       {save.isError ? (

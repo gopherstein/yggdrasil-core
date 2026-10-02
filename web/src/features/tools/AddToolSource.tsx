@@ -201,6 +201,9 @@ function GallerySetup({ entry, onBack, onAdded }: { entry: MCPGalleryEntry; onBa
     >
       <div>
         <button type="button" className="text-xs text-ink-muted hover:text-ink" onClick={onBack}>
+          <span className="inline-block rtl:-scale-x-100" aria-hidden>
+            ←
+          </span>{' '}
           {t('add.backToGallery')}
         </button>
         <h3 className="mt-1 font-display text-lg font-semibold text-ink">{entry.name}</h3>

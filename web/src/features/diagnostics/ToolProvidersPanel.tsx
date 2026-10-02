@@ -29,12 +29,12 @@ export function ToolProvidersPanel() {
         <p className="mt-1 text-sm text-ink-muted">{t('providers.description')}</p>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-start text-sm">
           <thead>
             <tr className="text-xs text-ink-faint">
-              <th className="py-1.5 pr-3 font-medium">{t('providers.computer')}</th>
+              <th className="py-1.5 pe-3 font-medium">{t('providers.computer')}</th>
               {TOOLS.map((tool) => (
-                <th key={tool} className="py-1.5 pr-3 font-medium">
+                <th key={tool} className="py-1.5 pe-3 font-medium">
                   {t(`providers.tools.${tool}`)}
                 </th>
               ))}
@@ -43,26 +43,26 @@ export function ToolProvidersPanel() {
           <tbody>
             {nodes.map((node) => (
               <tr key={node.node_id || node.name} className="border-t border-line/50 align-top">
-                <td className="py-2 pr-3">
+                <td className="py-2 pe-3">
                   <span className="text-ink">{node.name || node.node_id}</span>
-                  {node.local ? <span className="ml-1.5 text-xs text-ink-faint">{t('providers.thisComputer')}</span> : null}
+                  {node.local ? <span className="ms-1.5 text-xs text-ink-faint">{t('providers.thisComputer')}</span> : null}
                   {node.note ? <span className="block text-xs text-ink-faint">{node.note}</span> : null}
                 </td>
                 {TOOLS.map((tool) => {
                   const p = node.providers.find((x) => x.tool === tool)
                   if (!p) {
                     return (
-                      <td key={tool} className="py-2 pr-3 text-ink-faint">
+                      <td key={tool} className="py-2 pe-3 text-ink-faint">
                         –
                       </td>
                     )
                   }
                   const state = p.state in TONE ? p.state : 'unavailable'
                   return (
-                    <td key={tool} className="py-2 pr-3" title={p.reason || p.name}>
+                    <td key={tool} className="py-2 pe-3" title={p.reason || p.name}>
                       <span className={TONE[state]}>{t(`providers.states.${state}`)}</span>
                       {p.state === 'healthy' && p.accelerated ? (
-                        <span className="ml-1.5 text-xs text-ink-faint">{t('providers.gpu')}</span>
+                        <span className="ms-1.5 text-xs text-ink-faint">{t('providers.gpu')}</span>
                       ) : null}
                     </td>
                   )

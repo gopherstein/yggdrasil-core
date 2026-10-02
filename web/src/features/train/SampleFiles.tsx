@@ -35,7 +35,7 @@ export function SampleFiles({ open = false }: { open?: boolean }) {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium text-ink">{f.name}</span>
                 <span className="mono-id">{f.filename}</span>
-                <span className="ml-auto flex gap-1.5">
+                <span className="ms-auto flex gap-1.5">
                   <button type="button" className="btn-secondary px-2 py-1 text-xs" onClick={() => setShown(shown === f.filename ? null : f.filename)}>
                     {shown === f.filename ? t('samples.hide') : t('samples.preview')}
                   </button>

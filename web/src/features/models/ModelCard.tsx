@@ -154,7 +154,7 @@ export function ModelCard({
             <div className="pt-2">
               <dt>{t('card.recommendations')}</dt>
               <dd className="mt-1 text-ink">
-                <ul className="list-disc space-y-0.5 pl-4">
+                <ul className="list-disc space-y-0.5 ps-4">
                   {fit.recommendations.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
@@ -165,7 +165,7 @@ export function ModelCard({
           {peers.length > 1 ? (
             <div className="pt-2">
               <dt>{t('card.onYourComputers')}</dt>
-              <dd className="mt-1 space-y-0.5 text-right text-ink">
+              <dd className="mt-1 space-y-0.5 text-end text-ink">
                 {peers.map((peer) => (
                   <p key={`${peer.nodeName}-${peer.label}`}>
                     {peer.nodeName} · {fitLabelText(peer.label)}
@@ -194,7 +194,7 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex min-w-0 justify-between gap-3">
       <dt className="shrink-0">{label}</dt>
-      <dd className="min-w-0 break-anywhere text-right text-ink" title={value}>
+      <dd className="min-w-0 break-anywhere text-end text-ink" title={value}>
         {value}
       </dd>
     </div>

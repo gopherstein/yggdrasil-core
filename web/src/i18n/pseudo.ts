@@ -14,6 +14,24 @@ const vowels = new Set('aeiouAEIOU')
 // {{placeholders}}, <tags>, and $t(nested) references are kept verbatim.
 const protectedPart = /(\{\{[^}]*\}\}|<[^>]+>|\$t\([^)]*\))/
 
+// Right-to-left override … pop directional formatting: the letters inside
+// show in reverse order, so English reads as if written right to left.
+const RLO = '\u202e'
+const PDF = '\u202c'
+
+/**
+ * Turns English text into ar-XB pseudo-RTL text: each word written right to
+ * left, in a page laid out right to left. Text that is not from the catalog
+ * keeps reading left to right, and layout that does not mirror stands out.
+ */
+export function pseudoRtlLocalize(text: string): string {
+  if (!text) return text
+  return text
+    .split(protectedPart)
+    .map((part, i) => (i % 2 === 1 ? part : part.replace(/[^\s]+/g, (word) => `${RLO}${word}${PDF}`)))
+    .join('')
+}
+
 /** Turns English text into pseudo-localized text. */
 export function pseudoLocalize(text: string): string {
   if (!text) return text

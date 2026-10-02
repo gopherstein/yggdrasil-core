@@ -95,8 +95,33 @@ list of choices, goes through `i18n.t('namespace:key')` too.
    JSON, no duplicate keys, no keys English lacks, the same placeholders,
    and complete plural forms.
 
-## Pseudo-locale
+## Pseudo-locales
 
 `en-XA` is generated from English, not stored: accented, padded about 30%,
 and bracketed, such as `[!! Mööödéééls !!]`. Choose it in Settings in
 advanced mode to find text that is not translated or does not fit.
+
+`ar-XB` lays the page out right to left with each English word reversed, as
+Android's pseudo-locale of that name does: `sledoM`. Choose it in Settings
+in advanced mode to find layout that does not mirror. Text that still reads
+left to right is not from the catalog.
+
+## Right to left
+
+A language's `dir` in `languages.json` sets `dir` on the page, and the web UI
+mirrors from there:
+
+- Use logical sides in class names: `ms-`/`me-`, `ps-`/`pe-`, `start-`/`end-`,
+  `text-start`/`text-end`, `border-s`/`border-e`, `rounded-s`/`rounded-e`.
+  A test fails on `ml-`, `pr-`, `left-`, `text-right`, and the like.
+  Centering (`left-1/2` with `-translate-x-1/2`) stays as it is.
+- An arrow or chevron that points along the reading direction mirrors with
+  `inline-block rtl:-scale-x-100`. Don't write such arrows into the catalog;
+  steps in a row are joined with `formatSequence`, which points the arrow the
+  way the language reads. Menu paths in sentences, such as Settings →
+  Developer, are written by the translator with the arrow their language uses.
+- Code, commands, paths, and logs (`pre`, `code`, `.font-mono`) stay left to
+  right in every language.
+- Text people write, such as chat messages and memories, takes `dir="auto"`,
+  so Arabic reads right to left in an English UI and English left to right
+  in an Arabic one.

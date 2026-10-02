@@ -255,7 +255,7 @@ export function ModelsPage() {
         ))}
         {(tab === 'discover' || tab === 'installed') && (
           <input
-            className="field ml-auto min-w-[200px] max-w-sm flex-1"
+            className="field ms-auto min-w-[200px] max-w-sm flex-1"
             placeholder={t('page.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}

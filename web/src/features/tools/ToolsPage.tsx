@@ -116,7 +116,7 @@ export function ToolsPage() {
             <li key={tool.id}>
               <button
                 type="button"
-                className="card w-full text-left"
+                className="card w-full text-start"
                 onClick={() => {
                   setSelectedId(tool.id)
                   setTestOutput('')
@@ -238,7 +238,7 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-3">
       <dt>{label}</dt>
-      <dd className="text-right text-ink">{value}</dd>
+      <dd className="text-end text-ink">{value}</dd>
     </div>
   )
 }

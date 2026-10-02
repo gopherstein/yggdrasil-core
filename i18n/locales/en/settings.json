@@ -26,6 +26,7 @@
     "appLanguage": "App language",
     "systemDefault": "System default ({{language}})",
     "pseudo": "Pseudo-locale (for testing translations)",
+    "pseudoRtl": "Right-to-left pseudo-locale (for testing layout)",
     "saved": "Saved.",
     "saveFailed": "The language could not be saved: {{error}}"
   },

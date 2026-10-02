@@ -37,7 +37,7 @@ export function DeployStep({ view }: { view: SpecializedAIView }) {
                 <div className="min-w-0 flex-1">
                   <p className="text-ink">
                     {t('deploy.revision', { revision: r.revision })}
-                    {deployed && <span className="status-chip ml-2 bg-success/15 text-success">{t('deploy.deployed')}</span>}
+                    {deployed && <span className="status-chip ms-2 bg-success/15 text-success">{t('deploy.deployed')}</span>}
                   </p>
                   <p className="text-xs text-ink-muted">
                     {t('deploy.meta', {

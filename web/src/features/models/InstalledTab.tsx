@@ -173,7 +173,7 @@ export function InstalledTab({
                   </button>
                   {menuOpenId === model.id && (
                     <div
-                      className="absolute right-0 top-full z-20 mt-1 min-w-[9rem] rounded-lg border border-line bg-surface py-1 shadow-panel"
+                      className="absolute end-0 top-full z-20 mt-1 min-w-[9rem] rounded-lg border border-line bg-surface py-1 shadow-panel"
                       role="menu"
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -181,7 +181,7 @@ export function InstalledTab({
                         <button
                           type="button"
                           role="menuitem"
-                          className="block w-full px-3 py-1.5 text-left text-sm text-ink hover:bg-raised"
+                          className="block w-full px-3 py-1.5 text-start text-sm text-ink hover:bg-raised"
                           onClick={() => {
                             setMenuOpenId(null)
                             onStop(model.id, live.instance_id)
@@ -193,7 +193,7 @@ export function InstalledTab({
                       <button
                         type="button"
                         role="menuitem"
-                        className="block w-full px-3 py-1.5 text-left text-sm text-danger hover:bg-danger/10"
+                        className="block w-full px-3 py-1.5 text-start text-sm text-danger hover:bg-danger/10"
                         onClick={() => {
                           setMenuOpenId(null)
                           onDelete(model.id)

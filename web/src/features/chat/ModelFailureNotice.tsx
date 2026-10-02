@@ -21,7 +21,7 @@ export function ModelFailureNotice({
   const [detailsOpen, setDetailsOpen] = useState(false)
   return (
     <div className="flex max-w-[min(42rem,85%)] gap-3 rounded-2xl border border-line bg-raised/50 px-4 py-3 text-sm text-ink">
-      {mascot ? <Ratatoskr state="error" size={48} className="-ml-1 mt-0.5" /> : null}
+      {mascot ? <Ratatoskr state="error" size={48} className="-ms-1 mt-0.5" /> : null}
       <div className="min-w-0 flex-1">
         <p>{failure.message}</p>
         <div className="mt-3 flex flex-wrap gap-2">

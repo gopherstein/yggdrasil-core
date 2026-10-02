@@ -141,7 +141,7 @@ function AddFile({ aiID }: { aiID: string }) {
             <UseBadge use={rec.use} />
             {rec.example_count > 0 && <span className="text-xs text-ink-muted">{t('material.examplesFound', { count: rec.example_count })}</span>}
           </div>
-          <ul className="mt-2 list-disc space-y-0.5 pl-5 text-ink-muted">
+          <ul className="mt-2 list-disc space-y-0.5 ps-5 text-ink-muted">
             {rec.reasons.map((r) => (
               <li key={r}>{r}</li>
             ))}

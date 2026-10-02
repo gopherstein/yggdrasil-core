@@ -119,14 +119,14 @@ function ExampleRow({
         {turns > 2 && <span className="text-xs text-ink-faint">{t('examples.turns', { count: turns })}</span>}
       </div>
       <p className="mt-1 text-ink">
-        <span className="label-caps mr-1">{t('examples.q')}</span>
+        <span className="label-caps me-1">{t('examples.q')}</span>
         {lastUserTurn(example.messages) || <em className="text-ink-faint">{t('examples.empty')}</em>}
       </p>
       {editing ? (
         <textarea className="field mt-1 min-h-20 w-full text-sm" value={answer} onChange={(e) => setAnswer(e.target.value)} aria-label={t('examples.answer')} />
       ) : (
         <p className="mt-1 whitespace-pre-wrap text-ink-muted">
-          <span className="label-caps mr-1">{t('examples.a')}</span>
+          <span className="label-caps me-1">{t('examples.a')}</span>
           {lastAnswer(example.messages) || <em className="text-ink-faint">{t('examples.noAnswer')}</em>}
         </p>
       )}

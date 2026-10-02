@@ -33,7 +33,7 @@ export function BaseModelStep({ view, onNext }: { view: SpecializedAIView; onNex
                 type="button"
                 disabled={!c.fit.eligible || choose.isPending}
                 className={[
-                  'selectable w-full text-left disabled:cursor-not-allowed disabled:opacity-60',
+                  'selectable w-full text-start disabled:cursor-not-allowed disabled:opacity-60',
                   selected ? 'shadow-[inset_0_0_0_1.5px_rgb(var(--rgb-primary))]' : '',
                 ].join(' ')}
                 onClick={() => choose.mutate(c.model_id)}

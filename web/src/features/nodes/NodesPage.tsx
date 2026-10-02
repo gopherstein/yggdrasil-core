@@ -308,7 +308,7 @@ function ComputerCard({
               {manageOpen ? t('card.hideDetails') : t('card.manage')}
             </button>
             {!node.is_local && node.paired && (
-              <div className="relative ml-auto">
+              <div className="relative ms-auto">
                 <button
                   type="button"
                   className="rounded-md px-2 py-1.5 text-xs text-ink-faint hover:bg-raised hover:text-ink"
@@ -323,12 +323,12 @@ function ComputerCard({
                 </button>
                 {menuOpen && (
                   <div
-                    className="absolute right-0 z-20 mt-1 min-w-[10rem] rounded-xl border border-line bg-surface py-1 shadow-lg"
+                    className="absolute end-0 z-20 mt-1 min-w-[10rem] rounded-xl border border-line bg-surface py-1 shadow-lg"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
                       type="button"
-                      className="block w-full px-3 py-2 text-left text-xs text-danger hover:bg-danger/10"
+                      className="block w-full px-3 py-2 text-start text-xs text-danger hover:bg-danger/10"
                       disabled={revokeBusy}
                       onClick={() => {
                         setMenuOpen(false)

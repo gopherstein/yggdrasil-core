@@ -76,7 +76,7 @@ export function WhatLeft() {
               <span className="font-medium text-ink">{kindLabel(r.kind)}</span>
               <span className="text-ink">{r.destination}</span>
               {r.detail && <span className="min-w-0 flex-1 truncate text-ink-muted" title={r.detail}>{r.detail}</span>}
-              <span className="ml-auto shrink-0 text-ink-faint">
+              <span className="ms-auto shrink-0 text-ink-faint">
                 {r.source ? `${sourceLabel(r.source)} · ` : ''}
                 {when(r.at)}
               </span>

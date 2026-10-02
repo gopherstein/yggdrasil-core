@@ -1,5 +1,5 @@
 import i18n from '@/i18n'
-import { formatDate, formatDecimal, formatMilliseconds, formatTokensPerSecond } from '@/i18n/format'
+import { formatDate, formatDecimal, formatMilliseconds, formatSequence, formatTokensPerSecond } from '@/i18n/format'
 import type { GenerationRun, GenerationRoleStep, Model } from '@/types/api'
 
 export function formatMs(ms: number): string {
@@ -58,7 +58,7 @@ export function routeLabel(run: GenerationRun): string {
     return run.cross_machine ? i18n.t('performance:route.multiple') : i18n.t('performance:route.thisComputer')
   }
   if (names.length === 1) return names[0]
-  return names.join(' → ')
+  return formatSequence(names)
 }
 
 export type MetricLabels = {

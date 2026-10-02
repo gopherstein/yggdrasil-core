@@ -57,7 +57,7 @@ function ActivityRow({
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="flex w-full items-start gap-3 px-4 py-3.5 text-left transition hover:bg-raised/40"
+        className="flex w-full items-start gap-3 px-4 py-3.5 text-start transition hover:bg-raised/40"
       >
         <div className="min-w-0 flex-1 space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
@@ -75,7 +75,7 @@ function ActivityRow({
               <span className="inline-flex flex-wrap items-center gap-1">
                 {route.map((name, i) => (
                   <span key={`${name}-${i}`} className="inline-flex items-center gap-1">
-                    {i > 0 && <span className="text-ink-faint" aria-hidden>→</span>}
+                    {i > 0 && <span className="inline-block text-ink-faint rtl:-scale-x-100" aria-hidden>→</span>}
                     <span className="rounded-md bg-raised px-1.5 py-0.5 text-xs text-ink">
                       {name}
                     </span>
@@ -91,7 +91,7 @@ function ActivityRow({
             {run.eval_tok_per_sec > 0 ? ` · ${formatTokPerSec(run.eval_tok_per_sec)}` : ''}
           </p>
         </div>
-        <span className="shrink-0 pt-1 text-ink-faint" aria-hidden>
+        <span className={['shrink-0 pt-1 text-ink-faint', open ? '' : 'inline-block rtl:-scale-x-100'].join(' ')} aria-hidden>
           {open ? '▾' : '›'}
         </span>
       </button>

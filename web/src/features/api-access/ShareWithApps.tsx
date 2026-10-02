@@ -108,12 +108,12 @@ export function ShareWithApps() {
       </div>
       <p className="text-sm text-ink-muted">{setup.where}</p>
       <div className="relative">
-        <pre className="log-panel overflow-x-auto pr-20 text-xs" aria-label={t('share.settings', { language: setup.language })}>
+        <pre className="log-panel overflow-x-auto pe-20 text-xs" aria-label={t('share.settings', { language: setup.language })}>
           {setup.text}
         </pre>
         <button
           type="button"
-          className="btn-secondary absolute right-2 top-2 px-2.5 py-1 text-xs"
+          className="btn-secondary absolute end-2 top-2 px-2.5 py-1 text-xs"
           onClick={() => {
             void navigator.clipboard.writeText(setup.text).then(() => setCopied(true))
           }}

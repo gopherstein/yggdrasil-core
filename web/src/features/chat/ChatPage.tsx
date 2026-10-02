@@ -1205,6 +1205,8 @@ export function ChatPage() {
       />
       <textarea
         ref={composerRef}
+        // What is typed takes its own direction; the empty box follows the page.
+        dir={draft ? 'auto' : undefined}
         value={draft}
         rows={showLanding ? 5 : 4}
         onChange={(event) => setDraft(event.target.value)}
@@ -1455,7 +1457,7 @@ export function ChatPage() {
             </button>
 
             {selectedId ? (
-              <div className="ml-auto flex min-w-0 items-center gap-2">
+              <div className="ms-auto flex min-w-0 items-center gap-2">
                 <h2 className="min-w-0 truncate font-display text-base font-semibold text-ink sm:text-lg">
                   {selectedConversation?.title || t('header.untitledChat')}
                 </h2>
@@ -1517,7 +1519,7 @@ export function ChatPage() {
                     className={[
                       'max-w-[min(42rem,85%)] break-words rounded-2xl px-4 py-3 text-[15px] leading-relaxed',
                       message.role === 'user'
-                        ? 'ml-auto bg-primary text-primary-fg'
+                        ? 'ms-auto bg-primary text-primary-fg'
                         : 'bg-raised/80 text-ink',
                     ].join(' ')}
                   >
@@ -1536,7 +1538,7 @@ export function ChatPage() {
                       </>
                     ) : (
                       <>
-                        <span className="whitespace-pre-wrap">{text}</span>
+                        <span dir="auto" className="whitespace-pre-wrap">{text}</span>
                         {message.meta?.files?.length ? (
                           <span className="mt-2 flex flex-wrap justify-end gap-1.5">
                             {message.meta.files.map((file) => (
@@ -1551,7 +1553,7 @@ export function ChatPage() {
                 })}
 
                 {isSending && planSteps.length > 0 && (
-                  <ol className="max-w-[min(42rem,85%)] space-y-1.5 border-l-2 border-norn/40 pl-3" aria-label={t('transcript.plan')}>
+                  <ol className="max-w-[min(42rem,85%)] space-y-1.5 border-s-2 border-norn/40 ps-3" aria-label={t('transcript.plan')}>
                     {planSteps.map((s, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-ink-muted">
                         <span aria-hidden className={s.status === 'done' ? 'text-success' : s.status === 'failed' ? 'text-warning' : s.status === 'running' ? 'text-norn' : 'text-ink-faint'}>
@@ -1564,7 +1566,7 @@ export function ChatPage() {
                 )}
 
                 {teamSteps.length > 0 && (
-                  <ol className="max-w-[min(42rem,85%)] space-y-1.5 border-l-2 border-primary/30 pl-3">
+                  <ol className="max-w-[min(42rem,85%)] space-y-1.5 border-s-2 border-primary/30 ps-3">
                     {teamSteps.map((step) => (
                       <li key={step.role} className="text-sm text-ink-muted">
                         <span className="font-medium text-ink">
@@ -1629,7 +1631,7 @@ export function ChatPage() {
                       <p className="mt-2 text-xs text-ink-muted">{t('transcript.interrupted')}</p>
                     ) : null}
                     {isSending && (
-                      <span className="chat-caret ml-0.5 inline-block h-4 w-0.5 bg-primary align-middle" />
+                      <span className="chat-caret ms-0.5 inline-block h-4 w-0.5 bg-primary align-middle" />
                     )}
                   </div>
                 ) : null}

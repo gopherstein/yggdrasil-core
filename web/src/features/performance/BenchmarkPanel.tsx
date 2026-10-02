@@ -47,7 +47,7 @@ function SelectCard({
       onClick={onClick}
       aria-pressed={selected}
       className={[
-        'min-w-0 rounded-xl p-4 text-left transition duration-150',
+        'min-w-0 rounded-xl p-4 text-start transition duration-150',
         selected
           ? 'bg-primary-soft shadow-[inset_0_0_0_1.5px_rgb(var(--rgb-primary)/0.55)]'
           : 'bg-surface shadow-[inset_0_0_0_1px_rgb(var(--rgb-line)/0.55)] hover:bg-raised/70',
@@ -91,7 +91,7 @@ function VisualBars({
               <span className={r.winner ? 'font-semibold text-ink' : 'text-ink'}>
                 {r.label}
                 {r.winner ? (
-                  <span className="badge-preferred ml-2">{t('benchmark.fastest')}</span>
+                  <span className="badge-preferred ms-2">{t('benchmark.fastest')}</span>
                 ) : null}
               </span>
               <span className="shrink-0 tabular-nums text-ink-muted">
@@ -254,24 +254,24 @@ function BenchmarkResults({
                     </p>
                   </div>
                   <div className="table-scroll">
-                    <table className="min-w-full text-left text-sm">
+                    <table className="min-w-full text-start text-sm">
                       <thead>
                         <tr className="border-b border-line text-ink-muted">
                           <th className="px-3 py-2 font-medium">{t('benchmark.model')}</th>
-                          <th className="px-3 py-2 text-right font-medium">
+                          <th className="px-3 py-2 text-end font-medium">
                             {labels.speed}
                           </th>
-                          <th className="px-3 py-2 text-right font-medium">
+                          <th className="px-3 py-2 text-end font-medium">
                             {labels.prompt}
                           </th>
-                          <th className="px-3 py-2 text-right font-medium">
+                          <th className="px-3 py-2 text-end font-medium">
                             {labels.firstResponse}
                           </th>
-                          <th className="px-3 py-2 text-right font-medium">
+                          <th className="px-3 py-2 text-end font-medium">
                             {labels.total}
                           </th>
                           {advanced && (
-                            <th className="px-3 py-2 text-right font-medium">{t('benchmark.load')}</th>
+                            <th className="px-3 py-2 text-end font-medium">{t('benchmark.load')}</th>
                           )}
                         </tr>
                       </thead>
@@ -281,20 +281,20 @@ function BenchmarkResults({
                             <td className="px-3 py-2.5 text-ink">
                               {modelDisplayName(models, row.model_id)}
                             </td>
-                            <td className="px-3 py-2.5 text-right tabular-nums">
+                            <td className="px-3 py-2.5 text-end tabular-nums">
                               {formatRate(row.avg_eval_tok_per_sec)}
                             </td>
-                            <td className="px-3 py-2.5 text-right tabular-nums">
+                            <td className="px-3 py-2.5 text-end tabular-nums">
                               {formatRate(row.avg_prompt_tok_per_sec)}
                             </td>
-                            <td className="px-3 py-2.5 text-right tabular-nums">
+                            <td className="px-3 py-2.5 text-end tabular-nums">
                               {formatMs(row.avg_ttft_ms)}
                             </td>
-                            <td className="px-3 py-2.5 text-right tabular-nums">
+                            <td className="px-3 py-2.5 text-end tabular-nums">
                               {formatMs(row.avg_total_ms)}
                             </td>
                             {advanced && (
-                              <td className="px-3 py-2.5 text-right tabular-nums">
+                              <td className="px-3 py-2.5 text-end tabular-nums">
                                 {formatMs(row.load_ms ?? 0)}
                               </td>
                             )}
@@ -580,7 +580,7 @@ export function BenchmarkPanel() {
                     type="button"
                     onClick={() => setActiveJobId(job.id)}
                     className={[
-                      'flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-raised/50',
+                      'flex w-full items-center justify-between gap-3 px-4 py-3 text-start transition hover:bg-raised/50',
                       active ? 'bg-primary-soft/40' : '',
                     ].join(' ')}
                   >
@@ -594,7 +594,7 @@ export function BenchmarkPanel() {
                         })}
                       </p>
                     </div>
-                    <div className="text-right text-xs text-ink-muted">
+                    <div className="text-end text-xs text-ink-muted">
                       {winnerCount > 0 ? (
                         <span className="text-accent">{t('benchmark.winners', { count: winnerCount })}</span>
                       ) : (
