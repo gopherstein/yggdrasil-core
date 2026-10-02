@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { useState } from 'react'
 import type { Citation, MessageMeta } from '@/types/api'
 import { useUIStore } from '@/stores/uiStore'
@@ -24,7 +26,7 @@ function groupSources(sources: Citation[]): SourceItem[] {
         existing.passages.push(s)
         continue
       }
-      out.push({ kind: 'memory', label: 'Memory', passages: [s] })
+      out.push({ kind: 'memory', label: i18n.t('chat:answer.memory'), passages: [s] })
     } else if (s.kind === 'knowledge') {
       const name = s.source || s.title
       const existing = out.find((i) => i.kind === 'knowledge' && i.label === name)
@@ -46,6 +48,7 @@ const chipClass =
   'inline-flex max-w-[16rem] items-center gap-1.5 rounded-full border border-line/70 bg-surface px-2.5 py-1 text-xs text-ink-muted transition hover:border-primary/50 hover:text-ink'
 
 function SourceChip({ item, index }: { item: SourceItem; index: number }) {
+  const { t } = useTranslation('chat')
   const [open, setOpen] = useState(false)
   const badge = (
     <span className="tabular-nums text-ink-faint" aria-hidden>
@@ -64,7 +67,7 @@ function SourceChip({ item, index }: { item: SourceItem; index: number }) {
   const count = item.passages.length
   // A memory's text is its title; show it as the passage.
   const withText = item.passages
-    .map((p) => (item.kind === 'memory' ? { ...p, snippet: p.title, title: 'Remembered' } : p))
+    .map((p) => (item.kind === 'memory' ? { ...p, snippet: p.title, title: t('answer.remembered') } : p))
     .filter((p) => p.snippet)
   return (
     <span className="relative">
@@ -91,6 +94,7 @@ function SourceChip({ item, index }: { item: SourceItem; index: number }) {
 
 /** Sources and a plain-language summary of the work behind an answer. */
 export function AnswerDetails({ meta }: { meta?: MessageMeta }) {
+  const { t } = useTranslation('chat')
   const [stepsOpen, setStepsOpen] = useState(false)
   const sources = groupSources(meta?.sources ?? [])
   const steps = meta?.steps ?? []
@@ -109,7 +113,7 @@ export function AnswerDetails({ meta }: { meta?: MessageMeta }) {
       ) : null}
       {files.length > 0 ? (
         <div>
-          <p className="label-caps mb-1.5 text-[10px]">Files</p>
+          <p className="label-caps mb-1.5 text-[10px]">{t('answer.files')}</p>
           <div className="flex flex-wrap gap-1.5">
             {files.map((file) => (
               <FileChip key={file.id} file={file} />
@@ -119,7 +123,7 @@ export function AnswerDetails({ meta }: { meta?: MessageMeta }) {
       ) : null}
       {sources.length > 0 ? (
         <div>
-          <p className="label-caps mb-1.5 text-[10px]">Sources</p>
+          <p className="label-caps mb-1.5 text-[10px]">{t('answer.sources')}</p>
           <div className="flex flex-wrap gap-1.5">
             {sources.map((item, i) => (
               <SourceChip key={`${item.kind}-${item.url ?? item.label}`} item={item} index={i} />
@@ -135,7 +139,7 @@ export function AnswerDetails({ meta }: { meta?: MessageMeta }) {
             aria-expanded={stepsOpen}
             onClick={() => setStepsOpen((v) => !v)}
           >
-            {stepsOpen ? '▾' : '▸'} What I did ({steps.length} {steps.length === 1 ? 'step' : 'steps'})
+            {stepsOpen ? '▾' : '▸'} {t('answer.steps', { count: steps.length })}
           </button>
           {stepsOpen ? (
             <ol className="mt-1.5 space-y-1 pl-4">

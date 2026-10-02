@@ -631,6 +631,8 @@ func New(opts Options) (*App, error) {
 
 	a.Mimir = mimir.NewStore(db.SQL, filepath.Join(cfg.DataDir, "knowledge"))
 	a.Mimir.SetSecrets(secrets)
+	// The file store comes first: the tools below read and attach chat files.
+	a.Artifacts = artifacts.NewStore(db.SQL, filepath.Join(cfg.DataDir, "artifacts"))
 	a.python = pyenv.New(filepath.Join(cfg.RuntimesDir, "python"))
 	a.Mimir.SetRecognizer(&ocr.Recognizer{Python: a.python, WorkDir: filepath.Join(cfg.DataDir, "knowledge", "ocr-jobs")})
 	// Code runs only inside the operating system's sandbox (Gungnir §20).
@@ -645,7 +647,6 @@ func New(opts Options) (*App, error) {
 	a.Muninn = muninn.NewStore(db.SQL)
 	a.summarizer = &muninn.Summarizer{Store: a.Muninn}
 	a.API.BindMemory(a.Muninn)
-	a.Artifacts = artifacts.NewStore(db.SQL, filepath.Join(cfg.DataDir, "artifacts"))
 	a.Tools.Register(&artifacts.CreateTool{Store: a.Artifacts})
 	a.Tools.Register(&artifacts.AnalyzeTool{Store: a.Artifacts})
 	a.API.BindArtifacts(a.Artifacts)

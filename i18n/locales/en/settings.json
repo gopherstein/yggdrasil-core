@@ -1,4 +1,25 @@
 {
+  "page": {
+    "title": "Settings",
+    "subtitle": "How Yggdrasil should behave on this computer.",
+    "loading": "Loading settings…"
+  },
+  "groups": {
+    "general": "General",
+    "ai": "AI behavior",
+    "network": "Network & access",
+    "privacy": "Privacy & security",
+    "storage": "Storage",
+    "about": "About",
+    "danger": "Danger zone"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "description": "Choose light, dark, or follow the system.",
+    "dark": "Dark",
+    "light": "Light",
+    "system": "System"
+  },
   "language": {
     "title": "Language",
     "description": "The language of menus, buttons, and messages in Yggdrasil on every computer and phone you use with it. Each device can follow its own system language.",
@@ -7,5 +28,202 @@
     "pseudo": "Pseudo-locale (for testing translations)",
     "saved": "Saved.",
     "saveFailed": "The language could not be saved: {{error}}"
+  },
+  "personalization": {
+    "title": "Personalization",
+    "description": "How answers should look, in every chat and automation. This shapes style only. What the AI may do is set under Tool permissions, and nothing here or in Memory can change it.",
+    "length": {
+      "label": "Answer length",
+      "brief": "Brief",
+      "balanced": "Balanced",
+      "detailed": "Detailed"
+    },
+    "tone": {
+      "label": "Tone",
+      "friendly": "Friendly",
+      "neutral": "Neutral",
+      "direct": "Direct"
+    },
+    "format": {
+      "label": "Format",
+      "prose": "Paragraphs",
+      "lists": "Lists"
+    },
+    "units": {
+      "label": "Units",
+      "metric": "Metric",
+      "imperial": "Imperial"
+    },
+    "noPreference": "No preference",
+    "aboutYou": "About you",
+    "aboutYouPlaceholder": "I'm a backend engineer in Juneau. My main project is a Go service.",
+    "instructions": "Anything else about how to answer",
+    "instructionsPlaceholder": "Show code examples in Go. Mention sources at the end.",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "saveFailed": "Could not save."
+  },
+  "background": {
+    "title": "Keep running in background",
+    "description": "Closing the window keeps Chat, the API, and your schedules running. This stays on while a schedule exists."
+  },
+  "launchAtLogin": {
+    "title": "Launch at login",
+    "description": "Start Yggdrasil automatically when you sign in to this computer."
+  },
+  "defaultProfile": {
+    "title": "Default profile",
+    "description": "Used when you start a new chat.",
+    "automatic": "Automatic"
+  },
+  "runOn": {
+    "title": "Run chats on",
+    "description": "Where work should run by default across your team.",
+    "automatic": "Automatic",
+    "local": "This computer",
+    "ask": "Ask each time"
+  },
+  "lifecycle": {
+    "title": "Model lifecycle",
+    "description": "Automatic keeps models warm after chat. Manual leaves Start and Stop to you.",
+    "automatic": "Automatic",
+    "manual": "Manual",
+    "idleUnload": "Unload idle models after",
+    "idleUnloadHint": "Frees memory when a model hasn’t been used for a while. Use 0 to keep models loaded.",
+    "minutes": "minutes"
+  },
+  "downloads": {
+    "title": "Download models",
+    "description": "When a profile needs a model that isn’t installed yet.",
+    "ask": "Ask first",
+    "automatic": "Automatic"
+  },
+  "advanced": {
+    "title": "Advanced mode",
+    "description": "Show model IDs, API details, Profiles, logs, and other power-user controls."
+  },
+  "discovery": {
+    "title": "Find other computers",
+    "description": "Advertise this computer and look for other Yggdrasil installs on your network.",
+    "needsRestart": "Networking was updated. Restart Yggdrasil so other computers can fully reach this one.",
+    "restartManually": "Quit Yggdrasil completely, then open it again to finish applying network settings.",
+    "restartNow": "Restart now",
+    "status": "Status: <strong>{{state}}</strong>"
+  },
+  "onOff": {
+    "on": "On",
+    "off": "Off"
+  },
+  "api": {
+    "title": "API access",
+    "description": "How apps and other devices can talk to Yggdrasil.",
+    "local": "Local API",
+    "lan": "LAN API",
+    "manage": "Manage API access"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "description": "Alerts for long-running work and team connectivity.",
+    "taskFinish": "Notify when tasks finish",
+    "peerOffline": "Notify when a paired computer goes offline"
+  },
+  "toolPermissions": {
+    "title": "Tool permissions",
+    "description": "Default rules for what the AI may do on this computer.",
+    "terminal": "Terminal commands",
+    "fileWrites": "File writes",
+    "git": "Git operations",
+    "ask": "Ask",
+    "allowSession": "Allow for session",
+    "allow": "Allow",
+    "deny": "Deny"
+  },
+  "history": {
+    "title": "History",
+    "description": "Control what Yggdrasil keeps on this computer.",
+    "saveChats": "Save chat history",
+    "saveTasks": "Save task history",
+    "confirmClear": "Delete all chat history on this computer? This cannot be undone.",
+    "clear": "Clear chat history",
+    "clearing": "Clearing…"
+  },
+  "whatLeft": {
+    "title": "What left this computer",
+    "description": "Yggdrasil works on this computer. These are the times a chat, automation, or app sent something elsewhere: web searches and pages, paired computers, and connected services. Mark memories or knowledge “This computer only” to keep chats that use them here.",
+    "nothing": "Nothing left this computer in the last 30 days.",
+    "summary": "In the last 30 days: {{list}}.",
+    "summaryItem": "{{kind}} {{count}}",
+    "kinds": {
+      "web_search": "Web search",
+      "web_page": "Web page",
+      "paired_computer": "Paired computer",
+      "external_server": "External server",
+      "connector": "Connected service",
+      "notification": "Notification"
+    },
+    "kindsLower": {
+      "web_search": "web search",
+      "web_page": "web page",
+      "paired_computer": "paired computer",
+      "external_server": "external server",
+      "connector": "connected service",
+      "notification": "notification"
+    },
+    "sources": {
+      "chat": "Chat",
+      "api": "API",
+      "automation": "Automation",
+      "training": "Training"
+    },
+    "keepFor": "Keep run records for",
+    "retention": {
+      "days_one": "{{count}} day",
+      "days_other": "{{count}} days",
+      "year": "1 year",
+      "forever": "Keep them"
+    },
+    "delete": "Delete run records now",
+    "confirmDelete": "Delete run records now? This removes stored prompts and tool results from past runs, and this list. Chats are not deleted.",
+    "deleted": "Deleted {{tasks}} run records, {{automations}} automation results, and {{entries}} entries below.",
+    "footnote": "Run records hold prompts and tool results from past runs. Chats are kept or not by History below. Each automation keeps its latest result, which “notify when the result changes” compares against."
+  },
+  "storage": {
+    "folders": "Data directories",
+    "data": "Data",
+    "models": "Models",
+    "runtimes": "Runtimes",
+    "logs": "Logs",
+    "showInFinder": "Show in Finder",
+    "openFolder": "Open folder",
+    "opened": "Opened",
+    "copyPath": "Copy path from below",
+    "pending": "Will appear when Yggdrasil is running",
+    "limit": "Maximum model storage",
+    "limitDescription": "Soft limit for downloaded models on this computer.",
+    "unlimited": "Unlimited",
+    "gigabytes": "{{value}} GB"
+  },
+  "about": {
+    "tagline": "Local AI control plane",
+    "versionUnavailable": "Version unavailable",
+    "build": "Build {{commit}}",
+    "source": "Corresponding source",
+    "thisComputer": "This computer",
+    "service": "Service",
+    "unavailable": "Unavailable",
+    "diagnostics": "Open diagnostics"
+  },
+  "reset": {
+    "title": "Reset application",
+    "description": "Restore defaults and restart onboarding. Clears chats, custom profiles, tasks, and API keys.",
+    "button": "Reset settings and app data…",
+    "warningKeep": "This cannot be undone. You will go through onboarding again. Downloaded models and runtimes will be kept.",
+    "warningDelete": "This cannot be undone. You will go through onboarding again. Downloaded models will also be deleted.",
+    "deleteModels": "Also delete downloaded models",
+    "confirm": "Yes, reset",
+    "resetting": "Resetting…",
+    "cancel": "Cancel",
+    "failed": "Could not reset the application. Try again."
   }
 }

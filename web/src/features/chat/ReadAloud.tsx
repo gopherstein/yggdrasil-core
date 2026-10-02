@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { api } from '@/lib/api'
 import type { FileRef } from '@/types/api'
@@ -6,6 +7,7 @@ import { speakableText } from './speakableText'
 
 /** Reads an answer aloud on this computer and plays it. */
 export function ReadAloudButton({ text, conversationId }: { text: string; conversationId?: string }) {
+  const { t } = useTranslation('chat')
   const [audio, setAudio] = useState<FileRef | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -17,7 +19,7 @@ export function ReadAloudButton({ text, conversationId }: { text: string; conver
         type="button"
         className="inline-flex items-center gap-1.5 rounded-full border border-line/70 bg-surface px-2.5 py-1 text-xs text-ink-muted transition hover:border-primary/50 hover:text-ink disabled:opacity-60"
         disabled={busy}
-        title="Read this answer aloud on this computer"
+        title={t('readAloud.hint')}
         onClick={async () => {
           setBusy(true)
           setError(null)
@@ -25,7 +27,7 @@ export function ReadAloudButton({ text, conversationId }: { text: string; conver
             const res = await api.readAloud(speakableText(text), conversationId)
             if (res) setAudio(res.artifact)
           } catch (err) {
-            setError(err instanceof Error ? err.message : 'It could not be read aloud.')
+            setError(err instanceof Error ? err.message : t('readAloud.failed'))
           } finally {
             setBusy(false)
           }
@@ -35,7 +37,7 @@ export function ReadAloudButton({ text, conversationId }: { text: string; conver
           <path d="M2.5 6h2.5L8.5 3v10L5 10H2.5z" strokeLinejoin="round" />
           <path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.8 3.5a6 6 0 0 1 0 9" strokeLinecap="round" />
         </svg>
-        {busy ? 'Reading aloud… (the first time downloads a voice)' : 'Read aloud'}
+        {busy ? t('readAloud.busy') : t('readAloud.button')}
       </button>
       {error ? <span className="text-xs text-danger">{error}</span> : null}
     </span>

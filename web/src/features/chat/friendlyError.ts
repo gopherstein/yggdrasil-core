@@ -1,3 +1,5 @@
+import i18n from '@/i18n'
+
 export type ErrorAction = 'retry' | 'models' | 'new-chat' | 'computers'
 
 export interface FriendlyError {
@@ -8,62 +10,59 @@ export interface FriendlyError {
   detail?: string
 }
 
-const rules: { test: RegExp; error: Omit<FriendlyError, 'detail'> }[] = [
+// Each rule's title and body are chat:errors.<key>.title and .body in the catalog.
+type ErrorKey = 'notResponding' | 'engineMissing' | 'noModel' | 'tooLong' | 'outOfMemory' | 'offline' | 'connection' | 'serverError'
+
+const rules: { test: RegExp; error: { key: ErrorKey; actions: ErrorAction[] } }[] = [
   {
     test: /could not reach the local yggdrasil service|failed to fetch|networkerror/i,
     error: {
-      title: "Yggdrasil isn't responding",
-      body: 'The local service stopped answering. If this is the desktop app, quit and reopen it, then try again.',
+      key: 'notResponding',
       actions: ['retry'],
     },
   },
   {
     test: /llama-server (is )?not installed/i,
     error: {
-      title: "The AI engine isn't installed yet",
-      body: 'Install it from Models, then send your message again.',
+      key: 'engineMissing',
       actions: ['models'],
     },
   },
   {
     test: /no model assigned|needs model assignments|install a model|no installed model|model .* not installed/i,
-    error: { title: 'No model is ready', body: 'Install or choose a model, then try again.', actions: ['models'] },
+    error: { key: 'noModel', actions: ['models'] },
   },
   {
     test: /context (length|size|window)|too many tokens|exceeds the (available )?context|n_ctx/i,
     error: {
-      title: 'This conversation is too long for the model',
-      body: 'Start a new chat, or choose a model that can hold more text.',
+      key: 'tooLong',
       actions: ['new-chat', 'models'],
     },
   },
   {
     test: /out of memory|\boom\b|failed to allocate|insufficient memory|not enough memory/i,
     error: {
-      title: 'Not enough memory for this model',
-      body: 'Close other apps or choose a smaller model, then try again.',
+      key: 'outOfMemory',
       actions: ['retry', 'models'],
     },
   },
   {
     test: /is offline|offline\.|unreachable|no route to host/i,
     error: {
-      title: "A computer you're using is offline",
-      body: 'Turn it on and open Yggdrasil there, or run this chat on this computer.',
+      key: 'offline',
       actions: ['retry', 'computers'],
     },
   },
   {
     test: /econnreset|econnrefused|connection (reset|refused)|broken pipe|unexpected eof|\beof\b|deadline exceeded|timed? ?out|i\/o timeout/i,
     error: {
-      title: "Couldn't reach the model",
-      body: 'The model stopped responding. This is usually temporary.',
+      key: 'connection',
       actions: ['retry'],
     },
   },
   {
     test: /llama-server error 5\d\d|http 5\d\d|internal server error/i,
-    error: { title: 'The model ran into a problem', body: 'Try again. If it keeps happening, try another model.', actions: ['retry', 'models'] },
+    error: { key: 'serverError', actions: ['retry', 'models'] },
   },
 ]
 
@@ -82,15 +81,17 @@ export function explainError(raw: string): FriendlyError {
   const text = (raw || '').trim()
   for (const rule of rules) {
     if (rule.test.test(text)) {
-      return { ...rule.error, detail: text && text !== rule.error.body ? text : undefined }
+      const { key, actions } = rule.error
+      const body = i18n.t(`chat:errors.${key}.body`)
+      return { title: i18n.t(`chat:errors.${key}.title`), body, actions, detail: text && text !== body ? text : undefined }
     }
   }
   if (text && readable(text)) {
-    return { title: 'That didn’t work', body: text, actions: ['retry'] }
+    return { title: i18n.t('chat:errors.didNotWork'), body: text, actions: ['retry'] }
   }
   return {
-    title: 'Something went wrong',
-    body: 'Yggdrasil could not finish that reply. Try again in a moment.',
+    title: i18n.t('chat:errors.generic.title'),
+    body: i18n.t('chat:errors.generic.body'),
     actions: ['retry'],
     detail: text || undefined,
   }

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useEffect, useId, useRef, useState } from 'react'
 import {
   contextRows,
@@ -20,6 +21,7 @@ export function ContextUsageButton({
   usage: ContextUsage | null
   windowLimit: number
 }) {
+  const { t } = useTranslation('chat')
   const [open, setOpen] = useState(false)
   const rootRef = useRef<HTMLDivElement>(null)
   const titleId = useId()
@@ -50,10 +52,10 @@ export function ContextUsageButton({
       <button
         type="button"
         className="inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-muted transition hover:bg-raised hover:text-ink"
-        aria-label={usage ? `Context ${percent}% full` : 'Context usage'}
+        aria-label={usage ? t('context.full', { percent }) : t('context.usage')}
         aria-expanded={open}
         aria-controls={titleId}
-        title="Context usage"
+        title={t('context.usage')}
         onClick={() => setOpen((current) => !current)}
       >
         <ContextRing percent={percent} full={full} />
@@ -62,17 +64,17 @@ export function ContextUsageButton({
         <div
           id={titleId}
           role="dialog"
-          aria-label="Context usage"
+          aria-label={t('context.usage')}
           className="absolute bottom-11 right-0 z-20 w-72 rounded-xl border border-line/80 bg-surface p-3 shadow-panel"
         >
           <div className="flex items-baseline justify-between gap-3">
             <p className="text-sm font-medium text-ink">
-              {usage ? `${percent}% full` : 'Context'}
+              {usage ? t('context.percentFull', { percent }) : t('context.title')}
             </p>
             <p className="text-xs text-ink-faint">
               {usage
-                ? `${usage.estimated ? '~' : ''}${formatTokens(used)} / ${formatTokens(limit)} tokens`
-                : `${formatTokens(limit)} tokens`}
+                ? t(usage.estimated ? 'context.usedEstimated' : 'context.used', { used: formatTokens(used), limit: formatTokens(limit) })
+                : t('context.limit', { limit: formatTokens(limit) })}
             </p>
           </div>
           {usage && rows.length > 0 ? (
@@ -97,15 +99,12 @@ export function ContextUsageButton({
               </ul>
               {(usage.summarizedMessages ?? 0) > 0 ? (
                 <p className="mt-2 text-xs leading-relaxed text-ink-muted">
-                  The {usage.summarizedMessages} oldest messages were sent as a summary so the conversation fits. Every
-                  message is still saved.
+                  {t('context.summarized', { count: usage.summarizedMessages })}
                 </p>
               ) : null}
             </>
           ) : (
-            <p className="mt-2 text-xs leading-relaxed text-ink-muted">
-              Send a message to see how much of this model’s memory the chat is using.
-            </p>
+            <p className="mt-2 text-xs leading-relaxed text-ink-muted">{t('context.empty')}</p>
           )}
         </div>
       ) : null}

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { useEffect, useState } from 'react'
 import { artifactObjectUrl, downloadArtifact } from '@/lib/api'
 import { isAudioName, isImageName } from '@/lib/upload'
@@ -9,13 +11,11 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-const kindLabel: Record<string, string> = {
-  spreadsheet: 'Spreadsheet',
-  pdf: 'PDF',
-  document: 'Document',
-  code: 'Code',
-  image: 'Image',
-  audio: 'Audio',
+// A file's kind, as chat:attachments.kinds.<kind> names it.
+const knownKinds = ['spreadsheet', 'pdf', 'document', 'code', 'image', 'audio']
+
+function kindLabel(kind: string): string {
+  return i18n.t(`chat:attachments.kinds.${knownKinds.includes(kind) ? kind : 'other'}`)
 }
 
 function FileIcon({ kind }: { kind: string }) {
@@ -54,13 +54,14 @@ export function FileChip({ file }: { file: FileRef }) {
 }
 
 function DownloadChip({ file }: { file: FileRef }) {
+  const { t } = useTranslation('chat')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   return (
     <button
       type="button"
       className="inline-flex max-w-[18rem] items-center gap-2 rounded-lg border border-line/70 bg-surface px-2.5 py-1.5 text-left text-xs text-ink transition hover:border-primary/50"
-      title={error ?? `Download ${file.name}`}
+      title={error ?? t('attachments.download', { name: file.name })}
       disabled={busy}
       onClick={async () => {
         setBusy(true)
@@ -68,7 +69,7 @@ function DownloadChip({ file }: { file: FileRef }) {
         try {
           await downloadArtifact(file)
         } catch (err) {
-          setError(err instanceof Error ? err.message : 'The download failed.')
+          setError(err instanceof Error ? err.message : t('attachments.downloadFailed'))
         } finally {
           setBusy(false)
         }
@@ -78,7 +79,8 @@ function DownloadChip({ file }: { file: FileRef }) {
       <span className="min-w-0">
         <span className="block truncate font-medium">{file.name}</span>
         <span className={`block text-[11px] ${error ? 'text-danger' : 'text-ink-faint'}`}>
-          {error ?? `${kindLabel[file.kind] ?? 'File'} · ${formatSize(file.size_bytes)}${busy ? ' · Downloading…' : ''}`}
+          {error ??
+            `${t('attachments.meta', { kind: kindLabel(file.kind), size: formatSize(file.size_bytes) })}${busy ? ` · ${t('attachments.downloading')}` : ''}`}
         </span>
       </span>
     </button>
@@ -87,6 +89,7 @@ function DownloadChip({ file }: { file: FileRef }) {
 
 /** An audio file: Play loads it and shows a player; it can still be downloaded. */
 export function AudioChip({ file, autoPlay = false }: { file: FileRef; autoPlay?: boolean }) {
+  const { t } = useTranslation('chat')
   const [url, setUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -97,7 +100,7 @@ export function AudioChip({ file, autoPlay = false }: { file: FileRef; autoPlay?
     try {
       setUrl(await artifactObjectUrl(file.id))
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'The audio could not be loaded.')
+      setError(err instanceof Error ? err.message : t('attachments.audioFailed'))
     } finally {
       setBusy(false)
     }
@@ -119,7 +122,8 @@ export function AudioChip({ file, autoPlay = false }: { file: FileRef; autoPlay?
         <span className="min-w-0 flex-1">
           <span className="block truncate font-medium">{file.name}</span>
           <span className={`block text-[11px] ${error ? 'text-danger' : 'text-ink-faint'}`}>
-            {error ?? `Audio · ${formatSize(file.size_bytes)}${busy ? ' · Loading…' : ''}`}
+            {error ??
+              `${t('attachments.meta', { kind: kindLabel('audio'), size: formatSize(file.size_bytes) })}${busy ? ` · ${t('attachments.loading')}` : ''}`}
           </span>
         </span>
         {url ? null : (
@@ -129,15 +133,19 @@ export function AudioChip({ file, autoPlay = false }: { file: FileRef; autoPlay?
             disabled={busy}
             onClick={() => void load()}
           >
-            Play
+            {t('attachments.play')}
           </button>
         )}
         <button
           type="button"
           className="shrink-0 rounded-md px-1.5 py-0.5 text-ink-faint transition hover:text-ink"
-          title={`Download ${file.name}`}
-          aria-label={`Download ${file.name}`}
-          onClick={() => void downloadArtifact(file).catch((err: unknown) => setError(err instanceof Error ? err.message : 'The download failed.'))}
+          title={t('attachments.download', { name: file.name })}
+          aria-label={t('attachments.download', { name: file.name })}
+          onClick={() =>
+            void downloadArtifact(file).catch((err: unknown) =>
+              setError(err instanceof Error ? err.message : t('attachments.downloadFailed')),
+            )
+          }
         >
           ↓
         </button>
@@ -149,6 +157,7 @@ export function AudioChip({ file, autoPlay = false }: { file: FileRef; autoPlay?
 
 /** An image, shown in the chat; it can be downloaded. */
 export function ImageChip({ file }: { file: FileRef }) {
+  const { t } = useTranslation('chat')
   const [url, setUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -161,7 +170,7 @@ export function ImageChip({ file }: { file: FileRef }) {
         if (cancelled) URL.revokeObjectURL(u)
         else setUrl(u)
       })
-      .catch((err: unknown) => setError(err instanceof Error ? err.message : 'The image could not be loaded.'))
+      .catch((err: unknown) => setError(err instanceof Error ? err.message : t('attachments.imageFailed')))
     return () => {
       cancelled = true
       if (made) URL.revokeObjectURL(made)
@@ -173,7 +182,7 @@ export function ImageChip({ file }: { file: FileRef }) {
       {url ? (
         <img src={url} alt={file.name} className="max-h-80 w-auto max-w-full rounded-md object-contain sm:max-w-[24rem]" />
       ) : (
-        <span className="flex h-24 w-40 items-center justify-center rounded-md bg-raised text-ink-faint">{error ? 'Not available' : 'Loading…'}</span>
+        <span className="flex h-24 w-40 items-center justify-center rounded-md bg-raised text-ink-faint">{error ? t('attachments.notAvailable') : t('attachments.loading')}</span>
       )}
       <span className="flex items-center gap-2 px-1">
         <FileIcon kind="image" />
@@ -183,9 +192,9 @@ export function ImageChip({ file }: { file: FileRef }) {
         <button
           type="button"
           className="shrink-0 rounded-md px-1.5 py-0.5 text-ink-faint transition hover:text-ink"
-          title={`Download ${file.name}`}
-          aria-label={`Download ${file.name}`}
-          onClick={() => void downloadArtifact(file).catch((err: unknown) => setError(err instanceof Error ? err.message : 'The download failed.'))}
+          title={t('attachments.download', { name: file.name })}
+          aria-label={t('attachments.download', { name: file.name })}
+          onClick={() => void downloadArtifact(file).catch((err: unknown) => setError(err instanceof Error ? err.message : t('attachments.downloadFailed')))}
         >
           ↓
         </button>
@@ -206,6 +215,7 @@ export interface PendingFile {
 }
 
 export function PendingFileChip({ file, onRemove }: { file: PendingFile; onRemove: () => void }) {
+  const { t } = useTranslation('chat')
   return (
     <span
       className={[
@@ -220,13 +230,13 @@ export function PendingFileChip({ file, onRemove }: { file: PendingFile; onRemov
       <span className="min-w-0">
         <span className="block truncate font-medium text-ink">{file.name}</span>
         <span className={`block truncate text-[11px] ${file.status === 'error' ? 'text-danger' : 'text-ink-faint'}`}>
-          {file.status === 'uploading' ? 'Adding…' : file.status === 'error' ? file.error : formatSize(file.size)}
+          {file.status === 'uploading' ? t('attachments.adding') : file.status === 'error' ? file.error : formatSize(file.size)}
         </span>
       </span>
       <button
         type="button"
         className="ml-1 shrink-0 rounded px-1 text-ink-faint hover:text-ink"
-        aria-label={`Remove ${file.name}`}
+        aria-label={t('attachments.remove', { name: file.name })}
         onClick={onRemove}
       >
         ×

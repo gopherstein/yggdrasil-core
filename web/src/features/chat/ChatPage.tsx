@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
+import i18n from '@/i18n'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { RealmKicker } from '@/components/ui/Realm'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
@@ -35,6 +37,7 @@ import { contextWindow, parseContextUsage, type ContextUsage } from './contextUs
 import { displayChatText } from './displayChatText'
 import { parseModelFailure, type ModelFailure } from './modelFailure'
 import { ModelFailureNotice } from './ModelFailureNotice'
+import { toolDisplayName } from './toolNames'
 import { useChatFollow } from './useChatFollow'
 
 type TeamStep = {
@@ -56,17 +59,13 @@ type RunMode = 'automatic' | 'local'
 /** How much work a message gets (spec §15). Auto lets Yggdrasil decide. */
 type Effort = 'auto' | 'fast' | 'balanced' | 'thorough'
 const EFFORT_KEY = 'ygg.chat.effort'
-const EFFORTS: { id: Effort; label: string; hint: string }[] = [
-  { id: 'auto', label: 'Auto', hint: 'Yggdrasil decides: quick questions stay fast, big or data questions get more care.' },
-  { id: 'fast', label: 'Fast', hint: 'Answers in one go, without planning or a second pass.' },
-  { id: 'balanced', label: 'Balanced', hint: 'Plans big requests, reads a page when looking things up, and fixes figures once.' },
-  { id: 'thorough', label: 'Thorough', hint: 'Reads more pages, uses the largest model that fits, and checks figures twice.' },
-]
+// The efforts, in order; their names and hints are chat:effort.<id> in the catalog.
+const EFFORTS: Effort[] = ['auto', 'fast', 'balanced', 'thorough']
 
 function savedEffort(): Effort {
   try {
     const v = localStorage.getItem(EFFORT_KEY)
-    return EFFORTS.some((e) => e.id === v) ? (v as Effort) : 'auto'
+    return EFFORTS.some((e) => e === v) ? (v as Effort) : 'auto'
   } catch {
     return 'auto'
   }
@@ -75,11 +74,8 @@ function savedEffort(): Effort {
 /** The Model choice that lets Yggdrasil pick an installed model for each message. */
 const AUTO_MODEL_ID = 'auto'
 
-const SUGGESTIONS = [
-  { label: 'Explain a topic', prompt: 'Explain what a mutex is in two short paragraphs.' },
-  { label: 'Help me code', prompt: 'Help me write a clean Go function that retries an HTTP request with backoff.' },
-  { label: 'Plan something', prompt: 'Help me outline a weekend trip itinerary in three short sections.' },
-] as const
+// The landing page's suggestions; each label and prompt is chat:landing.suggestions.<id>.
+const SUGGESTIONS = ['explain', 'code', 'plan'] as const
 
 const PROFILE_PURPOSE_ORDER = ['general', 'coding', 'research', 'custom'] as const
 
@@ -99,8 +95,12 @@ function sortProfiles(profiles: AIProfile[]): AIProfile[] {
 }
 
 function formatRoleLabel(role: string): string {
-  if (!role) return 'Role'
+  if (!role) return i18n.t('chat:roles.role')
   // A plan's worker slots are "worker:1", "worker:2", …
+  const worker = /^worker:(\d+)$/.exec(role)
+  if (worker) return i18n.t('chat:roles.worker', { n: worker[1] })
+  if (role === 'planner') return i18n.t('chat:roles.planner')
+  if (role === 'reviewer') return i18n.t('chat:roles.reviewer')
   const slot = /^([a-z]+):(\d+)$/.exec(role)
   if (slot) return `${slot[1].charAt(0).toUpperCase()}${slot[1].slice(1)} ${slot[2]}`
   return role.charAt(0).toUpperCase() + role.slice(1)
@@ -125,54 +125,34 @@ function friendlyToolDetail(args: Record<string, unknown> | undefined): string {
 
 function formatToolArgs(args: Record<string, unknown> | undefined): string {
   if (!args || Object.keys(args).length === 0) {
-    return 'No arguments'
+    return i18n.t('chat:tools.noArguments')
   }
   try {
     const raw = JSON.stringify(args, null, 2)
     return raw.length > 400 ? `${raw.slice(0, 400)}…` : raw
   } catch {
-    return 'Arguments unavailable'
+    return i18n.t('chat:tools.argumentsUnavailable')
   }
-}
-
-function toolDisplayName(toolId: string): string {
-  const names: Record<string, string> = {
-    'internet.search': 'Web search',
-    'internet.open': 'Open page',
-    'filesystem.search': 'Find files',
-    'filesystem.read': 'Read file',
-    'filesystem.write': 'Write file',
-    'files.create': 'Create file',
-    'spreadsheet.analyze': 'Analyze spreadsheet',
-    'code.execute': 'Run code',
-    terminal: 'Terminal',
-    'git.status': 'Git status',
-    'git.diff': 'Git diff',
-    'git.log': 'Git log',
-    'git.show': 'Git show',
-    'git.add': 'Git add',
-    'git.commit': 'Git commit',
-    'git.push': 'Git push',
-  }
-  return names[toolId] || toolId
 }
 
 function toolProgress(toolId?: string, summary?: string): string {
-  if (toolId === 'internet.search') return 'Searching the web…'
-  if (toolId === 'internet.open') return summary ? `Reading ${hostLabel(summary)}…` : 'Reading a page…'
-  if (toolId === 'filesystem.read') return 'Reading a file…'
-  if (toolId === 'filesystem.search') return 'Searching local files…'
-  if (toolId === 'spreadsheet.analyze') return 'Reading the spreadsheet…'
-  if (toolId === 'files.create') return 'Creating the file…'
-  if (toolId === 'code.execute') return 'Running code in the sandbox…'
-  if (toolId === 'terminal') return 'Running command…'
+  const t = i18n.getFixedT(null, 'chat')
+  if (toolId === 'internet.search') return t('status.searchingWeb')
+  if (toolId === 'internet.open') return summary ? t('status.readingHost', { host: hostLabel(summary) }) : t('status.readingPage')
+  if (toolId === 'filesystem.read') return t('status.readingFile')
+  if (toolId === 'filesystem.search') return t('status.searchingFiles')
+  if (toolId === 'spreadsheet.analyze') return t('status.readingSpreadsheet')
+  if (toolId === 'files.create') return t('status.creatingFile')
+  if (toolId === 'code.execute') return t('status.runningCode')
+  if (toolId === 'terminal') return t('status.runningCommand')
   if (toolId === 'git.status' || toolId === 'git.diff' || toolId === 'git.log' || toolId === 'git.show') {
-    return 'Checking git…'
+    return t('status.checkingGit')
   }
-  return toolId ? `Using ${toolDisplayName(toolId)}…` : 'Working…'
+  return toolId ? t('status.usingTool', { tool: toolDisplayName(toolId) }) : t('status.working')
 }
 
 export function ChatPage() {
+  const { t } = useTranslation('chat')
   const queryClient = useQueryClient()
   const [searchParams, setSearchParams] = useSearchParams()
   const activeProfileId = useUIStore((s) => s.activeProfileId)
@@ -406,7 +386,7 @@ export function ChatPage() {
         )
   const chatToolAssessment = chatModel ? modelToolAssessment(chatModel, { terminalAllowed }) : null
   const capabilityLine = activeCapabilityLabels(activeProfile?.tools).map((label) =>
-    label === 'Internet' ? 'Web' : label,
+    label === 'Internet' ? t('composer.web') : label,
   )
   const activeIsTeam = isTeamProfile(activeProfile)
 
@@ -460,7 +440,7 @@ export function ChatPage() {
     onError: (error) => {
       setPendingDelete(null)
       setListError(
-        error instanceof Error ? error.message : 'Could not delete this chat.',
+        error instanceof Error ? error.message : t('send.deleteFailed'),
       )
     },
   })
@@ -515,17 +495,13 @@ export function ChatPage() {
       })
       setPendingTool(null)
       setStatusMessage(
-        allow
-          ? allowSession
-            ? 'Tool allowed for this session…'
-            : 'Tool allowed…'
-          : 'Tool denied — continuing without it…',
+        allow ? (allowSession ? t('status.toolAllowedSession') : t('status.toolAllowed')) : t('status.toolDenied'),
       )
     } catch (error) {
       setSendError(
         error instanceof Error
           ? error.message
-          : 'Could not record the tool permission choice.',
+          : t('tools.decideFailed'),
       )
     } finally {
       setToolDeciding(false)
@@ -557,12 +533,10 @@ export function ChatPage() {
             requestId: payload.request_id,
             toolId: payload.tool_id,
             reason: payload.reason,
-            argsSummary: friendlyToolDetail(payload.args) || 'No extra details',
+            argsSummary: friendlyToolDetail(payload.args) || t('tools.noDetails'),
             rawArgs: formatToolArgs(payload.args),
           })
-          setStatusMessage(
-            `Waiting for permission: ${toolDisplayName(payload.tool_id)}`,
-          )
+          setStatusMessage(t('status.waitingForPermission', { tool: toolDisplayName(payload.tool_id) }))
         }
         if (event.type === 'tool.started') {
           const toolId = event.payload?.tool_id as string | undefined
@@ -577,8 +551,8 @@ export function ChatPage() {
         }
         if (event.type === 'tool.completed') {
           const ms = Number(event.payload?.duration_ms)
-          const done = Number.isFinite(ms) && ms >= 0 ? `Completed in ${Math.round(ms)} ms` : 'Completed'
-          setStatusMessage('Checking sources…')
+          const done = Number.isFinite(ms) && ms >= 0 ? t('tools.completedIn', { ms: Math.round(ms) }) : t('tools.completed')
+          setStatusMessage(t('status.checkingSources'))
           setToolFailure(null)
           setToolTraces((current) => {
             const next = [...current]
@@ -594,14 +568,14 @@ export function ChatPage() {
         if (event.type === 'tool.failed') {
           if (event.payload?.malformed) return
           const toolId = event.payload?.tool_id as string | undefined
-          const label = toolId ? toolDisplayName(toolId) : 'Tool'
+          const label = toolId ? toolDisplayName(toolId) : t('tools.unnamed')
           setToolFailure(label)
-          setStatusMessage(`${label} failed`)
+          setStatusMessage(t('status.toolFailed', { tool: label }))
           setToolTraces((current) => {
             const next = [...current]
             for (let i = next.length - 1; i >= 0; i -= 1) {
               if (next[i].status === 'running') {
-                next[i] = { ...next[i], status: 'Failed' }
+                next[i] = { ...next[i], status: t('tools.traceFailed') }
                 break
               }
             }
@@ -638,8 +612,8 @@ export function ChatPage() {
           })
           setStatusMessage(
             nodeName
-              ? `${formatRoleLabel(payload.role)} on ${nodeName}…`
-              : `${formatRoleLabel(payload.role)} running…`,
+              ? t('status.roleOn', { role: formatRoleLabel(payload.role), computer: nodeName })
+              : t('status.roleRunning', { role: formatRoleLabel(payload.role) }),
           )
         }
         if (event.type === 'chat.model_routed') {
@@ -648,23 +622,23 @@ export function ChatPage() {
           const routedId = event.payload?.model_id as string | undefined
           if (routedId) setRoutedModel({ chatId: conversationId, modelId: routedId })
           const name = (event.payload?.model_name as string | undefined) || routedId
-          if (name) setStatusMessage(event.payload?.fallback ? `Switching to ${name}…` : `Using ${name}…`)
+          if (name) setStatusMessage(t(event.payload?.fallback ? 'status.switchingTo' : 'status.using', { model: name }))
         }
         if (event.type === 'plan.created' || event.type === 'plan.step' || event.type === 'chat.verifying') {
           const conversationId = event.payload?.conversation_id as string | undefined
           if (conversationId && conversationId !== selectedId && conversationId !== streamingConvRef.current) return
           if (event.type === 'chat.verifying') {
-            setStatusMessage('Checking the figures against the sources…')
+            setStatusMessage(t('status.verifying'))
           } else if (event.type === 'plan.created') {
             const steps = (event.payload?.steps as string[] | undefined) ?? []
             setPlanSteps(steps.map((step) => ({ step, status: 'pending' })))
-            setStatusMessage(`Working through ${steps.length} parts…`)
+            setStatusMessage(t('status.workingThrough', { count: steps.length }))
           } else {
             const index = Number(event.payload?.index)
             const status = event.payload?.status as 'running' | 'done' | 'failed'
             setPlanSteps((cur) => cur.map((s, i) => (i === index ? { ...s, status } : s)))
-            if (status === 'running') setStatusMessage(`Working on: ${event.payload?.step as string}…`)
-            else setStatusMessage('Putting it together…')
+            if (status === 'running') setStatusMessage(t('status.workingOn', { step: event.payload?.step as string }))
+            else setStatusMessage(t('status.puttingTogether'))
           }
         }
         if (event.type === 'chat.stopped') {
@@ -686,13 +660,13 @@ export function ChatPage() {
           const conversationId = event.payload?.conversation_id as string | undefined
           if (conversationId && conversationId !== selectedId && conversationId !== streamingConvRef.current) return
           const name = event.payload?.name as string | undefined
-          setStatusMessage(name ? `Writing ${name}…` : 'Writing the file…')
+          setStatusMessage(name ? t('status.writingNamed', { name }) : t('status.writingFile'))
         }
         if (event.type === 'chat.lookup') {
           const conversationId = event.payload?.conversation_id as string | undefined
           if (conversationId && conversationId !== selectedId && conversationId !== streamingConvRef.current) return
           const query = event.payload?.query as string | undefined
-          setStatusMessage(query ? `Searching the web for “${query}”…` : 'Searching the web…')
+          setStatusMessage(query ? t('status.searchingWebFor', { query }) : t('status.searchingWeb'))
         }
         if (event.type === 'model.load.started') {
           const nodeId = event.payload?.node_id as string | undefined
@@ -702,10 +676,10 @@ export function ChatPage() {
             modelLocations.find((n) => n.node_id === nodeId)?.node_name
           setStatusMessage(
             role && nodeName
-              ? `Loading ${formatRoleLabel(role)} on ${nodeName}…`
+              ? t('status.loadingRoleOn', { role: formatRoleLabel(role), computer: nodeName })
               : nodeName
-                ? `Loading model on ${nodeName}…`
-                : 'Loading model…',
+                ? t('status.loadingModelOn', { computer: nodeName })
+                : t('status.loadingModel'),
           )
         }
         if (event.type === 'model.load.completed') {
@@ -716,10 +690,10 @@ export function ChatPage() {
             modelLocations.find((n) => n.node_id === nodeId)?.node_name
           setStatusMessage(
             role && nodeName
-              ? `${formatRoleLabel(role)} generating on ${nodeName}…`
+              ? t('status.roleGeneratingOn', { role: formatRoleLabel(role), computer: nodeName })
               : nodeName
-                ? `Generating on ${nodeName}…`
-                : 'Generating response…',
+                ? t('status.generatingOn', { computer: nodeName })
+                : t('status.generating'),
           )
         }
         if (event.type === 'chat.token') {
@@ -762,10 +736,13 @@ export function ChatPage() {
           if (conversationId && conversationId !== selectedId && conversationId !== streamingConvRef.current) return
           const passages = Number(event.payload?.passages) || 0
           const names = (event.payload?.sources as string[] | undefined) ?? []
+          const source = names[0] ?? t('status.yourKnowledge')
           setStatusMessage(
-            passages > 0
-              ? `Found ${passages === 1 ? '1 passage' : `${passages} passages`} in ${names[0] ?? 'your knowledge'}${names.length > 1 ? ` and ${names.length - 1} more` : ''}…`
-              : 'Checked your knowledge…',
+            passages === 0
+              ? t('status.checkedKnowledge')
+              : names.length > 1
+                ? t('status.foundPassagesMore', { count: passages, source, more: names.length - 1 })
+                : t('status.foundPassages', { count: passages, source }),
           )
         }
         if (event.type === 'chat.error') {
@@ -774,16 +751,13 @@ export function ChatPage() {
           streamingConvRef.current = null
           setStatusMessage(null)
           setPendingTool(null)
-          setSendError(
-            (event.payload?.message as string) ||
-              'Something went wrong while generating a response.',
-          )
+          setSendError((event.payload?.message as string) || t('send.generationFailed'))
         }
       },
     })
     return unsubscribe
-    // queryClient is stable; everything else is read through eventContext.
-  }, [queryClient])
+    // queryClient and t are stable; everything else is read through eventContext.
+  }, [queryClient, t])
 
   const setProfile = (profileId: string) => {
     setDraftProfileId(profileId)
@@ -830,13 +804,11 @@ export function ChatPage() {
     if (downloadBehavior === 'ask') {
       const name =
         catalog.find((m) => m.id === candidate)?.display_name || candidate
-      const ok = window.confirm(
-        `Download “${name}” so chat can continue? You can change this under Settings → Download models.`,
-      )
+      const ok = window.confirm(t('send.confirmDownload', { model: name }))
       if (!ok) return null
     }
 
-    setStatusMessage('Downloading model…')
+    setStatusMessage(t('status.downloadingModel'))
     await api.installModel(candidate, { wait: true })
     await queryClient.invalidateQueries({ queryKey: ['models'] })
     setDraftModelId(candidate)
@@ -848,21 +820,21 @@ export function ChatPage() {
       const key = `${file.name}-${file.size}-${Math.random().toString(36).slice(2)}`
       const base: PendingFile = { key, name: file.name, size: file.size, status: 'uploading' }
       if (!isAttachable(file.name)) {
-        setPendingFiles((cur) => [...cur, { ...base, status: 'error', error: "Yggdrasil can't read this type of file yet" }])
+        setPendingFiles((cur) => [...cur, { ...base, status: 'error', error: t('attachments.unsupported') }])
         continue
       }
       if (file.size > MAX_ATTACH_BYTES) {
-        setPendingFiles((cur) => [...cur, { ...base, status: 'error', error: 'Files can be up to 25 MB' }])
+        setPendingFiles((cur) => [...cur, { ...base, status: 'error', error: t('attachments.tooLarge') }])
         continue
       }
       setPendingFiles((cur) => [...cur, base])
       void (async () => {
         try {
           const uploaded = await api.uploadArtifact(await readUpload(file), selectedId ?? undefined)
-          if (!uploaded) throw new Error('The file could not be added.')
+          if (!uploaded) throw new Error(t('attachments.addFailed'))
           setPendingFiles((cur) => cur.map((f) => (f.key === key ? { ...f, status: 'ready', file: uploaded } : f)))
         } catch (err) {
-          const error = err instanceof Error ? err.message : 'The file could not be added.'
+          const error = err instanceof Error ? err.message : t('attachments.addFailed')
           setPendingFiles((cur) => cur.map((f) => (f.key === key ? { ...f, status: 'error', error } : f)))
         }
       })()
@@ -880,16 +852,16 @@ export function ChatPage() {
   const sendMessage = async (overrideText?: string) => {
     const readyFiles = overrideText == null ? pendingFiles.filter((f) => f.status === 'ready' && f.file) : []
     if (overrideText == null && pendingFiles.some((f) => f.status === 'uploading')) {
-      setSendError('Wait for the files to finish adding, then send.')
+      setSendError(t('send.waitForFiles'))
       return
     }
     // A file on its own is a request to look at it.
     const typed = (overrideText ?? draft).trim()
-    const message = typed || (readyFiles.length > 0 ? (readyFiles.length === 1 ? 'Summarize this file.' : 'Summarize these files.') : '')
+    const message = typed || (readyFiles.length > 0 ? t('send.summarizeFile', { count: readyFiles.length }) : '')
     if (!message || isSending) return
 
     if (defaultExecution === 'ask' && !executionAsked && runMode == null) {
-      setSendError('Choose where to run this chat: Automatic or This computer.')
+      setSendError(t('send.chooseRunOn'))
       return
     }
 
@@ -901,13 +873,13 @@ export function ChatPage() {
         setSendError(
           error instanceof Error
             ? error.message
-            : 'Could not download a model for this chat.',
+            : t('send.downloadFailed'),
         )
         setStatusMessage(null)
         return
       }
       if (!modelId) {
-        setSendError('Install a model first, then try again.')
+        setSendError(t('send.installFirst'))
         return
       }
     }
@@ -928,7 +900,7 @@ export function ChatPage() {
     setCapabilityNotice(capabilityGap(message, activeModel, catalog, { terminalAllowed, internetAllowed }))
     setToolTraces([])
     setToolDetailsOpen(false)
-    setStatusMessage('Starting…')
+    setStatusMessage(t('status.starting'))
     setTeamSteps([])
     setPlanSteps([])
     setPendingTool(null)
@@ -946,7 +918,7 @@ export function ChatPage() {
           model_id: modelId,
         })
         if (!created?.id) {
-          throw new Error('Could not start a conversation.')
+          throw new Error(t('send.startFailed'))
         }
         conversationId = created.id
         if (memoryOffDraft) {
@@ -1005,8 +977,7 @@ export function ChatPage() {
             setModelFailure({
               kind: 'model_health',
               reason: 'runtime_error',
-              message:
-                'The model stopped before it could reply. Yggdrasil stopped it and cleaned up the failed process.',
+              message: t('send.noReply'),
             })
             queryClient.invalidateQueries({ queryKey: ['messages', conversationId] })
             return
@@ -1031,7 +1002,7 @@ export function ChatPage() {
           } else {
             setStreamingContent(null)
             setResponseInterrupted(false)
-            setSendError(errMessage || 'The model could not respond.')
+            setSendError(errMessage || t('send.couldNotRespond'))
           }
           queryClient.invalidateQueries({ queryKey: ['messages', conversationId] })
         },
@@ -1050,7 +1021,7 @@ export function ChatPage() {
       setSendError(
         error instanceof Error
           ? error.message
-          : 'Could not reach the local AI. Check Diagnostics for details.',
+          : t('send.unreachable'),
       )
       if (conversationId) {
         queryClient.invalidateQueries({ queryKey: ['messages', conversationId] })
@@ -1150,10 +1121,7 @@ export function ChatPage() {
   const historyMode = chatHistoryPinned && canPinHistory ? 'pinned' : 'overlay'
   const showPinnedSidebar = historyOpen && historyMode === 'pinned'
 
-  const runOnTitle =
-    effectiveRunMode === 'automatic'
-      ? 'Norn chooses the best available computer.'
-      : 'Run only on this computer.'
+  const runOnTitle = effectiveRunMode === 'automatic' ? t('composer.runOnAutomatic') : t('composer.runOnLocal')
 
   const historyDrawer = (
     <ChatHistoryDrawer
@@ -1243,10 +1211,10 @@ export function ChatPage() {
             void sendMessage()
           }
         }}
-        placeholder="Ask Yggdrasil anything…"
+        placeholder={t('composer.placeholder')}
         disabled={isSending}
         className="composer-input"
-        aria-label="Message"
+        aria-label={t('composer.message')}
       />
       <div className="composer-toolbar">
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
@@ -1255,16 +1223,16 @@ export function ChatPage() {
             className="composer-attach"
             onClick={() => fileInputRef.current?.click()}
             disabled={isSending}
-            aria-label="Attach files"
-            title="Attach a document, spreadsheet, PDF, or code file"
+            aria-label={t('composer.attach')}
+            title={t('composer.attachHint')}
           >
             <svg viewBox="0 0 16 16" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" aria-hidden>
               <path d="M13.5 7.5 8 13a3.5 3.5 0 0 1-5-5l6-6a2.3 2.3 0 0 1 3.3 3.3L6.4 11.2a1.2 1.2 0 0 1-1.6-1.6L10 4.4" />
             </svg>
           </button>
-          <label className="composer-select" title="Which assistant style to use">
-            <span className="composer-select-label">Profile</span>
-            <span className="sr-only">Assistant profile</span>
+          <label className="composer-select" title={t('composer.profileHint')}>
+            <span className="composer-select-label">{t('composer.profile')}</span>
+            <span className="sr-only">{t('composer.assistantProfile')}</span>
             <select
               ref={profileSelectRef}
               value={profileIdForChat ?? ''}
@@ -1289,8 +1257,8 @@ export function ChatPage() {
               .join(' ')}
             title={runOnTitle}
           >
-            <span className="composer-select-label">Run on</span>
-            <span className="sr-only">Run on</span>
+            <span className="composer-select-label">{t('composer.runOn')}</span>
+            <span className="sr-only">{t('composer.runOn')}</span>
             <select
               value={
                 runMode ??
@@ -1301,16 +1269,16 @@ export function ChatPage() {
             >
               {defaultExecution === 'ask' && runMode == null ? (
                 <option value="" disabled>
-                  Choose…
+                  {t('composer.choose')}
                 </option>
               ) : null}
-              <option value="automatic">Automatic</option>
-              <option value="local">This computer</option>
+              <option value="automatic">{t('composer.automatic')}</option>
+              <option value="local">{t('composer.thisComputer')}</option>
             </select>
           </label>
-          <label className="composer-select" title="Which installed model answers this chat">
-            <span className="composer-select-label">Model</span>
-            <span className="sr-only">Model</span>
+          <label className="composer-select" title={t('composer.modelHint')}>
+            <span className="composer-select-label">{t('composer.model')}</span>
+            <span className="sr-only">{t('composer.model')}</span>
             <select
               ref={modelSelectRef}
               value={modelIdForChat ?? ''}
@@ -1318,10 +1286,10 @@ export function ChatPage() {
               onChange={(event) => setModel(event.target.value)}
             >
               {installedModels.length === 0 ? (
-                <option value="">No model installed</option>
+                <option value="">{t('composer.noModel')}</option>
               ) : specializedModels.length === 0 ? (
                 <>
-                  <option value={AUTO_MODEL_ID}>Auto</option>
+                  <option value={AUTO_MODEL_ID}>{t('composer.auto')}</option>
                   {installedModels.map((model) => (
                     <option key={model.id} value={model.id}>
                       {model.display_name || model.id}
@@ -1330,15 +1298,15 @@ export function ChatPage() {
                 </>
               ) : (
                 <>
-                  <option value={AUTO_MODEL_ID}>Auto</option>
-                  <optgroup label="Models">
+                  <option value={AUTO_MODEL_ID}>{t('composer.auto')}</option>
+                  <optgroup label={t('composer.models')}>
                     {installedModels.map((model) => (
                       <option key={model.id} value={model.id}>
                         {model.display_name || model.id}
                       </option>
                     ))}
                   </optgroup>
-                  <optgroup label="Specialized AIs">
+                  <optgroup label={t('composer.specialized')}>
                     {specializedModels.map((model) => (
                       <option key={model.id} value={model.id}>
                         {model.display_name}
@@ -1349,13 +1317,13 @@ export function ChatPage() {
               )}
             </select>
           </label>
-          <label className="composer-select" title={EFFORTS.find((e) => e.id === effort)?.hint}>
-            <span className="composer-select-label">Effort</span>
-            <span className="sr-only">Effort</span>
+          <label className="composer-select" title={t(`effort.${effort}.hint`)}>
+            <span className="composer-select-label">{t('composer.effort')}</span>
+            <span className="sr-only">{t('composer.effort')}</span>
             <select value={effort} disabled={isSending} onChange={(event) => setEffort(event.target.value as Effort)}>
               {EFFORTS.map((e) => (
-                <option key={e.id} value={e.id} title={e.hint}>
-                  {e.label}
+                <option key={e} value={e} title={t(`effort.${e}.hint`)}>
+                  {t(`effort.${e}.label`)}
                 </option>
               ))}
             </select>
@@ -1379,15 +1347,15 @@ export function ChatPage() {
         />
         {isSending ? (
           <button type="button" className="btn-secondary px-3 py-2" onClick={handleStop}>
-            Stop
+            {t('composer.stop')}
           </button>
         ) : (
           <button
             type="submit"
             className="btn-primary h-9 w-9 shrink-0 rounded-full p-0 text-lg leading-none"
             disabled={!draft.trim() && !pendingFiles.some((f) => f.status === 'ready')}
-            aria-label="Send"
-            title="Send"
+            aria-label={t('composer.send')}
+            title={t('composer.send')}
           >
             ↑
           </button>
@@ -1396,29 +1364,31 @@ export function ChatPage() {
             {(chatModel || isAuto) && (
           <p
             className="mt-2 text-xs text-ink-muted"
-            title={isAuto ? 'Auto picks an installed model for each message' : chatToolAssessment?.detail}
+            title={isAuto ? t('composer.autoHint') : chatToolAssessment?.detail}
           >
             {isAuto
               ? chatModel
-                ? `Auto · last used ${chatModel.display_name || chatModel.id}`
-                : 'Auto · picks a model for each message'
+                ? t('composer.autoLastUsed', { model: chatModel.display_name || chatModel.id })
+                : t('composer.autoPicks')
               : chatModel?.display_name || chatModel?.id}
             {capabilityLine.length > 0 ? ` · ${capabilityLine.join(' · ')}` : ''}
           </p>
         )}
       {!modelIdForChat && (
         <p className="mt-2 text-xs text-ink-muted">
-          No model installed yet — sending will{' '}
-          {downloadBehavior === 'ask' ? 'ask before downloading' : 'download automatically'}.{' '}
+          {downloadBehavior === 'ask' ? t('composer.noModelAsk') : t('composer.noModelDownload')}{' '}
           <Link to="/models" className="font-medium text-primary underline-offset-2 hover:underline">
-            Open Models
+            {t('composer.openModels')}
           </Link>
         </p>
       )}
       {defaultExecution === 'ask' && !executionAsked && runMode == null && (
         <p className="mt-2 text-xs text-ink-muted">
-          Choose <span className="font-medium text-ink">Run on</span> before sending (Settings →
-          Run chats on).
+          <Trans
+            t={t}
+            i18nKey="composer.chooseRunOn"
+            components={{ strong: <span className="font-medium text-ink" /> }}
+          />
         </p>
       )}
     </form>
@@ -1426,16 +1396,16 @@ export function ChatPage() {
 
   const suggestions = (
     <div className="mt-5 flex flex-wrap justify-center gap-2">
-      <span className="self-center text-xs text-ink-faint">Try:</span>
+      <span className="self-center text-xs text-ink-faint">{t('landing.try')}</span>
       {SUGGESTIONS.map((item) => (
         <button
-          key={item.label}
+          key={item}
           type="button"
           className="chat-suggestion"
-          onClick={() => void sendMessage(item.prompt)}
+          onClick={() => void sendMessage(t(`landing.suggestions.${item}.prompt`))}
           disabled={isSending}
         >
-          {item.label}
+          {t(`landing.suggestions.${item}.label`)}
         </button>
       ))}
     </div>
@@ -1463,37 +1433,37 @@ export function ChatPage() {
               <span aria-hidden className="text-base leading-none">
                 ☰
               </span>
-              History
+              {t('header.history')}
             </button>
             <button
               type="button"
               className="btn-primary inline-flex items-center gap-1.5 px-3 py-1.5 text-xs"
-              title="New chat"
+              title={t('header.newChat')}
               onClick={startNewChat}
             >
               <span aria-hidden>+</span>
-              New chat
+              {t('header.newChat')}
             </button>
 
             {selectedId ? (
               <div className="ml-auto flex min-w-0 items-center gap-2">
                 <h2 className="min-w-0 truncate font-display text-base font-semibold text-ink sm:text-lg">
-                  {selectedConversation?.title || 'Chat'}
+                  {selectedConversation?.title || t('header.untitledChat')}
                 </h2>
                 <p className="hidden shrink-0 text-xs text-ink-faint sm:inline" title={runOnTitle}>
-                  {activeProfile?.name ?? 'Assistant'}
+                  {activeProfile?.name ?? t('header.assistant')}
                   <span className="mx-1.5 text-ink-faint/60">·</span>
-                  {effectiveRunMode === 'automatic' ? 'Automatic' : 'This computer'}
+                  {effectiveRunMode === 'automatic' ? t('composer.automatic') : t('composer.thisComputer')}
                 </p>
                 {selectedConversation && (
                   <button
                     type="button"
                     className="shrink-0 rounded-md px-2 py-1 text-xs text-ink-faint transition hover:bg-danger/15 hover:text-danger"
-                    title="Delete chat"
-                    aria-label="Delete chat"
+                    title={t('header.deleteChat')}
+                    aria-label={t('header.deleteChat')}
                     onClick={(e) => handleDelete(selectedConversation, e)}
                   >
-                    Delete
+                    {t('header.delete')}
                   </button>
                 )}
               </div>
@@ -1516,11 +1486,9 @@ export function ChatPage() {
               <Ratatoskr state={landingError ? 'error' : 'idle'} size={96} className="mb-3" />
               <RealmKicker path="/chat" className="justify-center" />
               <h1 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-                What can I help you with?
+                {t('landing.title')}
               </h1>
-              <p className="mt-2 max-w-md text-center text-sm text-ink-muted">
-                Talk to your local AI. Yggdrasil picks the right resources automatically.
-              </p>
+              <p className="mt-2 max-w-md text-center text-sm text-ink-muted">{t('landing.subtitle')}</p>
             </div>
 
             {selectedId ? (
@@ -1571,7 +1539,7 @@ export function ChatPage() {
                 })}
 
                 {isSending && planSteps.length > 0 && (
-                  <ol className="max-w-[min(42rem,85%)] space-y-1.5 border-l-2 border-norn/40 pl-3" aria-label="Plan">
+                  <ol className="max-w-[min(42rem,85%)] space-y-1.5 border-l-2 border-norn/40 pl-3" aria-label={t('transcript.plan')}>
                     {planSteps.map((s, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-ink-muted">
                         <span aria-hidden className={s.status === 'done' ? 'text-success' : s.status === 'failed' ? 'text-warning' : s.status === 'running' ? 'text-norn' : 'text-ink-faint'}>
@@ -1593,7 +1561,12 @@ export function ChatPage() {
                         {step.nodeName ? (
                           <span>
                             {' '}
-                            on <span className="text-info">{step.nodeName}</span>
+                            <Trans
+                              t={t}
+                              i18nKey="transcript.onComputer"
+                              values={{ computer: step.nodeName }}
+                              components={{ computer: <span className="text-info" /> }}
+                            />
                           </span>
                         ) : null}
                       </li>
@@ -1603,14 +1576,14 @@ export function ChatPage() {
 
                 {toolFailure && !isSending && !statusMessage && (
                   <p className="text-sm text-ink-muted">
-                    {toolFailure} failed
+                    {t('tools.failed', { tool: toolFailure })}
                     {' · '}
                     <button
                       type="button"
                       className="text-primary underline-offset-2 hover:underline"
                       onClick={() => void sendMessage(lastUserMessageRef.current)}
                     >
-                      Retry
+                      {t('tools.retry')}
                     </button>
                   </p>
                 )}
@@ -1621,7 +1594,7 @@ export function ChatPage() {
                       className="underline-offset-2 hover:underline"
                       onClick={() => setToolDetailsOpen((open) => !open)}
                     >
-                      Used {toolTraces.length} tool{toolTraces.length === 1 ? '' : 's'} {toolDetailsOpen ? '▾' : '▸'}
+                      {t('tools.used', { count: toolTraces.length })} {toolDetailsOpen ? '▾' : '▸'}
                     </button>
                     {toolDetailsOpen && (
                       <ul className="mt-2 space-y-1">
@@ -1641,7 +1614,7 @@ export function ChatPage() {
                   <div className="max-w-[min(42rem,85%)] break-words rounded-2xl bg-raised/80 px-4 py-3 text-[15px] leading-relaxed text-ink">
                     <ChatMarkdown text={streamingText} />
                     {responseInterrupted && !isSending ? (
-                      <p className="mt-2 text-xs text-ink-muted">Response interrupted</p>
+                      <p className="mt-2 text-xs text-ink-muted">{t('transcript.interrupted')}</p>
                     ) : null}
                     {isSending && (
                       <span className="chat-caret ml-0.5 inline-block h-4 w-0.5 bg-primary align-middle" />
@@ -1693,7 +1666,7 @@ export function ChatPage() {
                     onClick={jumpToLatest}
                   >
                     <span aria-hidden>↓ </span>
-                    Latest
+                    {t('header.latest')}
                   </button>
                 ) : null}
               </div>
@@ -1766,10 +1739,10 @@ export function ChatPage() {
                 id="delete-chat-title"
                 className="font-display text-lg font-semibold text-ink"
               >
-                Delete this chat?
+                {t('deleteDialog.title')}
               </h2>
               <p className="mt-1 break-words text-sm text-ink-muted">
-                “{pendingDelete.title || 'Untitled'}” will be removed permanently.
+                {t('deleteDialog.body', { title: pendingDelete.title || t('deleteDialog.untitled') })}
               </p>
             </div>
             <div className="flex flex-wrap justify-end gap-2">
@@ -1779,7 +1752,7 @@ export function ChatPage() {
                 disabled={deleteConversation.isPending}
                 onClick={() => setPendingDelete(null)}
               >
-                Cancel
+                {t('deleteDialog.cancel')}
               </button>
               <button
                 type="button"
@@ -1787,7 +1760,7 @@ export function ChatPage() {
                 disabled={deleteConversation.isPending}
                 onClick={confirmDelete}
               >
-                {deleteConversation.isPending ? 'Deleting…' : 'Delete'}
+                {deleteConversation.isPending ? t('deleteDialog.deleting') : t('deleteDialog.delete')}
               </button>
             </div>
           </div>
@@ -1807,12 +1780,9 @@ export function ChatPage() {
                 id="tool-permission-title"
                 className="font-display text-lg font-semibold text-ink"
               >
-                Allow {toolDisplayName(pendingTool.toolId)}?
+                {t('tools.permissionTitle', { tool: toolDisplayName(pendingTool.toolId) })}
               </h2>
-              <p className="mt-1 text-sm text-ink-muted">
-                {pendingTool.reason ||
-                  'The assistant wants to use a local tool to continue.'}
-              </p>
+              <p className="mt-1 text-sm text-ink-muted">{pendingTool.reason || t('tools.permissionReason')}</p>
             </div>
             <p className="break-words text-sm text-ink">{pendingTool.argsSummary}</p>
             {advancedMode && pendingTool.rawArgs && (
@@ -1825,7 +1795,7 @@ export function ChatPage() {
                 disabled={toolDeciding}
                 onClick={() => void decidePendingTool(true, false)}
               >
-                Allow once
+                {t('tools.allowOnce')}
               </button>
               <button
                 type="button"
@@ -1833,7 +1803,7 @@ export function ChatPage() {
                 disabled={toolDeciding}
                 onClick={() => void decidePendingTool(true, true)}
               >
-                Allow for session
+                {t('tools.allowSession')}
               </button>
               <button
                 type="button"
@@ -1841,7 +1811,7 @@ export function ChatPage() {
                 disabled={toolDeciding}
                 onClick={() => void decidePendingTool(false)}
               >
-                Deny
+                {t('tools.deny')}
               </button>
             </div>
           </div>

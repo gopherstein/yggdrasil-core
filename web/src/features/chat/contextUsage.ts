@@ -1,3 +1,5 @@
+import i18n from '@/i18n'
+
 export type ContextUsage = {
   promptTokens: number
   limit: number
@@ -66,10 +68,10 @@ export type ContextRow = {
 
 export function contextRows(usage: ContextUsage): ContextRow[] {
   const rows: ContextRow[] = [
-    { id: 'instructions', label: 'Instructions', tokens: usage.instructions },
-    { id: 'tools', label: 'Tools', tokens: usage.tools },
-    { id: 'conversation', label: 'Conversation', tokens: usage.conversation },
-    { id: 'toolResults', label: 'Tool results', tokens: usage.toolResults },
+    { id: 'instructions', label: i18n.t('chat:context.rows.instructions'), tokens: usage.instructions },
+    { id: 'tools', label: i18n.t('chat:context.rows.tools'), tokens: usage.tools },
+    { id: 'conversation', label: i18n.t('chat:context.rows.conversation'), tokens: usage.conversation },
+    { id: 'toolResults', label: i18n.t('chat:context.rows.toolResults'), tokens: usage.toolResults },
   ]
   return rows.filter((row) => row.tokens > 0)
 }

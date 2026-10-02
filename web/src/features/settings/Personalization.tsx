@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import type { PersonalStyle } from '@/types/api'
 
 const KEY = ['personalization'] as const
 
-const SELECTS: { key: 'length' | 'tone' | 'format' | 'units'; label: string; options: [string, string][] }[] = [
-  { key: 'length', label: 'Answer length', options: [['brief', 'Brief'], ['balanced', 'Balanced'], ['detailed', 'Detailed']] },
-  { key: 'tone', label: 'Tone', options: [['friendly', 'Friendly'], ['neutral', 'Neutral'], ['direct', 'Direct']] },
-  { key: 'format', label: 'Format', options: [['prose', 'Paragraphs'], ['lists', 'Lists']] },
-  { key: 'units', label: 'Units', options: [['metric', 'Metric'], ['imperial', 'Imperial']] },
+// Each choice's label and options are settings:personalization.<key> in the catalog.
+const SELECTS: { key: 'length' | 'tone' | 'format' | 'units'; options: string[] }[] = [
+  { key: 'length', options: ['brief', 'balanced', 'detailed'] },
+  { key: 'tone', options: ['friendly', 'neutral', 'direct'] },
+  { key: 'format', options: ['prose', 'lists'] },
+  { key: 'units', options: ['metric', 'imperial'] },
 ]
 
 /**
@@ -17,6 +19,7 @@ const SELECTS: { key: 'length' | 'tone' | 'format' | 'units'; label: string; opt
  * set under Tool permissions, and a preference here can never change it.
  */
 export function Personalization() {
+  const { t } = useTranslation('settings')
   const queryClient = useQueryClient()
   const query = useQuery({ queryKey: KEY, queryFn: () => api.getPersonalStyle(), retry: false })
   const [draft, setDraft] = useState<PersonalStyle>({})
@@ -36,7 +39,7 @@ export function Personalization() {
     },
     onError: (err) => {
       setSaved(false)
-      setError(err instanceof Error ? err.message : 'Could not save.')
+      setError(err instanceof Error ? err.message : t('personalization.saveFailed'))
     },
   })
 
@@ -48,25 +51,22 @@ export function Personalization() {
   return (
     <section className="card space-y-4">
       <div>
-        <h2 className="section-title">Personalization</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          How answers should look, in every chat and automation. This shapes style only. What the AI may do is set under
-          Tool permissions, and nothing here or in Memory can change it.
-        </p>
+        <h2 className="section-title">{t('personalization.title')}</h2>
+        <p className="mt-1 text-sm text-ink-muted">{t('personalization.description')}</p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         {SELECTS.map((s) => (
           <label key={s.key} className="block text-sm">
-            <span className="text-ink-muted">{s.label}</span>
+            <span className="text-ink-muted">{t(`personalization.${s.key}.label`)}</span>
             <select
               className="field mt-1 w-full"
               value={draft[s.key] ?? ''}
               onChange={(e) => set({ [s.key]: e.target.value } as PersonalStyle)}
             >
-              <option value="">No preference</option>
-              {s.options.map(([value, label]) => (
+              <option value="">{t('personalization.noPreference')}</option>
+              {s.options.map((value) => (
                 <option key={value} value={value}>
-                  {label}
+                  {t(`personalization.${s.key}.${value}`)}
                 </option>
               ))}
             </select>
@@ -74,30 +74,30 @@ export function Personalization() {
         ))}
       </div>
       <label className="block text-sm">
-        <span className="text-ink-muted">About you</span>
+        <span className="text-ink-muted">{t('personalization.aboutYou')}</span>
         <textarea
           className="field mt-1 min-h-20 w-full"
           maxLength={1500}
-          placeholder="I'm a backend engineer in Juneau. My main project is a Go service."
+          placeholder={t('personalization.aboutYouPlaceholder')}
           value={draft.about_me ?? ''}
           onChange={(e) => set({ about_me: e.target.value })}
         />
       </label>
       <label className="block text-sm">
-        <span className="text-ink-muted">Anything else about how to answer</span>
+        <span className="text-ink-muted">{t('personalization.instructions')}</span>
         <textarea
           className="field mt-1 min-h-20 w-full"
           maxLength={1500}
-          placeholder="Show code examples in Go. Mention sources at the end."
+          placeholder={t('personalization.instructionsPlaceholder')}
           value={draft.instructions ?? ''}
           onChange={(e) => set({ instructions: e.target.value })}
         />
       </label>
       <div className="flex items-center gap-3">
         <button type="button" className="btn-primary px-3 py-1.5 text-xs" disabled={save.isPending} onClick={() => save.mutate()}>
-          {save.isPending ? 'Saving…' : 'Save'}
+          {save.isPending ? t('personalization.saving') : t('personalization.save')}
         </button>
-        {saved && <span className="text-xs text-ink-faint">Saved</span>}
+        {saved && <span className="text-xs text-ink-faint">{t('personalization.saved')}</span>}
       </div>
       {error && <p className="text-xs text-danger">{error}</p>}
     </section>

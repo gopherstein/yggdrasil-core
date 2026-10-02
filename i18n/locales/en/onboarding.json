@@ -1,0 +1,76 @@
+{
+  "header": {
+    "welcome": "Welcome",
+    "lede": "This app can run AI privately on your own computers."
+  },
+  "hardware": {
+    "title": "This computer",
+    "description": "Hardware detected for local inference.",
+    "detecting": "Detecting hardware…",
+    "processor": "Processor",
+    "cores_one": "{{count}} core",
+    "cores_other": "{{count}} cores",
+    "memory": "Memory",
+    "graphics": "Graphics",
+    "system": "System",
+    "unavailable": "Hardware details will appear once the app backend is running. You can continue setup now."
+  },
+  "question": "What would you like your AI to do?",
+  "purposes": {
+    "general": {
+      "title": "General Assistant",
+      "description": "Everyday questions, writing help, and local-first conversation."
+    },
+    "coding": {
+      "title": "Programming",
+      "description": "Code help that can use all your paired computers automatically when models are installed on them."
+    },
+    "research": {
+      "title": "Research",
+      "description": "Long-form reading, summarization, and careful reasoning."
+    },
+    "custom": {
+      "title": "Custom",
+      "description": "Pick models and orchestration yourself in advanced mode."
+    }
+  },
+  "continue": "Continue",
+  "finding": "Finding a setup…",
+  "recommendFailed": "Could not get a recommendation.",
+  "recommend": {
+    "badge": "Recommended",
+    "title": "Recommended for {{purpose}}",
+    "download": "{{size}} download",
+    "storage": "Estimated storage",
+    "memory": "Estimated active memory",
+    "install": "Install recommended setup",
+    "skip": "Skip for now",
+    "back": "Back"
+  },
+  "roles": {
+    "coordinator": "Coordinator",
+    "worker": "Worker",
+    "reviewer": "Reviewer",
+    "researcher": "Researcher",
+    "assistant": "Assistant"
+  },
+  "install": {
+    "runtime": "Installing the local model runtime…",
+    "model": "Installing {{model}}…",
+    "downloading": "Downloading {{model}}… {{percent}}%",
+    "profile": "Creating your AI profile…",
+    "conversation": "Preparing your first conversation…",
+    "chatTitle": "{{profile}} chat",
+    "working": "Installing…",
+    "complete": "{{percent}}% complete",
+    "keepOpen": "Large model downloads can take several minutes. Keep this window open.",
+    "failed": "Installation failed.",
+    "downloadFailed": "Model download failed.",
+    "noProfileId": "Profile was created but no ID was returned."
+  },
+  "ready": {
+    "title": "You are ready",
+    "description": "Your recommended setup is installed. Start chatting with your local AI.",
+    "start": "Start chatting"
+  }
+}
