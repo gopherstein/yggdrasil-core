@@ -1,16 +1,30 @@
 name: Screenshots
 
+# Captures the README screenshots, the walkthrough, and the App Store images
+# from demo data. Run by the Release workflow after a release is published,
+# which attaches the README screenshots and the walkthrough to the release so
+# yggdrasil.yeix.io shows the ones that match it. Run it by hand with a tag
+# to attach them to an existing release, or without one to only capture.
+
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - "v*"
+    inputs:
+      tag:
+        description: "Release tag to attach the screenshots to, such as v1.4.0. Leave blank to only capture."
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      tag:
+        description: "Release tag to capture and attach the screenshots to."
+        required: true
+        type: string
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
-  group: screenshots-${{ github.ref }}
+  group: screenshots-${{ inputs.tag || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -18,6 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Capture the release's own interface, not whatever main has now.
+          ref: ${{ inputs.tag || github.ref }}
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
@@ -42,3 +59,19 @@ jobs:
             docs/screenshots
             screenshots/appstore
           if-no-files-found: error
+      # Release assets are one flat list, so each file gets a screenshot-
+      # prefix; the site looks for screenshot-<name>. --clobber replaces the
+      # files when the workflow is run again for the same release.
+      - name: Attach to the release
+        if: ${{ inputs.tag != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/release-screenshots
+          for f in docs/screenshots/*.png docs/screenshots/demo.mp4; do
+            cp "$f" "/tmp/release-screenshots/screenshot-$(basename "$f")"
+          done
+          gh release upload "$TAG" /tmp/release-screenshots/* --clobber --repo "$GITHUB_REPOSITORY"
+          echo "Attached $(ls /tmp/release-screenshots | wc -l) screenshots to ${TAG}."

@@ -15,6 +15,7 @@ After a successful release, the workflow sends a `core-release` event to `yeixio
 - [ ] API compatibility reviewed against [api.md](api.md) and [api/openapi.yaml](../api/openapi.yaml).
 - [ ] GitHub Release contains the `.deb`, `.rpm`, and `.tar.gz` artifacts.
 - [ ] `SHA256SUMS.txt` is attached and matches the artifacts.
+- [ ] The `screenshots` job attached `screenshot-*.png` and `screenshot-demo.mp4` to the release. yggdrasil.yeix.io shows them. If the job failed, fix it and run the Screenshots workflow by hand with the tag.
 - [ ] Release notes written. The workflow uses [packaging/release-install.md](../packaging/release-install.md) as the body.
 - [ ] Install tested from a clean environment for each platform you claim in the notes.
 - [ ] No secrets, data directories, or private keys in the artifacts or the notes.
