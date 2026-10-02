@@ -12,6 +12,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 
 ### Changed
 
+- `api/openapi.yaml` now describes every route: the control plane, the OpenAI-compatible API, and the MCP server, with request bodies, responses, the error shape, and bearer authentication. It previously covered 51 of them. A test fails when the daemon serves a route the spec does not describe, or the spec describes one the daemon does not serve.
 - Rewrote the architecture, privacy, and troubleshooting pages for 1.4.0, and updated tools, capabilities, compatibility, and the README. Removed statements that no longer matched the code, such as where retrieved knowledge goes in a prompt and which `/chat` fields exist.
 - Each release carries its own screenshots. After a release is published, the Screenshots workflow captures the README stills and the walkthrough from that release's interface and attaches them as `screenshot-<name>` files, which yggdrasil.yeix.io shows. Started by hand with a tag, it attaches them to an existing release.
 

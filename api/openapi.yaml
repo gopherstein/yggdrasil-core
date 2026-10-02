@@ -1,10 +1,17 @@
 openapi: 3.0.3
 info:
   title: Yggdrasil Control Plane API
-  version: 0.1.0
-  description: Local AI control plane API for Yggdrasil.
+  version: 1.4.0
+  description: >-
+    Local AI control plane API for Yggdrasil, its OpenAI-compatible routes, and its MCP server.
+    On the default loopback bind no key is needed. When the daemon listens on any other address,
+    every /api/v1, /v1, and /mcp route needs Authorization: Bearer YOUR_API_KEY; /about and /source do not.
+    Errors are {"error": {"code", "message", "details"}}. docs/api.md describes the behavior of each route.
 servers:
   - url: http://127.0.0.1:7331
+security:
+  - {}
+  - bearerAuth: []
 paths:
   /api/v1/health:
     get:
@@ -87,6 +94,28 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AIProfile"
+    post:
+      summary: Create a profile
+      operationId: createProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AIProfile"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AIProfile"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/v1/nodes:
     get:
       summary: List local and discovered computers
@@ -128,14 +157,45 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/SettingsView"
+    put:
+      summary: Update settings (same as PATCH)
+      operationId: putSettings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettingsView"
   /api/v1/settings/reset:
     post:
       summary: Reset application to defaults
       description: >
         Clears chats, custom profiles, tasks, and API keys; restores settings and
-        built-in profiles. Downloaded models and runtimes are kept. The client should
-        clear local UI state and restart onboarding.
+        built-in profiles. Downloaded models and runtimes are kept unless delete_models
+        is true. The client should clear local UI state and restart onboarding. Not reversible.
       operationId: resetApp
+      parameters:
+        - name: delete_models
+          in: query
+          schema:
+            type: string
+            enum: ["true", "false"]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                delete_models:
+                  type: boolean
       responses:
         "200":
           description: OK
@@ -299,6 +359,9 @@ paths:
                   type: string
                 model_id:
                   type: string
+                memory_off:
+                  type: boolean
+                  description: Turn memory off for this chat
       responses:
         "200":
           description: OK
@@ -787,6 +850,18 @@ paths:
           description: An API key is required
         "403":
           description: Origin not allowed
+    get:
+      summary: Not supported; the server does not open a stream
+      operationId: mcpServerGet
+      responses:
+        "405":
+          description: This endpoint takes POST
+    delete:
+      summary: End an MCP session
+      operationId: mcpServerDelete
+      responses:
+        "200":
+          description: Ended
   /mcp/oauth/callback:
     get:
       summary: Where a tool source's sign-in returns; shows a page that says how it went
@@ -943,28 +1018,2908 @@ paths:
           description: Not recorded, or removed by retention
   /api/v1/diagnostics:
     get:
-      summary: Create a diagnostics bundle
+      summary: Create a diagnostics bundle (a zip without secrets or private keys)
       operationId: exportDiagnostics
+      parameters:
+        - name: include_conversations
+          in: query
+          schema:
+            type: string
+            enum: ["true", "false"]
       responses:
         "200":
-          description: OK
+          description: Where the bundle was written
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path:
+                    type: string
+                  message:
+                    type: string
+        "500":
+          description: The bundle could not be created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Create a diagnostics bundle
+      operationId: createDiagnostics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                include_conversations:
+                  type: boolean
+      responses:
+        "200":
+          description: Where the bundle was written
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path:
+                    type: string
+                  message:
+                    type: string
+        "500":
+          description: The bundle could not be created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /v1/models:
     get:
       summary: OpenAI-compatible model list
+      description: auto, each profile as profile:<id>, and each deployed specialized AI as sai:<slug>.
       operationId: openaiListModels
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object:
+                    type: string
+                    enum: [list]
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        object:
+                          type: string
+                        owned_by:
+                          type: string
   /v1/chat/completions:
     post:
       summary: OpenAI-compatible chat completions
+      description: >-
+        temperature and max_tokens are accepted and ignored. The yggdrasil object asks for
+        memory, knowledge, tools, effort, and placement, within what the API key allows.
       operationId: openaiChatCompletions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [model, messages]
+              properties:
+                model:
+                  type: string
+                  description: auto, profile:<id>, sai:<slug>, or a model id
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                      content:
+                        type: string
+                stream:
+                  type: boolean
+                temperature:
+                  type: number
+                max_tokens:
+                  type: integer
+                reasoning_effort:
+                  type: string
+                  enum: [low, medium, high]
+                response_format:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum: [text, json_object, json_schema]
+                    json_schema:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        schema:
+                          type: object
+                          additionalProperties: true
+                yggdrasil:
+                  type: object
+                  properties:
+                    memory:
+                      type: boolean
+                    knowledge:
+                      type: boolean
+                    knowledge_sources:
+                      type: array
+                      items:
+                        type: string
+                    tools:
+                      type: array
+                      items:
+                        type: string
+                    effort:
+                      type: string
+                      enum: [auto, fast, balanced, thorough]
+                    placement:
+                      type: string
+                      enum: [local, automatic]
+                    progress:
+                      type: boolean
+                      description: Stream progress and tool activity as chunks with an empty delta and a yggdrasil field
       responses:
         "200":
-          description: OK
-        "501":
-          description: Not implemented yet
+          description: A chat.completion, or with stream, server-sent chat.completion.chunk events ending with data [DONE]
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+            text/event-stream:
+              schema:
+                type: string
+        "400":
+          description: Invalid JSON, no user message, or an invalid response_format
+        "401":
+          description: An API key is required
+        "403":
+          description: The API key does not allow what was asked
+        "422":
+          description: The answer did not fit response_format after repair and one retry
+        "500":
+          description: The chat failed; the message says why
+  /api/v1/capabilities:
+    get:
+      summary: "Capability inventory: what Yggdrasil can do right now"
+      operationId: getCapabilities
+      parameters:
+        - name: ask
+          in: query
+          description: "A question such as \"Can you generate an image?\"; returns the abilities that answer it"
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "The inventory, or {question, abilities} with ask"
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/v1/capabilities/models/{id}:
+    get:
+      summary: Which computers can run an installed model
+      operationId: getModelPlacement
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Model id and computers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                  computers:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        "404":
+          description: The model is not installed on any computer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/caches:
+    get:
+      summary: Caches with their declared policies and sizes
+      operationId: listCaches
+      responses:
+        "200":
+          description: Caches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+  /api/v1/caches/{name}/clear:
+    post:
+      summary: Clear one cache
+      operationId: clearCache
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Cleared
+        "404":
+          description: No cache has that name
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/models/recommend:
+    get:
+      summary: Recommended models for this computer
+      operationId: recommendModels
+      parameters:
+        - name: purpose
+          in: query
+          description: What the model is for, such as chat or coding
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Recommendations
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/v1/models/fit:
+    get:
+      summary: How well each catalog model fits this computer
+      operationId: modelsFit
+      responses:
+        "200":
+          description: Fit per model
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+  /api/v1/models/browse:
+    get:
+      summary: Search Hugging Face for GGUF models
+      operationId: browseModels
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Models
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+  /api/v1/models/running:
+    get:
+      summary: Loaded model instances on this and paired computers
+      operationId: listRunningModels
+      responses:
+        "200":
+          description: Running models
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+  /api/v1/models/install-from-url:
+    post:
+      summary: Download a GGUF from a URL
+      operationId: installModelFromURL
+      parameters:
+        - name: wait
+          in: query
+          description: true waits for the download to finish
+          schema:
+            type: string
+            enum: ["true", "false"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InstallFromURLRequest"
+      responses:
+        "200":
+          description: Started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  model_id:
+                    type: string
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/models/{id}/install:
+    post:
+      summary: Download a catalog model, here or on a paired computer
+      operationId: installModel
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: wait
+          in: query
+          schema:
+            type: string
+            enum: ["true", "false"]
+        - name: node_id
+          in: query
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node_id:
+                  type: string
+                wait:
+                  type: boolean
+      responses:
+        "200":
+          description: Started, or installed with wait
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [started, installed]
+                  model_id:
+                    type: string
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/models/{id}/start:
+    post:
+      summary: Load a model
+      operationId: startModel
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node_id:
+                  type: string
+      responses:
+        "200":
+          description: The running instance
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/models/{id}/stop:
+    post:
+      summary: Unload a model instance
+      operationId: stopModel
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node_id:
+                  type: string
+                instance_id:
+                  type: string
+                  description: Defaults to the path id
+      responses:
+        "200":
+          description: Stopped
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/models/{id}:
+    delete:
+      summary: Delete a model file
+      operationId: deleteModel
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: node_id
+          in: query
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node_id:
+                  type: string
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/runtimes:
+    get:
+      summary: Runtimes and whether each is installed
+      operationId: listRuntimes
+      responses:
+        "200":
+          description: Runtimes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+  /api/v1/runtimes/{id}/install:
+    post:
+      summary: Install a runtime, such as llamacpp
+      operationId: installRuntime
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Installed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  runtime_id:
+                    type: string
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/profiles/{id}:
+    get:
+      summary: One profile
+      operationId: getProfile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AIProfile"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      summary: Update a profile, including its orchestration controls
+      operationId: updateProfile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AIProfile"
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AIProfile"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a custom profile
+      operationId: deleteProfile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/chat:
+    post:
+      summary: Send a chat message
+      description: "Without stream, returns {content, metrics}. With stream, a server-sent event stream of token events, then done; an error event ends it early."
+      operationId: chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_id:
+                  type: string
+                message:
+                  type: string
+                profile_id:
+                  type: string
+                model_id:
+                  type: string
+                  description: "A model id, auto, or sai:<slug>"
+                effort:
+                  type: string
+                  enum: [auto, fast, balanced, thorough]
+                attachments:
+                  type: array
+                  items:
+                    type: string
+                  description: Artifact ids from POST /api/v1/artifacts
+                execution:
+                  type: string
+                  description: Where the turn runs, such as local
+                stream:
+                  type: boolean
+              required: [message]
+      responses:
+        "200":
+          description: The answer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: string
+                  metrics:
+                    type: object
+                    additionalProperties: true
+            text/event-stream:
+              schema:
+                type: string
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/chat/stop:
+    post:
+      summary: Stop a conversation's running turn
+      operationId: stopChat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_id:
+                  type: string
+              required: [conversation_id]
+      responses:
+        "200":
+          description: Whether a turn was stopped
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  stopped:
+                    type: boolean
+  /api/v1/conversations/{id}/messages:
+    get:
+      summary: Messages of a conversation, with sources, steps, and files
+      operationId: listConversationMessages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+  /api/v1/conversations/{id}/artifacts:
+    get:
+      summary: Files attached to or made in a conversation
+      operationId: listConversationArtifacts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Files
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Artifact"
+  /api/v1/artifacts:
+    post:
+      summary: Upload a file to attach to a chat (up to 25 MB)
+      operationId: uploadArtifact
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                text:
+                  type: string
+                content_base64:
+                  type: string
+                conversation_id:
+                  type: string
+              required: [name]
+      responses:
+        "200":
+          description: The file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artifact"
+        "400":
+          description: Unsupported, unreadable, or invalid file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/artifacts/{id}:
+    get:
+      summary: One file
+      operationId: getArtifact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Artifact"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a file
+      operationId: deleteArtifact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/artifacts/{id}/content:
+    get:
+      summary: A file's content
+      operationId: getArtifactContent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: inline
+          in: query
+          description: "1 shows a PDF or image in the browser instead of downloading it"
+          schema:
+            type: string
+            enum: ["1"]
+      responses:
+        "200":
+          description: The file, with its own content type
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/tasks:
+    get:
+      summary: Recent tasks
+      operationId: listTasks
+      responses:
+        "200":
+          description: Tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+    post:
+      summary: Run a prompt as a task
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profile_id:
+                  type: string
+                conversation_id:
+                  type: string
+                prompt:
+                  type: string
+              required: [prompt]
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/tasks/{id}:
+    get:
+      summary: One task
+      operationId: getTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Task
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/memory:
+    get:
+      summary: Memories and the categories they can have
+      operationId: listMemories
+      responses:
+        "200":
+          description: Memories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  memories:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Memory"
+                  categories:
+                    type: array
+                    items:
+                      type: string
+    post:
+      summary: "Add a memory; an existing equal memory is returned instead"
+      operationId: addMemory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                category:
+                  type: string
+              required: [content]
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Memory"
+        "200":
+          description: Already remembered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Memory"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/memory/{id}:
+    patch:
+      summary: Edit, turn off, or keep a memory on this computer only
+      operationId: updateMemory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                category:
+                  type: string
+                enabled:
+                  type: boolean
+                local_only:
+                  type: boolean
+      responses:
+        "200":
+          description: Memory
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Memory"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a memory
+      operationId: deleteMemory
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/knowledge/sources:
+    get:
+      summary: Connected knowledge sources
+      operationId: listKnowledgeSources
+      responses:
+        "200":
+          description: Sources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KnowledgeSource"
+    post:
+      summary: Connect a file, folder, upload, pasted text, database, or web API
+      operationId: createKnowledgeSource
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                kind:
+                  type: string
+                  enum: [path, text, database, api]
+                path:
+                  type: string
+                  description: A file or folder, for path
+                filename:
+                  type: string
+                  description: "For text; its extension picks the reader"
+                text:
+                  type: string
+                content_base64:
+                  type: string
+                  description: A binary upload such as .xlsx, in place of text
+                remote:
+                  type: object
+                  properties:
+                    driver:
+                      type: string
+                      description: sqlite, postgres, or mysql
+                    database:
+                      type: string
+                      description: SQLite file path
+                    connection_string:
+                      type: string
+                      description: "PostgreSQL or MySQL; empty on update keeps the stored one"
+                    query:
+                      type: string
+                      description: A read-only SELECT
+                    url:
+                      type: string
+                      description: A web API returning JSON, CSV, or text
+                    items:
+                      type: string
+                      description: Where the items are in a JSON response
+                    headers:
+                      type: object
+                      additionalProperties:
+                        type: string
+                      description: "Sent with API requests; an empty value on update keeps the stored one"
+                    refresh_minutes:
+                      type: integer
+              required: [kind]
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeSource"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/knowledge/sources/{id}:
+    get:
+      summary: One source
+      operationId: getKnowledgeSource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Source
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeSource"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      summary: Rename a source, replace a text source's content, or change its connection
+      operationId: updateKnowledgeSource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                text:
+                  type: string
+                local_only:
+                  type: boolean
+                remote:
+                  type: object
+                  properties:
+                    driver:
+                      type: string
+                      description: sqlite, postgres, or mysql
+                    database:
+                      type: string
+                      description: SQLite file path
+                    connection_string:
+                      type: string
+                      description: "PostgreSQL or MySQL; empty on update keeps the stored one"
+                    query:
+                      type: string
+                      description: A read-only SELECT
+                    url:
+                      type: string
+                      description: A web API returning JSON, CSV, or text
+                    items:
+                      type: string
+                      description: Where the items are in a JSON response
+                    headers:
+                      type: object
+                      additionalProperties:
+                        type: string
+                      description: "Sent with API requests; an empty value on update keeps the stored one"
+                    refresh_minutes:
+                      type: integer
+      responses:
+        "200":
+          description: Source
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeSource"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Remove a source and its index
+      operationId: deleteKnowledgeSource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Removed
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/knowledge/sources/{id}/content:
+    get:
+      summary: The text of a pasted or uploaded source
+      operationId: getKnowledgeContent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Text
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/knowledge/sources/{id}/refresh:
+    post:
+      summary: "Reindex a source; a failure is recorded on the source"
+      operationId: refreshKnowledgeSource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Source
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KnowledgeSource"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/knowledge/search:
+    post:
+      summary: Search connected knowledge
+      operationId: searchKnowledge
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                source_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: Empty searches every source
+                limit:
+                  type: integer
+              required: [query]
+      responses:
+        "200":
+          description: Matching passages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/tools:
+    get:
+      summary: Tools with their policies
+      operationId: listTools
+      responses:
+        "200":
+          description: Tools
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+  /api/v1/tools/activity:
+    get:
+      summary: Recent tool calls and pending approvals
+      operationId: toolActivity
+      responses:
+        "200":
+          description: Activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+  /api/v1/tools/decide:
+    post:
+      summary: Answer a tool approval request
+      operationId: decideTool
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                request_id:
+                  type: string
+                allow:
+                  type: boolean
+                allow_session:
+                  type: boolean
+                  description: Allow for the rest of the session
+              required: [request_id]
+      responses:
+        "200":
+          description: Recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/tools/{id}/enabled:
+    post:
+      summary: Turn a tool on or off
+      operationId: setToolEnabled
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enabled:
+                  type: boolean
+              required: [enabled]
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  enabled:
+                    type: boolean
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/tools/{id}/test:
+    post:
+      summary: Run a tool once with the given arguments
+      operationId: testTool
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                args:
+                  type: object
+                  additionalProperties: true
+      responses:
+        "200":
+          description: The tool result
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/backends:
+    get:
+      summary: Trainers on this computer and whether each can run
+      operationId: trainingBackends
+      responses:
+        "200":
+          description: Backends
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+  /api/v1/training/base-models:
+    get:
+      summary: Trainable base models, ranked for a goal
+      operationId: trainingBaseModels
+      parameters:
+        - name: goal
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Base models
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/v1/training/classify:
+    post:
+      summary: Recommend whether material is for training, knowledge, or both
+      operationId: classifyMaterial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filename:
+                  type: string
+                text:
+                  type: string
+                content_base64:
+                  type: string
+                use:
+                  type: string
+                  enum: [training, knowledge, both]
+                  description: Previews the warning for that choice
+      responses:
+        "200":
+          description: Recommendation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  recommendation:
+                    type: object
+                    additionalProperties: true
+                additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/samples:
+    get:
+      summary: Sample material files
+      operationId: trainingSamples
+      responses:
+        "200":
+          description: Samples
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+  /api/v1/training/example:
+    post:
+      summary: Create the example specialized AI
+      operationId: createExampleAI
+      responses:
+        "200":
+          description: The specialized AI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecializedAI"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/deployed:
+    get:
+      summary: "Deployed specialized AIs, as model ids sai:<slug>"
+      operationId: deployedAIs
+      responses:
+        "200":
+          description: Deployed AIs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties: true
+  /api/v1/training/ais:
+    get:
+      summary: Specialized AIs
+      operationId: listAIs
+      responses:
+        "200":
+          description: Specialized AIs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpecializedAI"
+    post:
+      summary: Create a specialized AI
+      operationId: createAI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                goal:
+                  type: string
+                instructions:
+                  type: string
+                base_model_id:
+                  type: string
+                preset:
+                  type: string
+                  enum: [quick, balanced, quality]
+              required: [name]
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecializedAI"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}:
+    get:
+      summary: A specialized AI with its materials, revisions, and jobs
+      operationId: getAI
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+      responses:
+        "200":
+          description: Specialized AI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecializedAI"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      summary: Update a specialized AI
+      operationId: updateAI
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                goal:
+                  type: string
+                instructions:
+                  type: string
+                base_model_id:
+                  type: string
+                preset:
+                  type: string
+                  enum: [quick, balanced, quality]
+                advanced:
+                  type: object
+                  properties:
+                    method:
+                      type: string
+                      enum: [lora, qlora]
+                    epochs:
+                      type: integer
+                    rank:
+                      type: integer
+                    scale:
+                      type: number
+                    layers:
+                      type: integer
+                    learning_rate:
+                      type: number
+                    batch_size:
+                      type: integer
+                    max_seq_length:
+                      type: integer
+                    iters:
+                      type: integer
+                    grad_checkpoint:
+                      type: boolean
+                    seed:
+                      type: integer
+                clear_advanced:
+                  type: boolean
+                knowledge_sources:
+                  type: array
+                  items:
+                    type: string
+                  description: Knowledge source ids
+      responses:
+        "200":
+          description: Specialized AI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecializedAI"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete a specialized AI
+      operationId: deleteAI
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Conflicts with the AI's current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/materials:
+    post:
+      summary: Add material
+      operationId: addMaterial
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                filename:
+                  type: string
+                text:
+                  type: string
+                content_base64:
+                  type: string
+                use:
+                  type: string
+                  enum: [training, knowledge, both]
+                  description: Empty accepts the recommendation
+      responses:
+        "201":
+          description: Material
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/materials/{mid}:
+    delete:
+      summary: Remove material
+      operationId: deleteMaterial
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+        - name: mid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Removed
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/conversations:
+    post:
+      summary: Add chats as training material
+      operationId: addConversations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                conversation_ids:
+                  type: array
+                  items:
+                    type: string
+              required: [conversation_ids]
+      responses:
+        "201":
+          description: Material
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/examples:
+    get:
+      summary: Training examples and their statistics
+      operationId: listExamples
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+      responses:
+        "200":
+          description: Examples
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  examples:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+                  stats:
+                    type: object
+                    additionalProperties: true
+    post:
+      summary: Add an example
+      operationId: addExample
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                      content:
+                        type: string
+              required: [messages]
+      responses:
+        "201":
+          description: Added
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/examples/{eid}:
+    patch:
+      summary: Edit or exclude an example
+      operationId: updateExample
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+        - name: eid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      role:
+                        type: string
+                      content:
+                        type: string
+                excluded:
+                  type: boolean
+      responses:
+        "204":
+          description: Updated
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete an example
+      operationId: deleteExample
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+        - name: eid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/plan:
+    get:
+      summary: "Training plan: fit, downloads, disk, time, and the computer to train on"
+      operationId: trainingPlan
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+      responses:
+        "200":
+          description: Plan
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/train:
+    post:
+      summary: Start training
+      operationId: startTraining
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node_id:
+                  type: string
+                  description: "A paired computer to train on; empty uses the plan"
+      responses:
+        "202":
+          description: The job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingJob"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Conflicts with a running job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/test-prompts:
+    put:
+      summary: Set the prompts evaluation compares
+      operationId: setTestPrompts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                prompts:
+                  type: array
+                  items:
+                    type: string
+              required: [prompts]
+      responses:
+        "200":
+          description: Specialized AI
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/revisions/{rev}/evaluate:
+    post:
+      summary: Compare a revision with the base model
+      operationId: evaluateRevision
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+        - name: rev
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Revision number
+      responses:
+        "202":
+          description: Running
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ai_id:
+                    type: string
+                  revision:
+                    type: integer
+                  status:
+                    type: string
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/revisions/{rev}/deploy:
+    post:
+      summary: Deploy an evaluated revision
+      operationId: deployRevision
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+        - name: rev
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Revision number
+      responses:
+        "200":
+          description: Specialized AI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecializedAI"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: The revision is not evaluated, or another conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/revisions/{rev}/export:
+    get:
+      summary: Export status of a revision
+      operationId: exportStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+        - name: rev
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Revision number
+      responses:
+        "200":
+          description: Status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportStatus"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      summary: Export a revision as one GGUF file
+      operationId: exportRevision
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+        - name: rev
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Revision number
+      responses:
+        "200":
+          description: Ready
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportStatus"
+        "202":
+          description: Started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportStatus"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete an exported file
+      operationId: deleteExport
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+        - name: rev
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Revision number
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/revisions/{rev}/export/file:
+    get:
+      summary: Download the exported GGUF
+      operationId: downloadExport
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+        - name: rev
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Revision number
+      responses:
+        "200":
+          description: "The GGUF file; supports range requests"
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/ais/{id}/undeploy:
+    post:
+      summary: Stop serving a specialized AI
+      operationId: undeployAI
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Specialized AI id
+      responses:
+        "200":
+          description: Specialized AI
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpecializedAI"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/jobs:
+    get:
+      summary: Training jobs
+      operationId: listTrainingJobs
+      parameters:
+        - name: ai_id
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrainingJob"
+  /api/v1/training/jobs/{id}:
+    get:
+      summary: One training job
+      operationId: getTrainingJob
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingJob"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/training/jobs/{id}/cancel:
+    post:
+      summary: Cancel a training job
+      operationId: cancelTrainingJob
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "202":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingJob"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/automations:
+    get:
+      summary: Automations with their last result
+      operationId: listAutomations
+      responses:
+        "200":
+          description: Automations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Automation"
+    post:
+      summary: Create an automation
+      operationId: createAutomation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AutomationInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Automation"
+        "400":
+          description: Invalid automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/automations/preview:
+    post:
+      summary: Check an automation and show its next runs without saving it
+      operationId: previewAutomation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AutomationInput"
+      responses:
+        "200":
+          description: Preview
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/automations/{id}:
+    get:
+      summary: An automation with its run history
+      operationId: getAutomation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Automation
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "404":
+          description: No such automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      summary: Change only the fields given
+      operationId: updateAutomation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AutomationInput"
+      responses:
+        "200":
+          description: Automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Automation"
+        "400":
+          description: Invalid automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: No such automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Conflicts with its current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      summary: Delete an automation
+      operationId: deleteAutomation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: No such automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/automations/{id}/run:
+    post:
+      summary: Run an automation now
+      operationId: runAutomation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The run
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: No such automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Conflicts with its current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/automations/{id}/pause:
+    post:
+      summary: Pause an automation
+      operationId: pauseAutomation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Automation"
+        "400":
+          description: Invalid automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: No such automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Conflicts with its current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/automations/{id}/resume:
+    post:
+      summary: Resume an automation
+      operationId: resumeAutomation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Automation"
+        "400":
+          description: Invalid automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: No such automation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "409":
+          description: Conflicts with its current state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/nodes/refresh:
+    post:
+      summary: Look for computers again
+      operationId: refreshNodes
+      responses:
+        "200":
+          description: Computers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Node"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/nodes/pair:
+    post:
+      summary: Offer to pair with a discovered computer
+      operationId: pairNode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node_id:
+                  type: string
+              required: [node_id]
+      responses:
+        "200":
+          description: Pairing session, with the code to confirm
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/nodes/pair/claim:
+    post:
+      summary: Pair using the code shown on the other computer
+      operationId: claimPairing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                node_id:
+                  type: string
+                code:
+                  type: string
+              required: [code]
+      responses:
+        "200":
+          description: Pairing session
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/nodes/pairing/pending:
+    get:
+      summary: Pairing offers waiting for approval on this computer
+      operationId: pendingPairings
+      responses:
+        "200":
+          description: Offers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PairingOffer"
+  /api/v1/nodes/pairing/offer:
+    post:
+      summary: Receive a pairing offer from another computer
+      operationId: receivePairingOffer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PairingOffer"
+      responses:
+        "200":
+          description: Pairing session
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/nodes/pairing/outbound/{code}:
+    get:
+      summary: The offer this computer made for a code
+      operationId: outboundPairing
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Offer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PairingOffer"
+        "404":
+          description: Unknown or expired code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/nodes/{id}/pair/approve:
+    post:
+      summary: Approve a pairing offer
+      operationId: approvePairing
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+      responses:
+        "200":
+          description: Pairing session
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/nodes/{id}/revoke:
+    post:
+      summary: Stop trusting a paired computer
+      operationId: revokeNode
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Revoked
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/api-keys:
+    get:
+      summary: API keys, without their secrets
+      operationId: listAPIKeys
+      responses:
+        "200":
+          description: Keys
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/APIKey"
+    post:
+      summary: "Create an API key; the secret is shown only in this response"
+      operationId: createAPIKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    $ref: "#/components/schemas/APIKey"
+                  secret:
+                    type: string
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/api-keys/{id}:
+    delete:
+      summary: Delete an API key
+      operationId: deleteAPIKey
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/api-keys/{id}/rotate:
+    post:
+      summary: "Replace a key's secret; the old one stops working"
+      operationId: rotateAPIKey
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Rotated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    $ref: "#/components/schemas/APIKey"
+                  secret:
+                    type: string
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: An API key from the API Access page, or YGGDRASIL_API_KEY
   schemas:
     PersonalStyle:
       type: object
@@ -1062,4 +4017,366 @@ components:
       additionalProperties: true
     Conversation:
       type: object
+      additionalProperties: true
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: object
+              additionalProperties: true
+    InstallFromURLRequest:
+      type: object
+      properties:
+        source_url:
+          type: string
+        display_name:
+          type: string
+        id:
+          type: string
+        filename:
+          type: string
+        size_bytes:
+          type: integer
+        parameters:
+          type: string
+        variant:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        node_id:
+          type: string
+      required: [source_url]
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        conversation_id:
+          type: string
+        role:
+          type: string
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        meta:
+          type: object
+          description: Sources, steps, and files of an answer
+          additionalProperties: true
+      additionalProperties: true
+    Artifact:
+      type: object
+      properties:
+        id:
+          type: string
+        conversation_id:
+          type: string
+        name:
+          type: string
+        mime_type:
+          type: string
+        kind:
+          type: string
+        size_bytes:
+          type: integer
+        producer:
+          type: string
+        source_task:
+          type: string
+      additionalProperties: true
+    Memory:
+      type: object
+      properties:
+        id:
+          type: string
+        content:
+          type: string
+        category:
+          type: string
+        enabled:
+          type: boolean
+        local_only:
+          type: boolean
+      additionalProperties: true
+    KnowledgeSource:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        kind:
+          type: string
+          enum: [path, text, database, api]
+        path:
+          type: string
+        filename:
+          type: string
+        status:
+          type: string
+        error:
+          type: string
+        chunk_count:
+          type: integer
+        embedded_count:
+          type: integer
+        embedding_model:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        refreshed_at:
+          type: string
+          format: date-time
+        local_only:
+          type: boolean
+        remote:
+          type: object
+          description: How a database or API source is reached, without its credentials
+          additionalProperties: true
+    SpecializedAI:
+      type: object
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        name:
+          type: string
+        goal:
+          type: string
+        instructions:
+          type: string
+        base_model_id:
+          type: string
+        preset:
+          type: string
+          enum: [quick, balanced, quality]
+        knowledge_sources:
+          type: array
+          items:
+            type: string
+        deployed_revision:
+          type: integer
+      additionalProperties: true
+    TrainingJob:
+      type: object
+      properties:
+        id:
+          type: string
+        ai_id:
+          type: string
+        revision:
+          type: integer
+        node_id:
+          type: string
+        node_name:
+          type: string
+        backend:
+          type: string
+        state:
+          type: string
+          enum: [queued, preparing_dataset, loading_model, training, evaluating, exporting, complete, failed, cancelled]
+        progress:
+          type: object
+          additionalProperties: true
+        error:
+          type: string
+      additionalProperties: true
+    ExportStatus:
+      type: object
+      properties:
+        ai_id:
+          type: string
+        revision:
+          type: integer
+        state:
+          type: string
+          enum: [none, exporting, ready, failed]
+        filename:
+          type: string
+        size_bytes:
+          type: integer
+        error:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        instructions:
+          type: string
+          description: The system prompt to use with the file
+      additionalProperties: true
+    Schedule:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum: [once, daily, weekly, interval]
+        time_zone:
+          type: string
+          description: IANA time zone
+        at:
+          type: string
+          format: date-time
+          description: For once
+        hour:
+          type: integer
+        minute:
+          type: integer
+        weekday:
+          type: integer
+          minimum: 0
+          maximum: 6
+          description: Sunday is 0
+        every_seconds:
+          type: integer
+          description: For interval
+        anchor:
+          type: string
+          format: date-time
+      required: [kind, time_zone]
+    AutomationNotification:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum: [always, condition, change, failure, none]
+        condition:
+          type: object
+          properties:
+            kind:
+              type: string
+              enum: [threshold, available, significant]
+            op:
+              type: string
+              enum: [below, above]
+            value:
+              type: number
+    AutomationInput:
+      type: object
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+        schedule:
+          $ref: "#/components/schemas/Schedule"
+        prompt:
+          type: string
+        profile_id:
+          type: string
+        model_id:
+          type: string
+          description: An installed model, or auto
+        tools:
+          type: array
+          items:
+            type: string
+          description: Tools approved to run unattended
+        notification:
+          $ref: "#/components/schemas/AutomationNotification"
+    Automation:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        enabled:
+          type: boolean
+        schedule:
+          $ref: "#/components/schemas/Schedule"
+        prompt:
+          type: string
+        profile_id:
+          type: string
+        model_id:
+          type: string
+        tools:
+          type: array
+          items:
+            type: string
+        notification:
+          $ref: "#/components/schemas/AutomationNotification"
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        next_run_at:
+          type: string
+          format: date-time
+        last_run_at:
+          type: string
+          format: date-time
+        consecutive_failures:
+          type: integer
+        last_error:
+          type: string
+        last_status:
+          type: string
+        last_result:
+          type: string
+    PairingOffer:
+      type: object
+      properties:
+        session_id:
+          type: string
+        from_node_id:
+          type: string
+        from_name:
+          type: string
+        from_cert_pem:
+          type: string
+        from_address:
+          type: string
+        code:
+          type: string
+        expires_at:
+          type: string
+    APIKey:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        prefix:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        last_used_at:
+          type: string
+          format: date-time
+        revoked:
+          type: boolean
+        permissions:
+          type: object
+          properties:
+            memory:
+              type: string
+              enum: [never, on_request, always]
+            knowledge:
+              type: string
+              enum: [never, on_request, always]
+            tools:
+              type: string
+              enum: [profile, read_only, none]
+            placement:
+              type: boolean
       additionalProperties: true
