@@ -96,7 +96,7 @@ Settings are stored in `yggdrasil.db`. The app's Settings page shows them, and `
 | `memory_enabled` | `true` | Persistent memory for chats. Each chat can still turn it off. |
 | `notify_task_finish` | `true` | Desktop notices for finished automations and tasks |
 | `notify_peer_offline` | `true` | A notice when a paired computer goes offline |
-| `notification_quiet_hours` | off, 22:00–07:00 | Quiet hours, as JSON; set them in Settings → Email and webhooks or with `PUT /api/v1/notifications/quiet-hours` |
+| `notification_quiet_hours` | off, 22:00–07:00 | Quiet hours, as JSON; set them in Settings → Email, push, and webhooks or with `PUT /api/v1/notifications/quiet-hours` |
 | `tool_terminal`, `tool_file_writes`, `tool_git` | `ask` | Default policy for the shell, file writes, and Git: `deny`, `ask`, `allow`, or `allow-for-session` |
 | `node_name`, `lan_api_enabled`, `discovery_enabled`, `web_ui_enabled` | see `config.json` | Writable through settings; stored in `config.json` |
 

@@ -4637,7 +4637,7 @@ components:
     NotificationDestinationInput:
       type: object
       properties:
-        kind: {type: string, enum: [email, webhook], description: Required when creating}
+        kind: {type: string, enum: [email, webhook, ntfy], description: Required when creating}
         name: {type: string}
         enabled: {type: boolean}
         email:
@@ -4653,18 +4653,26 @@ components:
           type: object
           properties:
             url: {type: string, description: "https, or http on this computer or the local network"}
+        ntfy:
+          type: object
+          properties:
+            server: {type: string, description: "Default https://ntfy.sh"}
+            topic: {type: string, pattern: "^[A-Za-z0-9_-]{1,64}$"}
+            content: {type: string, enum: [full, private], description: "private sends only a generic notice; the default on ntfy.sh"}
+            open_url: {type: string, description: This Yggdrasil's address; tapping a notification opens it there}
         categories: {type: array, items: {type: string}, description: Empty receives every category}
         min_severity: {type: string, enum: [info, success, warning, error]}
-        password: {type: string, description: The SMTP password; stored as a secret and never returned}
+        password: {type: string, description: The SMTP password or ntfy access token; stored as a secret and never returned}
     NotificationDestination:
       type: object
       properties:
         id: {type: string}
-        kind: {type: string, enum: [email, webhook]}
+        kind: {type: string, enum: [email, webhook, ntfy]}
         name: {type: string}
         enabled: {type: boolean}
         email: {type: object, additionalProperties: true}
         webhook: {type: object, additionalProperties: true}
+        ntfy: {type: object, additionalProperties: true}
         categories: {type: array, items: {type: string}}
         min_severity: {type: string}
         has_secret: {type: boolean}

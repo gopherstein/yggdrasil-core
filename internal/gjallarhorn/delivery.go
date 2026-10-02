@@ -286,6 +286,11 @@ func (h *Hub) sendTo(ctx context.Context, dest Destination, n Notification) erro
 	case KindEmail:
 		host = net.JoinHostPort(dest.Email.Host, strconv.Itoa(dest.Email.Port))
 		err = sendEmail(ctx, *dest.Email, secret, n, h.now())
+	case KindNtfy:
+		if u, perr := url.Parse(dest.Ntfy.Server); perr == nil {
+			host = u.Host
+		}
+		err = sendNtfy(ctx, h.client, *dest.Ntfy, secret, n)
 	default:
 		return PermanentError{Err: fmt.Errorf("unknown destination kind %q", dest.Kind)}
 	}

@@ -1131,22 +1131,34 @@ export type NotificationCategory = 'automation' | 'approval' | 'model' | 'traini
 /** An email or webhook destination (Gjallarhorn §12–13). Passwords and signing secrets are never returned. */
 export interface NotificationDestination {
   id: string
-  kind: 'email' | 'webhook'
+  kind: 'email' | 'webhook' | 'ntfy'
   name: string
   enabled: boolean
   email?: { host: string; port: number; username?: string; from: string; to: string[]; tls?: 'starttls' | 'tls' | 'none' }
   webhook?: { url: string }
+  /** Push through ntfy, on ntfy.sh or your own server. */
+  ntfy?: NtfyConfig
   categories?: NotificationCategory[]
   min_severity?: '' | NotificationSeverity
   has_secret: boolean
 }
 
+export interface NtfyConfig {
+  server: string
+  topic: string
+  /** full sends the title and text; private sends only "You have a new Yggdrasil notification". */
+  content?: 'full' | 'private'
+  /** This Yggdrasil's address; tapping a notification opens it there. */
+  open_url?: string
+}
+
 export interface NotificationDestinationInput {
-  kind?: 'email' | 'webhook'
+  kind?: 'email' | 'webhook' | 'ntfy'
   name?: string
   enabled?: boolean
   email?: NotificationDestination['email']
   webhook?: { url: string }
+  ntfy?: NtfyConfig
   categories?: NotificationCategory[]
   min_severity?: '' | NotificationSeverity
   password?: string

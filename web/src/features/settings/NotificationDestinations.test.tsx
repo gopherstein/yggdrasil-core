@@ -28,7 +28,7 @@ function renderCard() {
   )
 }
 
-describe('Email and webhooks', () => {
+describe('Email, push, and webhooks', () => {
   beforeEach(() => {
     vi.mocked(api.listNotificationDestinations).mockResolvedValue([])
     vi.mocked(api.getQuietHours).mockResolvedValue({ enabled: false, start: '22:00', end: '07:00', time_zone: 'UTC', allow: 'errors' })
@@ -53,6 +53,24 @@ describe('Email and webhooks', () => {
       webhook: { url: 'https://h.example/y' },
       categories: ['automation'],
       min_severity: 'error',
+    })
+  })
+
+  it('adds push through ntfy with a random topic', async () => {
+    vi.mocked(api.createNotificationDestination).mockResolvedValue({
+      destination: { id: 'n1', kind: 'ntfy', name: 'My phone', enabled: true, has_secret: false, ntfy: { server: 'https://ntfy.sh', topic: 't' } },
+    })
+    renderCard()
+    fireEvent.click(await screen.findByRole('button', { name: 'Add push (ntfy)' }))
+    expect((screen.getByLabelText('Topic') as HTMLInputElement).value).toMatch(/^yggdrasil-[0-9a-f]{16}$/)
+    fireEvent.change(screen.getByLabelText('Topic'), { target: { value: 'my-topic' } })
+    fireEvent.change(screen.getByLabelText('What to send'), { target: { value: 'private' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
+    await waitFor(() => expect(api.createNotificationDestination).toHaveBeenCalled())
+    expect(vi.mocked(api.createNotificationDestination).mock.calls[0][0]).toMatchObject({
+      kind: 'ntfy',
+      name: 'My phone',
+      ntfy: { server: 'https://ntfy.sh', topic: 'my-topic', content: 'private' },
     })
   })
 

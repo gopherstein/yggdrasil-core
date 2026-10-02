@@ -18,7 +18,7 @@ Everything Yggdrasil keeps is in the data directory. [Configuration](configurati
 | `training/` | Trained adapters, exported GGUF files, and downloaded training weights. |
 | `models/`, `runtimes/` | Model files, llama.cpp, and the Python environments for training and text recognition. |
 | `logs/` | JSON logs. They are not sent anywhere. |
-| `secrets/` | This computer's identity, and credentials for connected services, MCP tool sources, database and API knowledge, and notification destinations (SMTP passwords and webhook signing secrets). Directory mode `0700`, files `0600`. API keys are stored as bcrypt hashes in `yggdrasil.db`, never as plaintext. |
+| `secrets/` | This computer's identity, and credentials for connected services, MCP tool sources, database and API knowledge, and notification destinations (SMTP passwords, ntfy access tokens, and webhook signing secrets). Directory mode `0700`, files `0600`. API keys are stored as bcrypt hashes in `yggdrasil.db`, never as plaintext. |
 
 What you can see and remove:
 
@@ -47,7 +47,7 @@ Nothing leaves because the daemon started. Traffic is sent only when a feature t
 | Training on a paired computer | That computer receives the training examples and the AI's instructions over Bifrost, and returns the adapter. It deletes its copy when the job ends. |
 | First scanned PDF in Knowledge | PyPI, for the text-recognition packages (about 110 MB). The PDF itself is read on this computer. |
 | A chat placed on a paired computer | That computer receives the prompt and context over Bifrost |
-| Email and webhook notifications | Your SMTP server, or the webhook address, with each notification's title and text. Only for destinations you add, and only for the categories and severities you choose |
+| Email, push, and webhook notifications | Your SMTP server, the ntfy server (ntfy.sh or your own), or the webhook address, with each notification's title and text; push to ntfy.sh sends only a generic notice unless you choose full content. Only for destinations you add, and only for the categories and severities you choose |
 | External OpenAI runtime | The base URL configured for `external-openai`, with its API key |
 | Bifrost discovery and pairing | Other computers on the local network, or the static peers you listed |
 | LAN API | Any client that can reach port 7331 after you turn on local network access |

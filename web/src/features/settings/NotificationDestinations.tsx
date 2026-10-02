@@ -31,14 +31,15 @@ function errorText(err: unknown): string {
  */
 export function NotificationDestinations() {
   const query = useQuery({ queryKey: KEY, queryFn: () => api.listNotificationDestinations(), retry: false })
-  const [adding, setAdding] = useState<'' | 'email' | 'webhook'>('')
+  const [adding, setAdding] = useState<'' | NotificationDestination['kind']>('')
   const destinations = query.data ?? []
   return (
     <section className="card space-y-4">
       <div>
-        <h2 className="section-title">Email and webhooks</h2>
+        <h2 className="section-title">Email, push, and webhooks</h2>
         <p className="mt-1 text-sm text-ink-muted">
-          Send notifications to your email or to a service you run. Every notification is still in the bell. A delivery
+          Send notifications to your email, to your phone or computer with ntfy, or to a service you run. Every
+          notification is still in the bell. A delivery
           that fails is tried again after 1, 5, and 30 minutes, without running the task again.
         </p>
       </div>
@@ -53,6 +54,9 @@ export function NotificationDestinations() {
           <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={() => setAdding('email')}>
             Add email
           </button>
+          <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={() => setAdding('ntfy')}>
+            Add push (ntfy)
+          </button>
           <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={() => setAdding('webhook')}>
             Add webhook
           </button>
@@ -63,8 +67,15 @@ export function NotificationDestinations() {
   )
 }
 
+const KIND_LABEL: Record<NotificationDestination['kind'], string> = { email: 'Email', webhook: 'Webhook', ntfy: 'Push' }
+
 function summary(d: NotificationDestination): string {
-  const where = d.kind === 'email' ? (d.email?.to ?? []).join(', ') : (d.webhook?.url ?? '')
+  const where =
+    d.kind === 'email'
+      ? (d.email?.to ?? []).join(', ')
+      : d.kind === 'ntfy'
+        ? `${d.ntfy?.topic ?? ''} on ${d.ntfy?.server.replace(/^https?:\/\//, '') ?? ''}${d.ntfy?.content === 'private' ? ' (private)' : ''}`
+        : (d.webhook?.url ?? '')
   const what = d.categories?.length ? d.categories.map((c) => CATEGORY_LABEL[c]).join(', ') : 'All categories'
   const level = SEVERITIES.find((s) => s.value === (d.min_severity ?? ''))?.label ?? 'Everything'
   return `${where} · ${what} · ${level}`
@@ -98,7 +109,7 @@ function DestinationRow({ destination: d }: { destination: NotificationDestinati
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="text-sm font-medium text-ink">
-            {d.name} <span className="text-xs font-normal text-ink-faint">{d.kind === 'email' ? 'Email' : 'Webhook'}</span>
+            {d.name} <span className="text-xs font-normal text-ink-faint">{KIND_LABEL[d.kind]}</span>
             {!d.enabled && <span className="ml-1 text-xs font-normal text-ink-faint">· Off</span>}
           </p>
           <p className="mt-0.5 break-all text-xs text-ink-muted">{summary(d)}</p>
@@ -157,12 +168,16 @@ function DestinationForm({
   existing,
   onDone,
 }: {
-  kind: 'email' | 'webhook'
+  kind: NotificationDestination['kind']
   existing?: NotificationDestination
   onDone: () => void
 }) {
   const queryClient = useQueryClient()
-  const [name, setName] = useState(existing?.name ?? (kind === 'email' ? 'My email' : 'My webhook'))
+  const [name, setName] = useState(existing?.name ?? { email: 'My email', webhook: 'My webhook', ntfy: 'My phone' }[kind])
+  const [server, setServer] = useState(existing?.ntfy?.server ?? 'https://ntfy.sh')
+  const [topic, setTopic] = useState(existing?.ntfy?.topic ?? randomTopic())
+  const [content, setContent] = useState<'' | 'full' | 'private'>(existing?.ntfy?.content ?? '')
+  const [openUrl, setOpenUrl] = useState(existing?.ntfy?.open_url ?? '')
   const [url, setUrl] = useState(existing?.webhook?.url ?? '')
   const [host, setHost] = useState(existing?.email?.host ?? '')
   const [port, setPort] = useState(String(existing?.email?.port ?? ''))
@@ -180,7 +195,10 @@ function DestinationForm({
     mutationFn: async () => {
       const input: NotificationDestinationInput = { name, categories, min_severity: minSeverity }
       if (kind === 'webhook') input.webhook = { url: url.trim() }
-      else {
+      else if (kind === 'ntfy') {
+        input.ntfy = { server: server.trim(), topic: topic.trim(), content: content || undefined, open_url: openUrl.trim() || undefined }
+        if (password) input.password = password
+      } else {
         input.email = {
           host: host.trim(),
           port: Number(port) || 0,
@@ -238,7 +256,35 @@ function DestinationForm({
       }}
     >
       {field('Name', name, setName)}
-      {kind === 'webhook' ? (
+      {kind === 'ntfy' ? (
+        <>
+          <p className="rounded-md bg-info/10 px-2.5 py-2 text-xs leading-relaxed text-ink">
+            Install the ntfy app (Android, iPhone, or ntfy.sh in a browser) and subscribe to the topic below. ntfy is
+            free and open source; you can also run your own ntfy server.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {field('ntfy server', server, setServer, { placeholder: 'https://ntfy.sh' })}
+            {field('Topic', topic, setTopic)}
+          </div>
+          {field('Access token (optional)', password, setPassword, {
+            type: 'password',
+            autoComplete: 'off',
+            placeholder: existing?.has_secret ? 'Stored. Leave blank to keep it.' : 'Only if your topic needs one',
+          })}
+          <label className="block text-sm">
+            <span className="text-ink-muted">What to send</span>
+            <select className="field mt-1 w-full" value={content} onChange={(e) => setContent(e.target.value as typeof content)}>
+              <option value="">Automatic (private on ntfy.sh, full on your own server)</option>
+              <option value="full">Title and text</option>
+              <option value="private">Only “You have a new Yggdrasil notification”</option>
+            </select>
+          </label>
+          {field('Open notifications at', openUrl, setOpenUrl, { placeholder: 'http://192.168.1.10:7331' })}
+          <p className="text-xs text-ink-faint">
+            On ntfy.sh anyone who knows the topic can read it, so keep the random topic or send only the private notice.
+          </p>
+        </>
+      ) : kind === 'webhook' ? (
         <>
           {field('Address', url, setUrl, { placeholder: 'https://example.com/yggdrasil' })}
           <p className="text-xs text-ink-faint">
@@ -346,7 +392,7 @@ function QuietHoursForm() {
         <span>
           <span className="block text-sm font-medium text-ink">Quiet hours</span>
           <span className="block text-xs text-ink-muted">
-            Desktop notices, email, and webhooks wait until quiet hours end. They are in the bell at once.
+            Desktop notices, email, push, and webhooks wait until quiet hours end. They are in the bell at once.
           </span>
         </span>
         <input type="checkbox" checked={q.enabled} onChange={(e) => update({ enabled: e.target.checked })} aria-label="Quiet hours" />
@@ -374,4 +420,11 @@ function QuietHoursForm() {
       {error && <p className="text-xs text-danger">{error}</p>}
     </div>
   )
+}
+
+/** A topic that is hard to guess, for the public ntfy server. */
+function randomTopic(): string {
+  const bytes = new Uint8Array(8)
+  crypto.getRandomValues(bytes)
+  return `yggdrasil-${Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')}`
 }
