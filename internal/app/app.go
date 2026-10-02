@@ -137,6 +137,9 @@ type App struct {
 	memTotal atomic.Uint64
 	// failedModels maps a model id to when it last could not answer.
 	failedModels sync.Map
+	// work counts turns streaming on each computer, by node ID.
+	workMu sync.Mutex
+	work   map[string]int
 	// Speech transcribes audio and reads text aloud (Gungnir §18–19).
 	Speech *speech.Engine
 	// toolNet places heavy tools on the computer that suits them, and

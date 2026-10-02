@@ -463,6 +463,9 @@
     "autoChoseIn": "„Automatisch“ hat {{model}} gewählt – auf {{language}}, für {{kind}}",
     "autoChoseEffort": "„Automatisch“ hat {{model}} gewählt – für {{kind}}, mit Aufwand „{{effort}}“",
     "autoChoseInEffort": "„Automatisch“ hat {{model}} gewählt – auf {{language}}, für {{kind}}, mit Aufwand „{{effort}}“",
+    "autoWhy": "{{choice}}, {{why}}",
+    "autoRated": "auf Computern wie deinem besser bewertet",
+    "autoBusy": "da {{model}} beschäftigt war",
     "kinds": {
       "chat": "eine kurze Frage",
       "current": "eine Frage zu aktuellen Informationen",

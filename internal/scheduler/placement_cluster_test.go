@@ -171,3 +171,23 @@ func TestPlaceRolePrefersNodeWithModelInstalled(t *testing.T) {
 		t.Fatalf("expected node-b, got %s", d.NodeID)
 	}
 }
+
+// A computer already answering something gives way to an idle one that has
+// the model (#111).
+func TestPlaceAutomaticPrefersAnIdleComputer(t *testing.T) {
+	s := New(nil)
+	profile := contracts.AIProfile{ID: "general", Roles: []contracts.ModelRole{{Role: "assistant", ModelID: "m"}}}
+	nodes := []NodeCandidate{
+		{Node: contracts.Node{ID: "here", IsLocal: true, Paired: true, Status: contracts.NodeStatusOnline}, InstalledModels: map[string]struct{}{"m": {}}},
+		{Node: contracts.Node{ID: "gpu-box", Paired: true, Status: contracts.NodeStatusOnline, Address: "10.0.0.2:7332"}, InstalledModels: map[string]struct{}{"m": {}}},
+	}
+	idle, err := s.PlaceRole(context.Background(), ScoreInput{Role: "assistant", ModelID: "m", Profile: profile, Nodes: nodes})
+	if err != nil || idle.NodeID != "here" {
+		t.Fatalf("both idle -> %s, %v", idle.NodeID, err)
+	}
+	busy, err := s.PlaceRole(context.Background(), ScoreInput{Role: "assistant", ModelID: "m", Profile: profile, Nodes: nodes,
+		ActiveTasks: map[string]int{"here": 1}})
+	if err != nil || busy.NodeID != "gpu-box" {
+		t.Fatalf("this computer busy -> %s, %v", busy.NodeID, err)
+	}
+}

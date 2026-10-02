@@ -450,6 +450,9 @@
     "autoChoseIn": "자동이 {{kind}}에 맞춰 {{model}}을(를) 선택했어요(언어: {{language}})",
     "autoChoseEffort": "자동이 {{kind}}에 맞춰 {{model}}을(를) 선택했어요(노력 수준: {{effort}})",
     "autoChoseInEffort": "자동이 {{kind}}에 맞춰 {{model}}을(를) 선택했어요(언어: {{language}}, 노력 수준: {{effort}})",
+    "autoWhy": "{{choice}}({{why}})",
+    "autoRated": "비슷한 컴퓨터에서 더 높게 평가됨",
+    "autoBusy": "{{model}}이(가) 작업 중이었기 때문",
     "kinds": {
       "chat": "간단한 질문",
       "current": "최신 정보에 관한 질문",

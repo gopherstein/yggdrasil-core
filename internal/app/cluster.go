@@ -188,6 +188,7 @@ func (a *App) placeRoleWith(ctx context.Context, profile profiles.Profile, role,
 		AvoidNodeIDs:   a.rememberUnstable(profile.NodePolicy.Mode, modelID, avoidNodeIDs),
 		ExcludeNodeIDs: excludeNodeIDs,
 		RequireModel:   requireModel,
+		ActiveTasks:    a.activeWork(),
 	})
 	if err != nil {
 		return "", err
@@ -226,7 +227,7 @@ func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role, adapter
 		if err != nil {
 			return nil, err
 		}
-		return a.guardLocalChat(ctx, endpoint, ch), nil
+		return countWork(ctx, a.guardLocalChat(ctx, endpoint, ch), a.beginWork(cfg.NodeID)), nil
 	}
 	n, err := a.findPairedNode(ctx, nodeID)
 	if err != nil {
@@ -253,7 +254,58 @@ func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role, adapter
 	if err != nil {
 		return nil, remoteUnreachableErr(n, err)
 	}
-	return wrapRemoteChat(ch, n), nil
+	return countWork(ctx, wrapRemoteChat(ch, n), a.beginWork(n.ID)), nil
+}
+
+// beginWork counts a turn streaming on a computer until the returned
+// function is called, so placement can prefer a computer that isn't busy
+// (#111).
+func (a *App) beginWork(nodeID string) func() {
+	a.workMu.Lock()
+	defer a.workMu.Unlock()
+	if a.work == nil {
+		a.work = map[string]int{}
+	}
+	a.work[nodeID]++
+	var once sync.Once
+	return func() {
+		once.Do(func() {
+			a.workMu.Lock()
+			defer a.workMu.Unlock()
+			if a.work[nodeID]--; a.work[nodeID] <= 0 {
+				delete(a.work, nodeID)
+			}
+		})
+	}
+}
+
+// activeWork is the number of turns streaming on each computer.
+func (a *App) activeWork() map[string]int {
+	a.workMu.Lock()
+	defer a.workMu.Unlock()
+	out := make(map[string]int, len(a.work))
+	for k, v := range a.work {
+		out[k] = v
+	}
+	return out
+}
+
+// countWork passes a turn's chunks through and ends its count when the
+// stream closes or the turn ends.
+func countWork(ctx context.Context, in <-chan pluginapi.ChatChunk, done func()) <-chan pluginapi.ChatChunk {
+	out := make(chan pluginapi.ChatChunk, cap(in))
+	go func() {
+		defer close(out)
+		defer done()
+		for c := range in {
+			select {
+			case out <- c:
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+	return out
 }
 
 func nodeDisplayName(n contracts.Node) string {

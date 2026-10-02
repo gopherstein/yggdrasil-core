@@ -85,11 +85,28 @@ func (a *App) chooseAuto(ctx context.Context, message string, data bool, lang st
 	if data && kind == huginn.Chat {
 		kind = huginn.Research
 	}
-	choice, ok := huginn.ChooseIn(kind, huginn.EffortFrom(ctx), lang, usable, a.memoryTotal(ctx))
+	choice, ok := huginn.ChooseWith(kind, huginn.EffortFrom(ctx), lang, usable, a.memoryTotal(ctx), a.autoSignals(ctx))
 	if !ok {
 		return huginn.Choice{}, errNoModel
 	}
 	return choice, nil
+}
+
+// autoSignals are what Auto weighs beyond the request (spec §13): the
+// community's ratings from hardware like this computer's, from the summary
+// already kept, and the models busy answering something now.
+func (a *App) autoSignals(ctx context.Context) huginn.Signals {
+	var sig huginn.Signals
+	if rated := a.communitySignals(ctx); len(rated) > 0 {
+		sig.Rating = make(map[string]float64, len(rated))
+		for id, s := range rated {
+			sig.Rating[id] = s.Signal
+		}
+	}
+	if a.Health != nil {
+		sig.Busy = a.Health.Generating()
+	}
+	return sig
 }
 
 // recoverable reports whether a failed turn may be retried on another model:

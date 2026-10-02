@@ -250,6 +250,20 @@ func (m *Monitor) EndGeneration(runningID string) {
 	}
 }
 
+// Generating lists the models this monitor watches that are answering a
+// request now, by model ID.
+func (m *Monitor) Generating() map[string]bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	out := map[string]bool{}
+	for _, t := range m.instances {
+		if t.generating && t.ModelID != "" {
+			out[t.ModelID] = true
+		}
+	}
+	return out
+}
+
 // NoteProgress records a token or other inference activity.
 func (m *Monitor) NoteProgress(runningID string) {
 	m.mu.Lock()

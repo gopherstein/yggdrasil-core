@@ -476,6 +476,9 @@
     "autoChoseIn": "Auto a choisi {{model}} pour {{kind}} en {{language}}",
     "autoChoseEffort": "Auto a choisi {{model}} pour {{kind}} avec l'effort {{effort}}",
     "autoChoseInEffort": "Auto a choisi {{model}} pour {{kind}} en {{language}} avec l'effort {{effort}}",
+    "autoWhy": "{{choice}}, {{why}}",
+    "autoRated": "mieux noté sur des ordinateurs comme le vôtre",
+    "autoBusy": "car {{model}} était occupé",
     "kinds": {
       "chat": "une question rapide",
       "current": "une question qui demande des informations à jour",

@@ -450,6 +450,9 @@
     "autoChoseIn": "「自動」為{{language}}的{{kind}}選擇了 {{model}}",
     "autoChoseEffort": "「自動」為{{kind}}選擇了 {{model}}（投入程度：{{effort}}）",
     "autoChoseInEffort": "「自動」為{{language}}的{{kind}}選擇了 {{model}}（投入程度：{{effort}}）",
+    "autoWhy": "{{choice}}（{{why}}）",
+    "autoRated": "在類似電腦上評分較高",
+    "autoBusy": "因為 {{model}} 正忙",
     "kinds": {
       "chat": "簡單的問題",
       "current": "涉及最新資訊的問題",
