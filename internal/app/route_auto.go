@@ -11,6 +11,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/locale"
 	modelhealth "github.com/yeixio/yggdrasil-core/internal/models/health"
 	"github.com/yeixio/yggdrasil-core/internal/profiles"
+	"github.com/yeixio/yggdrasil-core/internal/ratings"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
@@ -109,6 +110,71 @@ func (a *App) autoSignals(ctx context.Context) huginn.Signals {
 	return sig
 }
 
+// otherQuantization is an installed version of the failed model at another
+// quantization that fits this computer: smaller when it ran out of memory,
+// and otherwise the largest that fits. It also returns both quantizations,
+// for the step that explains it.
+func otherQuantization(failedID string, installed []contracts.Model, memTotal uint64, oom bool) (contracts.Model, string, string, bool) {
+	var failed contracts.Model
+	for _, m := range installed {
+		if m.ID == failedID {
+			failed = m
+		}
+	}
+	base, err := ratings.Identify(failed, "")
+	if err != nil {
+		return contracts.Model{}, "", "", false
+	}
+	var best contracts.Model
+	bestQuant := ""
+	for _, m := range installed {
+		if m.ID == failedID || !m.Installed || huginn.Supporting(m) {
+			continue
+		}
+		id, err := ratings.Identify(m, "")
+		if err != nil || id.ID != base.ID || id.Format != base.Format || id.Quantization == base.Quantization {
+			continue
+		}
+		if oom && failed.MemoryNeeded > 0 && (m.MemoryNeeded == 0 || m.MemoryNeeded >= failed.MemoryNeeded) {
+			continue
+		}
+		if memTotal > 0 && m.MemoryNeeded > 0 && float64(m.MemoryNeeded) > float64(memTotal)*quantFallbackShare {
+			continue
+		}
+		if bestQuant == "" || m.MemoryNeeded > best.MemoryNeeded {
+			best, bestQuant = m, id.Quantization
+		}
+	}
+	return best, base.Quantization, bestQuant, bestQuant != ""
+}
+
+// withoutLargerVersions leaves out the other quantizations of the failed
+// model that need at least as much memory.
+func withoutLargerVersions(failedID string, installed []contracts.Model) []contracts.Model {
+	var failed contracts.Model
+	for _, m := range installed {
+		if m.ID == failedID {
+			failed = m
+		}
+	}
+	base, err := ratings.Identify(failed, "")
+	if err != nil {
+		return installed
+	}
+	out := make([]contracts.Model, 0, len(installed))
+	for _, m := range installed {
+		if id, err := ratings.Identify(m, ""); err == nil && m.ID != failedID && id.ID == base.ID && m.MemoryNeeded >= failed.MemoryNeeded {
+			continue
+		}
+		out = append(out, m)
+	}
+	return out
+}
+
+// quantFallbackShare is how much of this computer's memory another
+// quantization may need, as for any model Auto picks.
+const quantFallbackShare = 0.60
+
 // recoverable reports whether a failed turn may be retried on another model:
 // nothing was shown or changed yet, and the user did not stop it.
 func recoverable(ctx context.Context, errText, shown string, env *chatExecEnv) bool {
@@ -128,6 +194,32 @@ func (a *App) fallback(ctx context.Context, lang, failedID, errText string, pref
 }
 
 func fallbackFrom(lang, failedID, errText string, installed []contracts.Model, memTotal uint64, preferred ...string) (model contracts.Model, step, notice string, ok bool) {
+	health, isHealth := modelhealth.Parse(errText)
+	oom := isHealth && health.LikelyMemoryPressure
+	// Another quantization of the same model comes before another model
+	// (spec §14).
+	if next, failedQuant, quant, ok := otherQuantization(failedID, installed, memTotal, oom); ok {
+		why := "chat:steps.fallbackQuantFailed"
+		switch {
+		case oom:
+			why = "chat:steps.fallbackQuantOutOfMemory"
+		case isHealth:
+			why = "chat:steps.fallbackQuantStopped"
+		}
+		params := map[string]any{"model": huginn.Name(next), "failedQuant": failedQuant, "quant": quant}
+		step = locale.T(lang, why, params)
+		for _, m := range installed {
+			if m.ID == failedID && next.MemoryNeeded < m.MemoryNeeded {
+				notice = locale.T(lang, "chat:notices.fallbackQuantization", params)
+			}
+		}
+		return next, step, notice, true
+	}
+	if oom {
+		// A larger version of the model that ran out of memory won't do
+		// better, whatever else is installed.
+		installed = withoutLargerVersions(failedID, installed)
+	}
 	next, ok := preferredFallback(failedID, installed, preferred)
 	if !ok {
 		next, ok = huginn.Fallback(failedID, installed, memTotal)

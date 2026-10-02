@@ -208,3 +208,48 @@ func TestStepsInAppLanguage(t *testing.T) {
 		t.Fatalf("reason = %q", r)
 	}
 }
+
+func quantized(id, quant string, mem uint64) contracts.Model {
+	m := installed(id, "Qwen 2.5 7B", mem)
+	m.Variant = quant
+	m.Source = contracts.ModelSource{URL: "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/main/qwen2.5-7b-instruct-" + strings.ToLower(quant) + ".gguf"}
+	return m
+}
+
+func TestFallbackTriesAnotherQuantizationFirst(t *testing.T) {
+	q8, q5, q4 := quantized("qwen-7b-q8", "Q8_0", 9e9), quantized("qwen-7b-q5", "Q5_K_M", 6e9), quantized("qwen-7b-q4", "Q4_K_M", 5e9)
+	other := installed("mistral-7b", "Mistral 7B", 6e9)
+	models := []contracts.Model{q8, q5, q4, other}
+	oom := modelhealth.Encode(modelhealth.Failure{Kind: "model_health", Reason: "oom", LikelyMemoryPressure: true})
+
+	// Out of memory: the largest smaller version that fits, before another model.
+	next, step, notice, ok := fallbackFrom("en", "qwen-7b-q8", oom, models, 24e9)
+	if !ok || next.ID != "qwen-7b-q5" {
+		t.Fatalf("next = %s %v", next.ID, ok)
+	}
+	if step != "Qwen 2.5 7B at Q8_0 ran out of memory, so a smaller version at Q5_K_M answered instead" {
+		t.Fatalf("step = %q", step)
+	}
+	if !strings.Contains(notice, "(Q5_K_M instead of Q8_0)") {
+		t.Fatalf("notice = %q", notice)
+	}
+	// Any other failure: the largest other version that fits, even a larger one, with no notice.
+	next, step, notice, ok = fallbackFrom("en", "qwen-7b-q4", "llama-server exited", models, 24e9)
+	if !ok || next.ID != "qwen-7b-q8" || notice != "" || !strings.Contains(step, "the same model at Q8_0") {
+		t.Fatalf("crash: %s %q %q %v", next.ID, step, notice, ok)
+	}
+	// Out of memory with no smaller version: another model, never a larger
+	// version of the same one.
+	next, _, _, ok = fallbackFrom("en", "qwen-7b-q4", oom, models, 24e9)
+	if !ok || next.ID != "mistral-7b" {
+		t.Fatalf("no smaller version: %s %v", next.ID, ok)
+	}
+	// A version too big for this computer is passed over.
+	if next, _, _, _ := fallbackFrom("en", "qwen-7b-q4", "llama-server exited", models, 10e9); next.ID == "qwen-7b-q8" {
+		t.Fatal("a version that doesn't fit was chosen")
+	}
+	// A different model with a similar name is not another quantization.
+	if _, _, _, ok := otherQuantization("mistral-7b", models, 24e9, false); ok {
+		t.Fatal("a model without a Hugging Face source matched")
+	}
+}
