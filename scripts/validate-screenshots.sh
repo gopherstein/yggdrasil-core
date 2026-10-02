@@ -54,8 +54,9 @@ def check_canvas(label, size, directory):
         got_w, got_h, opaque = identify(path)
         if int(got_w) != want_w or int(got_h) != want_h:
             errors.append(f"{path} is {got_w}x{got_h}, expected {want_w}x{want_h}")
-        if opaque != "True":
-            errors.append(f"{path} has an alpha channel")
+        # ImageMagick 7 prints True and ImageMagick 6 (Ubuntu's) prints true.
+        if opaque.lower() != "true":
+            errors.append(f"{path} has an alpha channel (opaque={opaque})")
     if names != sorted(names):
         errors.append(f"Filenames for {label} are not in numeric order: {', '.join(names)}")
     return names
