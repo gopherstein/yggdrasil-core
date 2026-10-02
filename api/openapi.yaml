@@ -1529,6 +1529,7 @@ paths:
                 server: {type: string, description: "host:port of the issuer's Bifrost (7332 if left out)"}
                 token: {type: string}
                 fingerprint: {type: string}
+                name: {type: string, maxLength: 63, description: Rename this computer as it joins}
       responses:
         "200":
           description: Joined, or already joined

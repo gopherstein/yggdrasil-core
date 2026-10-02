@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -53,7 +54,7 @@ func TestJoinCommand(t *testing.T) {
 	if err := joinCommand(joinArgs, c, &out); err != nil {
 		t.Fatal(err)
 	}
-	if got["server"] != "10.0.0.5:7332" || got["fingerprint"] != joinArgs[5] {
+	if got["server"] != "10.0.0.5:7332" || got["fingerprint"] != joinArgs[5] || got["name"] != "" {
 		t.Fatalf("sent %v", got)
 	}
 	if !strings.Contains(out.String(), "✓ Connected to studio (10.0.0.5:7332)") || !strings.Contains(out.String(), "gpu-box") {
@@ -62,6 +63,9 @@ func TestJoinCommand(t *testing.T) {
 	out.Reset()
 	if err := joinCommand(append(joinArgs, "--output", "json"), c, &out); err != nil || !strings.Contains(out.String(), `"name": "studio"`) {
 		t.Fatalf("json = %v\n%s", err, out.String())
+	}
+	if err := joinCommand(append(joinArgs, "--name", "gpu box 2"), c, &bytes.Buffer{}); err != nil || got["name"] != "gpu box 2" {
+		t.Fatalf("--name = %v, sent %v", err, got)
 	}
 	// Missing a flag is a usage error.
 	var e *exitError
@@ -169,5 +173,37 @@ func TestNetworkAndLeave(t *testing.T) {
 	}
 	if !strings.Contains(out.String(), "Told: studio") || !strings.Contains(out.String(), "Couldn't reach laptop") {
 		t.Fatalf("leave:\n%s", out.String())
+	}
+}
+
+func TestJoinWaitsForTheDaemon(t *testing.T) {
+	// Nothing listens yet; a daemon appears after a second.
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	addr := ln.Addr().String()
+	_ = ln.Close()
+	srv := &http.Server{Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v1/network/join" {
+			reply(200, map[string]any{"status": "joined", "server": map[string]any{"name": "studio"}, "node": map[string]any{"name": "gpu-box"}})(w, r)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	})}
+	go func() {
+		time.Sleep(time.Second)
+		if l, err := net.Listen("tcp", addr); err == nil {
+			_ = srv.Serve(l)
+		}
+	}()
+	t.Cleanup(func() { _ = srv.Close() })
+	c := daemonClient{base: "http://" + addr, client: &http.Client{Timeout: time.Second}}
+	if err := joinCommand(joinArgs, c, &bytes.Buffer{}); err == nil || !strings.Contains(err.Error(), "isn't running") {
+		t.Fatalf("without --wait err = %v", err)
+	}
+	var out bytes.Buffer
+	if err := joinCommand(append(joinArgs, "--wait", "10s"), c, &out); err != nil || !strings.Contains(out.String(), "Joined") {
+		t.Fatalf("with --wait = %v\n%s", err, out.String())
 	}
 }

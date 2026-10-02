@@ -16,9 +16,11 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/config"
 )
 
-const joinUsage = `usage: yggctl join --server <host:port> --token <ygj_…> --fingerprint <sha256:…> [--output json]
+const joinUsage = `usage: yggctl join --server <host:port> --token <ygj_…> --fingerprint <sha256:…> [--name <name>] [--wait 60s] [--output json]
 Joins this computer to the Yggdrasil network of the computer that made the
-join command. Run the command that computer printed, as it is.`
+join command. Run the command that computer printed, as it is.
+  --name   rename this computer as it joins
+  --wait   wait this long for Yggdrasil to start here, for provisioning scripts`
 
 const joinTokenUsage = `usage: yggctl join-token <create|list|revoke> [--output json]
   create [--ttl 15m]   make a one-time join token and print the command to run on the new computer
@@ -46,6 +48,30 @@ func newDaemon() daemonClient {
 		base = "http://" + config.DefaultConfig().APIAddr()
 	}
 	return daemonClient{base: base, key: os.Getenv("YGGDRASIL_API_KEY"), client: &http.Client{Timeout: 60 * time.Second}}
+}
+
+// notRunningError is a daemon that didn't answer at all.
+type notRunningError struct{ base string }
+
+func (e *notRunningError) Error() string {
+	return fmt.Sprintf("Yggdrasil isn't running on this computer (%s). Start it, for example with systemctl start yggdrasil, and try again", e.base)
+}
+
+// waitRunning waits up to d for the daemon to answer, as a provisioning
+// script that just installed it needs. Any answer means it is running.
+func (c daemonClient) waitRunning(d time.Duration) error {
+	deadline := time.Now().Add(d)
+	for {
+		err := c.request(http.MethodGet, "/health", nil, nil)
+		var down *notRunningError
+		if !errors.As(err, &down) {
+			return nil
+		}
+		if !time.Now().Before(deadline) {
+			return err
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
 }
 
 // apiError is a refusal from the daemon, with its code.
@@ -80,7 +106,7 @@ func (c daemonClient) request(method, path string, body, dest any) error {
 	}
 	resp, err := c.client.Do(req)
 	if err != nil {
-		return fmt.Errorf("Yggdrasil isn't running on this computer (%s). Start it, for example with systemctl start yggdrasil, and try again", c.base) //nolint:staticcheck // ST1005: sentence printed to the terminal
+		return &notRunningError{base: c.base}
 	}
 	defer resp.Body.Close()
 	data, err := io.ReadAll(resp.Body)
@@ -130,15 +156,24 @@ func joinCommand(args []string, c daemonClient, out io.Writer) error {
 	server := fs.String("server", "", "")
 	token := fs.String("token", "", "")
 	fingerprint := fs.String("fingerprint", "", "")
+	name := fs.String("name", "", "")
+	wait := fs.Duration("wait", 0, "")
 	output := outputFlag(fs)
-	if err := fs.Parse(args); err != nil || *server == "" || *token == "" || *fingerprint == "" || fs.NArg() > 0 {
+	if err := fs.Parse(args); err != nil || *server == "" || *token == "" || *fingerprint == "" || fs.NArg() > 0 || *wait < 0 {
 		return &exitError{code: 2, msg: joinUsage}
 	}
 	if err := checkOutput(*output); err != nil {
 		return err
 	}
+	if err := c.waitRunning(*wait); err != nil {
+		return &exitError{code: 1, msg: err.Error()}
+	}
+	body := map[string]string{"server": *server, "token": *token, "fingerprint": *fingerprint}
+	if *name != "" {
+		body["name"] = *name
+	}
 	var res joinResult
-	err := c.request(http.MethodPost, "/network/join", map[string]string{"server": *server, "token": *token, "fingerprint": *fingerprint}, &res)
+	err := c.request(http.MethodPost, "/network/join", body, &res)
 	if err != nil {
 		return joinFailure(err)
 	}

@@ -18,7 +18,7 @@ _yggctl() {
       ;;
     join)
       if [[ "$cur" == -* ]]; then
-        COMPREPLY=($(compgen -W "--server --token --fingerprint --output" -- "$cur"))
+        COMPREPLY=($(compgen -W "--server --token --fingerprint --name --wait --output" -- "$cur"))
       fi
       ;;
     join-token)

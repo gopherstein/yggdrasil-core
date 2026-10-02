@@ -27,7 +27,7 @@ const unrated: ModelRating = {
   observations: { tokens_per_second: 41.5, ttft_ms: 320, starts: 3, start_failures: 1 },
   ask: true,
   shares: {
-    destination: 'ratings.yggdrasil.yeix.io',
+    destination: 'ratings.toskar.ai',
     model: { id: 'qwen2.5-coder-7b-instruct', format: 'gguf', quantization: 'Q4_K_M', runtime: 'llamacpp', backend: 'metal' },
     hardware: { platform: 'macos', architecture: 'arm64', vendor: 'apple', family: 'm4-max', memory_type: 'unified', memory_bucket_gb: '32-64' },
   },
@@ -61,7 +61,7 @@ describe('ratings', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Fast' }))
     fireEvent.click(screen.getByRole('checkbox', { name: /Share this rating/ }))
     expect(screen.getByText('apple m4-max · unified memory, 32-64 GB · macos arm64')).toBeInTheDocument()
-    expect(screen.getByText('ratings.yggdrasil.yeix.io')).toBeInTheDocument()
+    expect(screen.getByText('ratings.toskar.ai')).toBeInTheDocument()
     // A new rating is for the App language, and sharing says so.
     expect(screen.getByRole('radiogroup', { name: 'How well did it work for you in English?' })).toBeInTheDocument()
     expect(screen.getByText('Language').nextElementSibling).toHaveTextContent('English')

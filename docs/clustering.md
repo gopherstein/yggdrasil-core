@@ -71,6 +71,37 @@ How the join stays safe over Bifrost's plain HTTP:
 
 Running the command again on a computer that already joined says so and changes nothing. A computer in another network is refused until it runs `yggctl leave`, which tells each paired computer it is leaving and forgets them all. Models, settings, and its identity stay. `yggctl network` shows this computer's address, fingerprint, network, and paired computers.
 
+### Automating joins
+
+Every join command takes `--output json` and exits 0 when joined or already joined, 1 when refused, and 2 for a usage error, so provisioning tools can run them unattended.
+
+- **Make a token where you are:** run `yggctl join-token create --output json` on a computer in the network, over SSH from the provisioning machine if need be, and read `install_command` (or `command`, `token`, `server`, `fingerprint`) from it. Tokens can last up to a day (`--ttl 24h`) for a slow build, and each still works once, so make one per computer. The control API (`POST /api/v1/join-tokens`) does the same from scripts on that computer, or from elsewhere with an API key when the API listens beyond it.
+- **Name it:** `--name gpu-box-3` renames the computer as it joins. A name already taken in the network gets `-2`, `-3`, and so on.
+- **Right after installing:** `--wait 60s` waits for Yggdrasil to start before joining. `install.sh` waits on its own.
+
+cloud-init, with the token made beforehand:
+
+```yaml
+runcmd:
+  - curl -fsSL https://github.com/yeixio/yggdrasil-core/releases/latest/download/install.sh | sh -s -- join --server 10.0.0.5:7332 --token ygj_… --fingerprint sha256:… --name worker-01
+```
+
+Ansible, making the token on an existing computer for each new one:
+
+```yaml
+- name: Make a join token
+  ansible.builtin.command: yggctl join-token create --ttl 30m --output json
+  delegate_to: studio
+  register: token
+  changed_when: true
+  no_log: true  # the output holds the token
+
+- name: Install Yggdrasil and join
+  ansible.builtin.shell: >-
+    {{ (token.stdout | from_json).install_command }} --name {{ inventory_hostname }}
+  no_log: true
+```
+
 The new computer pairs with the computer that made the token. Other computers in the network pair with it separately.
 
 Both computers need Bifrost reachable on the network, which is so while discovery is on (the default). Making a token or joining is refused with `JOIN_NOT_REACHABLE` otherwise.

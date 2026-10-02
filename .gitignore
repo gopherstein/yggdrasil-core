@@ -7,6 +7,14 @@ SHA256SUMS.txt
 # Binaries
 /bin/
 /dist/
+# `go build ./cmd/<name>` at the repo root writes the binary here.
+/clustercheck
+/daemon
+/devctl
+/screenshot
+/yggctl
+/yggdrasil-daemon
+*.exe
 .ygg-dev-data/
 .gocache/
 

@@ -16,7 +16,7 @@ import (
 // Where ratings go and the public summary comes from, unless configuration
 // names others.
 const (
-	DefaultServiceURL = "https://ratings.yggdrasil.yeix.io"
+	DefaultServiceURL = "https://ratings.toskar.ai"
 	DefaultSummaryURL = "https://raw.githubusercontent.com/yeixio/yggdrasil-model-data/main/ratings/summary.json"
 )
 

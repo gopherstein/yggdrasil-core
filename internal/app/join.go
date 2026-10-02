@@ -11,9 +11,12 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/google/uuid"
 	"github.com/yeixio/yggdrasil-core/internal/api"
+	"github.com/yeixio/yggdrasil-core/internal/config"
 	"github.com/yeixio/yggdrasil-core/internal/egress"
 	"github.com/yeixio/yggdrasil-core/internal/events"
 	"github.com/yeixio/yggdrasil-core/internal/join"
@@ -167,10 +170,16 @@ func (a *App) JoinNetwork(ctx context.Context, req api.JoinRequest) (api.JoinRes
 		return api.JoinResult{}, errNotReachable
 	}
 	cfg := a.Config.Get()
-	result := api.JoinResult{Node: api.NetworkNode{ID: cfg.NodeID, Name: cfg.NodeName}}
+	name := cfg.NodeName
+	if req.Name != "" {
+		if name, err = validName(req.Name); err != nil {
+			return api.JoinResult{}, contracts.NewError("JOIN_BAD_REQUEST", nil, err)
+		}
+	}
+	result := api.JoinResult{Node: api.NetworkNode{ID: cfg.NodeID, Name: name}}
 	c := &join.Client{
 		Server: server, Token: req.Token, Fingerprint: req.Fingerprint,
-		Node: join.JoiningNode{ID: cfg.NodeID, Name: cfg.NodeName, PublicKeyPEM: string(a.identity.CertPEM),
+		Node: join.JoiningNode{ID: cfg.NodeID, Name: name, PublicKeyPEM: string(a.identity.CertPEM),
 			Address: a.bifrostAdvertiseAddr(), Version: version.Version},
 		Check: func(h join.HelloResponse) error {
 			result.Server = api.NetworkNode{ID: h.NodeID, Name: h.Name, Address: server}
@@ -196,6 +205,11 @@ func (a *App) JoinNetwork(ctx context.Context, req api.JoinRequest) (api.JoinRes
 	acc, _, err := c.Join(ctx)
 	switch {
 	case errors.Is(err, errAlreadyJoined):
+		if name != cfg.NodeName {
+			if err := a.rename(name); err != nil {
+				return api.JoinResult{}, err
+			}
+		}
 		result.Status = "already_joined"
 		return result, nil
 	case err != nil:
@@ -206,6 +220,11 @@ func (a *App) JoinNetwork(ctx context.Context, req api.JoinRequest) (api.JoinRes
 	}
 	if err := a.Settings.Set(ctx, networkKey, acc.NetworkID); err != nil {
 		return api.JoinResult{}, err
+	}
+	if name != cfg.NodeName {
+		if err := a.rename(name); err != nil {
+			return api.JoinResult{}, err
+		}
 	}
 	a.Logger.Info("joined network", "network_id", acc.NetworkID, "server", acc.Server.ID, "name", acc.Name)
 	a.Bus.Publish(events.New(events.NodePaired, map[string]any{"node_id": acc.Server.ID, "name": acc.Server.Name}))
@@ -218,6 +237,36 @@ func (a *App) JoinNetwork(ctx context.Context, req api.JoinRequest) (api.JoinRes
 func mustB64(s string) []byte {
 	b, _ := base64.StdEncoding.DecodeString(s)
 	return b
+}
+
+// validName is a computer name as people type it: 1 to 63 characters,
+// without control characters.
+func validName(s string) (string, error) {
+	s = strings.TrimSpace(s)
+	if s == "" || utf8.RuneCountInString(s) > 63 || strings.IndexFunc(s, unicode.IsControl) >= 0 {
+		return "", errors.New("a computer name is 1 to 63 characters")
+	}
+	return s, nil
+}
+
+// rename gives this computer a new name and tells the parts that show it.
+func (a *App) rename(name string) error {
+	if err := a.Config.Update(func(c *config.Config) { c.NodeName = name }); err != nil {
+		return err
+	}
+	a.renamed(name)
+	return nil
+}
+
+// renamed passes a new name to the computer list and discovery, which
+// otherwise kept the old one until a restart.
+func (a *App) renamed(name string) {
+	if a.Nodes != nil {
+		a.Nodes.SetLocalName(name)
+	}
+	if a.Config.Get().DiscoveryEnabled {
+		a.reloadDiscovery()
+	}
 }
 
 // joinError gives a join failure its error code.

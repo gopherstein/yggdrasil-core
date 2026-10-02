@@ -1217,6 +1217,13 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 	if err != nil {
 		return err
 	}
+	if v, ok := patch["node_name"].(string); ok && v != "" {
+		if discoveryTouched && a.Nodes != nil {
+			a.Nodes.SetLocalName(v) // discovery reloads below
+		} else {
+			a.renamed(v)
+		}
+	}
 	if discoveryTouched {
 		a.reloadDiscovery()
 		if discoveryEnabled && a.bifrostBoundLoopback {

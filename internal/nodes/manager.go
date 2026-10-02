@@ -23,6 +23,7 @@ type Manager struct {
 	bus           *events.Bus
 	pairing       *auth.PairingManager
 	localNodeID   string
+	nameMu        sync.RWMutex
 	localName     string
 	advertiseAddr func() string // reachable host:port for this node
 	staticPeers   []string
@@ -83,6 +84,19 @@ func (m *Manager) SetStaticPeers(peers []string) {
 	m.staticPeers = append([]string(nil), peers...)
 }
 
+// SetLocalName renames this computer, as other computers will see it.
+func (m *Manager) SetLocalName(name string) {
+	m.nameMu.Lock()
+	defer m.nameMu.Unlock()
+	m.localName = name
+}
+
+func (m *Manager) name() string {
+	m.nameMu.RLock()
+	defer m.nameMu.RUnlock()
+	return m.localName
+}
+
 // Pairing returns the pairing manager.
 func (m *Manager) Pairing() *auth.PairingManager { return m.pairing }
 
@@ -92,7 +106,7 @@ func (m *Manager) List(ctx context.Context) ([]contracts.Node, error) {
 	now := time.Now().UTC()
 	local := contracts.Node{
 		ID:         m.localNodeID,
-		Name:       m.localName,
+		Name:       m.name(),
 		OS:         inv.OS,
 		Arch:       inv.Arch,
 		Status:     contracts.NodeStatusOnline,
@@ -407,7 +421,7 @@ func (m *Manager) offerFor(session *auth.PairingSession) auth.PairingOffer {
 		SessionID:   session.ID,
 		FromNodeID:  m.localNodeID,
 		ToNodeID:    session.RemoteNodeID,
-		FromName:    firstNonEmpty(m.localName, m.localNodeID),
+		FromName:    firstNonEmpty(m.name(), m.localNodeID),
 		FromCertPEM: string(m.pairing.Identity().CertPEM),
 		FromAddress: fromAddr,
 		Code:        session.Code,
@@ -444,7 +458,7 @@ func (m *Manager) ApprovePairing(ctx context.Context, sessionID, code string) (*
 		complete := auth.PairingComplete{
 			SessionID:   session.ID,
 			FromNodeID:  m.localNodeID,
-			FromName:    m.localName,
+			FromName:    m.name(),
 			FromCertPEM: string(m.pairing.Identity().CertPEM),
 			FromAddress: fromAddr,
 		}
