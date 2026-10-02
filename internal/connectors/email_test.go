@@ -121,7 +121,7 @@ func mailServer(t *testing.T) (Credential, *fakeSMTP) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Logout()
+	defer logout(c)
 	if err := c.Login("username", "password"); err != nil {
 		t.Fatal(err)
 	}
@@ -164,7 +164,7 @@ func boxState(t *testing.T, cred Credential, box string) (total, deleted, unseen
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer c.Logout()
+	defer logout(c)
 	_ = c.Login("username", "password")
 	mb, err := c.Select(box, true)
 	if err != nil {

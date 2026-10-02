@@ -59,7 +59,7 @@ func (e Email) Check(ctx context.Context, _ *http.Client, cred Credential) (stri
 	if err != nil {
 		return "", err
 	}
-	defer c.Logout()
+	defer logout(c)
 	if _, err := c.Select("INBOX", true); err != nil {
 		return "", fmt.Errorf("the inbox could not be opened: %w", err)
 	}
@@ -140,18 +140,18 @@ func imapDial(ctx context.Context, cred Credential) (*client.Client, error) {
 		}
 		if ok, _ := c.SupportStartTLS(); ok {
 			if err := c.StartTLS(tlsFor(host)); err != nil {
-				c.Logout()
+				logout(c)
 				return nil, fmt.Errorf("the IMAP server's encryption failed: %w", err)
 			}
 		} else if !loopback(host) {
-			c.Logout()
+			logout(c)
 			return nil, errors.New("the IMAP server does not offer encryption; use port 993")
 		}
 	}
 	c.Timeout = emailTimeout
 	user, pass := login(cred)
 	if err := c.Login(user, pass); err != nil {
-		c.Logout()
+		logout(c)
 		return nil, fmt.Errorf("the IMAP server refused the sign-in; check the username and app password")
 	}
 	go func() {
@@ -160,6 +160,9 @@ func imapDial(ctx context.Context, cred Credential) (*client.Client, error) {
 	}()
 	return c, nil
 }
+
+// logout ends an IMAP session; a failure to say goodbye changes nothing.
+func logout(c *client.Client) { _ = c.Logout() }
 
 // smtpDial connects and signs in for sending.
 func smtpDial(ctx context.Context, cred Credential) (*smtp.Client, error) {
@@ -315,7 +318,7 @@ func (e Email) search(ctx context.Context, cred Credential, args map[string]any)
 	if err != nil {
 		return nil, err
 	}
-	defer c.Logout()
+	defer logout(c)
 	box := argStr(args, "folder")
 	if box == "" {
 		box = "INBOX"
@@ -407,7 +410,7 @@ func (e Email) read(ctx context.Context, cred Credential, args map[string]any) (
 	if err != nil {
 		return nil, err
 	}
-	defer c.Logout()
+	defer logout(c)
 	if _, err := c.Select(box, true); err != nil {
 		return nil, fmt.Errorf("the folder %q could not be opened", box)
 	}
@@ -602,7 +605,7 @@ func (e Email) headersOf(ctx context.Context, cred Credential, id string) (origH
 	if err != nil {
 		return origHeaders{}, err
 	}
-	defer c.Logout()
+	defer logout(c)
 	if _, err := c.Select(box, true); err != nil {
 		return origHeaders{}, fmt.Errorf("the folder %q could not be opened", box)
 	}
@@ -675,7 +678,7 @@ func (e Email) appendTo(ctx context.Context, cred Credential, use string, names 
 	if err != nil {
 		return err
 	}
-	defer c.Logout()
+	defer logout(c)
 	box, err := folder(c, use, names...)
 	if err != nil {
 		return err
@@ -703,7 +706,7 @@ func (e Email) archive(ctx context.Context, cred Credential, args map[string]any
 	if err != nil {
 		return nil, err
 	}
-	defer c.Logout()
+	defer logout(c)
 	dest, err := folder(c, imap.ArchiveAttr, "Archive", "Archives", "[Gmail]/All Mail")
 	if err != nil {
 		return nil, err
