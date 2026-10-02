@@ -32,6 +32,9 @@ type turnTrace struct {
 	files     []contracts.FileRef
 	notice    string
 	untrusted bool
+	// ownFiles is set when the answer read files attached to or made in
+	// this chat.
+	ownFiles bool
 	// runID links the answer to its run trace (§35).
 	runID string
 	// lang is the App language notices are written in (multilingual spec
@@ -105,34 +108,28 @@ func (t *turnTrace) attachment(a artifacts.Artifact, picked, total int) {
 	} else {
 		t.step("file", "read", map[string]any{"name": a.Name})
 	}
-	source := sourceAttached
+	t.ownFiles = true
+	source := "attachedFile"
 	if a.Producer == artifacts.ProducerAssistant {
-		source = sourceMade
+		source = "madeInChat"
 	}
-	t.addSource(contracts.Citation{Kind: "file", Title: a.Name, Source: source})
+	t.addSource(contracts.Citation{Kind: "file", Title: a.Name, Source: locale.T(t.lang, "chat:answer."+source, nil)})
 }
-
-// Source labels for files in a chat.
-const (
-	sourceAttached = "Attached file"
-	sourceMade     = "Made in this chat"
-)
 
 // dataKind reports whether the answer drew on the user's own data: "file"
 // for attached files, "knowledge" for connected knowledge, or "".
 func (t *turnTrace) dataKind() string {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	kind := ""
+	if t.ownFiles {
+		return "file"
+	}
 	for _, s := range t.sources {
-		switch {
-		case s.Kind == "file" && (s.Source == sourceAttached || s.Source == sourceMade):
-			return "file"
-		case s.Kind == "knowledge":
-			kind = "knowledge"
+		if s.Kind == "knowledge" {
+			return "knowledge"
 		}
 	}
-	return kind
+	return ""
 }
 
 // noticeIfNone sets the answer's notice unless one is already there, such
@@ -260,7 +257,7 @@ func (t *turnTrace) memories(list []muninn.Memory) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	for _, m := range list {
-		t.addSource(contracts.Citation{Kind: "memory", Title: m.Content, Source: "Memory"})
+		t.addSource(contracts.Citation{Kind: "memory", Title: m.Content, Source: locale.T(t.lang, "chat:answer.memory", nil)})
 	}
 	t.step("memory", "memories", map[string]any{"count": len(list)})
 }

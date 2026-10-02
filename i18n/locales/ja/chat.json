@@ -367,6 +367,8 @@
     "files": "ファイル",
     "sources": "ソース",
     "memory": "メモリ",
+    "attachedFile": "添付ファイル",
+    "madeInChat": "このチャットで作成",
     "remembered": "記憶しました",
     "steps_other": "実行した内容（{{count}}ステップ）"
   },

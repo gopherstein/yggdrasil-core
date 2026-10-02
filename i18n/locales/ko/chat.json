@@ -367,6 +367,8 @@
     "files": "파일",
     "sources": "소스",
     "memory": "메모리",
+    "attachedFile": "첨부 파일",
+    "madeInChat": "이 채팅에서 만듦",
     "remembered": "기억함",
     "steps_other": "수행한 작업({{count}}단계)"
   },

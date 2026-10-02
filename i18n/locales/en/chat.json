@@ -373,6 +373,8 @@
     "files": "Files",
     "sources": "Sources",
     "memory": "Memory",
+    "attachedFile": "Attached file",
+    "madeInChat": "Made in this chat",
     "remembered": "Remembered",
     "steps_one": "What I did ({{count}} step)",
     "steps_other": "What I did ({{count}} steps)"

@@ -367,6 +367,8 @@
     "files": "文件",
     "sources": "来源",
     "memory": "记忆",
+    "attachedFile": "附加的文件",
+    "madeInChat": "在此聊天中创建",
     "remembered": "已记住",
     "steps_other": "我做了什么（{{count}} 个步骤）"
   },

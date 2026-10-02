@@ -379,6 +379,8 @@
     "files": "File",
     "sources": "Fonti",
     "memory": "Memoria",
+    "attachedFile": "File allegato",
+    "madeInChat": "Creato in questa chat",
     "remembered": "Memorizzato",
     "steps_one": "Cosa ho fatto ({{count}} passaggio)",
     "steps_many": "Cosa ho fatto ({{count}} passaggi)",

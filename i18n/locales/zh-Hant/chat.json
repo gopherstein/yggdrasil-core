@@ -367,6 +367,8 @@
     "files": "檔案",
     "sources": "來源",
     "memory": "記憶",
+    "attachedFile": "附加的檔案",
+    "madeInChat": "在此聊天中建立",
     "remembered": "已記住",
     "steps_other": "我做了什麼（{{count}} 個步驟）"
   },

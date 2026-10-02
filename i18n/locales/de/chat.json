@@ -373,6 +373,8 @@
     "files": "Dateien",
     "sources": "Quellen",
     "memory": "Gedächtnis",
+    "attachedFile": "Angehängte Datei",
+    "madeInChat": "In diesem Chat erstellt",
     "remembered": "Gemerkt",
     "steps_one": "Was ich getan habe ({{count}} Schritt)",
     "steps_other": "Was ich getan habe ({{count}} Schritte)"
