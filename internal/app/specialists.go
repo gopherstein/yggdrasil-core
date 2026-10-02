@@ -5,17 +5,19 @@ import (
 	"fmt"
 
 	"github.com/yeixio/yggdrasil-core/internal/huginn"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 )
 
 // chooseSpecialist routes a message to a deployed specialized AI when it is
-// what that AI was trained for (spec §61). It returns the sai: model id.
-func (a *App) chooseSpecialist(ctx context.Context, message string) (string, string, bool) {
+// what that AI was trained for (spec §61). It returns the sai: model id and
+// why it was chosen.
+func (a *App) chooseSpecialist(ctx context.Context, message string) (string, locale.Text, bool) {
 	if a.Training == nil {
-		return "", "", false
+		return "", locale.Text{}, false
 	}
 	deployed, err := a.Training.Deployed(ctx)
 	if err != nil || len(deployed) == 0 {
-		return "", "", false
+		return "", locale.Text{}, false
 	}
 	installed := map[string]bool{}
 	for _, m := range a.installedModels(ctx) {
@@ -33,7 +35,7 @@ func (a *App) chooseSpecialist(ctx context.Context, message string) (string, str
 	}
 	s, reason, ok := huginn.ChooseSpecialist(message, huginn.Classify(message), list)
 	if !ok {
-		return "", "", false
+		return "", locale.Text{}, false
 	}
 	return s.ID, reason, true
 }

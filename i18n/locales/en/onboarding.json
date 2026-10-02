@@ -40,6 +40,7 @@
   "recommend": {
     "badge": "Recommended",
     "title": "Recommended for {{purpose}}",
+    "communityChosen": "People with computers like yours rated this setup's main model highly, so it's suggested ahead of the usual first choice.",
     "download": "{{size}} download",
     "storage": "Estimated storage",
     "memory": "Estimated active memory",

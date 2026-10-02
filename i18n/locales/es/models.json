@@ -285,6 +285,7 @@
       "backend": "en equipos con esta memoria"
     },
     "overall": "en total",
+    "chosenByCommunity": "Elegido con valoraciones de equipos como el tuyo",
     "confidence": {
       "limited": "Pocos datos",
       "early": "Primeras valoraciones"

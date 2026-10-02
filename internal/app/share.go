@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/events"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	modelhealth "github.com/yeixio/yggdrasil-core/internal/models/health"
 	"github.com/yeixio/yggdrasil-core/internal/share"
 )
@@ -49,12 +50,46 @@ func (a *App) trainingNow() (string, bool) {
 	return what + " is using this computer" + aboutLeft(w), true
 }
 
-func aboutLeft(w *share.Work) string {
+// trainingStep says, in the App language lang, that a training run holding
+// this computer may slow the answer, and about how long it has left.
+func (a *App) trainingStep(lang string) (string, bool) {
+	if a.Share == nil {
+		return "", false
+	}
+	w, ok := a.Share.Running(share.Training)
+	if !ok {
+		return "", false
+	}
+	msg := locale.Message{Body: []locale.Text{locale.Key("chat:steps.training", nil)}}
+	if w.Label() != "" {
+		msg.Body[0] = locale.Key("chat:steps.trainingNamed", map[string]any{"name": w.Label()})
+	}
+	if m, ok := minutesLeft(w); ok {
+		switch {
+		case m < 1:
+			msg.Body = append(msg.Body, locale.Key("chat:steps.leftUnderMinute", nil))
+		case m < 120:
+			msg.Body = append(msg.Body, locale.Key("chat:steps.leftMinutes", map[string]any{"count": m}))
+		default:
+			msg.Body = append(msg.Body, locale.Key("chat:steps.leftHours", map[string]any{"count": (m + 30) / 60}))
+		}
+	}
+	_, body := msg.Render(lang)
+	return body, true
+}
+
+// minutesLeft is a work's time left, rounded to minutes.
+func minutesLeft(w *share.Work) (int, bool) {
 	d, ok := w.Remaining()
+	return int((d + 30*time.Second) / time.Minute), ok
+}
+
+func aboutLeft(w *share.Work) string {
+	m, ok := minutesLeft(w)
 	if !ok {
 		return ""
 	}
-	switch m := int((d + 30*time.Second) / time.Minute); {
+	switch {
 	case m < 1:
 		return " (less than a minute left)"
 	case m == 1:

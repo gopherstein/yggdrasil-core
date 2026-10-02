@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
@@ -124,14 +123,14 @@ func fallbackFrom(lang, failedID, errText string, installed []contracts.Model, m
 			failed = m
 		}
 	}
-	why := "could not answer"
+	why := "chat:steps.fallbackFailed"
 	if f, isHealth := modelhealth.Parse(errText); isHealth {
-		why = "stopped responding"
+		why = "chat:steps.fallbackStopped"
 		if f.LikelyMemoryPressure {
-			why = "ran out of memory"
+			why = "chat:steps.fallbackOutOfMemory"
 		}
 	}
-	step = fmt.Sprintf("%s %s, so %s answered instead", huginn.Name(failed), why, huginn.Name(next))
+	step = locale.T(lang, why, map[string]any{"failed": huginn.Name(failed), "model": huginn.Name(next)})
 	if huginn.Smaller(failed, next) {
 		notice = locale.T(lang, "chat:notices.fallbackSmaller", map[string]any{"failed": huginn.Name(failed), "model": huginn.Name(next)})
 	}
@@ -156,8 +155,9 @@ func preferredFallback(failedID string, installed []contracts.Model, preferred [
 
 // profileRoleModel is the profile's own model for this kind of request when
 // the chat is on Auto (§20): its coding model for coding, and its fast model
-// for a quick question. ok is false when the profile has none installed.
-func (a *App) profileRoleModel(ctx context.Context, profile profiles.Profile, message string, data bool) (id, reason string, ok bool) {
+// for a quick question. reason is in the App language lang. ok is false
+// when the profile has none installed.
+func (a *App) profileRoleModel(ctx context.Context, lang string, profile profiles.Profile, message string, data bool) (id, reason string, ok bool) {
 	kind := huginn.Classify(message)
 	if data && kind == huginn.Chat {
 		kind = huginn.Research
@@ -177,11 +177,11 @@ func (a *App) profileRoleModel(ctx context.Context, profile profiles.Profile, me
 	}
 	for _, m := range a.installedModels(ctx) {
 		if m.ID == id && (m.Installed || m.Status == "installed") && !huginn.Supporting(m) {
-			what := "coding model"
+			key := "chat:steps.profileCoding"
 			if role == profiles.RoleFast {
-				what = "model for quick questions"
+				key = "chat:steps.profileFast"
 			}
-			return id, fmt.Sprintf("Used %s, the %s of %s", huginn.Name(m), what, profile.Name), true
+			return id, locale.T(lang, key, map[string]any{"model": huginn.Name(m), "profile": profile.Name}), true
 		}
 	}
 	return "", "", false

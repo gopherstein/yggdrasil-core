@@ -256,6 +256,9 @@ type CategoryWinner struct {
 	Category string `json:"category"` // best_overall|fastest|best_quality|lowest_memory|coding|general|reasoning|vision
 	Label    string `json:"label"`    // human label e.g. "Best coding"
 	ModelID  string `json:"model_id"`
+	// CommunityChosen is true when community ratings from hardware like
+	// this computer's moved this model ahead of the curated first choice.
+	CommunityChosen bool `json:"community_chosen,omitempty"`
 }
 
 // ModelsFitResponse is returned by GET /models/fit.
@@ -745,4 +748,7 @@ type Recommendation struct {
 	Reason       string      `json:"reason"`
 	StorageBytes uint64      `json:"estimated_storage_bytes"`
 	VRAMBytes    uint64      `json:"estimated_vram_bytes"`
+	// CommunityChosen is true when community ratings moved the main model
+	// ahead of the curated first choice.
+	CommunityChosen bool `json:"community_chosen,omitempty"`
 }

@@ -2,13 +2,13 @@ package app
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 	"strings"
 	"sync"
 	"unicode/utf8"
 
 	"github.com/yeixio/yggdrasil-core/internal/artifacts"
+	"github.com/yeixio/yggdrasil-core/internal/huginn"
 	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/internal/mimir"
 	"github.com/yeixio/yggdrasil-core/internal/muninn"
@@ -60,6 +60,11 @@ func (t *turnTrace) addStep(kind, text string) {
 	t.steps = append(t.steps, contracts.ActivityStep{Kind: kind, Text: text})
 }
 
+// step adds a chat:steps key's text in the App language.
+func (t *turnTrace) step(kind, key string, params map[string]any) {
+	t.addStep(kind, locale.T(t.lang, "chat:steps."+key, params))
+}
+
 // knowledge records passages retrieved from Mimir.
 func (t *turnTrace) knowledge(hits []mimir.Hit) {
 	if len(hits) == 0 {
@@ -77,7 +82,17 @@ func (t *turnTrace) knowledge(hits []mimir.Hit) {
 			names = append(names, h.SourceName)
 		}
 	}
-	t.addStep("knowledge", fmt.Sprintf("Found %s in %s", plural(len(hits), "passage", "passages"), joinNames(names)))
+	params := map[string]any{"count": len(hits), "source": locale.T(t.lang, "chat:status.yourKnowledge", nil)}
+	switch len(names) {
+	case 0:
+		t.step("knowledge", "passages", params)
+	case 1, 2:
+		params["source"] = listIn(t.lang, names)
+		t.step("knowledge", "passages", params)
+	default:
+		params["source"], params["more"] = names[0], len(names)-1
+		t.step("knowledge", "passagesMore", params)
+	}
 }
 
 // attachment records a file the user attached that the model read.
@@ -85,11 +100,11 @@ func (t *turnTrace) attachment(a artifacts.Artifact, picked, total int) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	t.untrusted = true
-	text := "Read " + a.Name
 	if picked < total {
-		text = fmt.Sprintf("Read the %d parts of %s that match the question", picked, a.Name)
+		t.step("file", "readParts", map[string]any{"count": picked, "name": a.Name})
+	} else {
+		t.step("file", "read", map[string]any{"name": a.Name})
 	}
-	t.addStep("file", text)
 	source := sourceAttached
 	if a.Producer == artifacts.ProducerAssistant {
 		source = sourceMade
@@ -137,13 +152,14 @@ func (t *turnTrace) noticeIfNone(notice string) {
 func (t *turnTrace) planned(parts int, parallel bool) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	text := fmt.Sprintf("Worked through the request in %d parts", parts)
-	if parts == 1 {
-		text = "Drafted the answer before writing it"
-	} else if parallel {
-		text = fmt.Sprintf("Split the request into %d parts and looked them up side by side", parts)
+	switch {
+	case parts == 1:
+		t.step("plan", "plannedOne", nil)
+	case parallel:
+		t.step("plan", "plannedParallel", map[string]any{"count": parts})
+	default:
+		t.step("plan", "planned", map[string]any{"count": parts})
 	}
-	t.addStep("plan", text)
 }
 
 // verified records an answer check (spec §24). Figures that could not be
@@ -153,11 +169,11 @@ func (t *turnTrace) verified(issues, fixed int, remaining []string) {
 	defer t.mu.Unlock()
 	switch {
 	case issues == 0:
-		t.addStep("verify", "Checked the figures against the sources")
+		t.step("verify", "checkedFigures", nil)
 	case fixed > 0 && len(remaining) == 0:
-		t.addStep("verify", "Checked the figures and corrected "+plural(fixed, "figure", "figures"))
+		t.step("verify", "correctedFigures", map[string]any{"count": fixed})
 	default:
-		t.addStep("verify", "Checked the figures; some could not be confirmed")
+		t.step("verify", "figuresUnconfirmed", nil)
 	}
 	if len(remaining) > 0 && t.notice == "" {
 		t.notice = t.noticeText("unconfirmedFigures", map[string]any{"figures": listIn(t.lang, remaining)})
@@ -169,7 +185,7 @@ func (t *turnTrace) verified(issues, fixed int, remaining []string) {
 func (t *turnTrace) unconfirmedAction() {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	t.addStep("verify", "Checked the answer against what actually ran")
+	t.step("verify", "checkedAction", nil)
 	t.notice = t.noticeText("nothingChanged", nil)
 }
 
@@ -180,21 +196,21 @@ func (t *turnTrace) stopped(kept, timedOut bool) {
 	defer t.mu.Unlock()
 	if timedOut {
 		// The profile's time limit ran out (§40).
-		t.addStep("stop", "Stopped at this profile's time limit")
+		t.step("stop", "stoppedTimeLimit", nil)
 		t.notice = t.noticeText("stoppedTimeLimit", nil)
 		return
 	}
-	t.addStep("stop", "Stopped by you")
+	t.step("stop", "stoppedByYou", nil)
 	if kept {
 		t.notice = t.noticeText("stopped", nil)
 	}
 }
 
 // effort records an effort the user chose. Auto's own choice is not listed.
-func (t *turnTrace) effort(label string) {
+func (t *turnTrace) effort(e huginn.Effort) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	t.addStep("effort", "Worked at "+label+" effort, as you chose")
+	t.step("effort", "effort", map[string]any{"effort": e.Describe(t.lang)})
 }
 
 // sharing records that other work, such as training, is using this computer.
@@ -246,7 +262,7 @@ func (t *turnTrace) memories(list []muninn.Memory) {
 	for _, m := range list {
 		t.addSource(contracts.Citation{Kind: "memory", Title: m.Content, Source: "Memory"})
 	}
-	t.addStep("memory", "Used "+plural(len(list), "memory", "memories"))
+	t.step("memory", "memories", map[string]any{"count": len(list)})
 }
 
 // tool records a tool call that succeeded.
@@ -260,7 +276,7 @@ func (t *turnTrace) tool(toolID string, args, result map[string]any) {
 	switch toolID {
 	case "internet.search":
 		t.untrusted = true
-		t.addStep("search", fmt.Sprintf("Searched the web for “%s”", str(args, "query")))
+		t.step("search", "searchedWeb", map[string]any{"query": str(args, "query")})
 		var rows []struct {
 			Title   string `json:"title"`
 			URL     string `json:"url"`
@@ -285,7 +301,7 @@ func (t *turnTrace) tool(toolID string, args, result map[string]any) {
 			title = ""
 		}
 		title = firstNonEmpty(title, hostOf(u))
-		t.addStep("read", fmt.Sprintf("Read “%s”", title))
+		t.step("read", "readPage", map[string]any{"title": title})
 		// A page that was read outranks the same page as a search hit.
 		for i := range t.sources {
 			if t.sources[i].Kind == "web" && t.sources[i].URL == u {
@@ -297,15 +313,15 @@ func (t *turnTrace) tool(toolID string, args, result map[string]any) {
 	case "filesystem.read":
 		t.untrusted = true
 		p := str(args, "path")
-		t.addStep("file", fmt.Sprintf("Read %s", p))
+		t.step("file", "read", map[string]any{"name": p})
 		t.addSource(contracts.Citation{Kind: "file", Title: p, Source: p})
 	case "filesystem.search":
-		t.addStep("file", fmt.Sprintf("Looked for files matching “%s”", str(args, "query")))
+		t.step("file", "searchedFiles", map[string]any{"query": str(args, "query")})
 	case "filesystem.write":
-		t.addStep("write", fmt.Sprintf("Saved %s", str(args, "path")))
+		t.step("write", "saved", map[string]any{"path": str(args, "path")})
 	case "files.create":
 		name := str(result, "name")
-		t.addStep("create", fmt.Sprintf("Created %s", name))
+		t.step("create", "created", map[string]any{"name": name})
 		size, _ := result["size_bytes"].(int64)
 		t.files = append(t.files, contracts.FileRef{
 			ID: str(result, "id"), Name: name, MimeType: str(result, "mime_type"), Kind: str(result, "kind"),
@@ -313,7 +329,7 @@ func (t *turnTrace) tool(toolID string, args, result map[string]any) {
 		})
 	case "terminal":
 		t.untrusted = true
-		t.addStep("command", "Ran a command on this computer")
+		t.step("command", "ranCommand", nil)
 	case "browser.open", "browser.click", "browser.type", "browser.extract", "browser.download", "browser.screenshot":
 		// Pages are written by other people, so they are data, not
 		// instructions (§58).
@@ -321,17 +337,17 @@ func (t *turnTrace) tool(toolID string, args, result map[string]any) {
 		page := firstNonEmpty(str(result, "title"), hostOf(str(result, "url")), hostOf(str(args, "url")))
 		switch toolID {
 		case "browser.open":
-			t.addStep("browser", "Opened "+page+" in the browser")
+			t.step("browser", "browserOpened", map[string]any{"page": page})
 		case "browser.click":
-			t.addStep("browser", "Clicked on the page, now "+page)
+			t.step("browser", "browserClicked", map[string]any{"page": page})
 		case "browser.type":
-			t.addStep("browser", "Typed into "+page)
+			t.step("browser", "browserTyped", map[string]any{"page": page})
 		case "browser.download":
-			t.addStep("browser", "Downloaded "+str(result, "name"))
+			t.step("browser", "browserDownloaded", map[string]any{"name": str(result, "name")})
 		case "browser.screenshot":
-			t.addStep("browser", "Took a screenshot of the page")
+			t.step("browser", "browserScreenshot", nil)
 		default:
-			t.addStep("browser", "Read "+page)
+			t.step("browser", "read", map[string]any{"name": page})
 		}
 	case "places.search", "places.details", "maps.route", "maps.distance":
 		// Place names and details are written by map contributors, so they
@@ -339,18 +355,18 @@ func (t *turnTrace) tool(toolID string, args, result map[string]any) {
 		t.untrusted = true
 		switch {
 		case toolID == "places.search" && str(args, "near") != "":
-			t.addStep("places", fmt.Sprintf("Looked up %s near %s", str(args, "query"), str(args, "near")))
+			t.step("places", "placesNear", map[string]any{"query": str(args, "query"), "near": str(args, "near")})
 		case toolID == "places.search":
-			t.addStep("places", fmt.Sprintf("Looked up “%s” on the map", str(args, "query")))
+			t.step("places", "placesSearch", map[string]any{"query": str(args, "query")})
 		case toolID == "places.details":
-			t.addStep("places", "Looked up a place's details")
+			t.step("places", "placeDetails", nil)
 		default:
-			t.addStep("places", fmt.Sprintf("Found the way from %s to %s", str(args, "from"), str(args, "to")))
+			t.step("places", "route", map[string]any{"from": str(args, "from"), "to": str(args, "to")})
 		}
 	default:
 		if strings.HasPrefix(toolID, "git.") {
 			t.untrusted = true
-			t.addStep("git", "Checked the Git repository ("+strings.TrimPrefix(toolID, "git.")+")")
+			t.step("git", "git", map[string]any{"action": strings.TrimPrefix(toolID, "git.")})
 			return
 		}
 		if def, ok := tools.Lookup(toolID); ok && (strings.HasPrefix(def.Source, "connector:") || strings.HasPrefix(def.Source, "mcp:")) {
@@ -445,13 +461,6 @@ func firstNonEmpty(vals ...string) string {
 	return ""
 }
 
-func plural(n int, one, many string) string {
-	if n == 1 {
-		return "1 " + one
-	}
-	return fmt.Sprintf("%d %s", n, many)
-}
-
 // listIn joins items in lang, such as "20, 30 and $9".
 func listIn(lang string, items []string) string {
 	switch len(items) {
@@ -462,17 +471,4 @@ func listIn(lang string, items []string) string {
 	}
 	first := strings.Join(items[:len(items)-1], locale.T(lang, "chat:notices.listSeparator", nil))
 	return locale.T(lang, "chat:notices.listAnd", map[string]any{"first": first, "last": items[len(items)-1]})
-}
-
-func joinNames(names []string) string {
-	switch len(names) {
-	case 0:
-		return "your knowledge"
-	case 1:
-		return names[0]
-	case 2:
-		return names[0] + " and " + names[1]
-	default:
-		return fmt.Sprintf("%s and %d more", names[0], len(names)-1)
-	}
 }

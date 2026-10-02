@@ -15,6 +15,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/egress"
 	"github.com/yeixio/yggdrasil-core/internal/events"
 	"github.com/yeixio/yggdrasil-core/internal/huginn"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/internal/mimir"
 	"github.com/yeixio/yggdrasil-core/internal/models"
 	modelhealth "github.com/yeixio/yggdrasil-core/internal/models/health"
@@ -98,12 +99,14 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 	// Auto: Huginn picks the installed model that suits this message. A
 	// question about files or connected knowledge counts as one that needs a
 	// careful answer.
+	// Steps and notices are written in the App language.
+	appLang := a.appLanguage(ctx)
 	routeReason, routeNotice := "", ""
 	if modelID == huginn.AutoModelID {
 		// A specialized AI trained for exactly this answers first (§61).
 		if id, reason, ok := a.chooseSpecialist(ctx, message); ok {
-			modelID, routeReason = id, reason
-		} else if id, reason, ok := a.profileRoleModel(ctx, profile, message, a.turnHasData(ctx, conversationID, profile)); ok {
+			modelID, routeReason = id, reason.Render(appLang)
+		} else if id, reason, ok := a.profileRoleModel(ctx, appLang, profile, message, a.turnHasData(ctx, conversationID, profile)); ok {
 			// The profile's own coding or fast model (§20).
 			modelID, routeReason = id, reason
 		} else {
@@ -112,7 +115,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			if err != nil {
 				return nil, err
 			}
-			modelID, routeReason = choice.Model.ID, choice.Reason
+			modelID, routeReason = choice.Model.ID, choice.Reason(appLang)
 			if choice.LanguageWeak {
 				// Nothing installed writes the language well (§16): the
 				// answer is still in it, with a word that it may read less well.
@@ -166,7 +169,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 				modelID = next
 				profile = withChatModel(profile, modelID)
 				profile = applyExecutionPolicy(profile, execution)
-				routeReason = fmt.Sprintf("Used %s because this question needs current information from the web", a.modelName(modelID))
+				routeReason = locale.T(appLang, "chat:steps.currentInfo", map[string]any{"model": a.modelName(modelID)})
 			}
 		}
 	}
@@ -275,20 +278,20 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			conversationID: conversationID,
 			taskID:         task.ID,
 			turnPrompt:     message,
-			trace:          &turnTrace{runID: task.ID, notice: routeNotice, lang: a.appLanguage(ctx)},
+			trace:          &turnTrace{runID: task.ID, notice: routeNotice, lang: appLang},
 			startedAt:      turnStart,
 			attachments:    attached,
 		}
 		if routeReason != "" {
 			env.trace.routed(routeReason)
 		}
-		if busy, ok := a.trainingNow(); ok {
-			env.trace.sharing(busy + ", so this answer may be slower.")
+		if busy, ok := a.trainingStep(appLang); ok {
+			env.trace.sharing(busy)
 		}
 		env.opts = opts
 		if facts := a.capabilityFacts(ctx, message); facts != "" {
 			env.capabilities = facts
-			env.trace.sharing("Checked what Yggdrasil can do right now")
+			env.trace.sharing(locale.T(appLang, "chat:steps.capabilities", nil))
 		}
 		if a.memoryOn(ctx, conversationID) && (opts == nil || opts.Memory) && profile.Orchestration.Memory != "off" {
 			if mems, err := a.Muninn.Relevant(ctx, message); err == nil {
@@ -345,7 +348,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 						}
 						exclude := append(env.excludedNodes(), failedNode)
 						if alt, ok := a.alternateNode(ctx, profile, profiles.RolePrimary, failedID, exclude); ok && !env.keepsLocal() {
-							step := fmt.Sprintf("%s failed on %s, so it answered on %s instead", a.modelName(failedID), a.nodeDisplayName(failedNode), a.nodeDisplayName(alt))
+							step := locale.T(appLang, "chat:steps.fallbackNode", map[string]any{"model": a.modelName(failedID), "failed": a.nodeDisplayName(failedNode), "computer": a.nodeDisplayName(alt)})
 							run.Retried()
 							run.Strategy("Answered on " + a.nodeDisplayName(alt) + " after " + a.modelName(failedID) + " failed on " + a.nodeDisplayName(failedNode))
 							a.Logger.Warn("chat model failed; retrying on another computer", "model", failedID, "failed_node", failedNode, "next_node", alt, "error", evt.Error)
@@ -1052,7 +1055,7 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 			e.trace.planned(len(steps), parallel)
 		case simple.EventEffort:
 			if chosen, _ := payload["chosen"].(string); chosen != "" && chosen != string(huginn.EffortAuto) {
-				e.trace.effort(huginn.ParseEffort(chosen).Label())
+				e.trace.effort(huginn.ParseEffort(chosen))
 			}
 		case simple.EventVerified:
 			issues, _ := payload["issues"].(int)

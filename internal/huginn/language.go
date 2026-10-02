@@ -3,7 +3,6 @@ package huginn
 import (
 	"strings"
 
-	"github.com/yeixio/yggdrasil-core/internal/replylang"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
@@ -78,9 +77,4 @@ func languageRank(m contracts.Model, lang string) int {
 // language levels is not weak, since nothing says so.
 func WeakIn(m contracts.Model, lang string) bool {
 	return lang != "" && languageRank(m, lang) == rankWeak
-}
-
-// languageName is a language's English name, such as Spanish, for reasons.
-func languageName(tag string) string {
-	return replylang.Name(tag)
 }

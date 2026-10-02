@@ -27,8 +27,8 @@ func TestLanguageIsARoutingSignal(t *testing.T) {
 	if !ok || c.Model.ID != "a" || c.LanguageWeak {
 		t.Fatalf("Spanish: %+v", c)
 	}
-	if !strings.Contains(c.Reason, "in Spanish") {
-		t.Errorf("reason = %q", c.Reason)
+	if !strings.Contains(c.Reason("en"), "in Spanish") {
+		t.Errorf("reason = %q", c.Reason("en"))
 	}
 	// In English, both write it well: the loaded model answers a quick question.
 	if c, _ := ChooseIn(Chat, EffortAuto, "en", installed, 32*gb); c.Model.ID != "b" {

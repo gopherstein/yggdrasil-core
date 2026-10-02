@@ -127,7 +127,7 @@ func (e *chatExecEnv) keepLocalIfNeeded(role, nodeID string) string {
 		return nodeID
 	}
 	if first && e.trace != nil {
-		e.trace.sharing("Answered on this computer, because the question used data marked this computer only.")
+		e.trace.sharing(e.trace.noticeText("chat:steps.localOnly", nil))
 	}
 	return local
 }

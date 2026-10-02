@@ -30,6 +30,9 @@ func TestChatExplainsTrainingOnThisComputer(t *testing.T) {
 		t.Fatalf("busy = %q", busy)
 	}
 	w.SetRemaining(12*time.Minute + 10*time.Second)
+	if step, _ := a.trainingStep("en"); step != `Training “Tire shop” is using this computer, so this answer may be slower. About 12 minutes left.` {
+		t.Fatalf("step = %q", step)
+	}
 	if busy, _ = a.trainingNow(); !strings.HasSuffix(busy, "(about 12 minutes left)") {
 		t.Fatalf("busy = %q", busy)
 	}
