@@ -1,5 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import { useNavigate } from 'react-router-dom'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
@@ -25,6 +27,7 @@ type InstallPhase =
   | 'done'
 
 export function OnboardingPage() {
+  const { t } = useTranslation('onboarding')
   const navigate = useNavigate()
   const setOnboardingComplete = useUIStore((s) => s.setOnboardingComplete)
   const setActiveProfileId = useUIStore((s) => s.setActiveProfileId)
@@ -53,7 +56,7 @@ export function OnboardingPage() {
       }
     },
     onError: (error: Error) => {
-      setInstallError(error.message || 'Could not get a recommendation.')
+      setInstallError(error.message || t('recommendFailed'))
     },
   })
 
@@ -72,7 +75,7 @@ export function OnboardingPage() {
             ...current,
             [payload.model_id]: payload.percent ?? 0,
           }))
-          setPhaseDetail(`Downloading ${payload.model_id}… ${Math.round(payload.percent ?? 0)}%`)
+          setPhaseDetail(t('install.downloading', { model: payload.model_id, percent: Math.round(payload.percent ?? 0) }))
         }
         if (event.type === 'model.download.completed') {
           const modelId = event.payload?.model_id as string | undefined
@@ -81,12 +84,12 @@ export function OnboardingPage() {
           }
         }
         if (event.type === 'model.download.failed') {
-          const message = (event.payload?.error as string) || 'Model download failed.'
+          const message = (event.payload?.error as string) || t('install.downloadFailed')
           setInstallError(message)
         }
       },
     })
-  }, [step])
+  }, [step, t])
 
   const installMutation = useMutation({
     mutationFn: async (rec: Recommendation) => {
@@ -95,30 +98,30 @@ export function OnboardingPage() {
       setDownloadProgress({})
 
       setPhase('runtime')
-      setPhaseDetail('Installing the local model runtime…')
+      setPhaseDetail(t('install.runtime'))
       await api.installRuntime('llamacpp')
 
       setPhase('models')
       const uniqueModels = uniqueById(rec.models)
       for (const model of uniqueModels) {
-        setPhaseDetail(`Installing ${model.display_name}…`)
+        setPhaseDetail(t('install.model', { model: model.display_name }))
         await api.installModel(model.id, { wait: true })
         setDownloadProgress((current) => ({ ...current, [model.id]: 100 }))
       }
 
       setPhase('profile')
-      setPhaseDetail('Creating your AI profile…')
+      setPhaseDetail(t('install.profile'))
       const profileBody = buildProfileFromRecommendation(selectedPurpose, rec)
       const profile = await api.createProfile(profileBody)
       if (!profile?.id) {
-        throw new Error('Profile was created but no ID was returned.')
+        throw new Error(t('install.noProfileId'))
       }
       setActiveProfileId(profile.id)
 
       setPhase('conversation')
-      setPhaseDetail('Preparing your first conversation…')
+      setPhaseDetail(t('install.conversation'))
       const conversation = await api.createConversation({
-        title: `${profile.name} chat`,
+        title: t('install.chatTitle', { profile: profile.name }),
         profile_id: profile.id,
       })
 
@@ -130,7 +133,7 @@ export function OnboardingPage() {
       setStep('ready')
     },
     onError: (error: Error) => {
-      setInstallError(error.message || 'Installation failed.')
+      setInstallError(error.message || t('install.failed'))
       setStep('recommend')
     },
   })
@@ -195,42 +198,40 @@ export function OnboardingPage() {
       <header className="mb-10 text-center">
         <Ratatoskr state={mascot} size={160} className="mx-auto mb-3" />
         <p className="mb-3 text-sm font-medium uppercase tracking-[0.18em] text-accent">
-          Welcome
+          {t('header.welcome')}
         </p>
         <h1 className="font-display text-5xl font-semibold tracking-tight text-ink md:text-6xl">
           Yggdrasil
         </h1>
         <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-ink-muted">
-          This app can run AI privately on your own computers.
+          {t('header.lede')}
         </p>
       </header>
 
       {step === 'setup' && (
         <>
           <section className="card mb-6">
-            <h2 className="font-display text-xl font-semibold text-ink">This computer</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Hardware detected for local inference.
-            </p>
+            <h2 className="font-display text-xl font-semibold text-ink">{t('hardware.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('hardware.description')}</p>
 
             <div className="mt-4">
-              {hardwareQuery.isLoading && <LoadingSpinner label="Detecting hardware…" />}
+              {hardwareQuery.isLoading && <LoadingSpinner label={t('hardware.detecting')} />}
               {hardware ? (
                 <dl className="grid gap-3 sm:grid-cols-2">
                   {hardware.cpu?.model && (
                     <div>
                       <dt className="text-xs uppercase tracking-wide text-ink-muted">
-                        Processor
+                        {t('hardware.processor')}
                       </dt>
                       <dd className="text-sm font-medium text-ink">
                         {hardware.cpu.model}
-                        {hardware.cpu.cores ? ` · ${hardware.cpu.cores} cores` : ''}
+                        {hardware.cpu.cores ? ` · ${t('hardware.cores', { count: hardware.cpu.cores })}` : ''}
                       </dd>
                     </div>
                   )}
                   {hardware.memory?.total_bytes != null && (
                     <div>
-                      <dt className="text-xs uppercase tracking-wide text-ink-muted">Memory</dt>
+                      <dt className="text-xs uppercase tracking-wide text-ink-muted">{t('hardware.memory')}</dt>
                       <dd className="text-sm font-medium text-ink">
                         {bytesToGb(hardware.memory.total_bytes)}
                       </dd>
@@ -239,7 +240,7 @@ export function OnboardingPage() {
                   {acceleratorLabels.length > 0 && (
                     <div className="sm:col-span-2">
                       <dt className="text-xs uppercase tracking-wide text-ink-muted">
-                        Graphics
+                        {t('hardware.graphics')}
                       </dt>
                       <dd className="text-sm font-medium text-ink">
                         {acceleratorLabels.join(', ')}
@@ -248,7 +249,7 @@ export function OnboardingPage() {
                   )}
                   {hardware.os && (
                     <div>
-                      <dt className="text-xs uppercase tracking-wide text-ink-muted">System</dt>
+                      <dt className="text-xs uppercase tracking-wide text-ink-muted">{t('hardware.system')}</dt>
                       <dd className="text-sm font-medium text-ink">
                         {hardware.os} / {hardware.arch}
                       </dd>
@@ -257,19 +258,14 @@ export function OnboardingPage() {
                 </dl>
               ) : (
                 !hardwareQuery.isLoading && (
-                  <p className="text-sm text-ink-muted">
-                    Hardware details will appear once the app backend is running. You can
-                    continue setup now.
-                  </p>
+                  <p className="text-sm text-ink-muted">{t('hardware.unavailable')}</p>
                 )
               )}
             </div>
           </section>
 
           <section className="card mb-8">
-            <h2 className="font-display text-xl font-semibold text-ink">
-              What would you like your AI to do?
-            </h2>
+            <h2 className="font-display text-xl font-semibold text-ink">{t('question')}</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {presetOptions.map((option) => {
                 const selected = selectedPurpose === option.id
@@ -285,8 +281,8 @@ export function OnboardingPage() {
                       .filter(Boolean)
                       .join(' ')}
                   >
-                    <p className="font-semibold text-ink">{option.title}</p>
-                    <p className="mt-1 text-sm text-ink-muted">{option.description}</p>
+                    <p className="font-semibold text-ink">{t(`purposes.${option.id}.title`)}</p>
+                    <p className="mt-1 text-sm text-ink-muted">{t(`purposes.${option.id}.description`)}</p>
                   </button>
                 )
               })}
@@ -306,7 +302,7 @@ export function OnboardingPage() {
               onClick={handleContinue}
               disabled={recommendMutation.isPending}
             >
-              {recommendMutation.isPending ? 'Finding a setup…' : 'Continue'}
+              {recommendMutation.isPending ? t('finding') : t('continue')}
             </button>
           </div>
         </>
@@ -316,12 +312,11 @@ export function OnboardingPage() {
         <>
           <section className="card mb-6">
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <span className="badge-preferred">Recommended</span>
+              <span className="badge-preferred">{t('recommend.badge')}</span>
               <span className="badge-mimir">Mimir</span>
             </div>
             <h2 className="font-display text-xl font-semibold text-ink">
-              Recommended for{' '}
-              {presetOptions.find((o) => o.id === selectedPurpose)?.title ?? 'your use case'}
+              {t('recommend.title', { purpose: t(`purposes.${selectedPurpose}.title`) })}
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
               {recommendation.reason}
@@ -335,13 +330,13 @@ export function OnboardingPage() {
                     key={`${role.role}-${role.model_id}`}
                     className="rounded-lg border border-line bg-raised/50 px-4 py-3"
                   >
-                    <p className="label-caps">{friendlyRole(role.role)}</p>
+                    <p className="label-caps">{friendlyRole(role.role, t)}</p>
                     <p className="font-medium text-ink">
                       {model?.display_name ?? role.model_id}
                     </p>
                     {model?.size_bytes ? (
                       <p className="mt-1 text-xs text-ink-muted">
-                        {formatBytes(model.size_bytes)} download
+                        {t('recommend.download', { size: formatBytes(model.size_bytes) })}
                       </p>
                     ) : null}
                   </li>
@@ -352,7 +347,7 @@ export function OnboardingPage() {
             <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
               <div>
                 <dt className="text-xs uppercase tracking-wide text-ink-muted">
-                  Estimated storage
+                  {t('recommend.storage')}
                 </dt>
                 <dd className="font-medium text-ink">
                   {formatBytes(recommendation.estimated_storage_bytes)}
@@ -360,7 +355,7 @@ export function OnboardingPage() {
               </div>
               <div>
                 <dt className="text-xs uppercase tracking-wide text-ink-muted">
-                  Estimated active memory
+                  {t('recommend.memory')}
                 </dt>
                 <dd className="font-medium text-ink">
                   {formatBytes(recommendation.estimated_vram_bytes)}
@@ -382,17 +377,17 @@ export function OnboardingPage() {
               onClick={() => installMutation.mutate(recommendation)}
               disabled={installMutation.isPending}
             >
-              Install recommended setup
+              {t('recommend.install')}
             </button>
             <button type="button" className="btn-secondary px-6" onClick={handleSkipInstall}>
-              Skip for now
+              {t('recommend.skip')}
             </button>
             <button
               type="button"
               className="btn-secondary px-6"
               onClick={() => setStep('setup')}
             >
-              Back
+              {t('recommend.back')}
             </button>
           </div>
         </>
@@ -401,29 +396,25 @@ export function OnboardingPage() {
       {step === 'installing' && (
         <div className="card py-10">
           <div className="mx-auto flex max-w-md flex-col items-center text-center">
-            <LoadingSpinner label={phaseDetail || 'Installing…'} />
+            <LoadingSpinner label={phaseDetail || t('install.working')} />
             <div className="mt-6 h-2 w-full overflow-hidden rounded-full bg-raised">
               <div
                 className="h-full rounded-full bg-primary transition-all duration-500"
                 style={{ width: `${overallProgress}%` }}
               />
             </div>
-            <p className="mt-3 text-xs text-ink-muted">{overallProgress}% complete</p>
-            <p className="mt-4 text-sm text-ink-muted">
-              Large model downloads can take several minutes. Keep this window open.
-            </p>
+            <p className="mt-3 text-xs text-ink-muted">{t('install.complete', { percent: overallProgress })}</p>
+            <p className="mt-4 text-sm text-ink-muted">{t('install.keepOpen')}</p>
           </div>
         </div>
       )}
 
       {step === 'ready' && (
         <div className="card flex flex-col items-center py-12 text-center">
-          <h2 className="font-display text-2xl font-semibold text-ink">You are ready</h2>
-          <p className="mt-2 max-w-md text-sm text-ink-muted">
-            Your recommended setup is installed. Start chatting with your local AI.
-          </p>
+          <h2 className="font-display text-2xl font-semibold text-ink">{t('ready.title')}</h2>
+          <p className="mt-2 max-w-md text-sm text-ink-muted">{t('ready.description')}</p>
           <button type="button" className="btn-primary mt-6 px-8" onClick={handleStartChatting}>
-            Start chatting
+            {t('ready.start')}
           </button>
         </div>
       )}
@@ -444,19 +435,9 @@ function uniqueById<T extends { id: string }>(items: T[]): T[] {
   return out
 }
 
-function friendlyRole(role: string): string {
-  switch (role) {
-    case 'coordinator':
-      return 'Coordinator'
-    case 'worker':
-      return 'Worker'
-    case 'reviewer':
-      return 'Reviewer'
-    case 'researcher':
-      return 'Researcher'
-    case 'assistant':
-      return 'Assistant'
-    default:
-      return role
-  }
+// Roles the catalog names (onboarding:roles.<role>); any other shows as the recommendation gives it.
+const ROLES = ['coordinator', 'worker', 'reviewer', 'researcher', 'assistant']
+
+function friendlyRole(role: string, t: TFunction<'onboarding'>): string {
+  return ROLES.includes(role) ? t(`roles.${role}`) : role
 }

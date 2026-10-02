@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { api } from '@/lib/api'
 import { subscribeEvents } from '@/lib/events'
@@ -7,17 +8,17 @@ import { errorText } from '@/features/train/display'
 import type { MemoryCategory, MemoryItem } from '@/types/api'
 import { RealmKicker } from '@/components/ui/Realm'
 
-const categoryLabels: Record<MemoryCategory, string> = {
-  identity: 'About you',
-  preferences: 'Preferences',
-  projects: 'Projects',
-  technical: 'Technical',
-  interests: 'Interests',
-  people: 'People',
-  other: 'Other',
+// The categories, in order; their names are memory:categories.<category> in the catalog.
+const CATEGORIES: MemoryCategory[] = ['identity', 'preferences', 'projects', 'technical', 'interests', 'people', 'other']
+
+function useCategoryLabel(): (category: MemoryCategory) => string {
+  const { t } = useTranslation('memory')
+  return (category) => (CATEGORIES.includes(category) ? t(`categories.${category}`) : category)
 }
 
 export function MemoryPage() {
+  const { t } = useTranslation('memory')
+  const categoryLabel = useCategoryLabel()
   const queryClient = useQueryClient()
   const memory = useQuery({ queryKey: ['memory'], queryFn: () => api.listMemory() })
   const settings = useQuery({ queryKey: ['settings'], queryFn: () => api.getSettings() })
@@ -40,7 +41,7 @@ export function MemoryPage() {
   })
 
   const items = memory.data?.memories ?? []
-  const categories = memory.data?.categories ?? (Object.keys(categoryLabels) as MemoryCategory[])
+  const categories = memory.data?.categories ?? CATEGORIES
   const on = settings.data?.memory_enabled !== false
 
   return (
@@ -48,30 +49,26 @@ export function MemoryPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <RealmKicker />
-          <h1 className="font-display text-2xl font-semibold text-ink">Memory</h1>
-          <p className="mt-1 max-w-2xl text-sm text-ink-muted">
-            Things you asked Yggdrasil to remember. They belong to Yggdrasil, not to one model, so they carry across
-            chats, restarts, and model changes. Only the memories that fit a question are used, and they stay on this
-            computer. Say “Remember that …” in any chat to add one.
-          </p>
+          <h1 className="font-display text-2xl font-semibold text-ink">{t('page.title')}</h1>
+          <p className="mt-1 max-w-2xl text-sm text-ink-muted">{t('page.description')}</p>
         </div>
         <label className="flex items-center gap-2 text-sm text-ink">
           <input type="checkbox" checked={on} disabled={toggleAll.isPending} onChange={(e) => toggleAll.mutate(e.target.checked)} />
-          Use memory in chats
+          {t('page.useInChats')}
         </label>
       </div>
       {!on && (
         <p className="rounded-md bg-warning/10 p-3 text-sm text-warning">
-          Memory is off. Chats do not use what is saved here, and nothing is deleted.
+          {t('page.off')}
         </p>
       )}
       <AddMemory categories={categories} onAdded={refresh} />
-      {memory.isLoading && <p className="text-sm text-ink-muted">Loading…</p>}
+      {memory.isLoading && <p className="text-sm text-ink-muted">{t('page.loading')}</p>}
       {!memory.isLoading && items.length === 0 && (
         <EmptyState
           mascot="idle"
-          title="Nothing remembered yet"
-          description="Tell Yggdrasil things worth keeping, such as “Remember that I prefer metric units” or “Remember that this project uses Go.”"
+          title={t('page.emptyTitle')}
+          description={t('page.emptyDescription')}
         />
       )}
       {categories.map((cat) => {
@@ -79,7 +76,7 @@ export function MemoryPage() {
         if (list.length === 0) return null
         return (
           <section key={cat} className="space-y-2">
-            <h2 className="label-caps">{categoryLabels[cat] ?? cat}</h2>
+            <h2 className="label-caps">{categoryLabel(cat)}</h2>
             <ul className="space-y-2">
               {list.map((m) => (
                 <MemoryRow key={m.id} memory={m} categories={categories} onChanged={refresh} />
@@ -93,6 +90,8 @@ export function MemoryPage() {
 }
 
 function AddMemory({ categories, onAdded }: { categories: MemoryCategory[]; onAdded: () => void }) {
+  const { t } = useTranslation('memory')
+  const categoryLabel = useCategoryLabel()
   const [content, setContent] = useState('')
   const [category, setCategory] = useState<MemoryCategory | ''>('')
   const add = useMutation({
@@ -112,19 +111,19 @@ function AddMemory({ categories, onAdded }: { categories: MemoryCategory[]; onAd
       }}
     >
       <label className="min-w-0 flex-1 space-y-1">
-        <span className="text-sm text-ink">Add a memory</span>
-        <input className="field w-full" value={content} onChange={(e) => setContent(e.target.value)} placeholder="I prefer short answers with examples" />
+        <span className="text-sm text-ink">{t('add.label')}</span>
+        <input className="field w-full" value={content} onChange={(e) => setContent(e.target.value)} placeholder={t('add.placeholder')} />
       </label>
-      <select className="field" value={category} onChange={(e) => setCategory(e.target.value as MemoryCategory)} aria-label="Category">
-        <option value="">Choose for me</option>
+      <select className="field" value={category} onChange={(e) => setCategory(e.target.value as MemoryCategory)} aria-label={t('add.category')}>
+        <option value="">{t('add.chooseForMe')}</option>
         {categories.map((c) => (
           <option key={c} value={c}>
-            {categoryLabels[c] ?? c}
+            {categoryLabel(c)}
           </option>
         ))}
       </select>
       <button type="submit" className="btn-primary px-3 py-1.5 text-sm" disabled={!content.trim() || add.isPending}>
-        Add
+        {t('add.button')}
       </button>
       {add.error && <p className="w-full text-sm text-danger">{errorText(add.error)}</p>}
     </form>
@@ -132,6 +131,8 @@ function AddMemory({ categories, onAdded }: { categories: MemoryCategory[]; onAd
 }
 
 function MemoryRow({ memory, categories, onChanged }: { memory: MemoryItem; categories: MemoryCategory[]; onChanged: () => void }) {
+  const { t } = useTranslation('memory')
+  const categoryLabel = useCategoryLabel()
   const [draft, setDraft] = useState<string | null>(null)
   const update = useMutation({
     mutationFn: (body: { content?: string; category?: MemoryCategory; enabled?: boolean; local_only?: boolean }) => api.updateMemory(memory.id, body),
@@ -151,51 +152,51 @@ function MemoryRow({ memory, categories, onChanged }: { memory: MemoryItem; cate
             update.mutate({ content: draft })
           }}
         >
-          <input className="field flex-1" value={draft} onChange={(e) => setDraft(e.target.value)} aria-label="Memory text" autoFocus />
+          <input className="field flex-1" value={draft} onChange={(e) => setDraft(e.target.value)} aria-label={t('row.text')} autoFocus />
           <button type="submit" className="btn-primary px-3 py-1 text-xs" disabled={update.isPending}>
-            Save
+            {t('row.save')}
           </button>
           <button type="button" className="btn-secondary px-3 py-1 text-xs" onClick={() => setDraft(null)}>
-            Cancel
+            {t('row.cancel')}
           </button>
         </form>
       ) : (
         <div className="flex flex-wrap items-center gap-2">
           <p className="min-w-[12rem] flex-1 text-sm text-ink">{memory.content}</p>
           <span className="text-xs text-ink-faint">
-            {memory.source_type === 'explicit' ? 'You asked in a chat' : 'Added here'} ·{' '}
+            {memory.source_type === 'explicit' ? t('row.fromChat') : t('row.addedHere')} ·{' '}
             {new Date(memory.updated_at).toLocaleDateString()}
           </span>
           <select
             className="field py-0.5 text-xs"
             value={memory.category}
-            aria-label="Category"
+            aria-label={t('row.category')}
             onChange={(e) => update.mutate({ category: e.target.value as MemoryCategory })}
           >
             {categories.map((c) => (
               <option key={c} value={c}>
-                {categoryLabels[c] ?? c}
+                {categoryLabel(c)}
               </option>
             ))}
           </select>
           <button type="button" className="btn-secondary px-2 py-0.5 text-xs" onClick={() => setDraft(memory.content)}>
-            Edit
+            {t('row.edit')}
           </button>
           <button type="button" className="btn-secondary px-2 py-0.5 text-xs" disabled={update.isPending} onClick={() => update.mutate({ enabled: !memory.enabled })}>
-            {memory.enabled ? 'Pause' : 'Use again'}
+            {memory.enabled ? t('row.pause') : t('row.useAgain')}
           </button>
           <button
             type="button"
             className="btn-secondary px-2 py-0.5 text-xs"
             disabled={update.isPending}
             aria-pressed={!!memory.local_only}
-            title="Never send this memory to a paired computer. Chats that use it run here."
+            title={t('row.localOnlyHint')}
             onClick={() => update.mutate({ local_only: !memory.local_only })}
           >
-            {memory.local_only ? 'This computer only ✓' : 'This computer only'}
+            {memory.local_only ? t('row.localOnlyOn') : t('row.localOnly')}
           </button>
-          <button type="button" className="btn-secondary px-2 py-0.5 text-xs" disabled={remove.isPending} onClick={() => remove.mutate()} aria-label={`Delete memory: ${memory.content}`}>
-            Delete
+          <button type="button" className="btn-secondary px-2 py-0.5 text-xs" disabled={remove.isPending} onClick={() => remove.mutate()} aria-label={t('row.deleteLabel', { content: memory.content })}>
+            {t('row.delete')}
           </button>
         </div>
       )}

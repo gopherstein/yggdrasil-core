@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { applyLanguage } from '@/i18n'
 import { api } from '@/lib/api'
 import { WhatLeft } from './WhatLeft'
 
@@ -39,5 +40,26 @@ describe('WhatLeft', () => {
     vi.spyOn(window, 'confirm').mockReturnValue(true)
     fireEvent.click(screen.getByRole('button', { name: 'Delete run records now' }))
     expect(await screen.findByText(/Deleted 4 run records, 1 automation results, and 2 entries/)).toBeInTheDocument()
+  })
+
+  describe('in another language', () => {
+    afterEach(async () => {
+      await applyLanguage('en')
+      localStorage.clear()
+    })
+
+    it('shows its text, counts, and retention choices from the catalog', async () => {
+      await applyLanguage('en-XA')
+      renderIt()
+      expect(await screen.findByText(/^\[!! .*2.*1.* !!\]$/)).toBeInTheDocument() // the 30-day summary
+      const keep = screen.getByRole('combobox')
+      expect(Array.from((keep as HTMLSelectElement).options).map((o) => o.textContent)).toEqual([
+        expect.stringMatching(/^\[!! 7 .* !!\]$/),
+        expect.stringMatching(/^\[!! 30 .* !!\]$/),
+        expect.stringMatching(/^\[!! 90 .* !!\]$/),
+        expect.stringMatching(/^\[!! 1 .* !!\]$/),
+        expect.stringMatching(/^\[!! .* !!\]$/),
+      ])
+    })
   })
 })

@@ -13,6 +13,8 @@ i18n/
     settings.json           and one file per area of the app
     desktop.json            the desktop app's own menus, tray, and closing screen
     mobile.json             the iPhone app's text
+    onboarding.json         the first-run setup
+    memory.json             the Memory page
 ```
 
 The desktop app's shell copies this folder when it builds and reads

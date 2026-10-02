@@ -1,0 +1,43 @@
+{
+  "page": {
+    "title": "Memory",
+    "description": "Things you asked Yggdrasil to remember. They belong to Yggdrasil, not to one model, so they carry across chats, restarts, and model changes. Only the memories that fit a question are used, and they stay on this computer. Say “Remember that …” in any chat to add one.",
+    "useInChats": "Use memory in chats",
+    "off": "Memory is off. Chats do not use what is saved here, and nothing is deleted.",
+    "loading": "Loading…",
+    "emptyTitle": "Nothing remembered yet",
+    "emptyDescription": "Tell Yggdrasil things worth keeping, such as “Remember that I prefer metric units” or “Remember that this project uses Go.”"
+  },
+  "categories": {
+    "identity": "About you",
+    "preferences": "Preferences",
+    "projects": "Projects",
+    "technical": "Technical",
+    "interests": "Interests",
+    "people": "People",
+    "other": "Other"
+  },
+  "add": {
+    "label": "Add a memory",
+    "placeholder": "I prefer short answers with examples",
+    "category": "Category",
+    "chooseForMe": "Choose for me",
+    "button": "Add"
+  },
+  "row": {
+    "text": "Memory text",
+    "save": "Save",
+    "cancel": "Cancel",
+    "fromChat": "You asked in a chat",
+    "addedHere": "Added here",
+    "category": "Category",
+    "edit": "Edit",
+    "pause": "Pause",
+    "useAgain": "Use again",
+    "localOnly": "This computer only",
+    "localOnlyOn": "This computer only ✓",
+    "localOnlyHint": "Never send this memory to a paired computer. Chats that use it run here.",
+    "delete": "Delete",
+    "deleteLabel": "Delete memory: {{content}}"
+  }
+}

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { api } from '@/lib/api'
@@ -64,6 +65,7 @@ function PathRow({
   path?: string
   openLabel: string
 }) {
+  const { t } = useTranslation('settings')
   const [status, setStatus] = useState<'idle' | 'opened' | 'failed'>('idle')
   return (
     <div className="min-w-0 space-y-1.5">
@@ -79,29 +81,24 @@ function PathRow({
               setTimeout(() => setStatus('idle'), 2000)
             }}
           >
-            {status === 'opened'
-              ? 'Opened'
-              : status === 'failed'
-                ? 'Copy path from below'
-                : openLabel}
+            {status === 'opened' ? t('storage.opened') : status === 'failed' ? t('storage.copyPath') : openLabel}
           </button>
         ) : null}
       </div>
       <p className="break-anywhere font-mono text-xs text-ink-muted" title={path}>
-        {path ?? 'Will appear when Yggdrasil is running'}
+        {path ?? t('storage.pending')}
       </p>
     </div>
   )
 }
 
-function openFolderLabel(): string {
+function isMac(): boolean {
   const ua = typeof navigator !== 'undefined' ? navigator.userAgent : ''
-  if (/Mac/i.test(ua)) return 'Show in Finder'
-  if (/Win/i.test(ua)) return 'Open folder'
-  return 'Open folder'
+  return /Mac/i.test(ua)
 }
 
 export function SettingsPage() {
+  const { t } = useTranslation('settings')
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const advancedMode = useUIStore((s) => s.advancedMode)
@@ -112,7 +109,7 @@ export function SettingsPage() {
   const [confirmReset, setConfirmReset] = useState(false)
   const [deleteModels, setDeleteModels] = useState(false)
   const [resetError, setResetError] = useState<string | null>(null)
-  const folderLabel = openFolderLabel()
+  const folderLabel = isMac() ? t('storage.showInFinder') : t('storage.openFolder')
 
   const settingsQuery = useQuery({
     queryKey: ['settings'],
@@ -201,7 +198,7 @@ export function SettingsPage() {
       setResetError(
         error instanceof Error
           ? error.message
-          : 'Could not reset the application. Try again.',
+          : t('reset.failed'),
       )
     },
   })
@@ -229,30 +226,28 @@ export function SettingsPage() {
     <div className="mx-auto w-full max-w-2xl min-w-0 space-y-6">
       <header className="page-header">
         <RealmKicker />
-        <h1 className="page-title">Settings</h1>
-        <p className="page-subtitle">How Yggdrasil should behave on this computer.</p>
+        <h1 className="page-title">{t('page.title')}</h1>
+        <p className="page-subtitle">{t('page.subtitle')}</p>
       </header>
 
       {(settingsQuery.isLoading || versionQuery.isLoading) && (
-        <LoadingSpinner label="Loading settings…" />
+        <LoadingSpinner label={t('page.loading')} />
       )}
 
       <div className="settings-group">
-        <p className="settings-group-label">General</p>
+        <p className="settings-group-label">{t('groups.general')}</p>
         <section className="card space-y-4">
           <div>
-            <h2 className="section-title">Appearance</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Choose light, dark, or follow the system.
-            </p>
+            <h2 className="section-title">{t('appearance.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('appearance.description')}</p>
           </div>
           <ChoiceGroup
             value={theme}
             onChange={setTheme}
             options={[
-              { id: 'dark', label: 'Dark' },
-              { id: 'light', label: 'Light' },
-              { id: 'system', label: 'System' },
+              { id: 'dark', label: t('appearance.dark') },
+              { id: 'light', label: t('appearance.light') },
+              { id: 'system', label: t('appearance.system') },
             ]}
           />
         </section>
@@ -264,14 +259,11 @@ export function SettingsPage() {
         <section className="card space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="section-title">Keep running in background</h2>
-              <p className="mt-1 text-sm text-ink-muted">
-                Closing the window keeps Chat, the API, and your schedules running. This stays
-                on while a schedule exists.
-              </p>
+              <h2 className="section-title">{t('background.title')}</h2>
+              <p className="mt-1 text-sm text-ink-muted">{t('background.description')}</p>
             </div>
             <Toggle
-              label="Keep running in background"
+              label={t('background.title')}
               checked={(settings?.keep_running_in_background ?? false) || hasSchedule}
               disabled={backgroundMutation.isPending || busy || hasSchedule}
               onChange={() =>
@@ -285,13 +277,11 @@ export function SettingsPage() {
           <section className="card space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="section-title">Launch at login</h2>
-                <p className="mt-1 text-sm text-ink-muted">
-                  Start Yggdrasil automatically when you sign in to this computer.
-                </p>
+                <h2 className="section-title">{t('launchAtLogin.title')}</h2>
+                <p className="mt-1 text-sm text-ink-muted">{t('launchAtLogin.description')}</p>
               </div>
               <Toggle
-                label="Launch at login"
+                label={t('launchAtLogin.title')}
                 checked={settings?.launch_at_login ?? false}
                 disabled={launchAtLoginMutation.isPending || busy}
                 onChange={() =>
@@ -304,13 +294,11 @@ export function SettingsPage() {
       </div>
 
       <div className="settings-group">
-        <p className="settings-group-label">AI behavior</p>
+        <p className="settings-group-label">{t('groups.ai')}</p>
         <section className="card space-y-4">
           <div>
-            <h2 className="section-title">Default profile</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Used when you start a new chat.
-            </p>
+            <h2 className="section-title">{t('defaultProfile.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('defaultProfile.description')}</p>
           </div>
           <select
             className="field w-full"
@@ -318,7 +306,7 @@ export function SettingsPage() {
             disabled={busy}
             onChange={(e) => patch({ default_profile_id: e.target.value })}
           >
-            <option value="">Automatic</option>
+            <option value="">{t('defaultProfile.automatic')}</option>
             {profiles.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
@@ -329,44 +317,37 @@ export function SettingsPage() {
 
         <section className="card space-y-4">
           <div>
-            <h2 className="section-title">Run chats on</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Where work should run by default across your team.
-            </p>
+            <h2 className="section-title">{t('runOn.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('runOn.description')}</p>
           </div>
           <ChoiceGroup
             value={(settings?.default_execution ?? 'automatic') as 'automatic' | 'local' | 'ask'}
             onChange={(id) => patch({ default_execution: id })}
             options={[
-              { id: 'automatic', label: 'Automatic' },
-              { id: 'local', label: 'This computer' },
-              { id: 'ask', label: 'Ask each time' },
+              { id: 'automatic', label: t('runOn.automatic') },
+              { id: 'local', label: t('runOn.local') },
+              { id: 'ask', label: t('runOn.ask') },
             ]}
           />
         </section>
 
         <section className="card space-y-4">
           <div>
-            <h2 className="section-title">Model lifecycle</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Automatic keeps models warm after chat. Manual leaves Start and Stop to you.
-            </p>
+            <h2 className="section-title">{t('lifecycle.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('lifecycle.description')}</p>
           </div>
           <ChoiceGroup
             value={(settings?.model_lifecycle ?? 'automatic') as 'automatic' | 'manual'}
             onChange={(id) => patch({ model_lifecycle: id })}
             options={[
-              { id: 'automatic', label: 'Automatic' },
-              { id: 'manual', label: 'Manual' },
+              { id: 'automatic', label: t('lifecycle.automatic') },
+              { id: 'manual', label: t('lifecycle.manual') },
             ]}
           />
           {(settings?.model_lifecycle ?? 'automatic') === 'automatic' && (
             <label className="block text-sm text-ink-muted">
-              Unload idle models after
-              <p className="mt-0.5 text-xs text-ink-faint">
-                Frees memory when a model hasn’t been used for a while. Use 0 to keep models
-                loaded.
-              </p>
+              {t('lifecycle.idleUnload')}
+              <p className="mt-0.5 text-xs text-ink-faint">{t('lifecycle.idleUnloadHint')}</p>
               <div className="mt-2 flex items-center gap-2">
                 <input
                   type="number"
@@ -382,7 +363,7 @@ export function SettingsPage() {
                     }
                   }}
                 />
-                <span className="text-xs text-ink-faint">minutes</span>
+                <span className="text-xs text-ink-faint">{t('lifecycle.minutes')}</span>
               </div>
             </label>
           )}
@@ -390,17 +371,15 @@ export function SettingsPage() {
 
         <section className="card space-y-4">
           <div>
-            <h2 className="section-title">Download models</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              When a profile needs a model that isn’t installed yet.
-            </p>
+            <h2 className="section-title">{t('downloads.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('downloads.description')}</p>
           </div>
           <ChoiceGroup
             value={(settings?.download_behavior ?? 'ask') as 'ask' | 'automatic'}
             onChange={(id) => patch({ download_behavior: id })}
             options={[
-              { id: 'ask', label: 'Ask first' },
-              { id: 'automatic', label: 'Automatic' },
+              { id: 'ask', label: t('downloads.ask') },
+              { id: 'automatic', label: t('downloads.automatic') },
             ]}
           />
         </section>
@@ -408,13 +387,11 @@ export function SettingsPage() {
         <section className="card space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="section-title">Advanced mode</h2>
-              <p className="mt-1 text-sm text-ink-muted">
-                Show model IDs, API details, Profiles, logs, and other power-user controls.
-              </p>
+              <h2 className="section-title">{t('advanced.title')}</h2>
+              <p className="mt-1 text-sm text-ink-muted">{t('advanced.description')}</p>
             </div>
             <Toggle
-              label="Advanced mode"
+              label={t('advanced.title')}
               checked={advancedMode}
               disabled={busy}
               onChange={() => {
@@ -428,17 +405,15 @@ export function SettingsPage() {
       </div>
 
       <div className="settings-group">
-        <p className="settings-group-label">Network & access</p>
+        <p className="settings-group-label">{t('groups.network')}</p>
         <section className="card space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="section-title">Find other computers</h2>
-              <p className="mt-1 text-sm text-ink-muted">
-                Advertise this computer and look for other Yggdrasil installs on your network.
-              </p>
+              <h2 className="section-title">{t('discovery.title')}</h2>
+              <p className="mt-1 text-sm text-ink-muted">{t('discovery.description')}</p>
             </div>
             <Toggle
-              label="Find other computers"
+              label={t('discovery.title')}
               checked={settings?.discovery_enabled ?? true}
               disabled={busy}
               onChange={() =>
@@ -448,72 +423,63 @@ export function SettingsPage() {
           </div>
           {settings?.discovery_needs_restart ? (
             <div className="rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-ink">
-              <p>
-                Networking was updated. Restart Yggdrasil so other computers can fully reach this
-                one.
-              </p>
+              <p>{t('discovery.needsRestart')}</p>
               <button
                 type="button"
                 className="btn-primary mt-3 px-3 py-1.5 text-xs"
                 onClick={async () => {
                   const ok = await quitDesktopForRestart()
                   if (!ok) {
-                    window.alert(
-                      'Quit Yggdrasil completely, then open it again to finish applying network settings.',
-                    )
+                    window.alert(t('discovery.restartManually'))
                   }
                 }}
               >
-                Restart now
+                {t('discovery.restartNow')}
               </button>
             </div>
           ) : (
             <p className="text-xs text-ink-faint">
-              Status:{' '}
-              <span className="font-medium text-ink">
-                {(settings?.discovery_enabled ?? true) ? 'On' : 'Off'}
-              </span>
+              <Trans
+                t={t}
+                i18nKey="discovery.status"
+                values={{ state: (settings?.discovery_enabled ?? true) ? t('onOff.on') : t('onOff.off') }}
+                components={{ strong: <span className="font-medium text-ink" /> }}
+              />
             </p>
           )}
         </section>
 
         <section className="card space-y-3">
           <div>
-            <h2 className="section-title">API access</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              How apps and other devices can talk to Yggdrasil.
-            </p>
+            <h2 className="section-title">{t('api.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('api.description')}</p>
           </div>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between gap-3">
-              <dt className="text-ink-muted">Local API</dt>
-              <dd className="font-medium text-ink">On</dd>
+              <dt className="text-ink-muted">{t('api.local')}</dt>
+              <dd className="font-medium text-ink">{t('onOff.on')}</dd>
             </div>
             <div className="flex justify-between gap-3">
-              <dt className="text-ink-muted">LAN API</dt>
-              <dd className="font-medium text-ink">
-                {settings?.lan_api_enabled ? 'On' : 'Off'}
-              </dd>
+              <dt className="text-ink-muted">{t('api.lan')}</dt>
+              <dd className="font-medium text-ink">{settings?.lan_api_enabled ? t('onOff.on') : t('onOff.off')}</dd>
             </div>
           </dl>
           <Link to="/api-access" className="btn-secondary inline-block px-3 py-1.5 text-xs">
-            Manage API access
+            {t('api.manage')}
           </Link>
         </section>
 
         <section className="card space-y-4">
           <div>
-            <h2 className="section-title">Notifications</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Alerts for long-running work and team connectivity.
-            </p>
+            <h2 className="section-title">{t('notifications.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('notifications.description')}</p>
           </div>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-ink">Notify when tasks finish</p>
+              <p className="text-sm font-medium text-ink">{t('notifications.taskFinish')}</p>
             </div>
             <Toggle
-              label="Notify when tasks finish"
+              label={t('notifications.taskFinish')}
               checked={settings?.notify_task_finish ?? true}
               disabled={busy}
               onChange={() =>
@@ -523,12 +489,10 @@ export function SettingsPage() {
           </div>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-ink">
-                Notify when a paired computer goes offline
-              </p>
+              <p className="text-sm font-medium text-ink">{t('notifications.peerOffline')}</p>
             </div>
             <Toggle
-              label="Notify when a paired computer goes offline"
+              label={t('notifications.peerOffline')}
               checked={settings?.notify_peer_offline ?? true}
               disabled={busy}
               onChange={() =>
@@ -541,21 +505,19 @@ export function SettingsPage() {
       </div>
 
       <div className="settings-group">
-        <p className="settings-group-label">Privacy & security</p>
+        <p className="settings-group-label">{t('groups.privacy')}</p>
         <ConnectedServices />
         <WhatLeft />
         <section className="card space-y-4">
           <div>
-            <h2 className="section-title">Tool permissions</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Default rules for what the AI may do on this computer.
-            </p>
+            <h2 className="section-title">{t('toolPermissions.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('toolPermissions.description')}</p>
           </div>
           {(
             [
-              { key: 'tool_terminal' as const, label: 'Terminal commands' },
-              { key: 'tool_file_writes' as const, label: 'File writes' },
-              { key: 'tool_git' as const, label: 'Git operations' },
+              { key: 'tool_terminal' as const, label: t('toolPermissions.terminal') },
+              { key: 'tool_file_writes' as const, label: t('toolPermissions.fileWrites') },
+              { key: 'tool_git' as const, label: t('toolPermissions.git') },
             ] as const
           ).map((row) => {
             const value = (settings?.[row.key] ?? 'ask') as string
@@ -568,10 +530,10 @@ export function SettingsPage() {
                   disabled={busy}
                   onChange={(e) => patch({ [row.key]: e.target.value } as SettingsPatch)}
                 >
-                  <option value="ask">Ask</option>
-                  <option value="allow-for-session">Allow for session</option>
-                  <option value="allow">Allow</option>
-                  <option value="deny">Deny</option>
+                  <option value="ask">{t('toolPermissions.ask')}</option>
+                  <option value="allow-for-session">{t('toolPermissions.allowSession')}</option>
+                  <option value="allow">{t('toolPermissions.allow')}</option>
+                  <option value="deny">{t('toolPermissions.deny')}</option>
                 </select>
               </label>
             )
@@ -580,15 +542,13 @@ export function SettingsPage() {
 
         <section className="card space-y-4">
           <div>
-            <h2 className="section-title">History</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Control what Yggdrasil keeps on this computer.
-            </p>
+            <h2 className="section-title">{t('history.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('history.description')}</p>
           </div>
           <div className="flex items-start justify-between gap-4">
-            <p className="text-sm font-medium text-ink">Save chat history</p>
+            <p className="text-sm font-medium text-ink">{t('history.saveChats')}</p>
             <Toggle
-              label="Save chat history"
+              label={t('history.saveChats')}
               checked={settings?.save_chat_history ?? true}
               disabled={busy}
               onChange={() =>
@@ -597,9 +557,9 @@ export function SettingsPage() {
             />
           </div>
           <div className="flex items-start justify-between gap-4">
-            <p className="text-sm font-medium text-ink">Save task history</p>
+            <p className="text-sm font-medium text-ink">{t('history.saveTasks')}</p>
             <Toggle
-              label="Save task history"
+              label={t('history.saveTasks')}
               checked={settings?.save_task_history ?? true}
               disabled={busy}
               onChange={() =>
@@ -612,35 +572,31 @@ export function SettingsPage() {
             className="btn-secondary px-3 py-1.5 text-xs"
             disabled={clearHistoryMutation.isPending}
             onClick={() => {
-              if (
-                window.confirm(
-                  'Delete all chat history on this computer? This cannot be undone.',
-                )
-              ) {
+              if (window.confirm(t('history.confirmClear'))) {
                 clearHistoryMutation.mutate()
               }
             }}
           >
-            {clearHistoryMutation.isPending ? 'Clearing…' : 'Clear chat history'}
+            {clearHistoryMutation.isPending ? t('history.clearing') : t('history.clear')}
           </button>
         </section>
       </div>
 
       <div className="settings-group">
-        <p className="settings-group-label">Storage</p>
+        <p className="settings-group-label">{t('groups.storage')}</p>
         <section className="card space-y-4">
-          <h2 className="section-title">Data directories</h2>
+          <h2 className="section-title">{t('storage.folders')}</h2>
           <div className="space-y-4">
-            <PathRow label="Data" path={settings?.data_dir} openLabel={folderLabel} />
-            <PathRow label="Models" path={settings?.models_dir} openLabel={folderLabel} />
+            <PathRow label={t('storage.data')} path={settings?.data_dir} openLabel={folderLabel} />
+            <PathRow label={t('storage.models')} path={settings?.models_dir} openLabel={folderLabel} />
             {advancedMode && (
               <>
                 <PathRow
-                  label="Runtimes"
+                  label={t('storage.runtimes')}
                   path={settings?.runtimes_dir}
                   openLabel={folderLabel}
                 />
-                <PathRow label="Logs" path={settings?.logs_dir} openLabel={folderLabel} />
+                <PathRow label={t('storage.logs')} path={settings?.logs_dir} openLabel={folderLabel} />
               </>
             )}
           </div>
@@ -648,26 +604,24 @@ export function SettingsPage() {
 
         <section className="card space-y-4">
           <div>
-            <h2 className="section-title">Maximum model storage</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Soft limit for downloaded models on this computer.
-            </p>
+            <h2 className="section-title">{t('storage.limit')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('storage.limitDescription')}</p>
           </div>
           <ChoiceGroup
             value={String(settings?.model_storage_limit_gb ?? 0)}
             onChange={(id) => patch({ model_storage_limit_gb: Number(id) })}
             options={[
-              { id: '0', label: 'Unlimited' },
-              { id: '50', label: '50 GB' },
-              { id: '100', label: '100 GB' },
-              { id: '250', label: '250 GB' },
+              { id: '0', label: t('storage.unlimited') },
+              { id: '50', label: t('storage.gigabytes', { value: 50 }) },
+              { id: '100', label: t('storage.gigabytes', { value: 100 }) },
+              { id: '250', label: t('storage.gigabytes', { value: 250 }) },
             ]}
           />
         </section>
       </div>
 
       <div className="settings-group">
-        <p className="settings-group-label">About</p>
+        <p className="settings-group-label">{t('groups.about')}</p>
         <section className="card space-y-4">
           <div className="flex items-center gap-4">
             <YggdrasilMark size={72} lore />
@@ -675,16 +629,16 @@ export function SettingsPage() {
               <p className="font-display text-xl font-semibold tracking-tight text-ink">
                 Yggdrasil
               </p>
-              <p className="mt-0.5 text-sm text-ink-muted">Local AI control plane</p>
+              <p className="mt-0.5 text-sm text-ink-muted">{t('about.tagline')}</p>
               <p className="mt-2 text-sm font-medium text-ink">
                 {displayVersion(versionQuery.data?.version ?? healthQuery.data?.version) ||
-                  'Version unavailable'}
+                  t('about.versionUnavailable')}
               </p>
               {versionQuery.data?.commit &&
               versionQuery.data.commit !== 'unknown' &&
               versionQuery.data.commit.trim() !== '' ? (
                 <p className="mt-0.5 font-mono text-xs text-ink-faint">
-                  Build {versionQuery.data.commit.slice(0, 7)}
+                  {t('about.build', { commit: versionQuery.data.commit.slice(0, 7) })}
                 </p>
               ) : null}
               {versionQuery.data?.source ? (
@@ -695,7 +649,7 @@ export function SettingsPage() {
                     rel="noopener noreferrer"
                     className="text-primary underline-offset-2 hover:underline"
                   >
-                    Corresponding source
+                    {t('about.source')}
                   </a>
                   {versionQuery.data.license ? (
                     <span className="text-ink-muted"> · {versionQuery.data.license}</span>
@@ -706,31 +660,28 @@ export function SettingsPage() {
           </div>
           <dl className="space-y-3 border-t border-line/50 pt-4 text-sm">
             <div>
-              <dt className="text-xs uppercase tracking-wide text-ink-faint">This computer</dt>
-              <dd className="font-medium text-ink">{settings?.node_name ?? 'Unavailable'}</dd>
+              <dt className="text-xs uppercase tracking-wide text-ink-faint">{t('about.thisComputer')}</dt>
+              <dd className="font-medium text-ink">{settings?.node_name ?? t('about.unavailable')}</dd>
             </div>
             <div>
-              <dt className="text-xs uppercase tracking-wide text-ink-faint">Service</dt>
+              <dt className="text-xs uppercase tracking-wide text-ink-faint">{t('about.service')}</dt>
               <dd className="font-medium capitalize text-ink">
-                {healthQuery.data?.status ?? 'Unavailable'}
+                {healthQuery.data?.status ?? t('about.unavailable')}
               </dd>
             </div>
           </dl>
           <Link to="/diagnostics" className="btn-secondary inline-block">
-            Open diagnostics
+            {t('about.diagnostics')}
           </Link>
         </section>
       </div>
 
       <div className="settings-group">
-        <p className="settings-group-label">Danger zone</p>
+        <p className="settings-group-label">{t('groups.danger')}</p>
         <section className="card space-y-4">
           <div>
-            <h2 className="section-title text-danger">Reset application</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Restore defaults and restart onboarding. Clears chats, custom profiles, tasks, and
-              API keys.
-            </p>
+            <h2 className="section-title text-danger">{t('reset.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('reset.description')}</p>
           </div>
 
           {resetError && (
@@ -749,16 +700,11 @@ export function SettingsPage() {
                 setConfirmReset(true)
               }}
             >
-              Reset settings and app data…
+              {t('reset.button')}
             </button>
           ) : (
             <div className="space-y-3 rounded-xl bg-danger/10 p-4">
-              <p className="text-sm text-danger">
-                This cannot be undone. You will go through onboarding again.
-                {!deleteModels
-                  ? ' Downloaded models and runtimes will be kept.'
-                  : ' Downloaded models will also be deleted.'}
-              </p>
+              <p className="text-sm text-danger">{deleteModels ? t('reset.warningDelete') : t('reset.warningKeep')}</p>
               <label className="flex items-start gap-2 text-sm text-ink">
                 <input
                   type="checkbox"
@@ -766,7 +712,7 @@ export function SettingsPage() {
                   checked={deleteModels}
                   onChange={(e) => setDeleteModels(e.target.checked)}
                 />
-                <span>Also delete downloaded models</span>
+                <span>{t('reset.deleteModels')}</span>
               </label>
               <div className="flex flex-wrap gap-2">
                 <button
@@ -775,7 +721,7 @@ export function SettingsPage() {
                   disabled={resetMutation.isPending}
                   onClick={() => resetMutation.mutate()}
                 >
-                  {resetMutation.isPending ? 'Resetting…' : 'Yes, reset'}
+                  {resetMutation.isPending ? t('reset.resetting') : t('reset.confirm')}
                 </button>
                 <button
                   type="button"
@@ -783,7 +729,7 @@ export function SettingsPage() {
                   disabled={resetMutation.isPending}
                   onClick={() => setConfirmReset(false)}
                 >
-                  Cancel
+                  {t('reset.cancel')}
                 </button>
               </div>
             </div>
