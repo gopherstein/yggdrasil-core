@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
@@ -357,5 +358,44 @@ func TestObservations(t *testing.T) {
 	// Keeping it private turns off sharing observations too.
 	if v, _ := s.Put(ctx, id, Input{Stars: 4, Observations: true}); v.ShareObservations {
 		t.Fatal("observations shared on a private rating")
+	}
+}
+
+func TestSignals(t *testing.T) {
+	fake := &fakeService{}
+	if err := json.Unmarshal([]byte(`{"schema_version":1,"generated_at":"2026-10-01T04:17:00Z","prior":3.5,"weight":5,"min_ratings":3,"models":[
+		{"model":"qwen2.5-coder-7b-instruct","format":"gguf","quantization":"Q4_K_M","runtime":"llamacpp","backend":"metal","cohorts":[
+			{"tier":"class","cohort":"apple:apple-silicon:32-64","ratings":4,"average":4.5,"weighted_score":4.1,"confidence":"early"},
+			{"tier":"global","ratings":40,"average":4.1,"weighted_score":4.0,"confidence":"community"}]}]}`), &fake.snap); err != nil {
+		t.Fatal(err)
+	}
+	srv := httptest.NewServer(fake)
+	defer srv.Close()
+	s, settings, records := newService(t, srv)
+	ctx := context.Background()
+
+	// Off: none, and nothing is downloaded to find them.
+	if sig, err := s.Signals(ctx); err != nil || sig != nil {
+		t.Fatalf("signals with ratings off = %v, %v", sig, err)
+	}
+	_ = settings.SetBool(ctx, SettingShow, true)
+	// On but no summary kept yet: still nothing downloaded.
+	if sig, _ := s.Signals(ctx); len(sig) != 0 || len(*records) != 0 {
+		t.Fatalf("signals before a summary = %v, records %v", sig, *records)
+	}
+	if _, err := s.Community(ctx); err != nil {
+		t.Fatal(err)
+	}
+	sig, err := s.Signals(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Early ratings from similar hardware count half: (4.1 - 3.5) × 0.5.
+	got := sig["qwen2.5-coder-7b-q4"]
+	if !got.Similar || got.Ratings != 4 || math.Abs(got.Signal-0.3) > 1e-9 {
+		t.Fatalf("signal = %+v", got)
+	}
+	if _, ok := sig["local-file"]; ok {
+		t.Fatal("a model that cannot be compared has a signal")
 	}
 }

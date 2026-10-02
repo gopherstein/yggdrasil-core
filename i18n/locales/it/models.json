@@ -285,6 +285,7 @@
       "backend": "su computer con questa memoria"
     },
     "overall": "in totale",
+    "chosenByCommunity": "Scelto con le valutazioni di computer come il tuo",
     "confidence": {
       "limited": "Dati limitati",
       "early": "Prime valutazioni"

@@ -285,6 +285,7 @@
       "backend": "sur des ordinateurs avec autant de mémoire"
     },
     "overall": "au total",
+    "chosenByCommunity": "Choisi grâce aux notes d'ordinateurs comme le vôtre",
     "confidence": {
       "limited": "Données limitées",
       "early": "Premières notes"

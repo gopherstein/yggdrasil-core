@@ -95,11 +95,12 @@ func (m *Manager) List(ctx context.Context) ([]contracts.Model, error) {
 }
 
 // Recommend wraps the recommendation engine with presets.
-func (m *Manager) Recommend(ctx context.Context, purpose string, hw contracts.HardwareInventory) (contracts.Recommendation, error) {
+func (m *Manager) Recommend(ctx context.Context, purpose string, hw contracts.HardwareInventory, community map[string]CommunitySignal) (contracts.Recommendation, error) {
+	in := RecommendInput{Purpose: purpose, Hardware: hw, Community: community}
 	if len(m.presets) > 0 {
-		return RecommendWithPresets(m.catalog, m.presets, RecommendInput{Purpose: purpose, Hardware: hw})
+		return RecommendWithPresets(m.catalog, m.presets, in)
 	}
-	return Recommend(m.catalog, RecommendInput{Purpose: purpose, Hardware: hw})
+	return Recommend(m.catalog, in)
 }
 
 // Fit builds hardware fit + winners for a node.

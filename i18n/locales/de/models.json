@@ -280,6 +280,7 @@
       "backend": "auf Computern mit so viel Speicher"
     },
     "overall": "insgesamt",
+    "chosenByCommunity": "Mit Bewertungen von Computern wie deinem ausgewählt",
     "confidence": {
       "limited": "Wenige Daten",
       "early": "Erste Bewertungen"

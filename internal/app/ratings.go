@@ -8,6 +8,7 @@ import (
 
 	"github.com/yeixio/yggdrasil-core/internal/config"
 	"github.com/yeixio/yggdrasil-core/internal/egress"
+	"github.com/yeixio/yggdrasil-core/internal/models"
 	modelhealth "github.com/yeixio/yggdrasil-core/internal/models/health"
 	"github.com/yeixio/yggdrasil-core/internal/ratings"
 	"github.com/yeixio/yggdrasil-core/internal/version"
@@ -57,4 +58,18 @@ func (a *App) newRatings(cfg config.Config) *ratings.Service {
 		LocalNode:   func() string { return a.Config.Get().NodeID },
 		AppVersion:  version.Version,
 	}
+}
+
+// communitySignals are community ratings as a recommendation signal (#37),
+// or nil when they are off or there is no summary yet.
+func (a *App) communitySignals(ctx context.Context) map[string]models.CommunitySignal {
+	if a.Ratings == nil {
+		return nil
+	}
+	signals, err := a.Ratings.Signals(ctx)
+	if err != nil {
+		a.Logger.Debug("community ratings signals", "error", err)
+		return nil
+	}
+	return signals
 }

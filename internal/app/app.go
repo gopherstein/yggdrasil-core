@@ -469,7 +469,7 @@ func New(opts Options) (*App, error) {
 		ListModels: a.listModelsCluster,
 		RecommendModels: func(ctx context.Context, purpose string) (contracts.Recommendation, error) {
 			hw, _ := a.detectHardware(ctx)
-			return modelMgr.Recommend(ctx, purpose, hw)
+			return modelMgr.Recommend(ctx, purpose, hw, a.communitySignals(ctx))
 		},
 		ModelsFit: a.modelsFitAll,
 		BrowseModels: func(ctx context.Context, query string, limit int) ([]contracts.BrowseModel, error) {

@@ -39,6 +39,7 @@
   "recommend": {
     "badge": "建議",
     "title": "適合「{{purpose}}」的建議配置",
+    "communityChosen": "使用類似電腦的人對此配置的主模型評價很高，因此優先於平常的首選推薦它。",
     "download": "下載大小 {{size}}",
     "storage": "預估儲存空間",
     "memory": "預估使用中記憶體",

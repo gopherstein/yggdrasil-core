@@ -41,6 +41,7 @@
   "recommend": {
     "badge": "Recomendado",
     "title": "Recomendado para {{purpose}}",
+    "communityChosen": "Quienes tienen equipos como el tuyo valoran bien el modelo principal de esta configuración, así que se sugiere antes que la opción habitual.",
     "download": "Descarga de {{size}}",
     "storage": "Almacenamiento estimado",
     "memory": "Memoria activa estimada",
