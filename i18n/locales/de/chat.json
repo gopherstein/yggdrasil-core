@@ -314,6 +314,11 @@
     "generic": {
       "title": "Etwas ist schiefgelaufen",
       "body": "Yggdrasil konnte diese Antwort nicht fertigstellen. Versuche es gleich noch einmal."
+    },
+    "trainingMemory": {
+      "busy": "Ein Training nutzt diesen Computer, deshalb war nicht genug Speicher für dieses Modell frei.",
+      "busyNamed": "Das Training „{{name}}“ nutzt diesen Computer, deshalb war nicht genug Speicher für dieses Modell frei.",
+      "advice": "Versuche es erneut, wenn das Training fertig ist, wähle ein kleineres Modell oder brich das Training auf der Seite „Trainieren“ ab."
     }
   },
   "modelFailure": {

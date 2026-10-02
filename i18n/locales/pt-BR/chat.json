@@ -319,6 +319,11 @@
     "generic": {
       "title": "Algo deu errado",
       "body": "O Yggdrasil não conseguiu concluir essa resposta. Tente novamente em instantes."
+    },
+    "trainingMemory": {
+      "busy": "Um treinamento está usando este computador, então não havia memória suficiente para este modelo.",
+      "busyNamed": "O treinamento “{{name}}” está usando este computador, então não havia memória suficiente para este modelo.",
+      "advice": "Tente de novo quando o treinamento terminar, escolha um modelo menor ou cancele o treinamento na página Treinar."
     }
   },
   "modelFailure": {

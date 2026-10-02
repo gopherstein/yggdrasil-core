@@ -319,6 +319,11 @@
     "generic": {
       "title": "Qualcosa è andato storto",
       "body": "Yggdrasil non è riuscito a completare la risposta. Riprova tra un momento."
+    },
+    "trainingMemory": {
+      "busy": "Un addestramento sta usando questo computer, quindi non c'era abbastanza memoria per questo modello.",
+      "busyNamed": "L'addestramento “{{name}}” sta usando questo computer, quindi non c'era abbastanza memoria per questo modello.",
+      "advice": "Riprova quando l'addestramento è finito, scegli un modello più piccolo o annulla l'addestramento nella pagina Addestra."
     }
   },
   "modelFailure": {
