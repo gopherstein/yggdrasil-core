@@ -330,7 +330,9 @@
     "runtime": "Laufzeit: {{value}}",
     "computer": "Computer: {{value}}",
     "exitCode": "Exit-Code: {{value}}",
-    "lastProbe": "Letzter Zustandscheck: {{value}}"
+    "lastProbe": "Letzter Zustandscheck: {{value}}",
+    "outOfMemory": "Diesem Modell ist auf diesem Computer wahrscheinlich der sichere Speicher ausgegangen. Yggdrasil hat es gestoppt, damit das System stabil bleibt.",
+    "stopped": "Das Modell hat nicht mehr geantwortet. Yggdrasil hat es deshalb gestoppt und den fehlgeschlagenen Prozess bereinigt."
   },
   "capability": {
     "enableInternet": "Internet aktivieren",

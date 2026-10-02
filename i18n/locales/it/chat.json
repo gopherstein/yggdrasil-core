@@ -335,7 +335,9 @@
     "runtime": "Runtime: {{value}}",
     "computer": "Computer: {{value}}",
     "exitCode": "Codice di uscita: {{value}}",
-    "lastProbe": "Ultimo controllo di stato: {{value}}"
+    "lastProbe": "Ultimo controllo di stato: {{value}}",
+    "outOfMemory": "Probabilmente questo modello ha esaurito la memoria sicura su questo computer. Yggdrasil lo ha arrestato per mantenere stabile il sistema.",
+    "stopped": "Il modello ha smesso di rispondere, quindi Yggdrasil lo ha arrestato e ha ripulito il processo non riuscito."
   },
   "capability": {
     "enableInternet": "Attiva Internet",

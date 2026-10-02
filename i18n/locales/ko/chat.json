@@ -325,7 +325,9 @@
     "runtime": "런타임: {{value}}",
     "computer": "컴퓨터: {{value}}",
     "exitCode": "종료 코드: {{value}}",
-    "lastProbe": "마지막 상태 확인: {{value}}"
+    "lastProbe": "마지막 상태 확인: {{value}}",
+    "outOfMemory": "이 모델이 이 컴퓨터에서 안전하게 쓸 수 있는 메모리를 다 쓴 것 같아요. 시스템을 안정적으로 유지하려고 Yggdrasil이 모델을 중지했어요.",
+    "stopped": "모델이 응답을 멈춰서 Yggdrasil이 모델을 중지하고 실패한 프로세스를 정리했어요."
   },
   "capability": {
     "enableInternet": "인터넷 사용",

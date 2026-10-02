@@ -325,7 +325,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			eventsCh, err := orch.Run(ctx, task, profile, env)
 			if err != nil {
 				runErr = codedError(err)
-				ch <- pluginapi.ChatChunk{Error: a.explainWhileTraining(appLang, err.Error()), Done: true}
+				ch <- pluginapi.ChatChunk{Error: a.explainFailure(appLang, err.Error()), Done: true}
 				return
 			}
 			retry := false
@@ -395,7 +395,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 						}
 					}
 					runErr = codedChatError(evt.Error)
-					ch <- pluginapi.ChatChunk{Error: a.explainWhileTraining(appLang, evt.Error), Done: true}
+					ch <- pluginapi.ChatChunk{Error: a.explainFailure(appLang, evt.Error), Done: true}
 					return
 				}
 				if evt.Type == "agent.completed" && evt.Role != "" {

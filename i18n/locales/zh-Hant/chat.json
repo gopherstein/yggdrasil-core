@@ -325,7 +325,9 @@
     "runtime": "執行環境：{{value}}",
     "computer": "電腦：{{value}}",
     "exitCode": "結束代碼：{{value}}",
-    "lastProbe": "上次健康檢查：{{value}}"
+    "lastProbe": "上次健康檢查：{{value}}",
+    "outOfMemory": "此模型可能已用完這台電腦上的安全記憶體。為了保持系統穩定，Yggdrasil 已將它停止。",
+    "stopped": "模型停止了回應，因此 Yggdrasil 已將它停止，並清理失敗的程序。"
   },
   "capability": {
     "enableInternet": "啟用網際網路",

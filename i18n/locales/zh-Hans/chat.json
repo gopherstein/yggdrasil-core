@@ -325,7 +325,9 @@
     "runtime": "运行时：{{value}}",
     "computer": "电脑：{{value}}",
     "exitCode": "退出代码：{{value}}",
-    "lastProbe": "上次健康检查：{{value}}"
+    "lastProbe": "上次健康检查：{{value}}",
+    "outOfMemory": "此模型可能已用完这台电脑上的安全内存。为保持系统稳定，Yggdrasil 已将其停止。",
+    "stopped": "模型停止了响应，因此 Yggdrasil 已终止它并清理了失败的进程。"
   },
   "capability": {
     "enableInternet": "启用互联网",
