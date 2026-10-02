@@ -48,7 +48,7 @@ Nothing leaves because the daemon started. Traffic is sent only when a feature t
 | Training on a paired computer | That computer receives the training examples and the AI's instructions over Bifrost, and returns the adapter. It deletes its copy when the job ends. |
 | First code run (`code.execute`) | PyPI, for numpy, pandas, matplotlib, and openpyxl. The code itself has no network. |
 | First use of speech (`speech.transcribe`, `speech.synthesize`, Read aloud) | PyPI, for faster-whisper and Piper, then Hugging Face for each Whisper model and Piper voice the first time it is used. The audio and text stay on this computer. |
-| Image and video generation setup | GitHub, for the pinned stable-diffusion.cpp release, and Hugging Face, for the model's files. Only when you set it up. Prompts, images, and clips stay on this computer. |
+| Image and video generation setup | GitHub, for the pinned stable-diffusion.cpp release (and, for video, the TAEHV decoder), and Hugging Face, for the model's files. Only when you set it up. Prompts, images, and clips stay on this computer. |
 | First scanned PDF in Knowledge | PyPI, for the text-recognition packages (about 110 MB). The PDF itself is read on this computer. |
 | A chat placed on a paired computer | That computer receives the prompt and context over Bifrost |
 | An image or speech tool run on a paired computer | That computer receives the tool's arguments, such as the prompt, and the chat file it needs, such as the image to edit or the audio to transcribe, over Bifrost. It returns the result and keeps nothing. Each job is recorded. |

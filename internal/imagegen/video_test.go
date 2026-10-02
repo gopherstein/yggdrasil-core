@@ -14,7 +14,7 @@ func videoFixture(t *testing.T) (*fixture, *Engine, *artifacts.Store, context.Co
 	t.Helper()
 	f, _, st, ctx := setupTools(t)
 	m := VideoCatalog()[0]
-	byRole := map[string]string{"diffusion": "diffusion.gguf", "t5xxl": "encoder.gguf", "vae": "vae.safetensors"}
+	byRole := map[string]string{"diffusion": "diffusion.gguf", "t5xxl": "encoder.gguf", "vae": "vae.safetensors", "tae": "vae.safetensors"}
 	for i, file := range m.Files {
 		data := f.files[byRole[file.Role]]
 		f.files[file.Path] = data
@@ -48,7 +48,7 @@ func TestVideoTool(t *testing.T) {
 	if flag(got, "-M") != "vid_gen" || flag(got, "--video-frames") != "49" || flag(got, "--fps") != "16" || flag(got, "--flow-shift") != "3" ||
 		filepath.Base(flag(got, "--t5xxl")) != "umt5-xxl-encoder-Q4_K_M.gguf" || filepath.Base(flag(got, "--vae")) != "wan2.2_vae.safetensors" ||
 		!strings.HasSuffix(flag(got, "-o"), "out.webm") || flag(got, "-i") != "" || flag(got, "-n") == "" ||
-		!strings.Contains(strings.Join(got, " "), "--vae-tiling --temporal-tiling") {
+		filepath.Base(flag(got, "--tae")) != "taew2_2.safetensors" {
 		t.Fatalf("sd-cli args %q", got)
 	}
 }

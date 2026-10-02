@@ -119,13 +119,13 @@ Each is the [FLUX.2 [klein] 4B](https://huggingface.co/black-forest-labs/FLUX.2-
 | --- | --- | --- | --- |
 | Wan 2.2 TI2V 5B | 8.5 GB | 16 GB of memory | A clip from a description, or from an image |
 
-The model is Wan 2.2 TI2V 5B (GGUF, Q4_K_M) with the umt5-xxl text encoder (GGUF) and the Wan 2.2 VAE. All three are Apache 2.0 and need no account to download.
+The model is Wan 2.2 TI2V 5B (GGUF, Q4_K_M) with the umt5-xxl text encoder (GGUF) and the Wan 2.2 VAE, all Apache 2.0. It also includes TAEHV (`taew2_2`, MIT, 23 MB from GitHub), a small decoder that turns the clip into frames in about 2 seconds; the full VAE's decode takes most of an hour on a 24 GB Mac. None of the files needs an account to download.
 
 - **Clips:** `prompt` describes the subject, motion, camera, and style. `seconds` is 1 to 5 (default 2), made at 16 frames a second. The size is 832×480, or the image's shape (480×832 for a tall one, 640×640 for a square one); `width` and `height` change it, within about 832×480 pixels, in multiples of 32. `seed` repeats a clip, and each result includes it.
 - **From an image:** `image` is a PNG or JPEG in the chat, by name or id. It becomes the first frame.
 - **Output:** clips are WebM (VP8), attached to the answer, where they play.
 - **Other computers:** a paired computer with video set up makes clips for this one, preferring one whose GPU does the work. A laptop can ask a workstation.
-- **Time:** a clip takes several minutes; each frame costs about as much as an image. One clip runs at a time, for up to 75 minutes. Stop ends it.
+- **Time:** a 2-second clip takes about 3½ minutes on an M5 Pro with 24 GB. One clip runs at a time, for up to 75 minutes. Stop ends it.
 
 ## Descriptors and levels
 
