@@ -9,9 +9,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/yeixio/yggdrasil-core/internal/personal"
+	"github.com/yeixio/yggdrasil-core/internal/replylang"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -57,7 +59,12 @@ type Memory struct {
 	Enabled    bool   `json:"enabled"`
 	// LocalOnly keeps the memory on this computer: work that uses it is
 	// never sent to a paired computer (§63).
-	LocalOnly bool      `json:"local_only"`
+	LocalOnly bool `json:"local_only"`
+	// Language is the language the memory is written in, as a BCP 47 tag
+	// detected on this computer (multilingual spec §18), or "" when it is
+	// too short to tell. A memory is found in any language; this says which
+	// one its text is in.
+	Language  string    `json:"language,omitempty"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
@@ -66,6 +73,9 @@ type Memory struct {
 type Store struct {
 	db  *sql.DB
 	now func() time.Time
+
+	mu       sync.Mutex
+	embedder EmbedderSource
 }
 
 // NewStore returns a memory store.
@@ -123,15 +133,15 @@ func (s *Store) Add(ctx context.Context, content, category, sourceType, sourceRe
 		return dup, false, err
 	}
 	m := Memory{ID: uuid.NewString(), Content: content, Category: category, SourceType: sourceType, SourceRef: sourceRef,
-		Enabled: true, CreatedAt: s.now().UTC(), UpdatedAt: s.now().UTC()}
+		Enabled: true, Language: languageOf(content), CreatedAt: s.now().UTC(), UpdatedAt: s.now().UTC()}
 	tx, err := s.db.BeginTx(ctx, nil)
 	if err != nil {
 		return Memory{}, false, err
 	}
 	defer func() { _ = tx.Rollback() }()
 	if _, err := tx.ExecContext(ctx, `
-		INSERT INTO memories (id, content, category, source_type, source_ref, enabled, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, 1, ?, ?)`, m.ID, m.Content, m.Category, m.SourceType, nullable(m.SourceRef), ts(m.CreatedAt), ts(m.UpdatedAt)); err != nil {
+		INSERT INTO memories (id, content, category, source_type, source_ref, enabled, language, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)`, m.ID, m.Content, m.Category, m.SourceType, nullable(m.SourceRef), nullable(m.Language), ts(m.CreatedAt), ts(m.UpdatedAt)); err != nil {
 		return Memory{}, false, err
 	}
 	if _, err := tx.ExecContext(ctx, `INSERT INTO memories_fts (content, memory_id) VALUES (?, ?)`, m.Content, m.ID); err != nil {
@@ -182,6 +192,7 @@ func (s *Store) Update(ctx context.Context, id string, p Patch) (Memory, error) 
 			return Memory{}, err
 		}
 		m.Content = c
+		m.Language = languageOf(c)
 	}
 	if p.Category != nil {
 		if !validCategory(*p.Category) {
@@ -200,8 +211,8 @@ func (s *Store) Update(ctx context.Context, id string, p Patch) (Memory, error) 
 		return Memory{}, err
 	}
 	defer func() { _ = tx.Rollback() }()
-	if _, err := tx.ExecContext(ctx, `UPDATE memories SET content=?, category=?, enabled=?, local_only=?, updated_at=? WHERE id=?`,
-		m.Content, m.Category, boolInt(m.Enabled), boolInt(m.LocalOnly), ts(s.now()), id); err != nil {
+	if _, err := tx.ExecContext(ctx, `UPDATE memories SET content=?, category=?, enabled=?, local_only=?, language=?, updated_at=? WHERE id=?`,
+		m.Content, m.Category, boolInt(m.Enabled), boolInt(m.LocalOnly), nullable(m.Language), ts(s.now()), id); err != nil {
 		return Memory{}, err
 	}
 	if _, err := tx.ExecContext(ctx, `UPDATE memories_fts SET content=? WHERE memory_id=?`, m.Content, id); err != nil {
@@ -230,16 +241,19 @@ func (s *Store) Delete(ctx context.Context, id string) error {
 	if _, err := tx.ExecContext(ctx, `DELETE FROM memories_fts WHERE memory_id = ?`, id); err != nil {
 		return err
 	}
+	if _, err := tx.ExecContext(ctx, `DELETE FROM memory_vectors WHERE memory_id = ?`, id); err != nil {
+		return err
+	}
 	return tx.Commit()
 }
 
-const columns = `id, content, category, source_type, COALESCE(source_ref, ''), enabled, local_only, created_at, updated_at`
+const columns = `id, content, category, source_type, COALESCE(source_ref, ''), enabled, local_only, COALESCE(language, ''), created_at, updated_at`
 
 func scan(row interface{ Scan(...any) error }) (Memory, error) {
 	var m Memory
 	var enabled, localOnly int
 	var created, updated string
-	if err := row.Scan(&m.ID, &m.Content, &m.Category, &m.SourceType, &m.SourceRef, &enabled, &localOnly, &created, &updated); err != nil {
+	if err := row.Scan(&m.ID, &m.Content, &m.Category, &m.SourceType, &m.SourceRef, &enabled, &localOnly, &m.Language, &created, &updated); err != nil {
 		return Memory{}, err
 	}
 	m.Enabled = enabled != 0
@@ -324,29 +338,56 @@ func (s *Store) Relevant(ctx context.Context, message string) ([]Memory, error) 
 			terms = append(terms, `"`+strings.ReplaceAll(t, `"`, `""`)+`"`)
 		}
 	}
-	if len(terms) == 0 {
-		return out, nil
+	rel := 0
+	if len(terms) > 0 {
+		n, err := s.byWords(ctx, terms, add)
+		if err != nil {
+			return nil, err
+		}
+		rel = n
 	}
+	// Then by meaning, in any language (§18).
+	for _, m := range s.byMeaning(ctx, message, all) {
+		if rel >= maxRelevant {
+			break
+		}
+		if add(m) {
+			rel++
+		}
+	}
+	return out, nil
+}
+
+// byWords adds the enabled memories that share words with the message, best
+// first, and says how many it added.
+func (s *Store) byWords(ctx context.Context, terms []string, add func(Memory) bool) (int, error) {
 	rows, err := s.db.QueryContext(ctx, `
-		SELECT m.id, m.content, m.category, m.source_type, COALESCE(m.source_ref, ''), m.enabled, m.local_only, m.created_at, m.updated_at
+		SELECT m.id, m.content, m.category, m.source_type, COALESCE(m.source_ref, ''), m.enabled, m.local_only, COALESCE(m.language, ''), m.created_at, m.updated_at
 		FROM memories_fts f JOIN memories m ON m.id = f.memory_id
 		WHERE memories_fts MATCH ? AND m.enabled = 1
 		ORDER BY bm25(memories_fts) LIMIT ?`, strings.Join(terms, " OR "), maxRelevant*2)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 	defer rows.Close()
 	rel := 0
 	for rows.Next() && rel < maxRelevant {
 		m, err := scan(rows)
 		if err != nil {
-			return nil, err
+			return 0, err
 		}
 		if add(m) {
 			rel++
 		}
 	}
-	return out, rows.Err()
+	return rel, rows.Err()
+}
+
+// languageOf is the language a memory is written in, detected on this
+// computer, or "" when it is too short to tell.
+func languageOf(content string) string {
+	tag, _ := replylang.Detect(content)
+	return tag
 }
 
 // Block formats memories as instructions. They come from the person, so

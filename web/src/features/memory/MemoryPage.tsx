@@ -8,6 +8,7 @@ import { errorText } from '@/features/train/display'
 import type { MemoryCategory, MemoryItem } from '@/types/api'
 import { RealmKicker } from '@/components/ui/Realm'
 import { formatDate } from '@/i18n/format'
+import { nameInItself } from '@/i18n/answerLanguages'
 
 // The categories, in order; their names are memory:categories.<category> in the catalog.
 const CATEGORIES: MemoryCategory[] = ['identity', 'preferences', 'projects', 'technical', 'interests', 'people', 'other']
@@ -132,7 +133,10 @@ function AddMemory({ categories, onAdded }: { categories: MemoryCategory[]; onAd
 }
 
 function MemoryRow({ memory, categories, onChanged }: { memory: MemoryItem; categories: MemoryCategory[]; onChanged: () => void }) {
-  const { t } = useTranslation('memory')
+  const { t, i18n } = useTranslation('memory')
+  // A memory in another language says which: it is still found in any language.
+  const otherLanguage =
+    memory.language && memory.language.split('-')[0] !== i18n.language.split('-')[0] ? nameInItself(memory.language) : ''
   const categoryLabel = useCategoryLabel()
   const [draft, setDraft] = useState<string | null>(null)
   const update = useMutation({
@@ -167,6 +171,12 @@ function MemoryRow({ memory, categories, onChanged }: { memory: MemoryItem; cate
           <span className="text-xs text-ink-faint">
             {memory.source_type === 'explicit' ? t('row.fromChat') : t('row.addedHere')} ·{' '}
             {formatDate(memory.updated_at)}
+            {otherLanguage ? (
+              <span lang={memory.language} title={t('row.languageHint')}>
+                {' · '}
+                {otherLanguage}
+              </span>
+            ) : null}
           </span>
           <select
             className="field py-0.5 text-xs"

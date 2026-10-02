@@ -30,6 +30,7 @@
     "cancel": "キャンセル",
     "fromChat": "チャットで依頼",
     "addedHere": "ここで追加",
+    "languageHint": "この言語で書かれています。埋め込みモデルがインストールされていれば、どの言語で質問してもYggdrasilが見つけます。",
     "category": "カテゴリ",
     "edit": "編集",
     "pause": "一時停止",

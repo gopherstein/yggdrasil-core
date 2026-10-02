@@ -679,8 +679,18 @@ func New(opts Options) (*App, error) {
 	a.registerPortable(&speech.TranscribeTool{Engine: a.Speech, Store: a.Artifacts})
 	a.registerPortable(&speech.SynthesizeTool{Engine: a.Speech, Store: a.Artifacts})
 	a.API.BindSpeech(a.Speech, a.Artifacts)
-	a.Mimir.SetModels(newKnowledgeModels(a))
+	knowledgeModels := newKnowledgeModels(a)
+	a.Mimir.SetModels(knowledgeModels)
 	a.Muninn = muninn.NewStore(db.SQL)
+	// Memories are found by meaning too, in any language, with the same
+	// embedding model as knowledge (multilingual spec §18).
+	a.Muninn.SetEmbedder(func(ctx context.Context) (muninn.Embedder, error) {
+		emb, err := knowledgeModels.Embedder(ctx)
+		if err != nil || emb == nil {
+			return nil, err
+		}
+		return emb, nil
+	})
 	a.summarizer = &muninn.Summarizer{Store: a.Muninn}
 	a.API.BindMemory(a.Muninn)
 	a.Tools.Register(&artifacts.CreateTool{Store: a.Artifacts})

@@ -30,6 +30,7 @@
     "cancel": "취소",
     "fromChat": "채팅에서 요청함",
     "addedHere": "여기에서 추가함",
+    "languageHint": "이 언어로 쓰였어요. 임베딩 모델이 설치되어 있으면 어떤 언어로 물어봐도 Yggdrasil이 찾아요.",
     "category": "카테고리",
     "edit": "편집",
     "pause": "일시 정지",

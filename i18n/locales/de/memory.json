@@ -30,6 +30,7 @@
     "cancel": "Abbrechen",
     "fromChat": "Von dir im Chat erbeten",
     "addedHere": "Hier hinzugefügt",
+    "languageHint": "In dieser Sprache geschrieben. Mit einem installierten Einbettungsmodell findet Yggdrasil es, egal in welcher Sprache du fragst.",
     "category": "Kategorie",
     "edit": "Bearbeiten",
     "pause": "Pausieren",

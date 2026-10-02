@@ -403,6 +403,19 @@
     "toolFailures": "{{count}}개 실패"
   },
   "notices": {
-    "languageWeak": "{{model}}은(는) 영어보다 {{language}}를 덜 잘 쓸 수 있고, 설치된 모델 중 이 컴퓨터에 맞으면서 더 잘 쓰는 모델이 없어요. {{language}} 평가가 좋은 모델은 모델 페이지에서 볼 수 있어요."
+    "languageWeak": "{{model}}은(는) 영어보다 {{language}}를 덜 잘 쓸 수 있고, 설치된 모델 중 이 컴퓨터에 맞으면서 더 잘 쓰는 모델이 없어요. {{language}} 평가가 좋은 모델은 모델 페이지에서 볼 수 있어요.",
+    "unconfirmedFigures": "Yggdrasil이 소스에서 {{figures}}을(를) 확인하지 못했어요. 믿기 전에 확인하세요.",
+    "listSeparator": ", ",
+    "listAnd": "{{first}} 및 {{last}}",
+    "nothingChanged": "아무것도 변경되지 않았어요. 답변 내용과 상관없이 이를 수행하는 도구가 실행되지 않았어요.",
+    "stoppedTimeLimit": "답변이 끝나기 전에 이 프로필의 시간 제한에 도달해 멈췄어요.",
+    "stopped": "답변이 끝나기 전에 멈췄어요.",
+    "fallbackSmaller": "{{failed}}이(가) 답하지 못해서 더 작은 {{model}}이(가) 대신 답했어요. 이 답변은 덜 자세할 수 있어요.",
+    "smallModelFiles": "{{model}}은(는) 작은 모델이라 내 파일의 수치와 세부 내용을 혼동할 수 있어요. 소스와 대조해 확인하세요.",
+    "smallModelFilesChoose": "{{model}}은(는) 작은 모델이라 내 파일의 수치와 세부 내용을 혼동할 수 있어요. 소스와 대조해 확인하세요. 이런 질문에는 모델에서 {{larger}} 또는 자동을 선택하세요.",
+    "smallModelFilesInstall": "{{model}}은(는) 작은 모델이라 내 파일의 수치와 세부 내용을 혼동할 수 있어요. 소스와 대조해 확인하세요. 모델 페이지에서 더 큰 모델을 받으면 더 믿을 수 있어요.",
+    "smallModelKnowledge": "{{model}}은(는) 작은 모델이라 내 지식의 수치와 세부 내용을 혼동할 수 있어요. 소스와 대조해 확인하세요.",
+    "smallModelKnowledgeChoose": "{{model}}은(는) 작은 모델이라 내 지식의 수치와 세부 내용을 혼동할 수 있어요. 소스와 대조해 확인하세요. 이런 질문에는 모델에서 {{larger}} 또는 자동을 선택하세요.",
+    "smallModelKnowledgeInstall": "{{model}}은(는) 작은 모델이라 내 지식의 수치와 세부 내용을 혼동할 수 있어요. 소스와 대조해 확인하세요. 모델 페이지에서 더 큰 모델을 받으면 더 믿을 수 있어요."
   }
 }
