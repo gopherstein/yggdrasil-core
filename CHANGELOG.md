@@ -8,6 +8,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Thi
 
 ### Added
 
+- Run code in a sandbox. `code.execute` runs Python with numpy, pandas, and matplotlib for calculations, analysis, and charts, with no network, no access to your files beyond those from the chat it is given, and a 90-second limit; charts and files it writes are attached. It runs only in the operating system's sandbox (`sandbox-exec` on macOS, bubblewrap on Linux) and is unavailable elsewhere; there is no unsandboxed fallback. It asks first by default.
+
 - Word documents and PDFs. `files.create` writes `.docx` and `.pdf` from Markdown, with headings, styled text, lists, tables, code, and quotes; `document.create` and `pdf.create` reach it in that format. PDFs use the standard fonts, so characters outside Western European text show as `?`.
 - Spreadsheets with several sheets and formulas: in the CSV for an `.xlsx`, a line `## Sheet: Name` starts another sheet and a cell starting with `=` is a formula. `spreadsheet.create` reaches `files.create` in that format.
 - `spreadsheet.analyze` summarizes a spreadsheet in the chat column by column (type, counts, minimum, maximum, average, total, or the most common values) with the first rows, so answers can use a whole file.
