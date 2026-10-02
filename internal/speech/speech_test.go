@@ -11,6 +11,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/artifacts"
 	"github.com/yeixio/yggdrasil-core/internal/pyenv"
 	"github.com/yeixio/yggdrasil-core/internal/store"
+	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
 // fakePython is a stand-in interpreter: it ignores the script and answers
@@ -120,5 +121,43 @@ func TestVoiceNames(t *testing.T) {
 		if voiceRe.MatchString(v) != ok {
 			t.Errorf("%s: %v", v, !ok)
 		}
+	}
+}
+
+// Read-aloud speaks a text's language (multilingual spec §20).
+func TestVoiceFollowsTheLanguage(t *testing.T) {
+	cases := []struct{ text, voice, language, want string }{
+		{"Kannst du mir bitte erklären, wie das funktioniert?", "", "", "de_DE-thorsten-medium"},
+		{"¿Puedes explicarme cómo funciona esto, por favor?", "", "", "es_ES-davefx-medium"},
+		{"请解释一下这个是怎么工作的。", "", "", "zh_CN-huayan-medium"},
+		{"ok", "", "", DefaultVoice}, // too short to tell
+		{"Kannst du mir bitte helfen?", "en_GB-alba-medium", "", "en_GB-alba-medium"}, // a voice asked for
+		{"Hello there, how are you doing today?", "", "pt-BR", "pt_BR-faber-medium"},  // a language asked for
+	}
+	for _, c := range cases {
+		if got, err := voiceFor(c.text, c.voice, c.language); err != nil || got != c.want {
+			t.Errorf("voiceFor(%q, %q, %q) = %q, %v; want %q", c.text, c.voice, c.language, got, err, c.want)
+		}
+	}
+	_, err := voiceFor("これがどのように動作するか説明してください。", "", "")
+	if code, params := contracts.ErrorCode(err); code != "SPEECH_NO_VOICE" || params["language"] != "ja" {
+		t.Fatalf("Japanese: %v (%s %v)", err, code, params)
+	}
+	for lang, v := range voices {
+		if !voiceRe.MatchString(v) {
+			t.Errorf("%s voice %q is not a Piper voice name", lang, v)
+		}
+	}
+}
+
+func TestProvidersSayTheirLanguages(t *testing.T) {
+	e := &Engine{Python: fakeEnv{}}
+	tr := e.provider("speech.transcribe", "Whisper")
+	if !tr.AutoDetect || !tr.Speaks("ja") || !tr.Speaks("de") {
+		t.Errorf("transcribe = %+v", tr)
+	}
+	sy := e.provider("speech.synthesize", "Piper")
+	if sy.AutoDetect || !sy.Speaks("de") || sy.Speaks("ja") {
+		t.Errorf("synthesize languages = %v", sy.Languages)
 	}
 }

@@ -394,6 +394,10 @@ export interface ToolProvider {
   reason?: string
   /** A GPU does the work. */
   accelerated: boolean
+  /** Languages it works in, such as de, when they matter (speech); none means any. */
+  languages?: string[]
+  /** It tells the language by itself, as Whisper does. */
+  auto_detect?: boolean
 }
 
 /** A computer's providers for tools that can run on any paired computer. */

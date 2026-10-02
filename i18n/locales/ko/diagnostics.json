@@ -161,6 +161,8 @@
       "installing": "설치하는 중",
       "failed": "실패",
       "unavailable": "설정되지 않음"
-    }
+    },
+    "languages_other": "{{count}}개 언어",
+    "autoDetect": "언어 자동 감지"
   }
 }

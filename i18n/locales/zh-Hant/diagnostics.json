@@ -161,6 +161,8 @@
       "installing": "正在安裝",
       "failed": "失敗",
       "unavailable": "尚未設定"
-    }
+    },
+    "languages_other": "{{count}} 種語言",
+    "autoDetect": "自動辨識語言"
   }
 }

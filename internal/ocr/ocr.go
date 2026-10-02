@@ -22,6 +22,11 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/pyenv"
 )
 
+// Languages are the languages the bundled recognition models read (multilingual
+// spec §20): RapidOCR's Chinese and English models. Accented letters of other
+// languages may be misread, and other scripts are not recognized.
+var Languages = []string{"zh", "en"}
+
 //go:embed ocr_pdf.py
 var script []byte
 

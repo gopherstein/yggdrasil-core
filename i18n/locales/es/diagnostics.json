@@ -187,6 +187,10 @@
       "installing": "Instalando",
       "failed": "Falló",
       "unavailable": "Sin configurar"
-    }
+    },
+    "languages_one": "{{count}} idioma",
+    "languages_many": "{{count}} idiomas",
+    "languages_other": "{{count}} idiomas",
+    "autoDetect": "detecta el idioma"
   }
 }

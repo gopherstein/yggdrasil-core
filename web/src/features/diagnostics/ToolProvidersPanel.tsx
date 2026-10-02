@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { api } from '@/lib/api'
 import type { ToolProvider } from '@/types/api'
 
@@ -11,6 +12,14 @@ const TONE: Record<ToolProvider['state'], string> = {
   installing: 'text-warning',
   failed: 'text-danger',
   unavailable: 'text-ink-faint',
+}
+
+/** A provider's name, and the languages it works in, for its tooltip (spec §20). */
+function providerTitle(p: ToolProvider): string {
+  const parts = [p.name ?? '']
+  if (p.languages?.length) parts.push(i18n.t('diagnostics:providers.languages', { count: p.languages.length }))
+  if (p.auto_detect) parts.push(i18n.t('diagnostics:providers.autoDetect'))
+  return parts.filter(Boolean).join(' · ')
 }
 
 /**
@@ -59,7 +68,7 @@ export function ToolProvidersPanel() {
                   }
                   const state = p.state in TONE ? p.state : 'unavailable'
                   return (
-                    <td key={tool} className="py-2 pe-3" title={p.reason || p.name}>
+                    <td key={tool} className="py-2 pe-3" title={p.reason || providerTitle(p)}>
                       <span className={TONE[state]}>{t(`providers.states.${state}`)}</span>
                       {p.state === 'healthy' && p.accelerated ? (
                         <span className="ms-1.5 text-xs text-ink-faint">{t('providers.gpu')}</span>

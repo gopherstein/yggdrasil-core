@@ -187,6 +187,10 @@
       "installing": "Installazione",
       "failed": "Non riuscito",
       "unavailable": "Non configurato"
-    }
+    },
+    "languages_one": "{{count}} lingua",
+    "languages_many": "{{count}} lingue",
+    "languages_other": "{{count}} lingue",
+    "autoDetect": "rileva la lingua"
   }
 }

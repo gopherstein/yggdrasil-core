@@ -21,6 +21,7 @@ type fakeTool struct {
 	where       string
 	state       string
 	accelerated bool
+	languages   []string
 	runs        atomic.Int32
 	block       chan struct{}
 	cancelled   atomic.Bool
@@ -39,7 +40,7 @@ func (f *fakeTool) Available() (bool, string) {
 	return false, "not set up on " + f.where
 }
 func (f *fakeTool) Provider() Provider {
-	return Provider{Tool: f.ID(), Name: "Fake", State: f.state, Accelerated: f.accelerated}
+	return Provider{Tool: f.ID(), Name: "Fake", State: f.state, Accelerated: f.accelerated, Languages: f.languages}
 }
 func (f *fakeTool) Execute(ctx context.Context, args map[string]any) (map[string]any, error) {
 	return Execute(ctx, f, args)
@@ -240,5 +241,46 @@ func TestHandlerRefusesWhatItCannotRun(t *testing.T) {
 		if !errors.As(err, &re) || !re.NotReady {
 			t.Errorf("%s: %v", tool, err)
 		}
+	}
+}
+
+// A call in a language goes to a computer whose provider works in it
+// (multilingual spec §20); when none does, it runs where it would anyway.
+func TestPlacementByLanguage(t *testing.T) {
+	remote := &fakeTool{where: "workstation", state: Healthy, languages: []string{"en", "de"}}
+	peer := peerServer(t, remote)
+	run := func(args map[string]any) string {
+		t.Helper()
+		net, _ := network(peer)
+		res, err := net.Proxy(&fakeTool{where: "laptop", state: Healthy, languages: []string{"en"}}).Execute(context.Background(), args)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return res["ran_on"].(string)
+	}
+	if got := run(map[string]any{"language": "en"}); got != "laptop" {
+		t.Errorf("English: ran on %s", got)
+	}
+	if got := run(map[string]any{"language": "de-AT"}); got != "workstation" {
+		t.Errorf("German asked for: ran on %s", got)
+	}
+	if got := run(map[string]any{"text": "Kannst du mir bitte erklären, wie das funktioniert?"}); got != "workstation" {
+		t.Errorf("German text: ran on %s", got)
+	}
+	if got := run(map[string]any{"language": "ja"}); got != "laptop" {
+		t.Errorf("no one speaks Japanese: ran on %s", got)
+	}
+}
+
+func TestProviderSpeaks(t *testing.T) {
+	p := Provider{Languages: []string{"en", "pt"}}
+	if !p.Speaks("pt-BR") || !p.Speaks("") || p.Speaks("de") {
+		t.Error("Speaks with a language list")
+	}
+	if !(Provider{}).Speaks("de") {
+		t.Error("a provider without languages works in any")
+	}
+	if got := CallLanguage(map[string]any{"text": "ok"}); got != "" {
+		t.Errorf("short text = %q", got)
 	}
 }
