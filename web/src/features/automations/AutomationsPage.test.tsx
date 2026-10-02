@@ -136,6 +136,28 @@ describe('AutomationsPage', () => {
     expect(body.prompt).toContain('{"price": 420}')
     expect(body.profile_id).toBe('general-assistant')
     expect(body.model_id).toBe('gemma-4-e4b')
+    // Results follow the assistant language unless the automation says otherwise (§22).
+    expect(body.response_language).toBe('account')
+  })
+
+  it('saves the language results are written in', async () => {
+    renderPage()
+    fireEvent.click(await screen.findByRole('button', { name: 'New automation' }))
+    fireEvent.change(screen.getByPlaceholderText(/Every morning at 8:00 AM/), {
+      target: { value: 'Every morning at 8:00 AM, check this product and tell me if the price is below $500.' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Set up automation' }))
+    expect(await screen.findByRole('option', { name: 'Gemma 4 E4B' })).toBeInTheDocument()
+    const language = screen.getByRole('combobox', { name: 'Results in' })
+    expect([...language.querySelectorAll('option')].slice(0, 3).map((o) => o.textContent)).toEqual([
+      'Same as the assistant language',
+      'Same as the App language',
+      'The language of the request',
+    ])
+    fireEvent.change(language, { target: { value: 'de' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Create automation' }))
+    await waitFor(() => expect(api.createAutomation).toHaveBeenCalled())
+    expect(vi.mocked(api.createAutomation).mock.calls[0][0].response_language).toBe('de')
   })
 
   it('lists tools that change things apart, offers Auto, and saves approvals', async () => {

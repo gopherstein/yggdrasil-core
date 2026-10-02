@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/yeixio/yggdrasil-core/internal/automations"
 	"github.com/yeixio/yggdrasil-core/internal/replylang"
 )
 
@@ -14,12 +15,25 @@ import (
 // the conversation's), a chosen language, or the App language; then this
 // computer's language; then English. It is worked out here, never sent
 // anywhere to find out.
-func (a *App) replyLanguage(ctx context.Context, conversationID, message string) replylang.Decision {
+//
+// response is an automation's response language (§22), which stands in for
+// the assistant language setting: "" or "account" keeps the setting, "app"
+// the App language, "auto" the request's language, or a language tag.
+func (a *App) replyLanguage(ctx context.Context, conversationID, message, response string) replylang.Decision {
 	in := replylang.Input{Mode: replylang.ModeAuto, Message: message, System: systemLanguage()}
 	if a.Settings != nil {
 		in.Mode, _ = a.Settings.GetString(ctx, "assistant_language_mode", replylang.ModeAuto)
 		in.Setting, _ = a.Settings.GetString(ctx, "assistant_language", "")
 		in.App, _ = a.Settings.GetString(ctx, "ui_locale", "")
+	}
+	switch response {
+	case "", automations.ResponseAccount:
+	case automations.ResponseApp:
+		in.Mode = replylang.ModeApp
+	case automations.ResponseAuto:
+		in.Mode = replylang.ModeAuto
+	default:
+		in.Mode, in.Setting = replylang.ModeLanguage, response
 	}
 	if conversationID != "" && a.Conversations != nil {
 		if stored, err := a.Conversations.ListMessages(ctx, conversationID); err == nil {

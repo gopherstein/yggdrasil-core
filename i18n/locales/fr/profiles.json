@@ -171,6 +171,10 @@
       "label": "Images",
       "description": "Créer et modifier des images sur cet ordinateur, une fois la génération d'images configurée"
     },
+    "browser": {
+      "label": "Navigateur",
+      "description": "Utiliser des pages web dans un navigateur isolé ; cliquer, saisir et télécharger demandent d’abord"
+    },
     "video": {
       "label": "Vidéo",
       "description": "Créer de courts clips sur cet ordinateur, une fois la génération de vidéos configurée"

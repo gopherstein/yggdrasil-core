@@ -846,6 +846,9 @@ type chatExecEnv struct {
 	// marked this computer only, so it is never sent elsewhere (§63).
 	localOnly   bool
 	keptLocally bool
+	// responseLanguage is an automation's response language (§22), or ""
+	// for the assistant language setting.
+	responseLanguage string
 	// attachments are the files attached to this message.
 	attachments []artifacts.Artifact
 	// summarized counts saved messages replaced by a summary this turn.
@@ -1168,7 +1171,7 @@ func (e *chatExecEnv) TurnInstructions(ctx context.Context, prompt string) strin
 		if strings.TrimSpace(message) == "" {
 			message = prompt
 		}
-		parts = append(parts, e.app.replyLanguage(ctx, e.conversationID, message).Instruction())
+		parts = append(parts, e.app.replyLanguage(ctx, e.conversationID, message, e.responseLanguage).Instruction())
 	}
 	// What Yggdrasil can do comes from its own inventory (§37).
 	if e.capabilities != "" {

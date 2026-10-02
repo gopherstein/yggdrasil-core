@@ -101,6 +101,8 @@ func (e automationExecutor) execute(ctx context.Context, automation automations.
 			taskID:        automation.ID,
 			turnPrompt:    automation.Prompt,
 			trace:         &turnTrace{},
+			// Results in the automation's response language (§22).
+			responseLanguage: automation.ResponseLanguage,
 		},
 		granted: automation.Tools,
 	}

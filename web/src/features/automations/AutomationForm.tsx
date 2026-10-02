@@ -5,6 +5,7 @@ import { api } from '@/lib/api'
 import { canChat } from '@/features/models/modelPresentation'
 import type { AutomationPreview } from '@/types/api'
 import { useUIStore } from '@/stores/uiStore'
+import { answerLanguages, nameInItself } from '@/i18n/answerLanguages'
 import { currencyName } from '@/i18n/format'
 import { readNumber } from './requestWords/match'
 import {
@@ -54,6 +55,7 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
   const installed = models.filter((model) => model.installed && canChat(model))
   const [profileID, setProfileID] = useState(initial?.profile_id || profiles.find((p) => p.id === 'general-assistant')?.id || profiles[0]?.id || '')
   const [modelID, setModelID] = useState(initial?.model_id || installed[0]?.id || '')
+  const [responseLanguage, setResponseLanguage] = useState(initial?.response_language || 'account')
   const [schedule, setSchedule] = useState<AutomationSchedule>(initial?.schedule ?? { kind: 'daily', time_zone: zone, hour: 8, minute: 0 })
   const [mode, setMode] = useState(initial?.notification.mode ?? 'always')
   const [conditionKind, setConditionKind] = useState(initial?.notification.condition?.kind ?? 'threshold')
@@ -131,6 +133,7 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
       schedule,
       notification,
       tools: selectedTools,
+      response_language: responseLanguage,
     }
   }
 
@@ -296,6 +299,19 @@ export function AutomationForm({ profiles, models, tools, initial, seedDescripti
             {installed.map((model) => (
               <option key={model.id} value={model.id}>
                 {model.display_name || model.id}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block space-y-1 text-sm">
+          <span className="text-ink-muted">{t('form.responseLanguage')}</span>
+          <select className="field w-full" value={responseLanguage} onChange={(event) => setResponseLanguage(event.target.value)}>
+            <option value="account">{t('form.responseAccount')}</option>
+            <option value="app">{t('form.responseApp')}</option>
+            <option value="auto">{t('form.responseAuto')}</option>
+            {[...answerLanguages, ...(['account', 'app', 'auto', ...answerLanguages].includes(responseLanguage) ? [] : [responseLanguage])].map((tag) => (
+              <option key={tag} value={tag} lang={tag}>
+                {nameInItself(tag)}
               </option>
             ))}
           </select>

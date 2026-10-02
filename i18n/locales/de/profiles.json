@@ -170,6 +170,10 @@
       "label": "Bilder",
       "description": "Bilder auf diesem Computer erstellen und bearbeiten, sobald die Bilderzeugung eingerichtet ist"
     },
+    "browser": {
+      "label": "Browser",
+      "description": "Webseiten in einem abgeschotteten Browser nutzen; Klicken, Tippen und Herunterladen fragen vorher"
+    },
     "video": {
       "label": "Video",
       "description": "Kurze Clips auf diesem Computer erstellen, sobald die Videoerzeugung eingerichtet ist"

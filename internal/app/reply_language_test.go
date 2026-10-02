@@ -94,3 +94,36 @@ func TestSystemLanguage(t *testing.T) {
 		t.Errorf("LANG=C.UTF-8 → %q", got)
 	}
 }
+
+// An automation's results come in its response language (spec §22), which
+// stands in for the assistant language setting.
+func TestAutomationResponseLanguage(t *testing.T) {
+	t.Setenv("LANG", "")
+	t.Setenv("LC_ALL", "")
+	t.Setenv("LC_MESSAGES", "")
+	a, _ := memoryApp(t)
+	ctx := context.Background()
+	for k, v := range map[string]string{"assistant_language_mode": "language", "assistant_language": "es", "ui_locale": "ja"} {
+		if err := a.Settings.Set(ctx, k, v); err != nil {
+			t.Fatal(err)
+		}
+	}
+	run := func(response, prompt string) string {
+		env := &chatExecEnv{app: a, turnPrompt: prompt, responseLanguage: response}
+		return env.TurnInstructions(ctx, prompt)
+	}
+	const german = "Prüfe jeden Morgen den Preis von diesem Laptop und sag mir, ob er gefallen ist."
+	cases := []struct{ response, prompt, want string }{
+		{"", german, "in Spanish"},        // same as account: the assistant language setting
+		{"account", german, "in Spanish"}, // the same, said outright
+		{"app", german, "in Japanese"},    // the App language
+		{"auto", german, "in German"},     // the request's language
+		{"fr", german, "in French"},       // a language
+		{"fr", "Check the price every morning and answer in Korean.", "in Korean"}, // a request wins
+	}
+	for _, c := range cases {
+		if got := run(c.response, c.prompt); !strings.Contains(got, c.want) {
+			t.Errorf("response %q: want %q in\n%s", c.response, c.want, got)
+		}
+	}
+}

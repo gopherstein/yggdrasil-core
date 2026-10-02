@@ -233,3 +233,40 @@ func TestAutomationCreateRejectsMissingModel(t *testing.T) {
 }
 
 func timePtr(t time.Time) *time.Time { return &t }
+
+// An automation keeps its response language (multilingual spec §22).
+func TestAutomationResponseLanguage(t *testing.T) {
+	db, err := store.Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	ctx := context.Background()
+	repo := repositories.NewAutomationRepo(db.SQL)
+	in := automations.CreateInput{
+		ModelID: "model-a", Name: "Preis", Prompt: "Prüfe den Preis",
+		Schedule:         automations.Schedule{Kind: automations.KindDaily, TimeZone: "UTC", Hour: 8},
+		ResponseLanguage: "de",
+	}
+	created, err := repo.Create(ctx, in, time.Now())
+	if err != nil {
+		t.Fatal(err)
+	}
+	got, _ := repo.Get(ctx, created.ID)
+	if got.ResponseLanguage != "de" {
+		t.Fatalf("response language = %q", got.ResponseLanguage)
+	}
+	auto := "auto"
+	if got, err = repo.Update(ctx, created.ID, automations.Patch{ResponseLanguage: &auto}, time.Now()); err != nil || got.ResponseLanguage != "auto" {
+		t.Fatalf("patched = %q, %v", got.ResponseLanguage, err)
+	}
+	// "account" is the default, stored as none.
+	account := "account"
+	if got, err = repo.Update(ctx, created.ID, automations.Patch{ResponseLanguage: &account}, time.Now()); err != nil || got.ResponseLanguage != "" {
+		t.Fatalf("account = %q, %v", got.ResponseLanguage, err)
+	}
+	in.ResponseLanguage = "German!"
+	if _, err := repo.Create(ctx, in, time.Now()); err == nil {
+		t.Fatal("a response language that isn't a tag was accepted")
+	}
+}

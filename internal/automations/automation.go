@@ -3,6 +3,7 @@ package automations
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -112,8 +113,14 @@ type Automation struct {
 	ModelID      string       `json:"model_id,omitempty"`
 	Tools        []string     `json:"tools"`
 	Notification Notification `json:"notification"`
-	CreatedAt    time.Time    `json:"created_at"`
-	UpdatedAt    time.Time    `json:"updated_at"`
+	// ResponseLanguage is the language results are written in (multilingual
+	// spec §22): "" or "account" follows the assistant language setting,
+	// "app" the App language, "auto" the language the request is written
+	// in, or a BCP 47 tag such as "de". A language the request asks for
+	// always wins.
+	ResponseLanguage string    `json:"response_language,omitempty"`
+	CreatedAt        time.Time `json:"created_at"`
+	UpdatedAt        time.Time `json:"updated_at"`
 	// NextRunAt is the occurrence the daemon should execute next.
 	// A missed restart keeps only the latest missed occurrence here.
 	NextRunAt *time.Time `json:"next_run_at,omitempty"`
@@ -157,6 +164,8 @@ type CreateInput struct {
 	ModelID      string       `json:"model_id,omitempty"`
 	Tools        []string     `json:"tools,omitempty"`
 	Notification Notification `json:"notification"`
+	// ResponseLanguage: see Automation.
+	ResponseLanguage string `json:"response_language,omitempty"`
 }
 
 // Patch updates the fields that are non-nil.
@@ -169,6 +178,26 @@ type Patch struct {
 	ModelID      *string       `json:"model_id,omitempty"`
 	Tools        *[]string     `json:"tools,omitempty"`
 	Notification *Notification `json:"notification,omitempty"`
+	// ResponseLanguage: see Automation; "" goes back to the account's.
+	ResponseLanguage *string `json:"response_language,omitempty"`
+}
+
+// Response languages an automation can have besides a language tag.
+const (
+	ResponseAccount = "account"
+	ResponseApp     = "app"
+	ResponseAuto    = "auto"
+)
+
+var languageTag = regexp.MustCompile(`^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})*$`)
+
+// ValidResponseLanguage reports a response language an automation can have.
+func ValidResponseLanguage(v string) bool {
+	switch v {
+	case "", ResponseAccount, ResponseApp, ResponseAuto:
+		return true
+	}
+	return len(v) <= 35 && languageTag.MatchString(v)
 }
 
 // ValidateDraft checks the fields required to store an automation.

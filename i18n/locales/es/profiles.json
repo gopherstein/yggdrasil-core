@@ -171,6 +171,10 @@
       "label": "Imágenes",
       "description": "Crea y edita imágenes en esta computadora, una vez configurada la generación de imágenes"
     },
+    "browser": {
+      "label": "Navegador",
+      "description": "Usar páginas web en un navegador aislado; hacer clic, escribir y descargar piden permiso antes"
+    },
     "video": {
       "label": "Video",
       "description": "Crea clips cortos en esta computadora, una vez configurada la generación de video"

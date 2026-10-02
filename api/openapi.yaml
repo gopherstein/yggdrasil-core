@@ -4806,6 +4806,9 @@ components:
           description: Tools approved to run unattended
         notification:
           $ref: "#/components/schemas/AutomationNotification"
+        response_language:
+          type: string
+          description: The language results are written in. account (or omitted) follows the assistant language setting, app the App language, auto the language of the request, or a BCP 47 tag such as de. A language the request asks for always wins.
     Automation:
       type: object
       properties:
@@ -4829,6 +4832,9 @@ components:
             type: string
         notification:
           $ref: "#/components/schemas/AutomationNotification"
+        response_language:
+          type: string
+          description: The language results are written in. account (or omitted) follows the assistant language setting, app the App language, auto the language of the request, or a BCP 47 tag such as de. A language the request asks for always wins.
         created_at:
           type: string
           format: date-time

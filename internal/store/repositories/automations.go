@@ -25,7 +25,7 @@ const automationSelect = `
 	SELECT id, name, enabled, schedule_json, time_zone, prompt,
 		COALESCE(profile_id, ''), COALESCE(model_id, ''), tools_json, notification_json,
 		created_at, updated_at, next_run_at, last_run_at,
-		consecutive_failures, COALESCE(last_error, '')
+		consecutive_failures, COALESCE(last_error, ''), COALESCE(response_language, '')
 	FROM automations`
 
 // Create stores an automation and computes its first next run.
@@ -37,17 +37,18 @@ func (r *AutomationRepo) Create(ctx context.Context, in automations.CreateInput,
 		enabled = *in.Enabled
 	}
 	a := automations.Automation{
-		ID:           uuid.NewString(),
-		Name:         in.Name,
-		Enabled:      enabled,
-		Schedule:     in.Schedule,
-		Prompt:       in.Prompt,
-		ProfileID:    in.ProfileID,
-		ModelID:      in.ModelID,
-		Tools:        in.Tools,
-		Notification: in.Notification,
-		CreatedAt:    now,
-		UpdatedAt:    now,
+		ID:               uuid.NewString(),
+		Name:             in.Name,
+		Enabled:          enabled,
+		Schedule:         in.Schedule,
+		Prompt:           in.Prompt,
+		ProfileID:        in.ProfileID,
+		ModelID:          in.ModelID,
+		Tools:            in.Tools,
+		Notification:     in.Notification,
+		ResponseLanguage: in.ResponseLanguage,
+		CreatedAt:        now,
+		UpdatedAt:        now,
 	}
 	if err := prepareAutomation(&a); err != nil {
 		return automations.Automation{}, err
@@ -127,6 +128,9 @@ func (r *AutomationRepo) Update(ctx context.Context, id string, patch automation
 	}
 	if patch.Tools != nil {
 		existing.Tools = *patch.Tools
+	}
+	if patch.ResponseLanguage != nil {
+		existing.ResponseLanguage = *patch.ResponseLanguage
 	}
 	if patch.Notification != nil {
 		existing.Notification = *patch.Notification
@@ -215,11 +219,11 @@ func (r *AutomationRepo) insert(ctx context.Context, a automations.Automation) e
 		INSERT INTO automations (
 			id, name, enabled, schedule_json, time_zone, prompt, profile_id, model_id,
 			tools_json, notification_json, created_at, updated_at, next_run_at, last_run_at,
-			consecutive_failures, last_error
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			consecutive_failures, last_error, response_language
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		a.ID, a.Name, boolInt(a.Enabled), sched, a.Schedule.TimeZone, a.Prompt, nullIfEmpty(a.ProfileID), nullIfEmpty(a.ModelID),
 		tools, note, formatTime(a.CreatedAt), formatTime(a.UpdatedAt), formatTimePtr(a.NextRunAt), formatTimePtr(a.LastRunAt),
-		a.ConsecutiveFailures, nullIfEmpty(a.LastError))
+		a.ConsecutiveFailures, nullIfEmpty(a.LastError), nullIfEmpty(a.ResponseLanguage))
 	return err
 }
 
@@ -240,11 +244,11 @@ func updateAutomation(ctx context.Context, db execer, a automations.Automation) 
 		UPDATE automations SET
 			name = ?, enabled = ?, schedule_json = ?, time_zone = ?, prompt = ?, profile_id = ?, model_id = ?,
 			tools_json = ?, notification_json = ?, updated_at = ?, next_run_at = ?, last_run_at = ?,
-			consecutive_failures = ?, last_error = ?
+			consecutive_failures = ?, last_error = ?, response_language = ?
 		WHERE id = ?`,
 		a.Name, boolInt(a.Enabled), sched, a.Schedule.TimeZone, a.Prompt, nullIfEmpty(a.ProfileID), nullIfEmpty(a.ModelID),
 		tools, note, formatTime(a.UpdatedAt), formatTimePtr(a.NextRunAt), formatTimePtr(a.LastRunAt),
-		a.ConsecutiveFailures, nullIfEmpty(a.LastError), a.ID)
+		a.ConsecutiveFailures, nullIfEmpty(a.LastError), nullIfEmpty(a.ResponseLanguage), a.ID)
 	if err != nil {
 		return err
 	}
@@ -260,6 +264,13 @@ func prepareAutomation(a *automations.Automation) error {
 	a.Prompt = strings.TrimSpace(a.Prompt)
 	a.ProfileID = strings.TrimSpace(a.ProfileID)
 	a.ModelID = strings.TrimSpace(a.ModelID)
+	a.ResponseLanguage = strings.TrimSpace(a.ResponseLanguage)
+	if a.ResponseLanguage == automations.ResponseAccount {
+		a.ResponseLanguage = ""
+	}
+	if !automations.ValidResponseLanguage(a.ResponseLanguage) {
+		return fmt.Errorf("response_language must be account, app, auto, or a language tag such as de")
+	}
 	if a.Tools == nil {
 		a.Tools = []string{}
 	}
@@ -302,7 +313,7 @@ func scanAutomation(s automationScanner) (automations.Automation, error) {
 	var next, last sql.NullString
 	if err := s.Scan(
 		&a.ID, &a.Name, &enabled, &sched, &zone, &a.Prompt, &a.ProfileID, &a.ModelID, &tools, &note,
-		&created, &updated, &next, &last, &a.ConsecutiveFailures, &a.LastError,
+		&created, &updated, &next, &last, &a.ConsecutiveFailures, &a.LastError, &a.ResponseLanguage,
 	); err != nil {
 		return automations.Automation{}, err
 	}

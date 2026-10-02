@@ -855,6 +855,8 @@ export interface Automation {
   model_id?: string
   tools: string[]
   notification: AutomationNotification
+  /** The language results are written in: see AutomationInput. */
+  response_language?: string
   created_at: string
   updated_at: string
   next_run_at?: string
@@ -903,6 +905,8 @@ export interface AutomationInput {
   notification: AutomationNotification
   tools?: string[]
   enabled?: boolean
+  /** account (the assistant language setting), app, auto (the request's language), or a language tag. */
+  response_language?: string
 }
 
 
