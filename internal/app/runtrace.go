@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/yeixio/yggdrasil-core/internal/huginn"
@@ -58,21 +57,21 @@ func traceEvent(c *runlog.Collector, eventType string, payload map[string]any) {
 		c.Plan(len(steps), parallel)
 		switch {
 		case len(steps) == 1:
-			c.Strategy("A worker drafted the answer first")
+			c.Note("drafted", nil)
 		case parallel:
-			c.Strategy(fmt.Sprintf("Worked through %d parts side by side", len(steps)))
+			c.Note("partsParallel", map[string]any{"count": len(steps)})
 		default:
-			c.Strategy(fmt.Sprintf("Worked through %d parts one after another", len(steps)))
+			c.Note("partsInOrder", map[string]any{"count": len(steps)})
 		}
 	case simple.EventEffort:
 		if e, _ := payload["effort"].(string); e != "" {
-			c.Effort(huginn.ParseEffort(e).Label())
+			c.Effort(huginn.ParseEffort(e).Describe(c.Language()))
 		}
 	case simple.EventVerified:
 		issues, _ := payload["issues"].(int)
 		fixed, _ := payload["fixed"].(int)
 		c.Verified(issues, fixed)
 	case simple.EventLookup:
-		c.Strategy("Looked up the web first")
+		c.Note("lookedUp", nil)
 	}
 }

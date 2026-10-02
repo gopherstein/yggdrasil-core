@@ -43,7 +43,7 @@ func (e automationExecutor) ensureStructured(ctx context.Context, env *automatio
 		}
 		return text
 	}
-	runlog.From(ctx).Strategy("Repaired the result's data for the condition")
+	runlog.From(ctx).Note("repaired", nil)
 	raw, _ := json.Marshal(fixed.Value)
 	prose := text
 	if first.Value != nil {

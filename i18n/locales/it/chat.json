@@ -379,6 +379,8 @@
     "files": "File",
     "sources": "Fonti",
     "memory": "Memoria",
+    "attachedFile": "File allegato",
+    "madeInChat": "Creato in questa chat",
     "remembered": "Memorizzato",
     "steps_one": "Cosa ho fatto ({{count}} passaggio)",
     "steps_many": "Cosa ho fatto ({{count}} passaggi)",
@@ -422,7 +424,24 @@
     "firstToken": "primo token {{time}}",
     "inOut": "{{in}} in entrata / {{out}} in uscita",
     "cached": "{{count}} dalla cache",
-    "toolFailures": "{{count}} non riuscite"
+    "toolFailures": "{{count}} non riuscite",
+    "notes": {
+      "team": "Squadra: un pianificatore divide la richiesta, gli esecutori svolgono le parti e un revisore controlla la risposta",
+      "single": "Modello singolo, senza piano",
+      "specialist": "L'IA specializzata {{name}} ha risposto su questo computer",
+      "otherComputer": "Risposto su {{computer}} dopo che {{model}} non ha funzionato su {{failed}}",
+      "otherModel": "Risposto con un altro modello dopo che {{model}} non ha funzionato",
+      "automation": "Automazione {{name}}",
+      "repaired": "Riparati i dati del risultato per la condizione",
+      "drafted": "Un esecutore ha abbozzato prima la risposta",
+      "partsParallel_one": "Elaborata {{count}} parte in parallelo",
+      "partsParallel_many": "Elaborate {{count}} parti in parallelo",
+      "partsParallel_other": "Elaborate {{count}} parti in parallelo",
+      "partsInOrder_one": "Elaborata {{count}} parte",
+      "partsInOrder_many": "Elaborate {{count}} parti in sequenza",
+      "partsInOrder_other": "Elaborate {{count}} parti in sequenza",
+      "lookedUp": "Prima cercato sul web"
+    }
   },
   "notices": {
     "languageWeak": "{{model}} potrebbe scrivere in {{language}} peggio che in inglese, e nessun modello installato adatto lo fa meglio. Nella pagina Modelli trovi i modelli con buona valutazione in {{language}}.",

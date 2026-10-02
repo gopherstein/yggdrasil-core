@@ -379,6 +379,8 @@
     "files": "Arquivos",
     "sources": "Fontes",
     "memory": "Memória",
+    "attachedFile": "Arquivo anexado",
+    "madeInChat": "Criado neste chat",
     "remembered": "Lembrado",
     "steps_one": "O que eu fiz ({{count}} etapa)",
     "steps_many": "O que eu fiz ({{count}} etapas)",
@@ -422,7 +424,24 @@
     "firstToken": "primeiro token {{time}}",
     "inOut": "{{in}} de entrada / {{out}} de saída",
     "cached": "{{count}} em cache",
-    "toolFailures": "{{count}} com falha"
+    "toolFailures": "{{count}} com falha",
+    "notes": {
+      "team": "Equipe: um planejador divide a solicitação, executores fazem as partes e um revisor verifica a resposta",
+      "single": "Modelo único, sem plano",
+      "specialist": "A IA especializada {{name}} respondeu neste computador",
+      "otherComputer": "Respondeu em {{computer}} depois que {{model}} falhou em {{failed}}",
+      "otherModel": "Outro modelo respondeu depois que {{model}} falhou",
+      "automation": "Automação {{name}}",
+      "repaired": "Os dados do resultado foram corrigidos para a condição",
+      "drafted": "Um executor esboçou a resposta primeiro",
+      "partsParallel_one": "{{count}} parte trabalhada lado a lado",
+      "partsParallel_many": "{{count}} partes trabalhadas lado a lado",
+      "partsParallel_other": "{{count}} partes trabalhadas lado a lado",
+      "partsInOrder_one": "{{count}} parte trabalhada",
+      "partsInOrder_many": "{{count}} partes trabalhadas uma após a outra",
+      "partsInOrder_other": "{{count}} partes trabalhadas uma após a outra",
+      "lookedUp": "Pesquisou na web primeiro"
+    }
   },
   "notices": {
     "languageWeak": "{{model}} pode escrever em {{language}} pior do que em inglês, e nenhum modelo instalado que caiba faz isso melhor. Na página Modelos você encontra modelos bem avaliados em {{language}}.",

@@ -33,20 +33,6 @@ func ParseEffort(s string) Effort {
 	}
 }
 
-// Label is how an effort is shown to the user.
-func (e Effort) Label() string {
-	switch e {
-	case EffortFast:
-		return "Fast"
-	case EffortBalanced:
-		return "Balanced"
-	case EffortThorough:
-		return "Thorough"
-	default:
-		return "Auto"
-	}
-}
-
 // Describe is the effort's label in the App language app, as the effort
 // control shows it.
 func (e Effort) Describe(app string) string {

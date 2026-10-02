@@ -29,10 +29,25 @@ func TestRunTraceFromStreamAndEvents(t *testing.T) {
 	if text != "Hi!" || len(r.Models) != 1 || r.Models[0].CachedTokens != 30 || r.Models[0].FirstTokenMs < 1000 || r.Models[0].TokPerSec != 55 {
 		t.Fatalf("text=%q models=%+v", text, r.Models)
 	}
-	if r.Workers != 2 || r.Effort != "Thorough" || r.VerificationPasses != 1 || len(r.Strategy) != 2 {
+	if r.Workers != 2 || r.Effort != "Thorough" || r.VerificationPasses != 1 || len(r.Strategy) != 2 ||
+		r.Strategy[0] != "Worked through 2 parts one after another" || r.Strategy[1] != "Looked up the web first" {
 		t.Fatalf("run = %+v", r)
 	}
 	if traceGeneration(nil, in, "m", "", "", time.Now()) != (<-chan pluginapi.ChatChunk)(in) {
 		t.Fatal("no collector should pass the stream through")
+	}
+}
+
+// A run's notes are written in the App language (multilingual spec §16).
+func TestRunTraceInAppLanguage(t *testing.T) {
+	c := runlog.New("r", "", "", "chat")
+	c.SetLanguage("de")
+	traceEvent(c, simple.EventPlanCreated, map[string]any{"steps": []string{"a", "b", "c"}, "parallel": true})
+	traceEvent(c, simple.EventEffort, map[string]any{"effort": "thorough"})
+	c.Note("otherModel", map[string]any{"model": "Qwen 14B"})
+	r := c.Finish(runlog.StatusCompleted, "")
+	if r.Effort != "Gründlich" || len(r.Strategy) != 2 || r.Strategy[0] != "3 Teile parallel bearbeitet" ||
+		r.Strategy[1] != "Mit einem anderen Modell geantwortet, nachdem Qwen 14B fehlgeschlagen ist" {
+		t.Fatalf("run = %+v", r)
 	}
 }
