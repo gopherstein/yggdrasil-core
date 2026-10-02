@@ -203,8 +203,7 @@
     "pending": "Will appear when Yggdrasil is running",
     "limit": "Maximum model storage",
     "limitDescription": "Soft limit for downloaded models on this computer.",
-    "unlimited": "Unlimited",
-    "gigabytes": "{{value}} GB"
+    "unlimited": "Unlimited"
   },
   "about": {
     "tagline": "Local AI control plane",

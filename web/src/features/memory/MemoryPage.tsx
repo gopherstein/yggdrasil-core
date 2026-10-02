@@ -7,6 +7,7 @@ import { subscribeEvents } from '@/lib/events'
 import { errorText } from '@/features/train/display'
 import type { MemoryCategory, MemoryItem } from '@/types/api'
 import { RealmKicker } from '@/components/ui/Realm'
+import { formatDate } from '@/i18n/format'
 
 // The categories, in order; their names are memory:categories.<category> in the catalog.
 const CATEGORIES: MemoryCategory[] = ['identity', 'preferences', 'projects', 'technical', 'interests', 'people', 'other']
@@ -165,7 +166,7 @@ function MemoryRow({ memory, categories, onChanged }: { memory: MemoryItem; cate
           <p className="min-w-[12rem] flex-1 text-sm text-ink">{memory.content}</p>
           <span className="text-xs text-ink-faint">
             {memory.source_type === 'explicit' ? t('row.fromChat') : t('row.addedHere')} ·{' '}
-            {new Date(memory.updated_at).toLocaleDateString()}
+            {formatDate(memory.updated_at)}
           </span>
           <select
             className="field py-0.5 text-xs"

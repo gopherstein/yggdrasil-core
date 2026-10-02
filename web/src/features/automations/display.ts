@@ -1,4 +1,5 @@
 import i18n from '@/i18n'
+import { formatDate, formatPrice } from '@/i18n/format'
 import type { AutomationNotification, AutomationRun } from '@/types/api'
 import { formatWhen, resultProse } from './parseRequest'
 
@@ -38,13 +39,13 @@ export function compactWhen(iso: string | undefined, timeZone: string): string {
   if (!iso) return i18n.t('automations:time.notScheduled')
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return i18n.t('automations:time.notScheduled')
-  return new Intl.DateTimeFormat(undefined, {
+  return formatDate(date, {
     timeZone: timeZone || 'UTC',
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
-  }).format(date)
+  })
 }
 
 export function runTiming(run: Pick<AutomationRun, 'occurrence_at' | 'started_at' | 'finished_at'>, timeZone: string): string {
@@ -168,7 +169,7 @@ function readSignal(result: string | undefined): { price?: number; available?: b
 }
 
 function formatAmount(value: number): string {
-  return Number.isInteger(value) ? `$${value}` : `$${value.toFixed(2)}`
+  return formatPrice(value)
 }
 
 function normalize(value: string | undefined): string {

@@ -9,11 +9,6 @@
     "benchmarks": "Benchmarks",
     "activity": "Activity"
   },
-  "units": {
-    "ms": "{{value}} ms",
-    "seconds": "{{value}} s",
-    "tokPerSec": "{{value}} tok/s"
-  },
   "roles": {
     "role": "Role",
     "worker": "Worker {{n}}",

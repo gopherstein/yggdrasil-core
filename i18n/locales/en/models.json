@@ -62,7 +62,7 @@
     "downloading": "Downloading…",
     "installing": "Installing…",
     "installed": "Installed",
-    "progress": "{{percent}}% · {{done}} / {{total}}"
+    "progress": "{{percent}} · {{done}} / {{total}}"
   },
   "speed": {
     "measured": "Measured {{value}} tok/s",
@@ -83,11 +83,7 @@
   },
   "lastUsed": {
     "never": "Never",
-    "justNow": "Just now",
-    "minutes_one": "{{count}} minute ago",
-    "minutes_other": "{{count}} minutes ago",
-    "hours_one": "{{count}} hour ago",
-    "hours_other": "{{count}} hours ago"
+    "justNow": "Just now"
   },
   "tags": {
     "context": "{{count}}K context"
@@ -177,7 +173,7 @@
   "installedTab": {
     "empty": "No installed models yet. Install from Discover, then they will appear here.",
     "runningOn": "Running on {{computer}}",
-    "downloading": "Downloading… {{percent}}%",
+    "downloading": "Downloading… {{percent}}",
     "installedOn": "Installed on {{where}}",
     "thisComputer": "This computer",
     "usedBy": "Used by {{profiles}}",

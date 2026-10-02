@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import type { SpecializedAIView } from '@/types/api'
 import { errorText } from '../display'
+import { formatDateTime } from '@/i18n/format'
 
 export function TestStep({ view, onNext }: { view: SpecializedAIView; onNext: () => void }) {
   const { t } = useTranslation('train')
@@ -76,7 +77,7 @@ export function TestStep({ view, onNext }: { view: SpecializedAIView; onNext: ()
         <div className="card space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="section-title">{t('test.results')}</h3>
-            <span className="text-xs text-ink-faint">{new Date(latest.created_at).toLocaleString()}</span>
+            <span className="text-xs text-ink-faint">{formatDateTime(latest.created_at)}</span>
             {latest.status === 'running' && <span className="status-chip bg-info/15 text-info">{t('test.running')}</span>}
             {latest.status === 'failed' && <span className="status-chip bg-danger/15 text-danger">{t('test.failed')}</span>}
           </div>

@@ -5,6 +5,7 @@ import { api } from '@/lib/api'
 import { formatBytes } from '@/lib/format'
 import type { SpecializedAIView, TrainingJob } from '@/types/api'
 import { elapsedSec, formatDuration, isTerminal, jobPercent, jobStages, stateLabel } from '../display'
+import { formatDecimal, formatGigabytes } from '@/i18n/format'
 
 export function TrainStep({ view, onNext }: { view: SpecializedAIView; onNext: () => void }) {
   const { t } = useTranslation('train')
@@ -146,12 +147,12 @@ function JobCard({ job, now }: { job: TrainingJob; now: number }) {
         />
         <Metric
           label={t('train.epoch')}
-          value={p.epoch != null ? t('train.epochOf', { epoch: p.epoch.toFixed(1), epochs: p.epochs ?? job.hyper.epochs }) : '—'}
+          value={p.epoch != null ? t('train.epochOf', { epoch: formatDecimal(p.epoch, 1), epochs: p.epochs ?? job.hyper.epochs }) : '—'}
         />
         <Metric label={t('train.speed')} value={p.tokens_per_sec ? t('train.tokensPerSec', { count: Math.round(p.tokens_per_sec) }) : '—'} />
-        <Metric label={t('train.trainingLoss')} value={p.train_loss != null ? p.train_loss.toFixed(3) : '—'} />
-        <Metric label={t('train.validationLoss')} value={p.val_loss != null ? p.val_loss.toFixed(3) : '—'} />
-        <Metric label={t('train.peakMemory')} value={p.peak_memory_gb ? t('train.gigabytes', { value: p.peak_memory_gb.toFixed(1) }) : '—'} />
+        <Metric label={t('train.trainingLoss')} value={p.train_loss != null ? formatDecimal(p.train_loss, 3) : '—'} />
+        <Metric label={t('train.validationLoss')} value={p.val_loss != null ? formatDecimal(p.val_loss, 3) : '—'} />
+        <Metric label={t('train.peakMemory')} value={p.peak_memory_gb ? formatGigabytes(p.peak_memory_gb) : '—'} />
       </dl>
       <p className="text-xs text-ink-faint">{t('train.lossNote')}</p>
     </div>

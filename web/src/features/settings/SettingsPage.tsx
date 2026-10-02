@@ -22,6 +22,7 @@ import { Toggle } from '@/components/ui/Toggle'
 import { LanguageSettings } from './LanguageSettings'
 import { Personalization } from './Personalization'
 import { YggdrasilMark } from '@/components/ui/YggdrasilMark'
+import { formatGigabytes } from '@/i18n/format'
 
 function ChoiceGroup<T extends string>({
   value,
@@ -612,9 +613,9 @@ export function SettingsPage() {
             onChange={(id) => patch({ model_storage_limit_gb: Number(id) })}
             options={[
               { id: '0', label: t('storage.unlimited') },
-              { id: '50', label: t('storage.gigabytes', { value: 50 }) },
-              { id: '100', label: t('storage.gigabytes', { value: 100 }) },
-              { id: '250', label: t('storage.gigabytes', { value: 250 }) },
+              { id: '50', label: formatGigabytes(50) },
+              { id: '100', label: formatGigabytes(100) },
+              { id: '250', label: formatGigabytes(250) },
             ]}
           />
         </section>

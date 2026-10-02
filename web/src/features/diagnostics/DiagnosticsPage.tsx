@@ -14,6 +14,7 @@ import { CapabilityPanel } from './CapabilityPanel'
 import { ToolProvidersPanel } from './ToolProvidersPanel'
 import { CachePanel } from './CachePanel'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
+import { formatRelativeTime } from '@/i18n/format'
 
 function kindLabel(kind: string, advanced: boolean): string {
   const known = kind === 'daemon' || kind === 'runtime'
@@ -30,16 +31,14 @@ function relativeAgo(iso?: string): string | null {
   if (mins < 60) return i18n.t('diagnostics:ago.minutes', { count: mins })
   const hours = Math.round(mins / 60)
   if (hours < 48) return i18n.t('diagnostics:ago.hours', { count: hours })
-  return new Date(iso).toLocaleDateString()
+  return i18n.t('diagnostics:ago.days', { count: Math.round(hours / 24) })
 }
 
 function lastCheckedLabel(updatedAt: number | undefined): string {
   if (!updatedAt) return i18n.t('diagnostics:checked.never')
   const secs = Math.round((Date.now() - updatedAt) / 1000)
   if (secs < 8) return i18n.t('diagnostics:checked.justNow')
-  if (secs < 60) return i18n.t('diagnostics:checked.seconds', { count: secs })
-  const mins = Math.round(secs / 60)
-  return i18n.t('diagnostics:checked.minutes', { count: mins })
+  return i18n.t('diagnostics:checked.at', { when: formatRelativeTime(updatedAt, new Date(), 'narrow') })
 }
 
 type RowTone = 'ok' | 'warn' | 'bad'

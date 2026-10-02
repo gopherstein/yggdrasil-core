@@ -12,6 +12,7 @@ import type {
 import { formatBytes } from '@/lib/format'
 import { formatLastUsed, largerAlternative } from './modelPresentation'
 import { SmallModelNote } from './SmallModelNote'
+import { formatPercent } from '@/i18n/format'
 
 export function InstalledTab({
   models,
@@ -114,7 +115,7 @@ export function InstalledTab({
                   {live ? (
                     <span className="text-success">{t('installedTab.runningOn', { computer: live.node_name })}</span>
                   ) : dl ? (
-                    <span>{t('installedTab.downloading', { percent: dl.percent.toFixed(0) })}</span>
+                    <span>{t('installedTab.downloading', { percent: formatPercent(dl.percent / 100) })}</span>
                   ) : (
                     <span>
                       {t('installedTab.installedOn', { where })}

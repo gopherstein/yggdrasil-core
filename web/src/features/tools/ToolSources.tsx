@@ -8,6 +8,7 @@ import type { MCPPrompt, MCPServer, MCPSpec, MCPUpdate } from '@/types/api'
 import { AddToolSource } from './AddToolSource'
 import { preopenSignInWindow } from '@/lib/desktopBridge'
 import { errorText, openSignIn, quoteArg, SOURCES_KEY, specSummary, splitArgs, statusOf, toneClass } from './mcpShared'
+import { formatDate } from '@/i18n/format'
 
 /**
  * Tool sources: MCP servers the person added. Each card says in plain words
@@ -398,7 +399,7 @@ function SourceLog({ id }: { id: string }) {
         <pre className="log-panel max-h-56 text-[11px]">
           {(logs.data ?? []).length === 0
             ? t('sources.logEmpty')
-            : (logs.data ?? []).map((l) => `${new Date(l.at).toLocaleTimeString()}  ${l.level.padEnd(6)} ${l.text}`).join('\n')}
+            : (logs.data ?? []).map((l) => `${formatDate(l.at, { timeStyle: 'medium' })}  ${l.level.padEnd(6)} ${l.text}`).join('\n')}
         </pre>
       )}
     </div>

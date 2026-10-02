@@ -10,6 +10,7 @@ import { RealmKicker } from '@/components/ui/Realm'
 import { meaningNote } from './semantic'
 import { refreshNote, sourceBadge, sourceWhere } from './remote'
 import { RemoteSourceForm } from './RemoteSourceForm'
+import { formatDateTime } from '@/i18n/format'
 
 
 export function KnowledgePage() {
@@ -82,7 +83,7 @@ function SourceRow({ source, onChanged }: { source: KnowledgeSource; onChanged: 
           </div>
           <p className="mt-0.5 break-anywhere text-xs text-ink-muted">
             {sourceWhere(source)} · {t('row.passages', { count: source.chunk_count })}
-            {source.refreshed_at && ` · ${t('row.indexed', { when: new Date(source.refreshed_at).toLocaleString() })}`}
+            {source.refreshed_at && ` · ${t('row.indexed', { when: formatDateTime(source.refreshed_at) })}`}
           </p>
           {source.kind === 'path' && (
             <p className="mt-0.5 text-xs text-ink-faint">{t('row.watches')}</p>

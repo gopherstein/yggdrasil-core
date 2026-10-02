@@ -22,15 +22,16 @@
   "checked": {
     "never": "Not checked yet",
     "justNow": "Last checked just now",
-    "seconds": "Last checked {{count}}s ago",
-    "minutes": "Last checked {{count}}m ago"
+    "at": "Last checked {{when}}"
   },
   "ago": {
     "justNow": "just now",
     "minutes_one": "{{count}} minute",
     "minutes_other": "{{count}} minutes",
     "hours_one": "{{count}} hour",
-    "hours_other": "{{count}} hours"
+    "hours_other": "{{count}} hours",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days"
   },
   "rows": {
     "working": "Working…",
@@ -153,10 +154,7 @@
     "services_other": "{{count}} connected services",
     "providers": "{{healthy}} of {{total}} providers ready",
     "files_one": "{{count}} file ({{size}})",
-    "files_other": "{{count}} files ({{size}})",
-    "gigabytes": "{{value}} GB",
-    "megabytes": "{{value}} MB",
-    "kilobytes": "{{value}} KB"
+    "files_other": "{{count}} files ({{size}})"
   },
   "providers": {
     "title": "Tools on each computer",

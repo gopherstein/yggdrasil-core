@@ -1,4 +1,5 @@
 import i18n from '@/i18n'
+import { formatNumber } from '@/i18n/format'
 
 export type ContextUsage = {
   promptTokens: number
@@ -48,11 +49,9 @@ function numberField(value: unknown): number {
 }
 
 export function formatTokens(n: number): string {
-  if (!Number.isFinite(n) || n < 1000) return String(Math.max(0, Math.round(n) || 0))
-  const thousands = n / 1000
-  if (thousands >= 100) return `${Math.round(thousands)}K`
-  const text = thousands.toFixed(1)
-  return `${text.endsWith('.0') ? text.slice(0, -2) : text}K`
+  if (!Number.isFinite(n) || n < 1000) return formatNumber(Math.max(0, Math.round(n) || 0))
+  // 12.5K in English, 12,5 Tsd. in German.
+  return formatNumber(n, { notation: 'compact', maximumFractionDigits: n >= 100_000 ? 0 : 1 })
 }
 
 export function fillPercent(used: number, limit: number): number {
