@@ -27,6 +27,8 @@ Pairing is a consent step between two daemons.
 
 Both steps are signed with the computers' node keys. The offer is signed by the computer that made it and names the computer it is for. The approving computer signs its answer over the session and the code, so only the computer that was asked, holding the key that was seen when pairing started, can finish it. Each computer stores the other's key and its fingerprint, sha256 of the raw ed25519 key, the same fingerprint join commands show.
 
+Pairing never replaces a paired computer's key. An offer or answer for a paired computer with a different key is refused; remove the computer (`POST /api/v1/nodes/{id}/revoke`) and pair again.
+
 Wrong codes and failed answers are limited by address. A pairing whose answer fails 5 times ends, and 10 wrong codes end every pairing waiting on that computer; start pairing again for a new code. Pending offers are listed only on this computer's API, not on Bifrost.
 
 A bearer token names the computer it is for and is good for one request, for up to 5 minutes. Both computers need this version or later to pair or to work together.
