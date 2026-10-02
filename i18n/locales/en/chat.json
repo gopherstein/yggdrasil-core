@@ -330,7 +330,9 @@
     "runtime": "Runtime: {{value}}",
     "computer": "Computer: {{value}}",
     "exitCode": "Exit code: {{value}}",
-    "lastProbe": "Last health probe: {{value}}"
+    "lastProbe": "Last health probe: {{value}}",
+    "outOfMemory": "This model likely ran out of safe memory on this computer. Yggdrasil stopped it to keep the system stable.",
+    "stopped": "The model stopped responding, so Yggdrasil stopped it and cleaned up the failed process."
   },
   "capability": {
     "enableInternet": "Enable Internet",

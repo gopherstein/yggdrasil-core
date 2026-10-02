@@ -145,6 +145,7 @@ type Server struct {
 	personal        PersonalStore
 	privacy         Privacy
 	ratings         Ratings
+	network         Network
 	runs            RunStore
 	capabilities    CapabilitySource
 	caches          CacheSource
@@ -257,6 +258,7 @@ func (s *Server) routes() {
 	s.personalRoutes(api)
 	s.privacyRoutes(api)
 	s.ratingsRoutes(api)
+	s.networkRoutes(api)
 	s.runRoutes(api)
 	s.capabilityRoutes(api)
 	s.cacheRoutes(api)

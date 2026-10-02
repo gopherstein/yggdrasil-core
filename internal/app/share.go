@@ -76,13 +76,21 @@ func minutesLeft(w *share.Work) (int, bool) {
 	return int((d + 30*time.Second) / time.Minute), ok
 }
 
-// explainWhileTraining rewrites an out-of-memory failure that happened while
-// training holds this computer, so the person knows why and when to retry,
-// in the App language lang. It is a model failure, which clients show as
-// written, even when the error was plain text.
-func (a *App) explainWhileTraining(lang, errText string) string {
+// explainFailure writes a chat error for the person in the App language
+// lang. A model failure is shown as written, so its sentence is replaced:
+// an out-of-memory failure while training holds this computer says why and
+// when to retry, and a generic one is translated. Other errors are left as
+// they are; clients show them by their code.
+func (a *App) explainFailure(lang, errText string) string {
 	w, ok := a.training()
 	if !ok || !modelhealth.OutOfMemory(errText) {
+		if f, isHealth := modelhealth.Parse(errText); isHealth && f.Message == modelhealth.UserMessage(f.LikelyMemoryPressure) {
+			key := "chat:modelFailure.stopped"
+			if f.LikelyMemoryPressure {
+				key = "chat:modelFailure.outOfMemory"
+			}
+			return modelhealth.WithMessage(errText, locale.T(lang, key, nil))
+		}
 		return errText
 	}
 	first := locale.Key("chat:errors.trainingMemory.busy", nil)

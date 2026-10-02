@@ -35,6 +35,11 @@ How it is started depends on how it was installed:
 | `yggctl paths` | Default data, model, runtime, log, and database paths |
 | `yggctl automations …` | Manage scheduled automations (below) |
 | `yggctl mcp` | Let an app that starts MCP servers as programs, such as Claude Desktop, use Yggdrasil (below) |
+| `yggctl join-token create [--ttl 15m]` | Make a one-time join token and print the command that adds a computer to this network ([Clustering](clustering.md#joining-with-one-command)) |
+| `yggctl join-token list`, `revoke <id>` | List recent join tokens, or stop an unused one |
+| `yggctl join --server … --token … --fingerprint …` | Join this computer to the network that made the command. Exits 0 when joined or already joined, 1 when refused, 2 for a usage error |
+| `yggctl network` | This computer's address, fingerprint, network, and paired computers |
+| `yggctl leave` | Leave the network: tell each paired computer, then forget them all |
 | `yggctl completion <bash\|zsh\|fish>` | Print a shell completion script |
 
 ### Automations

@@ -1,6 +1,6 @@
 # Contributing
 
-Yggdrasil Core is the headless control plane. Changes should fit that role: runtimes, models, hardware detection, pairing, placement, health, and the HTTP API. Desktop and mobile clients live in other repositories.
+Yggdrasil Core is the headless control plane. Changes should fit that role: runtimes, models, hardware detection, pairing, placement, health, and the HTTP API. Desktop and mobile clients live in other repositories, but every app's text is translated here (see [Translations](#translations)).
 
 ## Contributor License Agreement
 
@@ -98,6 +98,25 @@ Use the hardware issue form. Say whether it works, works with limitations, does 
 
 User-facing behavior belongs in `docs/user-guide/guide.json` when it changes the public guide, and in `docs/` when it explains the daemon. Run the doc checks in [docs/user-guide/README.md](docs/user-guide/README.md) if you touch the guide.
 
+## Translations
+
+Every app's text is in one catalog in this repository, `i18n/locales/<language>/`: the web UI, the desktop app's menus, and the iPhone app's screens. English is the source, and the other languages started as machine translations. A person who reads a language well can make it better than any machine. [i18n/README.md](i18n/README.md) has the catalog's rules.
+
+Translations go through the same steps as code: a pull request, a review, CI, and then a release.
+
+1. **Find the text.** Search `i18n/locales/<language>/` for the words you see, then change the same key in that file. Don't change the key or the English text unless the English is what's wrong.
+2. **Keep the terms consistent.** `python3 scripts/i18n.py glossary <language>` prints the words your language uses for Yggdrasil's main terms, such as Model, Auto, and Knowledge. Use the same word everywhere. To change a term, change it in every file in one pull request.
+3. **Keep what the app fills in.** `{{placeholders}}` stay exactly as in English, though they can move within the sentence. Plural keys need every form your language uses: Spanish, French, Italian, and Portuguese add `_many`; Japanese, Korean, and Chinese have only `_other`.
+4. **See what's left.** `python3 scripts/i18n.py status <language> --keys` lists keys that are missing (shown in English until translated) and text that is still the same as English. Some text is meant to stay that way, such as `PDF` or `Git commit`.
+5. **Check.** Run `pnpm test` in `web/`. It checks every language against English: valid JSON, no duplicate keys, the same placeholders, and every plural form.
+6. **Open a pull request.** Say which language, and how you checked it: in the app, or by reading the files. If you reviewed a whole language, set its `status` in `i18n/languages.json` to `reviewed`. Settings then stops saying it was machine translated.
+
+A fix in one language is reviewed by someone who reads it, when one is around. Otherwise a maintainer checks that the change is consistent with the glossary and passes CI. A change ships in the next release of core. The desktop and iPhone apps pick up the catalog the next time they're built.
+
+**A new language** starts as an issue on the [translation form](.github/ISSUE_TEMPLATE/translation.yml), so the work can be shared. It follows "Adding a language" in [i18n/README.md](i18n/README.md). Before it's complete, a language can ship as `partial`, because missing keys fall back to English.
+
+If you'd rather not edit files, report the text on the translation form, with a screenshot if you can.
+
 ## Security reports
 
 Do not file a public issue for a vulnerability. Use [SECURITY.md](SECURITY.md).
@@ -105,6 +124,7 @@ Do not file a public issue for a vulnerability. Use [SECURITY.md](SECURITY.md).
 ## Good first contributions
 
 - hardware testing on a machine you already have
+- reviewing the translation in a language you read (see [Translations](#translations))
 - runtime support notes, including Windows GPU builds versus the CPU archive the installer selects
 - documentation and examples
 - platform packaging (Windows archives, confirming the Homebrew formula on the default branch)

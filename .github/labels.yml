@@ -61,6 +61,10 @@
   color: f9d0c4
   description: Needs a reliable reproduction
 
+- name: translation
+  color: 1d76db
+  description: Text in a language other than English, or a new language
+
 - name: question
   color: d876e3
   description: More information or discussion is needed

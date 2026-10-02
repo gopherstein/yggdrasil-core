@@ -29,6 +29,32 @@ Pairing is a consent step between two daemons.
 
 Revoke a peer with `POST /api/v1/nodes/{id}/revoke`.
 
+## Joining with one command
+
+For a server or any computer you reach over SSH, without mDNS or a screen, join it with a command made on a computer already in the network.
+
+1. On a computer in the network, run `yggctl join-token create`. It prints the command for the new computer:
+
+   ```text
+   yggctl join --server 192.168.1.10:7332 --token ygj_… --fingerprint sha256:…
+   ```
+
+2. On the new computer, with Yggdrasil running, run that command. The two computers trust each other from then on, and the new one shows on the Computers page and takes work from Norn like any paired computer.
+
+The token lasts 15 minutes (`--ttl` up to `24h`) and works once. `yggctl join-token list` shows recent tokens, and `yggctl join-token revoke <id>` stops an unused one. Only a proof key derived from the token is stored, and the token is never logged.
+
+How the join stays safe over Bifrost's plain HTTP:
+- **The right computer:** the command carries the issuing computer's key fingerprint. Before going on, the new computer checks that computer's signature on a fresh challenge, so a different machine at that address is refused before anything that proves the token is sent.
+- **The token stays put:** the new computer proves it holds the token with an HMAC over the challenge and its own public key. The token itself never crosses the network, and a relay can't swap in its own key.
+- **One use:** the token is used up before the new computer is trusted, so two computers racing with one token can't both get in. Ten failed attempts from one address within 10 minutes pause joins from it.
+- **Records:** each join, refusal, token made, and token revoked is logged and published (`node.join.accepted`, `node.join.rejected`, `join_token.created`, `join_token.revoked`). A join also announces "Computer paired".
+
+Running the command again on a computer that already joined says so and changes nothing. A computer in another network is refused until it runs `yggctl leave`, which tells each paired computer it is leaving and forgets them all. Models, settings, and its identity stay. `yggctl network` shows this computer's address, fingerprint, network, and paired computers.
+
+The new computer pairs with the computer that made the token. Other computers in the network pair with it separately.
+
+Both computers need Bifrost reachable on the network, which is so while discovery is on (the default). Making a token or joining is refused with `JOIN_NOT_REACHABLE` otherwise.
+
 ## Placement
 
 Norn (`internal/scheduler`) scores candidates and picks a node for a role. With the Team strategy, a planner splits the request, each part goes to its own worker slot, and a reviewer checks the answer. With two paired computers and the models installed where those roles need them, the workers land on different machines and write their parts at the same time. The event stream records `scheduler.placement`.

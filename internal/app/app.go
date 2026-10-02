@@ -35,6 +35,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/hardware"
 	"github.com/yeixio/yggdrasil-core/internal/imagegen"
 	"github.com/yeixio/yggdrasil-core/internal/inventory"
+	"github.com/yeixio/yggdrasil-core/internal/join"
 	"github.com/yeixio/yggdrasil-core/internal/logs"
 	"github.com/yeixio/yggdrasil-core/internal/mcp"
 	"github.com/yeixio/yggdrasil-core/internal/mimir"
@@ -113,8 +114,13 @@ type App struct {
 	// Caches lists every cache and its policy (§36).
 	Caches *cache.Registry
 	// Ratings is community model ratings (#37).
-	Ratings  *ratings.Service
-	capCache *cache.Cache[inventory.Snapshot]
+	Ratings *ratings.Service
+	// identity is this computer's Bifrost key; joinTokens and networkMu
+	// serve the one-line join (#40).
+	identity   *auth.NodeIdentity
+	joinTokens *join.Tokens
+	networkMu  sync.Mutex
+	capCache   *cache.Cache[inventory.Snapshot]
 	// tokenCounts keeps counts from models' tokenizers (§66).
 	tokenCounts *cache.Cache[int]
 	// tokenize counts with a running model; tests replace it.
@@ -617,6 +623,9 @@ func New(opts Options) (*App, error) {
 	a.Ratings = a.newRatings(cfg)
 	ratingsRef.Store(a.Ratings)
 	a.API.BindRatings(a.Ratings)
+	a.identity = identity
+	a.joinTokens = &join.Tokens{DB: db.SQL}
+	a.API.BindNetwork(a)
 	a.API.BindRuns(a.RunLog)
 	a.API.BindCapabilities(a)
 	a.API.BindCaches(a)
@@ -715,6 +724,7 @@ func New(opts Options) (*App, error) {
 	a.API.BindTraining(a.Training, modelMgr.Catalog().List)
 	openaiHandler.Specialized = a.Training.DeployedModels
 
+	acceptor := a.newJoinAcceptor()
 	a.internal = nodes.NewInternalServer(nodes.InternalDeps{
 		Config:          a.Config.Get(),
 		Logger:          logger,
@@ -736,6 +746,9 @@ func New(opts Options) (*App, error) {
 		AdvertiseAddr:   a.bifrostAdvertiseAddr,
 		Training:        a.Training.RemoteHandler(),
 		Tools:           remotetools.Handler(a.portable, a.enterToolWork),
+		JoinHello:       acceptor.Hello,
+		Join:            acceptor.Join,
+		Leave:           a.peerLeft,
 	})
 
 	return a, nil

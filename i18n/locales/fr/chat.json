@@ -335,7 +335,9 @@
     "runtime": "Moteur d'exécution : {{value}}",
     "computer": "Ordinateur : {{value}}",
     "exitCode": "Code de sortie : {{value}}",
-    "lastProbe": "Dernier contrôle d'état : {{value}}"
+    "lastProbe": "Dernier contrôle d'état : {{value}}",
+    "outOfMemory": "Ce modèle a probablement manqué de mémoire sûre sur cet ordinateur. Yggdrasil l'a arrêté pour garder le système stable.",
+    "stopped": "Le modèle a cessé de répondre. Yggdrasil l'a donc arrêté et a nettoyé le processus en échec."
   },
   "capability": {
     "enableInternet": "Activer Internet",

@@ -202,6 +202,11 @@ Uploads send `text`, or `content_base64` for binary files such as `.xlsx` and `.
 | POST | `/nodes/pairing/offer` | Receive a pairing offer from another computer |
 | GET | `/nodes/pairing/outbound/{code}` | The status of a pairing this computer started |
 | POST | `/nodes/{id}/revoke` | Remove a paired computer |
+| POST, GET | `/join-tokens` | Make a one-time join token and the command to use it (`{"ttl_minutes": 15}`), or list recent ones |
+| DELETE | `/join-tokens/{id}` | Revoke an unused join token |
+| GET | `/network` | This computer's network, Bifrost address, fingerprint, and paired computers |
+| POST | `/network/join` | Join the network of the computer that made a token: `server`, `token`, `fingerprint` ([Clustering](clustering.md#joining-with-one-command)) |
+| POST | `/network/leave` | Leave the network and forget paired computers |
 
 ### API keys and benchmarks
 

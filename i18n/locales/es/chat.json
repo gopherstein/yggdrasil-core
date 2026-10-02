@@ -335,7 +335,9 @@
     "runtime": "Entorno de ejecución: {{value}}",
     "computer": "Computadora: {{value}}",
     "exitCode": "Código de salida: {{value}}",
-    "lastProbe": "Última comprobación de estado: {{value}}"
+    "lastProbe": "Última comprobación de estado: {{value}}",
+    "outOfMemory": "Probablemente este modelo se quedó sin memoria segura en esta computadora. Yggdrasil lo detuvo para mantener estable el sistema.",
+    "stopped": "El modelo dejó de responder, así que Yggdrasil lo detuvo y limpió el proceso fallido."
   },
   "capability": {
     "enableInternet": "Activar Internet",

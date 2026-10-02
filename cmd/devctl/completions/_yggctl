@@ -9,6 +9,10 @@ _yggctl() {
     'paths:print the data, model, runtime, log, and database directories'
     'automations:manage scheduled automations on the daemon'
     'mcp:connect an app such as Claude Desktop to Yggdrasil over MCP'
+    'join:join this computer to a Yggdrasil network with a join command'
+    'join-token:make, list, or revoke join tokens for adding computers'
+    'network:show this computer'"'"'s network and paired computers'
+    'leave:leave the network and forget paired computers'
     'completion:print a shell completion script'
   )
 
@@ -23,6 +27,21 @@ _yggctl() {
       ;;
     completion)
       (( CURRENT == 3 )) && _values 'shell' bash zsh fish
+      ;;
+    join)
+      _arguments '--server[address of the computer that made the command]:server:' \
+        '--token[join token]:token:' '--fingerprint[that computer'"'"'s fingerprint]:fingerprint:' \
+        '--output[output format]:format:(text json)'
+      ;;
+    join-token)
+      if (( CURRENT == 3 )); then
+        _values 'join-token command' create list revoke
+        return
+      fi
+      _arguments '--ttl[how long the token lasts]:duration:' '--output[output format]:format:(text json)'
+      ;;
+    network|leave)
+      _arguments '--output[output format]:format:(text json)'
       ;;
     automations)
       if (( CURRENT == 3 )); then

@@ -10,6 +10,7 @@ Use this repository for Yggdrasil Core. Desktop and mobile applications are sepa
 | Performance report | [Performance form](.github/ISSUE_TEMPLATE/performance_issue.yml) |
 | A new runtime | [Runtime request form](.github/ISSUE_TEMPLATE/runtime_request.yml) |
 | Documentation | [Documentation form](.github/ISSUE_TEMPLATE/documentation.yml) |
+| A translation, or a new language | [Translation form](.github/ISSUE_TEMPLATE/translation.yml), or a pull request ([how](CONTRIBUTING.md#translations)) |
 | A vulnerability | [SECURITY.md](SECURITY.md). Not a public issue. |
 | A code of conduct report | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Email conduct@yeix.io. Not a public issue. |
 | A question or an idea to discuss | [GitHub Discussions](https://github.com/yeixio/yggdrasil-core/discussions) |

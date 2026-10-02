@@ -7,6 +7,7 @@ folder when it builds, so all of them share one catalog.
 ```text
 i18n/
   languages.json            languages that can be chosen, with their direction
+  glossary.json             the main terms, by the key that holds each one
   locales/<language>/       one folder per BCP 47 tag, such as en, es, pt-BR
     common.json             navigation, status, and words used everywhere
     chat.json               Chat: the composer, history, progress, and errors
@@ -77,8 +78,21 @@ import of pasted training examples reads each language's own labels
 
 Read it in the app, fix wording in `locales/<tag>/*.json`, and set the
 language's `status` to `reviewed` (or `community`) in `languages.json` in
-the same pull request. Keep the glossary consistent: the same English term
-gets the same translation everywhere.
+the same pull request. The steps for contributors are in
+[CONTRIBUTING.md](../CONTRIBUTING.md#translations).
+
+Keep the glossary consistent: the same English term gets the same
+translation everywhere. `glossary.json` lists Yggdrasil's main terms by the
+catalog key that holds each one, so a language's glossary is its own text:
+
+```bash
+python3 scripts/i18n.py glossary de
+```
+
+To see what a language still lacks, run `python3 scripts/i18n.py status`.
+It lists keys that are missing and text that is the same as English, with
+`--keys` for the keys themselves. Some text is meant to stay the same, such
+as `PDF`. CI checks that every glossary key exists in English.
 
 ## Keys
 

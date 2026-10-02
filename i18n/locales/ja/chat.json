@@ -325,7 +325,9 @@
     "runtime": "ランタイム：{{value}}",
     "computer": "コンピュータ：{{value}}",
     "exitCode": "終了コード：{{value}}",
-    "lastProbe": "最後のヘルスチェック：{{value}}"
+    "lastProbe": "最後のヘルスチェック：{{value}}",
+    "outOfMemory": "このモデルは、このコンピュータで安全に使えるメモリが不足した可能性があります。システムを安定させるため、Yggdrasilがモデルを停止しました。",
+    "stopped": "モデルが応答しなくなったため、Yggdrasilがモデルを停止し、失敗したプロセスを片付けました。"
   },
   "capability": {
     "enableInternet": "インターネットを有効にする",
