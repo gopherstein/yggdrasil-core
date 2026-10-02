@@ -47,7 +47,8 @@ func TestVideoTool(t *testing.T) {
 	got := args(t, f)
 	if flag(got, "-M") != "vid_gen" || flag(got, "--video-frames") != "49" || flag(got, "--fps") != "16" || flag(got, "--flow-shift") != "3" ||
 		filepath.Base(flag(got, "--t5xxl")) != "umt5-xxl-encoder-Q4_K_M.gguf" || filepath.Base(flag(got, "--vae")) != "wan2.2_vae.safetensors" ||
-		!strings.HasSuffix(flag(got, "-o"), "out.webm") || flag(got, "-i") != "" || flag(got, "-n") == "" {
+		!strings.HasSuffix(flag(got, "-o"), "out.webm") || flag(got, "-i") != "" || flag(got, "-n") == "" ||
+		!strings.Contains(strings.Join(got, " "), "--vae-tiling --temporal-tiling") {
 		t.Fatalf("sd-cli args %q", got)
 	}
 }

@@ -140,6 +140,9 @@ func (e *Engine) GenerateVideo(ctx context.Context, req VideoRequest) (VideoResu
 		"--steps", strconv.Itoa(model.Steps), "--cfg-scale", f(model.CFG), "--flow-shift", f(model.FlowShift),
 		"--sampling-method", "euler", "-s", strconv.FormatInt(seed, 10), "-o", out,
 		"--offload-to-cpu", "--diffusion-fa",
+		// Wan's VAE decodes every frame at once unless tiled, which needs
+		// more memory than most computers have; tiles keep it in bounds.
+		"--vae-tiling", "--temporal-tiling",
 	}
 	if req.Image != nil {
 		ext := strings.ToLower(filepath.Ext(req.ImageName))
