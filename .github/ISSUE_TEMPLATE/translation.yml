@@ -1,0 +1,42 @@
+name: Translation
+description: Report wrong or missing text in a language, ask for a new language, or offer to review one.
+title: "[Translation]: "
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Translations live in `i18n/locales/<language>/` and are fixed by pull request. A small fix can go straight to a pull request without an issue. [CONTRIBUTING.md](https://github.com/yeixio/yggdrasil-core/blob/main/CONTRIBUTING.md#translations) explains how.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is this about?
+      options:
+        - Wrong, awkward, or inconsistent text
+        - Text that is still in English
+        - Text that does not fit or is cut off
+        - A new language
+        - I can review a language
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      description: Its name and tag, such as German (de) or Brazilian Portuguese (pt-BR).
+    validations:
+      required: true
+  - type: textarea
+    id: where
+    attributes:
+      label: Where
+      description: The page or screen, and the app (web, desktop, or iPhone). The catalog key, such as `chat:composer.attach`, if you know it. A screenshot helps.
+    validations:
+      required: false
+  - type: textarea
+    id: text
+    attributes:
+      label: What it says, and what it should say
+      description: For a new language or a review, say which parts you can help with.
+    validations:
+      required: true
