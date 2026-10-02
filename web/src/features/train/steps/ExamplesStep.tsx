@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import type { ExampleFlag, SpecializedAIView, TrainingExample, TrainingMessage } from '@/types/api'
-import { errorText, flagLabels, lastAnswer, lastUserTurn } from '../display'
+import { errorText, flagCount, flagInfo, lastAnswer, lastUserTurn } from '../display'
 
 const PAGE = 50
 
 export function ExamplesStep({ view, onNext }: { view: SpecializedAIView; onNext: () => void }) {
+  const { t } = useTranslation('train')
   const queryClient = useQueryClient()
   const [filter, setFilter] = useState<'all' | 'flagged' | 'excluded'>('all')
   const [shown, setShown] = useState(PAGE)
@@ -29,9 +31,14 @@ export function ExamplesStep({ view, onNext }: { view: SpecializedAIView; onNext
     <div className="space-y-4">
       <div className="card space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="section-title">Review examples</h3>
+          <h3 className="section-title">{t('examples.title')}</h3>
           <p className="text-sm text-ink-muted">
-            <span className="font-semibold tabular-nums text-ink">{stats.usable}</span> of {stats.total} will train
+            <Trans
+              t={t}
+              i18nKey="examples.willTrain"
+              values={{ usable: stats.usable, total: stats.total }}
+              components={{ strong: <span className="font-semibold tabular-nums text-ink" /> }}
+            />
           </p>
         </div>
         {(stats.warnings ?? []).map((w) => (
@@ -42,8 +49,8 @@ export function ExamplesStep({ view, onNext }: { view: SpecializedAIView; onNext
         {Object.keys(stats.flagged).length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {(Object.entries(stats.flagged) as [ExampleFlag, number][]).map(([flag, n]) => (
-              <span key={flag} className={['status-chip', flagLabels[flag]?.blocking ? 'bg-danger/15 text-danger' : 'bg-warning/15 text-warning'].join(' ')} title={flagLabels[flag]?.help}>
-                {n} {flagLabels[flag]?.label.toLowerCase() ?? flag}
+              <span key={flag} className={['status-chip', flagInfo(flag)?.blocking ? 'bg-danger/15 text-danger' : 'bg-warning/15 text-warning'].join(' ')} title={flagInfo(flag)?.help}>
+                {flagCount(flag, n)}
               </span>
             ))}
           </div>
@@ -51,11 +58,11 @@ export function ExamplesStep({ view, onNext }: { view: SpecializedAIView; onNext
         <div className="flex gap-1.5">
           {(['all', 'flagged', 'excluded'] as const).map((f) => (
             <button key={f} type="button" className={filter === f ? 'btn-primary px-3 py-1 text-xs' : 'btn-secondary px-3 py-1 text-xs'} onClick={() => setFilter(f)}>
-              {f === 'all' ? 'All' : f === 'flagged' ? 'Flagged' : 'Excluded'}
+              {t(`examples.filters.${f}`)}
             </button>
           ))}
         </div>
-        {examples.isLoading && <p className="text-sm text-ink-muted">Loading examples…</p>}
+        {examples.isLoading && <p className="text-sm text-ink-muted">{t('examples.loading')}</p>}
         <ul className="space-y-2">
           {list.slice(0, shown).map((ex) => (
             <ExampleRow
@@ -70,14 +77,14 @@ export function ExamplesStep({ view, onNext }: { view: SpecializedAIView; onNext
         </ul>
         {list.length > shown && (
           <button type="button" className="btn-secondary px-3 py-1 text-xs" onClick={() => setShown(shown + PAGE)}>
-            Show more ({list.length - shown} left)
+            {t('examples.showMore', { count: list.length - shown })}
           </button>
         )}
         {(update.error || remove.error) && <p className="text-sm text-danger">{errorText(update.error ?? remove.error)}</p>}
       </div>
       <AddExample aiID={view.id} onAdded={refresh} />
       <button type="button" className="btn-primary px-3 py-1.5 text-sm" disabled={stats.usable < 10} onClick={onNext}>
-        Continue
+        {t('examples.continue')}
       </button>
     </div>
   )
@@ -96,6 +103,7 @@ function ExampleRow({
   onSave: (messages: TrainingMessage[]) => void
   onDelete: () => void
 }) {
+  const { t } = useTranslation('train')
   const [editing, setEditing] = useState(false)
   const [answer, setAnswer] = useState(lastAnswer(example.messages))
   const turns = example.messages.filter((m) => m.role !== 'system').length
@@ -103,23 +111,23 @@ function ExampleRow({
     <li className={['rounded-lg bg-raised p-3 text-sm', example.excluded ? 'opacity-60' : ''].join(' ')}>
       <div className="flex flex-wrap items-center gap-1.5">
         {(example.flags ?? []).map((f) => (
-          <span key={f} className={['status-chip', flagLabels[f]?.blocking ? 'bg-danger/15 text-danger' : 'bg-warning/15 text-warning'].join(' ')} title={flagLabels[f]?.help}>
-            {flagLabels[f]?.label ?? f}
+          <span key={f} className={['status-chip', flagInfo(f)?.blocking ? 'bg-danger/15 text-danger' : 'bg-warning/15 text-warning'].join(' ')} title={flagInfo(f)?.help}>
+            {flagInfo(f)?.label ?? f}
           </span>
         ))}
-        {example.excluded && <span className="status-chip bg-raised text-ink-muted">Excluded</span>}
-        {turns > 2 && <span className="text-xs text-ink-faint">{turns} turns</span>}
+        {example.excluded && <span className="status-chip bg-raised text-ink-muted">{t('examples.excluded')}</span>}
+        {turns > 2 && <span className="text-xs text-ink-faint">{t('examples.turns', { count: turns })}</span>}
       </div>
       <p className="mt-1 text-ink">
-        <span className="label-caps mr-1">Q</span>
-        {lastUserTurn(example.messages) || <em className="text-ink-faint">empty</em>}
+        <span className="label-caps mr-1">{t('examples.q')}</span>
+        {lastUserTurn(example.messages) || <em className="text-ink-faint">{t('examples.empty')}</em>}
       </p>
       {editing ? (
-        <textarea className="field mt-1 min-h-20 w-full text-sm" value={answer} onChange={(e) => setAnswer(e.target.value)} aria-label="Answer" />
+        <textarea className="field mt-1 min-h-20 w-full text-sm" value={answer} onChange={(e) => setAnswer(e.target.value)} aria-label={t('examples.answer')} />
       ) : (
         <p className="mt-1 whitespace-pre-wrap text-ink-muted">
-          <span className="label-caps mr-1">A</span>
-          {lastAnswer(example.messages) || <em className="text-ink-faint">no answer</em>}
+          <span className="label-caps mr-1">{t('examples.a')}</span>
+          {lastAnswer(example.messages) || <em className="text-ink-faint">{t('examples.noAnswer')}</em>}
         </p>
       )}
       <div className="mt-2 flex gap-1.5">
@@ -138,22 +146,22 @@ function ExampleRow({
                 setEditing(false)
               }}
             >
-              Save
+              {t('examples.save')}
             </button>
             <button type="button" className="btn-secondary px-2 py-1 text-xs" onClick={() => setEditing(false)}>
-              Cancel
+              {t('examples.cancel')}
             </button>
           </>
         ) : (
           <button type="button" className="btn-secondary px-2 py-1 text-xs" onClick={() => setEditing(true)}>
-            Edit answer
+            {t('examples.editAnswer')}
           </button>
         )}
         <button type="button" className="btn-secondary px-2 py-1 text-xs" disabled={busy} onClick={onToggle}>
-          {example.excluded ? 'Include' : 'Exclude'}
+          {example.excluded ? t('examples.include') : t('examples.exclude')}
         </button>
         <button type="button" className="btn-secondary px-2 py-1 text-xs" disabled={busy} onClick={onDelete}>
-          Delete
+          {t('examples.delete')}
         </button>
       </div>
     </li>
@@ -161,6 +169,7 @@ function ExampleRow({
 }
 
 function AddExample({ aiID, onAdded }: { aiID: string; onAdded: () => void }) {
+  const { t } = useTranslation('train')
   const [question, setQuestion] = useState('')
   const [answer, setAnswer] = useState('')
   const add = useMutation({
@@ -177,13 +186,13 @@ function AddExample({ aiID, onAdded }: { aiID: string; onAdded: () => void }) {
   })
   return (
     <div className="card space-y-2">
-      <h3 className="section-title">Write an example</h3>
-      <p className="text-sm text-ink-muted">Show one question and the answer you want. Write how to use facts, not the facts themselves.</p>
-      <input className="field w-full" value={question} onChange={(e) => setQuestion(e.target.value)} placeholder="Customer question" aria-label="Question" />
-      <textarea className="field min-h-20 w-full" value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="The answer you want" aria-label="Answer" />
+      <h3 className="section-title">{t('examples.writeTitle')}</h3>
+      <p className="text-sm text-ink-muted">{t('examples.writeDescription')}</p>
+      <input className="field w-full" value={question} onChange={(e) => setQuestion(e.target.value)} placeholder={t('examples.questionPlaceholder')} aria-label={t('examples.question')} />
+      <textarea className="field min-h-20 w-full" value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder={t('examples.answerPlaceholder')} aria-label={t('examples.answer')} />
       {add.error && <p className="text-sm text-danger">{errorText(add.error)}</p>}
       <button type="button" className="btn-secondary px-3 py-1.5 text-sm" disabled={!question.trim() || !answer.trim() || add.isPending} onClick={() => add.mutate()}>
-        Add example
+        {t('examples.add')}
       </button>
     </div>
   )

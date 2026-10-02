@@ -1,12 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import { KnowledgePicker } from '@/features/knowledge/KnowledgePicker'
 import { formatBytes } from '@/lib/format'
 import type { NodeTrainingFit, SpecializedAIView, TrainingHyper, TrainingPreset } from '@/types/api'
-import { errorText, fitLabels, fitTone, formatDuration, presetInfo } from '../display'
+import { errorText, fitLabel, fitTone, formatDuration, PRESETS, presetDescription, presetLabel } from '../display'
 
 export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStarted: () => void }) {
+  const { t } = useTranslation('train')
   const queryClient = useQueryClient()
   const plan = useQuery({ queryKey: ['training', 'plan', view.id], queryFn: () => api.trainingPlan(view.id) })
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ['training'] })
@@ -29,33 +31,37 @@ export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStart
     <div className="space-y-4">
       <div className="grid gap-3 md:grid-cols-2">
         <div className="card-outline space-y-2 border-l-4 !border-l-primary p-4">
-          <p className="label-caps text-primary">Will be trained</p>
+          <p className="label-caps text-primary">{t('plan.willTrain')}</p>
           <p className="text-sm text-ink">
-            <span className="font-semibold tabular-nums">{p?.examples ?? view.dataset.usable}</span> examples teach how to
-            respond.
+            <Trans
+              t={t}
+              i18nKey="plan.examples"
+              count={p?.examples ?? view.dataset.usable}
+              components={{ strong: <span className="font-semibold tabular-nums" /> }}
+            />
           </p>
-          <p className="text-xs text-ink-muted">Base model: {view.base_model?.display_name ?? 'not chosen'}</p>
+          <p className="text-xs text-ink-muted">{t('plan.base', { model: view.base_model?.display_name ?? t('plan.notChosen') })}</p>
         </div>
         <div className="card-outline space-y-2 border-l-4 !border-l-mimir p-4">
-          <p className="label-caps text-mimir">Stays connected</p>
+          <p className="label-caps text-mimir">{t('plan.connected')}</p>
           <KnowledgePicker selected={view.knowledge_sources} disabled={setKnowledge.isPending} onChange={(ids) => setKnowledge.mutate(ids)} />
           {setKnowledge.error && <p className="text-xs text-danger">{errorText(setKnowledge.error)}</p>}
-          <p className="text-xs text-ink-muted">Looked up on every question. Edit it later without retraining.</p>
+          <p className="text-xs text-ink-muted">{t('plan.connectedHint')}</p>
         </div>
       </div>
 
       <div className="card space-y-3">
-        <h3 className="section-title">Training effort</h3>
+        <h3 className="section-title">{t('plan.effort')}</h3>
         <div className="grid gap-2 md:grid-cols-3">
-          {(Object.keys(presetInfo) as TrainingPreset[]).map((key) => (
+          {PRESETS.map((key) => (
             <button
               key={key}
               type="button"
               className={['selectable text-left', view.preset === key ? 'shadow-[inset_0_0_0_1.5px_rgb(var(--rgb-primary))]' : ''].join(' ')}
               onClick={() => setPreset.mutate(key)}
             >
-              <p className="font-medium text-ink">{presetInfo[key].label}</p>
-              <p className="mt-1 text-xs text-ink-muted">{presetInfo[key].description}</p>
+              <p className="font-medium text-ink">{presetLabel(key)}</p>
+              <p className="mt-1 text-xs text-ink-muted">{presetDescription(key)}</p>
             </button>
           ))}
         </div>
@@ -63,8 +69,8 @@ export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStart
       </div>
 
       <div className="card space-y-3">
-        <h3 className="section-title">Where it trains</h3>
-        {plan.isLoading && <p className="text-sm text-ink-muted">Estimating…</p>}
+        <h3 className="section-title">{t('plan.where')}</h3>
+        {plan.isLoading && <p className="text-sm text-ink-muted">{t('plan.estimating')}</p>}
         <ul className="space-y-2">
           {(p?.fits ?? []).map((f) => (
             <FitRow
@@ -94,7 +100,7 @@ export function PlanStep({ view, onStarted }: { view: SpecializedAIView; onStart
       )}
       {start.error && <p className="text-sm text-danger">{errorText(start.error)}</p>}
       <button type="button" className="btn-primary px-4 py-2 text-sm" disabled={!p?.ready || start.isPending} onClick={() => start.mutate(undefined)}>
-        {start.isPending ? 'Starting…' : `Train revision ${p?.next_revision ?? 1}`}
+        {start.isPending ? t('plan.starting') : t('plan.train', { revision: p?.next_revision ?? 1 })}
       </button>
     </div>
   )
@@ -111,16 +117,17 @@ function FitRow({
   canStart: boolean
   onStart: () => void
 }) {
+  const { t } = useTranslation('train')
   return (
     <li className={['rounded-lg bg-raised p-3 text-sm', chosen ? 'shadow-[inset_0_0_0_1.5px_rgb(var(--rgb-primary))]' : ''].join(' ')}>
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-medium text-ink">{fit.node_name}</span>
-        {fit.local && <span className="text-xs text-ink-faint">this computer</span>}
-        <span className={['status-chip', fitTone(fit)].join(' ')}>{fitLabels[fit.label]}</span>
-        {chosen && <span className="status-chip bg-norn/15 text-norn">Norn picked this</span>}
+        {fit.local && <span className="text-xs text-ink-faint">{t('plan.thisComputer')}</span>}
+        <span className={['status-chip', fitTone(fit)].join(' ')}>{fitLabel(fit.label)}</span>
+        {chosen && <span className="status-chip bg-norn/15 text-norn">{t('plan.nornPicked')}</span>}
         {!chosen && fit.eligible && (
           <button type="button" className="btn-secondary ml-auto px-2 py-0.5 text-xs" disabled={!canStart} onClick={onStart}>
-            Train here instead
+            {t('plan.trainHere')}
           </button>
         )}
       </div>
@@ -128,21 +135,21 @@ function FitRow({
       {fit.eligible && (
         <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-4">
           <div>
-            <dt className="text-ink-faint">Memory</dt>
+            <dt className="text-ink-faint">{t('plan.memory')}</dt>
             <dd className="tabular-nums text-ink">
-              {formatBytes(fit.memory_needed_bytes)} of {formatBytes(fit.memory_available_bytes)}
+              {t('plan.memoryOf', { needed: formatBytes(fit.memory_needed_bytes), available: formatBytes(fit.memory_available_bytes) })}
             </dd>
           </div>
           <div>
-            <dt className="text-ink-faint">Download</dt>
-            <dd className="tabular-nums text-ink">{fit.download_bytes ? formatBytes(fit.download_bytes) : 'None'}</dd>
+            <dt className="text-ink-faint">{t('plan.download')}</dt>
+            <dd className="tabular-nums text-ink">{fit.download_bytes ? formatBytes(fit.download_bytes) : t('plan.none')}</dd>
           </div>
           <div>
-            <dt className="text-ink-faint">Disk</dt>
+            <dt className="text-ink-faint">{t('plan.disk')}</dt>
             <dd className="tabular-nums text-ink">{formatBytes(fit.storage_needed_bytes)}</dd>
           </div>
           <div>
-            <dt className="text-ink-faint">Time, roughly</dt>
+            <dt className="text-ink-faint">{t('plan.time')}</dt>
             <dd className="tabular-nums text-ink">{formatDuration(fit.duration_sec)}</dd>
           </div>
         </dl>
@@ -156,16 +163,18 @@ function FitRow({
   )
 }
 
-const advancedFields: { key: keyof TrainingHyper; label: string; help: string; step?: string }[] = [
-  { key: 'epochs', label: 'Epochs', help: 'Passes over all examples.' },
-  { key: 'rank', label: 'LoRA rank', help: 'Adapter capacity. Higher learns more and needs more memory.' },
-  { key: 'layers', label: 'Layers', help: 'How many of the last layers to train. -1 trains all.' },
-  { key: 'learning_rate', label: 'Learning rate', help: 'Step size. Too high forgets the base model.', step: 'any' },
-  { key: 'batch_size', label: 'Batch size', help: 'Examples per step.' },
-  { key: 'max_seq_length', label: 'Max tokens', help: 'Longest example, in tokens.' },
+// Each field's label and help are train:plan.fields.<key> in the catalog.
+const advancedFields: { key: keyof TrainingHyper; step?: string }[] = [
+  { key: 'epochs' },
+  { key: 'rank' },
+  { key: 'layers' },
+  { key: 'learning_rate', step: 'any' },
+  { key: 'batch_size' },
+  { key: 'max_seq_length' },
 ]
 
 function AdvancedSettings({ view, planned }: { view: SpecializedAIView; planned?: TrainingHyper }) {
+  const { t } = useTranslation('train')
   const queryClient = useQueryClient()
   const [draft, setDraft] = useState<TrainingHyper>(view.advanced ?? {})
   const save = useMutation({
@@ -174,28 +183,29 @@ function AdvancedSettings({ view, planned }: { view: SpecializedAIView; planned?
   })
   return (
     <details className="text-sm" open={Boolean(view.advanced)}>
-      <summary className="cursor-pointer text-ink-muted">Advanced settings</summary>
+      <summary className="cursor-pointer text-ink-muted">{t('plan.advanced')}</summary>
       <div className="mt-3 space-y-3">
         <p className="text-xs text-ink-muted">
-          Leave a field empty to use the preset ({planned ? `${planned.method?.toUpperCase()}, ${planned.iters} steps` : '…'}). Settings you pin here are
-          used even if they do not fit in memory.
+          {t('plan.advancedHint', {
+            preset: planned ? t('plan.presetSummary', { method: planned.method?.toUpperCase(), iters: planned.iters }) : '…',
+          })}
         </p>
         <label className="flex items-center gap-2 text-xs">
-          <span className="w-28 text-ink">Method</span>
+          <span className="w-28 text-ink">{t('plan.method')}</span>
           <select
             className="field"
             value={draft.method ?? ''}
             onChange={(e) => setDraft({ ...draft, method: (e.target.value || undefined) as TrainingHyper['method'] })}
           >
-            <option value="">Preset ({planned?.method ?? '—'})</option>
-            <option value="lora">LoRA, full-precision base</option>
-            <option value="qlora">QLoRA, 4-bit base</option>
+            <option value="">{t('plan.presetMethod', { method: planned?.method ?? '—' })}</option>
+            <option value="lora">{t('plan.lora')}</option>
+            <option value="qlora">{t('plan.qlora')}</option>
           </select>
         </label>
         <div className="grid gap-2 sm:grid-cols-2">
           {advancedFields.map((f) => (
-            <label key={f.key} className="flex flex-col gap-0.5 text-xs" title={f.help}>
-              <span className="text-ink">{f.label}</span>
+            <label key={f.key} className="flex flex-col gap-0.5 text-xs" title={t(`plan.fields.${f.key}.help`)}>
+              <span className="text-ink">{t(`plan.fields.${f.key}.label`)}</span>
               <input
                 type="number"
                 step={f.step ?? '1'}
@@ -204,18 +214,18 @@ function AdvancedSettings({ view, planned }: { view: SpecializedAIView; planned?
                 value={draft[f.key] != null ? String(draft[f.key]) : ''}
                 onChange={(e) => setDraft({ ...draft, [f.key]: e.target.value === '' ? undefined : Number(e.target.value) })}
               />
-              <span className="text-ink-faint">{f.help}</span>
+              <span className="text-ink-faint">{t(`plan.fields.${f.key}.help`)}</span>
             </label>
           ))}
         </div>
         {save.error && <p className="text-danger">{errorText(save.error)}</p>}
         <div className="flex gap-2">
           <button type="button" className="btn-secondary px-3 py-1 text-xs" disabled={save.isPending} onClick={() => save.mutate(false)}>
-            Save advanced settings
+            {t('plan.saveAdvanced')}
           </button>
           {view.advanced && (
             <button type="button" className="btn-secondary px-3 py-1 text-xs" disabled={save.isPending} onClick={() => { setDraft({}); save.mutate(true) }}>
-              Use the preset
+              {t('plan.usePreset')}
             </button>
           )}
         </div>

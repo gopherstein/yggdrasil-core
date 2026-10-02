@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import i18n from '@/i18n'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { api } from '@/lib/api'
 import { displayVersion } from '@/lib/appVersion'
@@ -14,24 +16,9 @@ import { CachePanel } from './CachePanel'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
 
 function kindLabel(kind: string, advanced: boolean): string {
-  if (!advanced) {
-    switch (kind) {
-      case 'daemon':
-        return 'App'
-      case 'runtime':
-        return 'Model runtime'
-      default:
-        return 'Other'
-    }
-  }
-  switch (kind) {
-    case 'daemon':
-      return 'Daemon'
-    case 'runtime':
-      return 'Runtime'
-    default:
-      return kind
-  }
+  const known = kind === 'daemon' || kind === 'runtime'
+  if (!advanced) return i18n.t(`diagnostics:logs.kinds.${known ? kind : 'other'}`)
+  return known ? i18n.t(`diagnostics:logs.kindsAdvanced.${kind}`) : kind
 }
 
 function relativeAgo(iso?: string): string | null {
@@ -39,22 +26,20 @@ function relativeAgo(iso?: string): string | null {
   const t = new Date(iso).getTime()
   if (Number.isNaN(t)) return null
   const mins = Math.max(0, Math.round((Date.now() - t) / 60_000))
-  if (mins < 1) return 'just now'
-  if (mins === 1) return '1 minute'
-  if (mins < 60) return `${mins} minutes`
+  if (mins < 1) return i18n.t('diagnostics:ago.justNow')
+  if (mins < 60) return i18n.t('diagnostics:ago.minutes', { count: mins })
   const hours = Math.round(mins / 60)
-  if (hours === 1) return '1 hour'
-  if (hours < 48) return `${hours} hours`
+  if (hours < 48) return i18n.t('diagnostics:ago.hours', { count: hours })
   return new Date(iso).toLocaleDateString()
 }
 
 function lastCheckedLabel(updatedAt: number | undefined): string {
-  if (!updatedAt) return 'Not checked yet'
+  if (!updatedAt) return i18n.t('diagnostics:checked.never')
   const secs = Math.round((Date.now() - updatedAt) / 1000)
-  if (secs < 8) return 'Last checked just now'
-  if (secs < 60) return `Last checked ${secs}s ago`
+  if (secs < 8) return i18n.t('diagnostics:checked.justNow')
+  if (secs < 60) return i18n.t('diagnostics:checked.seconds', { count: secs })
   const mins = Math.round(secs / 60)
-  return `Last checked ${mins}m ago`
+  return i18n.t('diagnostics:checked.minutes', { count: mins })
 }
 
 type RowTone = 'ok' | 'warn' | 'bad'
@@ -84,6 +69,7 @@ function StatusIcon({ tone }: { tone: RowTone }) {
 }
 
 function HealthRow({ row }: { row: StatusRow }) {
+  const { t } = useTranslation('diagnostics')
   return (
     <li className="border-b border-line/50 py-3 last:border-0">
       <div className="flex gap-3">
@@ -126,7 +112,7 @@ function HealthRow({ row }: { row: StatusRow }) {
                     disabled={action.busy}
                     onClick={action.onClick}
                   >
-                    {action.busy ? 'Working…' : action.label}
+                    {action.busy ? t('rows.working') : action.label}
                   </button>
                 ),
               )}
@@ -143,6 +129,7 @@ function offlineRemotes(nodes: Node[]): Node[] {
 }
 
 export function DiagnosticsPage() {
+  const { t } = useTranslation('diagnostics')
   const advancedMode = useUIStore((s) => s.advancedMode)
   const queryClient = useQueryClient()
   const [selectedName, setSelectedName] = useState<string | null>(null)
@@ -240,11 +227,7 @@ export function DiagnosticsPage() {
     .filter((m) => m.installed || (m.installed_on?.length ?? 0) > 0)
     .reduce((sum, m) => sum + (m.size_bytes ?? 0), 0)
   const settings = settingsQuery.data
-  const apiDetail = !settings
-    ? '—'
-    : settings.lan_api_enabled
-      ? 'LAN enabled'
-      : 'Local only'
+  const apiDetail = !settings ? '—' : settings.lan_api_enabled ? t('rows.api.lan') : t('rows.api.local')
 
   const rows: StatusRow[] = useMemo(() => {
     const offlineNodes = offlineRemotes(nodes)
@@ -252,22 +235,20 @@ export function DiagnosticsPage() {
 
     out.push({
       id: 'control',
-      label: 'Control service',
+      label: t('rows.control.label'),
       tone: serviceOk ? 'ok' : 'bad',
-      detail: serviceOk ? 'Healthy' : 'Not responding',
-      message: serviceOk
-        ? undefined
-        : 'The local Yggdrasil service is not reachable. Quit and reopen the app, or check that the daemon is running.',
+      detail: serviceOk ? t('rows.healthy') : t('rows.control.notResponding'),
+      message: serviceOk ? undefined : t('rows.control.message'),
       actions: serviceOk
         ? undefined
         : [
             {
               kind: 'button',
-              label: 'Retry',
+              label: t('rows.retry'),
               onClick: () => refreshMutation.mutate(),
               busy: refreshMutation.isPending,
             },
-            { kind: 'link', label: 'Open Settings', to: '/settings' },
+            { kind: 'link', label: t('rows.openSettings'), to: '/settings' },
           ],
     })
 
@@ -277,30 +258,30 @@ export function DiagnosticsPage() {
     let runtimeActions: StatusAction[] | undefined
     if (!serviceOk) {
       runtimeTone = 'bad'
-      runtimeDetail = 'Needs attention'
-      runtimeMessage = 'The local model runtime is not responding.'
+      runtimeDetail = t('rows.runtime.needsAttention')
+      runtimeMessage = t('rows.runtime.notResponding')
       runtimeActions = [
-        { kind: 'link', label: 'View details', to: '/models' },
+        { kind: 'link', label: t('rows.viewDetails'), to: '/models' },
         {
           kind: 'button',
-          label: 'Retry',
+          label: t('rows.retry'),
           onClick: () => refreshMutation.mutate(),
           busy: refreshMutation.isPending,
         },
       ]
     } else if (!runtimeInstalled && !hasModel) {
       runtimeTone = 'warn'
-      runtimeDetail = 'Not set up'
-      runtimeMessage = 'Install a model to finish setting up the runtime.'
-      runtimeActions = [{ kind: 'link', label: 'Open Models', to: '/models' }]
+      runtimeDetail = t('rows.runtime.notSetUp')
+      runtimeMessage = t('rows.runtime.installModel')
+      runtimeActions = [{ kind: 'link', label: t('rows.openModels'), to: '/models' }]
     } else if (running.length === 0) {
-      runtimeDetail = 'Idle'
+      runtimeDetail = t('rows.runtime.idle')
     } else {
-      runtimeDetail = `${running.length} ${running.length === 1 ? 'model' : 'models'} running`
+      runtimeDetail = t('rows.runtime.running', { count: running.length })
     }
     out.push({
       id: 'runtime',
-      label: 'Model runtime',
+      label: t('rows.runtime.label'),
       tone: runtimeTone,
       detail: runtimeDetail,
       message: runtimeMessage,
@@ -309,9 +290,9 @@ export function DiagnosticsPage() {
 
     out.push({
       id: 'database',
-      label: 'Local database',
+      label: t('rows.database.label'),
       tone: serviceOk ? 'ok' : 'bad',
-      detail: serviceOk ? 'Healthy' : 'Unavailable',
+      detail: serviceOk ? t('rows.healthy') : t('rows.unavailable'),
     })
 
     if (offlineNodes.length > 0) {
@@ -319,42 +300,36 @@ export function DiagnosticsPage() {
       const ago = relativeAgo(offlineNodes[0]?.last_seen_at)
       out.push({
         id: 'bifrost',
-        label: 'Bifrost networking',
+        label: t('rows.bifrost.label'),
         tone: 'warn',
-        detail: `${offlineNodes.length} ${offlineNodes.length === 1 ? 'computer' : 'computers'} offline`,
+        detail: t('rows.bifrost.offline', { count: offlineNodes.length }),
         message: ago
-          ? `${names} ${offlineNodes.length === 1 ? 'has' : 'have'} not responded for ${ago}.`
-          : `${names} ${offlineNodes.length === 1 ? 'is' : 'are'} not responding.`,
+          ? t('rows.bifrost.silentFor', { count: offlineNodes.length, names, ago })
+          : t('rows.bifrost.silent', { count: offlineNodes.length, names }),
         actions: [
           {
             kind: 'button',
-            label: 'Retry',
+            label: t('rows.retry'),
             onClick: () => refreshMutation.mutate(),
             busy: refreshMutation.isPending,
           },
-          { kind: 'link', label: 'Open Computers', to: '/nodes' },
+          { kind: 'link', label: t('rows.openComputers'), to: '/nodes' },
         ],
       })
     } else {
       out.push({
         id: 'bifrost',
-        label: 'Bifrost networking',
+        label: t('rows.bifrost.label'),
         tone: connected > 0 || serviceOk ? 'ok' : 'warn',
-        detail:
-          connected > 0
-            ? `${connected} ${connected === 1 ? 'computer' : 'computers'} connected`
-            : 'No computers found',
-        message:
-          connected === 0
-            ? 'Add another computer or check Find other computers in Settings.'
-            : undefined,
+        detail: connected > 0 ? t('rows.bifrost.connected', { count: connected }) : t('rows.bifrost.none'),
+        message: connected === 0 ? t('rows.bifrost.noneHint') : undefined,
         actions:
           connected === 0
             ? [
-                { kind: 'link', label: 'Open Computers', to: '/nodes' },
+                { kind: 'link', label: t('rows.openComputers'), to: '/nodes' },
                 {
                   kind: 'button',
-                  label: 'Retry',
+                  label: t('rows.retry'),
                   onClick: () => refreshMutation.mutate(),
                   busy: refreshMutation.isPending,
                 },
@@ -367,37 +342,30 @@ export function DiagnosticsPage() {
       diskAvail != null && diskAvail > 0 && diskAvail < 5 * 1024 ** 3
     out.push({
       id: 'storage',
-      label: 'Storage',
+      label: t('rows.storage.label'),
       tone: !serviceOk ? 'bad' : storageTight ? 'warn' : 'ok',
       detail:
         diskAvail != null && diskAvail > 0
-          ? `${formatBytes(diskAvail)} available`
+          ? t('rows.storage.available', { size: formatBytes(diskAvail) })
           : serviceOk
-            ? 'Healthy'
-            : 'Unavailable',
+            ? t('rows.healthy')
+            : t('rows.unavailable'),
       message:
         modelsBytes > 0
-          ? `Models use about ${formatBytes(modelsBytes)} on this computer.`
+          ? t('rows.storage.modelsUse', { size: formatBytes(modelsBytes) })
           : storageTight
-            ? 'Free up disk space before installing more models.'
+            ? t('rows.storage.freeUp')
             : undefined,
-      actions: storageTight
-        ? [{ kind: 'link', label: 'Manage models', to: '/models' }]
-        : undefined,
+      actions: storageTight ? [{ kind: 'link', label: t('rows.manageModels'), to: '/models' }] : undefined,
     })
 
     out.push({
       id: 'api',
-      label: 'API',
+      label: t('rows.api.label'),
       tone: serviceOk ? 'ok' : 'bad',
-      detail: serviceOk ? apiDetail : 'Unavailable',
-      message:
-        settings?.lan_api_enabled
-          ? 'Other devices on your network can reach the API when authorized.'
-          : undefined,
-      actions: serviceOk
-        ? [{ kind: 'link', label: 'API settings', to: '/api-access' }]
-        : undefined,
+      detail: serviceOk ? apiDetail : t('rows.unavailable'),
+      message: settings?.lan_api_enabled ? t('rows.api.lanHint') : undefined,
+      actions: serviceOk ? [{ kind: 'link', label: t('rows.apiSettings'), to: '/api-access' }] : undefined,
     })
 
     return out
@@ -414,6 +382,7 @@ export function DiagnosticsPage() {
     settings?.lan_api_enabled,
     refreshMutation,
     tick,
+    t,
   ])
 
   const allOk = rows.every((r) => r.tone === 'ok')
@@ -463,11 +432,7 @@ export function DiagnosticsPage() {
     }
   }
 
-  const headline = !serviceOk
-    ? 'Something needs attention.'
-    : hasWarn
-      ? 'Mostly healthy — one thing needs a look.'
-      : 'Everything is working normally.'
+  const headline = !serviceOk ? t('page.attention') : hasWarn ? t('page.mostly') : t('page.normal')
 
   return (
     <div className="mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-6">
@@ -476,9 +441,7 @@ export function DiagnosticsPage() {
           {!serviceOk ? <Ratatoskr state="error" size={96} /> : null}
           <div className="min-w-0">
             <RealmKicker />
-            <h1 className="page-title">
-              Yggdrasil health
-            </h1>
+            <h1 className="page-title">{t('page.title')}</h1>
             <p className="page-subtitle">{headline}</p>
           </div>
         </div>
@@ -489,29 +452,23 @@ export function DiagnosticsPage() {
             disabled={diagnosticsMutation.isPending}
             onClick={() => diagnosticsMutation.mutate()}
           >
-            {diagnosticsMutation.isPending ? 'Creating…' : 'Export diagnostics'}
+            {diagnosticsMutation.isPending ? t('page.creating') : t('page.export')}
           </button>
-          <p className="mt-1.5 max-w-[14rem] text-left text-[11px] text-ink-faint sm:text-right">
-            Creates a troubleshooting bundle. Secrets are excluded.
-          </p>
+          <p className="mt-1.5 max-w-[14rem] text-left text-[11px] text-ink-faint sm:text-right">{t('page.exportHint')}</p>
         </div>
       </header>
 
       <section className="card min-w-0 space-y-1">
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line/50 pb-3">
           <div>
-            <p className="label-caps text-[10px] text-ink-faint">Overall status</p>
+            <p className="label-caps text-[10px] text-ink-faint">{t('page.overall')}</p>
             <p
               className={[
                 'mt-1 text-sm font-medium',
                 allOk ? 'text-success' : hasWarn ? 'text-warning' : 'text-danger',
               ].join(' ')}
             >
-              {allOk
-                ? '✓ All systems operational'
-                : !serviceOk
-                  ? '⚠ Needs attention'
-                  : '⚠ Check items below'}
+              {allOk ? t('page.allOk') : !serviceOk ? t('page.needsAttention') : t('page.checkBelow')}
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs text-ink-faint">
@@ -522,7 +479,7 @@ export function DiagnosticsPage() {
               disabled={refreshMutation.isPending || healthQuery.isFetching}
               onClick={() => refreshMutation.mutate()}
             >
-              {refreshMutation.isPending || healthQuery.isFetching ? 'Checking…' : 'Refresh'}
+              {refreshMutation.isPending || healthQuery.isFetching ? t('page.checking') : t('page.refresh')}
             </button>
           </div>
         </div>
@@ -534,34 +491,27 @@ export function DiagnosticsPage() {
         </ul>
 
         {!hasModel && serviceOk && (
-          <p className="border-t border-line/50 pt-3 text-sm text-ink-muted">
-            Tip: install a model in Models before chatting.
-          </p>
+          <p className="border-t border-line/50 pt-3 text-sm text-ink-muted">{t('page.tip')}</p>
         )}
       </section>
 
       {diagnosticsMutation.isSuccess && diagnosticsMutation.data && (
         <div className="min-w-0 rounded-lg bg-primary-soft px-4 py-3 text-sm text-ink">
-          Diagnostics bundle created
           {advancedMode ? (
-            <>
-              {' '}
-              at{' '}
-              <code
-                className="break-anywhere font-mono text-xs"
-                title={diagnosticsMutation.data.path}
-              >
-                {diagnosticsMutation.data.path}
-              </code>
-            </>
+            <Trans
+              t={t}
+              i18nKey="page.bundleAt"
+              values={{ path: diagnosticsMutation.data.path }}
+              components={{ path: <code className="break-anywhere font-mono text-xs" title={diagnosticsMutation.data.path} /> }}
+            />
           ) : (
-            '. You can share this file when asking for help.'
+            t('page.bundleShare')
           )}
         </div>
       )}
       {diagnosticsMutation.isError && (
         <div className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">
-          Could not create diagnostics bundle. Check that the daemon is running.
+          {t('page.bundleFailed')}
         </div>
       )}
 
@@ -574,16 +524,16 @@ export function DiagnosticsPage() {
 
       {advancedMode && (
         <section className="card space-y-3">
-          <h2 className="section-title">Environment</h2>
+          <h2 className="section-title">{t('env.title')}</h2>
           <dl className="grid gap-2 text-sm sm:grid-cols-2">
             <div className="flex justify-between gap-2 sm:block">
-              <dt className="text-ink-muted">Version</dt>
+              <dt className="text-ink-muted">{t('env.version')}</dt>
               <dd className="tabular-nums text-ink">
                 {displayVersion(versionQuery.data?.version ?? healthQuery.data?.version) || '—'}
               </dd>
             </div>
             <div className="flex justify-between gap-2 sm:block">
-              <dt className="text-ink-muted">API bind</dt>
+              <dt className="text-ink-muted">{t('env.apiBind')}</dt>
               <dd className="font-mono text-xs text-ink">
                 {settings
                   ? `${settings.api_host}:${settings.api_port}`
@@ -591,13 +541,13 @@ export function DiagnosticsPage() {
               </dd>
             </div>
             <div className="flex justify-between gap-2 sm:block">
-              <dt className="text-ink-muted">Node</dt>
+              <dt className="text-ink-muted">{t('env.node')}</dt>
               <dd className="truncate text-ink" title={settings?.node_id}>
                 {settings?.node_name ?? '—'}
               </dd>
             </div>
             <div className="flex justify-between gap-2 sm:block">
-              <dt className="text-ink-muted">Data directory</dt>
+              <dt className="text-ink-muted">{t('env.dataDir')}</dt>
               <dd
                 className="break-anywhere font-mono text-xs text-ink"
                 title={settings?.data_dir}
@@ -616,7 +566,7 @@ export function DiagnosticsPage() {
             className="btn-secondary"
             onClick={() => setShowLogs((v) => !v)}
           >
-            {showLogs ? 'Hide logs' : 'View logs'}
+            {showLogs ? t('logs.hide') : t('logs.view')}
           </button>
         </div>
       )}
@@ -625,7 +575,7 @@ export function DiagnosticsPage() {
         <div className="grid h-[min(36rem,calc(100dvh-14rem))] min-h-[20rem] min-w-0 gap-4 lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)]">
           <aside className="card flex min-h-0 min-w-0 flex-col overflow-hidden">
             <div className="mb-2 flex shrink-0 items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold text-ink">Log files</h2>
+              <h2 className="text-sm font-semibold text-ink">{t('logs.files')}</h2>
               <label className="flex items-center gap-1.5 text-xs text-ink-muted">
                 <input
                   type="checkbox"
@@ -633,15 +583,12 @@ export function DiagnosticsPage() {
                   onChange={(e) => setAutoRefresh(e.target.checked)}
                   className="rounded border-line"
                 />
-                Live
+                {t('logs.live')}
               </label>
             </div>
-            {logsQuery.isLoading && <LoadingSpinner label="Loading logs…" />}
+            {logsQuery.isLoading && <LoadingSpinner label={t('logs.loading')} />}
             {!logsQuery.isLoading && logEntries.length === 0 && (
-              <p className="mt-3 text-sm text-ink-muted">
-                No log files yet. They appear after the app has started and performed
-                work.
-              </p>
+              <p className="mt-3 text-sm text-ink-muted">{t('logs.none')}</p>
             )}
             <ul className="mt-3 min-h-0 flex-1 space-y-1 overflow-y-auto overflow-x-hidden">
               {logEntries.map((entry) => (
@@ -674,12 +621,8 @@ export function DiagnosticsPage() {
           <section className="card flex min-h-0 min-w-0 flex-col overflow-hidden">
             {!selectedName ? (
               <div className="flex flex-1 flex-col justify-center">
-                <p className="font-display text-lg font-semibold text-ink">
-                  Select a log
-                </p>
-                <p className="mt-1 max-w-prose text-sm text-ink-muted">
-                  Choose a log file on the left to inspect recent output.
-                </p>
+                <p className="font-display text-lg font-semibold text-ink">{t('logs.select')}</p>
+                <p className="mt-1 max-w-prose text-sm text-ink-muted">{t('logs.selectHint')}</p>
               </div>
             ) : (
               <>
@@ -689,31 +632,23 @@ export function DiagnosticsPage() {
                       {logQuery.data?.label ?? selectedMeta?.label ?? selectedName}
                     </p>
                     <p className="text-xs text-ink-muted">
-                      {logQuery.data?.truncated
-                        ? 'Showing the most recent portion of this file'
-                        : 'Full file'}
+                      {logQuery.data?.truncated ? t('logs.recent') : t('logs.full')}
                       {selectedMeta
                         ? ` · ${formatBytes(selectedMeta.size_bytes)}`
                         : ''}
                     </p>
                   </div>
                   <button type="button" className="btn-secondary shrink-0" onClick={handleCopy}>
-                    {copyState === 'copied'
-                      ? 'Copied'
-                      : copyState === 'failed'
-                        ? 'Copy failed'
-                        : 'Copy'}
+                    {copyState === 'copied' ? t('logs.copied') : copyState === 'failed' ? t('logs.copyFailed') : t('logs.copy')}
                   </button>
                 </div>
 
-                {logQuery.isLoading && <LoadingSpinner label="Reading log…" />}
+                {logQuery.isLoading && <LoadingSpinner label={t('logs.reading')} />}
                 {logQuery.isError && (
-                  <p className="text-sm text-danger">
-                    Could not read this log. It may have been rotated or removed.
-                  </p>
+                  <p className="text-sm text-danger">{t('logs.readFailed')}</p>
                 )}
                 {logQuery.data && (
-                  <pre className="log-panel flex-1">{logQuery.data.content || '(empty)'}</pre>
+                  <pre className="log-panel flex-1">{logQuery.data.content || t('logs.empty')}</pre>
                 )}
               </>
             )}
@@ -725,6 +660,7 @@ export function DiagnosticsPage() {
 }
 
 function ToolActivityPanel() {
+  const { t } = useTranslation('diagnostics')
   const activityQuery = useQuery({
     queryKey: ['tool-activity'],
     queryFn: () => api.toolActivity(),
@@ -733,9 +669,9 @@ function ToolActivityPanel() {
   const rows = [...(activityQuery.data ?? [])].reverse().slice(0, 12)
   return (
     <section className="card space-y-2">
-      <h2 className="section-title">Tool activity</h2>
+      <h2 className="section-title">{t('tools.title')}</h2>
       {rows.length === 0 ? (
-        <p className="text-sm text-ink-muted">No tool calls yet in this session.</p>
+        <p className="text-sm text-ink-muted">{t('tools.none')}</p>
       ) : (
         <ul className="space-y-1 text-xs text-ink-muted">
           {rows.map((row, index) => (

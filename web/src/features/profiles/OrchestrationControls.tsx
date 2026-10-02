@@ -1,71 +1,23 @@
+import { useTranslation } from 'react-i18next'
 import type { OrchestrationPolicy } from '@/types/api'
 
-type Choice = { value: string; label: string }
-
-const DEFAULT: Choice = { value: '', label: 'Default' }
-
-const SELECTS: { key: keyof OrchestrationPolicy; label: string; help: string; options: Choice[] }[] = [
-  {
-    key: 'effort',
-    label: 'Reasoning level',
-    help: 'Used when a chat leaves effort on Auto.',
-    options: [DEFAULT, { value: 'fast', label: 'Fast' }, { value: 'balanced', label: 'Balanced' }, { value: 'thorough', label: 'Thorough' }],
-  },
-  {
-    key: 'planning',
-    label: 'Planning',
-    help: 'Work through requests with several parts in parts. Always also splits requests with no obvious parts.',
-    options: [
-      DEFAULT,
-      { value: 'on', label: 'When a request has parts' },
-      { value: 'always', label: 'Always' },
-      { value: 'off', label: 'Never plan' },
-    ],
-  },
-  {
-    key: 'parallel',
-    label: 'Parallelism',
-    help: 'Look up independent parts side by side.',
-    options: [DEFAULT, { value: 'on', label: 'Side by side' }, { value: 'off', label: 'One at a time' }],
-  },
-  {
-    key: 'verification',
-    label: 'Verification',
-    help: 'Check figures against the sources before answering.',
-    options: [
-      DEFAULT,
-      { value: 'off', label: 'Off' },
-      { value: 'check', label: 'Check and report' },
-      { value: 'correct', label: 'Check and correct once' },
-      { value: 'thorough', label: 'Check and correct twice' },
-    ],
-  },
-  {
-    key: 'memory',
-    label: 'Memory',
-    help: 'Use persistent memories in this profile’s chats.',
-    options: [DEFAULT, { value: 'off', label: 'Off for this profile' }],
-  },
-  {
-    key: 'fallback',
-    label: 'Fallback',
-    help: 'Answer on another model when the chosen one fails.',
-    options: [DEFAULT, { value: 'off', label: 'Show the failure instead' }],
-  },
+// Each control's label and help, and each option's name, are
+// profiles:controls.<key> in the catalog; '' is the default.
+const SELECTS: { key: keyof OrchestrationPolicy; options: string[] }[] = [
+  { key: 'effort', options: ['', 'fast', 'balanced', 'thorough'] },
+  { key: 'planning', options: ['', 'on', 'always', 'off'] },
+  { key: 'parallel', options: ['', 'on', 'off'] },
+  { key: 'verification', options: ['', 'off', 'check', 'correct', 'thorough'] },
+  { key: 'memory', options: ['', 'off'] },
+  { key: 'fallback', options: ['', 'off'] },
 ]
 
-const NUMBERS: { key: keyof OrchestrationPolicy; label: string; help: string; min: number; max: number; step?: number }[] = [
-  { key: 'max_workers', label: 'Workers', help: 'Most parts in a plan (2–8).', min: 2, max: 8 },
-  { key: 'max_tool_calls', label: 'Tool calls', help: 'Most tool calls in one turn (1–50).', min: 1, max: 50 },
-  {
-    key: 'retries',
-    label: 'Retries',
-    help: 'Tries after a model fails (1–3): the same model on another computer, then another model.',
-    min: 1,
-    max: 3,
-  },
-  { key: 'timeout_seconds', label: 'Time limit (s)', help: 'Stop a turn that runs longer (10–3600).', min: 10, max: 3600 },
-  { key: 'context_share', label: 'Context budget', help: 'Most of the window earlier messages may use (0.1–0.9).', min: 0.1, max: 0.9, step: 0.05 },
+const NUMBERS: { key: keyof OrchestrationPolicy; min: number; max: number; step?: number }[] = [
+  { key: 'max_workers', min: 2, max: 8 },
+  { key: 'max_tool_calls', min: 1, max: 50 },
+  { key: 'retries', min: 1, max: 3 },
+  { key: 'timeout_seconds', min: 10, max: 3600 },
+  { key: 'context_share', min: 0.1, max: 0.9, step: 0.05 },
 ]
 
 /** Drops empty controls, so a profile keeps every default it does not change. */
@@ -95,13 +47,14 @@ export function OrchestrationControls({
   /** The controls to show; all of them when omitted. */
   only?: (keyof OrchestrationPolicy)[]
 }) {
+  const { t } = useTranslation('profiles')
   const set = (patch: OrchestrationPolicy) => onChange({ ...value, ...patch })
   const shown = (key: keyof OrchestrationPolicy) => !only || only.includes(key)
   return (
     <div className="grid gap-3 sm:grid-cols-2">
         {SELECTS.filter((s) => shown(s.key)).map((s) => (
-          <label key={s.key} className="block text-sm" title={s.help}>
-            <span className="text-ink-muted">{s.label}</span>
+          <label key={s.key} className="block text-sm" title={t(`controls.${s.key}.help`)}>
+            <span className="text-ink-muted">{t(`controls.${s.key}.label`)}</span>
             <select
               className="field mt-1 w-full py-1 text-sm"
               value={(value[s.key] as string | undefined) ?? ''}
@@ -109,29 +62,29 @@ export function OrchestrationControls({
               onChange={(e) => set({ [s.key]: e.target.value } as OrchestrationPolicy)}
             >
               {s.options.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {o.label}
+                <option key={o} value={o}>
+                  {o ? t(`controls.${s.key}.${o}`) : t('controls.default')}
                 </option>
               ))}
             </select>
-            <span className="mt-0.5 block text-xs text-ink-faint">{s.help}</span>
+            <span className="mt-0.5 block text-xs text-ink-faint">{t(`controls.${s.key}.help`)}</span>
           </label>
         ))}
         {NUMBERS.filter((n) => shown(n.key)).map((n) => (
-          <label key={n.key} className="block text-sm" title={n.help}>
-            <span className="text-ink-muted">{n.label}</span>
+          <label key={n.key} className="block text-sm" title={t(`controls.${n.key}.help`)}>
+            <span className="text-ink-muted">{t(`controls.${n.key}.label`)}</span>
             <input
               className="field mt-1 w-full py-1 text-sm"
               type="number"
               min={n.min}
               max={n.max}
               step={n.step ?? 1}
-              placeholder="Default"
+              placeholder={t('controls.default')}
               value={(value[n.key] as number | undefined) || ''}
               disabled={disabled}
               onChange={(e) => set({ [n.key]: e.target.value === '' ? 0 : Number(e.target.value) } as OrchestrationPolicy)}
             />
-            <span className="mt-0.5 block text-xs text-ink-faint">{n.help}</span>
+            <span className="mt-0.5 block text-xs text-ink-faint">{t(`controls.${n.key}.help`)}</span>
           </label>
         ))}
     </div>

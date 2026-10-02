@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { api } from '@/lib/api'
 import { errorText } from '@/features/train/display'
@@ -17,6 +18,7 @@ export function KnowledgePicker({
   onChange: (ids: string[]) => void
   disabled?: boolean
 }) {
+  const { t } = useTranslation('knowledge')
   const queryClient = useQueryClient()
   const sources = useQuery({ queryKey: ['knowledge'], queryFn: () => api.listKnowledge() })
   const [path, setPath] = useState('')
@@ -36,22 +38,22 @@ export function KnowledgePicker({
   return (
     <div className="space-y-2">
       {attached.length === 0 ? (
-        <p className="text-sm text-ink-muted">No knowledge connected.</p>
+        <p className="text-sm text-ink-muted">{t('picker.none')}</p>
       ) : (
         <ul className="space-y-1">
           {attached.map((s) => (
             <li key={s.id} className="flex items-center gap-2 text-sm">
               <span className="min-w-0 flex-1 truncate text-ink" title={s.path ?? s.filename}>
-                {s.name} <span className="text-xs text-ink-faint">· {s.chunk_count} passages</span>
+                {s.name} <span className="text-xs text-ink-faint">· {t('row.passages', { count: s.chunk_count })}</span>
               </span>
               <button
                 type="button"
                 className="btn-secondary px-2 py-0.5 text-xs"
                 disabled={disabled}
-                aria-label={`Disconnect ${s.name}`}
+                aria-label={t('picker.disconnect', { name: s.name })}
                 onClick={() => onChange(selected.filter((id) => id !== s.id))}
               >
-                Remove
+                {t('picker.remove')}
               </button>
             </li>
           ))}
@@ -62,10 +64,10 @@ export function KnowledgePicker({
           className="field w-full text-sm"
           value=""
           disabled={disabled}
-          aria-label="Connect existing knowledge"
+          aria-label={t('picker.connectExisting')}
           onChange={(e) => e.target.value && onChange([...selected, e.target.value])}
         >
-          <option value="">Connect existing knowledge…</option>
+          <option value="">{t('picker.connectExistingOption')}</option>
           {available.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
@@ -85,21 +87,17 @@ export function KnowledgePicker({
           value={path}
           disabled={disabled}
           onChange={(e) => setPath(e.target.value)}
-          placeholder="Or a file or folder, like ~/Documents/catalog"
-          aria-label="File or folder path"
+          placeholder={t('picker.pathPlaceholder')}
+          aria-label={t('picker.path')}
         />
         <button type="submit" className="btn-secondary px-3 py-1 text-xs" disabled={disabled || !path.trim() || connect.isPending}>
-          {connect.isPending ? 'Indexing…' : 'Connect'}
+          {connect.isPending ? t('picker.indexing') : t('picker.connect')}
         </button>
       </form>
       {connect.error && <p className="text-xs text-danger">{errorText(connect.error)}</p>}
       {connect.data?.status === 'failed' && <p className="text-xs text-danger">{connect.data.error}</p>}
       <p className="text-xs text-ink-faint">
-        Manage sources, edit pasted content, and try searches on the{' '}
-        <Link to="/knowledge" className="underline">
-          Knowledge
-        </Link>{' '}
-        page.
+        <Trans t={t} i18nKey="picker.manage" components={{ link: <Link to="/knowledge" className="underline" /> }} />
       </p>
     </div>
   )

@@ -20,7 +20,7 @@ import type {
   ToolRequestedPayload,
 } from '@/types/api'
 import { capabilityGap, type CapabilityGap } from '@/features/models/capabilityGap'
-import { activeCapabilityLabels, setCapability } from '@/features/profiles/capabilities'
+import { activeCapabilities, capabilityLabel, setCapability } from '@/features/profiles/capabilities'
 import { isTeamProfile } from '@/features/profiles/profilePresentation'
 import { canChat, modelToolAssessment } from '@/features/models/modelPresentation'
 import { CapabilityNotice } from './CapabilityNotice'
@@ -386,8 +386,8 @@ export function ChatPage() {
             tool.policy !== 'deny',
         )
   const chatToolAssessment = chatModel ? modelToolAssessment(chatModel, { terminalAllowed }) : null
-  const capabilityLine = activeCapabilityLabels(activeProfile?.tools).map((label) =>
-    label === 'Internet' ? t('composer.web') : label,
+  const capabilityLine = activeCapabilities(activeProfile?.tools).map((id) =>
+    id === 'internet' ? t('composer.web') : capabilityLabel(id),
   )
   const activeIsTeam = isTeamProfile(activeProfile)
 

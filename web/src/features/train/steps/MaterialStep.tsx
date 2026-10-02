@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import { MAX_UPLOAD_BYTES, readUpload, UPLOAD_ACCEPT } from '@/lib/upload'
 import type { ClassifyResult, MaterialUse, SpecializedAIView, TrainingMaterial } from '@/types/api'
 import { ConceptCards } from '../ConceptCards'
 import { SampleFiles } from '../SampleFiles'
-import { errorText, useDescriptions, useLabels } from '../display'
+import { errorText, MATERIAL_USES, materialUseDescription, materialUseLabel } from '../display'
 
 
 export function UseBadge({ use }: { use: MaterialUse }) {
@@ -15,23 +16,24 @@ export function UseBadge({ use }: { use: MaterialUse }) {
       : use === 'knowledge'
         ? 'bg-mimir/15 text-mimir'
         : 'bg-accent-soft text-accent'
-  return <span className={['status-chip', tone].join(' ')}>{useLabels[use]}</span>
+  return <span className={['status-chip', tone].join(' ')}>{materialUseLabel(use)}</span>
 }
 
 export function MaterialStep({ view, onNext }: { view: SpecializedAIView; onNext: () => void }) {
+  const { t } = useTranslation('train')
   const [mode, setMode] = useState<'file' | 'chats'>('file')
   return (
     <div className="space-y-4">
       <ConceptCards compact />
       <div className="card space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="section-title">Add material</h3>
+          <h3 className="section-title">{t('material.add')}</h3>
           <div className="flex gap-1.5">
             <button type="button" className={mode === 'file' ? 'btn-primary px-3 py-1 text-xs' : 'btn-secondary px-3 py-1 text-xs'} onClick={() => setMode('file')}>
-              File or paste
+              {t('material.filePaste')}
             </button>
             <button type="button" className={mode === 'chats' ? 'btn-primary px-3 py-1 text-xs' : 'btn-secondary px-3 py-1 text-xs'} onClick={() => setMode('chats')}>
-              Saved chats
+              {t('material.chats')}
             </button>
           </div>
         </div>
@@ -40,13 +42,14 @@ export function MaterialStep({ view, onNext }: { view: SpecializedAIView; onNext
       </div>
       <MaterialList view={view} />
       <button type="button" className="btn-primary px-3 py-1.5 text-sm" disabled={view.materials.length === 0} onClick={onNext}>
-        Continue
+        {t('material.continue')}
       </button>
     </div>
   )
 }
 
 function AddFile({ aiID }: { aiID: string }) {
+  const { t } = useTranslation('train')
   const queryClient = useQueryClient()
   const [filename, setFilename] = useState('')
   const [text, setText] = useState('')
@@ -92,7 +95,7 @@ function AddFile({ aiID }: { aiID: string }) {
   async function readFile(file: File) {
     setReadError('')
     if (file.size > MAX_UPLOAD_BYTES) {
-      setReadError('That file is larger than 20 MB. Connect it from Knowledge instead, which reads it from disk.')
+      setReadError(t('material.tooLarge'))
       return
     }
     const upload = await readUpload(file)
@@ -106,21 +109,19 @@ function AddFile({ aiID }: { aiID: string }) {
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
         <label className="btn-secondary cursor-pointer px-3 py-1.5 text-xs">
-          Choose a file
+          {t('material.chooseFile')}
           <input type="file" accept={UPLOAD_ACCEPT} className="sr-only" onChange={(e) => e.target.files?.[0] && void readFile(e.target.files[0])} />
         </label>
         <span className="text-xs text-ink-faint">
-          {filename ? filename : 'or paste below. JSONL chats, Q&A tables, CSV, Excel, PDF, Markdown, and text work.'}
+          {filename ? filename : t('material.pasteHint')}
         </span>
       </div>
       {binary ? (
         <p className="rounded-lg bg-raised p-3 text-sm text-ink-muted">
-          {filename} is ready.{' '}
-          {filename.toLowerCase().endsWith('.pdf')
-            ? 'Yggdrasil reads its text to classify it.'
-            : 'Yggdrasil reads the first sheet to classify it.'}{' '}
+          {t('material.ready', { filename })}{' '}
+          {filename.toLowerCase().endsWith('.pdf') ? t('material.readsPdf') : t('material.readsSheet')}{' '}
           <button type="button" className="underline" onClick={() => { setBinary(null); setFilename('') }}>
-            Clear
+            {t('material.clear')}
           </button>
         </p>
       ) : (
@@ -128,17 +129,17 @@ function AddFile({ aiID }: { aiID: string }) {
         className="field min-h-36 w-full font-mono text-xs"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder={'Q: A question your AI should handle\nA: The answer you want it to give\n\nQ: …'}
-        aria-label="Material"
+        placeholder={t('material.placeholder')}
+        aria-label={t('material.label')}
       />
       )}
       {readError && <p className="text-sm text-danger">{readError}</p>}
       {rec && (
         <div className="rounded-lg bg-raised p-3 text-sm">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-ink">Yggdrasil recommends</span>
+            <span className="text-ink">{t('material.recommends')}</span>
             <UseBadge use={rec.use} />
-            {rec.example_count > 0 && <span className="text-xs text-ink-muted">{rec.example_count} examples found</span>}
+            {rec.example_count > 0 && <span className="text-xs text-ink-muted">{t('material.examplesFound', { count: rec.example_count })}</span>}
           </div>
           <ul className="mt-2 list-disc space-y-0.5 pl-5 text-ink-muted">
             {rec.reasons.map((r) => (
@@ -146,14 +147,14 @@ function AddFile({ aiID }: { aiID: string }) {
             ))}
           </ul>
           <fieldset className="mt-3 space-y-1.5">
-            <legend className="text-xs font-medium text-ink">Use this material for</legend>
-            {(['training', 'knowledge', 'both'] as MaterialUse[]).map((u) => (
+            <legend className="text-xs font-medium text-ink">{t('material.useFor')}</legend>
+            {MATERIAL_USES.map((u) => (
               <label key={u} className="flex items-start gap-2">
                 <input
                   type="radio"
                   name="use"
                   value={u}
-                  aria-label={useLabels[u]}
+                  aria-label={materialUseLabel(u)}
                   className="mt-1"
                   checked={use === u}
                   onChange={() => {
@@ -162,9 +163,9 @@ function AddFile({ aiID }: { aiID: string }) {
                   }}
                 />
                 <span>
-                  <span className="text-ink">{useLabels[u]}</span>
-                  {u === rec.use && <span className="text-xs text-ink-faint"> (recommended)</span>}
-                  <span className="block text-xs text-ink-muted">{useDescriptions[u]}</span>
+                  <span className="text-ink">{materialUseLabel(u)}</span>
+                  {u === rec.use && <span className="text-xs text-ink-faint">{t('material.recommendedTag')}</span>}
+                  <span className="block text-xs text-ink-muted">{materialUseDescription(u)}</span>
                 </span>
               </label>
             ))}
@@ -180,13 +181,14 @@ function AddFile({ aiID }: { aiID: string }) {
         disabled={(!text.trim() && !binary) || !preview || Boolean(preview.error) || add.isPending}
         onClick={() => add.mutate()}
       >
-        {add.isPending ? 'Adding…' : 'Add material'}
+        {add.isPending ? t('material.adding') : t('material.addMaterial')}
       </button>
     </div>
   )
 }
 
 function AddChats({ aiID }: { aiID: string }) {
+  const { t } = useTranslation('train')
   const queryClient = useQueryClient()
   const conversations = useQuery({ queryKey: ['conversations'], queryFn: () => api.getConversations() })
   const [picked, setPicked] = useState<string[]>([])
@@ -200,11 +202,8 @@ function AddChats({ aiID }: { aiID: string }) {
   const list = conversations.data ?? []
   return (
     <div className="space-y-3">
-      <p className="text-sm text-ink-muted">
-        Pick chats where the answers are the kind you want. Each becomes one training example you can edit in the next
-        step.
-      </p>
-      {list.length === 0 && <p className="text-sm text-ink-faint">No saved chats.</p>}
+      <p className="text-sm text-ink-muted">{t('material.chatsHint')}</p>
+      {list.length === 0 && <p className="text-sm text-ink-faint">{t('material.noChats')}</p>}
       <ul className="max-h-64 space-y-1 overflow-y-auto">
         {list.map((c) => (
           <li key={c.id}>
@@ -214,20 +213,21 @@ function AddChats({ aiID }: { aiID: string }) {
                 checked={picked.includes(c.id)}
                 onChange={(e) => setPicked(e.target.checked ? [...picked, c.id] : picked.filter((id) => id !== c.id))}
               />
-              <span className="text-ink">{c.title || 'Untitled chat'}</span>
+              <span className="text-ink">{c.title || t('material.untitledChat')}</span>
             </label>
           </li>
         ))}
       </ul>
       {add.error && <p className="text-sm text-danger">{errorText(add.error)}</p>}
       <button type="button" className="btn-primary px-3 py-1.5 text-sm" disabled={picked.length === 0 || add.isPending} onClick={() => add.mutate()}>
-        Add {picked.length || ''} {picked.length === 1 ? 'chat' : 'chats'}
+        {picked.length ? t('material.addChats', { count: picked.length }) : t('material.addChatsNone')}
       </button>
     </div>
   )
 }
 
 function MaterialList({ view }: { view: SpecializedAIView }) {
+  const { t } = useTranslation('train')
   const queryClient = useQueryClient()
   const remove = useMutation({
     mutationFn: (m: TrainingMaterial) => api.deleteMaterial(view.id, m.id),
@@ -236,7 +236,7 @@ function MaterialList({ view }: { view: SpecializedAIView }) {
   if (view.materials.length === 0) return null
   return (
     <div className="card space-y-2">
-      <h3 className="section-title">Material</h3>
+      <h3 className="section-title">{t('material.list')}</h3>
       <ul className="divide-y divide-line/60">
         {view.materials.map((m) => (
           <li key={m.id} className="flex flex-wrap items-start gap-3 py-2">
@@ -244,12 +244,14 @@ function MaterialList({ view }: { view: SpecializedAIView }) {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium text-ink">{m.name}</span>
                 <UseBadge use={m.use} />
-                {m.use !== m.recommended.use && <span className="text-xs text-ink-faint">recommended {useLabels[m.recommended.use]}</span>}
+                {m.use !== m.recommended.use && (
+                  <span className="text-xs text-ink-faint">{t('material.recommendedUse', { use: materialUseLabel(m.recommended.use) })}</span>
+                )}
               </div>
               <p className="mt-0.5 text-xs text-ink-muted">
-                {m.example_count > 0 && `${m.example_count} examples`}
+                {m.example_count > 0 && t('material.examples', { count: m.example_count })}
                 {m.example_count > 0 && m.knowledge_source_id && ' · '}
-                {m.knowledge_source_id && 'Connected as knowledge'}
+                {m.knowledge_source_id && t('material.connected')}
               </p>
               {m.warning && <p className="mt-1 text-xs text-warning">{m.warning}</p>}
             </div>
@@ -258,10 +260,10 @@ function MaterialList({ view }: { view: SpecializedAIView }) {
               className="btn-secondary px-2 py-1 text-xs"
               disabled={remove.isPending}
               onClick={() => {
-                if (window.confirm(`Remove ${m.name}? Its examples and connected knowledge are removed too.`)) remove.mutate(m)
+                if (window.confirm(t('material.confirmRemove', { name: m.name }))) remove.mutate(m)
               }}
             >
-              Remove
+              {t('material.remove')}
             </button>
           </li>
         ))}

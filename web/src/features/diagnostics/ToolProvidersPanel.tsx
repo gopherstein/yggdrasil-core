@@ -1,19 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import type { ToolProvider } from '@/types/api'
 
-const TOOLS: { id: string; label: string }[] = [
-  { id: 'image.generate', label: 'Make images' },
-  { id: 'image.edit', label: 'Edit images' },
-  { id: 'speech.transcribe', label: 'Transcribe' },
-  { id: 'speech.synthesize', label: 'Read aloud' },
-]
+/** The tools shown; each is named at providers.tools.<id> in the catalog. */
+const TOOLS = ['image.generate', 'image.edit', 'speech.transcribe', 'speech.synthesize'] as const
 
-const STATE: Record<ToolProvider['state'], { text: string; tone: string }> = {
-  healthy: { text: 'Ready', tone: 'text-success' },
-  installing: { text: 'Installing', tone: 'text-warning' },
-  failed: { text: 'Failed', tone: 'text-danger' },
-  unavailable: { text: 'Not set up', tone: 'text-ink-faint' },
+const TONE: Record<ToolProvider['state'], string> = {
+  healthy: 'text-success',
+  installing: 'text-warning',
+  failed: 'text-danger',
+  unavailable: 'text-ink-faint',
 }
 
 /**
@@ -21,26 +18,24 @@ const STATE: Record<ToolProvider['state'], { text: string; tone: string }> = {
  * here runs on a computer that can, preferring one whose GPU does the work.
  */
 export function ToolProvidersPanel() {
+  const { t } = useTranslation('diagnostics')
   const query = useQuery({ queryKey: ['tools', 'providers'], queryFn: () => api.toolProviders(), retry: false, staleTime: 15_000 })
   const nodes = Array.isArray(query.data) ? query.data : []
   if (nodes.length === 0) return null
   return (
     <section className="card space-y-3">
       <div>
-        <h2 className="section-title">Tools on each computer</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          Images and speech run on whichever paired computer can run them, preferring one whose GPU does the work. Files
-          are sent to it for the job and the result comes back to this chat.
-        </p>
+        <h2 className="section-title">{t('providers.title')}</h2>
+        <p className="mt-1 text-sm text-ink-muted">{t('providers.description')}</p>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="text-xs text-ink-faint">
-              <th className="py-1.5 pr-3 font-medium">Computer</th>
-              {TOOLS.map((t) => (
-                <th key={t.id} className="py-1.5 pr-3 font-medium">
-                  {t.label}
+              <th className="py-1.5 pr-3 font-medium">{t('providers.computer')}</th>
+              {TOOLS.map((tool) => (
+                <th key={tool} className="py-1.5 pr-3 font-medium">
+                  {t(`providers.tools.${tool}`)}
                 </th>
               ))}
             </tr>
@@ -50,23 +45,25 @@ export function ToolProvidersPanel() {
               <tr key={node.node_id || node.name} className="border-t border-line/50 align-top">
                 <td className="py-2 pr-3">
                   <span className="text-ink">{node.name || node.node_id}</span>
-                  {node.local ? <span className="ml-1.5 text-xs text-ink-faint">this computer</span> : null}
+                  {node.local ? <span className="ml-1.5 text-xs text-ink-faint">{t('providers.thisComputer')}</span> : null}
                   {node.note ? <span className="block text-xs text-ink-faint">{node.note}</span> : null}
                 </td>
-                {TOOLS.map((t) => {
-                  const p = node.providers.find((x) => x.tool === t.id)
+                {TOOLS.map((tool) => {
+                  const p = node.providers.find((x) => x.tool === tool)
                   if (!p) {
                     return (
-                      <td key={t.id} className="py-2 pr-3 text-ink-faint">
+                      <td key={tool} className="py-2 pr-3 text-ink-faint">
                         –
                       </td>
                     )
                   }
-                  const s = STATE[p.state] ?? STATE.unavailable
+                  const state = p.state in TONE ? p.state : 'unavailable'
                   return (
-                    <td key={t.id} className="py-2 pr-3" title={p.reason || p.name}>
-                      <span className={s.tone}>{s.text}</span>
-                      {p.state === 'healthy' && p.accelerated ? <span className="ml-1.5 text-xs text-ink-faint">GPU</span> : null}
+                    <td key={tool} className="py-2 pr-3" title={p.reason || p.name}>
+                      <span className={TONE[state]}>{t(`providers.states.${state}`)}</span>
+                      {p.state === 'healthy' && p.accelerated ? (
+                        <span className="ml-1.5 text-xs text-ink-faint">{t('providers.gpu')}</span>
+                      ) : null}
                     </td>
                   )
                 })}

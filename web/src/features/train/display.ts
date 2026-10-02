@@ -1,3 +1,4 @@
+import i18n from '@/i18n'
 import { ApiError } from '@/lib/api'
 import type {
   ExampleFlag,
@@ -9,54 +10,64 @@ import type {
   TrainingState,
 } from '@/types/api'
 
-export const TRAINING_EXPLAINER =
-  'Training teaches your AI how to do its job. Connected knowledge gives it the current information it needs to do that job.'
-
-export const useLabels: Record<MaterialUse, string> = {
-  training: 'Training',
-  knowledge: 'Knowledge',
-  both: 'Both',
+/** What training is for, next to what connected knowledge is for. */
+export function trainingExplainer(): string {
+  return i18n.t('train:explainer')
 }
 
-export const useDescriptions: Record<MaterialUse, string> = {
-  training: 'Teaches how to respond. Baked into the model.',
-  knowledge: 'Looked up when needed. Stays current when you edit it.',
-  both: 'Examples teach the pattern; the facts stay connected.',
+export const MATERIAL_USES: MaterialUse[] = ['training', 'knowledge', 'both']
+
+export function materialUseLabel(use: MaterialUse): string {
+  return i18n.t(`train:uses.${use}.label`)
 }
 
-export const presetInfo: Record<TrainingPreset, { label: string; description: string }> = {
-  quick: { label: 'Quick', description: 'A short run to check the idea. Good for tone and format.' },
-  balanced: { label: 'Balanced', description: 'The default. Learns workflows and terminology from your examples.' },
-  quality: { label: 'Highest quality', description: 'Longer training on every layer. Needs more examples, memory, and time.' },
+export function materialUseDescription(use: MaterialUse): string {
+  return i18n.t(`train:uses.${use}.description`)
 }
 
-export const flagLabels: Record<ExampleFlag, { label: string; blocking: boolean; help: string }> = {
-  empty: { label: 'Empty', blocking: true, help: 'Has no question or answer.' },
-  no_answer: { label: 'No answer', blocking: true, help: 'The last turn is not an answer, so there is nothing to learn from.' },
-  duplicate: { label: 'Duplicate', blocking: true, help: 'Same as an earlier example. Only the first copy trains.' },
-  too_long: { label: 'Too long', blocking: true, help: 'Longer than the model can train on. Shorten it or split it.' },
-  short_answer: { label: 'Short answer', blocking: false, help: 'A one-word answer teaches little. It still trains.' },
-  volatile_facts: {
-    label: 'Changing facts',
-    blocking: false,
-    help: 'States a price, stock level, or SKU. The model may memorize a value that later changes. Keep those facts in knowledge.',
-  },
+export const PRESETS: TrainingPreset[] = ['quick', 'balanced', 'quality']
+
+export function presetLabel(preset: TrainingPreset): string {
+  return i18n.t(`train:presets.${preset}.label`)
 }
 
-const stateLabels: Record<TrainingState, string> = {
-  queued: 'Queued',
-  preparing_dataset: 'Preparing',
-  loading_model: 'Loading model',
-  training: 'Training',
-  exporting: 'Exporting',
-  evaluating: 'Testing',
-  complete: 'Complete',
-  failed: 'Failed',
-  cancelled: 'Cancelled',
+export function presetDescription(preset: TrainingPreset): string {
+  return i18n.t(`train:presets.${preset}.description`)
 }
+
+// Blocking flags keep an example out of training; the others only warn.
+const blockingFlags: ExampleFlag[] = ['empty', 'no_answer', 'duplicate', 'too_long']
+const knownFlags: ExampleFlag[] = [...blockingFlags, 'short_answer', 'volatile_facts']
+
+/** A flag's name, whether it keeps the example out, and why, or null for a flag this app doesn't know. */
+export function flagInfo(flag: ExampleFlag): { label: string; blocking: boolean; help: string } | null {
+  if (!knownFlags.includes(flag)) return null
+  return {
+    label: i18n.t(`train:flags.${flag}.label`),
+    blocking: blockingFlags.includes(flag),
+    help: i18n.t(`train:flags.${flag}.help`),
+  }
+}
+
+/** How many examples have a flag, such as "3 duplicate". */
+export function flagCount(flag: ExampleFlag, count: number): string {
+  return knownFlags.includes(flag) ? i18n.t(`train:flagCount.${flag}`, { count }) : `${count} ${flag}`
+}
+
+const knownStates: TrainingState[] = [
+  'queued',
+  'preparing_dataset',
+  'loading_model',
+  'training',
+  'exporting',
+  'evaluating',
+  'complete',
+  'failed',
+  'cancelled',
+]
 
 export function stateLabel(state: TrainingState): string {
-  return stateLabels[state] ?? state
+  return knownStates.includes(state) ? i18n.t(`train:states.${state}`) : state
 }
 
 /** The steps a job passes through, in order, for the progress timeline. */
@@ -77,13 +88,13 @@ export function isTerminal(state: TrainingState): boolean {
 export function formatDuration(totalSec: number | undefined | null): string {
   if (totalSec == null || totalSec < 0) return '—'
   const sec = Math.round(totalSec)
-  if (sec < 60) return `${sec}s`
+  if (sec < 60) return i18n.t('train:duration.s', { s: sec })
   const m = Math.floor(sec / 60)
   const s = sec % 60
-  if (m < 60) return s ? `${m}m ${s}s` : `${m}m`
+  if (m < 60) return s ? i18n.t('train:duration.ms', { m, s }) : i18n.t('train:duration.m', { m })
   const h = Math.floor(m / 60)
   const rm = m % 60
-  return rm ? `${h}h ${rm}m` : `${h}h`
+  return rm ? i18n.t('train:duration.hm', { h, m: rm }) : i18n.t('train:duration.h', { h })
 }
 
 export function elapsedSec(job: TrainingJob, now: number = Date.now()): number {
@@ -111,25 +122,27 @@ export function fitTone(fit: Pick<NodeTrainingFit, 'label'>): string {
   }
 }
 
-export const fitLabels: Record<NodeTrainingFit['label'], string> = {
-  comfortable: 'Fits',
-  tight: 'Tight fit',
-  too_large: 'Too large',
-  unsupported: 'Not supported',
+export function fitLabel(label: NodeTrainingFit['label']): string {
+  return i18n.t(`train:fit.${label}`)
 }
 
 export type StepID = 'describe' | 'base' | 'material' | 'examples' | 'plan' | 'train' | 'test' | 'deploy'
 
-export const steps: { id: StepID; label: string }[] = [
-  { id: 'describe', label: 'Describe' },
-  { id: 'base', label: 'Base model' },
-  { id: 'material', label: 'Material' },
-  { id: 'examples', label: 'Examples' },
-  { id: 'plan', label: 'Review' },
-  { id: 'train', label: 'Train' },
-  { id: 'test', label: 'Test' },
-  { id: 'deploy', label: 'Deploy' },
+// The build steps, in order; each name is train:steps.<id> in the catalog.
+export const steps: { id: StepID }[] = [
+  { id: 'describe' },
+  { id: 'base' },
+  { id: 'material' },
+  { id: 'examples' },
+  { id: 'plan' },
+  { id: 'train' },
+  { id: 'test' },
+  { id: 'deploy' },
 ]
+
+export function stepLabel(step: StepID): string {
+  return i18n.t(`train:steps.${step}`)
+}
 
 /** Which steps are done, so the step bar can show progress through the build. */
 export function completedSteps(view: SpecializedAIView): Set<StepID> {
@@ -170,8 +183,8 @@ export function lastAnswer(messages: { role: string; content: string }[]): strin
   return ''
 }
 
-export function errorText(error: unknown, fallback = 'Something went wrong.'): string {
-  return error instanceof ApiError || error instanceof Error ? error.message : fallback
+export function errorText(error: unknown, fallback?: string): string {
+  return error instanceof ApiError || error instanceof Error ? error.message : (fallback ?? i18n.t('train:generic'))
 }
 
 // exportRevision is the revision to export as a GGUF file: the deployed one,

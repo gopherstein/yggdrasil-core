@@ -1,11 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import { formatBytes } from '@/lib/format'
 import type { SpecializedAIView, TrainingJob } from '@/types/api'
 import { elapsedSec, formatDuration, isTerminal, jobPercent, jobStages, stateLabel } from '../display'
 
 export function TrainStep({ view, onNext }: { view: SpecializedAIView; onNext: () => void }) {
+  const { t } = useTranslation('train')
   const [now, setNow] = useState(() => Date.now())
   const job = view.jobs[0]
   const running = job && !isTerminal(job.state)
@@ -16,23 +18,23 @@ export function TrainStep({ view, onNext }: { view: SpecializedAIView; onNext: (
   }, [running])
 
   if (!job) {
-    return <div className="card text-sm text-ink-muted">No training yet. Review the plan and start training.</div>
+    return <div className="card text-sm text-ink-muted">{t('train.none')}</div>
   }
   return (
     <div className="space-y-4">
       <JobCard job={job} now={now} />
       {job.state === 'complete' && (
         <button type="button" className="btn-primary px-3 py-1.5 text-sm" onClick={onNext}>
-          Compare with the base model
+          {t('train.compare')}
         </button>
       )}
       {view.jobs.length > 1 && (
         <div className="card space-y-2">
-          <h3 className="section-title">Earlier runs</h3>
+          <h3 className="section-title">{t('train.earlier')}</h3>
           <ul className="divide-y divide-line/60 text-sm">
             {view.jobs.slice(1).map((j) => (
               <li key={j.id} className="flex flex-wrap items-center justify-between gap-2 py-1.5">
-                <span className="text-ink">Revision {j.revision}</span>
+                <span className="text-ink">{t('train.revision', { revision: j.revision })}</span>
                 <span className="text-ink-muted">
                   {stateLabel(j.state)} · {formatDuration(elapsedSec(j))}
                   {j.error && <span className="text-danger"> · {j.error}</span>}
@@ -47,6 +49,7 @@ export function TrainStep({ view, onNext }: { view: SpecializedAIView; onNext: (
 }
 
 function JobCard({ job, now }: { job: TrainingJob; now: number }) {
+  const { t } = useTranslation('train')
   const queryClient = useQueryClient()
   const cancel = useMutation({
     mutationFn: () => api.cancelTraining(job.id),
@@ -61,20 +64,24 @@ function JobCard({ job, now }: { job: TrainingJob; now: number }) {
     <div className="card space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h3 className="section-title">Revision {job.revision}</h3>
+          <h3 className="section-title">{t('train.revision', { revision: job.revision })}</h3>
           <p className="text-xs text-ink-muted">
-            On {job.node_name || job.node_id} with {job.backend.toUpperCase()} · {job.hyper.method?.toUpperCase()} ·{' '}
-            {job.hyper.epochs} epochs
+            {t('train.on', {
+              computer: job.node_name || job.node_id,
+              backend: job.backend.toUpperCase(),
+              method: job.hyper.method?.toUpperCase(),
+              epochs: job.hyper.epochs,
+            })}
           </p>
         </div>
         {!terminal && (
           <button type="button" className="btn-secondary px-3 py-1.5 text-xs" disabled={cancel.isPending} onClick={() => cancel.mutate()}>
-            {cancel.isPending ? 'Cancelling…' : 'Cancel'}
+            {cancel.isPending ? t('train.cancelling') : t('train.cancel')}
           </button>
         )}
       </div>
 
-      <ol className="flex flex-wrap gap-1 text-xs" aria-label="Training stages">
+      <ol className="flex flex-wrap gap-1 text-xs" aria-label={t('train.stages')}>
         {jobStages.map((s, i) => {
           const state =
             job.state === 'failed' || job.state === 'cancelled'
@@ -102,11 +109,11 @@ function JobCard({ job, now }: { job: TrainingJob; now: number }) {
 
       {job.state === 'failed' && (
         <p className="rounded-md bg-danger/10 p-3 text-sm text-danger">
-          {job.error || 'Training failed.'} Temporary files were removed. The base model was not changed.
+          {t('train.failed', { error: job.error || t('train.failedDefault') })}
         </p>
       )}
       {job.state === 'cancelled' && (
-        <p className="rounded-md bg-raised p-3 text-sm text-ink-muted">Cancelled. Temporary files were removed.</p>
+        <p className="rounded-md bg-raised p-3 text-sm text-ink-muted">{t('train.cancelled')}</p>
       )}
 
       {!terminal && (
@@ -114,9 +121,7 @@ function JobCard({ job, now }: { job: TrainingJob; now: number }) {
           <div className="flex justify-between text-xs text-ink-muted">
             <span>{p.detail || stateLabel(job.state)}</span>
             {p.iters ? (
-              <span className="tabular-nums">
-                step {p.iter ?? 0} of {p.iters}
-              </span>
+              <span className="tabular-nums">{t('train.step', { iter: p.iter ?? 0, iters: p.iters })}</span>
             ) : null}
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-raised" role="progressbar" aria-valuenow={jobPercent(job)} aria-valuemin={0} aria-valuemax={100}>
@@ -127,25 +132,28 @@ function JobCard({ job, now }: { job: TrainingJob; now: number }) {
           </div>
           {downloading && (
             <p className="text-xs text-ink-faint">
-              Downloaded {formatBytes(p.download_bytes)} of {formatBytes(p.download_total)}
+              {t('train.downloaded', { done: formatBytes(p.download_bytes), total: formatBytes(p.download_total) })}
             </p>
           )}
         </div>
       )}
 
       <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm sm:grid-cols-4">
-        <Metric label="Elapsed" value={formatDuration(elapsedSec(job, now))} />
-        <Metric label="Remaining" value={p.remaining_sec != null && !terminal ? `about ${formatDuration(p.remaining_sec)}` : '—'} />
-        <Metric label="Epoch" value={p.epoch != null ? `${p.epoch.toFixed(1)} of ${p.epochs ?? job.hyper.epochs}` : '—'} />
-        <Metric label="Speed" value={p.tokens_per_sec ? `${Math.round(p.tokens_per_sec)} tokens/s` : '—'} />
-        <Metric label="Training loss" value={p.train_loss != null ? p.train_loss.toFixed(3) : '—'} />
-        <Metric label="Validation loss" value={p.val_loss != null ? p.val_loss.toFixed(3) : '—'} />
-        <Metric label="Peak memory" value={p.peak_memory_gb ? `${p.peak_memory_gb.toFixed(1)} GB` : '—'} />
+        <Metric label={t('train.elapsed')} value={formatDuration(elapsedSec(job, now))} />
+        <Metric
+          label={t('train.remaining')}
+          value={p.remaining_sec != null && !terminal ? t('train.about', { time: formatDuration(p.remaining_sec) }) : '—'}
+        />
+        <Metric
+          label={t('train.epoch')}
+          value={p.epoch != null ? t('train.epochOf', { epoch: p.epoch.toFixed(1), epochs: p.epochs ?? job.hyper.epochs }) : '—'}
+        />
+        <Metric label={t('train.speed')} value={p.tokens_per_sec ? t('train.tokensPerSec', { count: Math.round(p.tokens_per_sec) }) : '—'} />
+        <Metric label={t('train.trainingLoss')} value={p.train_loss != null ? p.train_loss.toFixed(3) : '—'} />
+        <Metric label={t('train.validationLoss')} value={p.val_loss != null ? p.val_loss.toFixed(3) : '—'} />
+        <Metric label={t('train.peakMemory')} value={p.peak_memory_gb ? t('train.gigabytes', { value: p.peak_memory_gb.toFixed(1) }) : '—'} />
       </dl>
-      <p className="text-xs text-ink-faint">
-        Loss shows how closely the model reproduces your examples. A lower number does not guarantee better answers, so
-        compare the results before you deploy.
-      </p>
+      <p className="text-xs text-ink-faint">{t('train.lossNote')}</p>
     </div>
   )
 }

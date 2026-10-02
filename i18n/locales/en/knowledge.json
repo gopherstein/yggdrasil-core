@@ -1,0 +1,110 @@
+{
+  "page": {
+    "title": "Knowledge",
+    "description": "Mimir keeps catalogs, prices, policies, and documents searchable. When a profile or a specialized AI uses a source, the passages that match each question are added to it. Edit a file and the next question sees the change. No retraining.",
+    "loading": "Loading…",
+    "emptyTitle": "No knowledge connected",
+    "emptyDescription": "Connect a file or folder on this computer, paste content, or read from a database or web API. PDF, Excel, CSV, TSV, JSON, JSONL, Markdown, text, and HTML files work."
+  },
+  "badge": {
+    "linked": "Linked",
+    "database": "Database",
+    "api": "Web API",
+    "copy": "Copy"
+  },
+  "meaning": {
+    "full": "Searchable by meaning, not only by matching words.",
+    "partial": "Searchable by meaning: {{embedded}} of {{total}} passages so far."
+  },
+  "refresh": {
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "note": "Fetched again when a question uses it and the data is more than {{every}} old, or on Reindex."
+  },
+  "row": {
+    "failed": "Failed",
+    "passages_one": "{{count}} passage",
+    "passages_other": "{{count}} passages",
+    "indexed": "indexed {{when}}",
+    "watches": "Reindexes itself when the files change.",
+    "edit": "Edit",
+    "indexing": "Indexing…",
+    "reindex": "Reindex",
+    "localOnlyHint": "Never send passages from this source to a paired computer. Chats that use it run here.",
+    "localOnly": "This computer only",
+    "localOnlyOn": "This computer only ✓",
+    "confirmDisconnect": "Disconnect {{name}}? Profiles and AIs that use it stop seeing it. Your files are not deleted.",
+    "disconnect": "Disconnect",
+    "editLabel": "Edit {{name}}",
+    "saveHint": "Saving reindexes the source. Chats and specialized AIs see the change on their next question.",
+    "saving": "Saving…",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "add": {
+    "title": "Connect knowledge",
+    "modes": {
+      "path": "File or folder",
+      "text": "Upload or paste",
+      "database": "Database",
+      "api": "Web API"
+    },
+    "path": "Path on this computer",
+    "pathHint": "Yggdrasil reads it in place and picks up edits automatically.",
+    "chooseFile": "Choose a file",
+    "pastePlaceholder": "Paste text, Markdown, or CSV",
+    "content": "Content",
+    "name": "Name (optional)",
+    "indexing": "Indexing…",
+    "connect": "Connect"
+  },
+  "remote": {
+    "database": "Database",
+    "sqlite": "SQLite file",
+    "file": "File on this computer",
+    "connection": "Connection string",
+    "connectionHint": "Use an account that can only read. It is stored apart from the database and not shown again.",
+    "query": "Query",
+    "queryHint": "One SELECT. It runs read-only, so Yggdrasil never changes the database. Each row becomes a passage.",
+    "url": "URL",
+    "urlHint": "JSON, CSV, or text. A list of objects becomes one passage per item.",
+    "items": "List in the response (optional)",
+    "header": "Header",
+    "value": "Value (optional)",
+    "refresh": "Fetch again when older than",
+    "refreshChoices": {
+      "m5": "5 minutes",
+      "m15": "15 minutes",
+      "h1": "1 hour",
+      "h6": "6 hours",
+      "d1": "1 day"
+    },
+    "name": "Name (optional)",
+    "connecting": "Connecting…",
+    "connect": "Connect"
+  },
+  "search": {
+    "title": "Try a question",
+    "description": "See which passages a question would bring into the chat.",
+    "placeholder": "Do you have 225/45R17 in stock?",
+    "question": "Question",
+    "search": "Search",
+    "nothing": "Nothing matched."
+  },
+  "picker": {
+    "none": "No knowledge connected.",
+    "disconnect": "Disconnect {{name}}",
+    "remove": "Remove",
+    "connectExisting": "Connect existing knowledge",
+    "connectExistingOption": "Connect existing knowledge…",
+    "pathPlaceholder": "Or a file or folder, like ~/Documents/catalog",
+    "path": "File or folder path",
+    "indexing": "Indexing…",
+    "connect": "Connect",
+    "manage": "Manage sources, edit pasted content, and try searches on the <link>Knowledge</link> page."
+  }
+}
