@@ -1,3 +1,4 @@
+import i18n from '@/i18n'
 import type { KnowledgeSource } from '@/types/api'
 
 const driverNames = { sqlite: 'SQLite', postgres: 'PostgreSQL', mysql: 'MySQL' } as const
@@ -6,13 +7,13 @@ const driverNames = { sqlite: 'SQLite', postgres: 'PostgreSQL', mysql: 'MySQL' }
 export function sourceBadge(source: KnowledgeSource): string {
   switch (source.kind) {
     case 'path':
-      return 'Linked'
+      return i18n.t('knowledge:badge.linked')
     case 'database':
-      return source.remote?.driver ? driverNames[source.remote.driver] : 'Database'
+      return source.remote?.driver ? driverNames[source.remote.driver] : i18n.t('knowledge:badge.database')
     case 'api':
-      return 'Web API'
+      return i18n.t('knowledge:badge.api')
     default:
-      return 'Copy'
+      return i18n.t('knowledge:badge.copy')
   }
 }
 
@@ -30,9 +31,9 @@ export function refreshNote(source: KnowledgeSource): string | null {
   if (!minutes) return null
   const every =
     minutes % 1440 === 0
-      ? `${minutes / 1440} day${minutes === 1440 ? '' : 's'}`
+      ? i18n.t('knowledge:refresh.days', { count: minutes / 1440 })
       : minutes % 60 === 0
-        ? `${minutes / 60} hour${minutes === 60 ? '' : 's'}`
-        : `${minutes} minute${minutes === 1 ? '' : 's'}`
-  return `Fetched again when a question uses it and the data is more than ${every} old, or on Reindex.`
+        ? i18n.t('knowledge:refresh.hours', { count: minutes / 60 })
+        : i18n.t('knowledge:refresh.minutes', { count: minutes })
+  return i18n.t('knowledge:refresh.note', { every })
 }

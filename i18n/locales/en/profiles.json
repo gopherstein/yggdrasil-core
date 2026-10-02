@@ -1,0 +1,361 @@
+{
+  "page": {
+    "title": "Profiles & Orchestration",
+    "subtitle": "A profile is a saved assistant: how it works through requests, its models, tools, memory, and computers.",
+    "hint": "Choose one in Chat, or create your own.",
+    "create": "Create profile",
+    "createTitle": "Create a new profile",
+    "loading": "Loading profiles…",
+    "loadFailed": "Could not load profiles. Is the local daemon running?",
+    "emptyTitle": "No profiles yet",
+    "emptyDescription": "Create a profile to tell Chat how your assistant should work.",
+    "noneInFilter": "No profiles in this filter.",
+    "filter": "Filter profiles",
+    "filters": {
+      "all": "All",
+      "builtin": "Built-in",
+      "custom": "Custom"
+    }
+  },
+  "create": {
+    "title": "Create profile",
+    "startFrom": "Start from:",
+    "startingWith": "Starting with <strong>{{name}}</strong>. You can rename and fine-tune after creating.",
+    "creating": "Creating…",
+    "create": "Create",
+    "cancel": "Cancel",
+    "copyName": "{{name}} (copy)",
+    "options": {
+      "general": {
+        "label": "General Assistant",
+        "description": "Everyday questions and local-first chat."
+      },
+      "coding": {
+        "label": "Programming",
+        "description": "Code help with an AI team across your computers."
+      },
+      "research": {
+        "label": "Research",
+        "description": "Long-form reading and careful reasoning."
+      },
+      "blank": {
+        "label": "Blank",
+        "description": "Start empty and set roles, tools, and computers yourself."
+      }
+    }
+  },
+  "purposes": {
+    "general": "Everyday conversation",
+    "coding": "Programming & code help",
+    "research": "Research & long-form reading",
+    "custom": "Custom setup"
+  },
+  "card": {
+    "rename": "Rename profile",
+    "builtin": "Built-in",
+    "custom": "Custom",
+    "automaticSelection": "Automatic computer selection",
+    "customSelection": "Custom computer selection",
+    "tools_one": "{{count}} tool",
+    "tools_other": "{{count}} tools",
+    "askFirst": " · {{count}} ask first",
+    "noTools": "No tools enabled",
+    "more": "+{{count}} more",
+    "useInChat": "Use in Chat",
+    "close": "Close",
+    "edit": "Edit",
+    "hideDetails": "Hide details",
+    "details": "Details",
+    "moreActions": "More actions for {{name}}",
+    "howItWorks": "How it works",
+    "computerSelection": "Computer selection",
+    "selectionDetail": "{{title}}. {{detail}}",
+    "strategy": "Strategy: <strong>{{strategy}}</strong>",
+    "thisMachine": "{{name}} (this machine)"
+  },
+  "menu": {
+    "duplicate": "Duplicate",
+    "rename": "Rename",
+    "confirmReset": "Reset “{{name}}” to how Yggdrasil ships it? Your changes to it are lost.",
+    "reset": "Reset to defaults",
+    "confirmDelete": "Delete “{{name}}”? This cannot be undone.",
+    "delete": "Delete"
+  },
+  "strategies": {
+    "auto": {
+      "label": "Auto",
+      "detail": "Yggdrasil decides: quick questions get one model, requests with several parts are planned and checked."
+    },
+    "single": {
+      "label": "Single model",
+      "detail": "One model answers every request, without a plan."
+    },
+    "planned": {
+      "label": "Planner + workers",
+      "detail": "Requests with several parts are always worked through in parts before the answer is written."
+    },
+    "team": {
+      "label": "Team",
+      "detail": "A planner splits each request, workers do the parts (on other computers when they can), and a reviewer checks the answer. Quick questions are still answered directly."
+    },
+    "teamTitle": "AI team",
+    "automaticTitle": "Automatic",
+    "withStrategy": "{{title}} · Strategy: {{strategy}}"
+  },
+  "computers": {
+    "prefer_local": {
+      "title": "Prefer this computer",
+      "short": "This computer first",
+      "detail": "Tries to run on this machine first. Falls back to a paired computer when a model is not installed here."
+    },
+    "manual": {
+      "title": "Custom",
+      "short": "Custom",
+      "detail": "Uses role pins for placement. Ideal when you want a specific step on a specific machine."
+    },
+    "automatic": {
+      "title": "Automatic",
+      "short": "Automatic",
+      "detail": "Places each step on whichever paired computer already has the model. No IP or port setup."
+    }
+  },
+  "chips": {
+    "files": "Files",
+    "git": "Git",
+    "terminal": "Terminal",
+    "ok": "{{label}} ✓",
+    "ask": "{{label}} Ask"
+  },
+  "roles": {
+    "role": "Role",
+    "assistant": "Primary",
+    "fast": "Fast",
+    "coding": "Coding",
+    "planner": "Planner",
+    "worker": "Worker",
+    "reviewer": "Reviewer",
+    "numbered": "{{role}} {{n}}",
+    "automaticModel": "Automatic model",
+    "pinnedComputer": "Pinned computer",
+    "automaticComputer": "Automatic computer",
+    "hint": "{{model}} · {{computer}}",
+    "help": {
+      "assistant": "Writes the answer. Automatic uses the model chosen in the chat.",
+      "fast": "Answers quick questions when the chat is on Auto.",
+      "coding": "Answers coding requests when the chat is on Auto.",
+      "planner": "Splits a request into parts.",
+      "worker": "Works on one part of a plan. Parts can run on different computers at once.",
+      "reviewer": "Checks the answer before you see it.",
+      "other": "A named step in this profile’s workflow."
+    }
+  },
+  "capabilities": {
+    "internet": {
+      "label": "Internet",
+      "description": "Search and read current information from the web"
+    },
+    "files": {
+      "label": "Files",
+      "description": "Find, read, and write files in the workspace"
+    },
+    "code": {
+      "label": "Run code",
+      "description": "Run Python in a sandbox for calculations, analysis, and charts; asks first"
+    },
+    "speech": {
+      "label": "Speech",
+      "description": "Transcribe audio and read text aloud, on this computer"
+    },
+    "images": {
+      "label": "Images",
+      "description": "Make and edit images on this computer, once image generation is set up"
+    },
+    "shell": {
+      "label": "Shell",
+      "description": "Run commands on this computer"
+    },
+    "git": {
+      "label": "Git",
+      "description": "Inspect the repository, and commit or push"
+    }
+  },
+  "tools": {
+    "internet": {
+      "search": {
+        "label": "Web search",
+        "description": "Searches the public web and returns titles, links, and snippets."
+      },
+      "open": {
+        "label": "Open web page",
+        "description": "Opens a URL and returns readable text."
+      }
+    },
+    "filesystem": {
+      "search": {
+        "label": "Find files",
+        "description": "Finds files in the workspace by name."
+      },
+      "read": {
+        "label": "Read file",
+        "description": "Lets the assistant open files inside your Yggdrasil workspace so it can quote or summarize real content."
+      },
+      "write": {
+        "label": "Write file",
+        "description": "Lets the assistant create or update files in the workspace."
+      }
+    },
+    "terminal": {
+      "label": "Terminal",
+      "description": "Runs shell commands on this computer."
+    },
+    "git": {
+      "status": {
+        "label": "Git status",
+        "description": "Shows which files are changed so the assistant can reason about your working tree."
+      },
+      "diff": {
+        "label": "Git diff",
+        "description": "Shows the actual code changes so the assistant can review or explain a patch."
+      },
+      "log": {
+        "label": "Git log",
+        "description": "Shows recent commits in the workspace."
+      },
+      "show": {
+        "label": "Git show",
+        "description": "Shows one commit."
+      },
+      "add": {
+        "label": "Git add",
+        "description": "Stages files for commit. Useful when you want help preparing a commit."
+      },
+      "commit": {
+        "label": "Git commit",
+        "description": "Creates a local git commit."
+      },
+      "push": {
+        "label": "Git push",
+        "description": "Pushes commits to the remote."
+      }
+    }
+  },
+  "policies": {
+    "deny": {
+      "label": "Deny",
+      "description": "Never available to this profile."
+    },
+    "ask": {
+      "label": "Ask each time",
+      "description": "Shows an in-chat prompt before every use."
+    },
+    "allow-for-session": {
+      "label": "Ask once per session",
+      "description": "Prompts the first time, then remembers until you restart the app."
+    },
+    "allow": {
+      "label": "Always allow",
+      "description": "Runs without asking. Best for low-risk tools you use often."
+    }
+  },
+  "editor": {
+    "profile": "Profile",
+    "name": "Name",
+    "namePlaceholder": "e.g. Programming",
+    "models": "Models",
+    "modelsHint": "Automatic uses the model chosen in the chat.",
+    "model": "Model",
+    "automatic": "Automatic",
+    "computer": "Computer",
+    "fallback": "Fallback order",
+    "fallbackHint": "Tried in order when the answering model fails. After these, Yggdrasil picks another installed model.",
+    "none": "None",
+    "tools": "Tools",
+    "on": "On",
+    "off": "Off",
+    "individualTools": "Individual tools",
+    "memory": "Memory",
+    "memoryHint": "Chats with this profile search these sources on every question and use the matching passages.",
+    "orchestration": "Orchestration",
+    "strategy": "Strategy",
+    "execution": "Execution",
+    "computerSelection": "Computer selection",
+    "selectionOptions": {
+      "automatic": "Automatic — place where the model already lives",
+      "prefer_local": "Prefer this computer",
+      "manual": "Custom — use the computers set in Models"
+    },
+    "localOnly": "Only this computer — never use paired computers",
+    "allowed": "Allowed",
+    "preferred": "Preferred",
+    "never": "Never use",
+    "save": "Save profile",
+    "cancel": "Cancel"
+  },
+  "controls": {
+    "default": "Default",
+    "effort": {
+      "label": "Reasoning level",
+      "help": "Used when a chat leaves effort on Auto.",
+      "fast": "Fast",
+      "balanced": "Balanced",
+      "thorough": "Thorough"
+    },
+    "planning": {
+      "label": "Planning",
+      "help": "Work through requests with several parts in parts. Always also splits requests with no obvious parts.",
+      "on": "When a request has parts",
+      "always": "Always",
+      "off": "Never plan"
+    },
+    "parallel": {
+      "label": "Parallelism",
+      "help": "Look up independent parts side by side.",
+      "on": "Side by side",
+      "off": "One at a time"
+    },
+    "verification": {
+      "label": "Verification",
+      "help": "Check figures against the sources before answering.",
+      "off": "Off",
+      "check": "Check and report",
+      "correct": "Check and correct once",
+      "thorough": "Check and correct twice"
+    },
+    "memory": {
+      "label": "Memory",
+      "help": "Use persistent memories in this profile’s chats.",
+      "off": "Off for this profile"
+    },
+    "fallback": {
+      "label": "Fallback",
+      "help": "Answer on another model when the chosen one fails.",
+      "off": "Show the failure instead"
+    },
+    "max_workers": {
+      "label": "Workers",
+      "help": "Most parts in a plan (2–8)."
+    },
+    "max_tool_calls": {
+      "label": "Tool calls",
+      "help": "Most tool calls in one turn (1–50)."
+    },
+    "retries": {
+      "label": "Retries",
+      "help": "Tries after a model fails (1–3): the same model on another computer, then another model."
+    },
+    "timeout_seconds": {
+      "label": "Time limit (s)",
+      "help": "Stop a turn that runs longer (10–3600)."
+    },
+    "context_share": {
+      "label": "Context budget",
+      "help": "Most of the window earlier messages may use (0.1–0.9)."
+    }
+  },
+  "orchestrators": {
+    "title": "Orchestrators",
+    "description": "Pluggable orchestration engines that coordinate models and tools.",
+    "emptyTitle": "Orchestrator management coming soon",
+    "emptyDescription": "Built-in and plugin orchestrators will be configurable here under advanced mode."
+  }
+}

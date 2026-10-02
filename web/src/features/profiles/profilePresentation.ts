@@ -1,3 +1,4 @@
+import i18n from '@/i18n'
 import type { AIProfile, Purpose, ToolPolicy } from '@/types/api'
 
 /** Built-in profile template IDs (must match server presets). */
@@ -12,11 +13,11 @@ export function isBuiltInProfile(id: string): boolean {
   return BUILT_IN_PROFILE_IDS.has(id)
 }
 
-export const PURPOSE_LABELS: Record<string, string> = {
-  general: 'Everyday conversation',
-  coding: 'Programming & code help',
-  research: 'Research & long-form reading',
-  custom: 'Custom setup',
+const PURPOSES = ['general', 'coding', 'research', 'custom']
+
+/** What a profile is for, in words, or its purpose id for one this app doesn't know. */
+export function purposeLabel(purpose: string): string {
+  return PURPOSES.includes(purpose) ? i18n.t(`profiles:purposes.${purpose}`) : purpose
 }
 
 /** Whether a profile uses the Team strategy (or the Team orchestrator of older versions). */
@@ -25,34 +26,31 @@ export function isTeamProfile(profile: Pick<AIProfile, 'orchestrator_id' | 'orch
   return profile.orchestration?.strategy === 'team' || profile.orchestrator_id === 'team'
 }
 
-export const STRATEGY_OPTIONS: { value: '' | 'single' | 'planned' | 'team'; label: string; detail: string }[] = [
-  {
-    value: '',
-    label: 'Auto',
-    detail: 'Yggdrasil decides: quick questions get one model, requests with several parts are planned and checked.',
-  },
-  { value: 'single', label: 'Single model', detail: 'One model answers every request, without a plan.' },
-  {
-    value: 'planned',
-    label: 'Planner + workers',
-    detail: 'Requests with several parts are always worked through in parts before the answer is written.',
-  },
-  {
-    value: 'team',
-    label: 'Team',
-    detail:
-      'A planner splits each request, workers do the parts (on other computers when they can), and a reviewer checks the answer. Quick questions are still answered directly.',
-  },
-]
+export type StrategyValue = '' | 'single' | 'planned' | 'team'
 
+/** The strategies, in order; each is profiles:strategies.<value, or "auto"> in the catalog. */
+export const STRATEGY_VALUES: StrategyValue[] = ['', 'single', 'planned', 'team']
+
+export function strategyOption(value: StrategyValue): { label: string; detail: string } {
+  const key = value || 'auto'
+  return { label: i18n.t(`profiles:strategies.${key}.label`), detail: i18n.t(`profiles:strategies.${key}.detail`) }
+}
+
+/** A profile's strategy: its short name, the title shown (with the strategy in advanced mode), and how it works. */
 export function strategyLabel(
   profile: Pick<AIProfile, 'orchestrator_id' | 'orchestration'>,
   advanced: boolean,
-): { title: string; detail: string } {
-  const value = isTeamProfile(profile) ? 'team' : (profile.orchestration?.strategy ?? '')
-  const option = STRATEGY_OPTIONS.find((o) => o.value === value) ?? STRATEGY_OPTIONS[0]
-  const title = value === 'team' ? 'AI team' : value === '' ? 'Automatic' : option.label
-  return { title: advanced ? `${title} · Strategy: ${option.label}` : title, detail: option.detail }
+): { name: string; title: string; detail: string } {
+  const value = (isTeamProfile(profile) ? 'team' : (profile.orchestration?.strategy ?? '')) as StrategyValue
+  const option = strategyOption(STRATEGY_VALUES.includes(value) ? value : '')
+  const name =
+    value === 'team'
+      ? i18n.t('profiles:strategies.teamTitle')
+      : value === ''
+        ? i18n.t('profiles:strategies.automaticTitle')
+        : option.label
+  const title = advanced ? i18n.t('profiles:strategies.withStrategy', { title: name, strategy: option.label }) : name
+  return { name, title, detail: option.detail }
 }
 
 export function computerSelectionLabel(mode: string): {
@@ -60,28 +58,11 @@ export function computerSelectionLabel(mode: string): {
   short: string
   detail: string
 } {
-  switch (mode) {
-    case 'prefer_local':
-      return {
-        title: 'Prefer this computer',
-        short: 'This computer first',
-        detail:
-          'Tries to run on this machine first. Falls back to a paired computer when a model is not installed here.',
-      }
-    case 'manual':
-      return {
-        title: 'Custom',
-        short: 'Custom',
-        detail:
-          'Uses role pins for placement. Ideal when you want a specific step on a specific machine.',
-      }
-    default:
-      return {
-        title: 'Automatic',
-        short: 'Automatic',
-        detail:
-          'Places each step on whichever paired computer already has the model. No IP or port setup.',
-      }
+  const key = mode === 'prefer_local' || mode === 'manual' ? mode : 'automatic'
+  return {
+    title: i18n.t(`profiles:computers.${key}.title`),
+    short: i18n.t(`profiles:computers.${key}.short`),
+    detail: i18n.t(`profiles:computers.${key}.detail`),
   }
 }
 
@@ -110,64 +91,49 @@ export function toolChipPreview(tools: ToolPolicy[] | undefined): {
 }[] {
   const byId = new Map((tools ?? []).map((t) => [t.tool_id, t.policy]))
   const rows: { id: string; label: string }[] = [
-    { id: 'filesystem.read', label: 'Files' },
-    { id: 'git.status', label: 'Git' },
-    { id: 'terminal', label: 'Terminal' },
+    { id: 'filesystem.read', label: i18n.t('profiles:chips.files') },
+    { id: 'git.status', label: i18n.t('profiles:chips.git') },
+    { id: 'terminal', label: i18n.t('profiles:chips.terminal') },
   ]
   const chips: { label: string; tone: 'ok' | 'ask' | 'off' }[] = []
   for (const row of rows) {
     const policy = byId.get(row.id)
     if (!policy) continue
     if (policy === 'deny') chips.push({ label: row.label, tone: 'off' })
-    else if (policy === 'allow') chips.push({ label: `${row.label} ✓`, tone: 'ok' })
-    else chips.push({ label: `${row.label} Ask`, tone: 'ask' })
+    else if (policy === 'allow') chips.push({ label: i18n.t('profiles:chips.ok', { label: row.label }), tone: 'ok' })
+    else chips.push({ label: i18n.t('profiles:chips.ask', { label: row.label }), tone: 'ask' })
   }
   return chips
 }
 
 export function roleDisplayName(role: string): string {
-  if (!role) return 'Role'
-  const known = MODEL_ROLES.find((r) => r.role === role)
-  if (known) return known.label
+  if (!role) return i18n.t('profiles:roles.role')
+  if (MODEL_ROLES.some((r) => r.role === role)) return i18n.t(`profiles:roles.${role}`)
   const slot = /^([a-z]+):(\d+)$/.exec(role)
-  if (slot) return `${roleDisplayName(slot[1])} ${slot[2]}`
+  if (slot) return i18n.t('profiles:roles.numbered', { role: roleDisplayName(slot[1]), n: slot[2] })
   return role.charAt(0).toUpperCase() + role.slice(1)
 }
 
 export function roleHint(role: ModelRoleLike): string {
-  const model = role.model_id ? shortModel(role.model_id) : 'Automatic model'
-  const computer = role.node_id ? 'Pinned computer' : 'Automatic computer'
-  return `${model} · ${computer}`
+  const model = role.model_id ? shortModel(role.model_id) : i18n.t('profiles:roles.automaticModel')
+  const computer = role.node_id ? i18n.t('profiles:roles.pinnedComputer') : i18n.t('profiles:roles.automaticComputer')
+  return i18n.t('profiles:roles.hint', { model, computer })
 }
 
 /** The model roles a profile can assign (spec §20). An empty role uses the chat's model. */
-export const MODEL_ROLES: { role: string; label: string }[] = [
-  { role: 'assistant', label: 'Primary' },
-  { role: 'fast', label: 'Fast' },
-  { role: 'coding', label: 'Coding' },
-  { role: 'planner', label: 'Planner' },
-  { role: 'worker', label: 'Worker' },
-  { role: 'reviewer', label: 'Reviewer' },
+// Each role's name is profiles:roles.<role> in the catalog.
+export const MODEL_ROLES: { role: string }[] = [
+  { role: 'assistant' },
+  { role: 'fast' },
+  { role: 'coding' },
+  { role: 'planner' },
+  { role: 'worker' },
+  { role: 'reviewer' },
 ]
 
 export function roleHelp(role: string): string {
-  switch (role.toLowerCase()) {
-    case 'assistant':
-      return 'Writes the answer. Automatic uses the model chosen in the chat.'
-    case 'fast':
-      return 'Answers quick questions when the chat is on Auto.'
-    case 'coding':
-      return 'Answers coding requests when the chat is on Auto.'
-    case 'planner':
-    case 'coordinator':
-      return 'Splits a request into parts.'
-    case 'worker':
-      return 'Works on one part of a plan. Parts can run on different computers at once.'
-    case 'reviewer':
-      return 'Checks the answer before you see it.'
-    default:
-      return 'A named step in this profile’s workflow.'
-  }
+  const key = role.toLowerCase() === 'coordinator' ? 'planner' : role.toLowerCase()
+  return MODEL_ROLES.some((r) => r.role === key) ? i18n.t(`profiles:roles.help.${key}`) : i18n.t('profiles:roles.help.other')
 }
 
 type ModelRoleLike = { role: string; model_id?: string; node_id?: string }
@@ -215,26 +181,9 @@ export function createStartOptions(): {
   title: string
   description: string
 }[] {
-  return [
-    {
-      id: 'general',
-      title: 'General Assistant',
-      description: 'Everyday questions and local-first chat.',
-    },
-    {
-      id: 'coding',
-      title: 'Programming',
-      description: 'Code help with an AI team across your computers.',
-    },
-    {
-      id: 'research',
-      title: 'Research',
-      description: 'Long-form reading and careful reasoning.',
-    },
-    {
-      id: 'blank',
-      title: 'Blank',
-      description: 'Start empty and set roles, tools, and computers yourself.',
-    },
-  ]
+  return (['general', 'coding', 'research', 'blank'] as const).map((id) => ({
+    id,
+    title: i18n.t(`profiles:create.options.${id}.label`),
+    description: i18n.t(`profiles:create.options.${id}.description`),
+  }))
 }

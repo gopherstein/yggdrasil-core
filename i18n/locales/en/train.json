@@ -1,0 +1,385 @@
+{
+  "explainer": "Training teaches your AI how to do its job. Connected knowledge gives it the current information it needs to do that job.",
+  "generic": "Something went wrong.",
+  "uses": {
+    "training": {
+      "label": "Training",
+      "description": "Teaches how to respond. Baked into the model."
+    },
+    "knowledge": {
+      "label": "Knowledge",
+      "description": "Looked up when needed. Stays current when you edit it."
+    },
+    "both": {
+      "label": "Both",
+      "description": "Examples teach the pattern; the facts stay connected."
+    }
+  },
+  "presets": {
+    "quick": {
+      "label": "Quick",
+      "description": "A short run to check the idea. Good for tone and format."
+    },
+    "balanced": {
+      "label": "Balanced",
+      "description": "The default. Learns workflows and terminology from your examples."
+    },
+    "quality": {
+      "label": "Highest quality",
+      "description": "Longer training on every layer. Needs more examples, memory, and time."
+    }
+  },
+  "flags": {
+    "empty": {
+      "label": "Empty",
+      "help": "Has no question or answer."
+    },
+    "no_answer": {
+      "label": "No answer",
+      "help": "The last turn is not an answer, so there is nothing to learn from."
+    },
+    "duplicate": {
+      "label": "Duplicate",
+      "help": "Same as an earlier example. Only the first copy trains."
+    },
+    "too_long": {
+      "label": "Too long",
+      "help": "Longer than the model can train on. Shorten it or split it."
+    },
+    "short_answer": {
+      "label": "Short answer",
+      "help": "A one-word answer teaches little. It still trains."
+    },
+    "volatile_facts": {
+      "label": "Changing facts",
+      "help": "States a price, stock level, or SKU. The model may memorize a value that later changes. Keep those facts in knowledge."
+    }
+  },
+  "flagCount": {
+    "empty": "{{count}} empty",
+    "no_answer": "{{count}} no answer",
+    "duplicate": "{{count}} duplicate",
+    "too_long": "{{count}} too long",
+    "short_answer": "{{count}} short answer",
+    "volatile_facts": "{{count}} changing facts"
+  },
+  "states": {
+    "queued": "Queued",
+    "preparing_dataset": "Preparing",
+    "loading_model": "Loading model",
+    "training": "Training",
+    "exporting": "Exporting",
+    "evaluating": "Testing",
+    "complete": "Complete",
+    "failed": "Failed",
+    "cancelled": "Cancelled"
+  },
+  "fit": {
+    "comfortable": "Fits",
+    "tight": "Tight fit",
+    "too_large": "Too large",
+    "unsupported": "Not supported"
+  },
+  "duration": {
+    "s": "{{s}}s",
+    "m": "{{m}}m",
+    "ms": "{{m}}m {{s}}s",
+    "h": "{{h}}h",
+    "hm": "{{h}}h {{m}}m"
+  },
+  "steps": {
+    "describe": "Describe",
+    "base": "Base model",
+    "material": "Material",
+    "examples": "Examples",
+    "plan": "Review",
+    "train": "Train",
+    "test": "Test",
+    "deploy": "Deploy"
+  },
+  "page": {
+    "title": "Train your own AI",
+    "description": "Build a small assistant that is good at one job. Show it how to respond with examples, and connect the information it needs. You do not need to know how models are trained.",
+    "settingUpExample": "Setting up the example…",
+    "tryExample": "Try an example",
+    "build": "Build a new AI",
+    "loading": "Loading…",
+    "nothing": "Nothing built yet.",
+    "emptyTitle": "Build a specialized AI",
+    "emptyDescription": "Describe the job, add examples of good answers, and connect the data it should look up. Yggdrasil recommends a base model, trains it on this computer, and lets you compare it with the original before you use it.",
+    "exampleHint": "The example uses a sample tire shop, so you can see real data first.",
+    "exampleBadge": "Example",
+    "deployed": "Deployed · revision {{revision}}",
+    "notDeployed": "Not deployed",
+    "newTitle": "What should your AI do?",
+    "newDescription": "Describe the job in a sentence or two, the way you would explain it to a new employee.",
+    "name": "Name",
+    "namePlaceholder": "Tire shop assistant",
+    "job": "The job",
+    "jobPlaceholder": "Answer customer questions about tires. Ask for the vehicle's year, make, and model, explain fitment, and recommend tires we have in stock.",
+    "creating": "Creating…",
+    "continue": "Continue",
+    "cancel": "Cancel",
+    "base": "{{model}} base",
+    "noBase": "No base model yet",
+    "buildSteps": "Build steps",
+    "done": "done"
+  },
+  "example": {
+    "title": "In this example",
+    "describe": "This example is an assistant for a tire shop. Yggdrasil drafted the instructions from the description. Edit anything; nothing trains until you press Train.",
+    "base": "Yggdrasil picked the smallest model that trains comfortably on this computer and allows business use. Smaller models train in minutes.",
+    "material": "Three files were added, and Yggdrasil classified each one. The chats became Training because they show how to answer. The inventory became Knowledge because prices and stock change. The policies became Knowledge because the assistant should quote them exactly. Open \"See sample files\" to read them.",
+    "examples": "Three examples are flawed on purpose. The duplicate and the question with no answer are left out automatically. The answer that states a price still trains, which is why it is flagged. Try excluding it.",
+    "plan": "The example uses Quick, so training takes a few minutes. Everything under \"Stays connected\" is searched on each question instead of being trained in.",
+    "train": "Watch the training loss fall as the model learns the examples. A low loss means it copies them well, not that its answers are right. That is what the next step checks.",
+    "test": "Compare the columns. The specialized answers should ask for the vehicle and sign off as Tread Right Tires. Look for made-up details too, such as a tire size that sounds right but is not: a small model learns style well and facts poorly, which is why prices and sizes belong in knowledge. Add a test prompt such as \"How much is the Pilot Sport 4?\" to see connected knowledge at work.",
+    "deploy": "After you deploy, ask it in Chat for the price of a tire. Then open Knowledge, edit the inventory, and ask again. The answer changes without retraining. Delete the example from the Describe step when you are done."
+  },
+  "concepts": {
+    "training": "Training",
+    "trainingTitle": "Train how your AI behaves",
+    "trainingBody": "Examples of good answers teach its role, your terminology, the questions it should ask, the steps it follows, its tone, and how it formats replies.",
+    "trainingUse": "Use: chat transcripts, question and answer pairs, sample replies.",
+    "knowledge": "Knowledge",
+    "knowledgeTitle": "Connect what your AI knows",
+    "knowledgeBody": "Information that changes or must stay exact is looked up when it is needed: inventory, prices, SKUs, catalogs, policies, and documents. Edit it any time without retraining.",
+    "knowledgeUse": "Use: spreadsheets, CSV exports, product lists, policy documents.",
+    "how": "How it works",
+    "lora": "<strong>LoRA</strong> trains a small add-on (an adapter) instead of changing the whole model. The original model stays untouched and available. <strong>QLoRA</strong> does the same on a compressed copy of the model so it fits in less memory.",
+    "rag": "<strong>Connected knowledge</strong> is retrieval: before each answer Yggdrasil searches your sources for the passages that match the question and gives them to the model. This is often called RAG, retrieval-augmented generation.",
+    "epoch": "An <strong>epoch</strong> is one pass over all of your examples. Training loss measures how closely the model reproduces your examples. Lower loss does not by itself mean better answers, which is why you test before you deploy."
+  },
+  "samples": {
+    "see": "See sample files",
+    "description": "What good material looks like. Download one as a template for your own data.",
+    "hide": "Hide",
+    "preview": "Preview",
+    "download": "Download",
+    "moreLines": "… {{count}} more lines"
+  },
+  "describe": {
+    "title": "Describe the AI",
+    "description": "The instructions are sent with every message and added to every training example, so the AI learns them the same way it will use them.",
+    "name": "Name",
+    "job": "The job",
+    "instructions": "Instructions",
+    "instructionsHint": "Changing the instructions after training works best if you train again, so the examples match.",
+    "saveContinue": "Save and continue",
+    "continue": "Continue",
+    "confirmDelete": "Delete {{name}}? Its examples, trained revisions, and the knowledge its material created are removed.",
+    "delete": "Delete"
+  },
+  "base": {
+    "title": "Choose a base model",
+    "description": "Smaller models train faster and answer faster. Training fit is checked separately from running the model, because training needs several times more memory.",
+    "checking": "Checking what this computer can train…",
+    "recommended": "Recommended",
+    "selected": "Selected",
+    "installed": "Installed",
+    "memory": " · training needs about {{size}}",
+    "download": " · downloads {{size}} once",
+    "notInstalled": "{{model}} is not installed. Training works without it, but you need it to test and use the result. <link>Install it from Models</link>.",
+    "continue": "Continue"
+  },
+  "material": {
+    "add": "Add material",
+    "filePaste": "File or paste",
+    "chats": "Saved chats",
+    "continue": "Continue",
+    "tooLarge": "That file is larger than 20 MB. Connect it from Knowledge instead, which reads it from disk.",
+    "chooseFile": "Choose a file",
+    "pasteHint": "or paste below. JSONL chats, Q&A tables, CSV, Excel, PDF, Markdown, and text work.",
+    "ready": "{{filename}} is ready.",
+    "readsPdf": "Yggdrasil reads its text to classify it.",
+    "readsSheet": "Yggdrasil reads the first sheet to classify it.",
+    "clear": "Clear",
+    "placeholder": "Q: A question your AI should handle\nA: The answer you want it to give\n\nQ: …",
+    "label": "Material",
+    "recommends": "Yggdrasil recommends",
+    "examplesFound_one": "{{count}} example found",
+    "examplesFound_other": "{{count}} examples found",
+    "useFor": "Use this material for",
+    "recommendedTag": " (recommended)",
+    "adding": "Adding…",
+    "addMaterial": "Add material",
+    "chatsHint": "Pick chats where the answers are the kind you want. Each becomes one training example you can edit in the next step.",
+    "noChats": "No saved chats.",
+    "untitledChat": "Untitled chat",
+    "addChats_one": "Add {{count}} chat",
+    "addChats_other": "Add {{count}} chats",
+    "addChatsNone": "Add chats",
+    "list": "Material",
+    "recommendedUse": "recommended {{use}}",
+    "examples_one": "{{count}} example",
+    "examples_other": "{{count}} examples",
+    "connected": "Connected as knowledge",
+    "confirmRemove": "Remove {{name}}? Its examples and connected knowledge are removed too.",
+    "remove": "Remove"
+  },
+  "examples": {
+    "title": "Review examples",
+    "willTrain": "<strong>{{usable}}</strong> of {{total}} will train",
+    "filters": {
+      "all": "All",
+      "flagged": "Flagged",
+      "excluded": "Excluded"
+    },
+    "loading": "Loading examples…",
+    "showMore": "Show more ({{count}} left)",
+    "continue": "Continue",
+    "excluded": "Excluded",
+    "turns": "{{count}} turns",
+    "q": "Q",
+    "a": "A",
+    "empty": "empty",
+    "noAnswer": "no answer",
+    "answer": "Answer",
+    "save": "Save",
+    "cancel": "Cancel",
+    "editAnswer": "Edit answer",
+    "include": "Include",
+    "exclude": "Exclude",
+    "delete": "Delete",
+    "writeTitle": "Write an example",
+    "writeDescription": "Show one question and the answer you want. Write how to use facts, not the facts themselves.",
+    "questionPlaceholder": "Customer question",
+    "question": "Question",
+    "answerPlaceholder": "The answer you want",
+    "add": "Add example"
+  },
+  "plan": {
+    "willTrain": "Will be trained",
+    "examples_one": "<strong>{{count}}</strong> example teaches how to respond.",
+    "examples_other": "<strong>{{count}}</strong> examples teach how to respond.",
+    "base": "Base model: {{model}}",
+    "notChosen": "not chosen",
+    "connected": "Stays connected",
+    "connectedHint": "Looked up on every question. Edit it later without retraining.",
+    "effort": "Training effort",
+    "where": "Where it trains",
+    "estimating": "Estimating…",
+    "starting": "Starting…",
+    "train": "Train revision {{revision}}",
+    "thisComputer": "this computer",
+    "nornPicked": "Norn picked this",
+    "trainHere": "Train here instead",
+    "memory": "Memory",
+    "memoryOf": "{{needed}} of {{available}}",
+    "download": "Download",
+    "none": "None",
+    "disk": "Disk",
+    "time": "Time, roughly",
+    "advanced": "Advanced settings",
+    "advancedHint": "Leave a field empty to use the preset ({{preset}}). Settings you pin here are used even if they do not fit in memory.",
+    "presetSummary": "{{method}}, {{iters}} steps",
+    "method": "Method",
+    "presetMethod": "Preset ({{method}})",
+    "lora": "LoRA, full-precision base",
+    "qlora": "QLoRA, 4-bit base",
+    "fields": {
+      "epochs": {
+        "label": "Epochs",
+        "help": "Passes over all examples."
+      },
+      "rank": {
+        "label": "LoRA rank",
+        "help": "Adapter capacity. Higher learns more and needs more memory."
+      },
+      "layers": {
+        "label": "Layers",
+        "help": "How many of the last layers to train. -1 trains all."
+      },
+      "learning_rate": {
+        "label": "Learning rate",
+        "help": "Step size. Too high forgets the base model."
+      },
+      "batch_size": {
+        "label": "Batch size",
+        "help": "Examples per step."
+      },
+      "max_seq_length": {
+        "label": "Max tokens",
+        "help": "Longest example, in tokens."
+      }
+    },
+    "saveAdvanced": "Save advanced settings",
+    "usePreset": "Use the preset"
+  },
+  "train": {
+    "none": "No training yet. Review the plan and start training.",
+    "compare": "Compare with the base model",
+    "earlier": "Earlier runs",
+    "revision": "Revision {{revision}}",
+    "on": "On {{computer}} with {{backend}} · {{method}} · {{epochs}} epochs",
+    "cancelling": "Cancelling…",
+    "cancel": "Cancel",
+    "stages": "Training stages",
+    "failed": "{{error}} Temporary files were removed. The base model was not changed.",
+    "failedDefault": "Training failed.",
+    "cancelled": "Cancelled. Temporary files were removed.",
+    "step": "step {{iter}} of {{iters}}",
+    "downloaded": "Downloaded {{done}} of {{total}}",
+    "elapsed": "Elapsed",
+    "remaining": "Remaining",
+    "about": "about {{time}}",
+    "epoch": "Epoch",
+    "epochOf": "{{epoch}} of {{epochs}}",
+    "speed": "Speed",
+    "tokensPerSec": "{{count}} tokens/s",
+    "trainingLoss": "Training loss",
+    "validationLoss": "Validation loss",
+    "peakMemory": "Peak memory",
+    "gigabytes": "{{value}} GB",
+    "lossNote": "Loss shows how closely the model reproduces your examples. A lower number does not guarantee better answers, so compare the results before you deploy."
+  },
+  "test": {
+    "first": "Train a revision first. Then compare it with the base model here.",
+    "title": "Compare with the base model",
+    "revision": "Revision",
+    "deployedTag": " (deployed)",
+    "description": "Both sides get the same instructions and connected knowledge, so the difference is what training added. The default test prompts are questions held out of training.",
+    "prompts": "Test prompts, one per line",
+    "comparing": "Comparing…",
+    "again": "Run again",
+    "run": "Run comparison",
+    "save": "Save prompts",
+    "results": "Results",
+    "running": "Running",
+    "failed": "Failed",
+    "base": "Base",
+    "specialized": "Specialized",
+    "continue": "Continue to deploy"
+  },
+  "deploy": {
+    "title": "Deploy",
+    "description": "A deployed AI appears in the Chat model menu and in the API. It keeps its base model, adapter revision, instructions, and connected knowledge together. The base model stays available on its own.",
+    "first": "Train and test a revision first.",
+    "revision": "Revision {{revision}}",
+    "deployed": "Deployed",
+    "meta": "{{examples}} examples · {{method}} · {{date}}",
+    "valLoss": " · validation loss {{loss}}",
+    "compareFirst": "Compare it first",
+    "undeploy": "Undeploy",
+    "switch": "Switch to this revision",
+    "deploy": "Deploy",
+    "use": "Use it",
+    "useBody": "In Chat, pick <name>{{name}}</name> from the model menu. <link>Open Chat</link>. From other programs, use the model id <id>{{id}}</id>:",
+    "runsHere": "It runs on this computer, where its adapter is stored. Retraining creates a new revision; this one keeps answering until you deploy the new one."
+  },
+  "export": {
+    "title": "Export as a GGUF file",
+    "description": "Merge revision {{revision}} into its base model as one file that llama.cpp, LM Studio, Ollama, and other GGUF tools can load. The file is about the size of the base model. Its instructions and connected knowledge stay in Yggdrasil.",
+    "exporting": "Exporting…",
+    "upTo": "up to {{size}}",
+    "failed": "The export failed: {{error}}",
+    "saving": "Saving…",
+    "download": "Download {{filename}}",
+    "savedTo": "Saved to {{path}}",
+    "deleteFile": "Delete file",
+    "tryAgain": "Try again",
+    "export": "Export",
+    "cancel": "Cancel",
+    "instructions": "Instructions to use as the system prompt"
+  }
+}

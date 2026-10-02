@@ -30,7 +30,7 @@ describe('CapabilityPanel', () => {
     expect(await screen.findByText('Search the web and read pages')).toBeInTheDocument()
     expect(screen.getByText(/Via Web Search/)).toBeInTheDocument()
     expect(screen.getByText(/No image model or image tool is installed/)).toBeInTheDocument()
-    expect(screen.getByText(/1 models installed · 1 of 1 computers online · 1 tools/)).toBeInTheDocument()
+    expect(screen.getByText(/1 model installed · 1 of 1 computers online · 1 tool ·/)).toBeInTheDocument()
   })
 
   // The release screenshots once served [] here, which blanked Diagnostics.

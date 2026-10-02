@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import { saveText } from '@/lib/desktopBridge'
 import type { SampleFile } from '@/types/api'
@@ -17,13 +18,14 @@ async function download(file: SampleFile) {
 
 /** Example material in each format, to read or download as a starting point. */
 export function SampleFiles({ open = false }: { open?: boolean }) {
+  const { t } = useTranslation('train')
   const samples = useQuery({ queryKey: ['training', 'samples'], queryFn: () => api.trainingSamples(), staleTime: Infinity })
   const [shown, setShown] = useState<string | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
   return (
     <details className="text-sm" open={open}>
-      <summary className="cursor-pointer text-ink">See sample files</summary>
-      <p className="mt-2 text-ink-muted">What good material looks like. Download one as a template for your own data.</p>
+      <summary className="cursor-pointer text-ink">{t('samples.see')}</summary>
+      <p className="mt-2 text-ink-muted">{t('samples.description')}</p>
       {saveError && <p className="mt-2 text-xs text-danger">{saveError}</p>}
       <ul className="mt-2 space-y-2">
         {(samples.data ?? []).map((f) => {
@@ -35,7 +37,7 @@ export function SampleFiles({ open = false }: { open?: boolean }) {
                 <span className="mono-id">{f.filename}</span>
                 <span className="ml-auto flex gap-1.5">
                   <button type="button" className="btn-secondary px-2 py-1 text-xs" onClick={() => setShown(shown === f.filename ? null : f.filename)}>
-                    {shown === f.filename ? 'Hide' : 'Preview'}
+                    {shown === f.filename ? t('samples.hide') : t('samples.preview')}
                   </button>
                   <button
                     type="button"
@@ -45,7 +47,7 @@ export function SampleFiles({ open = false }: { open?: boolean }) {
                       download(f).catch((err) => setSaveError(err instanceof Error ? err.message : String(err)))
                     }}
                   >
-                    Download
+                    {t('samples.download')}
                   </button>
                 </span>
               </div>
@@ -53,7 +55,7 @@ export function SampleFiles({ open = false }: { open?: boolean }) {
               {shown === f.filename && (
                 <pre className="log-panel mt-2 max-h-64 overflow-auto whitespace-pre text-xs">
                   {lines.slice(0, 12).join('\n')}
-                  {lines.length > 13 ? `\n… ${lines.length - 13} more lines` : ''}
+                  {lines.length > 13 ? `\n${t('samples.moreLines', { count: lines.length - 13 })}` : ''}
                 </pre>
               )}
             </li>

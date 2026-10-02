@@ -1,17 +1,15 @@
+import i18n from '@/i18n'
 import type { ToolPolicy } from '@/types/api'
 
 export type CapabilityId = 'internet' | 'files' | 'code' | 'speech' | 'images' | 'shell' | 'git'
 
+// Each capability's name and description are profiles:capabilities.<id> in the catalog.
 export const CAPABILITIES: {
   id: CapabilityId
-  label: string
-  description: string
   tools: { id: string; on: ToolPolicy['policy'] }[]
 }[] = [
   {
     id: 'internet',
-    label: 'Internet',
-    description: 'Search and read current information from the web',
     tools: [
       { id: 'internet.search', on: 'allow' },
       { id: 'internet.open', on: 'allow' },
@@ -19,8 +17,6 @@ export const CAPABILITIES: {
   },
   {
     id: 'files',
-    label: 'Files',
-    description: 'Find, read, and write files in the workspace',
     tools: [
       { id: 'filesystem.search', on: 'allow' },
       { id: 'filesystem.read', on: 'allow' },
@@ -29,14 +25,10 @@ export const CAPABILITIES: {
   },
   {
     id: 'code',
-    label: 'Run code',
-    description: 'Run Python in a sandbox for calculations, analysis, and charts; asks first',
     tools: [{ id: 'code.execute', on: 'ask' }],
   },
   {
     id: 'speech',
-    label: 'Speech',
-    description: 'Transcribe audio and read text aloud, on this computer',
     tools: [
       { id: 'speech.transcribe', on: 'allow' },
       { id: 'speech.synthesize', on: 'allow' },
@@ -44,8 +36,6 @@ export const CAPABILITIES: {
   },
   {
     id: 'images',
-    label: 'Images',
-    description: 'Make and edit images on this computer, once image generation is set up',
     tools: [
       { id: 'image.generate', on: 'allow' },
       { id: 'image.edit', on: 'allow' },
@@ -53,14 +43,10 @@ export const CAPABILITIES: {
   },
   {
     id: 'shell',
-    label: 'Shell',
-    description: 'Run commands on this computer',
     tools: [{ id: 'terminal', on: 'allow' }],
   },
   {
     id: 'git',
-    label: 'Git',
-    description: 'Inspect the repository, and commit or push',
     tools: [
       { id: 'git.status', on: 'allow' },
       { id: 'git.diff', on: 'allow' },
@@ -95,6 +81,19 @@ export function setCapability(tools: ToolPolicy[], id: CapabilityId, enabled: bo
   return next
 }
 
+export function capabilityLabel(id: CapabilityId): string {
+  return i18n.t(`profiles:capabilities.${id}.label`)
+}
+
+export function capabilityDescription(id: CapabilityId): string {
+  return i18n.t(`profiles:capabilities.${id}.description`)
+}
+
+/** The capabilities a profile has turned on, in order. */
+export function activeCapabilities(tools: ToolPolicy[] | undefined): CapabilityId[] {
+  return CAPABILITIES.filter((item) => capabilityEnabled(tools, item.id)).map((item) => item.id)
+}
+
 export function activeCapabilityLabels(tools: ToolPolicy[] | undefined): string[] {
-  return CAPABILITIES.filter((item) => capabilityEnabled(tools, item.id)).map((item) => item.label)
+  return activeCapabilities(tools).map(capabilityLabel)
 }

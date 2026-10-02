@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { api } from '@/lib/api'
 
 function bytesText(b: number): string {
-  if (b >= 1 << 30) return `${(b / (1 << 30)).toFixed(1)} GB`
-  if (b >= 1 << 20) return `${(b / (1 << 20)).toFixed(1)} MB`
-  return `${Math.round(b / 1024)} KB`
+  if (b >= 1 << 30) return i18n.t('diagnostics:abilities.gigabytes', { value: (b / (1 << 30)).toFixed(1) })
+  if (b >= 1 << 20) return i18n.t('diagnostics:abilities.megabytes', { value: (b / (1 << 20)).toFixed(1) })
+  return i18n.t('diagnostics:abilities.kilobytes', { value: Math.round(b / 1024) })
 }
 
 /**
@@ -12,6 +14,7 @@ function bytesText(b: number): string {
  * or what would make it possible, and what it is built from.
  */
 export function CapabilityPanel() {
+  const { t } = useTranslation('diagnostics')
   const query = useQuery({ queryKey: ['capabilities'], queryFn: () => api.getCapabilities(), retry: false, staleTime: 15_000 })
   const snap = query.data
   // A daemon too old for the inventory, or a malformed reply, hides the
@@ -28,11 +31,8 @@ export function CapabilityPanel() {
   return (
     <section className="card space-y-3">
       <div>
-        <h2 className="section-title">What Yggdrasil can do</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          From what is installed, online, and connected right now. Chat answers questions such as &ldquo;Can you
-          generate an image?&rdquo; from this list.
-        </p>
+        <h2 className="section-title">{t('abilities.title')}</h2>
+        <p className="mt-1 text-sm text-ink-muted">{t('abilities.description')}</p>
       </div>
       <ul className="grid gap-x-4 gap-y-1.5 text-sm sm:grid-cols-2">
         {snap.abilities.map((a) => (
@@ -42,10 +42,10 @@ export function CapabilityPanel() {
             </span>
             <span className="min-w-0">
               <span className={a.available ? 'text-ink' : 'text-ink-muted'}>{a.label}</span>
-              <span className="sr-only">{a.available ? ' (available)' : ' (not available)'}</span>
+              <span className="sr-only">{a.available ? t('abilities.available') : t('abilities.notAvailable')}</span>
               {(a.via?.length || a.note) && (
                 <span className="block text-xs text-ink-faint">
-                  {a.via?.length ? `Via ${a.via.join(', ')}. ` : ''}
+                  {a.via?.length ? t('abilities.via', { via: a.via.join(', ') }) : ''}
                   {a.note}
                 </span>
               )}
@@ -54,9 +54,14 @@ export function CapabilityPanel() {
         ))}
       </ul>
       <p className="text-xs text-ink-faint">
-        {models.length} models installed · {online} of {nodes.length} computers online · {tools} tools ·{' '}
-        {connected} connected services · {healthy} of {providers.length} providers ready · {snap.artifacts?.count ?? 0} files (
-        {bytesText(snap.artifacts?.bytes ?? 0)})
+        {t('abilities.summary', {
+          models: t('abilities.models', { count: models.length }),
+          computers: t('abilities.computers', { online, total: nodes.length }),
+          tools: t('abilities.tools', { count: tools }),
+          services: t('abilities.services', { count: connected }),
+          providers: t('abilities.providers', { healthy, total: providers.length }),
+          files: t('abilities.files', { count: snap.artifacts?.count ?? 0, size: bytesText(snap.artifacts?.bytes ?? 0) }),
+        })}
       </p>
     </section>
   )

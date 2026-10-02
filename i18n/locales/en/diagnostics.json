@@ -1,0 +1,161 @@
+{
+  "page": {
+    "title": "Yggdrasil health",
+    "attention": "Something needs attention.",
+    "mostly": "Mostly healthy — one thing needs a look.",
+    "normal": "Everything is working normally.",
+    "creating": "Creating…",
+    "export": "Export diagnostics",
+    "exportHint": "Creates a troubleshooting bundle. Secrets are excluded.",
+    "overall": "Overall status",
+    "allOk": "✓ All systems operational",
+    "needsAttention": "⚠ Needs attention",
+    "checkBelow": "⚠ Check items below",
+    "checking": "Checking…",
+    "refresh": "Refresh",
+    "tip": "Tip: install a model in Models before chatting.",
+    "bundleCreated": "Diagnostics bundle created",
+    "bundleAt": "Diagnostics bundle created at <path>{{path}}</path>",
+    "bundleShare": "Diagnostics bundle created. You can share this file when asking for help.",
+    "bundleFailed": "Could not create diagnostics bundle. Check that the daemon is running."
+  },
+  "checked": {
+    "never": "Not checked yet",
+    "justNow": "Last checked just now",
+    "seconds": "Last checked {{count}}s ago",
+    "minutes": "Last checked {{count}}m ago"
+  },
+  "ago": {
+    "justNow": "just now",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours"
+  },
+  "rows": {
+    "working": "Working…",
+    "retry": "Retry",
+    "openSettings": "Open Settings",
+    "viewDetails": "View details",
+    "openModels": "Open Models",
+    "openComputers": "Open Computers",
+    "manageModels": "Manage models",
+    "apiSettings": "API settings",
+    "healthy": "Healthy",
+    "unavailable": "Unavailable",
+    "control": {
+      "label": "Control service",
+      "notResponding": "Not responding",
+      "message": "The local Yggdrasil service is not reachable. Quit and reopen the app, or check that the daemon is running."
+    },
+    "runtime": {
+      "label": "Model runtime",
+      "needsAttention": "Needs attention",
+      "notResponding": "The local model runtime is not responding.",
+      "notSetUp": "Not set up",
+      "installModel": "Install a model to finish setting up the runtime.",
+      "idle": "Idle",
+      "running_one": "{{count}} model running",
+      "running_other": "{{count}} models running"
+    },
+    "database": {
+      "label": "Local database"
+    },
+    "bifrost": {
+      "label": "Bifrost networking",
+      "offline_one": "{{count}} computer offline",
+      "offline_other": "{{count}} computers offline",
+      "silentFor_one": "{{names}} has not responded for {{ago}}.",
+      "silentFor_other": "{{names}} have not responded for {{ago}}.",
+      "silent_one": "{{names}} is not responding.",
+      "silent_other": "{{names}} are not responding.",
+      "connected_one": "{{count}} computer connected",
+      "connected_other": "{{count}} computers connected",
+      "none": "No computers found",
+      "noneHint": "Add another computer or check Find other computers in Settings."
+    },
+    "storage": {
+      "label": "Storage",
+      "available": "{{size}} available",
+      "modelsUse": "Models use about {{size}} on this computer.",
+      "freeUp": "Free up disk space before installing more models."
+    },
+    "api": {
+      "label": "API",
+      "lan": "LAN enabled",
+      "local": "Local only",
+      "lanHint": "Other devices on your network can reach the API when authorized."
+    }
+  },
+  "env": {
+    "title": "Environment",
+    "version": "Version",
+    "apiBind": "API bind",
+    "node": "Node",
+    "dataDir": "Data directory"
+  },
+  "logs": {
+    "hide": "Hide logs",
+    "view": "View logs",
+    "files": "Log files",
+    "live": "Live",
+    "loading": "Loading logs…",
+    "none": "No log files yet. They appear after the app has started and performed work.",
+    "kinds": {
+      "daemon": "App",
+      "runtime": "Model runtime",
+      "other": "Other"
+    },
+    "kindsAdvanced": {
+      "daemon": "Daemon",
+      "runtime": "Runtime"
+    },
+    "select": "Select a log",
+    "selectHint": "Choose a log file on the left to inspect recent output.",
+    "recent": "Showing the most recent portion of this file",
+    "full": "Full file",
+    "copied": "Copied",
+    "copyFailed": "Copy failed",
+    "copy": "Copy",
+    "reading": "Reading log…",
+    "readFailed": "Could not read this log. It may have been rotated or removed.",
+    "empty": "(empty)"
+  },
+  "tools": {
+    "title": "Tool activity",
+    "none": "No tool calls yet in this session."
+  },
+  "caches": {
+    "title": "Caches",
+    "description": "What Yggdrasil keeps to answer repeats faster. Personal caches stay on this computer and are cleared with run records. Passwords and keys are never cached.",
+    "by": "By {{key}}",
+    "keptUntil": "kept until invalidated",
+    "keptFor": "kept {{ttl}}",
+    "clearedWhen": "; cleared when {{invalidation}}",
+    "entries_one": "{{count}} entry",
+    "entries_other": "{{count}} entries",
+    "hitsMisses": " · {{hits}} hits · {{misses}} misses",
+    "clear": "Clear"
+  },
+  "abilities": {
+    "title": "What Yggdrasil can do",
+    "description": "From what is installed, online, and connected right now. Chat answers questions such as “Can you generate an image?” from this list.",
+    "available": " (available)",
+    "notAvailable": " (not available)",
+    "via": "Via {{via}}. ",
+    "summary": "{{models}} · {{computers}} · {{tools}} · {{services}} · {{providers}} · {{files}}",
+    "models_one": "{{count}} model installed",
+    "models_other": "{{count}} models installed",
+    "computers": "{{online}} of {{total}} computers online",
+    "tools_one": "{{count}} tool",
+    "tools_other": "{{count}} tools",
+    "services_one": "{{count}} connected service",
+    "services_other": "{{count}} connected services",
+    "providers": "{{healthy}} of {{total}} providers ready",
+    "files_one": "{{count}} file ({{size}})",
+    "files_other": "{{count}} files ({{size}})",
+    "gigabytes": "{{value}} GB",
+    "megabytes": "{{value}} MB",
+    "kilobytes": "{{value}} KB"
+  }
+}

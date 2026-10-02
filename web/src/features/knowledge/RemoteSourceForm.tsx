@@ -1,23 +1,26 @@
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import type { KnowledgeRemoteInput } from '@/types/api'
 import { errorText } from '@/features/train/display'
 
 type Driver = NonNullable<KnowledgeRemoteInput['driver']>
 
+// Each choice's label is knowledge:remote.refreshChoices.<key> in the catalog.
 const refreshChoices = [
-  { minutes: 5, label: '5 minutes' },
-  { minutes: 15, label: '15 minutes' },
-  { minutes: 60, label: '1 hour' },
-  { minutes: 360, label: '6 hours' },
-  { minutes: 1440, label: '1 day' },
+  { minutes: 5, key: 'm5' },
+  { minutes: 15, key: 'm15' },
+  { minutes: 60, key: 'h1' },
+  { minutes: 360, key: 'h6' },
+  { minutes: 1440, key: 'd1' },
 ]
 
 // RemoteSourceForm connects a database query or a web API as knowledge.
 // Passwords and tokens go to the daemon's secrets directory and are never
 // shown again.
 export function RemoteSourceForm({ kind, onAdded }: { kind: 'database' | 'api'; onAdded: () => void }) {
+  const { t } = useTranslation('knowledge')
   const [name, setName] = useState('')
   const [driver, setDriver] = useState<Driver>('sqlite')
   const [database, setDatabase] = useState('')
@@ -63,21 +66,21 @@ export function RemoteSourceForm({ kind, onAdded }: { kind: 'database' | 'api'; 
       {kind === 'database' ? (
         <>
           <label className="block space-y-1">
-            <span className="text-sm text-ink">Database</span>
+            <span className="text-sm text-ink">{t('remote.database')}</span>
             <select className="field w-full" value={driver} onChange={(e) => setDriver(e.target.value as Driver)}>
-              <option value="sqlite">SQLite file</option>
+              <option value="sqlite">{t('remote.sqlite')}</option>
               <option value="postgres">PostgreSQL</option>
               <option value="mysql">MySQL</option>
             </select>
           </label>
           {driver === 'sqlite' ? (
             <label className="block space-y-1">
-              <span className="text-sm text-ink">File on this computer</span>
+              <span className="text-sm text-ink">{t('remote.file')}</span>
               <input className="field w-full font-mono text-xs" value={database} onChange={(e) => setDatabase(e.target.value)} placeholder="~/shop/inventory.db" />
             </label>
           ) : (
             <label className="block space-y-1">
-              <span className="text-sm text-ink">Connection string</span>
+              <span className="text-sm text-ink">{t('remote.connection')}</span>
               <input
                 className="field w-full font-mono text-xs"
                 type="password"
@@ -86,39 +89,39 @@ export function RemoteSourceForm({ kind, onAdded }: { kind: 'database' | 'api'; 
                 onChange={(e) => setConnection(e.target.value)}
                 placeholder={driver === 'postgres' ? 'postgres://reader:password@db.local/shop' : 'reader:password@tcp(db.local:3306)/shop'}
               />
-              <span className="block text-xs text-ink-faint">Use an account that can only read. It is stored apart from the database and not shown again.</span>
+              <span className="block text-xs text-ink-faint">{t('remote.connectionHint')}</span>
             </label>
           )}
           <label className="block space-y-1">
-            <span className="text-sm text-ink">Query</span>
+            <span className="text-sm text-ink">{t('remote.query')}</span>
             <textarea
               className="field min-h-20 w-full font-mono text-xs"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="SELECT sku, name, price, in_stock FROM products WHERE active"
-              aria-label="Query"
+              aria-label={t('remote.query')}
             />
-            <span className="block text-xs text-ink-faint">One SELECT. It runs read-only, so Yggdrasil never changes the database. Each row becomes a passage.</span>
+            <span className="block text-xs text-ink-faint">{t('remote.queryHint')}</span>
           </label>
         </>
       ) : (
         <>
           <label className="block space-y-1">
-            <span className="text-sm text-ink">URL</span>
+            <span className="text-sm text-ink">{t('remote.url')}</span>
             <input className="field w-full font-mono text-xs" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://shop.example.com/api/products" />
-            <span className="block text-xs text-ink-faint">JSON, CSV, or text. A list of objects becomes one passage per item.</span>
+            <span className="block text-xs text-ink-faint">{t('remote.urlHint')}</span>
           </label>
           <label className="block space-y-1">
-            <span className="text-sm text-ink">List in the response (optional)</span>
+            <span className="text-sm text-ink">{t('remote.items')}</span>
             <input className="field w-full font-mono text-xs" value={items} onChange={(e) => setItems(e.target.value)} placeholder="data.products" />
           </label>
           <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-2">
             <label className="block space-y-1">
-              <span className="text-sm text-ink">Header</span>
+              <span className="text-sm text-ink">{t('remote.header')}</span>
               <input className="field w-full font-mono text-xs" value={headerName} onChange={(e) => setHeaderName(e.target.value)} />
             </label>
             <label className="block space-y-1">
-              <span className="text-sm text-ink">Value (optional)</span>
+              <span className="text-sm text-ink">{t('remote.value')}</span>
               <input
                 className="field w-full font-mono text-xs"
                 type="password"
@@ -132,23 +135,23 @@ export function RemoteSourceForm({ kind, onAdded }: { kind: 'database' | 'api'; 
         </>
       )}
       <label className="block space-y-1">
-        <span className="text-sm text-ink">Fetch again when older than</span>
+        <span className="text-sm text-ink">{t('remote.refresh')}</span>
         <select className="field w-full" value={refresh} onChange={(e) => setRefresh(Number(e.target.value))}>
           {refreshChoices.map((c) => (
             <option key={c.minutes} value={c.minutes}>
-              {c.label}
+              {t(`remote.refreshChoices.${c.key}`)}
             </option>
           ))}
         </select>
       </label>
       <label className="block space-y-1">
-        <span className="text-sm text-ink">Name (optional)</span>
+        <span className="text-sm text-ink">{t('remote.name')}</span>
         <input className="field w-full" value={name} onChange={(e) => setName(e.target.value)} />
       </label>
       {add.error && <p className="text-sm text-danger">{errorText(add.error)}</p>}
       {add.data?.status === 'failed' && <p className="text-sm text-danger">{add.data.error}</p>}
       <button type="button" className="btn-primary px-3 py-1.5 text-sm" disabled={add.isPending || !ready} onClick={() => add.mutate()}>
-        {add.isPending ? 'Connecting…' : 'Connect'}
+        {add.isPending ? t('remote.connecting') : t('remote.connect')}
       </button>
     </>
   )

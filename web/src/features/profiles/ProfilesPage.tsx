@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
@@ -8,7 +9,7 @@ import { blankProfileTemplate, profileTemplateFromPurpose } from '@/lib/profileP
 import { useUIStore } from '@/stores/uiStore'
 import type { AIProfile, ModelRole, NodePolicy, OrchestrationPolicy, ToolPolicy } from '@/types/api'
 import { KnowledgePicker } from '@/features/knowledge/KnowledgePicker'
-import { CAPABILITIES, capabilityEnabled, setCapability } from './capabilities'
+import { CAPABILITIES, capabilityDescription, capabilityEnabled, capabilityLabel, setCapability } from './capabilities'
 import {
   computerSelectionLabel,
   createStartOptions,
@@ -16,14 +17,16 @@ import {
   isBuiltInProfile,
   isTeamProfile,
   MODEL_ROLES,
-  PURPOSE_LABELS,
   purposeIcon,
+  purposeLabel,
   roleDisplayName,
   roleHelp,
   roleHint,
   sortProfilesForDisplay,
-  STRATEGY_OPTIONS,
+  STRATEGY_VALUES,
   strategyLabel,
+  strategyOption,
+  type StrategyValue,
   toolChipPreview,
   toolSummary,
   type CreateStartFrom,
@@ -33,114 +36,31 @@ import { OrchestrationControls, cleanOrchestration } from './OrchestrationContro
 import { EXECUTION_KEYS, MEMORY_KEYS, ORCHESTRATION_KEYS } from './orchestrationKeys'
 import { RealmKicker } from '@/components/ui/Realm'
 
-const TOOL_CATALOG: {
-  id: string
-  label: string
-  description: string
-}[] = [
-  {
-    id: 'internet.search',
-    label: 'Web search',
-    description: 'Searches the public web and returns titles, links, and snippets.',
-  },
-  {
-    id: 'internet.open',
-    label: 'Open web page',
-    description: 'Opens a URL and returns readable text.',
-  },
-  {
-    id: 'filesystem.search',
-    label: 'Find files',
-    description: 'Finds files in the workspace by name.',
-  },
-  {
-    id: 'filesystem.read',
-    label: 'Read file',
-    description:
-      'Lets the assistant open files inside your Yggdrasil workspace so it can quote or summarize real content.',
-  },
-  {
-    id: 'filesystem.write',
-    label: 'Write file',
-    description:
-      'Lets the assistant create or update files in the workspace.',
-  },
-  {
-    id: 'terminal',
-    label: 'Terminal',
-    description:
-      'Runs shell commands on this computer.',
-  },
-  {
-    id: 'git.status',
-    label: 'Git status',
-    description: 'Shows which files are changed so the assistant can reason about your working tree.',
-  },
-  {
-    id: 'git.diff',
-    label: 'Git diff',
-    description: 'Shows the actual code changes so the assistant can review or explain a patch.',
-  },
-  {
-    id: 'git.log',
-    label: 'Git log',
-    description: 'Shows recent commits in the workspace.',
-  },
-  {
-    id: 'git.show',
-    label: 'Git show',
-    description: 'Shows one commit.',
-  },
-  {
-    id: 'git.add',
-    label: 'Git add',
-    description: 'Stages files for commit. Useful when you want help preparing a commit.',
-  },
-  {
-    id: 'git.commit',
-    label: 'Git commit',
-    description:
-      'Creates a local git commit.',
-  },
-  {
-    id: 'git.push',
-    label: 'Git push',
-    description: 'Pushes commits to the remote.',
-  },
+// The tools a profile can set one by one; each name and description is profiles:tools.<tool id> in the catalog.
+const TOOL_CATALOG: string[] = [
+  'internet.search',
+  'internet.open',
+  'filesystem.search',
+  'filesystem.read',
+  'filesystem.write',
+  'terminal',
+  'git.status',
+  'git.diff',
+  'git.log',
+  'git.show',
+  'git.add',
+  'git.commit',
+  'git.push',
 ]
 
-const POLICY_OPTIONS: {
-  value: ToolPolicy['policy']
-  label: string
-  description: string
-}[] = [
-  {
-    value: 'deny',
-    label: 'Deny',
-    description: 'Never available to this profile.',
-  },
-  {
-    value: 'ask',
-    label: 'Ask each time',
-    description: 'Shows an in-chat prompt before every use.',
-  },
-  {
-    value: 'allow-for-session',
-    label: 'Ask once per session',
-    description: 'Prompts the first time, then remembers until you restart the app.',
-  },
-  {
-    value: 'allow',
-    label: 'Always allow',
-    description: 'Runs without asking. Best for low-risk tools you use often.',
-  },
-]
+// The permission choices; each is profiles:policies.<policy> in the catalog.
+const POLICY_OPTIONS: ToolPolicy['policy'][] = ['deny', 'ask', 'allow-for-session', 'allow']
 
 function defaultToolsFrom(profile: AIProfile): ToolPolicy[] {
   const existing = new Map((profile.tools ?? []).map((t) => [t.tool_id, t.policy]))
-  return TOOL_CATALOG.map((tool) => ({
-    tool_id: tool.id,
-    policy: existing.get(tool.id) ?? 'allow',
+  return TOOL_CATALOG.map((id) => ({
+    tool_id: id,
+    policy: existing.get(id) ?? 'allow',
   }))
 }
 
@@ -194,6 +114,7 @@ function PurposeGlyph({ purpose }: { purpose: string }) {
 }
 
 export function ProfilesPage() {
+  const { t } = useTranslation('profiles')
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const advancedMode = useUIStore((s) => s.advancedMode)
@@ -252,7 +173,7 @@ export function ProfilesPage() {
   const duplicateMutation = useMutation({
     mutationFn: (profile: AIProfile) =>
       api.createProfile({
-        name: `${profile.name} (copy)`,
+        name: t('create.copyName', { name: profile.name }),
         purpose: profile.purpose,
         orchestrator_id: profile.orchestrator_id,
         node_policy: profile.node_policy,
@@ -334,29 +255,25 @@ export function ProfilesPage() {
       <header className="page-header flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <RealmKicker />
-          <h1 className="page-title">Profiles &amp; Orchestration</h1>
-          <p className="page-subtitle">
-            A profile is a saved assistant: how it works through requests, its models, tools, memory, and computers.
-          </p>
-          <p className="mt-1 text-sm text-ink-muted">
-            Choose one in Chat, or create your own.
-          </p>
+          <h1 className="page-title">{t('page.title')}</h1>
+          <p className="page-subtitle">{t('page.subtitle')}</p>
+          <p className="mt-1 text-sm text-ink-muted">{t('page.hint')}</p>
         </div>
         <button
           type="button"
           className="btn-primary"
           onClick={() => setShowCreate(true)}
-          title="Create a new profile"
+          title={t('page.createTitle')}
         >
-          Create profile
+          {t('page.create')}
         </button>
       </header>
 
       {showCreate && (
         <section className="card space-y-4">
           <div>
-            <h2 className="font-display text-lg font-semibold text-ink">Create profile</h2>
-            <p className="mt-1 text-sm text-ink-muted">Start from:</p>
+            <h2 className="font-display text-lg font-semibold text-ink">{t('create.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('create.startFrom')}</p>
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
             {startOptions.map((option) => (
@@ -377,8 +294,12 @@ export function ProfilesPage() {
             ))}
           </div>
           <p className="text-xs text-ink-faint">
-            Starting with <span className="font-medium text-ink">{selectedStartMeta.title}</span>
-            . You can rename and fine-tune after creating.
+            <Trans
+              t={t}
+              i18nKey="create.startingWith"
+              values={{ name: selectedStartMeta.title }}
+              components={{ strong: <span className="font-medium text-ink" /> }}
+            />
           </p>
           <div className="flex gap-2">
             <button
@@ -387,22 +308,22 @@ export function ProfilesPage() {
               disabled={createMutation.isPending}
               onClick={() => createMutation.mutate()}
             >
-              {createMutation.isPending ? 'Creating…' : 'Create'}
+              {createMutation.isPending ? t('create.creating') : t('create.create')}
             </button>
             <button type="button" className="btn-secondary" onClick={() => setShowCreate(false)}>
-              Cancel
+              {t('create.cancel')}
             </button>
           </div>
         </section>
       )}
 
       {allProfiles.length > 0 && (
-        <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filter profiles">
+        <div className="flex flex-wrap gap-2" role="tablist" aria-label={t('page.filter')}>
           {(
             [
-              { id: 'all', label: 'All' },
-              { id: 'builtin', label: 'Built-in' },
-              { id: 'custom', label: 'Custom' },
+              { id: 'all', label: t('page.filters.all') },
+              { id: 'builtin', label: t('page.filters.builtin') },
+              { id: 'custom', label: t('page.filters.custom') },
             ] as const
           ).map((tab) => (
             <button
@@ -424,28 +345,28 @@ export function ProfilesPage() {
         </div>
       )}
 
-      {profilesQuery.isLoading && <LoadingSpinner label="Loading profiles…" />}
+      {profilesQuery.isLoading && <LoadingSpinner label={t('page.loading')} />}
 
       {profilesQuery.isError && (
         <div className="rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
-          Could not load profiles. Is the local daemon running?
+          {t('page.loadFailed')}
         </div>
       )}
 
       {!profilesQuery.isLoading && !profilesQuery.isError && allProfiles.length === 0 && (
         <EmptyState
-          title="No profiles yet"
-          description="Create a profile to tell Chat how your assistant should work."
+          title={t('page.emptyTitle')}
+          description={t('page.emptyDescription')}
           action={
             <button type="button" className="btn-primary" onClick={() => setShowCreate(true)}>
-              Create profile
+              {t('page.create')}
             </button>
           }
         />
       )}
 
       {!profilesQuery.isLoading && allProfiles.length > 0 && profiles.length === 0 && (
-        <p className="text-sm text-ink-muted">No profiles in this filter.</p>
+        <p className="text-sm text-ink-muted">{t('page.noneInFilter')}</p>
       )}
 
       {profiles.length > 0 && (
@@ -493,37 +414,37 @@ export function ProfilesPage() {
                               setRenamingId(null)
                             }
                           }}
-                          aria-label="Rename profile"
+                          aria-label={t('card.rename')}
                         />
                       ) : (
                         <h2 className="font-semibold text-ink">{profile.name}</h2>
                       )}
                       <span className="label-caps">
-                        {builtIn ? 'Built-in' : 'Custom'}
+                        {builtIn ? t('card.builtin') : t('card.custom')}
                       </span>
                     </div>
                     <p className="mt-0.5 text-sm text-ink-muted">
-                      {PURPOSE_LABELS[profile.purpose] ?? profile.purpose}
+                      {purposeLabel(profile.purpose)}
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-1.5 text-sm">
-                  <p className="font-medium text-ink">{orch.title.split(' · ')[0]}</p>
+                  <p className="font-medium text-ink">{orch.name}</p>
                   <p className="text-ink-muted">
-                    {computers.short === 'Automatic'
-                      ? 'Automatic computer selection'
-                      : computers.short === 'Custom'
-                        ? 'Custom computer selection'
-                        : computers.title}
+                    {nodeMode === 'prefer_local'
+                      ? computers.title
+                      : nodeMode === 'manual'
+                        ? t('card.customSelection')
+                        : t('card.automaticSelection')}
                   </p>
                   {tools.enabled > 0 ? (
                     <p className="text-ink-muted">
-                      {tools.enabled} tools
-                      {tools.ask > 0 ? ` · ${tools.ask} ask first` : ''}
+                      {t('card.tools', { count: tools.enabled })}
+                      {tools.ask > 0 ? t('card.askFirst', { count: tools.ask }) : ''}
                     </p>
                   ) : (
-                    <p className="text-ink-muted">No tools enabled</p>
+                    <p className="text-ink-muted">{t('card.noTools')}</p>
                   )}
                   {chips.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 pt-0.5">
@@ -547,7 +468,7 @@ export function ProfilesPage() {
                         const remaining = Math.max(0, tools.enabled - previewed)
                         return remaining > 0 ? (
                           <span className="rounded-md px-1.5 py-0.5 text-[11px] text-ink-faint">
-                            +{remaining} more
+                            {t('card.more', { count: remaining })}
                           </span>
                         ) : null
                       })()}
@@ -587,7 +508,7 @@ export function ProfilesPage() {
                     className="btn-primary px-3 py-1.5 text-xs"
                     onClick={() => openProfileInChat(profile.id)}
                   >
-                    Use in Chat
+                    {t('card.useInChat')}
                   </button>
                   <button
                     type="button"
@@ -604,17 +525,17 @@ export function ProfilesPage() {
                   >
                     {advancedMode
                       ? isEditing
-                        ? 'Close'
-                        : 'Edit'
+                        ? t('card.close')
+                        : t('card.edit')
                       : showDetails
-                        ? 'Hide details'
-                        : 'Details'}
+                        ? t('card.hideDetails')
+                        : t('card.details')}
                   </button>
                   <div className="relative ml-auto">
                     <button
                       type="button"
                       className="rounded-md px-2 py-1.5 text-xs text-ink-faint hover:bg-raised hover:text-ink"
-                      aria-label={`More actions for ${profile.name}`}
+                      aria-label={t('card.moreActions', { name: profile.name })}
                       aria-expanded={menuOpenId === profile.id}
                       onClick={(e: MouseEvent) => {
                         e.stopPropagation()
@@ -636,21 +557,21 @@ export function ProfilesPage() {
                           }}
                           disabled={duplicateMutation.isPending}
                         >
-                          Duplicate
+                          {t('menu.duplicate')}
                         </MenuItem>
-                        <MenuItem onClick={() => beginRename(profile)}>Rename</MenuItem>
+                        <MenuItem onClick={() => beginRename(profile)}>{t('menu.rename')}</MenuItem>
                         {builtIn && (
                           <MenuItem
                             disabled={resetMutation.isPending}
                             onClick={() => {
-                              if (window.confirm(`Reset “${profile.name}” to how Yggdrasil ships it? Your changes to it are lost.`)) {
+                              if (window.confirm(t('menu.confirmReset', { name: profile.name }))) {
                                 resetMutation.mutate(profile.id)
                               } else {
                                 setMenuOpenId(null)
                               }
                             }}
                           >
-                            Reset to defaults
+                            {t('menu.reset')}
                           </MenuItem>
                         )}
                         {!builtIn && (
@@ -658,18 +579,14 @@ export function ProfilesPage() {
                             danger
                             disabled={deleteMutation.isPending}
                             onClick={() => {
-                              if (
-                                window.confirm(
-                                  `Delete “${profile.name}”? This cannot be undone.`,
-                                )
-                              ) {
+                              if (window.confirm(t('menu.confirmDelete', { name: profile.name }))) {
                                 deleteMutation.mutate(profile.id)
                               } else {
                                 setMenuOpenId(null)
                               }
                             }}
                           >
-                            Delete
+                            {t('menu.delete')}
                           </MenuItem>
                         )}
                       </div>
@@ -679,18 +596,23 @@ export function ProfilesPage() {
 
                 {showDetails && !isEditing && (
                   <div className="space-y-3 border-t border-line pt-3 text-sm">
-                    <DetailBlock label="How it works" body={orch.detail} />
+                    <DetailBlock label={t('card.howItWorks')} body={orch.detail} />
                     <DetailBlock
-                      label="Computer selection"
-                      body={`${computers.title}. ${computers.detail}`}
+                      label={t('card.computerSelection')}
+                      body={t('card.selectionDetail', { title: computers.title, detail: computers.detail })}
                     />
                     {advancedMode && (
                       <p className="text-xs text-ink-faint">
-                        Strategy:{' '}
-                        <span className="font-medium text-ink">
-                          {(STRATEGY_OPTIONS.find((o) => o.value === (isTeam ? 'team' : (profile.orchestration?.strategy ?? ''))) ??
-                            STRATEGY_OPTIONS[0]).label}
-                        </span>
+                        <Trans
+                          t={t}
+                          i18nKey="card.strategy"
+                          values={{
+                            strategy: strategyOption(
+                              (isTeam ? 'team' : (profile.orchestration?.strategy ?? '')) as StrategyValue,
+                            ).label,
+                          }}
+                          components={{ strong: <span className="font-medium text-ink" /> }}
+                        />
                       </p>
                     )}
                   </div>
@@ -705,7 +627,7 @@ export function ProfilesPage() {
                     }))}
                     nodes={pairedNodes.map((n) => ({
                       id: n.id,
-                      name: n.is_local ? `${n.name} (this machine)` : n.name,
+                      name: n.is_local ? t('card.thisMachine', { name: n.name }) : n.name,
                     }))}
                     saving={updateMutation.isPending}
                     onSave={(next) => updateMutation.mutate(next)}
@@ -785,6 +707,7 @@ function AdvancedEditor({
   onSave: (profile: AIProfile) => void
   onCancel: () => void
 }) {
+  const { t } = useTranslation('profiles')
   const [name, setName] = useState(profile.name)
   const [nodeMode, setNodeMode] = useState(profile.node_policy?.mode ?? 'automatic')
   const [placement, setPlacement] = useState(placementFrom(profile))
@@ -817,8 +740,8 @@ function AdvancedEditor({
     )
   }
 
-  const strategy = orchestration.strategy ?? ''
-  const orchHint = (STRATEGY_OPTIONS.find((o) => o.value === strategy) ?? STRATEGY_OPTIONS[0]).detail
+  const strategy = (orchestration.strategy ?? '') as StrategyValue
+  const orchHint = strategyOption(STRATEGY_VALUES.includes(strategy) ? strategy : '').detail
   const fallbacks = orchestration.fallback_models ?? []
   const setFallback = (index: number, id: string) => {
     const next = [...fallbacks]
@@ -831,25 +754,21 @@ function AdvancedEditor({
   return (
     <div className="space-y-5 border-t border-line pt-4">
       <section className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-          Profile
-        </h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{t('editor.profile')}</h3>
         <label className="block text-xs text-ink-muted">
-          Name
+          {t('editor.name')}
           <input
             className="field mt-1 w-full py-1.5 text-sm"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Programming"
+            placeholder={t('editor.namePlaceholder')}
           />
         </label>
       </section>
 
       <section className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-          Models
-        </h3>
-        <p className="text-xs text-ink-muted">Automatic uses the model chosen in the chat.</p>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{t('editor.models')}</h3>
+        <p className="text-xs text-ink-muted">{t('editor.modelsHint')}</p>
         {roles.map((role, index) => (
           <div
             key={`${profile.id}-${role.role}-${index}`}
@@ -859,13 +778,13 @@ function AdvancedEditor({
             <div className="grid gap-2 sm:grid-cols-3">
               <p className="text-sm font-medium text-ink sm:pt-5">{roleDisplayName(role.role)}</p>
               <label className="text-xs text-ink-muted">
-                Model
+                {t('editor.model')}
                 <select
                   className="field mt-1 w-full py-1.5 text-sm"
                   value={role.model_id}
                   onChange={(e) => updateRole(index, { model_id: e.target.value })}
                 >
-                  <option value="">Automatic</option>
+                  <option value="">{t('editor.automatic')}</option>
                   {installedModels.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.name || m.id}
@@ -877,7 +796,7 @@ function AdvancedEditor({
                 </select>
               </label>
               <label className="text-xs text-ink-muted">
-                Computer
+                {t('editor.computer')}
                 <select
                   className="field mt-1 w-full py-1.5 text-sm"
                   value={role.node_id ?? ''}
@@ -885,7 +804,7 @@ function AdvancedEditor({
                     updateRole(index, { node_id: e.target.value || undefined })
                   }
                 >
-                  <option value="">Automatic</option>
+                  <option value="">{t('editor.automatic')}</option>
                   {nodes.map((n) => (
                     <option key={n.id} value={n.id}>
                       {n.name}
@@ -897,10 +816,8 @@ function AdvancedEditor({
           </div>
         ))}
         <div className="space-y-2 rounded-lg bg-raised px-3 py-3">
-          <p className="text-sm font-medium text-ink">Fallback order</p>
-          <p className="text-xs leading-relaxed text-ink-muted">
-            Tried in order when the answering model fails. After these, Yggdrasil picks another installed model.
-          </p>
+          <p className="text-sm font-medium text-ink">{t('editor.fallback')}</p>
+          <p className="text-xs leading-relaxed text-ink-muted">{t('editor.fallbackHint')}</p>
           <div className="grid gap-2 sm:grid-cols-3">
             {[0, 1, 2].map((i) => (
               <label key={i} className="text-xs text-ink-muted">
@@ -911,7 +828,7 @@ function AdvancedEditor({
                   disabled={i > fallbacks.length}
                   onChange={(e) => setFallback(i, e.target.value)}
                 >
-                  <option value="">None</option>
+                  <option value="">{t('editor.none')}</option>
                   {installedModels.map((m) => (
                     <option key={m.id} value={m.id}>
                       {m.name || m.id}
@@ -925,15 +842,15 @@ function AdvancedEditor({
       </section>
 
       <section className="space-y-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Tools</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{t('editor.tools')}</h3>
         <ul className="space-y-2">
           {CAPABILITIES.map((capability) => {
             const on = capabilityEnabled(tools, capability.id)
             return (
               <li key={capability.id} className="flex items-start justify-between gap-3 rounded-lg bg-raised px-3 py-3">
                 <div>
-                  <p className="text-sm font-medium text-ink">{capability.label}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-ink-muted">{capability.description}</p>
+                  <p className="text-sm font-medium text-ink">{capabilityLabel(capability.id)}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-ink-muted">{capabilityDescription(capability.id)}</p>
                 </div>
                 <button
                   type="button"
@@ -941,7 +858,7 @@ function AdvancedEditor({
                   aria-pressed={on}
                   onClick={() => setTools((current) => setCapability(current, capability.id, !on))}
                 >
-                  {on ? 'On' : 'Off'}
+                  {on ? t('editor.on') : t('editor.off')}
                 </button>
               </li>
             )
@@ -949,32 +866,29 @@ function AdvancedEditor({
         </ul>
         {advancedMode && (
           <div className="space-y-3">
-        <p className="text-xs font-medium text-ink-muted">Individual tools</p>
+        <p className="text-xs font-medium text-ink-muted">{t('editor.individualTools')}</p>
         <ul className="space-y-2">
-          {TOOL_CATALOG.map((tool) => {
-            const policy = tools.find((t) => t.tool_id === tool.id)?.policy ?? 'ask'
-            const policyMeta =
-              POLICY_OPTIONS.find((opt) => opt.value === policy) ?? POLICY_OPTIONS[1]
+          {TOOL_CATALOG.map((id) => {
+            const policy = tools.find((tool) => tool.tool_id === id)?.policy ?? 'ask'
+            const policyKey = POLICY_OPTIONS.includes(policy) ? policy : 'ask'
             return (
-              <li key={tool.id} className="rounded-lg bg-raised px-3 py-3">
+              <li key={id} className="rounded-lg bg-raised px-3 py-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-ink">{tool.label}</p>
-                    <p className="mt-1 text-xs leading-relaxed text-ink-muted">
-                      {tool.description}
-                    </p>
+                    <p className="text-sm font-medium text-ink">{t(`tools.${id}.label`)}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-ink-muted">{t(`tools.${id}.description`)}</p>
                   </div>
                   <select
                     className="field max-w-[200px] py-1 text-sm"
                     value={policy}
-                    title={policyMeta.description}
+                    title={t(`policies.${policyKey}.description`)}
                     onChange={(e) =>
-                      updateToolPolicy(tool.id, e.target.value as ToolPolicy['policy'])
+                      updateToolPolicy(id, e.target.value as ToolPolicy['policy'])
                     }
                   >
                     {POLICY_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value} title={opt.description}>
-                        {opt.label}
+                      <option key={opt} value={opt} title={t(`policies.${opt}.description`)}>
+                        {t(`policies.${opt}.label`)}
                       </option>
                     ))}
                   </select>
@@ -988,10 +902,8 @@ function AdvancedEditor({
       </section>
 
       <section className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Memory</h3>
-        <p className="text-xs text-ink-muted">
-          Chats with this profile search these sources on every question and use the matching passages.
-        </p>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{t('editor.memory')}</h3>
+        <p className="text-xs text-ink-muted">{t('editor.memoryHint')}</p>
         <KnowledgePicker selected={knowledge} onChange={setKnowledge} disabled={saving} />
         {advancedMode && (
           <OrchestrationControls value={orchestration} onChange={setOrchestration} disabled={saving} only={MEMORY_KEYS} />
@@ -999,9 +911,9 @@ function AdvancedEditor({
       </section>
 
       <section className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Orchestration</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{t('editor.orchestration')}</h3>
         <label className="block text-xs text-ink-muted">
-          Strategy
+          {t('editor.strategy')}
           <select
             className="field mt-1 w-full py-1.5 text-sm"
             value={strategy}
@@ -1009,9 +921,9 @@ function AdvancedEditor({
               setOrchestration({ ...orchestration, strategy: e.target.value as OrchestrationPolicy['strategy'] })
             }
           >
-            {STRATEGY_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>
-                {o.label}
+            {STRATEGY_VALUES.map((value) => (
+              <option key={value} value={value}>
+                {strategyOption(value).label}
               </option>
             ))}
           </select>
@@ -1023,9 +935,9 @@ function AdvancedEditor({
       </section>
 
       <section className="space-y-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Execution</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">{t('editor.execution')}</h3>
         <label className="block text-xs text-ink-muted">
-          Computer selection
+          {t('editor.computerSelection')}
           <select
             className="field mt-1 w-full py-1.5 text-sm"
             value={nodeMode}
@@ -1033,9 +945,9 @@ function AdvancedEditor({
               setNodeMode(e.target.value as AIProfile['node_policy']['mode'])
             }
           >
-            <option value="automatic">Automatic — place where the model already lives</option>
-            <option value="prefer_local">Prefer this computer</option>
-            <option value="manual">Custom — use the computers set in Models</option>
+            <option value="automatic">{t('editor.selectionOptions.automatic')}</option>
+            <option value="prefer_local">{t('editor.selectionOptions.prefer_local')}</option>
+            <option value="manual">{t('editor.selectionOptions.manual')}</option>
           </select>
         </label>
         <p className="text-xs leading-relaxed text-ink-faint">{nodeHint}</p>
@@ -1045,7 +957,7 @@ function AdvancedEditor({
             checked={placement.remote === 'off'}
             onChange={(e) => setPlacement({ ...placement, remote: e.target.checked ? 'off' : '' })}
           />
-          Only this computer — never use paired computers
+          {t('editor.localOnly')}
         </label>
         {placement.remote !== 'off' && nodes.length > 0 && (
           <div className="space-y-1.5">
@@ -1057,9 +969,9 @@ function AdvancedEditor({
                   value={placement.preferred.includes(n.id) ? 'preferred' : placement.denied.includes(n.id) ? 'denied' : ''}
                   onChange={(e) => setPlacement(withPlacement(placement, n.id, e.target.value))}
                 >
-                  <option value="">Allowed</option>
-                  <option value="preferred">Preferred</option>
-                  <option value="denied">Never use</option>
+                  <option value="">{t('editor.allowed')}</option>
+                  <option value="preferred">{t('editor.preferred')}</option>
+                  <option value="denied">{t('editor.never')}</option>
                 </select>
               </label>
             ))}
@@ -1088,10 +1000,10 @@ function AdvancedEditor({
             })
           }
         >
-          Save profile
+          {t('editor.save')}
         </button>
         <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={onCancel}>
-          Cancel
+          {t('editor.cancel')}
         </button>
       </div>
     </div>

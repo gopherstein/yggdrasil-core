@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { api } from '@/lib/api'
 import { isBinaryUpload, readUpload, UPLOAD_ACCEPT } from '@/lib/upload'
@@ -12,6 +13,7 @@ import { RemoteSourceForm } from './RemoteSourceForm'
 
 
 export function KnowledgePage() {
+  const { t } = useTranslation('knowledge')
   const queryClient = useQueryClient()
   const sources = useQuery({ queryKey: ['knowledge'], queryFn: () => api.listKnowledge() })
   const refresh = () => void queryClient.invalidateQueries({ queryKey: ['knowledge'] })
@@ -21,21 +23,17 @@ export function KnowledgePage() {
     <div className="page-fill gap-4 overflow-y-auto p-4">
       <div>
         <RealmKicker />
-        <h1 className="font-display text-2xl font-semibold text-ink">Knowledge</h1>
-        <p className="mt-1 max-w-2xl text-sm text-ink-muted">
-          Mimir keeps catalogs, prices, policies, and documents searchable. When a profile or a specialized AI uses a
-          source, the passages that match each question are added to it. Edit a file and the next question sees the
-          change. No retraining.
-        </p>
+        <h1 className="font-display text-2xl font-semibold text-ink">{t('page.title')}</h1>
+        <p className="mt-1 max-w-2xl text-sm text-ink-muted">{t('page.description')}</p>
       </div>
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,26rem)]">
         <section className="space-y-3">
-          {sources.isLoading && <p className="text-sm text-ink-muted">Loading…</p>}
+          {sources.isLoading && <p className="text-sm text-ink-muted">{t('page.loading')}</p>}
           {!sources.isLoading && list.length === 0 && (
             <EmptyState
               mascot="idle"
-              title="No knowledge connected"
-              description="Connect a file or folder on this computer, paste content, or read from a database or web API. PDF, Excel, CSV, TSV, JSON, JSONL, Markdown, text, and HTML files work."
+              title={t('page.emptyTitle')}
+              description={t('page.emptyDescription')}
             />
           )}
           <ul className="space-y-2">
@@ -54,6 +52,7 @@ export function KnowledgePage() {
 }
 
 function SourceRow({ source, onChanged }: { source: KnowledgeSource; onChanged: () => void }) {
+  const { t } = useTranslation('knowledge')
   const [draft, setDraft] = useState<string | null>(null)
   const open = useMutation({
     mutationFn: () => api.knowledgeContent(source.id),
@@ -79,14 +78,14 @@ function SourceRow({ source, onChanged }: { source: KnowledgeSource; onChanged: 
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-medium text-ink">{source.name}</span>
             <span className="badge-mimir">{sourceBadge(source)}</span>
-            {source.status === 'failed' && <span className="status-chip bg-danger/15 text-danger">Failed</span>}
+            {source.status === 'failed' && <span className="status-chip bg-danger/15 text-danger">{t('row.failed')}</span>}
           </div>
           <p className="mt-0.5 break-anywhere text-xs text-ink-muted">
-            {sourceWhere(source)} · {source.chunk_count} passages
-            {source.refreshed_at && ` · indexed ${new Date(source.refreshed_at).toLocaleString()}`}
+            {sourceWhere(source)} · {t('row.passages', { count: source.chunk_count })}
+            {source.refreshed_at && ` · ${t('row.indexed', { when: new Date(source.refreshed_at).toLocaleString() })}`}
           </p>
           {source.kind === 'path' && (
-            <p className="mt-0.5 text-xs text-ink-faint">Reindexes itself when the files change.</p>
+            <p className="mt-0.5 text-xs text-ink-faint">{t('row.watches')}</p>
           )}
           {refreshNote(source) && <p className="mt-0.5 text-xs text-ink-faint">{refreshNote(source)}</p>}
           {meaningNote(source) && <p className="mt-0.5 text-xs text-ink-faint">{meaningNote(source)}</p>}
@@ -95,44 +94,44 @@ function SourceRow({ source, onChanged }: { source: KnowledgeSource; onChanged: 
         <div className="flex shrink-0 gap-1.5">
           {source.kind === 'text' && draft == null && !isBinaryUpload(source.filename ?? '') && (
             <button type="button" className="btn-secondary px-2 py-1 text-xs" disabled={open.isPending} onClick={() => open.mutate()}>
-              Edit
+              {t('row.edit')}
             </button>
           )}
           <button type="button" className="btn-secondary px-2 py-1 text-xs" disabled={reindex.isPending} onClick={() => reindex.mutate()}>
-            {reindex.isPending ? 'Indexing…' : 'Reindex'}
+            {reindex.isPending ? t('row.indexing') : t('row.reindex')}
           </button>
           <button
             type="button"
             className="btn-secondary px-2 py-1 text-xs"
             disabled={localOnly.isPending}
             aria-pressed={!!source.local_only}
-            title="Never send passages from this source to a paired computer. Chats that use it run here."
+            title={t('row.localOnlyHint')}
             onClick={() => localOnly.mutate()}
           >
-            {source.local_only ? 'This computer only ✓' : 'This computer only'}
+            {source.local_only ? t('row.localOnlyOn') : t('row.localOnly')}
           </button>
           <button
             type="button"
             className="btn-secondary px-2 py-1 text-xs"
             disabled={remove.isPending}
             onClick={() => {
-              if (window.confirm(`Disconnect ${source.name}? Profiles and AIs that use it stop seeing it. Your files are not deleted.`)) remove.mutate()
+              if (window.confirm(t('row.confirmDisconnect', { name: source.name }))) remove.mutate()
             }}
           >
-            Disconnect
+            {t('row.disconnect')}
           </button>
         </div>
       </div>
       {draft != null && (
         <div className="mt-3 space-y-2">
-          <textarea className="field min-h-48 w-full font-mono text-xs" value={draft} onChange={(e) => setDraft(e.target.value)} aria-label={`Edit ${source.name}`} />
-          <p className="text-xs text-ink-faint">Saving reindexes the source. Chats and specialized AIs see the change on their next question.</p>
+          <textarea className="field min-h-48 w-full font-mono text-xs" value={draft} onChange={(e) => setDraft(e.target.value)} aria-label={t('row.editLabel', { name: source.name })} />
+          <p className="text-xs text-ink-faint">{t('row.saveHint')}</p>
           <div className="flex gap-1.5">
             <button type="button" className="btn-primary px-3 py-1 text-xs" disabled={save.isPending} onClick={() => save.mutate(draft)}>
-              {save.isPending ? 'Saving…' : 'Save'}
+              {save.isPending ? t('row.saving') : t('row.save')}
             </button>
             <button type="button" className="btn-secondary px-3 py-1 text-xs" onClick={() => setDraft(null)}>
-              Cancel
+              {t('row.cancel')}
             </button>
           </div>
         </div>
@@ -145,6 +144,7 @@ function SourceRow({ source, onChanged }: { source: KnowledgeSource; onChanged: 
 }
 
 function AddSource({ onAdded }: { onAdded: () => void }) {
+  const { t } = useTranslation('knowledge')
   const [mode, setMode] = useState<'path' | 'text' | 'database' | 'api'>('path')
   const [path, setPath] = useState('')
   const [name, setName] = useState('')
@@ -173,18 +173,11 @@ function AddSource({ onAdded }: { onAdded: () => void }) {
   })
   return (
     <div className="card space-y-3">
-      <h2 className="section-title">Connect knowledge</h2>
+      <h2 className="section-title">{t('add.title')}</h2>
       <div className="flex flex-wrap gap-1.5">
-        {(
-          [
-            ['path', 'File or folder'],
-            ['text', 'Upload or paste'],
-            ['database', 'Database'],
-            ['api', 'Web API'],
-          ] as const
-        ).map(([m, label]) => (
+        {(['path', 'text', 'database', 'api'] as const).map((m) => (
           <button key={m} type="button" className={mode === m ? 'btn-primary px-3 py-1 text-xs' : 'btn-secondary px-3 py-1 text-xs'} onClick={() => setMode(m)}>
-            {label}
+            {t(`add.modes.${m}`)}
           </button>
         ))}
       </div>
@@ -194,14 +187,14 @@ function AddSource({ onAdded }: { onAdded: () => void }) {
         <>
           {mode === 'path' ? (
             <label className="block space-y-1">
-              <span className="text-sm text-ink">Path on this computer</span>
+              <span className="text-sm text-ink">{t('add.path')}</span>
               <input className="field w-full font-mono text-xs" value={path} onChange={(e) => setPath(e.target.value)} placeholder="~/Documents/inventory.csv" />
-              <span className="block text-xs text-ink-faint">Yggdrasil reads it in place and picks up edits automatically.</span>
+              <span className="block text-xs text-ink-faint">{t('add.pathHint')}</span>
             </label>
           ) : (
             <>
               <label className="btn-secondary inline-block cursor-pointer px-3 py-1.5 text-xs">
-                Choose a file
+                {t('add.chooseFile')}
                 <input
                   type="file"
                   accept={UPLOAD_ACCEPT}
@@ -217,11 +210,11 @@ function AddSource({ onAdded }: { onAdded: () => void }) {
                 />
               </label>
               {filename && <span className="ml-2 text-xs text-ink-muted">{filename}</span>}
-              <textarea className="field min-h-32 w-full font-mono text-xs" value={text} onChange={(e) => setText(e.target.value)} placeholder="Paste text, Markdown, or CSV" aria-label="Content" />
+              <textarea className="field min-h-32 w-full font-mono text-xs" value={text} onChange={(e) => setText(e.target.value)} placeholder={t('add.pastePlaceholder')} aria-label={t('add.content')} />
             </>
           )}
           <label className="block space-y-1">
-            <span className="text-sm text-ink">Name (optional)</span>
+            <span className="text-sm text-ink">{t('add.name')}</span>
             <input className="field w-full" value={name} onChange={(e) => setName(e.target.value)} />
           </label>
           {add.error && <p className="text-sm text-danger">{errorText(add.error)}</p>}
@@ -232,7 +225,7 @@ function AddSource({ onAdded }: { onAdded: () => void }) {
             disabled={add.isPending || (mode === 'path' ? !path.trim() : !text.trim() && !binary)}
             onClick={() => add.mutate()}
           >
-            {add.isPending ? 'Indexing…' : 'Connect'}
+            {add.isPending ? t('add.indexing') : t('add.connect')}
           </button>
         </>
       )}
@@ -241,12 +234,13 @@ function AddSource({ onAdded }: { onAdded: () => void }) {
 }
 
 function SearchBox() {
+  const { t } = useTranslation('knowledge')
   const [query, setQuery] = useState('')
   const search = useMutation({ mutationFn: () => api.searchKnowledge(query) })
   return (
     <div className="card space-y-3">
-      <h2 className="section-title">Try a question</h2>
-      <p className="text-sm text-ink-muted">See which passages a question would bring into the chat.</p>
+      <h2 className="section-title">{t('search.title')}</h2>
+      <p className="text-sm text-ink-muted">{t('search.description')}</p>
       <form
         className="flex gap-2"
         onSubmit={(e) => {
@@ -254,12 +248,12 @@ function SearchBox() {
           if (query.trim()) search.mutate()
         }}
       >
-        <input className="field flex-1" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Do you have 225/45R17 in stock?" aria-label="Question" />
+        <input className="field flex-1" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('search.placeholder')} aria-label={t('search.question')} />
         <button type="submit" className="btn-secondary px-3 py-1.5 text-sm" disabled={search.isPending}>
-          Search
+          {t('search.search')}
         </button>
       </form>
-      {search.data && search.data.length === 0 && <p className="text-sm text-ink-muted">Nothing matched.</p>}
+      {search.data && search.data.length === 0 && <p className="text-sm text-ink-muted">{t('search.nothing')}</p>}
       <ul className="space-y-2">
         {(search.data ?? []).map((h, i) => (
           <li key={i} className="rounded-lg bg-raised p-3 text-sm">

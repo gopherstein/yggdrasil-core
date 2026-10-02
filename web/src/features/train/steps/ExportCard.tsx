@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
 import { isDesktopShell, saveFromDaemon } from '@/lib/desktopBridge'
 import { formatBytes } from '@/lib/format'
@@ -8,6 +9,7 @@ import { errorText, exportRevision } from '../display'
 // ExportCard merges a revision into one GGUF file that other GGUF tools can
 // load without Yggdrasil.
 export function ExportCard({ view }: { view: SpecializedAIView }) {
+  const { t } = useTranslation('train')
   const revision = exportRevision(view)
   const queryClient = useQueryClient()
   const key = ['training', view.id, 'export', revision]
@@ -30,18 +32,14 @@ export function ExportCard({ view }: { view: SpecializedAIView }) {
   const error = start.error ?? remove.error ?? save.error ?? status.error
   return (
     <div className="card space-y-3">
-      <h3 className="section-title">Export as a GGUF file</h3>
-      <p className="text-sm text-ink-muted">
-        Merge revision {revision} into its base model as one file that llama.cpp, LM Studio, Ollama, and other GGUF
-        tools can load. The file is about the size of the base model. Its instructions and connected knowledge stay in
-        Yggdrasil.
-      </p>
+      <h3 className="section-title">{t('export.title')}</h3>
+      <p className="text-sm text-ink-muted">{t('export.description', { revision })}</p>
       {st?.state === 'exporting' && (
         <p className="text-sm text-ink" role="status">
-          Exporting… {st.size_bytes ? `up to ${formatBytes(st.size_bytes)}` : ''}
+          {t('export.exporting')} {st.size_bytes ? t('export.upTo', { size: formatBytes(st.size_bytes) }) : ''}
         </p>
       )}
-      {st?.state === 'failed' && <p className="text-sm text-danger">The export failed: {st.error}</p>}
+      {st?.state === 'failed' && <p className="text-sm text-danger">{t('export.failed', { error: st.error })}</p>}
       {st?.state === 'ready' && (
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <a
@@ -55,28 +53,28 @@ export function ExportCard({ view }: { view: SpecializedAIView }) {
               if (!save.isPending && st.filename) save.mutate(st.filename)
             }}
           >
-            {save.isPending ? 'Saving…' : `Download ${st.filename}`}
+            {save.isPending ? t('export.saving') : t('export.download', { filename: st.filename })}
           </a>
           <span className="text-xs text-ink-muted">{formatBytes(st.size_bytes)}</span>
-          {save.data && <span className="text-xs text-ink-muted">Saved to {save.data}</span>}
+          {save.data && <span className="text-xs text-ink-muted">{t('export.savedTo', { path: save.data })}</span>}
           <button type="button" className="btn-secondary px-3 py-1 text-xs" disabled={remove.isPending} onClick={() => remove.mutate()}>
-            Delete file
+            {t('export.deleteFile')}
           </button>
         </div>
       )}
       {(st?.state === 'none' || st?.state === 'failed') && (
         <button type="button" className="btn-secondary px-3 py-1 text-xs" disabled={start.isPending} onClick={() => start.mutate()}>
-          {st.state === 'failed' ? 'Try again' : 'Export'}
+          {st.state === 'failed' ? t('export.tryAgain') : t('export.export')}
         </button>
       )}
       {st?.state === 'exporting' && (
         <button type="button" className="btn-secondary px-3 py-1 text-xs" disabled={remove.isPending} onClick={() => remove.mutate()}>
-          Cancel
+          {t('export.cancel')}
         </button>
       )}
       {st?.state === 'ready' && st.instructions && (
         <details className="text-xs text-ink-muted">
-          <summary className="cursor-pointer">Instructions to use as the system prompt</summary>
+          <summary className="cursor-pointer">{t('export.instructions')}</summary>
           <pre className="log-panel mt-2 whitespace-pre-wrap">{st.instructions}</pre>
         </details>
       )}

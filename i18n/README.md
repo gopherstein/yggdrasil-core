@@ -23,6 +23,10 @@ i18n/
     tools.json              the Tools page and tool sources
     services.json           connected services
     apiAccess.json          the API Access page
+    knowledge.json          Knowledge sources, connections, and search
+    train.json              training specialized AIs
+    profiles.json           AI profiles, their strategies, tools, and orchestrators
+    diagnostics.json        the health page, logs, caches, and what Yggdrasil can do
 ```
 
 The desktop app's shell copies this folder when it builds and reads
