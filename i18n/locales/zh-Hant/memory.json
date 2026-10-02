@@ -30,6 +30,7 @@
     "cancel": "取消",
     "fromChat": "你在聊天中要求的",
     "addedHere": "在這裡新增",
+    "languageHint": "以這種語言撰寫。安裝了嵌入模型後，無論你用哪種語言提問，Yggdrasil 都能找到它。",
     "category": "類別",
     "edit": "編輯",
     "pause": "暫停",

@@ -86,4 +86,21 @@ describe('memory sources', () => {
     fireEvent.click(chip)
     expect(screen.getByText('I prefer metric units')).toBeInTheDocument()
   })
+
+  it('says which language a memory in another language is written in', async () => {
+    vi.mocked(api.listMemory).mockResolvedValue({
+      memories: [
+        { ...mem('1', 'Mi proyecto usa Go.', 'projects'), language: 'es' },
+        { ...mem('2', 'I prefer metric units', 'preferences'), language: 'en' },
+      ],
+      categories: ['identity', 'preferences', 'projects', 'technical', 'interests', 'people', 'other'],
+    })
+    vi.mocked(api.getSettings).mockResolvedValue({ memory_enabled: true } as SettingsView)
+    wrap(<MemoryPage />)
+    expect(await screen.findByText('Mi proyecto usa Go.')).toBeInTheDocument()
+    const label = screen.getByText((_, el) => el?.tagName === 'SPAN' && el.getAttribute('lang') === 'es')
+    expect(label).toHaveTextContent('Español')
+    // A memory in the App language says nothing more.
+    expect(document.querySelector('span[lang="en"]')).toBeNull()
+  })
 })

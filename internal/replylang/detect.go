@@ -154,7 +154,7 @@ func chineseScript(text string) string {
 var functionWords = map[string][]string{
 	"en": {"a", "an", "in", "on", "be", "when", "where", "who", "why", "more", "could", "should", "the", "and", "is", "are", "you", "what", "how", "this", "that", "with", "for", "can", "please", "my", "your", "of", "to", "it", "do", "does", "i", "me", "have", "was", "will", "would", "about", "from", "which", "there"},
 	"de": {"den", "dem", "des", "im", "ist", "sind", "welche", "welcher", "wann", "mehr", "kann", "eigentlich", "genau", "der", "die", "das", "und", "ist", "nicht", "ich", "du", "sie", "wie", "was", "mit", "für", "auf", "ein", "eine", "einen", "bitte", "mir", "mein", "dein", "kannst", "können", "habe", "hast", "warum", "auch", "noch", "oder", "wenn", "aber", "zu", "von"},
-	"es": {"la", "de", "un", "cuál", "cuándo", "más", "hacer", "puedo", "tiene", "ser", "el", "los", "las", "es", "y", "que", "qué", "cómo", "por", "para", "con", "una", "pero", "muy", "también", "puedes", "hola", "gracias", "sí", "porque", "esto", "eso", "mi", "tu", "del", "al", "está", "son", "hay", "dónde", "cuál", "yo", "me"},
+	"es": {"lo", "la", "de", "un", "cuál", "cuándo", "más", "hacer", "puedo", "tiene", "ser", "el", "los", "las", "es", "y", "que", "qué", "cómo", "por", "para", "con", "una", "pero", "muy", "también", "puedes", "hola", "gracias", "sí", "porque", "esto", "eso", "mi", "tu", "del", "al", "está", "son", "hay", "dónde", "cuál", "yo", "me"},
 	"fr": {"la", "de", "un", "quel", "quelle", "quels", "plus", "au", "aux", "ou", "où", "sont", "faire", "peux", "pouvez", "est-ce", "ça", "le", "les", "est", "et", "je", "tu", "vous", "nous", "pas", "que", "qui", "quoi", "comment", "pour", "avec", "une", "des", "du", "mais", "très", "aussi", "bonjour", "merci", "oui", "parce", "ce", "cette", "mon", "ton", "votre", "sur", "dans", "il", "elle", "c'est", "j'ai"},
 	"it": {"la", "più", "quale", "quando", "fare", "posso", "ha", "essere", "ci", "sei", "il", "lo", "gli", "le", "è", "e", "che", "come", "per", "con", "una", "ma", "molto", "anche", "ciao", "grazie", "sì", "perché", "questo", "questa", "mio", "tuo", "del", "della", "sono", "non", "puoi", "cosa", "dove", "io", "mi", "di", "un"},
 	"pt": {"a", "de", "qual", "quando", "mais", "fazer", "posso", "tem", "ser", "ao", "o", "os", "as", "é", "e", "que", "como", "por", "para", "com", "uma", "mas", "muito", "também", "olá", "obrigado", "obrigada", "sim", "não", "você", "isso", "este", "esta", "meu", "seu", "do", "da", "dos", "das", "em", "no", "na", "está", "são", "pode", "eu", "um"},
@@ -165,6 +165,28 @@ var functionWords = map[string][]string{
 	"id": {"dan", "yang", "di", "ke", "dari", "ini", "itu", "apa", "bagaimana", "untuk", "dengan", "tidak", "saya", "anda", "kamu", "bisa", "tolong", "terima", "kasih", "ya", "juga", "ada", "mengapa"},
 	"vi": {"và", "là", "của", "không", "tôi", "bạn", "gì", "như", "thế", "nào", "cho", "với", "có", "được", "này", "đó", "cảm", "ơn", "vâng", "tại", "sao", "một", "những"},
 }
+
+// uniqueWords are function words only one language's list has, which tell
+// close languages apart (y in Spanish, e in Italian).
+var uniqueWords = func() map[string]bool {
+	count := map[string]int{}
+	for _, words := range functionWords {
+		seen := map[string]bool{}
+		for _, w := range words {
+			if !seen[w] {
+				count[w]++
+				seen[w] = true
+			}
+		}
+	}
+	out := map[string]bool{}
+	for w, n := range count {
+		if n == 1 {
+			out[w] = true
+		}
+	}
+	return out
+}()
 
 var wordSets = func() map[string]map[string]bool {
 	out := map[string]map[string]bool{}
@@ -204,6 +226,9 @@ func byWords(text string) (string, bool) {
 		for lang, set := range wordSets {
 			if set[w] {
 				scores[lang] += 2
+				if uniqueWords[w] {
+					scores[lang]++
+				}
 			}
 		}
 	}
@@ -222,7 +247,7 @@ func byWords(text string) (string, bool) {
 		}
 	}
 	// Enough evidence, and clearly more than for any other language.
-	if best < 4 || best*2 < second*3 {
+	if best < 4 || best == second || best*5 < second*6 {
 		return "", false
 	}
 	return bestLang, true

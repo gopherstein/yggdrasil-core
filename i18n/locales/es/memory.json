@@ -30,6 +30,7 @@
     "cancel": "Cancelar",
     "fromChat": "Lo pediste en un chat",
     "addedHere": "Agregado aquí",
+    "languageHint": "Escrito en este idioma. Con un modelo de embeddings instalado, Yggdrasil lo encuentra sin importar en qué idioma preguntes.",
     "category": "Categoría",
     "edit": "Editar",
     "pause": "Pausar",
