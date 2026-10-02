@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { formatBytes } from '@/lib/format'
 import type { AIProfile, HardwareInventory, RunningModelView } from '@/types/api'
@@ -16,13 +17,12 @@ export function RunningTab({
   tightModelIds?: Set<string>
   onStop: (modelId: string, instanceId: string, nodeId: string) => void
 }) {
+  const { t } = useTranslation('models')
   if (running.length === 0) {
     return (
       <div className="flex items-center gap-4">
         <Ratatoskr state="sleep" size={96} />
-        <p className="text-sm text-ink-muted">
-          No models are loaded right now. Chat will start one automatically when you need it.
-        </p>
+        <p className="text-sm text-ink-muted">{t('runningTab.empty')}</p>
       </div>
     )
   }
@@ -37,9 +37,9 @@ export function RunningTab({
   return (
     <div className="space-y-4">
       <p className="text-sm text-ink-muted">
-        Active models
-        {totalMem > 0 ? ` · ~${formatBytes(totalMem)} in use` : ''}
-        {hostMem > 0 ? ` of ${formatBytes(hostMem)} on this computer` : ''}
+        {t('runningTab.active')}
+        {totalMem > 0 ? t('runningTab.inUse', { size: formatBytes(totalMem) }) : ''}
+        {hostMem > 0 ? t('runningTab.ofHost', { size: formatBytes(hostMem) }) : ''}
       </p>
       <ul className="grid gap-4 lg:grid-cols-2">
         {running.map((item) => {
@@ -60,13 +60,13 @@ export function RunningTab({
                   {tightModelIds?.has(item.model_id) ? (
                     <p
                       className="mt-1 text-xs text-ink-muted"
-                      title="Uses most of this computer's available memory and may be less stable."
+                      title={t('tightFit.hint')}
                     >
-                      Tight fit
+                      {t('tightFit.label')}
                     </p>
                   ) : null}
                   <p className="mt-1 text-sm text-success">
-                    Running on {item.node_name}
+                    {t('runningTab.runningOn', { computer: item.node_name })}
                     {item.accelerator ? ` · ${item.accelerator}` : ''}
                   </p>
                 </div>
@@ -75,38 +75,38 @@ export function RunningTab({
                   className="btn-secondary shrink-0 px-3 py-1.5 text-xs"
                   onClick={() => onStop(item.model_id, item.instance_id, item.node_id)}
                 >
-                  Stop
+                  {t('runningTab.stop')}
                 </button>
               </div>
 
               <dl className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <dt className="label-caps">Memory</dt>
+                  <dt className="label-caps">{t('runningTab.memory')}</dt>
                   <dd className="mt-0.5 tabular-nums text-ink">
                     {item.memory_bytes
                       ? hostMem > 0
                         ? `${formatBytes(item.memory_bytes)} / ${formatBytes(hostMem)}`
                         : formatBytes(item.memory_bytes)
-                      : 'Memory usage unavailable'}
+                      : t('runningTab.memoryUnavailable')}
                   </dd>
                 </div>
                 <div>
-                  <dt className="label-caps">Speed</dt>
+                  <dt className="label-caps">{t('runningTab.speed')}</dt>
                   <dd className="mt-0.5 tabular-nums text-ink">
                     {item.speed_tok_per_sec
-                      ? `${Math.round(item.speed_tok_per_sec)} tok/s`
-                      : 'Speed unavailable'}
+                      ? t('speed.tokPerSec', { value: Math.round(item.speed_tok_per_sec) })
+                      : t('runningTab.speedUnavailable')}
                   </dd>
                 </div>
               </dl>
 
               {usedBy.length > 0 && (
-                <p className="text-xs text-ink-faint">Used by: {usedBy.join(', ')}</p>
+                <p className="text-xs text-ink-faint">{t('runningTab.usedBy', { profiles: usedBy.join(', ') })}</p>
               )}
 
               <div className="flex flex-wrap gap-2">
                 <Link to="/chat" className="btn-primary px-3 py-1.5 text-xs">
-                  Open Chat
+                  {t('runningTab.openChat')}
                 </Link>
               </div>
             </li>

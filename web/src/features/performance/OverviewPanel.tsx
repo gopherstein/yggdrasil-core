@@ -1,15 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
+import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { api } from '@/lib/api'
 import { describeNodeHardware } from '@/features/nodes/nodePresentation'
 import type { Node, RunningModelView, Task } from '@/types/api'
-import { formatRate, memoryUsePercent } from './performanceFormat'
+import { formatTokPerSec, memoryUsePercent } from './performanceFormat'
 
 function MemoryBar({ percent }: { percent: number }) {
+  const { t } = useTranslation('performance')
   return (
     <div className="flex items-center gap-3">
-      <span className="w-16 shrink-0 text-xs text-ink-muted">Memory</span>
+      <span className="w-16 shrink-0 text-xs text-ink-muted">{t('overview.memory')}</span>
       <div className="h-2 flex-1 overflow-hidden rounded-full bg-raised">
         <div
           className="h-full bg-primary/80 transition-all duration-300"
@@ -28,6 +30,7 @@ function NodeLiveCard({
   node: Node
   running: RunningModelView[]
 }) {
+  const { t } = useTranslation('performance')
   const hw = describeNodeHardware(node.hardware)
   const memPct = memoryUsePercent(
     node.hardware?.memory?.total_bytes,
@@ -58,14 +61,14 @@ function NodeLiveCard({
             online ? 'bg-success/15 text-success' : 'bg-raised text-ink-muted',
           ].join(' ')}
         >
-          {online ? (idle ? 'Idle' : 'Active') : 'Offline'}
+          {online ? (idle ? t('overview.idle') : t('overview.active')) : t('overview.offline')}
         </span>
       </div>
 
       {!online ? (
-        <p className="text-sm text-ink-faint">Not reachable right now.</p>
+        <p className="text-sm text-ink-faint">{t('overview.unreachable')}</p>
       ) : idle ? (
-        <p className="text-sm text-ink-muted">Idle — no models loaded</p>
+        <p className="text-sm text-ink-muted">{t('overview.idleNoModels')}</p>
       ) : (
         <div className="space-y-3">
           {memPct != null && <MemoryBar percent={memPct} />}
@@ -73,16 +76,12 @@ function NodeLiveCard({
             {running.map((r) => (
               <li key={r.instance_id} className="space-y-1 text-sm">
                 <div className="flex justify-between gap-2">
-                  <span className="text-ink-muted">Model</span>
+                  <span className="text-ink-muted">{t('overview.model')}</span>
                   <span className="truncate font-medium text-ink">{r.display_name}</span>
                 </div>
                 <div className="flex justify-between gap-2">
-                  <span className="text-ink-muted">Speed</span>
-                  <span className="tabular-nums text-ink">
-                    {r.speed_tok_per_sec && r.speed_tok_per_sec > 0
-                      ? `${formatRate(r.speed_tok_per_sec)} tok/s`
-                      : '—'}
-                  </span>
+                  <span className="text-ink-muted">{t('overview.speed')}</span>
+                  <span className="tabular-nums text-ink">{formatTokPerSec(r.speed_tok_per_sec ?? 0)}</span>
                 </div>
               </li>
             ))}
@@ -94,6 +93,7 @@ function NodeLiveCard({
 }
 
 export function OverviewPanel() {
+  const { t } = useTranslation('performance')
   const nodesQuery = useQuery({
     queryKey: ['nodes'],
     queryFn: () => api.getNodes(),
@@ -118,7 +118,7 @@ export function OverviewPanel() {
   const fleet = (nodesQuery.data ?? []).filter((n) => n.is_local || n.paired)
   const running = runningQuery.data ?? []
   const tasks = (tasksQuery.data ?? []).filter(
-    (t: Task) => t.status === 'running' || t.status === 'pending',
+    (task: Task) => task.status === 'running' || task.status === 'pending',
   )
 
   const connected = fleet.filter((n) => n.is_local || n.status === 'online').length
@@ -135,27 +135,27 @@ export function OverviewPanel() {
   }
 
   if (nodesQuery.isLoading) {
-    return <LoadingSpinner label="Checking what your AI is doing…" />
+    return <LoadingSpinner label={t('overview.loading')} />
   }
 
   return (
     <div className="space-y-6 animate-fade">
       <section className="rounded-2xl bg-raised/40 px-5 py-4">
         <p className="text-sm text-ink">
-          {connected} {connected === 1 ? 'computer' : 'computers'} connected
-          {' · '}
-          {running.length} {running.length === 1 ? 'model' : 'models'} running
-          {' · '}
-          {tasks.length} active {tasks.length === 1 ? 'task' : 'tasks'}
-          {crossing ? ' · work across machines' : ''}
+          {[
+            t('overview.computers', { count: connected }),
+            t('overview.models', { count: running.length }),
+            t('overview.tasks', { count: tasks.length }),
+            ...(crossing ? [t('overview.acrossMachines')] : []),
+          ].join(' · ')}
         </p>
         {tasks.length > 0 && (
           <ul className="mt-3 space-y-1.5">
-            {tasks.slice(0, 3).map((t) => (
-              <li key={t.id} className="truncate text-xs text-ink-muted">
-                <span className="font-medium text-accent capitalize">{t.status}</span>
+            {tasks.slice(0, 3).map((task) => (
+              <li key={task.id} className="truncate text-xs text-ink-muted">
+                <span className="font-medium text-accent">{t(`overview.taskStatus.${task.status}`)}</span>
                 {' — '}
-                {t.prompt?.slice(0, 80) || 'Task in progress'}
+                {task.prompt?.slice(0, 80) || t('overview.taskInProgress')}
               </li>
             ))}
           </ul>
@@ -164,9 +164,9 @@ export function OverviewPanel() {
 
       {fleet.length === 0 ? (
         <p className="text-sm text-ink-muted">
-          No computers in your team yet.{' '}
+          {t('overview.noComputers')}{' '}
           <Link to="/nodes" className="text-primary hover:underline">
-            Add a computer
+            {t('overview.addComputer')}
           </Link>
         </p>
       ) : (
@@ -184,11 +184,11 @@ export function OverviewPanel() {
 
       {running.length === 0 && fleet.length > 0 && (
         <p className="text-sm text-ink-faint">
-          Nothing loaded right now. Open{' '}
-          <Link to="/chat" className="text-primary hover:underline">
-            Chat
-          </Link>{' '}
-          or run a benchmark when you want to compare models.
+          <Trans
+            t={t}
+            i18nKey="overview.nothingLoaded"
+            components={{ chat: <Link to="/chat" className="text-primary hover:underline" /> }}
+          />
         </p>
       )}
     </div>

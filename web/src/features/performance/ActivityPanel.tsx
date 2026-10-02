@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { api } from '@/lib/api'
@@ -9,6 +10,7 @@ import {
   formatMs,
   formatRate,
   formatRoleLabel,
+  formatTokPerSec,
   formatWhen,
   metricLabels,
   modelDisplayName,
@@ -37,13 +39,14 @@ function ActivityRow({
   open: boolean
   onToggle: () => void
 }) {
+  const { t } = useTranslation('performance')
   const advanced = useUIStore((s) => s.advancedMode)
   const labels = metricLabels(advanced)
   const title =
     run.conversation_title ||
     run.profile_name ||
     modelDisplayName(models, run.model_id) ||
-    'Generation'
+    t('activity.generation')
   const route = nodeRoute(run)
   const modelName = modelDisplayName(models, run.model_id)
   const helpedPeer = run.profile_name === 'Cluster request'
@@ -61,7 +64,7 @@ function ActivityRow({
             <p className="font-medium text-ink">{title}</p>
             {run.cross_machine && (
               <span className="rounded-full border border-info/40 bg-info/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-info">
-                {helpedPeer ? 'Helped peer' : labels.teamRun}
+                {helpedPeer ? t('activity.helpedPeer') : labels.teamRun}
               </span>
             )}
           </div>
@@ -85,9 +88,7 @@ function ActivityRow({
           </p>
           <p className="text-sm tabular-nums text-ink-muted">
             {formatMs(run.total_ms)}
-            {run.eval_tok_per_sec > 0
-              ? ` · ${formatRate(run.eval_tok_per_sec)} tok/s`
-              : ''}
+            {run.eval_tok_per_sec > 0 ? ` · ${formatTokPerSec(run.eval_tok_per_sec)}` : ''}
           </p>
         </div>
         <span className="shrink-0 pt-1 text-ink-faint" aria-hidden>
@@ -108,11 +109,7 @@ function ActivityRow({
             </div>
             <div className="flex justify-between gap-2 text-sm">
               <dt className="text-ink-muted">{labels.speed}</dt>
-              <dd className="tabular-nums text-ink">
-                {run.eval_tok_per_sec > 0
-                  ? `${formatRate(run.eval_tok_per_sec)} tok/s`
-                  : '—'}
-              </dd>
+              <dd className="tabular-nums text-ink">{formatTokPerSec(run.eval_tok_per_sec)}</dd>
             </div>
             <div className="flex justify-between gap-2 text-sm">
               <dt className="text-ink-muted">{labels.total}</dt>
@@ -121,13 +118,13 @@ function ActivityRow({
             {advanced && (
               <>
                 <div className="flex justify-between gap-2 text-sm">
-                  <dt className="text-ink-muted">Prompt tok/s</dt>
+                  <dt className="text-ink-muted">{t('activity.promptTokPerSec')}</dt>
                   <dd className="tabular-nums text-ink">
                     {formatRate(run.prompt_tok_per_sec)}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-2 text-sm">
-                  <dt className="text-ink-muted">Tokens out</dt>
+                  <dt className="text-ink-muted">{t('activity.tokensOut')}</dt>
                   <dd className="tabular-nums text-ink">
                     {run.completion_tokens > 0 ? run.completion_tokens : '—'}
                   </dd>
@@ -139,9 +136,7 @@ function ActivityRow({
           {(run.role_steps?.length ?? 0) > 0 && (
             <div className="space-y-2">
               <p className="text-xs font-medium text-ink-muted">
-                {run.cross_machine
-                  ? 'Per role across computers'
-                  : 'Per role for this turn'}
+                {run.cross_machine ? t('activity.perRoleAcross') : t('activity.perRoleTurn')}
               </p>
               <ul className="space-y-2">
                 {run.role_steps!.map((step) => (
@@ -178,6 +173,7 @@ function ActivityRow({
 }
 
 export function ActivityPanel() {
+  const { t } = useTranslation('performance')
   const advanced = useUIStore((s) => s.advancedMode)
   const labels = metricLabels(advanced)
   const [expandedId, setExpandedId] = useState<string | null>(null)
@@ -262,23 +258,18 @@ export function ActivityPanel() {
     <div className="space-y-6 animate-fade">
       {summary && (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <SummaryCard label="Runs" value={String(summary.count)} />
-          <SummaryCard
-            label={`${labels.speed} average`}
-            value={
-              summary.avgSpeed > 0 ? `${formatRate(summary.avgSpeed)} tok/s` : '—'
-            }
-          />
+          <SummaryCard label={t('activity.runs')} value={String(summary.count)} />
+          <SummaryCard label={t('activity.averageOf', { metric: labels.speed })} value={formatTokPerSec(summary.avgSpeed)} />
           <SummaryCard
             label={labels.firstResponse}
             value={formatMs(summary.avgTtft)}
           />
           <SummaryCard
-            label="Average response"
+            label={t('activity.averageResponse')}
             value={formatMs(summary.avgTotal)}
           />
           <SummaryCard
-            label={advanced ? 'Cross-machine' : 'Team runs'}
+            label={advanced ? t('activity.crossMachine') : t('activity.teamRuns')}
             value={String(summary.teamRuns)}
           />
         </div>
@@ -290,9 +281,9 @@ export function ActivityPanel() {
             className="field py-1.5 text-xs"
             value={filterComputer}
             onChange={(e) => setFilterComputer(e.target.value)}
-            aria-label="Filter by computer"
+            aria-label={t('activity.filterComputer')}
           >
-            <option value="">Computer</option>
+            <option value="">{t('activity.computer')}</option>
             {computers.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -303,9 +294,9 @@ export function ActivityPanel() {
             className="field py-1.5 text-xs"
             value={filterModel}
             onChange={(e) => setFilterModel(e.target.value)}
-            aria-label="Filter by model"
+            aria-label={t('activity.filterModel')}
           >
-            <option value="">Model</option>
+            <option value="">{t('activity.model')}</option>
             {modelOptions.map((id) => (
               <option key={id} value={id}>
                 {modelDisplayName(models, id)}
@@ -316,9 +307,9 @@ export function ActivityPanel() {
             className="field py-1.5 text-xs"
             value={filterProfile}
             onChange={(e) => setFilterProfile(e.target.value)}
-            aria-label="Filter by profile"
+            aria-label={t('activity.filterProfile')}
           >
-            <option value="">Profile</option>
+            <option value="">{t('activity.profile')}</option>
             {profiles.map((p) => (
               <option key={p} value={p}>
                 {p}
@@ -330,23 +321,23 @@ export function ActivityPanel() {
             className="field py-1.5 text-xs"
             value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
-            aria-label="Filter by date"
+            aria-label={t('activity.filterDate')}
           />
         </div>
       )}
 
-      {performanceQuery.isLoading && <LoadingSpinner label="Loading activity…" />}
+      {performanceQuery.isLoading && <LoadingSpinner label={t('activity.loading')} />}
 
       {performanceQuery.isError && (
         <div className="rounded-lg border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
-          Could not load performance history. Is Yggdrasil running?
+          {t('activity.loadFailed')}
         </div>
       )}
 
       {!performanceQuery.isLoading && !performanceQuery.isError && runs.length === 0 && (
         <EmptyState
-          title="No activity yet"
-          description="Send a few chat messages. Team turns that use more than one computer are labeled as team runs."
+          title={t('activity.emptyTitle')}
+          description={t('activity.emptyDescription')}
         />
       )}
 
@@ -367,7 +358,7 @@ export function ActivityPanel() {
       )}
 
       {runs.length > 0 && filtered.length === 0 && (
-        <p className="text-sm text-ink-muted">No runs match these filters.</p>
+        <p className="text-sm text-ink-muted">{t('activity.noMatches')}</p>
       )}
     </div>
   )

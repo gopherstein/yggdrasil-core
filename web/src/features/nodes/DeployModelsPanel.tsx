@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import type { Model, Node } from '@/types/api'
 import { formatBytes } from '@/lib/format'
 
@@ -48,6 +49,7 @@ export function DeployModelsPanel({
   busy: boolean
   onDeploy: (modelId: string, nodeIds: string[]) => void
 }) {
+  const { t } = useTranslation('computers')
   const [modelId, setModelId] = useState('')
   const [selected, setSelected] = useState<Record<string, boolean>>({})
   const [forceDeploy, setForceDeploy] = useState(false)
@@ -109,16 +111,13 @@ export function DeployModelsPanel({
   return (
     <section className="card space-y-4 animate-fade">
       <div>
-        <h2 className="font-display text-lg font-semibold text-ink">Deploy a model</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          Install a model on one computer or several at once. Yggdrasil checks free disk
-          before starting.
-        </p>
+        <h2 className="font-display text-lg font-semibold text-ink">{t('deploy.title')}</h2>
+        <p className="mt-1 text-sm text-ink-muted">{t('deploy.description')}</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block space-y-1.5 text-sm">
-          <span className="text-ink-muted">Model</span>
+          <span className="text-ink-muted">{t('deploy.model')}</span>
           <select
             className="field w-full"
             value={modelId}
@@ -128,11 +127,10 @@ export function DeployModelsPanel({
               setSelected({})
             }}
           >
-            <option value="">Choose a model…</option>
+            <option value="">{t('deploy.chooseModel')}</option>
             {selectable.map((m) => (
               <option key={m.id} value={m.id}>
-                {m.display_name}
-                {m.size_bytes ? ` (${formatBytes(m.size_bytes)})` : ''}
+                {m.size_bytes ? t('deploy.modelSize', { model: m.display_name, size: formatBytes(m.size_bytes) }) : m.display_name}
               </option>
             ))}
           </select>
@@ -140,14 +138,14 @@ export function DeployModelsPanel({
 
         <div className="space-y-1.5 text-sm">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-ink-muted">Computers</span>
+            <span className="text-ink-muted">{t('deploy.computers')}</span>
             {modelId && online.length > 1 && (
               <button
                 type="button"
                 className="text-xs text-primary hover:underline"
                 onClick={selectAllMissing}
               >
-                Select all that need it
+                {t('deploy.selectMissing')}
               </button>
             )}
           </div>
@@ -173,15 +171,10 @@ export function DeployModelsPanel({
                       onChange={() => toggle(n.id)}
                     />
                     <span className="min-w-0 flex-1 truncate text-ink">
-                      {n.name}
-                      {n.is_local ? ' (this computer)' : ''}
+                      {n.is_local ? t('deploy.thisComputer', { name: n.name }) : n.name}
                     </span>
                     <span className="shrink-0 text-xs text-ink-faint tabular-nums">
-                      {has
-                        ? 'Installed'
-                        : avail != null
-                          ? `${formatBytes(avail)} free`
-                          : '—'}
+                      {has ? t('deploy.installed') : avail != null ? t('deploy.free', { size: formatBytes(avail) }) : '—'}
                     </span>
                   </label>
                 </li>
@@ -193,7 +186,7 @@ export function DeployModelsPanel({
 
       {alreadyOn.length > 0 && model && (
         <p className="text-xs text-ink-faint">
-          Already on {alreadyOn.map((n) => n.name).join(', ')}.
+          {t('deploy.alreadyOn', { names: alreadyOn.map((n) => n.name).join(', ') })}
         </p>
       )}
 
@@ -202,12 +195,15 @@ export function DeployModelsPanel({
           className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger"
           role="alert"
         >
-          <p className="font-medium">Not enough free disk</p>
+          <p className="font-medium">{t('deploy.notEnoughDisk')}</p>
           <ul className="mt-2 list-inside list-disc space-y-1">
             {conflicts.map((c) => (
               <li key={c.node.id}>
-                {c.node.name}: needs {formatBytes(c.needed)}, has{' '}
-                {formatBytes(c.available)} free
+                {t('deploy.conflict', {
+                  name: c.node.name,
+                  needed: formatBytes(c.needed),
+                  available: formatBytes(c.available),
+                })}
               </li>
             ))}
           </ul>
@@ -218,9 +214,7 @@ export function DeployModelsPanel({
               checked={forceDeploy}
               onChange={(e) => setForceDeploy(e.target.checked)}
             />
-            <span className="text-xs">
-              Try anyway (download may fail on those computers)
-            </span>
+            <span className="text-xs">{t('deploy.tryAnyway')}</span>
           </label>
         </div>
       )}
@@ -234,21 +228,21 @@ export function DeployModelsPanel({
             if (!modelId || targets.length === 0) return
             onDeploy(
               modelId,
-              targets.map((t) => t.id),
+              targets.map((target) => target.id),
             )
           }}
         >
           {busy
-            ? 'Deploying…'
+            ? t('deploy.deploying')
             : targets.length > 1
-              ? `Deploy to ${targets.length} computers`
+              ? t('deploy.deployTo', { count: targets.length })
               : targets.length === 1
-                ? `Deploy to ${targets[0].name}`
-                : 'Deploy'}
+                ? t('deploy.deployToName', { name: targets[0].name })
+                : t('deploy.deploy')}
         </button>
         {model?.size_bytes ? (
           <span className="text-xs text-ink-faint">
-            Download size ~{formatBytes(model.size_bytes)}
+            {t('deploy.downloadSize', { size: formatBytes(model.size_bytes) })}
           </span>
         ) : null}
       </div>

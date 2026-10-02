@@ -1,3 +1,4 @@
+import i18n from '@/i18n'
 import { modelUsesTools } from './modelPresentation'
 import type { Model } from '@/types/api'
 
@@ -84,26 +85,26 @@ export function capabilityGap(
   if (needsWeb(text) && !(modelUsesTools(model) && internetAllowed)) {
     if (!internetAllowed) {
       notes.push({
-        text: "Live web access isn't available with the current configuration.",
+        text: i18n.t('models:capability.noWeb'),
         suggestions: modelUsesTools(model) ? [] : suggest(catalog, model.id, modelUsesTools),
         action: 'enable-internet',
       })
     } else {
       notes.push({
-        text: `${name} cannot use tools, so it cannot look that up. Switch to a tool-capable model such as one below.`,
+        text: i18n.t('models:capability.noTools', { model: name }),
         suggestions: suggest(catalog, model.id, modelUsesTools),
       })
     }
   }
   if (needsLocalTools(text) && !modelUsesTools(model)) {
     notes.push({
-      text: `${name} does not use local tools, so it cannot read files, run commands, or use git for you.`,
+      text: i18n.t('models:capability.noLocalTools', { model: name }),
       suggestions: suggest(catalog, model.id, modelUsesTools),
     })
   }
   if (needsVision(text) && !seesImages(model)) {
     notes.push({
-      text: `${name} cannot look at images.`,
+      text: i18n.t('models:capability.noVision', { model: name }),
       suggestions: suggest(catalog, model.id, seesImages),
     })
   }

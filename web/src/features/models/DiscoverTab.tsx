@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type {
   CategoryWinner,
   FitLabel,
@@ -29,6 +30,7 @@ export function DiscoverTab({
   onBrowseAll: () => void
   installingId?: string | null
 }) {
+  const { t } = useTranslation('models')
   const q = search.trim().toLowerCase()
   const filtered = models.filter((m) => {
     if (!q) return true
@@ -67,17 +69,15 @@ export function DiscoverTab({
       <section className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="section-title">Recommended</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Curated picks that fit the selected computer — purpose first.
-            </p>
+            <h2 className="section-title">{t('discover.recommended')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('discover.recommendedHint')}</p>
           </div>
           <button type="button" className="btn-secondary text-sm" onClick={onBrowseAll}>
-            Browse all models →
+            {t('discover.browseAll')}
           </button>
         </div>
         {uniqueRecommended.length === 0 ? (
-          <p className="text-sm text-ink-muted">No recommendations available yet.</p>
+          <p className="text-sm text-ink-muted">{t('discover.noRecommendations')}</p>
         ) : (
           <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {uniqueRecommended.map((model) => (
@@ -106,7 +106,7 @@ export function DiscoverTab({
         if (list.length === 0) return null
         return (
           <section key={section.id} className="space-y-3">
-            <h2 className="section-title">{section.title}</h2>
+            <h2 className="section-title">{t(`categories.${section.id}`)}</h2>
             <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {list.map((model) => (
                 <li key={`${section.id}-${model.id}`}>
@@ -128,7 +128,7 @@ export function DiscoverTab({
       })}
 
       {filtered.length === 0 && (
-        <p className="text-sm text-ink-muted">No curated models match this search.</p>
+        <p className="text-sm text-ink-muted">{t('discover.noMatches')}</p>
       )}
     </div>
   )

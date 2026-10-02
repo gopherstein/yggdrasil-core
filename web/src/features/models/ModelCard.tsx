@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import type { Model, ModelFit, ModelDownloadProgressPayload } from '@/types/api'
 import { formatBytes } from '@/lib/format'
@@ -39,6 +40,7 @@ export function ModelCard({
   installing?: boolean
   onInstall: () => void
 }) {
+  const { t } = useTranslation('models')
   const advancedMode = useUIStore((s) => s.advancedMode)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const isDownloading = model.status === 'downloading' || Boolean(progress)
@@ -65,7 +67,7 @@ export function ModelCard({
       <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{purpose}</p>
 
       <p className="mt-3 text-sm text-ink">
-        <span className="font-medium">{fitLabelText(fit?.label) || 'Fit unknown'}</span>
+        <span className="font-medium">{fitLabelText(fit?.label) || t('fit.unknown')}</span>
         <span className="text-ink-faint"> · </span>
         <span className="tabular-nums">{memoryLabel(model)}</span>
         {speed ? (
@@ -101,8 +103,11 @@ export function ModelCard({
             />
           </div>
           <p className="mt-1 text-xs text-ink-muted">
-            {progress.percent.toFixed(0)}% · {formatBytes(progress.bytes_downloaded)} /{' '}
-            {formatBytes(progress.bytes_total)}
+            {t('install.progress', {
+              percent: progress.percent.toFixed(0),
+              done: formatBytes(progress.bytes_downloaded),
+              total: formatBytes(progress.bytes_total),
+            })}
           </p>
         </div>
       )}
@@ -115,38 +120,38 @@ export function ModelCard({
             disabled={installing || isDownloading || install.disabled}
             onClick={onInstall}
           >
-            {isDownloading ? 'Downloading…' : install.label}
+            {isDownloading ? t('install.downloading') : install.label}
           </button>
         ) : (
-          <span className="status-chip bg-success/15 text-success">Installed</span>
+          <span className="status-chip bg-success/15 text-success">{t('install.installed')}</span>
         )}
         <button
           type="button"
           className="btn-secondary px-3 py-1.5 text-xs"
           onClick={() => setDetailsOpen((v) => !v)}
         >
-          {detailsOpen ? 'Hide details' : 'Details'}
+          {detailsOpen ? t('card.hideDetails') : t('card.details')}
         </button>
       </div>
 
       {detailsOpen && (
         <dl className="mt-4 space-y-1 border-t border-line/50 pt-3 text-xs text-ink-muted">
-          <Row label="Model size" value={memoryLabel(model)} />
-          <Row label="Quantization" value={fit?.quantization || model.variant || 'Unknown'} />
-          {runtime ? <Row label="Estimated runtime memory" value={runtime} /> : null}
+          <Row label={t('card.modelSize')} value={memoryLabel(model)} />
+          <Row label={t('card.quantization')} value={fit?.quantization || model.variant || t('card.unknown')} />
+          {runtime ? <Row label={t('card.runtimeMemory')} value={runtime} /> : null}
           <Row
-            label="Configured context"
+            label={t('card.context')}
             value={fit?.context_tokens ? contextTokensLabel(fit.context_tokens) : '—'}
           />
-          {machine ? <Row label="Machine memory" value={machine} /> : null}
+          {machine ? <Row label={t('card.machineMemory')} value={machine} /> : null}
           {fit?.available_memory_bytes ? (
-            <Row label="Available now" value={formatBytes(fit.available_memory_bytes)} />
+            <Row label={t('card.available')} value={formatBytes(fit.available_memory_bytes)} />
           ) : null}
-          <Row label="Expected behavior" value={fitLabelText(fit?.label) || 'Unknown'} />
-          {fit?.gpu_note ? <Row label="GPU" value={fit.gpu_note} /> : null}
+          <Row label={t('card.expected')} value={fitLabelText(fit?.label) || t('card.unknown')} />
+          {fit?.gpu_note ? <Row label={t('card.gpu')} value={fit.gpu_note} /> : null}
           {fit?.recommendations && fit.recommendations.length > 0 ? (
             <div className="pt-2">
-              <dt>Recommendations</dt>
+              <dt>{t('card.recommendations')}</dt>
               <dd className="mt-1 text-ink">
                 <ul className="list-disc space-y-0.5 pl-4">
                   {fit.recommendations.map((item) => (
@@ -158,24 +163,24 @@ export function ModelCard({
           ) : null}
           {peers.length > 1 ? (
             <div className="pt-2">
-              <dt>On your computers</dt>
+              <dt>{t('card.onYourComputers')}</dt>
               <dd className="mt-1 space-y-0.5 text-right text-ink">
                 {peers.map((peer) => (
                   <p key={`${peer.nodeName}-${peer.label}`}>
                     {peer.nodeName} · {fitLabelText(peer.label)}
                   </p>
                 ))}
-                <p>Best available machine: {bestMachineName(peers)}</p>
+                <p>{t('card.bestMachine', { name: bestMachineName(peers) })}</p>
               </dd>
             </div>
           ) : null}
           {advancedMode && (
             <>
-              <Row label="Model family" value={model.family || '—'} />
-              <Row label="Parameters" value={model.parameters || '—'} />
-              <Row label="Format" value={model.source?.format || 'gguf'} />
-              <Row label="Runtime" value={(model.runtime ?? ['llamacpp']).join(', ')} />
-              <Row label="Model ID" value={model.id} />
+              <Row label={t('card.family')} value={model.family || '—'} />
+              <Row label={t('card.parameters')} value={model.parameters || '—'} />
+              <Row label={t('card.format')} value={model.source?.format || 'gguf'} />
+              <Row label={t('card.runtime')} value={(model.runtime ?? ['llamacpp']).join(', ')} />
+              <Row label={t('card.modelId')} value={model.id} />
             </>
           )}
         </dl>

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 export function TightFitDialog({
   modelName,
   onCancel,
@@ -7,6 +9,7 @@ export function TightFitDialog({
   onCancel: () => void
   onInstall: () => void
 }) {
+  const { t } = useTranslation('models')
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-4 sm:items-center"
@@ -29,24 +32,18 @@ export function TightFitDialog({
           </span>
           <div>
             <h2 id="tight-fit-title" className="font-display text-lg font-semibold text-ink">
-              This model may be unstable on this computer
+              {t('tightFit.title')}
             </h2>
-            <p className="mt-2 text-sm text-ink-muted">
-              {modelName} uses most of the memory available on this computer. It may run slowly,
-              stop responding, or cause system instability under heavier workloads or larger context
-              sizes.
-            </p>
-            <p className="mt-2 text-sm text-ink-muted">
-              Yggdrasil recommends leaving more memory available for the operating system and graphics.
-            </p>
+            <p className="mt-2 text-sm text-ink-muted">{t('tightFit.body', { model: modelName })}</p>
+            <p className="mt-2 text-sm text-ink-muted">{t('tightFit.advice')}</p>
           </div>
         </div>
         <div className="flex flex-wrap justify-end gap-2">
           <button type="button" className="btn-secondary" autoFocus onClick={onCancel}>
-            Cancel
+            {t('tightFit.cancel')}
           </button>
           <button type="button" className="btn-primary" onClick={onInstall}>
-            Install anyway
+            {t('tightFit.install')}
           </button>
         </div>
       </div>

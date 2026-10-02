@@ -1,0 +1,207 @@
+{
+  "page": {
+    "title": "Models",
+    "subtitle": "Choose what to install — Yggdrasil recommends models that fit your hardware.",
+    "loading": "Loading model library…",
+    "search": "Search models…",
+    "emptyTitle": "No curated models",
+    "emptyDescription": "The local catalog is empty. Try Browse all models to install from Hugging Face.",
+    "ready": "{{model}} finished downloading and is ready to use.",
+    "readyFallback": "The model",
+    "dismiss": "Dismiss"
+  },
+  "tabs": {
+    "discover": "Discover",
+    "installed": "Installed",
+    "running": "Running"
+  },
+  "target": {
+    "label": "Models for:",
+    "aria": "Computer for model recommendations",
+    "thisComputer": "This computer",
+    "all": "All computers",
+    "computer": "Computer",
+    "clusterView": "Cluster view · {{running}}",
+    "running_one": "{{count}} model running",
+    "running_other": "{{count}} models running",
+    "allHint": "Installs can go to every paired computer. Recommendations still emphasize what fits well.",
+    "basedOn": "Recommendations are based on {{name}}’s hardware.",
+    "manage": "Manage computers",
+    "useAnother": "Use another computer",
+    "hardwareUnavailable": "Hardware details unavailable",
+    "unifiedMemory": "{{size}} unified memory",
+    "memory": "{{size}} memory"
+  },
+  "discover": {
+    "recommended": "Recommended",
+    "recommendedHint": "Curated picks that fit the selected computer — purpose first.",
+    "browseAll": "Browse all models →",
+    "noRecommendations": "No recommendations available yet.",
+    "noMatches": "No curated models match this search."
+  },
+  "categories": {
+    "coding": "Coding",
+    "general": "General assistants",
+    "reasoning": "Reasoning",
+    "vision": "Vision",
+    "fast": "Small & fast",
+    "large": "Large models"
+  },
+  "fit": {
+    "excellent": "Excellent fit",
+    "good": "Good fit",
+    "tight": "Tight fit",
+    "heavy": "May run slowly",
+    "unsupported": "Unsupported",
+    "unknown": "Fit unknown"
+  },
+  "install": {
+    "install": "Install",
+    "anyway": "Install anyway",
+    "unsupported": "Unsupported",
+    "downloading": "Downloading…",
+    "installing": "Installing…",
+    "installed": "Installed",
+    "progress": "{{percent}}% · {{done}} / {{total}}"
+  },
+  "speed": {
+    "measured": "Measured {{value}} tok/s",
+    "estimated": "Estimated ~{{value}} tok/s",
+    "tokPerSec": "{{value}} tok/s"
+  },
+  "memory": {
+    "approximate": "{{range}} approximate",
+    "unified": "{{size}} unified memory",
+    "plain": "{{size}} memory",
+    "needed": "~{{size}}"
+  },
+  "status": {
+    "running": "Running",
+    "downloading": "Downloading",
+    "installed": "Installed",
+    "notInstalled": "Not installed"
+  },
+  "lastUsed": {
+    "never": "Never",
+    "justNow": "Just now",
+    "minutes_one": "{{count}} minute ago",
+    "minutes_other": "{{count}} minutes ago",
+    "hours_one": "{{count}} hour ago",
+    "hours_other": "{{count}} hours ago"
+  },
+  "tags": {
+    "context": "{{count}}K context"
+  },
+  "tools": {
+    "webSummary": "Uses local tools · Can fetch the web",
+    "webDetail": "Can read files, use git, and run terminal commands after you approve them. A command such as curl can look something up on the web. There is no separate browser.",
+    "blockedSummary": "Uses local tools · Web blocked by this profile",
+    "blockedDetail": "This model can run terminal commands, but the current assistant profile turns the terminal off, so it cannot fetch web pages.",
+    "chatSummary": "Chat only · No web access",
+    "chatDetail": "Answers from the model itself. It cannot run a terminal command, so it cannot look anything up on the web."
+  },
+  "chips": {
+    "coding": "Coding",
+    "tools": "Tools",
+    "reasoning": "Reasoning",
+    "vision": "Vision",
+    "fast": "Fast",
+    "general": "General"
+  },
+  "support": {
+    "embedding": "Embedding model: helps search knowledge, does not chat",
+    "reranker": "Reranker: orders search results, does not chat",
+    "classifier": "Classifier: sorts requests, does not chat"
+  },
+  "bestFor": {
+    "coding": "Best for programming",
+    "reasoning": "Best for careful reasoning",
+    "vision": "Best for images and documents",
+    "fast": "Best for quick answers",
+    "large": "Best for hard problems",
+    "everyday": "Everyday local assistant"
+  },
+  "small": {
+    "note": "Small and fast, but it can mix up facts and numbers, especially from your files and knowledge. For questions about your data, a larger model is more reliable.",
+    "installedOther": "{{model}} is installed. Pick it, or Auto, in chat for those questions.",
+    "fitsOther": "{{model}} fits this computer.",
+    "installOther": "Install {{model}}"
+  },
+  "capability": {
+    "noWeb": "Live web access isn't available with the current configuration.",
+    "noTools": "{{model}} cannot use tools, so it cannot look that up. Switch to a tool-capable model such as one below.",
+    "noLocalTools": "{{model}} does not use local tools, so it cannot read files, run commands, or use git for you.",
+    "noVision": "{{model}} cannot look at images."
+  },
+  "card": {
+    "details": "Details",
+    "hideDetails": "Hide details",
+    "modelSize": "Model size",
+    "quantization": "Quantization",
+    "unknown": "Unknown",
+    "runtimeMemory": "Estimated runtime memory",
+    "context": "Configured context",
+    "machineMemory": "Machine memory",
+    "available": "Available now",
+    "expected": "Expected behavior",
+    "gpu": "GPU",
+    "recommendations": "Recommendations",
+    "onYourComputers": "On your computers",
+    "bestMachine": "Best available machine: {{name}}",
+    "family": "Model family",
+    "parameters": "Parameters",
+    "format": "Format",
+    "runtime": "Runtime",
+    "modelId": "Model ID"
+  },
+  "tightFit": {
+    "label": "Tight fit",
+    "hint": "Uses most of this computer's available memory and may be less stable.",
+    "title": "This model may be unstable on this computer",
+    "body": "{{model}} uses most of the memory available on this computer. It may run slowly, stop responding, or cause system instability under heavier workloads or larger context sizes.",
+    "advice": "Yggdrasil recommends leaving more memory available for the operating system and graphics.",
+    "cancel": "Cancel",
+    "install": "Install anyway"
+  },
+  "browse": {
+    "title": "Browse all models",
+    "description": "Search Hugging Face for models Yggdrasil can run locally. Installs use the computer selected above.",
+    "close": "Close",
+    "placeholder": "Search models…",
+    "search": "Search",
+    "searching": "Searching Hugging Face…",
+    "failed": "Could not reach Hugging Face. Check your network and try again.",
+    "install": "Install",
+    "installFailed": "Install failed"
+  },
+  "installedTab": {
+    "empty": "No installed models yet. Install from Discover, then they will appear here.",
+    "runningOn": "Running on {{computer}}",
+    "downloading": "Downloading… {{percent}}%",
+    "installedOn": "Installed on {{where}}",
+    "thisComputer": "This computer",
+    "usedBy": "Used by {{profiles}}",
+    "lastUsed": "Last used {{when}}",
+    "chat": "Chat",
+    "start": "Start",
+    "installElsewhere": "Install on other computers",
+    "installing": "Installing…",
+    "moreActions": "More actions for {{model}}",
+    "stop": "Stop",
+    "remove": "Remove"
+  },
+  "runningTab": {
+    "empty": "No models are loaded right now. Chat will start one automatically when you need it.",
+    "active": "Active models",
+    "inUse": " · ~{{size}} in use",
+    "ofHost": " of {{size}} on this computer",
+    "runningOn": "Running on {{computer}}",
+    "stop": "Stop",
+    "memory": "Memory",
+    "memoryUnavailable": "Memory usage unavailable",
+    "speed": "Speed",
+    "speedUnavailable": "Speed unavailable",
+    "usedBy": "Used by: {{profiles}}",
+    "openChat": "Open Chat"
+  }
+}

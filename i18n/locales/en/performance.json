@@ -1,0 +1,140 @@
+{
+  "page": {
+    "title": "Performance",
+    "subtitle": "What your AI is doing right now — load, speed, and how work moves across your team.",
+    "views": "Performance views"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "benchmarks": "Benchmarks",
+    "activity": "Activity"
+  },
+  "units": {
+    "ms": "{{value}} ms",
+    "seconds": "{{value}} s",
+    "tokPerSec": "{{value}} tok/s"
+  },
+  "roles": {
+    "role": "Role",
+    "worker": "Worker {{n}}",
+    "planner": "Planner",
+    "reviewer": "Reviewer"
+  },
+  "route": {
+    "multiple": "Multiple computers",
+    "thisComputer": "This computer"
+  },
+  "metrics": {
+    "speed": "Generation speed",
+    "prompt": "Prompt processing",
+    "firstResponse": "First response",
+    "total": "Total response time",
+    "teamRun": "Team run"
+  },
+  "metricsAdvanced": {
+    "speed": "Eval tok/s",
+    "prompt": "Prompt eval",
+    "firstResponse": "TTFT",
+    "total": "Total",
+    "teamRun": "Cross-machine"
+  },
+  "overview": {
+    "loading": "Checking what your AI is doing…",
+    "memory": "Memory",
+    "idle": "Idle",
+    "active": "Active",
+    "offline": "Offline",
+    "unreachable": "Not reachable right now.",
+    "idleNoModels": "Idle — no models loaded",
+    "model": "Model",
+    "speed": "Speed",
+    "computers_one": "{{count}} computer connected",
+    "computers_other": "{{count}} computers connected",
+    "models_one": "{{count}} model running",
+    "models_other": "{{count}} models running",
+    "tasks_one": "{{count}} active task",
+    "tasks_other": "{{count}} active tasks",
+    "acrossMachines": "work across machines",
+    "taskStatus": {
+      "running": "Running",
+      "pending": "Pending"
+    },
+    "taskInProgress": "Task in progress",
+    "noComputers": "No computers in your team yet.",
+    "addComputer": "Add a computer",
+    "nothingLoaded": "Nothing loaded right now. Open <chat>Chat</chat> or run a benchmark when you want to compare models."
+  },
+  "activity": {
+    "generation": "Generation",
+    "helpedPeer": "Helped peer",
+    "promptTokPerSec": "Prompt tok/s",
+    "tokensOut": "Tokens out",
+    "perRoleAcross": "Per role across computers",
+    "perRoleTurn": "Per role for this turn",
+    "runs": "Runs",
+    "averageOf": "{{metric}} average",
+    "averageResponse": "Average response",
+    "crossMachine": "Cross-machine",
+    "teamRuns": "Team runs",
+    "filterComputer": "Filter by computer",
+    "computer": "Computer",
+    "filterModel": "Filter by model",
+    "model": "Model",
+    "filterProfile": "Filter by profile",
+    "profile": "Profile",
+    "filterDate": "Filter by date",
+    "loading": "Loading activity…",
+    "loadFailed": "Could not load performance history. Is Yggdrasil running?",
+    "emptyTitle": "No activity yet",
+    "emptyDescription": "Send a few chat messages. Team turns that use more than one computer are labeled as team runs.",
+    "noMatches": "No runs match these filters."
+  },
+  "benchmark": {
+    "fastest": "Fastest",
+    "results": "Results",
+    "status": "Status: {{status}}",
+    "statuses": {
+      "pending": "Pending",
+      "running": "Running",
+      "completed": "Completed",
+      "failed": "Failed",
+      "cancelled": "Cancelled",
+      "canceled": "Canceled"
+    },
+    "winner": "Winner · {{workload}}",
+    "leading": "Leading · {{workload}}",
+    "hideDetail": "Hide detailed results",
+    "detail": "Detailed results",
+    "model": "Model",
+    "load": "Load",
+    "running": "Running benchmark…",
+    "title": "Compare models",
+    "description": "Run the same prompts across models and see which is fastest for each kind of work.",
+    "chooseModels": "Choose models",
+    "chooseWorkloads": "Choose workloads",
+    "run": "Run benchmark",
+    "step": "{{n}}. {{label}}",
+    "loadingModels": "Loading models…",
+    "installFirst": "Install at least one model on the Models page before benchmarking.",
+    "selected": "{{count}}/6 selected",
+    "prompts_one": "{{count}} prompt",
+    "prompts_other": "{{count}} prompts",
+    "warning": "Yggdrasil will temporarily load and unload models while benchmarking. Active chats may be slower during the test.",
+    "runsPerPrompt": "Measured runs per prompt",
+    "starting": "Starting…",
+    "cancel": "Cancel",
+    "estimate": "{{models}} · {{workloads}} · ~{{minutes}}",
+    "models_one": "{{count}} model",
+    "models_other": "{{count}} models",
+    "workloads_one": "{{count}} workload",
+    "workloads_other": "{{count}} workloads",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "startFailed": "Could not start benchmark.",
+    "recent": "Recent benchmarks",
+    "recentHint": "Jobs stay available while Yggdrasil is running.",
+    "jobSummary": "{{models}} · {{workloads}} · {{when}}",
+    "winners_one": "{{count}} winner",
+    "winners_other": "{{count}} winners"
+  }
+}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -39,6 +40,7 @@ function pickFitBundle(
 }
 
 export function ModelsPage() {
+  const { t } = useTranslation('models')
   const queryClient = useQueryClient()
   const advancedMode = useUIStore((s) => s.advancedMode)
   const [tab, setTab] = useState<Tab>('discover')
@@ -180,7 +182,7 @@ export function ModelsPage() {
   const peerFits = useMemo(() => {
     const map: Record<string, { nodeName: string; label: FitLabel }[]> = {}
     for (const bundle of fitQuery.data ?? []) {
-      const nodeName = bundle.node_name || 'Computer'
+      const nodeName = bundle.node_name || t('target.computer')
       for (const fit of bundle.fits ?? []) {
         map[fit.model_id] = [
           ...(map[fit.model_id] ?? []),
@@ -189,7 +191,7 @@ export function ModelsPage() {
       }
     }
     return map
-  }, [fitQuery.data])
+  }, [fitQuery.data, t])
   const tightModelIds = useMemo(() => {
     const ids = new Set<string>()
     for (const [id, fit] of Object.entries(fits)) {
@@ -214,10 +216,8 @@ export function ModelsPage() {
     <div className="w-full min-w-0 space-y-6">
       <header className="page-header">
         <RealmKicker />
-        <h1 className="page-title">Models</h1>
-        <p className="page-subtitle">
-          Choose what to install — Yggdrasil recommends models that fit your hardware.
-        </p>
+        <h1 className="page-title">{t('page.title')}</h1>
+        <p className="page-subtitle">{t('page.subtitle')}</p>
       </header>
 
       <ModelsTargetBar
@@ -231,9 +231,9 @@ export function ModelsPage() {
       <div className="flex flex-wrap items-center gap-2">
         {(
           [
-            { id: 'discover', label: 'Discover' },
-            { id: 'installed', label: 'Installed' },
-            { id: 'running', label: 'Running' },
+            { id: 'discover', label: t('tabs.discover') },
+            { id: 'installed', label: t('tabs.installed') },
+            { id: 'running', label: t('tabs.running') },
           ] as const
         ).map((option) => (
           <button
@@ -256,7 +256,7 @@ export function ModelsPage() {
         {(tab === 'discover' || tab === 'installed') && (
           <input
             className="field ml-auto min-w-[200px] max-w-sm flex-1"
-            placeholder="Search models…"
+            placeholder={t('page.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -267,20 +267,20 @@ export function ModelsPage() {
         <div role="status" className="flex items-center gap-3 rounded-xl bg-success/10 px-4 py-2 text-sm text-ink animate-fade">
           <Ratatoskr state={downloadMascot === 'success' ? 'success' : 'idle'} size={64} />
           <span className="min-w-0 flex-1">
-            {models.find((m) => m.id === justInstalled)?.display_name ?? 'The model'} finished downloading and is ready to use.
+            {t('page.ready', { model: models.find((m) => m.id === justInstalled)?.display_name ?? t('page.readyFallback') })}
           </span>
           <button type="button" className="text-xs text-ink-faint hover:text-ink" onClick={() => setJustInstalled(null)}>
-            Dismiss
+            {t('page.dismiss')}
           </button>
         </div>
       ) : null}
 
-      {modelsQuery.isLoading && <LoadingSpinner label="Loading model library…" />}
+      {modelsQuery.isLoading && <LoadingSpinner label={t('page.loading')} />}
 
       {!modelsQuery.isLoading && models.length === 0 && tab === 'discover' && (
         <EmptyState
-          title="No curated models"
-          description="The local catalog is empty. Try Browse all models to install from Hugging Face."
+          title={t('page.emptyTitle')}
+          description={t('page.emptyDescription')}
         />
       )}
 

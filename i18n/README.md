@@ -15,6 +15,9 @@ i18n/
     mobile.json             the iPhone app's text
     onboarding.json         the first-run setup
     memory.json             the Memory page
+    models.json             the Models page and what Chat says about a model
+    computers.json          the Computers page
+    performance.json        the Performance page
 ```
 
 The desktop app's shell copies this folder when it builds and reads

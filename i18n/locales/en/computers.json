@@ -1,0 +1,127 @@
+{
+  "page": {
+    "title": "Your Yggdrasil team",
+    "titleAdvanced": "Your AI cluster",
+    "subtitle": "These computers work together as one AI system. Add a machine, then deploy models where they fit.",
+    "find": "Find computers",
+    "scanning": "Scanning…",
+    "looking": "Looking for computers…",
+    "emptyTitle": "Build your AI team",
+    "emptyDescription": "Install Yggdrasil on another computer on your network and it will appear here automatically."
+  },
+  "status": {
+    "team": "Team status",
+    "cluster": "Cluster status",
+    "computers_one": "{{count}} computer",
+    "computers_other": "{{count}} computers",
+    "combinedMemory": " · {{size}} combined memory",
+    "modelsRunning_one": " · {{count}} model running",
+    "modelsRunning_other": " · {{count}} models running",
+    "bestAt": "Best at"
+  },
+  "errors": {
+    "action": "Could not complete that action",
+    "network": "Allow Local Network / Firewall for Yggdrasil on both computers, and keep Find other computers On in Settings.",
+    "generic": "Something went wrong",
+    "claimFailed": "Could not load pairing offer for that code"
+  },
+  "pairing": {
+    "waiting": "Waiting for approval",
+    "pairingWith": "Pairing with <name>{{name}}</name>. On that computer, open Computers and Approve the incoming request.",
+    "otherComputer": "the other computer",
+    "code": "Code: <code>{{code}}</code>",
+    "incoming": "Incoming requests",
+    "offerCode": "Code <code>{{code}}</code>",
+    "approve": "Approve"
+  },
+  "nearby": {
+    "title": "Available to add",
+    "description": "Yggdrasil found these computers on your network."
+  },
+  "fleet": {
+    "title": "Your Yggdrasil team",
+    "titleAdvanced": "Your cluster",
+    "moves": "Work moves across this team automatically.",
+    "movesAdvanced": "Work moves across this cluster automatically.",
+    "alone": "This is the only computer in the team so far.",
+    "installModels": "Install models",
+    "openChat": "Open Chat"
+  },
+  "membership": {
+    "local": "This computer",
+    "paired": "Paired",
+    "nearby": "Available to pair",
+    "offline": "Offline"
+  },
+  "online": {
+    "online": "Online",
+    "offline": "Offline",
+    "checking": "Checking…"
+  },
+  "hardware": {
+    "unavailable": "Hardware details unavailable",
+    "gigabytes": "{{value}} GB",
+    "unified": "{{size}} unified memory",
+    "vram": "{{size}} VRAM",
+    "ram": "{{size}} RAM",
+    "memory": "{{size}} memory"
+  },
+  "abilities": {
+    "general": "General",
+    "coding": "Coding",
+    "reasoning": "Reasoning",
+    "vision": "Vision",
+    "tools": "Tools",
+    "fast": "Fast",
+    "large": "Large models"
+  },
+  "card": {
+    "nearbyHint": "On your network and ready to join this team.",
+    "running": "Running: <strong>{{models}}</strong>",
+    "models_one": "{{count}} model",
+    "models_other": "{{count}} models",
+    "availableFor": "Available for:",
+    "partOfTeam": "Part of this team",
+    "disk": "Disk",
+    "diskFree": "{{free}} free of {{total}}",
+    "diskLow": "Low free space for more models",
+    "modelsHere": "Models on this computer",
+    "modelsHereCount": "Models on this computer ({{count}})",
+    "noModels": "None yet. Deploy below or open Models.",
+    "remove": "Remove",
+    "removing": "Removing…",
+    "noAddress": "No address yet — try Find computers",
+    "connecting": "Connecting…",
+    "addToTeam": "Add to team",
+    "codePlaceholder": "Code",
+    "codeFor": "Pairing code for {{name}}",
+    "approving": "Approving…",
+    "approveCode": "Approve with code",
+    "hideDetails": "Hide details",
+    "manage": "Manage",
+    "moreActions": "More actions for {{name}}",
+    "removeFromTeam": "Remove from team"
+  },
+  "deploy": {
+    "title": "Deploy a model",
+    "description": "Install a model on one computer or several at once. Yggdrasil checks free disk before starting.",
+    "model": "Model",
+    "chooseModel": "Choose a model…",
+    "modelSize": "{{model}} ({{size}})",
+    "computers": "Computers",
+    "selectMissing": "Select all that need it",
+    "thisComputer": "{{name}} (this computer)",
+    "installed": "Installed",
+    "free": "{{size}} free",
+    "alreadyOn": "Already on {{names}}.",
+    "notEnoughDisk": "Not enough free disk",
+    "conflict": "{{name}}: needs {{needed}}, has {{available}} free",
+    "tryAnyway": "Try anyway (download may fail on those computers)",
+    "deploying": "Deploying…",
+    "deployTo_one": "Deploy to {{count}} computer",
+    "deployTo_other": "Deploy to {{count}} computers",
+    "deployToName": "Deploy to {{name}}",
+    "deploy": "Deploy",
+    "downloadSize": "Download size ~{{size}}"
+  }
+}

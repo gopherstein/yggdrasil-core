@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
@@ -15,6 +16,7 @@ export function BrowseAllPanel({
   onClose: () => void
   onInstalled: () => void
 }) {
+  const { t } = useTranslation('models')
   const [query, setQuery] = useState('gguf instruct')
   const [submitted, setSubmitted] = useState('gguf instruct')
 
@@ -44,14 +46,11 @@ export function BrowseAllPanel({
     <div className="space-y-4 rounded-xl border border-line bg-surface p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="section-title">Browse all models</h2>
-          <p className="mt-1 text-sm text-ink-muted">
-            Search Hugging Face for models Yggdrasil can run locally. Installs use the
-            computer selected above.
-          </p>
+          <h2 className="section-title">{t('browse.title')}</h2>
+          <p className="mt-1 text-sm text-ink-muted">{t('browse.description')}</p>
         </div>
         <button type="button" className="btn-secondary text-sm" onClick={onClose}>
-          Close
+          {t('browse.close')}
         </button>
       </div>
 
@@ -66,18 +65,16 @@ export function BrowseAllPanel({
           className="field min-w-[220px] flex-1"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search models…"
+          placeholder={t('browse.placeholder')}
         />
         <button type="submit" className="btn-primary">
-          Search
+          {t('browse.search')}
         </button>
       </form>
 
-      {browseQuery.isLoading && <LoadingSpinner label="Searching Hugging Face…" />}
+      {browseQuery.isLoading && <LoadingSpinner label={t('browse.searching')} />}
       {browseQuery.isError && (
-        <p className="text-sm text-danger">
-          Could not reach Hugging Face. Check your network and try again.
-        </p>
+        <p className="text-sm text-danger">{t('browse.failed')}</p>
       )}
 
       <ul className="divide-y divide-line rounded-xl border border-line">
@@ -100,14 +97,14 @@ export function BrowseAllPanel({
               disabled={installMutation.isPending}
               onClick={() => installMutation.mutate(item)}
             >
-              Install
+              {t('browse.install')}
             </button>
           </li>
         ))}
       </ul>
       {installMutation.isError && (
         <p className="text-sm text-danger">
-          {(installMutation.error as Error)?.message || 'Install failed'}
+          {(installMutation.error as Error)?.message || t('browse.installFailed')}
         </p>
       )}
     </div>

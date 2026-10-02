@@ -1,9 +1,10 @@
+import i18n from '@/i18n'
 import type { GenerationRun, GenerationRoleStep, Model } from '@/types/api'
 
 export function formatMs(ms: number): string {
   if (!ms || ms <= 0) return '—'
-  if (ms < 1000) return `${ms.toFixed(0)} ms`
-  return `${(ms / 1000).toFixed(1)} s`
+  if (ms < 1000) return i18n.t('performance:units.ms', { value: ms.toFixed(0) })
+  return i18n.t('performance:units.seconds', { value: (ms / 1000).toFixed(1) })
 }
 
 export function formatRate(n: number): string {
@@ -23,8 +24,12 @@ export function formatWhen(iso: string): string {
 }
 
 export function formatRoleLabel(role: string): string {
-  if (!role) return 'Role'
+  if (!role) return i18n.t('performance:roles.role')
   // A plan's worker slots are "worker:1", "worker:2", …
+  const worker = /^worker:(\d+)$/.exec(role)
+  if (worker) return i18n.t('performance:roles.worker', { n: worker[1] })
+  if (role === 'planner') return i18n.t('performance:roles.planner')
+  if (role === 'reviewer') return i18n.t('performance:roles.reviewer')
   const slot = /^([a-z]+):(\d+)$/.exec(role)
   if (slot) return `${slot[1].charAt(0).toUpperCase()}${slot[1].slice(1)} ${slot[2]}`
   return role.charAt(0).toUpperCase() + role.slice(1)
@@ -50,7 +55,7 @@ export function nodeRoute(run: GenerationRun): string[] {
 export function routeLabel(run: GenerationRun): string {
   const names = nodeRoute(run)
   if (names.length === 0) {
-    return run.cross_machine ? 'Multiple computers' : 'This computer'
+    return run.cross_machine ? i18n.t('performance:route.multiple') : i18n.t('performance:route.thisComputer')
   }
   if (names.length === 1) return names[0]
   return names.join(' → ')
@@ -67,20 +72,25 @@ export type MetricLabels = {
 export function metricLabels(advanced: boolean): MetricLabels {
   if (advanced) {
     return {
-      speed: 'Eval tok/s',
-      prompt: 'Prompt eval',
-      firstResponse: 'TTFT',
-      total: 'Total',
-      teamRun: 'Cross-machine',
+      speed: i18n.t('performance:metricsAdvanced.speed'),
+      prompt: i18n.t('performance:metricsAdvanced.prompt'),
+      firstResponse: i18n.t('performance:metricsAdvanced.firstResponse'),
+      total: i18n.t('performance:metricsAdvanced.total'),
+      teamRun: i18n.t('performance:metricsAdvanced.teamRun'),
     }
   }
   return {
-    speed: 'Generation speed',
-    prompt: 'Prompt processing',
-    firstResponse: 'First response',
-    total: 'Total response time',
-    teamRun: 'Team run',
+    speed: i18n.t('performance:metrics.speed'),
+    prompt: i18n.t('performance:metrics.prompt'),
+    firstResponse: i18n.t('performance:metrics.firstResponse'),
+    total: i18n.t('performance:metrics.total'),
+    teamRun: i18n.t('performance:metrics.teamRun'),
   }
+}
+
+/** A speed in tokens per second, or — when there is none. */
+export function formatTokPerSec(n: number): string {
+  return n > 0 ? i18n.t('performance:units.tokPerSec', { value: formatRate(n) }) : '—'
 }
 
 export function estimateBenchmarkMinutes(
@@ -109,7 +119,7 @@ export function stepMetricRows(step: GenerationRoleStep, advanced: boolean) {
     { label: labels.total, value: formatMs(step.total_ms) },
     {
       label: labels.speed,
-      value: step.eval_tok_per_sec > 0 ? `${formatRate(step.eval_tok_per_sec)} tok/s` : '—',
+      value: formatTokPerSec(step.eval_tok_per_sec),
     },
   ]
 }

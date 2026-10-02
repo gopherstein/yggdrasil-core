@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useEffect, useState, type MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
 import type {
@@ -46,6 +47,7 @@ export function InstalledTab({
   onInstallElsewhere?: (id: string) => void
   installingId?: string | null
 }) {
+  const { t } = useTranslation('models')
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
   const q = search.trim().toLowerCase()
   const installed = models.filter((m) => {
@@ -71,9 +73,7 @@ export function InstalledTab({
 
   if (installed.length === 0) {
     return (
-      <p className="text-sm text-ink-muted">
-        No installed models yet. Install from Discover, then they will appear here.
-      </p>
+      <p className="text-sm text-ink-muted">{t('installedTab.empty')}</p>
     )
   }
 
@@ -93,7 +93,7 @@ export function InstalledTab({
         const where =
           onNodes.length > 0
             ? onNodes.map((p) => p.node_name).join(', ')
-            : 'This computer'
+            : t('installedTab.thisComputer')
 
         return (
           <li key={model.id} className="card relative min-w-0">
@@ -105,27 +105,27 @@ export function InstalledTab({
                 {tightModelIds?.has(model.id) ? (
                   <p
                     className="mt-1 text-xs text-ink-muted"
-                    title="Uses most of this computer's available memory and may be less stable."
+                    title={t('tightFit.hint')}
                   >
-                    Tight fit
+                    {t('tightFit.label')}
                   </p>
                 ) : null}
                 <p className="mt-1 text-sm text-ink-muted">
                   {live ? (
-                    <span className="text-success">Running on {live.node_name}</span>
+                    <span className="text-success">{t('installedTab.runningOn', { computer: live.node_name })}</span>
                   ) : dl ? (
-                    <span>Downloading… {dl.percent.toFixed(0)}%</span>
+                    <span>{t('installedTab.downloading', { percent: dl.percent.toFixed(0) })}</span>
                   ) : (
                     <span>
-                      Installed on {where}
+                      {t('installedTab.installedOn', { where })}
                       {model.size_bytes ? ` · ${formatBytes(model.size_bytes)}` : ''}
                     </span>
                   )}
                 </p>
                 <p className="mt-1 text-xs text-ink-faint">
                   {usedBy.length > 0
-                    ? `Used by ${usedBy.join(', ')}`
-                    : `Last used ${formatLastUsed(model.last_used_at)}`}
+                    ? t('installedTab.usedBy', { profiles: usedBy.join(', ') })
+                    : t('installedTab.lastUsed', { when: formatLastUsed(model.last_used_at) })}
                 </p>
                 <SmallModelNote model={model} alternative={alternative} onInstallAlternative={onInstall} />
               </div>
@@ -133,7 +133,7 @@ export function InstalledTab({
               <div className="flex flex-wrap items-center gap-2">
                 {live ? (
                   <Link to="/chat" className="btn-primary px-3 py-1.5 text-xs">
-                    Chat
+                    {t('installedTab.chat')}
                   </Link>
                 ) : (
                   showManualControls &&
@@ -143,7 +143,7 @@ export function InstalledTab({
                       className="btn-primary px-3 py-1.5 text-xs"
                       onClick={() => onStart(model.id)}
                     >
-                      Start
+                      {t('installedTab.start')}
                     </button>
                   )
                 )}
@@ -154,16 +154,14 @@ export function InstalledTab({
                     disabled={installingId === model.id}
                     onClick={() => onInstallElsewhere(model.id)}
                   >
-                    {installingId === model.id
-                      ? 'Installing…'
-                      : 'Install on other computers'}
+                    {installingId === model.id ? t('installedTab.installing') : t('installedTab.installElsewhere')}
                   </button>
                 )}
                 <div className="relative">
                   <button
                     type="button"
                     className="rounded-md px-2 py-1.5 text-xs text-ink-faint hover:bg-raised hover:text-ink"
-                    aria-label={`More actions for ${model.display_name}`}
+                    aria-label={t('installedTab.moreActions', { model: model.display_name })}
                     aria-expanded={menuOpenId === model.id}
                     onClick={(e: MouseEvent) => {
                       e.stopPropagation()
@@ -188,7 +186,7 @@ export function InstalledTab({
                             onStop(model.id, live.instance_id)
                           }}
                         >
-                          Stop
+                          {t('installedTab.stop')}
                         </button>
                       )}
                       <button
@@ -200,7 +198,7 @@ export function InstalledTab({
                           onDelete(model.id)
                         }}
                       >
-                        Remove
+                        {t('installedTab.remove')}
                       </button>
                     </div>
                   )}

@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState, type MouseEvent } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import i18n from '@/i18n'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { ApiError, api } from '@/lib/api'
@@ -15,6 +17,7 @@ import {
   membershipKind,
   membershipLabel,
   onlineLabel,
+  onlineState,
   teamBestAt,
 } from './nodePresentation'
 import { RealmKicker } from '@/components/ui/Realm'
@@ -24,7 +27,7 @@ import { useMascotState } from '@/lib/ratatoskr/useMascotState'
 function errorMessage(err: unknown): string {
   if (err instanceof ApiError) return err.message
   if (err instanceof Error) return err.message
-  return 'Something went wrong'
+  return i18n.t('computers:errors.generic')
 }
 
 function modelsOnNode(models: Model[], nodeId: string): Model[] {
@@ -89,6 +92,7 @@ function ComputerCard({
   claimBusy: boolean
   revokeBusy: boolean
 }) {
+  const { t } = useTranslation('computers')
   const advancedMode = useUIStore((s) => s.advancedMode)
   const [manageOpen, setManageOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -100,7 +104,7 @@ function ComputerCard({
   const diskTotal = node.hardware?.disk?.total_bytes
   const diskTight = diskPct != null && diskPct >= 90
   const online = onlineLabel(node)
-  const isOnline = online === 'Online'
+  const isOnline = onlineState(node) === 'online'
   const nearby = kind === 'nearby'
   const inTeam = kind === 'local' || kind === 'paired' || kind === 'offline'
 
@@ -153,13 +157,11 @@ function ComputerCard({
       </div>
 
       {nearby ? (
-        <p className="mt-4 text-sm text-ink-muted">
-          On your network and ready to join this team.
-        </p>
+        <p className="mt-4 text-sm text-ink-muted">{t('card.nearbyHint')}</p>
       ) : (
         <div className="mt-4 space-y-3 text-sm">
           {hw.unavailable ? (
-            <p className="text-ink-faint">Hardware details unavailable</p>
+            <p className="text-ink-faint">{t('hardware.unavailable')}</p>
           ) : (
             <div className="text-ink-muted">
               {hw.primary ? <p className="text-ink">{hw.primary}</p> : null}
@@ -168,21 +170,23 @@ function ComputerCard({
           )}
 
           <p className="text-ink">
-            Running:{' '}
-            <span className="font-medium">
-              {runningCount} {runningCount === 1 ? 'model' : 'models'}
-            </span>
+            <Trans
+              t={t}
+              i18nKey="card.running"
+              values={{ models: t('card.models', { count: runningCount }) }}
+              components={{ strong: <span className="font-medium" /> }}
+            />
           </p>
 
           {capabilities.length > 0 && (
             <p className="text-sm text-ink-muted">
-              <span className="text-ink-faint">Available for:</span>{' '}
+              <span className="text-ink-faint">{t('card.availableFor')}</span>{' '}
               <span className="text-ink">{capabilities.join(', ')}</span>
             </p>
           )}
 
           {kind === 'paired' || kind === 'offline' ? (
-            <p className="text-xs text-accent">Part of this team</p>
+            <p className="text-xs text-accent">{t('card.partOfTeam')}</p>
           ) : null}
 
           {advancedMode && node.address ? (
@@ -196,14 +200,14 @@ function ComputerCard({
           {diskPct != null && diskFree != null && diskTotal != null && (
             <div>
               <div className="mb-1 flex justify-between text-xs">
-                <span>Disk</span>
+                <span>{t('card.disk')}</span>
                 <span
                   className={[
                     'tabular-nums',
                     diskTight ? 'font-medium text-danger' : 'text-ink',
                   ].join(' ')}
                 >
-                  {formatBytes(diskFree)} free of {formatBytes(diskTotal)}
+                  {t('card.diskFree', { free: formatBytes(diskFree), total: formatBytes(diskTotal) })}
                 </span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-raised">
@@ -216,20 +220,19 @@ function ComputerCard({
                 />
               </div>
               {diskTight ? (
-                <p className="mt-1 text-xs text-danger">Low free space for more models</p>
+                <p className="mt-1 text-xs text-danger">{t('card.diskLow')}</p>
               ) : null}
             </div>
           )}
 
           <div>
             <p className="text-xs font-medium text-ink">
-              Models on this computer
-              {installedModels.length > 0 ? ` (${installedModels.length})` : ''}
+              {installedModels.length > 0
+                ? t('card.modelsHereCount', { count: installedModels.length })
+                : t('card.modelsHere')}
             </p>
             {installedModels.length === 0 ? (
-              <p className="mt-1 text-xs text-ink-faint">
-                None yet. Deploy below or open Models.
-              </p>
+              <p className="mt-1 text-xs text-ink-faint">{t('card.noModels')}</p>
             ) : (
               <ul className="mt-2 space-y-1.5">
                 {installedModels.map((m) => (
@@ -249,7 +252,7 @@ function ComputerCard({
                       disabled={removingModelId === m.id}
                       onClick={() => onRemoveModel(m.id)}
                     >
-                      {removingModelId === m.id ? 'Removing…' : 'Remove'}
+                      {removingModelId === m.id ? t('card.removing') : t('card.remove')}
                     </button>
                   </li>
                 ))}
@@ -267,17 +270,17 @@ function ComputerCard({
               className="btn-primary"
               onClick={onPair}
               disabled={pairingBusy || !node.address}
-              title={!node.address ? 'No address yet — try Find computers' : undefined}
+              title={!node.address ? t('card.noAddress') : undefined}
             >
-              {pairingBusy ? 'Connecting…' : 'Add to team'}
+              {pairingBusy ? t('card.connecting') : t('card.addToTeam')}
             </button>
             <div className="flex flex-wrap items-center gap-2">
               <input
                 type="text"
                 inputMode="numeric"
                 maxLength={6}
-                placeholder="Code"
-                aria-label={`Pairing code for ${node.name}`}
+                placeholder={t('card.codePlaceholder')}
+                aria-label={t('card.codeFor', { name: node.name })}
                 className="field w-24 px-2 py-1.5 text-xs font-mono"
                 value={claimCode}
                 onChange={(e) => onClaimCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
@@ -288,7 +291,7 @@ function ComputerCard({
                 disabled={claimBusy || !node.address || claimCode.length !== 6}
                 onClick={onApproveCode}
               >
-                {claimBusy ? 'Approving…' : 'Approve with code'}
+                {claimBusy ? t('card.approving') : t('card.approveCode')}
               </button>
             </div>
           </>
@@ -302,14 +305,14 @@ function ComputerCard({
               onClick={() => setManageOpen((o) => !o)}
               aria-expanded={manageOpen}
             >
-              {manageOpen ? 'Hide details' : 'Manage'}
+              {manageOpen ? t('card.hideDetails') : t('card.manage')}
             </button>
             {!node.is_local && node.paired && (
               <div className="relative ml-auto">
                 <button
                   type="button"
                   className="rounded-md px-2 py-1.5 text-xs text-ink-faint hover:bg-raised hover:text-ink"
-                  aria-label={`More actions for ${node.name}`}
+                  aria-label={t('card.moreActions', { name: node.name })}
                   aria-expanded={menuOpen}
                   onClick={(e: MouseEvent) => {
                     e.stopPropagation()
@@ -332,7 +335,7 @@ function ComputerCard({
                         onRevoke()
                       }}
                     >
-                      {revokeBusy ? 'Removing…' : 'Remove from team'}
+                      {revokeBusy ? t('card.removing') : t('card.removeFromTeam')}
                     </button>
                   </div>
                 )}
@@ -346,6 +349,7 @@ function ComputerCard({
 }
 
 export function NodesPage() {
+  const { t } = useTranslation('computers')
   const queryClient = useQueryClient()
   const advancedMode = useUIStore((s) => s.advancedMode)
   const [pairingSession, setPairingSession] = useState<PairingSession | null>(null)
@@ -401,7 +405,7 @@ export function NodesPage() {
     mutationFn: async ({ nodeId, code }: { nodeId: string; code: string }) => {
       const session = await api.claimPairing(nodeId, code)
       if (!session?.id) {
-        throw new Error('Could not load pairing offer for that code')
+        throw new Error(t('errors.claimFailed'))
       }
       return api.approvePairing(session.id)
     },
@@ -501,8 +505,7 @@ export function NodesPage() {
   const teamCaps = useMemo(() => teamBestAt(fleet, models), [fleet, models])
   const totalRunning = running.length
 
-  const teamNoun = advancedMode ? 'cluster' : 'team'
-  const sectionTitle = advancedMode ? 'Your cluster' : 'Your Yggdrasil team'
+  const sectionTitle = advancedMode ? t('fleet.titleAdvanced') : t('fleet.title')
 
   const actionError =
     pairMutation.error ??
@@ -519,12 +522,9 @@ export function NodesPage() {
         <div>
           <RealmKicker />
           <h1 className="page-title">
-            {advancedMode ? 'Your AI cluster' : 'Your Yggdrasil team'}
+            {advancedMode ? t('page.titleAdvanced') : t('page.title')}
           </h1>
-          <p className="page-subtitle">
-            These computers work together as one AI system. Add a machine, then deploy
-            models where they fit.
-          </p>
+          <p className="page-subtitle">{t('page.subtitle')}</p>
         </div>
         <button
           type="button"
@@ -532,7 +532,7 @@ export function NodesPage() {
           disabled={refreshMutation.isPending}
           onClick={() => refreshMutation.mutate()}
         >
-          {refreshMutation.isPending ? 'Scanning…' : 'Find computers'}
+          {refreshMutation.isPending ? t('page.scanning') : t('page.find')}
         </button>
         {headerMascot ? <Ratatoskr state={headerMascot} size={96} className="order-first sm:order-none" /> : null}
       </header>
@@ -540,16 +540,16 @@ export function NodesPage() {
       {fleet.length > 0 && (
         <section className="rounded-2xl bg-raised/40 px-5 py-4 animate-fade">
           <p className="label-caps text-[10px] text-ink-faint">
-            {advancedMode ? 'Cluster status' : 'Team status'}
+            {advancedMode ? t('status.cluster') : t('status.team')}
           </p>
           <p className="mt-1 text-sm text-ink">
-            {fleet.length} {fleet.length === 1 ? 'computer' : 'computers'}
-            {teamMem > 0 ? ` · ${formatBytes(teamMem)} combined memory` : ''}
-            {` · ${totalRunning} ${totalRunning === 1 ? 'model' : 'models'} running`}
+            {t('status.computers', { count: fleet.length })}
+            {teamMem > 0 ? t('status.combinedMemory', { size: formatBytes(teamMem) }) : ''}
+            {t('status.modelsRunning', { count: totalRunning })}
           </p>
           {teamCaps.length > 0 && (
             <p className="mt-2 text-sm text-ink-muted">
-              <span className="text-ink-faint">Best at</span>{' '}
+              <span className="text-ink-faint">{t('status.bestAt')}</span>{' '}
               <span className="text-ink">{teamCaps.join(' · ')}</span>
             </p>
           )}
@@ -558,43 +558,45 @@ export function NodesPage() {
 
       {actionError && (
         <div className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">
-          <p className="font-medium">Could not complete that action</p>
+          <p className="font-medium">{t('errors.action')}</p>
           <p className="mt-1">{errorMessage(actionError)}</p>
           {(pairMutation.error ||
             approveMutation.error ||
             claimMutation.error ||
             revokeMutation.error ||
             refreshMutation.error) && (
-            <p className="mt-2 text-xs opacity-90">
-              Allow Local Network / Firewall for Yggdrasil on both computers, and keep Find other
-              computers On in Settings.
-            </p>
+            <p className="mt-2 text-xs opacity-90">{t('errors.network')}</p>
           )}
         </div>
       )}
 
       {pairingSession && (
         <section className="card space-y-2 ring-1 ring-accent/40 animate-fade">
-          <h2 className="font-display text-lg font-semibold text-ink">Waiting for approval</h2>
+          <h2 className="font-display text-lg font-semibold text-ink">{t('pairing.waiting')}</h2>
           <p className="text-sm text-ink">
-            Pairing with{' '}
-            <span className="font-medium">
-              {pairingSession.remote_name || pairingSession.remote_node_id || 'the other computer'}
-            </span>
-            . On that computer, open Computers and Approve the incoming request.
+            <Trans
+              t={t}
+              i18nKey="pairing.pairingWith"
+              values={{
+                name: pairingSession.remote_name || pairingSession.remote_node_id || t('pairing.otherComputer'),
+              }}
+              components={{ name: <span className="font-medium" /> }}
+            />
           </p>
           <p className="text-sm text-ink-muted">
-            Code:{' '}
-            <span className="font-mono text-lg font-semibold text-ink">
-              {pairingSession.code || '—'}
-            </span>
+            <Trans
+              t={t}
+              i18nKey="pairing.code"
+              values={{ code: pairingSession.code || '—' }}
+              components={{ code: <span className="font-mono text-lg font-semibold text-ink" /> }}
+            />
           </p>
         </section>
       )}
 
       {pending.length > 0 && (
         <section className="card space-y-3 animate-fade">
-          <h2 className="font-display text-lg font-semibold text-ink">Incoming requests</h2>
+          <h2 className="font-display text-lg font-semibold text-ink">{t('pairing.incoming')}</h2>
           <ul className="space-y-2">
             {pending.map((offer) => (
               <li
@@ -604,7 +606,12 @@ export function NodesPage() {
                 <div>
                   <p className="font-medium text-ink">{offer.remote_name}</p>
                   <p className="text-xs text-ink-muted">
-                    Code <span className="font-mono">{offer.code}</span>
+                    <Trans
+                      t={t}
+                      i18nKey="pairing.offerCode"
+                      values={{ code: offer.code }}
+                      components={{ code: <span className="font-mono" /> }}
+                    />
                   </p>
                 </div>
                 <button
@@ -613,7 +620,7 @@ export function NodesPage() {
                   disabled={approveMutation.isPending}
                   onClick={() => approveMutation.mutate(offer.id)}
                 >
-                  Approve
+                  {t('pairing.approve')}
                 </button>
               </li>
             ))}
@@ -621,12 +628,12 @@ export function NodesPage() {
         </section>
       )}
 
-      {nodesQuery.isLoading && <LoadingSpinner label="Looking for computers…" />}
+      {nodesQuery.isLoading && <LoadingSpinner label={t('page.looking')} />}
 
       {!nodesQuery.isLoading && nodes.length === 0 && (
         <EmptyState
-          title="Build your AI team"
-          description="Install Yggdrasil on another computer on your network and it will appear here automatically."
+          title={t('page.emptyTitle')}
+          description={t('page.emptyDescription')}
           action={
             <button
               type="button"
@@ -634,7 +641,7 @@ export function NodesPage() {
               disabled={refreshMutation.isPending}
               onClick={() => refreshMutation.mutate()}
             >
-              Find computers
+              {t('page.find')}
             </button>
           }
         />
@@ -643,10 +650,8 @@ export function NodesPage() {
       {nearby.length > 0 && (
         <section className="space-y-3">
           <div>
-            <h2 className="section-title">Available to add</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Yggdrasil found these computers on your network.
-            </p>
+            <h2 className="section-title">{t('nearby.title')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('nearby.description')}</p>
           </div>
           <ul className="grid gap-4 md:grid-cols-2">
             {nearby.map((node) => (
@@ -686,16 +691,18 @@ export function NodesPage() {
               <h2 className="section-title">{sectionTitle}</h2>
               <p className="mt-1 text-sm text-ink-muted">
                 {pairedRemotes.length > 0
-                  ? `Work moves across this ${teamNoun} automatically.`
-                  : 'This is the only computer in the team so far.'}
+                  ? advancedMode
+                    ? t('fleet.movesAdvanced')
+                    : t('fleet.moves')
+                  : t('fleet.alone')}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Link to="/models" className="btn-secondary px-3 py-1.5 text-xs">
-                Install models
+                {t('fleet.installModels')}
               </Link>
               <Link to="/chat" className="btn-secondary px-3 py-1.5 text-xs">
-                Open Chat
+                {t('fleet.openChat')}
               </Link>
             </div>
           </div>

@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import i18n from '@/i18n'
 import { formatBytes } from '@/lib/format'
 import type { HardwareInventory, Node, RunningModelView } from '@/types/api'
 
@@ -11,7 +13,7 @@ export function resolveInstallNodeId(target: ModelsTarget): string | undefined {
 }
 
 function hardwareLine(hw: HardwareInventory | null | undefined): string {
-  if (!hw) return 'Hardware details unavailable'
+  if (!hw) return i18n.t('models:target.hardwareUnavailable')
   const parts: string[] = []
   const accel = hw.accelerators?.[0]
   if (accel?.model) parts.push(accel.model)
@@ -23,9 +25,9 @@ function hardwareLine(hw: HardwareInventory | null | undefined): string {
     0
   if (mem > 0) {
     const unified = Boolean(accel?.unified_memory_bytes)
-    parts.push(`${formatBytes(mem)}${unified ? ' unified memory' : ' memory'}`)
+    parts.push(i18n.t(unified ? 'models:target.unifiedMemory' : 'models:target.memory', { size: formatBytes(mem) }))
   }
-  return parts.join(' · ') || 'Hardware details unavailable'
+  return parts.join(' · ') || i18n.t('models:target.hardwareUnavailable')
 }
 
 function targetHardware(
@@ -42,9 +44,9 @@ function targetName(
   localHw: HardwareInventory | null,
   nodes: Node[],
 ): string {
-  if (target === 'all') return 'All computers'
-  if (target === 'local') return localHw?.hostname || 'This computer'
-  return nodes.find((n) => n.id === target)?.name || 'Computer'
+  if (target === 'all') return i18n.t('models:target.all')
+  if (target === 'local') return localHw?.hostname || i18n.t('models:target.thisComputer')
+  return nodes.find((n) => n.id === target)?.name || i18n.t('models:target.computer')
 }
 
 export function ModelsTargetBar({
@@ -60,6 +62,7 @@ export function ModelsTargetBar({
   nodes: Node[]
   running: RunningModelView[]
 }) {
+  const { t } = useTranslation('models')
   const localNode = nodes.find((n) => n.is_local)
   const onlinePeers = nodes.filter(
     (n) => !n.is_local && n.paired && n.status === 'online',
@@ -83,26 +86,24 @@ export function ModelsTargetBar({
         : running.filter((r) => r.node_id === target)
 
   const line = hardwareLine(hw)
-  const runningLabel = `${runningForTarget.length} model${
-    runningForTarget.length === 1 ? '' : 's'
-  } running`
+  const runningLabel = t('target.running', { count: runningForTarget.length })
 
   return (
     <div className="min-w-0 rounded-xl border border-line/70 bg-surface px-4 py-3 shadow-panel">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
           <label className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-medium text-ink-muted">Models for:</span>
+            <span className="text-sm font-medium text-ink-muted">{t('target.label')}</span>
             <select
               className="field max-w-full py-1.5 text-sm font-semibold text-ink"
               value={target}
               onChange={(e) => onTargetChange(e.target.value as ModelsTarget)}
-              aria-label="Computer for model recommendations"
+              aria-label={t('target.aria')}
             >
               <option value="local">
-                {localHardware?.hostname || localNode?.name || 'This computer'}
+                {localHardware?.hostname || localNode?.name || t('target.thisComputer')}
               </option>
-              {hasCluster && <option value="all">All computers</option>}
+              {hasCluster && <option value="all">{t('target.all')}</option>}
               {onlinePeers.map((n) => (
                 <option key={n.id} value={n.id}>
                   {n.name}
@@ -112,9 +113,7 @@ export function ModelsTargetBar({
           </label>
           <p className="mt-1.5 text-sm text-ink-muted">
             {target === 'all' ? (
-              <>
-                Cluster view · {runningLabel}
-              </>
+              <>{t('target.clusterView', { running: runningLabel })}</>
             ) : (
               <>
                 {line}
@@ -124,16 +123,14 @@ export function ModelsTargetBar({
             )}
           </p>
           <p className="mt-1 text-xs text-ink-faint">
-            {target === 'all'
-              ? 'Installs can go to every paired computer. Recommendations still emphasize what fits well.'
-              : `Recommendations are based on ${name}’s hardware.`}
+            {target === 'all' ? t('target.allHint') : t('target.basedOn', { name })}
           </p>
         </div>
         <Link
           to="/nodes"
           className="shrink-0 text-sm font-medium text-primary underline-offset-2 hover:underline"
         >
-          {hasCluster ? 'Manage computers' : 'Use another computer'}
+          {hasCluster ? t('target.manage') : t('target.useAnother')}
         </Link>
       </div>
     </div>

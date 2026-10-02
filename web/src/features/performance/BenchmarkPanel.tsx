@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { api } from '@/lib/api'
 import { useUIStore } from '@/stores/uiStore'
@@ -17,6 +19,13 @@ import {
   metricLabels,
   modelDisplayName,
 } from './performanceFormat'
+
+const JOB_STATUSES = ['pending', 'running', 'completed', 'failed', 'cancelled', 'canceled']
+
+/** A benchmark job's status in the App language, or as the computer sent it. */
+function jobStatus(status: string): string {
+  return JOB_STATUSES.includes(status) ? i18n.t(`performance:benchmark.statuses.${status}`) : status
+}
 
 function SelectCard({
   selected,
@@ -66,6 +75,7 @@ function VisualBars({
   unit: string
   higherIsBetter: boolean
 }) {
+  const { t } = useTranslation('performance')
   const max = Math.max(...rows.map((r) => r.value), 0.001)
   const sorted = [...rows].sort((a, b) =>
     higherIsBetter ? b.value - a.value : a.value - b.value,
@@ -80,7 +90,7 @@ function VisualBars({
               <span className={r.winner ? 'font-semibold text-ink' : 'text-ink'}>
                 {r.label}
                 {r.winner ? (
-                  <span className="badge-preferred ml-2">Fastest</span>
+                  <span className="badge-preferred ml-2">{t('benchmark.fastest')}</span>
                 ) : null}
               </span>
               <span className="shrink-0 tabular-nums text-ink-muted">
@@ -113,6 +123,7 @@ function BenchmarkResults({
   workloads: BenchmarkWorkload[]
   models: Model[]
 }) {
+  const { t } = useTranslation('performance')
   const advanced = useUIStore((s) => s.advancedMode)
   const labels = metricLabels(advanced)
   const [showDetail, setShowDetail] = useState(false)
@@ -133,8 +144,8 @@ function BenchmarkResults({
     <section className="card space-y-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="section-title">Results</h2>
-          <p className="mt-1 text-sm capitalize text-ink-muted">Status: {job.status}</p>
+          <h2 className="section-title">{t('benchmark.results')}</h2>
+          <p className="mt-1 text-sm text-ink-muted">{t('benchmark.status', { status: jobStatus(job.status) })}</p>
         </div>
         {(job.status === 'running' || job.status === 'pending') && (
           <div className="min-w-[220px] flex-1">
@@ -166,8 +177,9 @@ function BenchmarkResults({
               className="rounded-lg border border-accent/30 bg-accent-soft px-4 py-3"
             >
               <p className="label-caps text-accent">
-                {job.status === 'completed' ? 'Winner' : 'Leading'} ·{' '}
-                {workloadName(workloadId)}
+                {t(job.status === 'completed' ? 'benchmark.winner' : 'benchmark.leading', {
+                  workload: workloadName(workloadId),
+                })}
               </p>
               <p className="mt-1 font-medium text-ink">
                 {modelDisplayName(models, modelId)}
@@ -226,7 +238,7 @@ function BenchmarkResults({
             className="text-sm text-primary hover:underline"
             onClick={() => setShowDetail((o) => !o)}
           >
-            {showDetail ? 'Hide detailed results' : 'Detailed results'}
+            {showDetail ? t('benchmark.hideDetail') : t('benchmark.detail')}
           </button>
           {showDetail && (
             <div className="mt-3 space-y-4">
@@ -244,7 +256,7 @@ function BenchmarkResults({
                     <table className="min-w-full text-left text-sm">
                       <thead>
                         <tr className="border-b border-line text-ink-muted">
-                          <th className="px-3 py-2 font-medium">Model</th>
+                          <th className="px-3 py-2 font-medium">{t('benchmark.model')}</th>
                           <th className="px-3 py-2 text-right font-medium">
                             {labels.speed}
                           </th>
@@ -258,7 +270,7 @@ function BenchmarkResults({
                             {labels.total}
                           </th>
                           {advanced && (
-                            <th className="px-3 py-2 text-right font-medium">Load</th>
+                            <th className="px-3 py-2 text-right font-medium">{t('benchmark.load')}</th>
                           )}
                         </tr>
                       </thead>
@@ -298,13 +310,14 @@ function BenchmarkResults({
       )}
 
       {(job.status === 'running' || job.status === 'pending') && byWorkload.length === 0 && (
-        <LoadingSpinner label={job.progress.message || 'Running benchmark…'} />
+        <LoadingSpinner label={job.progress.message || t('benchmark.running')} />
       )}
     </section>
   )
 }
 
 export function BenchmarkPanel() {
+  const { t } = useTranslation('performance')
   const queryClient = useQueryClient()
   const advanced = useUIStore((s) => s.advancedMode)
   const [selectedModels, setSelectedModels] = useState<string[]>([])
@@ -390,7 +403,7 @@ export function BenchmarkPanel() {
       }
     },
     onError: (error) => {
-      setBenchError(error instanceof Error ? error.message : 'Could not start benchmark.')
+      setBenchError(error instanceof Error ? error.message : t('benchmark.startFailed'))
     },
   })
 
@@ -428,15 +441,13 @@ export function BenchmarkPanel() {
     <div className="space-y-6 animate-fade">
       <section className="card space-y-6">
         <div>
-          <h2 className="section-title">Compare models</h2>
-          <p className="mt-1 text-sm text-ink-muted">
-            Run the same prompts across models and see which is fastest for each kind of work.
-          </p>
+          <h2 className="section-title">{t('benchmark.title')}</h2>
+          <p className="mt-1 text-sm text-ink-muted">{t('benchmark.description')}</p>
           <ol className="mt-4 flex flex-wrap gap-3 text-sm">
             {[
-              { n: 1, label: 'Choose models', done: selectedModels.length > 0 },
-              { n: 2, label: 'Choose workloads', done: selectedWorkloads.length > 0 },
-              { n: 3, label: 'Run benchmark', done: false },
+              { n: 1, label: t('benchmark.chooseModels'), done: selectedModels.length > 0 },
+              { n: 2, label: t('benchmark.chooseWorkloads'), done: selectedWorkloads.length > 0 },
+              { n: 3, label: t('benchmark.run'), done: false },
             ].map((step) => (
               <li
                 key={step.n}
@@ -453,12 +464,10 @@ export function BenchmarkPanel() {
         </div>
 
         <div>
-          <p className="label-caps mb-2">1. Choose models</p>
-          {modelsQuery.isLoading && <LoadingSpinner label="Loading models…" />}
+          <p className="label-caps mb-2">{t('benchmark.step', { n: 1, label: t('benchmark.chooseModels') })}</p>
+          {modelsQuery.isLoading && <LoadingSpinner label={t('benchmark.loadingModels')} />}
           {!modelsQuery.isLoading && installedModels.length === 0 && (
-            <p className="text-sm text-ink-muted">
-              Install at least one model on the Models page before benchmarking.
-            </p>
+            <p className="text-sm text-ink-muted">{t('benchmark.installFirst')}</p>
           )}
           <div className="grid gap-2 sm:grid-cols-2">
             {installedModels.map((model) => (
@@ -471,11 +480,11 @@ export function BenchmarkPanel() {
               />
             ))}
           </div>
-          <p className="mt-2 text-xs text-ink-muted">{selectedModels.length}/6 selected</p>
+          <p className="mt-2 text-xs text-ink-muted">{t('benchmark.selected', { count: selectedModels.length })}</p>
         </div>
 
         <div>
-          <p className="label-caps mb-2">2. Choose workloads</p>
+          <p className="label-caps mb-2">{t('benchmark.step', { n: 2, label: t('benchmark.chooseWorkloads') })}</p>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {workloads.map((workload) => (
               <SelectCard
@@ -483,7 +492,7 @@ export function BenchmarkPanel() {
                 selected={selectedWorkloads.includes(workload.id)}
                 title={workload.name}
                 subtitle={workload.description}
-                meta={`${workload.prompts.length} prompts`}
+                meta={t('benchmark.prompts', { count: workload.prompts.length })}
                 onClick={() => toggleWorkload(workload.id)}
               />
             ))}
@@ -491,15 +500,14 @@ export function BenchmarkPanel() {
         </div>
 
         <div className="space-y-3 border-t border-line/60 pt-5">
-          <p className="label-caps">3. Run benchmark</p>
+          <p className="label-caps">{t('benchmark.step', { n: 3, label: t('benchmark.run') })}</p>
           <div className="rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-ink">
-            Yggdrasil will temporarily load and unload models while benchmarking. Active chats
-            may be slower during the test.
+            {t('benchmark.warning')}
           </div>
           <div className="flex flex-wrap items-end gap-4">
             {advanced && (
               <label className="text-sm text-ink-muted">
-                Measured runs per prompt
+                {t('benchmark.runsPerPrompt')}
                 <select
                   className="field mt-1 block"
                   value={runsPerPrompt}
@@ -519,7 +527,7 @@ export function BenchmarkPanel() {
               disabled={!canStart}
               onClick={() => startMutation.mutate()}
             >
-              {startMutation.isPending ? 'Starting…' : 'Run benchmark'}
+              {startMutation.isPending ? t('benchmark.starting') : t('benchmark.run')}
             </button>
             {activeJob &&
               (activeJob.status === 'running' || activeJob.status === 'pending') && (
@@ -529,17 +537,17 @@ export function BenchmarkPanel() {
                   disabled={cancelMutation.isPending}
                   onClick={() => cancelMutation.mutate()}
                 >
-                  Cancel
+                  {t('benchmark.cancel')}
                 </button>
               )}
           </div>
           {selectedModels.length > 0 && selectedWorkloads.length > 0 && (
             <p className="text-xs text-ink-faint">
-              {selectedModels.length}{' '}
-              {selectedModels.length === 1 ? 'model' : 'models'} ·{' '}
-              {selectedWorkloads.length}{' '}
-              {selectedWorkloads.length === 1 ? 'workload' : 'workloads'} · ~{estMinutes}{' '}
-              {estMinutes === 1 ? 'minute' : 'minutes'}
+              {t('benchmark.estimate', {
+                models: t('benchmark.models', { count: selectedModels.length }),
+                workloads: t('benchmark.workloads', { count: selectedWorkloads.length }),
+                minutes: t('benchmark.minutes', { count: estMinutes }),
+              })}
             </p>
           )}
         </div>
@@ -558,10 +566,8 @@ export function BenchmarkPanel() {
       {recentJobs.length > 0 && (
         <section className="card space-y-3">
           <div>
-            <h2 className="section-title">Recent benchmarks</h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Jobs stay available while Yggdrasil is running.
-            </p>
+            <h2 className="section-title">{t('benchmark.recent')}</h2>
+            <p className="mt-1 text-sm text-ink-muted">{t('benchmark.recentHint')}</p>
           </div>
           <ul className="divide-y divide-line rounded-xl border border-line">
             {recentJobs.slice(0, 8).map((job) => {
@@ -578,16 +584,18 @@ export function BenchmarkPanel() {
                     ].join(' ')}
                   >
                     <div>
-                      <p className="font-medium capitalize text-ink">{job.status}</p>
+                      <p className="font-medium text-ink">{jobStatus(job.status)}</p>
                       <p className="mt-0.5 text-xs text-ink-muted">
-                        {job.request.model_ids.length} models ·{' '}
-                        {job.request.workload_ids.length} workloads ·{' '}
-                        {formatWhen(job.created_at)}
+                        {t('benchmark.jobSummary', {
+                          models: t('benchmark.models', { count: job.request.model_ids.length }),
+                          workloads: t('benchmark.workloads', { count: job.request.workload_ids.length }),
+                          when: formatWhen(job.created_at),
+                        })}
                       </p>
                     </div>
                     <div className="text-right text-xs text-ink-muted">
                       {winnerCount > 0 ? (
-                        <span className="text-accent">{winnerCount} winners</span>
+                        <span className="text-accent">{t('benchmark.winners', { count: winnerCount })}</span>
                       ) : (
                         <span className="tabular-nums">{job.progress.percent}%</span>
                       )}

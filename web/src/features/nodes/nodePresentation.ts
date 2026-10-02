@@ -1,5 +1,6 @@
+import i18n from '@/i18n'
 import type { Accelerator, HardwareInventory, Model, Node } from '@/types/api'
-import { purposeChips } from '@/features/models/modelPresentation'
+import { purposeChipIds } from '@/features/models/modelPresentation'
 
 function isMeaningful(s?: string | null): s is string {
   if (!s) return false
@@ -15,21 +16,17 @@ function isMeaningful(s?: string | null): s is string {
 function gbLabel(bytes?: number): string | null {
   if (bytes == null || bytes <= 0) return null
   const gb = bytes / 1024 ** 3
-  if (gb >= 10) return `${Math.round(gb)} GB`
-  return `${gb.toFixed(1)} GB`
+  return i18n.t('computers:hardware.gigabytes', { value: gb >= 10 ? Math.round(gb) : gb.toFixed(1) })
 }
 
 function accelLine(accel?: Accelerator): string | null {
   if (!accel) return null
   const name = [accel.model, accel.vendor].find(isMeaningful)
   if (!name) return null
-  const vram =
-    gbLabel(accel.dedicated_vram_bytes) ||
-    (accel.unified_memory_bytes
-      ? `${gbLabel(accel.unified_memory_bytes)} unified memory`
-      : null)
-  if (vram && accel.unified_memory_bytes) return `${name} · ${vram}`
-  if (vram && accel.dedicated_vram_bytes) return `${name} · ${vram} VRAM`
+  const dedicated = gbLabel(accel.dedicated_vram_bytes)
+  if (dedicated) return `${name} · ${i18n.t('computers:hardware.vram', { size: dedicated })}`
+  const unified = gbLabel(accel.unified_memory_bytes)
+  if (unified) return `${name} · ${i18n.t('computers:hardware.unified', { size: unified })}`
   return name
 }
 
@@ -58,7 +55,9 @@ export function describeNodeHardware(hw?: HardwareInventory | null): NodeHardwar
   if (cpu && /apple|m[0-9]/i.test(cpu) && (unified || ram)) {
     return {
       primary: cpu,
-      secondary: unified ? `${unified} unified memory` : `${ram} memory`,
+      secondary: unified
+        ? i18n.t('computers:hardware.unified', { size: unified })
+        : i18n.t('computers:hardware.memory', { size: ram }),
       memoryBytes: unified
         ? accel!.unified_memory_bytes!
         : memBytes,
@@ -78,7 +77,7 @@ export function describeNodeHardware(hw?: HardwareInventory | null): NodeHardwar
   if (accelText) {
     return {
       primary: accelText,
-      secondary: ram ? `${ram} RAM` : null,
+      secondary: ram ? i18n.t('computers:hardware.ram', { size: ram }) : null,
       memoryBytes: memBytes || accel?.dedicated_vram_bytes || 0,
       unavailable: false,
     }
@@ -87,7 +86,7 @@ export function describeNodeHardware(hw?: HardwareInventory | null): NodeHardwar
   if (cpu) {
     return {
       primary: cpu,
-      secondary: ram ? `${ram} RAM` : null,
+      secondary: ram ? i18n.t('computers:hardware.ram', { size: ram }) : null,
       memoryBytes: memBytes,
       unavailable: false,
     }
@@ -95,7 +94,7 @@ export function describeNodeHardware(hw?: HardwareInventory | null): NodeHardwar
 
   if (ram) {
     return {
-      primary: `${ram} memory`,
+      primary: i18n.t('computers:hardware.memory', { size: ram }),
       secondary: null,
       memoryBytes: memBytes,
       unavailable: false,
@@ -117,29 +116,38 @@ export function membershipKind(node: Node): MembershipKind {
 export function membershipLabel(kind: MembershipKind): string {
   switch (kind) {
     case 'local':
-      return 'This computer'
+      return i18n.t('computers:membership.local')
     case 'paired':
-      return 'Paired'
+      return i18n.t('computers:membership.paired')
     case 'nearby':
-      return 'Available to pair'
+      return i18n.t('computers:membership.nearby')
     case 'offline':
-      return 'Offline'
+      return i18n.t('computers:membership.offline')
   }
 }
 
-export function onlineLabel(node: Node): string {
-  if (node.is_local) return 'Online'
-  if (node.status === 'online') return 'Online'
-  if (node.status === 'offline') return 'Offline'
-  return 'Checking…'
+export type OnlineState = 'online' | 'offline' | 'checking'
+
+export function onlineState(node: Node): OnlineState {
+  if (node.is_local || node.status === 'online') return 'online'
+  if (node.status === 'offline') return 'offline'
+  return 'checking'
 }
 
-/** What this computer is good for, from installed models + hardware hints. */
-export function availableForLabels(models: Model[], hw?: HardwareInventory | null): string[] {
-  const set = new Set<string>()
+export function onlineLabel(node: Node): string {
+  return i18n.t(`computers:online.${onlineState(node)}`)
+}
+
+/** What a computer is good for; each is computers:abilities.<ability> in the catalog. */
+export type Ability = 'general' | 'coding' | 'reasoning' | 'vision' | 'tools' | 'fast' | 'large'
+
+const abilityLabel = (ability: Ability) => i18n.t(`computers:abilities.${ability}`)
+
+function abilities(models: Model[], hw?: HardwareInventory | null): Set<Ability> {
+  const set = new Set<Ability>()
   for (const m of models) {
-    for (const chip of purposeChips(m)) set.add(chip)
-    if (m.tags?.includes('large')) set.add('Large models')
+    for (const chip of purposeChipIds(m)) set.add(chip)
+    if (m.tags?.includes('large')) set.add('large')
   }
 
   const mem =
@@ -153,28 +161,37 @@ export function availableForLabels(models: Model[], hw?: HardwareInventory | nul
     0
 
   if (set.size === 0) {
-    if (mem >= 24 * 1024 ** 3 || vram >= 16 * 1024 ** 3) set.add('Large models')
-    if (vram >= 8 * 1024 ** 3) set.add('Vision')
-    set.add('General')
-    set.add('Coding')
+    if (mem >= 24 * 1024 ** 3 || vram >= 16 * 1024 ** 3) set.add('large')
+    if (vram >= 8 * 1024 ** 3) set.add('vision')
+    set.add('general')
+    set.add('coding')
   } else if (mem >= 48 * 1024 ** 3 || vram >= 20 * 1024 ** 3) {
-    set.add('Large models')
+    set.add('large')
   }
+  return set
+}
 
-  const order = ['General', 'Coding', 'Reasoning', 'Vision', 'Tools', 'Fast', 'Large models']
-  return order.filter((l) => set.has(l)).slice(0, 4)
+function topAbilities(models: Model[], hw?: HardwareInventory | null): Ability[] {
+  const set = abilities(models, hw)
+  const order: Ability[] = ['general', 'coding', 'reasoning', 'vision', 'tools', 'fast', 'large']
+  return order.filter((a) => set.has(a)).slice(0, 4)
+}
+
+/** What this computer is good for, from installed models + hardware hints. */
+export function availableForLabels(models: Model[], hw?: HardwareInventory | null): string[] {
+  return topAbilities(models, hw).map(abilityLabel)
 }
 
 export function teamBestAt(fleet: Node[], models: Model[]): string[] {
-  const set = new Set<string>()
+  const set = new Set<Ability>()
   for (const n of fleet) {
     const onNode = models.filter((m) =>
       (m.installed_on ?? []).some((p) => p.node_id === n.id),
     )
-    for (const label of availableForLabels(onNode, n.hardware)) set.add(label)
+    for (const ability of topAbilities(onNode, n.hardware)) set.add(ability)
   }
-  const order = ['Coding', 'Vision', 'Reasoning', 'Large models', 'General', 'Tools', 'Fast']
-  return order.filter((l) => set.has(l)).slice(0, 3)
+  const order: Ability[] = ['coding', 'vision', 'reasoning', 'large', 'general', 'tools', 'fast']
+  return order.filter((a) => set.has(a)).slice(0, 3).map(abilityLabel)
 }
 
 export function combinedMemoryBytes(fleet: Node[]): number {
