@@ -4,5 +4,8 @@
   "type": "module",
   "dependencies": {
     "playwright": "1.49.1"
+  },
+  "devDependencies": {
+    "axe-core": "4.11.0"
   }
 }

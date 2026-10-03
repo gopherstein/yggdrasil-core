@@ -174,3 +174,29 @@ jobs:
       - run: pnpm exec tsc -b --pretty false
       - run: pnpm test
       - run: pnpm build
+
+  # axe-core over every page of the built UI with demo data, in both themes
+  # at desktop and phone widths (#217). Contrast needs a real browser.
+  accessibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.26.x"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: |
+            web/pnpm-lock.yaml
+            scripts/screenshots/pnpm-lock.yaml
+      - name: Build the web UI
+        working-directory: web
+        run: pnpm install && pnpm build
+      - name: Install the browser
+        working-directory: scripts/screenshots
+        run: pnpm install && pnpm exec playwright install --with-deps chromium
+      - name: Check every page
+        run: node scripts/screenshots/a11y.mjs

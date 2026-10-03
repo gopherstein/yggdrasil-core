@@ -64,6 +64,16 @@ Web tests alone:
 cd web && pnpm test
 ```
 
+Accessibility check (axe-core in Chromium, over every page with demo data, in both themes at desktop and phone widths; build `web/dist` first):
+
+```bash
+cd scripts/screenshots && pnpm install && pnpm exec playwright install chromium && cd ../..
+node scripts/screenshots/a11y.mjs
+A11Y_PAGES=/chat,/settings node scripts/screenshots/a11y.mjs
+```
+
+Any WCAG 2.2 A or AA violation, best-practice violation, or page error fails it, with the element and the reason.
+
 Cluster check (Docker, stub inference, not a GPU test):
 
 ```bash
@@ -92,6 +102,7 @@ The web check in CI is `pnpm lint`, `pnpm exec tsc -b --pretty false`, `pnpm tes
 
 - **go:** user-guide publish checks; changelog fragment checks; `gofmt`, `go vet`, golangci-lint, `go test ./...`; then cross-compiles of `yggdrasil-daemon` and `yggctl` for linux/amd64, linux/arm64, darwin/amd64, darwin/arm64, and windows/amd64 (`CGO_ENABLED=0`). These share one runner, so the module and build caches are reused.
 - **frontend:** web lint, typecheck, test, and build.
+- **accessibility:** builds the web UI and runs `scripts/screenshots/a11y.mjs` (axe-core in Chromium) over every page, in both themes at 1440 and 390 px wide. New UI has to meet WCAG 2.2 AA: 4.5:1 text contrast, labeled controls, and headings in order.
 
 To keep runs short:
 

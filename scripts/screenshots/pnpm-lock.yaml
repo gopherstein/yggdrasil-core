@@ -11,8 +11,16 @@ importers:
       playwright:
         specifier: 1.49.1
         version: 1.49.1
+    devDependencies:
+      axe-core:
+        specifier: 4.11.0
+        version: 4.11.0
 
 packages:
+
+  axe-core@4.11.0:
+    resolution: {integrity: sha512-ilYanEU8vxxBexpJd8cWM4ElSQq4QctCLKih0TSfjIfCQTeyH/6zVrmIJfLPrKTKJRbiG+cfnZbQIjAlJmF1jQ==}
+    engines: {node: '>=4'}
 
   fsevents@2.3.2:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
@@ -30,6 +38,8 @@ packages:
     hasBin: true
 
 snapshots:
+
+  axe-core@4.11.0: {}
 
   fsevents@2.3.2:
     optional: true
