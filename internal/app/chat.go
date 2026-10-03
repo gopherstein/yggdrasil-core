@@ -1091,6 +1091,11 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 			fixed, _ := payload["fixed"].(int)
 			remaining, _ := payload["remaining"].([]string)
 			e.trace.codeChecked(issues, fixed, remaining)
+		case simple.EventLinksChecked:
+			issues, _ := payload["issues"].(int)
+			fixed, _ := payload["fixed"].(int)
+			remaining, _ := payload["remaining"].([]string)
+			e.trace.linksChecked(issues, fixed, remaining)
 		case simple.EventConsistency:
 			found, _ := payload["found"].(int)
 			fixed, _ := payload["fixed"].(int)

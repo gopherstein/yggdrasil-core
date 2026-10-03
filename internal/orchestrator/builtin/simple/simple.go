@@ -76,7 +76,8 @@ func (o *Orchestrator) Run(
 		defer close(ch)
 		ch <- pluginapi.OrchestrationEvent{Type: "agent.started", Role: role}
 
-		instructions := "Format answers in Markdown with short paragraphs, lists, and links. Do not wrap the whole answer in a code fence."
+		instructions := "Format answers in Markdown with short paragraphs and lists. Do not wrap the whole answer in a code fence. " +
+			"Link only to addresses from the reference material, tool results, or the conversation; otherwise name the site instead of guessing a page's address, since remembered addresses are often wrong."
 		reference := referenceMaterial(ctx, env, task.Prompt)
 		// The effort the user chose, or Auto's pick for this kind of request,
 		// sets how much planning, reading, and checking the turn gets (§15).
@@ -347,6 +348,7 @@ func (o *Orchestrator) Run(
 			if budget.Verify {
 				answer = verifyAnswer(ctx, env, reviewerRole(profile, role), messages, parsed.Text, evidence, task.Prompt, budget.Corrections)
 				answer = checkCode(ctx, env, reviewerRole(profile, role), messages, answer, budget.Corrections)
+				answer = checkLinks(ctx, env, reviewerRole(profile, role), messages, answer, evidence, budget.Corrections)
 				if budget.Effort == huginn.EffortThorough && budget.Corrections > 0 {
 					answer = checkConsistency(ctx, env, reviewerRole(profile, role), messages, answer, evidence)
 				}

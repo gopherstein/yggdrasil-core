@@ -89,3 +89,36 @@ func TestCheckConsistency(t *testing.T) {
 		t.Fatal("a short answer was checked")
 	}
 }
+
+func TestCheckLinksSendsGuessedLinksBackOnce(t *testing.T) {
+	guessed := "Install Go by following the steps at https://go.dev/doc/install-guide-2026, which covers every platform in detail."
+	sourced := "Install Go by following the steps at https://go.dev/doc/install, which covers every platform in detail and more."
+	evidence := "From https://go.dev/doc/install: download the installer."
+	env := &recordingEnv{scriptedEnv: scriptedEnv{replies: []string{sourced}}}
+	if got := checkLinks(context.Background(), env, "assistant", nil, guessed, evidence, 1); got != sourced {
+		t.Fatalf("answer = %q", got)
+	}
+	if ask := env.seen[0][len(env.seen[0])-1].Content; !strings.Contains(ask, "install-guide-2026") {
+		t.Fatalf("the link wasn't named: %q", ask)
+	}
+	if ev := env.emitted[EventLinksChecked]; ev["issues"] != 1 || ev["fixed"] != 1 || len(ev["remaining"].([]string)) != 0 {
+		t.Fatalf("event = %v", ev)
+	}
+	// No corrections: reported, not sent back.
+	env = &recordingEnv{}
+	if got := checkLinks(context.Background(), env, "assistant", nil, guessed, evidence, 0); got != guessed || env.n != 0 {
+		t.Fatalf("check only: %q, %d calls", got, env.n)
+	}
+	if ev := env.emitted[EventLinksChecked]; len(ev["remaining"].([]string)) != 1 {
+		t.Fatalf("check-only event = %v", ev)
+	}
+	// Links from the sources, or an answer without links, cost nothing.
+	env = &recordingEnv{}
+	if got := checkLinks(context.Background(), env, "assistant", nil, sourced, evidence, 2); got != sourced || env.n != 0 || env.emitted[EventLinksChecked]["issues"] != 0 {
+		t.Fatalf("sourced link: %d calls, %v", env.n, env.emitted)
+	}
+	env = &recordingEnv{}
+	if checkLinks(context.Background(), env, "assistant", nil, "Just words.", "", 2); env.n != 0 || env.emitted != nil {
+		t.Fatal("an answer without links was checked")
+	}
+}

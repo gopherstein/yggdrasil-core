@@ -195,6 +195,25 @@ func (t *turnTrace) codeChecked(issues, fixed int, remaining []string) {
 	}
 }
 
+// linksChecked records the answer's links checked against the sources:
+// all from a source, guessed ones rewritten, or some left, which the
+// notice lists so the person knows they may not work.
+func (t *turnTrace) linksChecked(issues, fixed int, remaining []string) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	switch {
+	case issues == 0:
+		t.step("verify", "checkedLinks", nil)
+	case len(remaining) == 0:
+		t.step("verify", "correctedLinks", map[string]any{"count": fixed})
+	default:
+		t.step("verify", "linksUnconfirmed", nil)
+		if t.notice == "" {
+			t.notice = t.noticeText("unsourcedLinks", map[string]any{"links": listIn(t.lang, remaining)})
+		}
+	}
+}
+
 // consistencyChecked records the answer checked for contradictions.
 func (t *turnTrace) consistencyChecked(found, fixed int, remaining []string) {
 	t.mu.Lock()

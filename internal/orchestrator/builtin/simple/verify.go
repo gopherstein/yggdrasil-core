@@ -23,7 +23,51 @@ const (
 	EventCodeChecked = "verify.code"
 	// EventConsistency reports the answer checked for contradictions.
 	EventConsistency = "verify.consistency"
+	// EventLinksChecked reports the answer's links checked against the
+	// sources.
+	EventLinksChecked = "verify.links"
 )
+
+// checkLinks finds the answer's links to pages no source gave, which a
+// model writes from memory and which are often wrong or gone. They go back
+// to the model once per correction, and the revision is kept when it has
+// fewer; those left are reported for the answer's notice. The check needs
+// no model and makes no request.
+func checkLinks(ctx context.Context, env pluginapi.ExecutionEnvironment, role string, messages []pluginapi.ChatMessage, answer, evidence string, corrections int) string {
+	links := huginn.Links(answer)
+	if len(links) == 0 {
+		return answer
+	}
+	sources := []string{evidence}
+	for _, m := range messages {
+		sources = append(sources, m.Content)
+	}
+	issues := huginn.UngroundedLinks(answer, sources...)
+	remaining := issues
+	for pass := 0; pass < corrections && len(remaining) > 0 && ctx.Err() == nil; pass++ {
+		env.Emit(EventVerifying, map[string]any{"issues": len(remaining)})
+		ask := append(append([]pluginapi.ChatMessage(nil), messages...),
+			pluginapi.ChatMessage{Role: "assistant", Content: answer},
+			pluginapi.ChatMessage{Role: "user", Content: "These links in your answer are not in the reference material or the conversation, so they may not exist:\n" + huginn.DescribeLinks(remaining) +
+				"Rewrite the whole answer for the user without guessed addresses: link only to pages from the reference material or the conversation, and otherwise name the site, or link its home page, and say what to look for there. Reply with the answer only."},
+		)
+		revised, _, err := generateText(ctx, env, role, ask)
+		if err != nil {
+			break
+		}
+		text := tools.ParseModelOutput(revised).Text
+		if !substantial(text, answer) {
+			break
+		}
+		again := huginn.UngroundedLinks(text, sources...)
+		if len(again) >= len(remaining) {
+			break
+		}
+		answer, remaining = text, again
+	}
+	env.Emit(EventLinksChecked, map[string]any{"links": len(links), "issues": len(issues), "fixed": len(issues) - len(remaining), "remaining": remaining})
+	return answer
+}
 
 // checkCode parses the answer's code blocks without running them (#111).
 // Code with syntax errors goes back to the model once per correction,
