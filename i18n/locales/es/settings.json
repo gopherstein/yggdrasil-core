@@ -166,6 +166,15 @@
     "ask": "Pedirme que valore modelos",
     "askHint": "Tras usar un modelo un tiempo, un chat te pregunta qué tal funciona."
   },
+  "yourData": {
+    "title": "Tus datos siguen siendo privados",
+    "points": {
+      "stored": "Tus chats, recuerdos, conocimiento, archivos e IA especializadas se guardan en esta computadora, en la carpeta de datos de Yggdrasil. No hay cuenta de Yggdrasil ni nube, y no se envían datos de uso a nadie.",
+      "leaves": "Algo sale de esta computadora solo cuando usas una función que se conecta a internet, como una búsqueda web, un servicio conectado o una computadora vinculada. Cada vez aparece abajo, en Lo que salió de esta computadora.",
+      "atRest": "Yggdrasil no cifra sus propios archivos ni te obliga a hacerlo. Para que estén cifrados mientras la computadora está apagada o bloqueado, activa el cifrado de disco: FileVault en macOS, BitLocker en Windows o LUKS en Linux.",
+      "inTransit": "Los sitios web y servicios en línea se usan mediante conexiones HTTPS cifradas. El tráfico entre tus propias computadoras, y desde otros dispositivos de tu red hacia esta, aún no está cifrado, así que usa esas funciones solo en una red de confianza."
+    }
+  },
   "whatLeft": {
     "title": "Lo que salió de esta computadora",
     "description": "Yggdrasil trabaja en esta computadora. Estas son las veces en que un chat, una automatización o una app envió algo a otro lugar: búsquedas y páginas web, consultas de mapas, computadoras vinculadas y servicios conectados. Marca recuerdos o conocimiento como “Solo esta computadora” para que los chats que los usan se queden aquí.",
@@ -261,6 +270,6 @@
     "models_one": "{{count}} modelo disponible",
     "models_many": "{{count}} modelos disponibles",
     "models_other": "{{count}} modelos disponibles",
-    "privacy": "Los chats con estos modelos salen de este equipo y quedan registrados en Lo que salió de este equipo. Los perfiles sin conexión y los chats que usan recuerdos o conocimiento marcados como Solo este equipo nunca los usan."
+    "privacy": "Los chats con estos modelos salen de este equipo y quedan registrados en Lo que salió de esta computadora. Los perfiles sin conexión y los chats que usan recuerdos o conocimiento marcados como Solo este equipo nunca los usan."
   }
 }

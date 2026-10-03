@@ -157,7 +157,11 @@ var (
 	// questionRe is a message asking something.
 	questionRe = regexp.MustCompile(`(?i)\?|^\s*(how|what|where|why|when|which|can|could|does|do|is|are|will|explain|tell me|show me|help)\b`)
 	// selfRe is a message about Yggdrasil itself.
-	selfRe = regexp.MustCompile(`(?i)\b(yggdrasil|this app|the app|your (own )?(features?|docs?|documentation|settings|capabilit\w*|guide)|you (support|offer|have|do)|in the (app|ui|settings)|what left this computer|this computer only|tool sources?|connected services?|specialized ais?|join (token|command)s?|paired computers?|team profile)\b`)
+	selfRe = regexp.MustCompile(`(?i)\b(yggdrasil|this app|the app|your (own )?(features?|docs?|documentation|settings|capabilit\w*|guide)|you (support|offer|have|do)|in the (app|ui|settings)|what left this computer|this computer only|tool sources?|connected services?|specialized ais?|join (token|command)s?|paired computers?|team profile` +
+		// Privacy questions are about this app: "are my chats private?",
+		// "who can see my data?", "do I need encryption?".
+		`|my (data|chats?|conversations?|files|memories|messages|information) (is |are )?(private|encrypted|safe|secure|stored)` +
+		`|(see|read|access) my (data|chats?|conversations?|files|memories|messages)|do i need encryption|is encryption (required|needed))\b`)
 )
 
 // Thresholds: a question naming Yggdrasil needs a modest match; one that

@@ -19,6 +19,7 @@ import { ConnectedServices } from './ConnectedServices'
 import { NotificationDestinations } from './NotificationDestinations'
 import { ExternalServer } from './ExternalServer'
 import { WhatLeft } from './WhatLeft'
+import { YourData } from './YourData'
 import { Toggle } from '@/components/ui/Toggle'
 import { LanguageSettings } from './LanguageSettings'
 import { Personalization } from './Personalization'
@@ -511,6 +512,7 @@ export function SettingsPage() {
 
       <div className="settings-group">
         <p className="settings-group-label">{t('groups.privacy')}</p>
+        <YourData />
         <ConnectedServices />
         <WhatLeft />
         <section className="card space-y-4">

@@ -166,6 +166,15 @@
     "ask": "Pedir que eu avalie modelos",
     "askHint": "Depois de usar um modelo por um tempo, uma conversa pergunta como ele está funcionando."
   },
+  "yourData": {
+    "title": "Seus dados continuam privados",
+    "points": {
+      "stored": "Suas conversas, memórias, conhecimento, arquivos e IAs especializadas ficam armazenados neste computador, na pasta de dados do Yggdrasil. Não há conta do Yggdrasil nem nuvem, e nenhum dado de uso é enviado a ninguém.",
+      "leaves": "Algo sai deste computador apenas quando você usa um recurso que acessa a internet, como uma pesquisa na web, um serviço conectado ou um computador pareado. Cada vez aparece abaixo, em O que saiu deste computador.",
+      "atRest": "O Yggdrasil não criptografa os próprios arquivos e não exige que você faça isso. Para mantê-los criptografados enquanto o computador está desligado ou bloqueado, ative a criptografia de disco: FileVault no macOS, BitLocker no Windows ou LUKS no Linux.",
+      "inTransit": "Sites e serviços on-line são acessados por conexões HTTPS criptografadas. O tráfego entre seus próprios computadores, e de outros dispositivos da sua rede para este, ainda não é criptografado, então use esses recursos apenas em uma rede confiável."
+    }
+  },
   "whatLeft": {
     "title": "O que saiu deste computador",
     "description": "O Yggdrasil trabalha neste computador. Estas são as vezes em que um chat, uma automação ou um app enviou algo para fora: pesquisas e páginas da web, consultas de mapas, computadores pareados e serviços conectados. Marque memórias ou conhecimento como “Somente este computador” para manter aqui os chats que os usam.",

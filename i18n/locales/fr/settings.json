@@ -166,6 +166,15 @@
     "ask": "Me proposer de noter les modèles",
     "askHint": "Après quelque temps d'utilisation d'un modèle, une conversation vous demande comment il fonctionne."
   },
+  "yourData": {
+    "title": "Vos données restent privées",
+    "points": {
+      "stored": "Vos conversations, souvenirs, connaissances, fichiers et IA spécialisées sont stockés sur cet ordinateur, dans le dossier de données d'Yggdrasil. Il n'y a ni compte Yggdrasil ni cloud, et aucune donnée d'utilisation n'est envoyée à qui que ce soit.",
+      "leaves": "Quelque chose quitte cet ordinateur seulement quand vous utilisez une fonction qui va en ligne, comme une recherche web, un service connecté ou un ordinateur associé. Chaque fois est listée ci-dessous, dans Ce qui a quitté cet ordinateur.",
+      "atRest": "Yggdrasil ne chiffre pas ses propres fichiers et ne vous oblige pas à le faire. Pour qu'ils restent chiffrés quand l'ordinateur est éteint ou verrouillé, activez le chiffrement du disque : FileVault sur macOS, BitLocker sur Windows ou LUKS sur Linux.",
+      "inTransit": "Les sites web et services en ligne sont joints par des connexions HTTPS chiffrées. Le trafic entre vos propres ordinateurs, et des autres appareils de votre réseau vers celui-ci, n'est pas encore chiffré : utilisez ces fonctions uniquement sur un réseau de confiance."
+    }
+  },
   "whatLeft": {
     "title": "Ce qui a quitté cet ordinateur",
     "description": "Yggdrasil travaille sur cet ordinateur. Voici les fois où une discussion, une automatisation ou une app a envoyé quelque chose ailleurs : recherches et pages web, recherches de cartes, ordinateurs jumelés et services connectés. Marquez des souvenirs ou des connaissances « Cet ordinateur uniquement » pour que les discussions qui les utilisent restent ici.",

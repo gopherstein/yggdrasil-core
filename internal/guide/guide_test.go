@@ -11,7 +11,11 @@ func TestAboutYggdrasil(t *testing.T) {
 		"Can Yggdrasil train its own AI?":         "Train your own AI",
 		"what features do you have?":              "What Yggdrasil does",
 		"How do I connect my other computer?":     "Connect your computers",
-		"where is what left this computer?":       "Privacy and what left this computer",
+		"where is what left this computer?":       "Privacy, encryption, and what left this computer",
+		"is my data encrypted?":                   "Privacy, encryption, and what left this computer",
+		"are my chats private?":                   "Privacy, encryption, and what left this computer",
+		"Do I need encryption?":                   "Privacy, encryption, and what left this computer",
+		"who can see my chats?":                   "Privacy, encryption, and what left this computer",
 		"How do I add knowledge from a folder?":   "Connect knowledge",
 		"How do I use an API key with Yggdrasil?": "Connect another app through the API",
 		"how to turn on notifications by email?":  "Notifications",
@@ -27,6 +31,7 @@ func TestAboutYggdrasil(t *testing.T) {
 		"How do I make pasta carbonara?", "Can you write a poem about the sea?", "What is the capital of France?",
 		"How do I fix a flat bike tire?", "Explain quantum computing", "How do I improve my resume?",
 		"what is memory in a computer?", "Summarize this: the meeting moved to Tuesday.",
+		"How does AES encryption work?", "Is end-to-end encryption safe?",
 	} {
 		if ps := About(q); len(ps) != 0 {
 			t.Errorf("About(%q) = %v, want nothing", q, ps)

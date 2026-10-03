@@ -166,6 +166,15 @@
     "ask": "Ask me to rate models",
     "askHint": "After you’ve used a model for a while, a chat asks how it’s working."
   },
+  "yourData": {
+    "title": "Your data stays private",
+    "points": {
+      "stored": "Your chats, memories, knowledge, files, and specialized AIs are stored on this computer, in Yggdrasil's data folder. There's no Yggdrasil account or cloud, and no usage data is sent to anyone.",
+      "leaves": "Something leaves this computer only when you use a feature that goes online, such as a web search, a connected service, or a paired computer. Each time is listed below, under What left this computer.",
+      "atRest": "Yggdrasil doesn't encrypt its own files, and doesn't require you to. To keep them encrypted while the computer is off or locked, turn on its disk encryption: FileVault on macOS, BitLocker on Windows, or LUKS on Linux.",
+      "inTransit": "Websites and online services are reached over encrypted HTTPS connections. Traffic between your own computers, and from other devices on your network to this one, isn't encrypted yet, so use those features only on a network you trust."
+    }
+  },
   "whatLeft": {
     "title": "What left this computer",
     "description": "Yggdrasil works on this computer. These are the times a chat, automation, or app sent something elsewhere: web searches and pages, map lookups, paired computers, and connected services. Mark memories or knowledge “This computer only” to keep chats that use them here.",

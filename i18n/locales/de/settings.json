@@ -166,6 +166,15 @@
     "ask": "Mich bitten, Modelle zu bewerten",
     "askHint": "Nachdem du ein Modell eine Weile genutzt hast, fragt ein Chat, wie es läuft."
   },
+  "yourData": {
+    "title": "Deine Daten bleiben privat",
+    "points": {
+      "stored": "Deine Chats, Erinnerungen, Wissensquellen, Dateien und spezialisierten KIs werden auf diesem Computer gespeichert, im Datenordner von Yggdrasil. Es gibt kein Yggdrasil-Konto und keine Cloud, und es werden keine Nutzungsdaten an irgendwen gesendet.",
+      "leaves": "Etwas verlässt diesen Computer nur, wenn du eine Funktion nutzt, die online geht, etwa eine Websuche, einen verbundenen Dienst oder einen gekoppelten Computer. Jedes Mal steht unten unter „Was diesen Computer verlassen hat“.",
+      "atRest": "Yggdrasil verschlüsselt seine eigenen Dateien nicht und verlangt das auch nicht. Damit sie verschlüsselt sind, während der Computer aus oder gesperrt ist, schalte die Festplattenverschlüsselung ein: FileVault unter macOS, BitLocker unter Windows oder LUKS unter Linux.",
+      "inTransit": "Websites und Onlinedienste werden über verschlüsselte HTTPS-Verbindungen erreicht. Der Verkehr zwischen deinen eigenen Computern und von anderen Geräten in deinem Netzwerk zu diesem ist noch nicht verschlüsselt. Nutze diese Funktionen daher nur in einem Netzwerk, dem du vertraust."
+    }
+  },
   "whatLeft": {
     "title": "Was diesen Computer verlassen hat",
     "description": "Yggdrasil arbeitet auf diesem Computer. Hier siehst du, wann ein Chat, eine Automation oder eine App etwas nach außen gesendet hat: Websuchen und Webseiten, Kartenabfragen, gekoppelte Computer und verbundene Dienste. Markiere Erinnerungen oder Wissen als „Nur dieser Computer“, damit Chats, die sie nutzen, hier bleiben.",

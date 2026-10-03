@@ -29,6 +29,17 @@ What you can see and remove:
 
 The diagnostic bundle is written to omit secrets, private keys, and API key material. Do not assume a log file has been redacted. Remove tokens and personal text before you paste a log into an issue.
 
+## Encryption
+
+Yggdrasil does not encrypt its own files, and encryption is not required to use it.
+
+- **At rest:** `yggdrasil.db`, `artifacts/`, `knowledge/`, and the other files above are plain files on disk. `secrets/` is readable only by your user account (`0700`/`0600`), and API keys are bcrypt hashes. Turn on full-disk encryption to keep everything encrypted while the computer is off or locked: FileVault on macOS, BitLocker or Device Encryption on Windows, and LUKS on Linux.
+- **To the internet:** web search, page reads, model and runtime downloads, community ratings, and the built-in services use HTTPS. Addresses you enter, such as an external server, a webhook, an MCP server, or your own map services, are encrypted when they use `https://`. Email requires TLS or STARTTLS except for a mail server on this computer.
+- **Between your computers:** Bifrost (port 7332) is plain HTTP. Pairing uses a signed handshake and each request carries a token from a paired node, so other machines can't join or call it, but a chat placed on a paired computer, and its answer, cross the network unencrypted.
+- **Local network access:** the API on port 7331 is plain HTTP with a bearer key. See [API exposure](#api-exposure).
+
+Use paired computers and local network access on a network you trust. Settings → **Your data stays private** states the same in the app.
+
 ## What can leave the machine
 
 Nothing leaves because the daemon started. Traffic is sent only when a feature that talks to the network is used:
