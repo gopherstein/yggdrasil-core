@@ -520,6 +520,11 @@
     "placesSearch": "지도에서 “{{query}}”을(를) 찾아봤어요",
     "placeDetails": "장소의 세부 정보를 찾아봤어요",
     "route": "{{from}}에서 {{to}}까지 가는 길을 찾았어요",
-    "git": "Git 저장소를 확인했어요({{action}})"
+    "git": "Git 저장소를 확인했어요({{action}})",
+    "helpAnswered": "Yggdrasil 안내서를 바탕으로 답했습니다"
+  },
+  "help": {
+    "mcpTools": "MCP 자체는 설치할 필요가 없습니다. Yggdrasil이 이미 지원합니다. MCP 서버의 도구를 추가하려면 **{{tools}} → {{addTools}}**를 열고 네 가지 방법 중 하나를 고르세요.\n\n- **갤러리:** 폴더, 브라우저, Notion, Linear, GitHub 같은 서버를 고르고 질문이 있으면 한두 개에 답합니다. 로그인이 필요한 서비스는 로그인 창이 열립니다.\n- **붙여넣기:** 서버 안내에 나온 내용을 그대로 붙여넣습니다. Claude Desktop·Cursor·VS Code용 JSON, 명령줄, `claude mcp add` 줄, 웹 주소 모두 됩니다.\n- **다른 앱에서:** Claude Desktop, Claude Code, Cursor, VS Code, Windsurf, Gemini CLI, LM Studio에 이미 설정한 서버를 추가합니다.\n- **사용자 지정:** 실행할 명령이나 웹 주소를 지정합니다.\n\nYggdrasil은 저장하기 전에 서버에 연결해 도구 목록을 보여 줍니다. 이 컴퓨터에서 실행되는 서버에는 Node.js나 uv가 필요하며, 없으면 오류 메시지가 알려 줍니다. 무언가를 바꾸는 도구는 실행 전에 물어봅니다.",
+    "mcpServer": "Claude Desktop, Claude Code, Cursor, VS Code 같은 MCP 지원 앱에서 Yggdrasil을 사용하려면 **{{apiAccess}} → {{useElsewhere}}**을 여세요. 각 앱에 붙여넣을 내용이 나옵니다. 그러면 그 앱에서 로컬 AI에 질문하고, 모델 목록을 보고, 연결된 지식을 검색할 수 있습니다."
   }
 }

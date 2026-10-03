@@ -57,6 +57,10 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		if ch, ok := a.answerCapabilityQuestion(ctx, conversationID, message); ok {
 			return ch, nil
 		}
+		// "How do I install MCP?" is answered from what Yggdrasil offers.
+		if ch, ok := a.answerHowTo(ctx, conversationID, message); ok {
+			return ch, nil
+		}
 	}
 	// An API caller changes memories only when it opted into memory (§62).
 	if opts != nil && !opts.Memory {

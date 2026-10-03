@@ -520,6 +520,11 @@
     "placesSearch": "在地图上查找了“{{query}}”",
     "placeDetails": "查询了一个地点的详细信息",
     "route": "查找了从 {{from}} 到 {{to}} 的路线",
-    "git": "检查了 Git 仓库（{{action}}）"
+    "git": "检查了 Git 仓库（{{action}}）",
+    "helpAnswered": "根据 Yggdrasil 指南回答"
+  },
+  "help": {
+    "mcpTools": "MCP 本身无需安装：Yggdrasil 已经支持它。要添加 MCP 服务器的工具，请打开 **{{tools}} → {{addTools}}**，然后从四种方式中选择一种：\n\n- **图库：** 选择一个服务器，例如文件夹、浏览器、Notion、Linear 或 GitHub，最多回答一两个问题。需要登录的服务会打开登录窗口。\n- **粘贴：** 粘贴服务器说明中的内容：适用于 Claude Desktop、Cursor 或 VS Code 的 JSON、一条命令行、一条 `claude mcp add` 命令或一个网址。\n- **从其他应用导入：** 添加你已在 Claude Desktop、Claude Code、Cursor、VS Code、Windsurf、Gemini CLI 或 LM Studio 中设置好的服务器。\n- **自定义：** 一条要运行的命令或一个网址。\n\nYggdrasil 会先连接服务器并列出其工具，然后才保存。在这台电脑上运行的服务器需要 Node.js 或 uv；缺少时错误信息会说明缺哪个。会更改内容的工具会先征求你的同意。",
+    "mcpServer": "要在 Claude Desktop、Claude Code、Cursor、VS Code 或其他支持 MCP 的应用中使用 Yggdrasil，请打开 **{{apiAccess}} → {{useElsewhere}}**。那里会显示要粘贴到每个应用中的内容。之后该应用就能向你的本地 AI 提问、列出其模型，并搜索你连接的知识。"
   }
 }

@@ -545,6 +545,11 @@
     "placesSearch": "„{{query}}“ auf der Karte gesucht",
     "placeDetails": "Details zu einem Ort nachgeschlagen",
     "route": "Den Weg von {{from}} nach {{to}} gefunden",
-    "git": "Das Git-Repository geprüft ({{action}})"
+    "git": "Das Git-Repository geprüft ({{action}})",
+    "helpAnswered": "Aus der Yggdrasil-Anleitung beantwortet"
+  },
+  "help": {
+    "mcpTools": "Für MCP selbst musst du nichts installieren: Yggdrasil beherrscht es bereits. Um die Werkzeuge eines MCP-Servers hinzuzufügen, öffne **{{tools}} → {{addTools}}** und wähle einen von vier Wegen:\n\n- **Galerie:** Wähle einen Server, etwa Ordner, einen Browser, Notion, Linear oder GitHub, und beantworte höchstens ein, zwei Fragen. Dienste mit Anmeldung öffnen eine.\n- **Einfügen:** Füge ein, was die Anleitung des Servers sagt: JSON für Claude Desktop, Cursor oder VS Code, eine Befehlszeile, eine `claude mcp add`-Zeile oder eine Webadresse.\n- **Aus deinen anderen Apps:** Übernimm Server, die du schon in Claude Desktop, Claude Code, Cursor, VS Code, Windsurf, Gemini CLI oder LM Studio eingerichtet hast.\n- **Eigener:** Ein Befehl zum Ausführen oder eine Webadresse.\n\nYggdrasil verbindet sich und listet die Werkzeuge des Servers, bevor es ihn speichert. Server auf diesem Computer brauchen Node.js oder uv; die Fehlermeldung sagt, was fehlt. Werkzeuge, die etwas ändern, fragen dich vorher.",
+    "mcpServer": "Um Yggdrasil aus Claude Desktop, Claude Code, Cursor, VS Code oder einer anderen MCP-fähigen App zu nutzen, öffne **{{apiAccess}} → {{useElsewhere}}**. Dort steht, was du in jede App einfügst. Die App kann dann deine lokale KI fragen, ihre Modelle auflisten und dein verbundenes Wissen durchsuchen."
   }
 }
