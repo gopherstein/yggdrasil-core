@@ -515,6 +515,7 @@
     "leftHours_many": "Mancano circa {{count}} ore.",
     "leftHours_other": "Mancano circa {{count}} ore.",
     "capabilities": "Ho controllato cosa può fare Yggdrasil in questo momento",
+    "guide": "Consultata la guida di Yggdrasil: {{sections}}",
     "localOnly": "Ho risposto su questo computer, perché la domanda usava dati riservati a questo computer.",
     "passages_one": "Ho trovato {{count}} passaggio (fonte: {{source}})",
     "passages_many": "Ho trovato {{count}} passaggi (fonte: {{source}})",

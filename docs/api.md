@@ -467,6 +467,8 @@ Three behaviors come from the quality test set (`tests/quality`):
 - **Capability questions:** a short question about what Yggdrasil can do is answered straight from the capability inventory, without a model.
 - **False claims:** an answer that says it changed something, when no tool that changes things ran, gets the notice "Nothing was changed: no tool ran to do this, whatever the answer says."
 
+**Questions about Yggdrasil.** The user guide (`docs/user-guide/guide.json`) ships inside the daemon. A question about Yggdrasil itself, one that names it or its screens, or one that matches the guide's own words strongly, gets up to four matching guide passages (about 3,000 characters) in the turn's instructions, and the model is told to answer from them, name screens as they do, and say when they don't cover the question. The answer's steps say which sections it read. Questions about anything else get nothing added. A short how-to question about MCP is answered directly, without a model.
+
 ## Caches
 
 Every cache declares its policy: `key`, `ttl`, `invalidation`, `scope`, and `privacy` (`public` or `personal`). Secret data, such as credentials, is never cached; a cache that would hold it is refused when it is created.

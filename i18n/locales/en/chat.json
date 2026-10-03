@@ -499,6 +499,7 @@
     "leftHours_one": "About {{count}} hour left.",
     "leftHours_other": "About {{count}} hours left.",
     "capabilities": "Checked what Yggdrasil can do right now",
+    "guide": "Read Yggdrasil's guide: {{sections}}",
     "localOnly": "Answered on this computer, because the question used data marked this computer only.",
     "passages_one": "Found {{count}} passage in {{source}}",
     "passages_other": "Found {{count}} passages in {{source}}",

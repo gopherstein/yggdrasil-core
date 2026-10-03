@@ -499,6 +499,7 @@
     "leftHours_one": "Noch etwa {{count}} Stunde.",
     "leftHours_other": "Noch etwa {{count}} Stunden.",
     "capabilities": "Geprüft, was Yggdrasil gerade kann",
+    "guide": "In der Yggdrasil-Anleitung nachgelesen: {{sections}}",
     "localOnly": "Auf diesem Computer beantwortet, weil die Frage Daten genutzt hat, die als „nur dieser Computer“ markiert sind.",
     "passages_one": "{{count}} Textstelle in {{source}} gefunden",
     "passages_other": "{{count}} Textstellen in {{source}} gefunden",

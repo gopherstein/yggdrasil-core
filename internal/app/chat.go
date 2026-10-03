@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/contextusage"
 	"github.com/yeixio/yggdrasil-core/internal/egress"
 	"github.com/yeixio/yggdrasil-core/internal/events"
+	"github.com/yeixio/yggdrasil-core/internal/guide"
 	"github.com/yeixio/yggdrasil-core/internal/huginn"
 	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/internal/mimir"
@@ -295,6 +297,17 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		if facts := a.capabilityFacts(ctx, message); facts != "" {
 			env.capabilities = facts
 			env.trace.sharing(locale.T(appLang, "chat:steps.capabilities", nil))
+		}
+		// A question about Yggdrasil itself is answered from its own guide.
+		if ps := guide.About(message); len(ps) > 0 {
+			env.guide = guide.Block(ps)
+			var sections []string
+			for _, p := range ps {
+				if !slices.Contains(sections, p.Section) {
+					sections = append(sections, p.Section)
+				}
+			}
+			env.trace.sharing(locale.T(appLang, "chat:steps.guide", map[string]any{"sections": listIn(appLang, sections)}))
 		}
 		if a.memoryOn(ctx, conversationID) && (opts == nil || opts.Memory) && profile.Orchestration.Memory != "off" {
 			if mems, err := a.Muninn.Relevant(ctx, message); err == nil {
@@ -852,6 +865,8 @@ type chatExecEnv struct {
 	memories []muninn.Memory
 	// opts are an API request's choices for this turn, or nil (§62).
 	opts *turnopts.Options
+	// guide is excerpts from the user guide for a question about Yggdrasil.
+	guide string
 	// capabilities are inventory facts for a question about what
 	// Yggdrasil can do (§37).
 	capabilities string
@@ -1216,6 +1231,10 @@ func (e *chatExecEnv) TurnInstructions(ctx context.Context, prompt string) strin
 	// What Yggdrasil can do comes from its own inventory (§37).
 	if e.capabilities != "" {
 		parts = append(parts, e.capabilities)
+	}
+	// So does how to use it: the user guide ships with Yggdrasil.
+	if e.guide != "" {
+		parts = append(parts, e.guide)
 	}
 	// Memories come from the person, so they are trusted instructions.
 	if block := muninn.Block(e.memories); block != "" {

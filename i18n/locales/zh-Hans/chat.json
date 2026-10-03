@@ -483,6 +483,7 @@
     "leftMinutes_other": "大约还剩 {{count}} 分钟。",
     "leftHours_other": "大约还剩 {{count}} 小时。",
     "capabilities": "检查了 Yggdrasil 目前能做什么",
+    "guide": "查阅了 Yggdrasil 指南：{{sections}}",
     "localOnly": "已在这台电脑上回答，因为问题用到了标记为“仅限这台电脑”的数据。",
     "passages_other": "在 {{source}} 中找到 {{count}} 个段落",
     "passagesMore_other": "在 {{source}} 及另外 {{more}} 个来源中找到 {{count}} 个段落",

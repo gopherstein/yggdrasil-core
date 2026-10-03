@@ -483,6 +483,7 @@
     "leftMinutes_other": "残り約{{count}}分です。",
     "leftHours_other": "残り約{{count}}時間です。",
     "capabilities": "Yggdrasilが現在できることを確認しました",
+    "guide": "Yggdrasilのガイドを参照しました: {{sections}}",
     "localOnly": "質問に「このコンピュータのみ」と指定されたデータが使われたため、このコンピュータで回答しました。",
     "passages_other": "{{source}}で{{count}}件の抜粋が見つかりました",
     "passagesMore_other": "{{source}}とほか{{more}}件で{{count}}件の抜粋が見つかりました",
