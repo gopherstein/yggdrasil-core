@@ -369,6 +369,15 @@ export async function streamChat({
   }
 }
 
+/** The browser's time zone, such as America/Juneau, so answers know the person's date and time. */
+export function localTimeZone(): string | undefined {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined
+  } catch {
+    return undefined
+  }
+}
+
 /** How long a finished reply waits for the desktop relay to deliver its last tokens. */
 const relayDrainMs = 3000
 
@@ -387,7 +396,7 @@ async function readChatStream({
       'Content-Type': 'application/json',
       ...authHeaders(),
     },
-    body: JSON.stringify({ ...body, stream: true }),
+    body: JSON.stringify({ time_zone: localTimeZone(), ...body, stream: true }),
     signal,
   })
 
@@ -684,7 +693,7 @@ export const api = {
   sendChat: (body: ChatRequest) =>
     request<ChatResponse>('/api/v1/chat', {
       method: 'POST',
-      body: JSON.stringify({ ...body, stream: false }),
+      body: JSON.stringify({ time_zone: localTimeZone(), ...body, stream: false }),
     }),
 
   listLogs: () => request<LogEntry[]>('/api/v1/logs'),

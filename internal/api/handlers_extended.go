@@ -11,6 +11,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/artifacts"
 	"github.com/yeixio/yggdrasil-core/internal/auth"
 	"github.com/yeixio/yggdrasil-core/internal/huginn"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/pkg/contracts"
 )
 
@@ -305,12 +306,15 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 		Attachments []string `json:"attachments"`
 		// Effort is auto, fast, balanced, or thorough (spec §15).
 		Effort string `json:"effort"`
+		// TimeZone is the person's IANA time zone, from their browser.
+		TimeZone string `json:"time_zone"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "invalid body", nil)
 		return
 	}
-	r = r.WithContext(huginn.WithEffort(artifacts.WithAttachments(r.Context(), body.Attachments), huginn.ParseEffort(body.Effort)))
+	ctx := huginn.WithEffort(artifacts.WithAttachments(r.Context(), body.Attachments), huginn.ParseEffort(body.Effort))
+	r = r.WithContext(locale.WithTimeZone(ctx, body.TimeZone))
 	if err := s.deps.Chat(w, r, body.ConversationID, body.ProfileID, body.ModelID, body.Message, body.Stream, body.Execution); err != nil {
 		writeErrFrom(w, http.StatusInternalServerError, "CHAT_FAILED", err)
 	}

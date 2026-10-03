@@ -1215,6 +1215,21 @@ func (e *chatExecEnv) modelForRole(role string) string {
 // TurnInstructions returns trusted instructions for this turn: a specialized
 // AI's system instructions. The simple orchestrator places them ahead of its
 // own system prompt.
+// nowLine tells the model the date and time where the person is, such as
+// "Friday, October 2, 2026, 6:42 PM AKDT (UTC-08:00, America/Juneau)".
+func nowLine(now time.Time, loc *time.Location) string {
+	if now.IsZero() {
+		now = time.Now()
+	}
+	t := now.In(loc)
+	zone := t.Format("MST (UTC-07:00")
+	if name := loc.String(); name != "" && name != "Local" && name != "UTC" {
+		zone += ", " + name
+	}
+	return "The current date and time for the user: " + t.Format("Monday, January 2, 2006, 3:04 PM ") + zone +
+		"). Use it for anything relative to now, such as \"today\", \"this Friday\", or \"in 3 hours\"."
+}
+
 func (e *chatExecEnv) TurnInstructions(ctx context.Context, prompt string) string {
 	var parts []string
 	if s := strings.TrimSpace(e.instructions); s != "" {
@@ -1233,6 +1248,13 @@ func (e *chatExecEnv) TurnInstructions(ctx context.Context, prompt string) strin
 		}
 		parts = append(parts, e.app.replyLanguage(ctx, e.conversationID, message, e.responseLanguage).Instruction())
 	}
+	// The model has no clock: "this Friday" or "in 3 hours" needs the date
+	// and time where the person is.
+	tctx := e.ctx
+	if tctx == nil {
+		tctx = ctx
+	}
+	parts = append(parts, nowLine(e.startedAt, locale.TimeZone(tctx)))
 	// What Yggdrasil can do comes from its own inventory (§37).
 	if e.capabilities != "" {
 		parts = append(parts, e.capabilities)

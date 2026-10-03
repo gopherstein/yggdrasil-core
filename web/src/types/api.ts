@@ -529,6 +529,8 @@ export interface ChatRequest {
   attachments?: string[]
   /** How much work the message gets: auto (default), fast, balanced, or thorough. */
   effort?: 'auto' | 'fast' | 'balanced' | 'thorough'
+  /** The person's IANA time zone, for the date and time the answer uses; set by the api client. */
+  time_zone?: string
 }
 
 export interface StopChatResponse {

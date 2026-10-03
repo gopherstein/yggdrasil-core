@@ -13,6 +13,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/egress"
 	"github.com/yeixio/yggdrasil-core/internal/gjallarhorn"
 	"github.com/yeixio/yggdrasil-core/internal/huginn"
+	"github.com/yeixio/yggdrasil-core/internal/locale"
 	"github.com/yeixio/yggdrasil-core/internal/runlog"
 	"github.com/yeixio/yggdrasil-core/internal/share"
 	"github.com/yeixio/yggdrasil-core/internal/tools"
@@ -65,6 +66,8 @@ func (e automationExecutor) execute(ctx context.Context, automation automations.
 	// A chat on this computer goes first; the run waits for it instead of
 	// loading a model alongside it (§60).
 	ctx = egress.WithRun(ctx, egress.Run{Source: egress.SourceAutomation, TaskID: "automation:" + automation.ID})
+	// Its answer's "today" is in the time zone its schedule runs in.
+	ctx = locale.WithTimeZone(ctx, automation.Schedule.TimeZone)
 	work, err := e.app.enterWork(ctx, share.Automation, automation.Name, nil)
 	if err != nil {
 		return automations.Execution{}, err

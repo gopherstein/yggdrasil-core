@@ -1969,6 +1969,9 @@ paths:
                 effort:
                   type: string
                   enum: [auto, fast, balanced, thorough]
+                time_zone:
+                  type: string
+                  description: "The person's IANA time zone, such as America/Juneau, for the date and time the answer uses; this computer's when empty or unknown"
                 attachments:
                   type: array
                   items:
