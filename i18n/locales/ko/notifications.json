@@ -101,6 +101,12 @@
     "to": "받는 사람",
     "categories": "카테고리(선택하지 않으면 전체)",
     "send": "보내기",
+    "when": "보내는 시점",
+    "whenNow": "즉시",
+    "whenDigest": "하루 요약",
+    "digestAt": "요약을 보낼 시간",
+    "digestHint": "오류는 계속 즉시 보냅니다. 그 밖의 알림은 하루 한 번 메시지로 모읍니다.",
+    "digestSummary": "· 매일 {{time}}에 요약.",
     "saving": "저장하는 중…",
     "save": "저장",
     "add": "추가",
@@ -152,7 +158,9 @@
     "automationUnavailable": "이용할 수 없어요.",
     "automationSignificant": "의미 있는 결과예요.",
     "test": "Yggdrasil 테스트",
-    "testBody": "{{destination}}(으)로 알림이 잘 전달돼요."
+    "testBody": "{{destination}}(으)로 알림이 잘 전달돼요.",
+    "digest_other": "알림 {{count}}개",
+    "digestMore_other": "…외 {{count}}개"
   },
   "sent": {
     "times": "{{title}} ({{count}}회)",

@@ -56,6 +56,26 @@ describe('Email, push, and webhooks', () => {
     })
   })
 
+  it('sends a daily digest instead of each notice', async () => {
+    vi.mocked(api.createNotificationDestination).mockResolvedValue({
+      destination: { id: 'd2', kind: 'webhook', name: 'Digest', enabled: true, has_secret: true, webhook: { url: 'https://h.example/d' }, digest: { at: '07:30', time_zone: 'UTC' } },
+      secret: 'whsec_def',
+    })
+    renderCard()
+    fireEvent.click(await screen.findByRole('button', { name: 'Add webhook' }))
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Digest' } })
+    fireEvent.change(screen.getByLabelText('Address'), { target: { value: 'https://h.example/d' } })
+    expect(screen.queryByLabelText('Send the digest at')).not.toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('When'), { target: { value: 'digest' } })
+    expect(screen.getByText(/Errors still go out right away/)).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('Send the digest at'), { target: { value: '07:30' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
+    await waitFor(() => expect(api.createNotificationDestination).toHaveBeenCalled())
+    expect(vi.mocked(api.createNotificationDestination).mock.calls[0][0]).toMatchObject({
+      digest: { at: '07:30', time_zone: Intl.DateTimeFormat().resolvedOptions().timeZone },
+    })
+  })
+
   it('adds push through ntfy with a random topic', async () => {
     vi.mocked(api.createNotificationDestination).mockResolvedValue({
       destination: { id: 'n1', kind: 'ntfy', name: 'My phone', enabled: true, has_secret: false, ntfy: { server: 'https://ntfy.sh', topic: 't' } },

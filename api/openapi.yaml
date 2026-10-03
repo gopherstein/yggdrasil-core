@@ -5305,6 +5305,8 @@ components:
             open_url: {type: string, description: This Yggdrasil's address; tapping a notification opens it there}
         categories: {type: array, items: {type: string}, description: Empty receives every category}
         min_severity: {type: string, enum: [info, success, warning, error]}
+        digest:
+          $ref: "#/components/schemas/NotificationDigest"
         password: {type: string, description: The SMTP password or ntfy access token; stored as a secret and never returned}
     NotificationDestination:
       type: object
@@ -5318,7 +5320,15 @@ components:
         ntfy: {type: object, additionalProperties: true}
         categories: {type: array, items: {type: string}}
         min_severity: {type: string}
+        digest:
+          $ref: "#/components/schemas/NotificationDigest"
         has_secret: {type: boolean}
+    NotificationDigest:
+      type: object
+      description: A daily digest instead of each notice; errors still go out at once. On a change, an empty at turns it off.
+      properties:
+        at: {type: string, description: "HH:MM"}
+        time_zone: {type: string, description: "IANA time zone; UTC when left out"}
     QuietHours:
       type: object
       properties:

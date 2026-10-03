@@ -47,6 +47,8 @@ const (
 	DeliveryPending = "pending"
 	// DeliveryHeld waits for quiet hours to end (§25).
 	DeliveryHeld = "held"
+	// DeliveryDigest waits for its destination's daily digest (#111).
+	DeliveryDigest = "digest"
 	// DeliveryCancelled was never sent, such as when its destination was removed.
 	DeliveryCancelled = "cancelled"
 )
@@ -274,6 +276,11 @@ func (h *Hub) Notify(ctx context.Context, req Request) (Notification, error) {
 		queued := false
 		for _, d := range dests {
 			if !d.Accepts(n) {
+				continue
+			}
+			// Errors go out at once; anything else waits for the digest.
+			if d.Digest != nil && n.Severity != SeverityError {
+				n.Deliveries = append(n.Deliveries, h.queue(ctx, n, d.channelName(), d.ID, DeliveryDigest, d.Digest.Next(now)))
 				continue
 			}
 			if held {

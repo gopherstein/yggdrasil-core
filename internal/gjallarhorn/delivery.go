@@ -212,6 +212,7 @@ func (h *Hub) DeliverDue(ctx context.Context) {
 		}
 		h.attemptDue(ctx, d)
 	}
+	h.deliverDigests(ctx)
 }
 
 func (h *Hub) attemptDue(ctx context.Context, d due) {

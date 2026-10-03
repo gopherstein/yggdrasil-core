@@ -101,6 +101,12 @@
     "to": "An",
     "categories": "Kategorien (keine markiert: alle)",
     "send": "Senden",
+    "when": "Wann",
+    "whenNow": "Sofort",
+    "whenDigest": "Tägliche Zusammenfassung",
+    "digestAt": "Zusammenfassung senden um",
+    "digestHint": "Fehler werden weiterhin sofort gesendet. Alles andere wartet auf eine Nachricht am Tag.",
+    "digestSummary": "· Tägliche Zusammenfassung um {{time}}.",
     "saving": "Wird gespeichert …",
     "save": "Speichern",
     "add": "Hinzufügen",
@@ -156,7 +162,11 @@
     "automationUnavailable": "Es ist nicht verfügbar.",
     "automationSignificant": "Dieses Ergebnis ist bedeutsam.",
     "test": "Test von Yggdrasil",
-    "testBody": "Mitteilungen an {{destination}} funktionieren."
+    "testBody": "Mitteilungen an {{destination}} funktionieren.",
+    "digest_one": "{{count}} Mitteilung",
+    "digest_other": "{{count}} Mitteilungen",
+    "digestMore_one": "… und {{count}} weitere",
+    "digestMore_other": "… und {{count}} weitere"
   },
   "sent": {
     "times": "{{title}} ({{count}}-mal)",

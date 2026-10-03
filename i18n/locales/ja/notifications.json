@@ -101,6 +101,12 @@
     "to": "宛先",
     "categories": "カテゴリ（未選択の場合はすべて）",
     "send": "送信",
+    "when": "送信のタイミング",
+    "whenNow": "すぐに",
+    "whenDigest": "1日1回のまとめ",
+    "digestAt": "まとめを送る時刻",
+    "digestHint": "エラーは引き続きすぐに送信されます。それ以外は1日1回のメッセージにまとめます。",
+    "digestSummary": "・毎日{{time}}にまとめて送信。",
     "saving": "保存中…",
     "save": "保存",
     "add": "追加",
@@ -152,7 +158,9 @@
     "automationUnavailable": "利用できません。",
     "automationSignificant": "この結果は重要です。",
     "test": "Yggdrasilからのテスト",
-    "testBody": "{{destination}}への通知は正常に動作しています。"
+    "testBody": "{{destination}}への通知は正常に動作しています。",
+    "digest_other": "{{count}}件の通知",
+    "digestMore_other": "…ほか{{count}}件"
   },
   "sent": {
     "times": "{{title}}（{{count}}回）",

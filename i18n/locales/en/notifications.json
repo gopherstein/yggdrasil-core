@@ -101,6 +101,12 @@
     "to": "To",
     "categories": "Categories (none checked: all)",
     "send": "Send",
+    "when": "When",
+    "whenNow": "Right away",
+    "whenDigest": "Daily digest",
+    "digestAt": "Send the digest at",
+    "digestHint": "Errors still go out right away. Everything else waits for one message a day.",
+    "digestSummary": "· Daily digest at {{time}}.",
     "saving": "Saving…",
     "save": "Save",
     "add": "Add",
@@ -156,7 +162,11 @@
     "automationUnavailable": "It is not available.",
     "automationSignificant": "This result is significant.",
     "test": "Test from Yggdrasil",
-    "testBody": "Notifications to {{destination}} work."
+    "testBody": "Notifications to {{destination}} work.",
+    "digest_one": "{{count}} notification",
+    "digest_other": "{{count}} notifications",
+    "digestMore_one": "…and {{count}} more",
+    "digestMore_other": "…and {{count}} more"
   },
   "sent": {
     "times": "{{title}} ({{count}} times)",

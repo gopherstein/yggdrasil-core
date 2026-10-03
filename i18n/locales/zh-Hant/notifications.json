@@ -101,6 +101,12 @@
     "to": "收件者",
     "categories": "類別（全不勾選即為全部）",
     "send": "傳送",
+    "when": "傳送時間",
+    "whenNow": "立即",
+    "whenDigest": "每日摘要",
+    "digestAt": "摘要傳送時間",
+    "digestHint": "錯誤仍會立即傳送。其餘通知每天彙整成一則訊息。",
+    "digestSummary": "· 每日 {{time}} 傳送摘要。",
     "saving": "正在儲存…",
     "save": "儲存",
     "add": "新增",
@@ -152,7 +158,9 @@
     "automationUnavailable": "目前無法使用。",
     "automationSignificant": "這個結果很重要。",
     "test": "來自 Yggdrasil 的測試",
-    "testBody": "傳送到 {{destination}} 的通知運作正常。"
+    "testBody": "傳送到 {{destination}} 的通知運作正常。",
+    "digest_other": "{{count}} 則通知",
+    "digestMore_other": "…另有 {{count}} 則"
   },
   "sent": {
     "times": "{{title}}（{{count}} 次）",

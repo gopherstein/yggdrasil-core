@@ -101,6 +101,12 @@
     "to": "Para",
     "categories": "Categorías (ninguna marcada: todas)",
     "send": "Enviar",
+    "when": "Cuándo",
+    "whenNow": "De inmediato",
+    "whenDigest": "Resumen diario",
+    "digestAt": "Enviar el resumen a las",
+    "digestHint": "Los errores se siguen enviando de inmediato. Todo lo demás espera a un único mensaje al día.",
+    "digestSummary": "· Resumen diario a las {{time}}.",
     "saving": "Guardando…",
     "save": "Guardar",
     "add": "Agregar",
@@ -160,7 +166,13 @@
     "automationUnavailable": "No está disponible.",
     "automationSignificant": "Este resultado es significativo.",
     "test": "Prueba de Yggdrasil",
-    "testBody": "Las notificaciones a {{destination}} funcionan."
+    "testBody": "Las notificaciones a {{destination}} funcionan.",
+    "digest_one": "{{count}} notificación",
+    "digest_many": "{{count}} notificaciones",
+    "digest_other": "{{count}} notificaciones",
+    "digestMore_one": "…y {{count}} más",
+    "digestMore_many": "…y {{count}} más",
+    "digestMore_other": "…y {{count}} más"
   },
   "sent": {
     "times": "{{title}} ({{count}} veces)",

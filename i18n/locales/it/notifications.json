@@ -101,6 +101,12 @@
     "to": "A",
     "categories": "Categorie (nessuna selezionata: tutte)",
     "send": "Invia",
+    "when": "Quando",
+    "whenNow": "Subito",
+    "whenDigest": "Riepilogo giornaliero",
+    "digestAt": "Invia il riepilogo alle",
+    "digestHint": "Gli errori vengono comunque inviati subito. Tutto il resto attende un solo messaggio al giorno.",
+    "digestSummary": "· Riepilogo giornaliero alle {{time}}.",
     "saving": "Salvataggio…",
     "save": "Salva",
     "add": "Aggiungi",
@@ -160,7 +166,13 @@
     "automationUnavailable": "Non è disponibile.",
     "automationSignificant": "Questo risultato è significativo.",
     "test": "Prova da Yggdrasil",
-    "testBody": "Le notifiche a {{destination}} funzionano."
+    "testBody": "Le notifiche a {{destination}} funzionano.",
+    "digest_one": "{{count}} notifica",
+    "digest_many": "{{count}} notifiche",
+    "digest_other": "{{count}} notifiche",
+    "digestMore_one": "…e altre {{count}}",
+    "digestMore_many": "…e altre {{count}}",
+    "digestMore_other": "…e altre {{count}}"
   },
   "sent": {
     "times": "{{title}} ({{count}} volte)",

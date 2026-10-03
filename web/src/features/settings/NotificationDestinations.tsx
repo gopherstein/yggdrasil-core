@@ -81,7 +81,8 @@ function summary(d: NotificationDestination): string {
     ? d.categories.map(categoryLabel).join(', ')
     : i18n.t('notifications:destinations.allCategories')
   const level = severityLabel(d.min_severity ?? '')
-  return i18n.t('notifications:destinations.summary', { where, what, level })
+  const summary = i18n.t('notifications:destinations.summary', { where, what, level })
+  return d.digest?.at ? `${summary} ${i18n.t('notifications:destinations.digestSummary', { time: d.digest.at })}` : summary
 }
 
 function DestinationRow({ destination: d }: { destination: NotificationDestination }) {
@@ -195,12 +196,15 @@ function DestinationForm({
   const [to, setTo] = useState((existing?.email?.to ?? []).join(', '))
   const [categories, setCategories] = useState<NotificationCategory[]>(existing?.categories ?? [])
   const [minSeverity, setMinSeverity] = useState<'' | NotificationSeverity>(existing?.min_severity ?? '')
+  const [digestAt, setDigestAt] = useState(existing?.digest?.at ?? '')
   const [error, setError] = useState('')
   const [secret, setSecret] = useState('')
 
   const save = useMutation({
     mutationFn: async () => {
       const input: NotificationDestinationInput = { name, categories, min_severity: minSeverity }
+      if (digestAt) input.digest = { at: digestAt, time_zone: Intl.DateTimeFormat().resolvedOptions().timeZone }
+      else if (existing?.digest?.at) input.digest = { at: '' }
       if (kind === 'webhook') input.webhook = { url: url.trim() }
       else if (kind === 'ntfy') {
         input.ntfy = { server: server.trim(), topic: topic.trim(), content: content || undefined, open_url: openUrl.trim() || undefined }
@@ -344,6 +348,22 @@ function DestinationForm({
           ))}
         </select>
       </label>
+      <label className="block text-sm">
+        <span className="text-ink-muted">{t('destinations.when')}</span>
+        <select className="field mt-1 w-full" value={digestAt ? 'digest' : 'now'} onChange={(e) => setDigestAt(e.target.value === 'digest' ? digestAt || '18:00' : '')}>
+          <option value="now">{t('destinations.whenNow')}</option>
+          <option value="digest">{t('destinations.whenDigest')}</option>
+        </select>
+      </label>
+      {digestAt ? (
+        <div>
+          <label className="block text-sm">
+            <span className="text-ink-muted">{t('destinations.digestAt')}</span>
+            <input type="time" className="field mt-1 w-full" value={digestAt} required onChange={(e) => setDigestAt(e.target.value)} />
+          </label>
+          <p className="mt-1 text-xs text-ink-faint">{t('destinations.digestHint')}</p>
+        </div>
+      ) : null}
       {error && <p className="text-xs text-danger">{error}</p>}
       <div className="flex gap-2">
         <button type="submit" className="btn-primary px-3 py-1.5 text-xs" disabled={save.isPending}>

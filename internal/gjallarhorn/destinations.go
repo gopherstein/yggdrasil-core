@@ -65,6 +65,9 @@ type Destination struct {
 	// MinSeverity is the lowest severity it receives: info (the default),
 	// success, warning, or error.
 	MinSeverity string `json:"min_severity,omitempty"`
+	// Digest, when set, gathers notices into one message a day; errors
+	// still go out at once.
+	Digest *Digest `json:"digest,omitempty"`
 	// HasSecret reports a stored password, signing secret, or access token,
 	// never its value.
 	HasSecret bool `json:"has_secret"`
@@ -81,6 +84,8 @@ type DestinationInput struct {
 	Ntfy        *NtfyConfig    `json:"ntfy,omitempty"`
 	Categories  *[]string      `json:"categories,omitempty"`
 	MinSeverity *string        `json:"min_severity,omitempty"`
+	// Digest sets a daily digest; an empty At sends each notice again.
+	Digest *Digest `json:"digest,omitempty"`
 	// Password is the SMTP password, or the ntfy access token, stored as a
 	// secret.
 	Password string `json:"password,omitempty"`
@@ -118,6 +123,11 @@ func validate(d Destination) error {
 	if _, ok := severityRank[d.MinSeverity]; d.MinSeverity != "" && !ok {
 		return fmt.Errorf("min_severity must be info, success, warning, or error")
 	}
+	if d.Digest != nil {
+		if err := d.Digest.Validate(); err != nil {
+			return err
+		}
+	}
 	switch d.Kind {
 	case KindEmail:
 		if d.Email == nil {
@@ -143,7 +153,7 @@ func (h *Hub) SetSecrets(s Secrets) { h.secrets = s }
 
 // Destinations lists every destination.
 func (h *Hub) Destinations(ctx context.Context) ([]Destination, error) {
-	rows, err := h.db.QueryContext(ctx, `SELECT id, kind, name, enabled, config_json, COALESCE(categories_json, ''), COALESCE(min_severity, '') FROM notification_destinations ORDER BY created_at`)
+	rows, err := h.db.QueryContext(ctx, `SELECT id, kind, name, enabled, config_json, COALESCE(categories_json, ''), COALESCE(min_severity, ''), COALESCE(digest_json, '') FROM notification_destinations ORDER BY created_at`)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +171,7 @@ func (h *Hub) Destinations(ctx context.Context) ([]Destination, error) {
 
 // Destination returns one destination.
 func (h *Hub) Destination(ctx context.Context, id string) (Destination, error) {
-	d, err := h.scanDestination(h.db.QueryRowContext(ctx, `SELECT id, kind, name, enabled, config_json, COALESCE(categories_json, ''), COALESCE(min_severity, '') FROM notification_destinations WHERE id = ?`, id))
+	d, err := h.scanDestination(h.db.QueryRowContext(ctx, `SELECT id, kind, name, enabled, config_json, COALESCE(categories_json, ''), COALESCE(min_severity, ''), COALESCE(digest_json, '') FROM notification_destinations WHERE id = ?`, id))
 	if errors.Is(err, sql.ErrNoRows) {
 		return Destination{}, ErrNotFound
 	}
@@ -171,9 +181,15 @@ func (h *Hub) Destination(ctx context.Context, id string) (Destination, error) {
 func (h *Hub) scanDestination(row interface{ Scan(...any) error }) (Destination, error) {
 	var d Destination
 	var enabled int
-	var config, cats string
-	if err := row.Scan(&d.ID, &d.Kind, &d.Name, &enabled, &config, &cats, &d.MinSeverity); err != nil {
+	var config, cats, digest string
+	if err := row.Scan(&d.ID, &d.Kind, &d.Name, &enabled, &config, &cats, &d.MinSeverity, &digest); err != nil {
 		return Destination{}, err
+	}
+	if digest != "" {
+		d.Digest = &Digest{}
+		if json.Unmarshal([]byte(digest), d.Digest) != nil || d.Digest.At == "" {
+			d.Digest = nil
+		}
 	}
 	d.Enabled = enabled == 1
 	switch d.Kind {
@@ -284,8 +300,8 @@ func (h *Hub) DeleteDestination(ctx context.Context, id string) error {
 	if n, _ := res.RowsAffected(); n == 0 {
 		return ErrNotFound
 	}
-	_, _ = h.db.ExecContext(ctx, `UPDATE notification_deliveries SET status = ?, next_attempt_at = NULL, error = 'The destination was removed.' WHERE destination_id = ? AND status IN (?, ?)`,
-		DeliveryCancelled, id, DeliveryPending, DeliveryHeld)
+	_, _ = h.db.ExecContext(ctx, `UPDATE notification_deliveries SET status = ?, next_attempt_at = NULL, error = 'The destination was removed.' WHERE destination_id = ? AND status IN (?, ?, ?)`,
+		DeliveryCancelled, id, DeliveryPending, DeliveryHeld, DeliveryDigest)
 	if h.secrets != nil {
 		_ = h.secrets.Delete(secretName(id))
 	}
@@ -304,6 +320,14 @@ func applyInput(d *Destination, in DestinationInput) {
 	}
 	if in.MinSeverity != nil {
 		d.MinSeverity = *in.MinSeverity
+	}
+	if in.Digest != nil {
+		d.Digest = in.Digest
+		if d.Digest.At == "" {
+			d.Digest = nil
+		} else if d.Digest.TimeZone == "" {
+			d.Digest.TimeZone = "UTC"
+		}
 	}
 	if d.Ntfy != nil {
 		applyNtfyDefaults(d.Ntfy)
@@ -340,14 +364,19 @@ func (h *Hub) saveDestination(ctx context.Context, d Destination, create bool) e
 	if d.Enabled {
 		enabled = 1
 	}
+	var digest any
+	if d.Digest != nil {
+		b, _ := json.Marshal(d.Digest)
+		digest = string(b)
+	}
 	now := ts(h.now())
 	if create {
-		_, err := h.db.ExecContext(ctx, `INSERT INTO notification_destinations (id, kind, name, enabled, config_json, categories_json, min_severity, created_at, updated_at)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, d.ID, d.Kind, d.Name, enabled, string(config), cats, nullable(d.MinSeverity), now, now)
+		_, err := h.db.ExecContext(ctx, `INSERT INTO notification_destinations (id, kind, name, enabled, config_json, categories_json, min_severity, digest_json, created_at, updated_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`, d.ID, d.Kind, d.Name, enabled, string(config), cats, nullable(d.MinSeverity), digest, now, now)
 		return err
 	}
-	_, err := h.db.ExecContext(ctx, `UPDATE notification_destinations SET name = ?, enabled = ?, config_json = ?, categories_json = ?, min_severity = ?, updated_at = ? WHERE id = ?`,
-		d.Name, enabled, string(config), cats, nullable(d.MinSeverity), now, d.ID)
+	_, err := h.db.ExecContext(ctx, `UPDATE notification_destinations SET name = ?, enabled = ?, config_json = ?, categories_json = ?, min_severity = ?, digest_json = ?, updated_at = ? WHERE id = ?`,
+		d.Name, enabled, string(config), cats, nullable(d.MinSeverity), digest, now, d.ID)
 	return err
 }
 

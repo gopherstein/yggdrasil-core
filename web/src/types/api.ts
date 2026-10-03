@@ -1300,6 +1300,8 @@ export interface NotificationDestination {
   ntfy?: NtfyConfig
   categories?: NotificationCategory[]
   min_severity?: '' | NotificationSeverity
+  /** A daily digest instead of each notice; errors still go out at once. An empty at turns it off. */
+  digest?: { at: string; time_zone?: string }
   has_secret: boolean
 }
 
@@ -1321,6 +1323,8 @@ export interface NotificationDestinationInput {
   ntfy?: NtfyConfig
   categories?: NotificationCategory[]
   min_severity?: '' | NotificationSeverity
+  /** A daily digest instead of each notice; errors still go out at once. An empty at turns it off. */
+  digest?: { at: string; time_zone?: string }
   password?: string
 }
 
