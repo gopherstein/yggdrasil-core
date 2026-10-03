@@ -1066,6 +1066,16 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 			e.trace.verified(issues, fixed, figures)
 		case simple.EventUnconfirmedAction:
 			e.trace.unconfirmedAction()
+		case simple.EventCodeChecked:
+			issues, _ := payload["issues"].(int)
+			fixed, _ := payload["fixed"].(int)
+			remaining, _ := payload["remaining"].([]string)
+			e.trace.codeChecked(issues, fixed, remaining)
+		case simple.EventConsistency:
+			found, _ := payload["found"].(int)
+			fixed, _ := payload["fixed"].(int)
+			remaining, _ := payload["remaining"].([]string)
+			e.trace.consistencyChecked(found, fixed, remaining)
 		}
 	}
 	if e.app.Tools != nil && (eventType == events.ToolParsed || eventType == events.ToolFailed) {

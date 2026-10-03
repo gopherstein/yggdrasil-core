@@ -19,7 +19,118 @@ const (
 	EventVerified  = "verify.done"
 	// EventUnconfirmedAction says the answer claims a change no tool made.
 	EventUnconfirmedAction = "verify.action"
+	// EventCodeChecked reports the answer's code blocks parsed (#111).
+	EventCodeChecked = "verify.code"
+	// EventConsistency reports the answer checked for contradictions.
+	EventConsistency = "verify.consistency"
 )
+
+// checkCode parses the answer's code blocks without running them (#111).
+// Code with syntax errors goes back to the model once per correction,
+// with the errors named, and the revision is kept when it has fewer.
+func checkCode(ctx context.Context, env pluginapi.ExecutionEnvironment, role string, messages []pluginapi.ChatMessage, answer string, corrections int) string {
+	blocks := huginn.CodeBlocks(answer)
+	if len(blocks) == 0 {
+		return answer
+	}
+	issues := huginn.CheckCode(ctx, answer)
+	remaining := issues
+	for pass := 0; pass < corrections && len(remaining) > 0 && ctx.Err() == nil; pass++ {
+		env.Emit(EventVerifying, map[string]any{"issues": len(remaining)})
+		ask := append(append([]pluginapi.ChatMessage(nil), messages...),
+			pluginapi.ChatMessage{Role: "assistant", Content: answer},
+			pluginapi.ChatMessage{Role: "user", Content: "The code in your answer does not parse:\n" + huginn.DescribeCode(remaining) +
+				"Fix the code and rewrite the whole answer for the user, keeping everything else. Reply with the answer only."},
+		)
+		revised, _, err := generateText(ctx, env, role, ask)
+		if err != nil {
+			break
+		}
+		text := tools.ParseModelOutput(revised).Text
+		if !substantial(text, answer) || len(huginn.CodeBlocks(text)) == 0 {
+			break
+		}
+		again := huginn.CheckCode(ctx, text)
+		if len(again) >= len(remaining) {
+			break
+		}
+		answer, remaining = text, again
+	}
+	texts := make([]string, 0, len(remaining))
+	for _, is := range remaining {
+		texts = append(texts, is.Text())
+	}
+	env.Emit(EventCodeChecked, map[string]any{"blocks": len(blocks), "issues": len(issues), "fixed": len(issues) - len(remaining), "remaining": texts})
+	return answer
+}
+
+// minConsistencyLen is the shortest answer checked for contradictions; a
+// short reply has too little to contradict.
+const minConsistencyLen = 400
+
+// checkConsistency asks the reviewer whether the answer contradicts itself
+// or the reference material (#111), and when it does, has the answer
+// rewritten once with the contradictions named. It costs model calls, so
+// only Thorough effort runs it.
+func checkConsistency(ctx context.Context, env pluginapi.ExecutionEnvironment, role string, messages []pluginapi.ChatMessage, answer, evidence string) string {
+	if utf8.RuneCountInString(answer) < minConsistencyLen {
+		return answer
+	}
+	found := contradictions(ctx, env, role, answer, evidence)
+	fixed := 0
+	if len(found) > 0 && ctx.Err() == nil {
+		env.Emit(EventVerifying, map[string]any{"issues": len(found)})
+		ask := append(append([]pluginapi.ChatMessage(nil), messages...),
+			pluginapi.ChatMessage{Role: "assistant", Content: answer},
+			pluginapi.ChatMessage{Role: "user", Content: "Your answer contradicts itself or the reference material:\n- " + strings.Join(found, "\n- ") +
+				"\nRewrite the whole answer so it is consistent, following the reference material where there is any. Reply with the answer only."},
+		)
+		if revised, _, err := generateText(ctx, env, role, ask); err == nil {
+			text := tools.ParseModelOutput(revised).Text
+			if substantial(text, answer) {
+				again := contradictions(ctx, env, role, text, evidence)
+				if len(again) < len(found) {
+					answer, fixed = text, len(found)-len(again)
+					found = again
+				}
+			}
+		}
+	}
+	env.Emit(EventConsistency, map[string]any{"found": len(found) + fixed, "fixed": fixed, "remaining": found})
+	return answer
+}
+
+// contradictions asks the reviewer for the answer's contradictions. An
+// answer it can't read counts as none, so a check never blocks an answer.
+func contradictions(ctx context.Context, env pluginapi.ExecutionEnvironment, role, answer, evidence string) []string {
+	prompt := "Check this answer for contradictions: statements in it that contradict each other"
+	if evidence != "" {
+		prompt += ", or that contradict the reference material"
+	}
+	prompt += ". Differences in wording, and details the reference material doesn't cover, are not contradictions. " +
+		"Reply only with JSON: {\"contradictions\": [\"short description\", ...]}, an empty list when there are none.\n\nAnswer:\n" + answer
+	if evidence != "" {
+		prompt += "\n\nReference material:\n" + evidence
+	}
+	raw, _, err := generateText(ctx, env, role, []pluginapi.ChatMessage{{Role: "user", Content: prompt}})
+	if err != nil {
+		return nil
+	}
+	var out struct {
+		Contradictions []string `json:"contradictions"`
+	}
+	start, end := strings.Index(raw, "{"), strings.LastIndex(raw, "}")
+	if start < 0 || end <= start || json.Unmarshal([]byte(raw[start:end+1]), &out) != nil {
+		return nil
+	}
+	var list []string
+	for _, c := range out.Contradictions {
+		if c = strings.TrimSpace(c); c != "" && len(list) < 5 {
+			list = append(list, c)
+		}
+	}
+	return list
+}
 
 // verifyAnswer checks an answer's arithmetic and, when the turn used
 // reference material or tool results, that its figures appear in them. The

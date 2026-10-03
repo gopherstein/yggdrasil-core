@@ -264,6 +264,10 @@ A request with several parts is worked through in parts. "Compare A, B and C…"
 
 Before an answer is shown, its arithmetic is recomputed. When the turn used reference material or tool results, each figure must appear in, or follow from, the lines about the same subject. Dates and years are skipped. This check needs no model. Only an answer with issues is sent back to the model once, with the issues named (`chat.verifying`), and the revision is kept if it fixes some. `verify.done` reports `issues`, `fixed`, and `remaining`. Remaining figures become the answer's `meta.notice`. An answer that describes tool calls instead of answering is asked for again without tools.
 
+Two more checks follow:
+- **Code:** fenced code blocks tagged `go`, `json`, `python`, or `bash`/`sh` are parsed, never run. Go and JSON are parsed in Yggdrasil; Python with Python's own parser (`ast.parse`) and shell with `bash -n`, when installed. Untagged blocks, other languages, and sketches with `...` are skipped. Code that doesn't parse goes back to the model with the errors named, once per correction the effort allows, and the revision is kept when it has fewer errors. `verify.code` reports `blocks`, `issues`, `fixed`, and `remaining`, and errors left become the answer's `meta.notice`.
+- **Contradictions:** at Thorough effort, an answer of 400 characters or more is checked by the reviewer for statements that contradict each other or the reference material. When some are found, the answer is rewritten once with them named, and kept when the contradictions drop. `verify.consistency` reports `found`, `fixed`, and `remaining`. A check whose reply can't be read counts as finding none, so it never holds an answer back.
+
 Stopping a turn, with `POST /chat/stop` or by closing the stream, stops every model call, tool call, plan step, pending approval, and paired computer working on it. The part already written is saved as the answer, with `meta.notice` "Stopped before the answer was finished." A turn stopped in the middle of a plan keeps the notes of the parts that finished. A turn stopped before anything was written keeps a short note with the sources found so far. The `chat.stopped` event carries `conversation_id` and `kept`. A new message in the same chat stops a turn still running there.
 
 ### Context, memory, and look-ups
@@ -499,7 +503,7 @@ A chat that fails while streaming sends `event: error_code` with the same `code`
 | `chat.model_routed` | A model is chosen for a turn, with `reason`, and `fallback: true` after a failure |
 | `chat.effort`, `chat.lookup`, `chat.verifying`, `chat.making_file`, `chat.summarized` | Effort is set, the web is looked up first, figures are being checked, a requested file is being made, or older messages were summarized |
 | `plan.created`, `plan.step` | A request with several parts is planned, and each part runs |
-| `verify.action`, `verify.done` | The answer check corrects something, and its result |
+| `verify.action`, `verify.done`, `verify.code`, `verify.consistency` | The answer checks: figures, claimed actions, code, and contradictions |
 | `tool.requested`, `tool.started`, `tool.completed`, `tool.failed`, `tool.parsed` | A tool call waits for approval, runs, finishes, fails (with `kind`), or is read from text |
 | `knowledge.retrieved`, `knowledge.failed` | Knowledge passages are added to a turn, or the search fails |
 | `memory.saved`, `memory.deleted` | A memory is saved or forgotten from a chat |

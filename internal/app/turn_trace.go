@@ -177,6 +177,41 @@ func (t *turnTrace) verified(issues, fixed int, remaining []string) {
 	}
 }
 
+// codeChecked records the answer's code blocks parsed (#111): all fine,
+// errors fixed, or errors left, which the notice lists.
+func (t *turnTrace) codeChecked(issues, fixed int, remaining []string) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	switch {
+	case issues == 0:
+		t.step("verify", "checkedCode", nil)
+	case len(remaining) == 0:
+		t.step("verify", "correctedCode", map[string]any{"count": fixed})
+	default:
+		t.step("verify", "codeUnconfirmed", nil)
+		if t.notice == "" {
+			t.notice = t.noticeText("codeErrors", map[string]any{"errors": listIn(t.lang, remaining)})
+		}
+	}
+}
+
+// consistencyChecked records the answer checked for contradictions.
+func (t *turnTrace) consistencyChecked(found, fixed int, remaining []string) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	switch {
+	case found == 0:
+		t.step("verify", "checkedConsistency", nil)
+	case len(remaining) == 0:
+		t.step("verify", "resolvedContradictions", map[string]any{"count": fixed})
+	default:
+		t.step("verify", "contradictionsRemain", nil)
+		if t.notice == "" {
+			t.notice = t.noticeText("contradictions", map[string]any{"count": len(remaining)})
+		}
+	}
+}
+
 // unconfirmedAction records an answer that says it changed something when
 // nothing that changes things ran. The person is told plainly.
 func (t *turnTrace) unconfirmedAction() {

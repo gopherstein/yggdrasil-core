@@ -67,10 +67,14 @@ func traceEvent(c *runlog.Collector, eventType string, payload map[string]any) {
 		if e, _ := payload["effort"].(string); e != "" {
 			c.Effort(huginn.ParseEffort(e).Describe(c.Language()))
 		}
-	case simple.EventVerified:
+	case simple.EventVerified, simple.EventCodeChecked:
 		issues, _ := payload["issues"].(int)
 		fixed, _ := payload["fixed"].(int)
 		c.Verified(issues, fixed)
+	case simple.EventConsistency:
+		found, _ := payload["found"].(int)
+		fixed, _ := payload["fixed"].(int)
+		c.Verified(found, fixed)
 	case simple.EventLookup:
 		c.Note("lookedUp", nil)
 	}

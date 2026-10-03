@@ -346,6 +346,10 @@ func (o *Orchestrator) Run(
 			answer := parsed.Text
 			if budget.Verify {
 				answer = verifyAnswer(ctx, env, reviewerRole(profile, role), messages, parsed.Text, evidence, task.Prompt, budget.Corrections)
+				answer = checkCode(ctx, env, reviewerRole(profile, role), messages, answer, budget.Corrections)
+				if budget.Effort == huginn.EffortThorough && budget.Corrections > 0 {
+					answer = checkConsistency(ctx, env, reviewerRole(profile, role), messages, answer, evidence)
+				}
 			}
 			// The Team strategy's reviewer reads every answer it escalated.
 			if strat.team && escalate {
