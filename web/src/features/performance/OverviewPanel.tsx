@@ -49,7 +49,7 @@ function NodeLiveCard({
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <h3 className="font-display text-lg font-semibold text-ink">{node.name}</h3>
+          <h2 className="font-display text-lg font-semibold text-ink">{node.name}</h2>
           {!hw.unavailable && (
             <p className="mt-0.5 text-sm text-ink-muted">
               {[hw.primary, hw.secondary].filter(Boolean).join(' · ')}

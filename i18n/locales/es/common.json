@@ -54,5 +54,12 @@
     "ms": "{{value}} ms",
     "seconds": "{{value}} s",
     "tokPerSec": "{{value}} tok/s"
+  },
+  "pageError": {
+    "title": "Esta página tuvo un problema",
+    "body": "El resto de Yggdrasil sigue funcionando. Vuelve a intentarlo o recarga la app si se repite.",
+    "retry": "Reintentar",
+    "reload": "Recargar",
+    "details": "Detalles"
   }
 }

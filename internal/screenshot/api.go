@@ -100,6 +100,9 @@ func screenshotGET(path string) (string, bool) {
 		return `{"url":"http://127.0.0.1:7331/mcp","command":"yggctl","args":["mcp"],"needs_key":false}`, true
 	case path == "/api/v1/capabilities":
 		return screenshotCapabilities, true
+	// Setup status is an object, never a list: the Tools page reads its models.
+	case path == "/api/v1/images/setup" || path == "/api/v1/video/setup":
+		return `{"supported":true,"ready":false,"program":false,"release":"","models":[]}`, true
 	case path == "/v1/models":
 		return `{"object":"list","data":[{"id":"gemma-4-e4b","object":"model"}]}`, true
 	default:

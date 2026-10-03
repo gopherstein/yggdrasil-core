@@ -52,5 +52,12 @@
     "ms": "{{value}}ms",
     "seconds": "{{value}}초",
     "tokPerSec": "{{value}} tok/s"
+  },
+  "pageError": {
+    "title": "이 페이지에 문제가 생겼어요",
+    "body": "Yggdrasil의 다른 부분은 계속 사용할 수 있어요. 다시 시도하거나, 계속 발생하면 앱을 새로고침하세요.",
+    "retry": "다시 시도",
+    "reload": "새로고침",
+    "details": "자세히"
   }
 }

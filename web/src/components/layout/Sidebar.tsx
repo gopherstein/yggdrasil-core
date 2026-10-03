@@ -117,8 +117,10 @@ export function Sidebar() {
   )
 
   return (
-    <aside className="app-sidebar flex h-full min-h-0 w-[15.5rem] shrink-0 flex-col overflow-hidden border-e border-line/60 bg-sidebar">
-      <div className="px-4 pb-3 pt-4">
+    // App chrome, not complementary content: the brand and status are the
+    // page header, the links are the Main nav, and subsystem status is the footer.
+    <div className="app-sidebar flex h-full min-h-0 w-[15.5rem] shrink-0 flex-col overflow-hidden border-e border-line/60 bg-sidebar">
+      <header className="px-4 pb-3 pt-4">
         <div className="flex items-center gap-2.5">
           <YggdrasilMark size={36} lore />
           <a href="/" className="brand flex min-w-0 flex-1 items-center gap-2.5 no-underline">
@@ -153,7 +155,7 @@ export function Sidebar() {
           </a>
           <NotificationBell />
         </div>
-      </div>
+      </header>
 
       <nav className="flex flex-1 flex-col gap-4 overflow-y-auto px-2.5 pb-3" aria-label={t('nav.label')}>
         <div>
@@ -176,7 +178,7 @@ export function Sidebar() {
         </div>
       </nav>
 
-      <div className="mt-auto space-y-1.5 border-t border-line/50 px-4 py-3">
+      <footer className="mt-auto space-y-1.5 border-t border-line/50 px-4 py-3">
         <p className="label-caps mb-2 text-[10px] text-ink-faint">{t('subsystems.title')}</p>
         <div
           className="flex items-center justify-between gap-2 text-[11px] text-ink-faint"
@@ -210,7 +212,7 @@ export function Sidebar() {
           </span>
           <span>{t('subsystems.mimirReady')}</span>
         </div>
-      </div>
-    </aside>
+      </footer>
+    </div>
   )
 }

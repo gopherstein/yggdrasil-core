@@ -14,7 +14,7 @@ export function EmptyState({ title, description, action, mascot }: EmptyStatePro
   return (
     <div className="empty-hero max-w-lg">
       {mascot ? <Ratatoskr state={mascot} size={96} className="-mb-1" /> : null}
-      <h3 className="font-display text-xl font-semibold text-ink">{title}</h3>
+      <h2 className="font-display text-xl font-semibold text-ink">{title}</h2>
       <p className="text-[15px] leading-relaxed text-ink-muted">{description}</p>
       {action ? <div className="pt-2">{action}</div> : null}
     </div>

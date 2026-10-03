@@ -52,5 +52,12 @@
     "ms": "{{value}} ms",
     "seconds": "{{value}} 秒",
     "tokPerSec": "{{value}} tok/s"
+  },
+  "pageError": {
+    "title": "此页面出现了问题",
+    "body": "Yggdrasil 的其他部分仍可正常使用。请重试；如果问题反复出现，请重新加载应用。",
+    "retry": "重试",
+    "reload": "重新加载",
+    "details": "详细信息"
   }
 }

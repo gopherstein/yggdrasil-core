@@ -302,11 +302,12 @@ export function SettingsPage() {
         <p className="settings-group-label">{t('groups.ai')}</p>
         <section className="card space-y-4">
           <div>
-            <h2 className="section-title">{t('defaultProfile.title')}</h2>
+            <h2 id="default-profile-title" className="section-title">{t('defaultProfile.title')}</h2>
             <p className="mt-1 text-sm text-ink-muted">{t('defaultProfile.description')}</p>
           </div>
           <select
             className="field w-full"
+            aria-labelledby="default-profile-title"
             value={settings?.default_profile_id ?? ''}
             disabled={busy}
             onChange={(e) => patch({ default_profile_id: e.target.value })}
