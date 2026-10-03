@@ -591,6 +591,42 @@
   }
 }
 
+/* Below md the sidebar is a drawer from the top bar's menu button, so pages
+   keep the full width of a phone or a narrow window. */
+@media (max-width: 767px) {
+  :root {
+    --spacing-page-x: 1rem;
+  }
+
+  .app-sidebar {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: 40;
+    max-width: 85vw;
+    box-shadow: 0 0 48px rgb(0 0 0 / 0.35);
+    transform: translateX(calc(-100% * var(--ygg-inline-sign)));
+    visibility: hidden;
+    /* Hidden only once it has slid out, so it leaves the tab order then. */
+    transition:
+      transform 200ms ease,
+      visibility 0s linear 200ms;
+  }
+
+  /* Visible at once on opening, so focus can move into it. */
+  .app-sidebar[data-open='true'] {
+    transform: none;
+    visibility: visible;
+    transition: transform 200ms ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-sidebar {
+    transition: none;
+  }
+}
+
 /* The drawer slides in from the side it sits on: the left, or the right in RTL. */
 :root {
   --ygg-inline-sign: 1;

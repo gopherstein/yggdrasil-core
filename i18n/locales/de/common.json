@@ -2,6 +2,7 @@
   "tagline": "Lokale KI-Steuerzentrale",
   "nav": {
     "label": "Haupt",
+    "open": "Menü öffnen",
     "main": "Haupt",
     "system": "System",
     "chat": "Chat",

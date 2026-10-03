@@ -2,6 +2,7 @@
   "tagline": "本機 AI 控制中心",
   "nav": {
     "label": "主要",
+    "open": "開啟選單",
     "main": "主要",
     "system": "系統",
     "chat": "聊天",

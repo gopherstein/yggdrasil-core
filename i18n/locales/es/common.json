@@ -2,6 +2,7 @@
   "tagline": "Plano de control de IA local",
   "nav": {
     "label": "Principal",
+    "open": "Abrir el menú",
     "main": "Principal",
     "system": "Sistema",
     "chat": "Chat",

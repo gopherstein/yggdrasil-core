@@ -2,6 +2,7 @@
   "tagline": "Pannello di controllo per l'IA locale",
   "nav": {
     "label": "Principale",
+    "open": "Apri il menu",
     "main": "Principale",
     "system": "Sistema",
     "chat": "Chat",

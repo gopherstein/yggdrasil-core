@@ -45,7 +45,8 @@ function NavItem({ to, label }: { to: string; label: string }) {
   )
 }
 
-export function Sidebar() {
+/** open shows the sidebar as a drawer below the md breakpoint; wider, it is always shown. */
+export function Sidebar({ open = false }: { open?: boolean }) {
   const { t } = useTranslation()
   const advancedMode = useUIStore((s) => s.advancedMode)
   const healthQuery = useQuery({
@@ -119,7 +120,7 @@ export function Sidebar() {
   return (
     // App chrome, not complementary content: the brand and status are the
     // page header, the links are the Main nav, and subsystem status is the footer.
-    <div className="app-sidebar flex h-full min-h-0 w-[15.5rem] shrink-0 flex-col overflow-hidden border-e border-line/60 bg-sidebar">
+    <div id="app-sidebar" data-open={open} className="app-sidebar flex h-full min-h-0 w-[15.5rem] shrink-0 flex-col overflow-hidden border-e border-line/60 bg-sidebar">
       <header className="px-4 pb-3 pt-4">
         <div className="flex items-center gap-2.5">
           <YggdrasilMark size={36} lore />

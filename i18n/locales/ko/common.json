@@ -2,6 +2,7 @@
   "tagline": "로컬 AI 제어 센터",
   "nav": {
     "label": "메인",
+    "open": "메뉴 열기",
     "main": "메인",
     "system": "시스템",
     "chat": "채팅",

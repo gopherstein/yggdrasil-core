@@ -2,6 +2,7 @@
   "tagline": "本地 AI 控制中心",
   "nav": {
     "label": "主菜单",
+    "open": "打开菜单",
     "main": "主要",
     "system": "系统",
     "chat": "聊天",

@@ -2,6 +2,7 @@
   "tagline": "Local AI control plane",
   "nav": {
     "label": "Main",
+    "open": "Open menu",
     "main": "Main",
     "system": "System",
     "chat": "Chat",
