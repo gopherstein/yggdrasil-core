@@ -41,6 +41,10 @@ try {
   // error keeps that page's elements alive, which reads as a leak.
   const errors = []
   page.on('pageerror', (error) => errors.push(error.message.split('\n')[0]))
+  // A crash the page's error boundary catches is logged as "page error".
+  page.on('console', (message) => {
+    if (message.type() === 'error' && message.text().startsWith('page error')) errors.push(message.text().split('\n')[0])
+  })
   const cdp = await context.newCDPSession(page)
   await cdp.send('Performance.enable')
   const go = (to) =>
@@ -52,30 +56,40 @@ try {
   const sample = async () => {
     await go('/chat')
     await page.waitForTimeout(800)
-    await page.evaluate(() => globalThis.gc?.())
-    await page.waitForTimeout(300)
+    // A full collection, DOM included; plain gc() leaves detached nodes for
+    // Blink's own collector, which made single readings noisy.
+    await cdp.send('HeapProfiler.collectGarbage')
+    await cdp.send('HeapProfiler.collectGarbage')
+    await page.waitForTimeout(200)
     const { metrics } = await cdp.send('Performance.getMetrics')
     const get = (name) => metrics.find((m) => m.name === name)?.value ?? 0
     return { heap: get('JSHeapUsedSize'), nodes: get('Nodes'), listeners: get('JSEventListeners') }
   }
+  await cdp.send('HeapProfiler.enable')
   await page.goto(`${base}/chat`, { waitUntil: 'domcontentloaded' })
   await page.waitForTimeout(1500)
-  let before
-  const trend = []
+  // A sample after every round past warm-up. A leak raises the floor (what
+  // can't be collected), while garbage not yet collected only adds noise, so
+  // the check compares the lowest readings early and late in the run.
+  const series = []
   for (let round = 0; round < rounds; round++) {
-    if (round === warmup) before = await sample()
     for (const route of pages) {
       // In-app navigation, as a person clicking the sidebar does.
       await go(route)
       await page.waitForTimeout(250)
     }
-    if (round >= warmup && process.env.LEAK_TREND) trend.push(await sample())
+    if (round >= warmup - 1) series.push(await sample())
   }
-  const after = await sample()
-  if (trend.length) console.log('per round:', trend.map((s) => `${s.nodes}n/${s.listeners}l/${(s.heap / 1048576).toFixed(1)}MB`).join(' '))
+  const third = Math.max(2, Math.floor(series.length / 3))
+  const floor = (part, key) => Math.min(...part.map((s) => s[key]))
+  const early = series.slice(0, third)
+  const late = series.slice(-third)
+  const before = { heap: floor(early, 'heap'), nodes: floor(early, 'nodes'), listeners: floor(early, 'listeners') }
+  const after = { heap: floor(late, 'heap'), nodes: floor(late, 'nodes'), listeners: floor(late, 'listeners') }
   const mb = (n) => (n / 1048576).toFixed(1)
-  console.log(`after warm-up: heap ${mb(before.heap)} MB, ${before.nodes} nodes, ${before.listeners} listeners`)
-  console.log(`after ${rounds - warmup} more rounds of ${pages.length} pages: heap ${mb(after.heap)} MB, ${after.nodes} nodes, ${after.listeners} listeners`)
+  if (process.env.LEAK_TREND) console.log('per round:', series.map((s) => `${s.nodes}n/${s.listeners}l/${mb(s.heap)}MB`).join(' '))
+  console.log(`lowest early: heap ${mb(before.heap)} MB, ${before.nodes} nodes, ${before.listeners} listeners`)
+  console.log(`lowest late (${series.length} rounds sampled, ${pages.length} pages each): heap ${mb(after.heap)} MB, ${after.nodes} nodes, ${after.listeners} listeners`)
   // Slack for caches (React Query keeps each page's data) and lazy chunks;
   // a leak grows with every round and passes it.
   const problems = []
