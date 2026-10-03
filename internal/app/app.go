@@ -113,6 +113,14 @@ type App struct {
 	RunLog *runlog.Store
 	// Caches lists every cache and its policy (§36).
 	Caches *cache.Registry
+	// External is the OpenAI-compatible server whose models can be chosen
+	// for a chat (#111).
+	External *external.Runtime
+	secrets  *auth.SecretStore
+	extMu    sync.Mutex
+	extList  []contracts.Model
+	extAt    time.Time
+	extErr   error
 	// Ratings is community model ratings (#37).
 	Ratings *ratings.Service
 	// identity is this computer's Bifrost key; joinTokens and networkMu
@@ -266,7 +274,8 @@ func New(opts Options) (*App, error) {
 		}
 	}
 	rtRegistry.Register(llamaRT)
-	rtRegistry.Register(external.New(external.Config{}))
+	extRuntime := external.New(external.Config{BaseURL: mustNormalizeExternal(cfg.ExternalOpenAIURL)})
+	rtRegistry.Register(extRuntime)
 	rtMgr := runtimes.NewManager(rtRegistry, db.SQL, bus, llamaClient)
 	rtMgr.OnStart = func(ctx context.Context, modelID string, err error) {
 		if r := ratingsRef.Load(); r != nil {
@@ -294,7 +303,14 @@ func New(opts Options) (*App, error) {
 	}
 	apiKeyMgr := auth.NewAPIKeyManager(db.SQL, secrets)
 
+	if key, err := secrets.Read(externalKeySecret); err == nil {
+		c := extRuntime.Config()
+		c.APIKey = strings.TrimSpace(key)
+		extRuntime.SetConfig(c)
+	}
 	a := &App{
+		External:      extRuntime,
+		secrets:       secrets,
 		Share:         share.New(0),
 		Config:        cfgMgr,
 		DB:            db,
@@ -629,6 +645,7 @@ func New(opts Options) (*App, error) {
 	a.identity = identity
 	a.joinTokens = &join.Tokens{DB: db.SQL}
 	a.API.BindNetwork(a)
+	a.API.BindExternal(a)
 	a.API.BindRuns(a.RunLog)
 	a.API.BindCapabilities(a)
 	a.API.BindCaches(a)

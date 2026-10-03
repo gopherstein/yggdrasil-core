@@ -3,8 +3,9 @@ package external
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"sync"
 
-	"github.com/yeixio/yggdrasil-core/internal/runtimes/llamacpp"
 	"github.com/yeixio/yggdrasil-core/pkg/pluginapi"
 )
 
@@ -16,9 +17,12 @@ type Config struct {
 	APIKey  string `json:"api_key,omitempty"`
 }
 
-// Runtime adapts a remote OpenAI-compatible server.
+// Runtime adapts a remote OpenAI-compatible server. Its models are only
+// used when someone chooses one; Auto never does.
 type Runtime struct {
-	cfg Config
+	mu     sync.RWMutex
+	cfg    Config
+	client *http.Client
 }
 
 // New creates an external OpenAI runtime adapter.
@@ -26,19 +30,34 @@ func New(cfg Config) *Runtime {
 	return &Runtime{cfg: cfg}
 }
 
+// Config is the current base URL and API key.
+func (r *Runtime) Config() Config {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.cfg
+}
+
+// SetConfig changes the base URL and API key.
+func (r *Runtime) SetConfig(cfg Config) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.cfg = cfg
+}
+
 func (r *Runtime) ID() string          { return runtimeID }
 func (r *Runtime) DisplayName() string { return "External OpenAI-compatible" }
 
 func (r *Runtime) Detect(ctx context.Context) (pluginapi.RuntimeDetection, error) {
-	if r.cfg.BaseURL == "" {
+	cfg := r.Config()
+	if cfg.BaseURL == "" {
 		return pluginapi.RuntimeDetection{
 			Installed: false,
-			Message:   "Configure base_url in settings to use an external OpenAI-compatible endpoint",
+			Message:   "Set external_openai_url in the configuration, or the external server in Settings, to use an OpenAI-compatible server",
 		}, nil
 	}
 	return pluginapi.RuntimeDetection{
 		Installed: true,
-		Path:      r.cfg.BaseURL,
+		Path:      cfg.BaseURL,
 		Version:   "remote",
 	}, nil
 }
@@ -71,7 +90,7 @@ func (r *Runtime) StartModel(ctx context.Context, cfg pluginapi.ModelStartConfig
 	return pluginapi.RunningModel{
 		ID:        cfg.ModelID,
 		ModelID:   cfg.ModelID,
-		Endpoint:  r.cfg.BaseURL,
+		Endpoint:  r.Config().BaseURL,
 		Status:    "remote",
 		RuntimeID: runtimeID,
 	}, nil
@@ -92,17 +111,4 @@ func (r *Runtime) Health(ctx context.Context) error {
 		return fmt.Errorf("external runtime not configured")
 	}
 	return nil
-}
-
-// Client wraps llamacpp client for OpenAI-compatible remote endpoints.
-type Client struct {
-	inner *llamacpp.Client
-}
-
-func NewClient() *Client {
-	return &Client{inner: llamacpp.NewClient()}
-}
-
-func (c *Client) Chat(ctx context.Context, req pluginapi.ChatRequest) (<-chan pluginapi.ChatChunk, error) {
-	return c.inner.Chat(ctx, req)
 }

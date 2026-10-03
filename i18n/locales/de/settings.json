@@ -246,5 +246,19 @@
     "resetting": "Wird zurückgesetzt …",
     "cancel": "Abbrechen",
     "failed": "Die App konnte nicht zurückgesetzt werden. Versuche es erneut."
+  },
+  "external": {
+    "title": "Externer Server",
+    "description": "Ein OpenAI-kompatibler Server, etwa OpenAI, vLLM oder Ollama auf einem anderen Rechner. Seine Modelle lassen sich für einen Chat wählen; „Auto“ wählt sie nie.",
+    "url": "Basis-URL",
+    "key": "API-Schlüssel",
+    "keyStored": "Gespeichert; gib einen neuen ein, um ihn zu ersetzen",
+    "keyOptional": "Optional",
+    "save": "Speichern",
+    "saving": "Wird gespeichert …",
+    "forgetKey": "Schlüssel vergessen",
+    "models_one": "{{count}} Modell verfügbar",
+    "models_other": "{{count}} Modelle verfügbar",
+    "privacy": "Chats mit diesen Modellen verlassen diesen Computer und erscheinen unter „Was diesen Computer verlassen hat“. Offline-Profile und Chats mit Erinnerungen oder Wissen, die als „Nur dieser Computer“ markiert sind, nutzen sie nie."
   }
 }

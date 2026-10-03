@@ -310,5 +310,9 @@
     "observedHint_one": "De {{formatted}} avaliação que compartilhou como ele roda",
     "observedHint_many": "De {{formatted}} avaliações que compartilharam como ele roda",
     "observedHint_other": "De {{formatted}} avaliações que compartilharam como ele roda"
+  },
+  "external": {
+    "title": "Servidor externo",
+    "description": "Um servidor compatível com OpenAI, como OpenAI, vLLM ou Ollama em outra máquina. Os modelos dele podem ser escolhidos em uma conversa; o Auto nunca os escolhe."
   }
 }

@@ -247,5 +247,20 @@
     "resetting": "Réinitialisation…",
     "cancel": "Annuler",
     "failed": "Impossible de réinitialiser l'application. Réessayez."
+  },
+  "external": {
+    "title": "Serveur externe",
+    "description": "Un serveur compatible OpenAI, comme OpenAI, vLLM ou Ollama sur une autre machine. Ses modèles peuvent être choisis pour une conversation ; Auto ne les choisit jamais.",
+    "url": "URL de base",
+    "key": "Clé d'API",
+    "keyStored": "Enregistrée ; saisissez-en une nouvelle pour la remplacer",
+    "keyOptional": "Facultative",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "forgetKey": "Oublier la clé",
+    "models_one": "{{count}} modèle disponible",
+    "models_many": "{{count}} modèles disponibles",
+    "models_other": "{{count}} modèles disponibles",
+    "privacy": "Les conversations avec ces modèles quittent cet ordinateur et sont enregistrées dans Ce qui a quitté cet ordinateur. Les profils hors ligne, et les conversations qui utilisent des souvenirs ou des connaissances marqués Cet ordinateur uniquement, ne les utilisent jamais."
   }
 }

@@ -36,7 +36,10 @@ type Config struct {
 	PlacesRouterURL   string `json:"places_router_url,omitempty"`
 	// Community model ratings (#37): the ratings service, and the public
 	// summary used when it cannot be reached. Empty uses Yeix's.
-	RatingsURL        string `json:"ratings_url,omitempty"`
+	RatingsURL string `json:"ratings_url,omitempty"`
+	// ExternalOpenAIURL is an OpenAI-compatible server whose models can be
+	// chosen for a chat (#111); its API key is in the secrets folder.
+	ExternalOpenAIURL string `json:"external_openai_url,omitempty"`
 	RatingsSummaryURL string `json:"ratings_summary_url,omitempty"`
 }
 

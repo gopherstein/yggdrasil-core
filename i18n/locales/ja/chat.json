@@ -57,7 +57,8 @@
     "noModelAsk": "モデルがまだインストールされていません。送信するとダウンロード前に確認します。",
     "noModelDownload": "モデルがまだインストールされていません。送信すると自動でダウンロードします。",
     "openModels": "モデルを開く",
-    "chooseRunOn": "送信する前に<strong>実行場所</strong>を選んでください（設定 → チャットの実行場所）。"
+    "chooseRunOn": "送信する前に<strong>実行場所</strong>を選んでください（設定 → チャットの実行場所）。",
+    "external": "・外部"
   },
   "effort": {
     "auto": {

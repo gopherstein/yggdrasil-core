@@ -310,5 +310,9 @@
     "observedHint_one": "D'après {{formatted}} note partageant son fonctionnement",
     "observedHint_many": "D'après {{formatted}} notes partageant son fonctionnement",
     "observedHint_other": "D'après {{formatted}} notes partageant son fonctionnement"
+  },
+  "external": {
+    "title": "Serveur externe",
+    "description": "Un serveur compatible OpenAI, comme OpenAI, vLLM ou Ollama sur une autre machine. Ses modèles peuvent être choisis pour une conversation ; Auto ne les choisit jamais."
   }
 }

@@ -24,6 +24,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/profiles"
 	"github.com/yeixio/yggdrasil-core/internal/remotetools"
 	"github.com/yeixio/yggdrasil-core/internal/runlog"
+	"github.com/yeixio/yggdrasil-core/internal/runtimes/external"
 	"github.com/yeixio/yggdrasil-core/internal/runtimes/llamacpp"
 	"github.com/yeixio/yggdrasil-core/internal/share"
 	"github.com/yeixio/yggdrasil-core/internal/structured"
@@ -1133,6 +1134,18 @@ func (e *chatExecEnv) NodeForRole(role string) (string, error) {
 	e.mu.Unlock()
 
 	modelID := e.modelForRole(role)
+	// A model on the external server runs there, chosen explicitly, never
+	// for a profile or a chat that keeps work here (#111).
+	if external.IsModel(modelID) {
+		if err := externalAllowed(e.profile, e.keepsLocal()); err != nil {
+			return "", err
+		}
+		local := e.app.Config.Get().NodeID
+		e.mu.Lock()
+		e.roleNodes[role], e.roleModels[role], e.lastModel = local, modelID, modelID
+		e.mu.Unlock()
+		return local, nil
+	}
 	e.mu.Lock()
 	excluded := append([]string(nil), e.excluded...)
 	e.mu.Unlock()

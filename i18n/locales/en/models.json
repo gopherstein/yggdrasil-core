@@ -303,5 +303,9 @@
     "crashRate": "{{percent}} crashed",
     "observedHint_one": "From {{formatted}} rating that shared how it runs",
     "observedHint_other": "From {{formatted}} ratings that shared how it runs"
+  },
+  "external": {
+    "title": "External server",
+    "description": "An OpenAI-compatible server, such as OpenAI, vLLM, or Ollama elsewhere. Its models can be chosen for a chat; Auto never picks them."
   }
 }

@@ -245,5 +245,18 @@
     "resetting": "正在重置…",
     "cancel": "取消",
     "failed": "無法重置應用程式。請再試一次。"
+  },
+  "external": {
+    "title": "外部伺服器",
+    "description": "相容 OpenAI 的伺服器，例如 OpenAI，或其他機器上的 vLLM、Ollama。可在對話中選擇它的模型；「自動」從不選擇它們。",
+    "url": "基礎 URL",
+    "key": "API 金鑰",
+    "keyStored": "已儲存；輸入新金鑰即可取代",
+    "keyOptional": "選填",
+    "save": "儲存",
+    "saving": "正在儲存…",
+    "forgetKey": "刪除金鑰",
+    "models_other": "可用模型 {{count}} 個",
+    "privacy": "與這些模型的對話會離開這台電腦，並記錄在「離開這台電腦的內容」中。離線設定檔，以及使用標記為「僅此電腦」的記憶或知識的對話，從不使用它們。"
   }
 }

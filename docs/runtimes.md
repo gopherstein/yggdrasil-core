@@ -51,7 +51,14 @@ To bundle an environment, run `yggdrasil-daemon -python-envs`. It prints each en
 | Id | `external-openai` |
 | Display name | External OpenAI-compatible |
 
-This adapter does not download a runtime. It needs a base URL in its configuration. When that URL is set, the adapter reports itself installed and points generation at that server. Prompts sent through it leave the machine. See [privacy.md](privacy.md).
+This adapter does not download a runtime. It connects to an OpenAI-compatible server you set up: `external_openai_url` in the configuration, or Settings → External server (advanced mode), with an optional API key kept in `secrets/external-openai.key`.
+
+- **Models:** the server's models (`GET /v1/models`) appear in the model list as `ext:<name>`, marked external, for a chat to choose. The Models page lists them separately; they can't be installed, started, or removed here.
+- **Chats:** a chat that chooses one sends its messages to `POST /v1/chat/completions` with the model's name and the key, streams the reply, and records it in What left this computer.
+- **Never automatic:** Auto, fallback, and the default model never pick an external model. A profile that turns web search off, and a chat using memories or knowledge marked This computer only, refuse it with `EXTERNAL_OFFLINE_PROFILE` or `EXTERNAL_LOCAL_ONLY`.
+- **Errors:** a refused key or an unreachable server is `EXTERNAL_FAILED`, with the server's reason.
+
+See [privacy.md](privacy.md).
 
 ## Adding an adapter
 

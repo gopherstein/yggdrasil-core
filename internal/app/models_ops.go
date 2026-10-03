@@ -387,6 +387,10 @@ func (a *App) listModelsCluster(ctx context.Context) ([]contracts.Model, error) 
 		m.InstalledOn = presence[id]
 		out = append(out, m)
 	}
+	// The external server's models, to choose; Auto never picks them.
+	if ext, err := a.externalModels(ctx); err == nil {
+		out = append(out, ext...)
+	}
 	return out, nil
 }
 

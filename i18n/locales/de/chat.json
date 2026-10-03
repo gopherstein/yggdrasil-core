@@ -57,7 +57,8 @@
     "noModelAsk": "Noch kein Modell installiert – beim Senden wird vor dem Laden gefragt.",
     "noModelDownload": "Noch kein Modell installiert – beim Senden wird automatisch eines geladen.",
     "openModels": "Modelle öffnen",
-    "chooseRunOn": "Wähle vor dem Senden <strong>Ausführen auf</strong> (Einstellungen → Chats ausführen auf)."
+    "chooseRunOn": "Wähle vor dem Senden <strong>Ausführen auf</strong> (Einstellungen → Chats ausführen auf).",
+    "external": " · extern"
   },
   "effort": {
     "auto": {

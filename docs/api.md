@@ -101,6 +101,7 @@ Control-plane routes are under `/api/v1`. The OpenAI-compatible routes are under
 | POST | `/models/{id}/rating/dismiss` | Stop asking for a rating of a model |
 | GET | `/ratings/community` | Everyone's ratings of the models here, from hardware like this computer's, overall, and by language |
 | GET | `/runtimes` | Runtimes and their detection |
+| GET, PUT | `/external-server` | The external OpenAI-compatible server: `base_url`, `has_key`, and its `models`; PUT takes `base_url`, `api_key`, and `clear_key` |
 | POST | `/runtimes/{id}/install` | Install a runtime (`llamacpp`) |
 
 ### Profiles and tools

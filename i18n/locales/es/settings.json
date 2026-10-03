@@ -247,5 +247,20 @@
     "resetting": "Restableciendo…",
     "cancel": "Cancelar",
     "failed": "No se pudo restablecer la aplicación. Vuelve a intentarlo."
+  },
+  "external": {
+    "title": "Servidor externo",
+    "description": "Un servidor compatible con OpenAI, como OpenAI, vLLM u Ollama en otro equipo. Sus modelos se pueden elegir para un chat; Auto nunca los elige.",
+    "url": "URL base",
+    "key": "Clave de API",
+    "keyStored": "Guardada; escribe una nueva para reemplazarla",
+    "keyOptional": "Opcional",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "forgetKey": "Olvidar clave",
+    "models_one": "{{count}} modelo disponible",
+    "models_many": "{{count}} modelos disponibles",
+    "models_other": "{{count}} modelos disponibles",
+    "privacy": "Los chats con estos modelos salen de este equipo y quedan registrados en Lo que salió de este equipo. Los perfiles sin conexión y los chats que usan recuerdos o conocimiento marcados como Solo este equipo nunca los usan."
   }
 }

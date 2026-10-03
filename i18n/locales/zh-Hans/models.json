@@ -296,5 +296,9 @@
     "contextBand": "{{band}} 上下文",
     "crashRate": "{{percent}} 崩溃",
     "observedHint_other": "来自 {{formatted}} 条分享了运行情况的评分"
+  },
+  "external": {
+    "title": "外部服务器",
+    "description": "兼容 OpenAI 的服务器，例如 OpenAI，或其他机器上的 vLLM、Ollama。可在聊天中选择它的模型；“自动”从不选择它们。"
   }
 }

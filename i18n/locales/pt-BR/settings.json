@@ -247,5 +247,20 @@
     "resetting": "Redefinindo…",
     "cancel": "Cancelar",
     "failed": "Não foi possível redefinir o aplicativo. Tente novamente."
+  },
+  "external": {
+    "title": "Servidor externo",
+    "description": "Um servidor compatível com OpenAI, como OpenAI, vLLM ou Ollama em outra máquina. Os modelos dele podem ser escolhidos em uma conversa; o Auto nunca os escolhe.",
+    "url": "URL base",
+    "key": "Chave de API",
+    "keyStored": "Salva; digite uma nova para substituir",
+    "keyOptional": "Opcional",
+    "save": "Salvar",
+    "saving": "Salvando…",
+    "forgetKey": "Esquecer chave",
+    "models_one": "{{count}} modelo disponível",
+    "models_many": "{{count}} modelos disponíveis",
+    "models_other": "{{count}} modelos disponíveis",
+    "privacy": "Conversas com esses modelos saem deste computador e ficam registradas em O que saiu deste computador. Perfis offline e conversas que usam memórias ou conhecimento marcados como Somente este computador nunca os usam."
   }
 }

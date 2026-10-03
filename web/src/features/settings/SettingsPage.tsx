@@ -17,6 +17,7 @@ import type { SettingsPatch } from '@/types/api'
 import { RealmKicker } from '@/components/ui/Realm'
 import { ConnectedServices } from './ConnectedServices'
 import { NotificationDestinations } from './NotificationDestinations'
+import { ExternalServer } from './ExternalServer'
 import { WhatLeft } from './WhatLeft'
 import { Toggle } from '@/components/ui/Toggle'
 import { LanguageSettings } from './LanguageSettings'
@@ -505,6 +506,7 @@ export function SettingsPage() {
           </div>
         </section>
         <NotificationDestinations />
+        {advancedMode ? <ExternalServer /> : null}
       </div>
 
       <div className="settings-group">

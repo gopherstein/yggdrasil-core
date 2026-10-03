@@ -246,5 +246,19 @@
     "resetting": "Resetting…",
     "cancel": "Cancel",
     "failed": "Could not reset the application. Try again."
+  },
+  "external": {
+    "title": "External server",
+    "description": "An OpenAI-compatible server, such as OpenAI, vLLM, or Ollama elsewhere. Its models can be chosen for a chat; Auto never picks them.",
+    "url": "Base URL",
+    "key": "API key",
+    "keyStored": "Stored; type a new one to replace it",
+    "keyOptional": "Optional",
+    "save": "Save",
+    "saving": "Saving…",
+    "forgetKey": "Forget key",
+    "models_one": "{{count}} model available",
+    "models_other": "{{count}} models available",
+    "privacy": "Chats with these models leave this computer and are recorded in What left this computer. Offline profiles, and chats using memories or knowledge marked This computer only, never use them."
   }
 }

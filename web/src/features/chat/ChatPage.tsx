@@ -1310,6 +1310,7 @@ export function ChatPage() {
                   {installedModels.map((model) => (
                     <option key={model.id} value={model.id}>
                       {model.display_name || model.id}
+                      {model.status === 'external' ? t('composer.external') : ''}
                     </option>
                   ))}
                 </>
@@ -1320,6 +1321,7 @@ export function ChatPage() {
                     {installedModels.map((model) => (
                       <option key={model.id} value={model.id}>
                         {model.display_name || model.id}
+                        {model.status === 'external' ? t('composer.external') : ''}
                       </option>
                     ))}
                   </optgroup>

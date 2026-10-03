@@ -310,5 +310,9 @@
     "observedHint_one": "De {{formatted}} valoración que compartió cómo funciona",
     "observedHint_many": "De {{formatted}} valoraciones que compartieron cómo funciona",
     "observedHint_other": "De {{formatted}} valoraciones que compartieron cómo funciona"
+  },
+  "external": {
+    "title": "Servidor externo",
+    "description": "Un servidor compatible con OpenAI, como OpenAI, vLLM u Ollama en otro equipo. Sus modelos se pueden elegir para un chat; Auto nunca los elige."
   }
 }

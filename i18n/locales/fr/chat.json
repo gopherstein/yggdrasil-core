@@ -57,7 +57,8 @@
     "noModelAsk": "Aucun modèle installé pour l'instant : l'envoi vous demandera avant de télécharger.",
     "noModelDownload": "Aucun modèle installé pour l'instant : l'envoi lancera le téléchargement automatiquement.",
     "openModels": "Ouvrir Modèles",
-    "chooseRunOn": "Choisissez <strong>Exécuter sur</strong> avant d'envoyer (Paramètres → Exécuter les discussions sur)."
+    "chooseRunOn": "Choisissez <strong>Exécuter sur</strong> avant d'envoyer (Paramètres → Exécuter les discussions sur).",
+    "external": " · externe"
   },
   "effort": {
     "auto": {

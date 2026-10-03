@@ -296,5 +296,9 @@
     "contextBand": "{{band}} 上下文",
     "crashRate": "{{percent}} 當機",
     "observedHint_other": "來自 {{formatted}} 則分享執行情況的評分"
+  },
+  "external": {
+    "title": "外部伺服器",
+    "description": "相容 OpenAI 的伺服器，例如 OpenAI，或其他機器上的 vLLM、Ollama。可在對話中選擇它的模型；「自動」從不選擇它們。"
   }
 }

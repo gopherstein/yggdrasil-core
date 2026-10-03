@@ -57,7 +57,8 @@
     "noModelAsk": "Todavía no hay ningún modelo instalado: al enviar, se te preguntará antes de descargar uno.",
     "noModelDownload": "Todavía no hay ningún modelo instalado: al enviar, se descargará uno automáticamente.",
     "openModels": "Abrir Modelos",
-    "chooseRunOn": "Elige <strong>Ejecutar en</strong> antes de enviar (Configuración → Ejecutar los chats en)."
+    "chooseRunOn": "Elige <strong>Ejecutar en</strong> antes de enviar (Configuración → Ejecutar los chats en).",
+    "external": " · externo"
   },
   "effort": {
     "auto": {

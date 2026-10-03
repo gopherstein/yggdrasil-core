@@ -24,6 +24,7 @@ import type {
   EgressRecord,
   JoinToken,
   JoinTokenCreated,
+  ExternalServerInfo,
   ModelRating,
   RatingTag,
   PrivacyOverview,
@@ -837,6 +838,11 @@ export const api = {
   /** Makes a one-time join token for adding a computer (#40); the token is in the answer only. */
   createJoinToken: (ttlMinutes?: number) =>
     request<JoinTokenCreated>('/api/v1/join-tokens', { method: 'POST', body: JSON.stringify(ttlMinutes ? { ttl_minutes: ttlMinutes } : {}) }),
+
+  getExternalServer: () => request<ExternalServerInfo>('/api/v1/external-server'),
+
+  setExternalServer: (body: { base_url: string; api_key?: string; clear_key?: boolean }) =>
+    request<ExternalServerInfo>('/api/v1/external-server', { method: 'PUT', body: JSON.stringify(body) }),
 
   listJoinTokens: async () => (await request<JoinToken[]>('/api/v1/join-tokens')) ?? [],
 

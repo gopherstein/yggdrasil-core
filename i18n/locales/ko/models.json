@@ -296,5 +296,9 @@
     "contextBand": "컨텍스트 {{band}}",
     "crashRate": "{{percent}} 충돌",
     "observedHint_other": "실행 정보를 공유한 평가 {{formatted}}개 기준"
+  },
+  "external": {
+    "title": "외부 서버",
+    "description": "OpenAI 호환 서버(OpenAI, 다른 컴퓨터의 vLLM 또는 Ollama 등)입니다. 채팅에서 이 서버의 모델을 고를 수 있으며, 자동은 이 모델을 고르지 않습니다."
   }
 }

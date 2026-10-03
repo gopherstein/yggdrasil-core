@@ -167,7 +167,10 @@ export function ModelsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['models-running'] }),
   })
 
-  const models = modelsQuery.data ?? []
+  // Models on the external server are chosen in chat; they aren't
+  // installed or recommended here (#111).
+  const models = (modelsQuery.data ?? []).filter((m) => m.status !== 'external')
+  const externalModels = (modelsQuery.data ?? []).filter((m) => m.status === 'external')
   const running = runningQuery.data ?? []
   const nodes = nodesQuery.data ?? []
   const profiles = profilesQuery.data ?? []
@@ -331,6 +334,13 @@ export function ModelsPage() {
           onDelete={(id) => deleteMutation.mutate(id)}
         />
       )}
+      {tab === 'installed' && externalModels.length > 0 ? (
+        <section className="card space-y-2">
+          <h2 className="section-title">{t('external.title')}</h2>
+          <p className="text-sm text-ink-muted">{t('external.description')}</p>
+          <p className="text-sm text-ink">{externalModels.map((m) => m.display_name || m.id).join(', ')}</p>
+        </section>
+      ) : null}
 
       {tab === 'running' && (
         <RunningTab

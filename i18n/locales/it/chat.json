@@ -57,7 +57,8 @@
     "noModelAsk": "Ancora nessun modello installato: all'invio ti verrà chiesto prima di scaricarne uno.",
     "noModelDownload": "Ancora nessun modello installato: all'invio ne verrà scaricato uno automaticamente.",
     "openModels": "Apri Modelli",
-    "chooseRunOn": "Scegli <strong>Esegui su</strong> prima di inviare (Impostazioni → Esegui le chat su)."
+    "chooseRunOn": "Scegli <strong>Esegui su</strong> prima di inviare (Impostazioni → Esegui le chat su).",
+    "external": " · esterno"
   },
   "effort": {
     "auto": {

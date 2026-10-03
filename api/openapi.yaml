@@ -1433,6 +1433,40 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/v1/external-server:
+    get:
+      summary: The OpenAI-compatible server whose models can be chosen for a chat, and the models it offers
+      operationId: getExternalServer
+      responses:
+        "200":
+          description: Settings and models
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExternalServer"
+    put:
+      summary: Set the external server's base URL and API key
+      description: The key is stored in the secrets folder and never returned. An empty api_key keeps the stored one; clear_key removes it; an empty base_url turns the server off.
+      operationId: setExternalServer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                base_url: {type: string}
+                api_key: {type: string}
+                clear_key: {type: boolean}
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExternalServer"
+        "400":
+          description: The base URL isn't http(s)
   /api/v1/join-tokens:
     post:
       summary: Make a one-time join token and the command that adds a computer to this network
@@ -4663,6 +4697,13 @@ components:
         instructions:
           type: string
           maxLength: 1500
+    ExternalServer:
+      type: object
+      properties:
+        base_url: {type: string}
+        has_key: {type: boolean}
+        models: {type: array, items: {type: string}}
+        error: {type: string, description: Why the model list couldn't be read}
     JoinToken:
       type: object
       properties:

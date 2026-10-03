@@ -57,7 +57,8 @@
     "noModelAsk": "No model installed yet — sending will ask before downloading.",
     "noModelDownload": "No model installed yet — sending will download automatically.",
     "openModels": "Open Models",
-    "chooseRunOn": "Choose <strong>Run on</strong> before sending (Settings → Run chats on)."
+    "chooseRunOn": "Choose <strong>Run on</strong> before sending (Settings → Run chats on).",
+    "external": " · external"
   },
   "effort": {
     "auto": {

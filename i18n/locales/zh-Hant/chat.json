@@ -57,7 +57,8 @@
     "noModelAsk": "尚未安裝模型。傳送時會先詢問是否下載。",
     "noModelDownload": "尚未安裝模型。傳送時會自動下載。",
     "openModels": "打開模型",
-    "chooseRunOn": "傳送前請先選擇<strong>執行位置</strong>（設定 → 聊天執行位置）。"
+    "chooseRunOn": "傳送前請先選擇<strong>執行位置</strong>（設定 → 聊天執行位置）。",
+    "external": " · 外部"
   },
   "effort": {
     "auto": {

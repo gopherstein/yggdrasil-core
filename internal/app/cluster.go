@@ -16,6 +16,7 @@ import (
 	"github.com/yeixio/yggdrasil-core/internal/nodes"
 	"github.com/yeixio/yggdrasil-core/internal/profiles"
 	"github.com/yeixio/yggdrasil-core/internal/runlog"
+	"github.com/yeixio/yggdrasil-core/internal/runtimes/external"
 	"github.com/yeixio/yggdrasil-core/internal/scheduler"
 	"github.com/yeixio/yggdrasil-core/internal/share"
 	"github.com/yeixio/yggdrasil-core/internal/structured"
@@ -200,6 +201,9 @@ func (a *App) placeRoleWith(ctx context.Context, profile profiles.Profile, role,
 // generateOnNode streams a turn from modelID on a node. adapter applies a
 // specialized AI's LoRA adapter; adapters exist only on this computer.
 func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role, adapter string, messages []pluginapi.ChatMessage) (<-chan pluginapi.ChatChunk, error) {
+	if external.IsModel(modelID) {
+		return a.generateExternal(ctx, modelID, messages)
+	}
 	cfg := a.Config.Get()
 	if adapter != "" && nodeID != "" && nodeID != cfg.NodeID {
 		return nil, fmt.Errorf("specialized AIs run on the computer that trained them")

@@ -296,5 +296,9 @@
     "contextBand": "コンテキスト{{band}}",
     "crashRate": "{{percent}}がクラッシュ",
     "observedHint_other": "動作状況を共有した{{formatted}}件の評価から"
+  },
+  "external": {
+    "title": "外部サーバー",
+    "description": "OpenAI互換のサーバー（OpenAI、別のマシンのvLLMやOllamaなど）です。チャットでそのモデルを選べます。「自動」が選ぶことはありません。"
   }
 }

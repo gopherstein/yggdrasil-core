@@ -21,6 +21,12 @@ type chatErrorRule struct {
 }
 
 var chatErrorRules = []chatErrorRule{
+	// The external server (#111): refusals for profiles and chats that keep
+	// work here, then the server's own failures, ahead of the generic rules.
+	{code: "EXTERNAL_OFFLINE_PROFILE", test: regexp.MustCompile(`(?i)doesn't use the external server`)},
+	{code: "EXTERNAL_LOCAL_ONLY", test: regexp.MustCompile(`(?i)can't go to the external server`)},
+	{code: "EXTERNAL_FAILED", test: regexp.MustCompile(`(?is)^.*the external server.*$`),
+		params: func(m []string) map[string]any { return map[string]any{"detail": m[0]} }},
 	{code: "RUNTIME_NOT_INSTALLED", test: regexp.MustCompile(`(?i)llama-server (is )?not installed`),
 		params: func([]string) map[string]any { return map[string]any{"runtime": "llama-server"} }},
 	{code: "MODEL_NOT_INSTALLED", test: regexp.MustCompile(`(?i)model "([^"]+)" not installed`),

@@ -21,6 +21,11 @@ func TestChatErrorCode(t *testing.T) {
 		{"read tcp 10.0.0.2:7332: connection reset by peer", "CONNECTION_LOST", nil},
 		{"llama-server error 503: loading model", "RUNTIME_ERROR", nil},
 		{`{"kind":"model_health","reason":"crashed","message":"The model stopped."}`, "MODEL_UNHEALTHY", nil},
+		{"this profile keeps work on this computer, so it doesn't use the external server; choose a model on this computer or another profile", "EXTERNAL_OFFLINE_PROFILE", nil},
+		{"this chat uses memories or knowledge marked This computer only, so it can't go to the external server; choose a model on this computer", "EXTERNAL_LOCAL_ONLY", nil},
+		{"the external server refused the API key (401): bad key", "EXTERNAL_FAILED", map[string]any{"detail": "the external server refused the API key (401): bad key"}},
+		{"couldn't reach the external server: dial tcp 10.0.0.9:443: connection refused", "EXTERNAL_FAILED",
+			map[string]any{"detail": "couldn't reach the external server: dial tcp 10.0.0.9:443: connection refused"}},
 		{"The tool returned nothing.", "", nil},
 	}
 	for _, c := range cases {

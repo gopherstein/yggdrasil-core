@@ -1412,6 +1412,16 @@ export interface PersonalStyle {
 
 export type EgressKind = 'web_search' | 'web_page' | 'places' | 'paired_computer' | 'external_server' | 'connector' | 'notification' | 'community_ratings'
 
+/** The OpenAI-compatible server whose models can be chosen for a chat (#111). */
+export interface ExternalServerInfo {
+  base_url: string
+  /** A stored API key, never its value. */
+  has_key: boolean
+  models: string[]
+  /** Why the model list couldn't be read. */
+  error?: string
+}
+
 /** A one-line join token's record (#40); the token itself is shown once. */
 export interface JoinToken {
   id: string
