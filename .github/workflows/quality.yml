@@ -37,13 +37,13 @@ jobs:
           TOSKAR_QUALITY_REPORT: ${{ runner.temp }}/quality-report.md
         run: scripts/quality-model.sh run
       - name: Report
-        if: always(#)
+        if: always()
         run: |
           if [ -f "$RUNNER_TEMP/quality-report.md" ]; then
             head -c 60000 "$RUNNER_TEMP/quality-report.md" >> "$GITHUB_STEP_SUMMARY"
           fi
       - uses: actions/upload-artifact@v4
-        if: always(#)
+        if: always()
         with:
           name: quality-report-core
           path: ${{ runner.temp }}/quality-report.md
