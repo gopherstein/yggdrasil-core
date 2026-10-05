@@ -3,7 +3,6 @@ package telemetry
 import (
 	"context"
 	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/yeixio/toskar-core/pkg/contracts"
@@ -37,14 +36,4 @@ func run(ctx context.Context, name string, args ...string) (string, error) {
 	defer cancel()
 	out, err := exec.CommandContext(ctx, name, args...).Output()
 	return string(out), err
-}
-
-// hasNVIDIA reports whether any reading is an NVIDIA card's.
-func hasNVIDIA(gpus []contracts.GPUSample) bool {
-	for _, g := range gpus {
-		if strings.Contains(strings.ToUpper(g.Name), "NVIDIA") {
-			return true
-		}
-	}
-	return false
 }
