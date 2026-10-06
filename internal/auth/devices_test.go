@@ -93,7 +93,7 @@ func TestDevicePairingLimits(t *testing.T) {
 
 	// One address gets ten tries in ten minutes, right or wrong.
 	for i := 0; i < 10; i++ {
-		p.Start()
+		_, _ = p.Start()
 		_, _, _ = p.Pair(ctx, wrong, "x", "192.168.1.40")
 	}
 	shown, _ = p.Start()
