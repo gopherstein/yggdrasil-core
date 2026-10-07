@@ -81,10 +81,12 @@ func (w want) check(t *testing.T, label string, s Schedule) {
 	}
 }
 
-func daily(h, m int) want     { return want{kind: KindDaily, hour: intp(h), minute: intp(m)} }
-func weekly(d, h, m int) want { return want{kind: KindWeekly, weekday: intp(d), hour: intp(h), minute: intp(m)} }
-func every(s int) want        { return want{kind: KindInterval, every: s} }
-func once(at time.Time) want  { return want{kind: KindOnce, at: &at} }
+func daily(h, m int) want { return want{kind: KindDaily, hour: intp(h), minute: intp(m)} }
+func weekly(d, h, m int) want {
+	return want{kind: KindWeekly, weekday: intp(d), hour: intp(h), minute: intp(m)}
+}
+func every(s int) want       { return want{kind: KindInterval, every: s} }
+func once(at time.Time) want { return want{kind: KindOnce, at: &at} }
 
 func TestParseRequestEnglish(t *testing.T) {
 	parsed := mustParse(t, "Every morning at 8:00 AM, check this product and tell me if the price is below $500.", "en")
