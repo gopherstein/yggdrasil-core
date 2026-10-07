@@ -549,6 +549,7 @@
     "passagesMore_many": "Ho trovato {{count}} passaggi (fonti: {{source}} e altre {{more}})",
     "passagesMore_other": "Ho trovato {{count}} passaggi (fonti: {{source}} e altre {{more}})",
     "read": "Ho letto {{name}}",
+    "watched": "Ho guardato {{name}}",
     "readParts_one": "Ho letto {{count}} parte di {{name}} pertinente alla domanda",
     "readParts_many": "Ho letto {{count}} parti di {{name}} pertinenti alla domanda",
     "readParts_other": "Ho letto {{count}} parti di {{name}} pertinenti alla domanda",

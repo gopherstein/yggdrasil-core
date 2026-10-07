@@ -531,6 +531,7 @@
     "passagesMore_one": "{{count}} Textstelle in {{source}} und {{more}} weiteren gefunden",
     "passagesMore_other": "{{count}} Textstellen in {{source}} und {{more}} weiteren gefunden",
     "read": "{{name}} gelesen",
+    "watched": "{{name}} angesehen",
     "readParts_one": "Den {{count}} Teil von {{name}} gelesen, der zur Frage passt",
     "readParts_other": "Die {{count}} Teile von {{name}} gelesen, die zur Frage passen",
     "plannedOne": "Die Antwort vor dem Schreiben entworfen",

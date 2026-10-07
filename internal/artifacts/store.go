@@ -134,6 +134,9 @@ func IsAudio(name string) bool {
 	return kindOf(name) == "audio" || strings.EqualFold(filepath.Ext(name), ".webm")
 }
 
+// IsVideo reports a video file, whose frames a model that can see is shown.
+func IsVideo(name string) bool { return kindOf(name) == "video" }
+
 func kindOf(name string) string {
 	switch strings.ToLower(filepath.Ext(name)) {
 	case ".csv", ".tsv", ".xlsx":
@@ -144,7 +147,7 @@ func kindOf(name string) string {
 		return "image"
 	case ".wav", ".mp3", ".m4a", ".aac", ".ogg", ".flac":
 		return "audio"
-	case ".webm":
+	case ".webm", ".mp4", ".mov", ".m4v", ".mkv":
 		return "video"
 	case ".txt", ".md", ".markdown", ".html", ".htm", ".json", ".jsonl", ".log", ".docx":
 		return "document"

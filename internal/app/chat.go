@@ -190,9 +190,9 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			}
 		}
 	}
-	// Pictures go to a model that can see them (#191), on this computer,
-	// which has its projector.
-	var images []string
+	// Pictures and videos go to a model that can see them (#191), on this
+	// computer, which has its projector. A video's frames are read when the
+	// answer starts.
 	var shown []artifacts.Artifact
 	if pictures := a.turnPictures(ctx, conversationID, attached); len(pictures) > 0 && special == nil {
 		switch m, ok := a.seeingModel(ctx); {
@@ -208,7 +208,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		}
 		if a.seesImages(modelID) {
 			profile = applyExecutionPolicy(profile, "local")
-			images, shown = a.imageURLs(ctx, pictures)
+			shown = pictures
 		}
 	}
 	if routeReason != "" {
@@ -330,7 +330,6 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			trace:          &turnTrace{runID: task.ID, notice: routeNotice, lang: appLang},
 			startedAt:      turnStart,
 			attachments:    attached,
-			images:         images,
 			pictures:       shown,
 		}
 		if routeReason != "" {
@@ -985,11 +984,13 @@ type chatExecEnv struct {
 	responseLanguage string
 	// attachments are the files attached to this message.
 	attachments []artifacts.Artifact
-	// images are the pictures shown to the model with this message, as data
-	// URLs, when it can see them (#191).
-	images []string
-	// pictures are the files behind images.
+	// pictures are the pictures and videos shown to the model with this
+	// message, when it can see them (#191). look reads them once into images,
+	// data URLs, and watched, what each video's frames are.
 	pictures []artifacts.Artifact
+	lookOnce sync.Once
+	images   []string
+	watched  map[string]string
 	// summarized counts saved messages replaced by a summary this turn.
 	summarized int
 	// startedAt and firstGenerate measure the pipeline's overhead before
@@ -1569,5 +1570,9 @@ func (e *chatExecEnv) noteTraining(nodeID string) {
 	}
 }
 
-// TurnImages are the pictures shown to the model with this message.
-func (e *chatExecEnv) TurnImages() []string { return e.images }
+// TurnImages are the pictures, and video frames, shown to the model with
+// this message.
+func (e *chatExecEnv) TurnImages() []string {
+	e.look(e.ctx)
+	return e.images
+}

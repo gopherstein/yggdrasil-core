@@ -138,7 +138,7 @@
   "TRAINING_CANCELLED": "L'addestramento è stato annullato.",
   "UNAUTHORIZED": "Questo Toskar richiede una chiave API.",
   "UNREADABLE_FILE": "Toskar non riesce a leggere {{name}}: {{cause}}",
-  "UNSUPPORTED_FILE": "Toskar non può ancora leggere {{name}}. Allega un documento, un foglio di calcolo, un PDF, un file di codice, un audio o un'immagine PNG o JPEG.",
+  "UNSUPPORTED_FILE": "Toskar non può ancora leggere {{name}}. Allega un documento, un foglio di calcolo, un PDF, un file di codice, un audio, un video o un'immagine PNG o JPEG.",
   "DEVICE_NOT_ALLOWED": "La chiave di un dispositivo non può farlo. Usa una chiave da Accesso API.",
   "PAIRING_EXPIRED": "Il codice è scaduto. Scegli di nuovo Collega un dispositivo sul computer.",
   "PAIRING_FAILED": "Non è stato possibile collegare il dispositivo.",

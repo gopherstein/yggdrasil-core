@@ -531,6 +531,7 @@
     "passagesMore_one": "Found {{count}} passage in {{source}} and {{more}} more",
     "passagesMore_other": "Found {{count}} passages in {{source}} and {{more}} more",
     "read": "Read {{name}}",
+    "watched": "Watched {{name}}",
     "readParts_one": "Read the {{count}} part of {{name}} that matches the question",
     "readParts_other": "Read the {{count}} parts of {{name}} that match the question",
     "plannedOne": "Drafted the answer before writing it",

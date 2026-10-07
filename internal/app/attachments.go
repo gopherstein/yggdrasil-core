@@ -136,6 +136,20 @@ func (e *chatExecEnv) attachmentBlock(ctx context.Context, prompt string) string
 			default:
 				label = "attached earlier in this chat by the user"
 			}
+			if watchable(art) {
+				// A video is shown as frames to a model that can see (#191).
+				e.look(ctx)
+				if note, ok := e.watched[art.ID]; ok {
+					fmt.Fprintf(&b, "\nVideo %s: %s. %s\n", label, art.Name, note)
+					continue
+				}
+				fmt.Fprintf(&b, "\nVideo %s: %s. You cannot see it.", label, art.Name)
+				if e.app.toolReady(AudioToolID) {
+					fmt.Fprintf(&b, " To know what is said in it, call %s with {\"file\": %q}.", AudioToolID, art.Name)
+				}
+				b.WriteString("\n")
+				continue
+			}
 			if artifacts.IsAudio(art.Name) {
 				// Audio is not text; the model transcribes it when it needs to.
 				fmt.Fprintf(&b, "\nAudio file %s: %s. To know what it says, call %s with {\"file\": %q}.\n", label, art.Name, AudioToolID, art.Name)

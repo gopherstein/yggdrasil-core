@@ -5,12 +5,17 @@ import (
 	"io"
 	"log/slog"
 	"os"
+	"os/exec"
+	"path/filepath"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
 
 	"github.com/yeixio/toskar-core/internal/artifacts"
 	"github.com/yeixio/toskar-core/internal/models"
+	"github.com/yeixio/toskar-core/internal/pyenv"
+	"github.com/yeixio/toskar-core/internal/speech"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 	"github.com/yeixio/toskar-core/pkg/pluginapi"
 )
@@ -167,5 +172,68 @@ func TestWithoutImages(t *testing.T) {
 	plain := in[:1]
 	if got := withoutImages(plain); &got[0] != &plain[0] {
 		t.Fatal("messages without pictures were copied")
+	}
+}
+
+// fakeFrames is a stand-in for PyAV: it writes the frames asked for.
+const fakeFrames = `#!/usr/bin/env python3
+import json, sys
+cfg = json.load(open(sys.argv[3]))
+frames = []
+for i in range(cfg["count"]):
+    open(cfg["out_dir"] + "/frame-%d.jpg" % i, "wb").write(b"\xff\xd8JPEG")
+    frames.append({"time": 5.0 + i * 10, "file": "frame-%d.jpg" % i})
+json.dump({"duration": 62.0, "has_audio": True, "frames": frames}, sys.stdout)
+`
+
+type framesEnv struct{ path string }
+
+func (f framesEnv) Ensure(context.Context, pyenv.Spec, pyenv.Progress) (string, error) {
+	return f.path, nil
+}
+func (f framesEnv) Env() []string                 { return nil }
+func (f framesEnv) Unavailable(pyenv.Spec) string { return "" }
+
+// A video is shown to a model that can see as frames sampled through it,
+// with when each is (#191).
+func TestVideoFramesReachAModelThatSees(t *testing.T) {
+	if _, err := exec.LookPath("python3"); err != nil {
+		t.Skip("python3 is not installed")
+	}
+	a, used, sent := pictureApp(t, true)
+	py := filepath.Join(t.TempDir(), "python")
+	if err := os.WriteFile(py, []byte(fakeFrames), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	a.Speech = &speech.Engine{Python: framesEnv{py}, Dir: t.TempDir()}
+	ctx := context.Background()
+	conv, _ := a.Conversations.Create(ctx, "video", "general-assistant", "text-model")
+	clip, err := a.Artifacts.Save(ctx, artifacts.Input{Name: "walk.mp4", Data: []byte("MP4"), ConversationID: conv.ID})
+	if err != nil {
+		t.Fatal(err)
+	}
+	runPictureChat(t, a, conv.ID, "What happens in this video?", clip.ID)
+	if (*used)[len(*used)-1] != "see-model" {
+		t.Fatalf("models = %v", *used)
+	}
+	msg := lastUser((*sent)[len(*sent)-1])
+	if len(msg.Images) != framesPerVideo || !strings.HasPrefix(msg.Images[0], "data:image/jpeg;base64,") {
+		t.Fatalf("images = %d", len(msg.Images))
+	}
+	for _, want := range []string{"Video attached to this message by the user: walk.mp4. It is 1:02 long.", "shown 6 frames", "at 0:05, 0:15, 0:25", "call speech.transcribe"} {
+		if !strings.Contains(msg.Content, want) {
+			t.Fatalf("content lacks %q:\n%s", want, msg.Content)
+		}
+	}
+	msgs, _ := a.Conversations.ListMessages(ctx, conv.ID)
+	last := msgs[len(msgs)-1]
+	if last.Meta == nil || !slices.ContainsFunc(last.Meta.Steps, func(s contracts.ActivityStep) bool { return s.Text == "Watched walk.mp4" }) {
+		t.Fatalf("steps = %+v", last.Meta)
+	}
+
+	// A follow-up uses the frames read before.
+	runPictureChat(t, a, conv.ID, "What color is the dog?")
+	if len(lastUser((*sent)[len(*sent)-1]).Images) != framesPerVideo {
+		t.Fatal("the follow-up didn't see the video")
 	}
 }

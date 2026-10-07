@@ -7,17 +7,22 @@ export const AUDIO_ACCEPT = '.wav,.mp3,.m4a,.aac,.ogg,.flac,.webm'
 /** Images chat can show and edit. */
 export const IMAGE_ACCEPT = '.png,.jpg,.jpeg'
 
-const BINARY = ['.xlsx', '.pdf', ...AUDIO_ACCEPT.split(','), ...IMAGE_ACCEPT.split(',')]
+/** Videos chat can show to a model that sees, as frames. (.webm is with audio.) */
+export const VIDEO_ACCEPT = '.mp4,.mov,.m4v,.mkv'
+
+const BINARY = ['.xlsx', '.pdf', ...AUDIO_ACCEPT.split(','), ...IMAGE_ACCEPT.split(','), ...VIDEO_ACCEPT.split(',')]
 
 export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 
-/** File types chat can read: documents, spreadsheets, PDFs, code, audio, and images. */
+/** File types chat can read: documents, spreadsheets, PDFs, code, audio, images, and videos. */
 export const ATTACH_ACCEPT =
   UPLOAD_ACCEPT +
   ',.py,.js,.ts,.tsx,.jsx,.go,.rs,.java,.kt,.c,.h,.cpp,.hpp,.cs,.rb,.php,.swift,.sh,.sql,.yaml,.yml,.toml,.xml,.css,.ini,.log,' +
   AUDIO_ACCEPT +
   ',' +
-  IMAGE_ACCEPT
+  IMAGE_ACCEPT +
+  ',' +
+  VIDEO_ACCEPT
 
 /** Whether a file is a PNG or JPEG image, by its name. */
 export function isImageName(filename: string): boolean {

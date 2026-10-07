@@ -31,6 +31,9 @@ var transcribeScript []byte
 //go:embed synthesize.py
 var synthesizeScript []byte
 
+//go:embed frames.py
+var framesScript []byte
+
 // Requirements are the speech environment's packages. PyAV is pinned
 // because 19 removed an argument faster-whisper 1.2.1 passes.
 var Requirements = []string{"faster-whisper==1.2.1", "av==18.0.0", "piper-tts==1.8.0"}
@@ -144,6 +147,9 @@ func (e *Engine) run(ctx context.Context, script []byte, cfg map[string]any, fil
 	if v, ok := cfg["out"].(string); ok {
 		cfg["out"] = filepath.Join(job, v)
 	}
+	if _, ok := cfg["out_dir"]; ok {
+		cfg["out_dir"] = job
+	}
 	raw, _ := json.Marshal(cfg)
 	cfgPath := filepath.Join(job, "config.json")
 	scriptPath := filepath.Join(job, "script.py")
@@ -172,6 +178,15 @@ func (e *Engine) run(ctx context.Context, script []byte, cfg map[string]any, fil
 	}
 	if err := json.Unmarshal(stdout.Bytes(), out); err != nil {
 		return fmt.Errorf("speech returned something unexpected: %w", err)
+	}
+	if c, ok := out.(*Clip); ok {
+		for i := range c.Frames {
+			data, err := os.ReadFile(filepath.Join(job, filepath.Base(c.Frames[i].File)))
+			if err != nil {
+				return err
+			}
+			c.Frames[i].JPEG = data
+		}
 	}
 	if v, ok := cfg["out"].(string); ok {
 		data, err := os.ReadFile(v)
@@ -217,6 +232,46 @@ func (e *Engine) Transcribe(ctx context.Context, name string, audio []byte, qual
 		map[string]any{"model": model, "models_dir": filepath.Join(e.Dir, "whisper"), "language": language},
 		map[string][]byte{"audio" + strings.ToLower(filepath.Ext(name)): audio}, &t)
 	return t, err
+}
+
+// Clip is frames sampled evenly through a video, for a model that can see.
+type Clip struct {
+	Duration float64 `json:"duration"`
+	HasAudio bool    `json:"has_audio"`
+	Frames   []Frame `json:"frames"`
+}
+
+// Frame is one sampled frame: when it is in the clip, as a JPEG.
+type Frame struct {
+	Time float64 `json:"time"`
+	File string  `json:"file"`
+	JPEG []byte  `json:"-"`
+}
+
+// Frame size: the longer side, in pixels. Vision models shrink a picture
+// to about this anyway.
+const frameSide = 768
+
+// Frames samples count frames evenly through a video (#191), with PyAV,
+// which the speech environment has for reading audio.
+func (e *Engine) Frames(ctx context.Context, name string, video []byte, count int) (Clip, error) {
+	if len(video) > maxAudioBytes {
+		return Clip{}, fmt.Errorf("%s is larger than %d MB", name, maxAudioBytes>>20)
+	}
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	var c Clip
+	err := e.run(ctx, framesScript,
+		map[string]any{"count": count, "side": frameSide, "out_dir": ""},
+		map[string][]byte{"video" + strings.ToLower(filepath.Ext(name)): video}, &c)
+	return c, err
+}
+
+// Ready reports a speech environment installed here, so a job starts
+// without installing it first.
+func (e *Engine) Ready() bool {
+	st, ok := e.Python.(interface{ Status(pyenv.Spec) pyenv.Status })
+	return ok && st.Status(Spec()).Installed
 }
 
 type audioResult struct {
