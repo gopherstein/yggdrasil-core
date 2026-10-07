@@ -96,7 +96,7 @@
     }
   },
   "phoneModels": {
-    "heading": "Auf diesem iPhone",
+    "heading": "Auf diesem Gerät",
     "copy": "Das sind die kleineren Modelle aus dem Toskar-Katalog. Die Datei wird auf dieses Handy geladen und bleibt hier.",
     "meta": "{{parameters}} · {{size}}",
     "chat": "Chat",
@@ -123,9 +123,9 @@
   },
   "onboarding": {
     "welcome": "Willkommen bei",
-    "lede": "Mit dieser App läuft KI privat auf diesem iPhone.",
-    "thisIPhone": "Dieses iPhone",
-    "hardware": "Was dieses iPhone zum Ausführen von KI-Modellen mitbringt.",
+    "lede": "Mit dieser App läuft KI privat auf diesem Gerät.",
+    "thisIPhone": "Dieses Gerät",
+    "hardware": "Was dieses Gerät zum Ausführen von KI-Modellen mitbringt.",
     "device": "Gerät",
     "memory": "Arbeitsspeicher",
     "system": "System",
@@ -137,7 +137,7 @@
       },
       "coding": {
         "title": "Programmieren",
-        "description": "Hilfe beim Code für kurze Änderungen und kleine Aufgaben auf diesem iPhone."
+        "description": "Hilfe beim Code für kurze Änderungen und kleine Aufgaben auf diesem Gerät."
       },
       "research": {
         "title": "Recherche",
@@ -145,7 +145,7 @@
       },
       "custom": {
         "title": "Eigene",
-        "description": "Wähle selbst ein Modell aus denen, die auf dieses iPhone passen."
+        "description": "Wähle selbst ein Modell aus denen, die auf dieses Gerät passen."
       }
     },
     "continue": "Weiter",
@@ -153,7 +153,7 @@
     "recommendedFor": "Empfohlen für {{purpose}}",
     "modelFacts": "{{parameters}} · {{download}} Download · etwa {{memory}} Speicher",
     "install": "Empfehlung installieren",
-    "tooLarge": "Dieses Modell braucht mehr Speicher, als dieses iPhone erübrigen kann.",
+    "tooLarge": "Dieses Modell braucht mehr Speicher, als dieses Gerät erübrigen kann.",
     "chooseOther": "Anderes Modell wählen",
     "installing": "{{model}} wird installiert",
     "downloaded": "{{percent}} geladen",
@@ -164,8 +164,8 @@
   },
   "settings": {
     "title": "Einstellungen",
-    "subtitle": "Modelle, die du auf diesem iPhone installierst, bleiben auf diesem iPhone. Chats mit einem verbundenen Computer bleiben auf diesem Computer.",
-    "thisIPhone": "Dieses iPhone",
+    "subtitle": "Modelle, die du auf diesem Gerät installierst, bleiben auf diesem Gerät. Chats mit einem verbundenen Computer bleiben auf diesem Computer.",
+    "thisIPhone": "Dieses Gerät",
     "whereChatsRun": "Wo Chats laufen",
     "onDevice": "Auf diesem Gerät, nachdem du ein Modell installiert hast",
     "computer": "Computer",
@@ -178,10 +178,10 @@
     "connect": "Computer verbinden",
     "about": "Über",
     "version": "Version {{version}}",
-    "aboutCopy": "Benannt nach Ratatoskr, dem Eichhörnchen, das Botschaften am Weltenbaum entlangträgt. Toskar verbindet deine Apps mit den Modellen auf deinen Computern und auf diesem iPhone.",
+    "aboutCopy": "Benannt nach Ratatoskr, dem Eichhörnchen, das Botschaften am Weltenbaum entlangträgt. Toskar verbindet deine Apps mit den Modellen auf deinen Computern und auf diesem Gerät.",
     "dangerZone": "Gefahrenbereich",
-    "resetTitle": "Dieses iPhone zurücksetzen",
-    "resetCopy": "Stellt die Willkommenseinrichtung wieder her. Löscht Chats auf diesem iPhone und vergisst den verbundenen Computer.",
+    "resetTitle": "Dieses Gerät zurücksetzen",
+    "resetCopy": "Stellt die Willkommenseinrichtung wieder her. Löscht Chats auf diesem Gerät und vergisst den verbundenen Computer.",
     "resetButton": "Einstellungen und App-Daten zurücksetzen …",
     "resetDeletesModels": "Das kann nicht rückgängig gemacht werden. Geladene Modelle werden ebenfalls gelöscht.",
     "resetKeepsModels": "Das kann nicht rückgängig gemacht werden. Geladene Modelle bleiben erhalten.",
@@ -194,7 +194,7 @@
     "title": "Sprache",
     "appLanguage": "App-Sprache",
     "automatic": "Automatisch ({{language}})",
-    "automaticHint": "Folgt der App-Sprache des verbundenen Computers oder, falls dort keine festgelegt ist, der Sprache dieses iPhone.",
+    "automaticHint": "Folgt der App-Sprache des verbundenen Computers oder, falls dort keine festgelegt ist, der Sprache dieses Geräts.",
     "choose": "Sprache der App wählen",
     "pseudo": "Pseudo-Sprache (en-XA)"
   },
@@ -234,14 +234,14 @@
     "sending": "Wird gesendet",
     "stop": "Stoppen",
     "working": "Wird bearbeitet …",
-    "thinkingOnPhone": "Denkt auf diesem iPhone nach …",
-    "installFirst": "Installiere ein Modell, um auf diesem iPhone zu chatten.",
+    "thinkingOnPhone": "Denkt auf diesem Gerät nach …",
+    "installFirst": "Installiere ein Modell, um auf diesem Gerät zu chatten.",
     "setUpModel": "Modell einrichten",
     "modelMissing": "Dieses Modell ist auf diesem Handy nicht installiert.",
     "interrupted": "Antwort unterbrochen",
     "couldNotRun": "Dieses Handy konnte das Modell nicht ausführen.",
     "noProfile": "Dieser Computer hat noch kein Profil. Erstelle zuerst eines in der Mac-App.",
-    "noChatPlace": "Dieses iPhone hat keinen Ort zum Speichern von Chats.",
+    "noChatPlace": "Dieses Gerät hat keinen Ort zum Speichern von Chats.",
     "speed": "{{generated}} tok/s",
     "speedWithPrompt": "{{generated}} tok/s · Prompt {{prompt}} tok/s",
     "groups": {
@@ -253,7 +253,7 @@
     },
     "empty": {
       "title": "Wobei kann ich helfen?",
-      "phone": "Sprich mit der KI auf diesem iPhone. Nichts, was du schreibst, verlässt es.",
+      "phone": "Sprich mit der KI auf diesem Gerät. Nichts, was du schreibst, verlässt es.",
       "computer": "Toskar wählt das passende Modell und den passenden Computer, schlägt bei Bedarf nach und zeigt, was es genutzt hat."
     },
     "unsent": {
@@ -358,7 +358,7 @@
   "realms": {
     "about": "{{norse}}. {{rune}}. Über diesen Namen",
     "chat": {
-      "meaning": "Im Chat werden deine Nachrichten zu den Modellen auf diesem iPhone oder deinen Computern getragen und die Antworten zurück.",
+      "meaning": "Im Chat werden deine Nachrichten zu den Modellen auf diesem Gerät oder deinen Computern getragen und die Antworten zurück.",
       "story": "Ratatoskr ist das Eichhörnchen, das den Stamm von Yggdrasil auf und ab läuft und Botschaften zwischen dem Adler im Wipfel und dem Drachen Níðhöggr überbringt, der an den Wurzeln nagt.",
       "runeName": "Ansuz, die Rune der Sprache"
     },

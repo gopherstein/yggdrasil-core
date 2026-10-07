@@ -96,7 +96,7 @@
     }
   },
   "phoneModels": {
-    "heading": "在這部 iPhone 上",
+    "heading": "在這台裝置 上",
     "copy": "這些是 Toskar 目錄中較小的模型。檔案會下載到這部手機上並保存在這裡。",
     "meta": "{{parameters}} · {{size}}",
     "chat": "聊天",
@@ -123,9 +123,9 @@
   },
   "onboarding": {
     "welcome": "歡迎使用",
-    "lede": "這個 App 可以在這部 iPhone 上私密地執行 AI。",
-    "thisIPhone": "這部 iPhone",
-    "hardware": "這台 iPhone 用於執行 AI 模型的硬體。",
+    "lede": "這個 App 可以在這台裝置 上私密地執行 AI。",
+    "thisIPhone": "這台裝置",
+    "hardware": "這台裝置 用於執行 AI 模型的硬體。",
     "device": "裝置",
     "memory": "記憶體",
     "system": "系統",
@@ -137,7 +137,7 @@
       },
       "coding": {
         "title": "程式設計",
-        "description": "在這部 iPhone 上進行快速編輯和小型工作的程式碼協助。"
+        "description": "在這台裝置 上進行快速編輯和小型工作的程式碼協助。"
       },
       "research": {
         "title": "研究",
@@ -145,7 +145,7 @@
       },
       "custom": {
         "title": "自訂",
-        "description": "從適合這部 iPhone 的模型中自行挑選。"
+        "description": "從適合這台裝置 的模型中自行挑選。"
       }
     },
     "continue": "繼續",
@@ -153,7 +153,7 @@
     "recommendedFor": "適合「{{purpose}}」的建議配置",
     "modelFacts": "{{parameters}} · 下載大小 {{download}} · 約使用 {{memory}} 記憶體",
     "install": "安裝建議配置",
-    "tooLarge": "這個模型需要的記憶體超過這部 iPhone 能提供的量。",
+    "tooLarge": "這個模型需要的記憶體超過這台裝置 能提供的量。",
     "chooseOther": "選擇其他模型",
     "installing": "正在安裝 {{model}}",
     "downloaded": "已下載 {{percent}}",
@@ -164,8 +164,8 @@
   },
   "settings": {
     "title": "設定",
-    "subtitle": "你安裝在這部 iPhone 上的模型會留在這部 iPhone 上。與已連線電腦的聊天會留在那台電腦上。",
-    "thisIPhone": "這部 iPhone",
+    "subtitle": "你安裝在這台裝置 上的模型會留在這台裝置 上。與已連線電腦的聊天會留在那台電腦上。",
+    "thisIPhone": "這台裝置",
     "whereChatsRun": "聊天執行位置",
     "onDevice": "在你安裝模型後，於這部裝置上執行",
     "computer": "電腦",
@@ -178,10 +178,10 @@
     "connect": "連線到電腦",
     "about": "關於",
     "version": "版本 {{version}}",
-    "aboutCopy": "名稱來自在世界之樹上傳遞訊息的松鼠 Ratatoskr。Toskar 將你的 App 連結到你電腦上和這部 iPhone 上的模型。",
+    "aboutCopy": "名稱來自在世界之樹上傳遞訊息的松鼠 Ratatoskr。Toskar 將你的 App 連結到你電腦上和這台裝置 上的模型。",
     "dangerZone": "危險區域",
-    "resetTitle": "重置這部 iPhone",
-    "resetCopy": "恢復歡迎設定畫面。會清除這部 iPhone 上的聊天，並忘記已連線的電腦。",
+    "resetTitle": "重置這台裝置",
+    "resetCopy": "恢復歡迎設定畫面。會清除這台裝置 上的聊天，並忘記已連線的電腦。",
     "resetButton": "重置設定和 App 資料…",
     "resetDeletesModels": "這個動作無法復原。已下載的模型也會被刪除。",
     "resetKeepsModels": "這個動作無法復原。已下載的模型會保留。",
@@ -194,7 +194,7 @@
     "title": "語言",
     "appLanguage": "App 語言",
     "automatic": "自動（{{language}}）",
-    "automaticHint": "跟隨已連線電腦的 App 語言；如果沒有，則使用這部 iPhone 的語言。",
+    "automaticHint": "跟隨已連線電腦的 App 語言；如果沒有，則使用這台裝置 的語言。",
     "choose": "選擇 App 的語言",
     "pseudo": "虛擬語系（en-XA）"
   },
@@ -234,14 +234,14 @@
     "sending": "正在傳送",
     "stop": "停止",
     "working": "正在處理…",
-    "thinkingOnPhone": "正在這部 iPhone 上思考…",
-    "installFirst": "安裝模型後即可在這部 iPhone 上聊天。",
+    "thinkingOnPhone": "正在這台裝置 上思考…",
+    "installFirst": "安裝模型後即可在這台裝置 上聊天。",
     "setUpModel": "設定模型",
     "modelMissing": "這部手機上沒有安裝該模型。",
     "interrupted": "回應已中斷",
     "couldNotRun": "這部手機無法執行該模型。",
     "noProfile": "那台電腦還沒有任何設定檔。請先在 Mac App 中建立一個。",
-    "noChatPlace": "這部 iPhone 沒有可以儲存聊天的位置。",
+    "noChatPlace": "這台裝置 沒有可以儲存聊天的位置。",
     "speed": "{{generated}} tok/s",
     "speedWithPrompt": "{{generated}} tok/s · 提示 {{prompt}} tok/s",
     "groups": {
@@ -253,7 +253,7 @@
     },
     "empty": {
       "title": "有什麼我可以幫你的？",
-      "phone": "和這部 iPhone 上的 AI 對話。你寫的任何內容都不會離開這部手機。",
+      "phone": "和這台裝置 上的 AI 對話。你寫的任何內容都不會離開這台裝置。",
       "computer": "Toskar 會挑選合適的模型和電腦，需要時查詢資料，並顯示它使用了哪些內容。"
     },
     "unsent": {
@@ -354,7 +354,7 @@
   "realms": {
     "about": "{{norse}}。{{rune}}。關於這個名稱",
     "chat": {
-      "meaning": "在「聊天」中，你的訊息會被送到這部 iPhone 或你電腦上的模型，再把回答帶回來。",
+      "meaning": "在「聊天」中，你的訊息會被送到這台裝置 或你電腦上的模型，再把回答帶回來。",
       "story": "Ratatoskr 是一隻在 Yggdrasil 樹幹上跑上跑下的松鼠，在樹頂的老鷹與啃咬樹根的巨龍 Níðhöggr 之間傳遞訊息。",
       "runeName": "Ansuz，言語的符文"
     },

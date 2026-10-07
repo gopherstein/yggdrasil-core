@@ -96,7 +96,7 @@
     }
   },
   "phoneModels": {
-    "heading": "Sur cet iPhone",
+    "heading": "Sur cet appareil",
     "copy": "Voici les plus petits modèles du catalogue Toskar. Le fichier est téléchargé sur ce téléphone et y reste.",
     "meta": "{{parameters}} · {{size}}",
     "chat": "Discuter",
@@ -123,9 +123,9 @@
   },
   "onboarding": {
     "welcome": "Bienvenue dans",
-    "lede": "Cette app peut exécuter de l'IA en toute confidentialité sur cet iPhone.",
-    "thisIPhone": "Cet iPhone",
-    "hardware": "Ce dont cet iPhone dispose pour exécuter des modèles d'IA.",
+    "lede": "Cette app peut exécuter de l'IA en toute confidentialité sur cet appareil.",
+    "thisIPhone": "Cet appareil",
+    "hardware": "Ce dont cet appareil dispose pour exécuter des modèles d'IA.",
     "device": "Appareil",
     "memory": "Mémoire",
     "system": "Système",
@@ -137,7 +137,7 @@
       },
       "coding": {
         "title": "Programmation",
-        "description": "Aide au code pour les modifications rapides et les petites tâches sur cet iPhone."
+        "description": "Aide au code pour les modifications rapides et les petites tâches sur cet appareil."
       },
       "research": {
         "title": "Recherche",
@@ -145,7 +145,7 @@
       },
       "custom": {
         "title": "Personnalisé",
-        "description": "Choisissez vous-même un modèle parmi ceux qui conviennent à cet iPhone."
+        "description": "Choisissez vous-même un modèle parmi ceux qui conviennent à cet appareil."
       }
     },
     "continue": "Continuer",
@@ -153,7 +153,7 @@
     "recommendedFor": "Recommandé pour {{purpose}}",
     "modelFacts": "{{parameters}} · téléchargement de {{download}} · environ {{memory}} de mémoire",
     "install": "Installer la configuration recommandée",
-    "tooLarge": "Ce modèle nécessite plus de mémoire que cet iPhone ne peut en libérer.",
+    "tooLarge": "Ce modèle nécessite plus de mémoire que cet appareil ne peut en libérer.",
     "chooseOther": "Choisir un autre modèle",
     "installing": "Installation de {{model}}",
     "downloaded": "{{percent}} téléchargé",
@@ -164,8 +164,8 @@
   },
   "settings": {
     "title": "Paramètres",
-    "subtitle": "Les modèles que vous installez sur cet iPhone restent sur cet iPhone. Les discussions avec un ordinateur connecté restent sur cet ordinateur.",
-    "thisIPhone": "Cet iPhone",
+    "subtitle": "Les modèles que vous installez sur cet appareil restent sur cet appareil. Les discussions avec un ordinateur connecté restent sur cet ordinateur.",
+    "thisIPhone": "Cet appareil",
     "whereChatsRun": "Où s'exécutent les discussions",
     "onDevice": "Sur cet appareil, une fois un modèle installé",
     "computer": "Ordinateur",
@@ -178,10 +178,10 @@
     "connect": "Connecter un ordinateur",
     "about": "À propos",
     "version": "Version {{version}}",
-    "aboutCopy": "Son nom vient de Ratatoskr, l'écureuil qui porte les messages le long de l'arbre-monde. Toskar relie vos apps aux modèles de vos ordinateurs et de cet iPhone.",
+    "aboutCopy": "Son nom vient de Ratatoskr, l'écureuil qui porte les messages le long de l'arbre-monde. Toskar relie vos apps aux modèles de vos ordinateurs et de cet appareil.",
     "dangerZone": "Zone de danger",
-    "resetTitle": "Réinitialiser cet iPhone",
-    "resetCopy": "Rétablir la configuration d'accueil. Efface les discussions de cet iPhone et oublie l'ordinateur connecté.",
+    "resetTitle": "Réinitialiser cet appareil",
+    "resetCopy": "Rétablir la configuration d'accueil. Efface les discussions de cet appareil et oublie l'ordinateur connecté.",
     "resetButton": "Réinitialiser les paramètres et les données…",
     "resetDeletesModels": "Cette action est irréversible. Les modèles téléchargés seront également supprimés.",
     "resetKeepsModels": "Cette action est irréversible. Les modèles téléchargés seront conservés.",
@@ -194,7 +194,7 @@
     "title": "Langue",
     "appLanguage": "Langue de l'app",
     "automatic": "Automatique ({{language}})",
-    "automaticHint": "Suit la langue de l'app de l'ordinateur connecté, ou la langue de cet iPhone s'il n'y en a pas.",
+    "automaticHint": "Suit la langue de l'app de l'ordinateur connecté, ou la langue de cet appareil s'il n'y en a pas.",
     "choose": "Choisir la langue de l'app",
     "pseudo": "Pseudo-langue (en-XA)"
   },
@@ -234,14 +234,14 @@
     "sending": "Envoi",
     "stop": "Arrêter",
     "working": "En cours…",
-    "thinkingOnPhone": "Réflexion sur cet iPhone…",
-    "installFirst": "Installez un modèle pour discuter sur cet iPhone.",
+    "thinkingOnPhone": "Réflexion sur cet appareil…",
+    "installFirst": "Installez un modèle pour discuter sur cet appareil.",
     "setUpModel": "Configurer un modèle",
     "modelMissing": "Ce modèle n'est pas installé sur ce téléphone.",
     "interrupted": "Réponse interrompue",
     "couldNotRun": "Ce téléphone n'a pas pu exécuter le modèle.",
     "noProfile": "Cet ordinateur n'a pas encore de profil. Créez-en d'abord un dans l'app Mac.",
-    "noChatPlace": "Cet iPhone n'a aucun emplacement pour stocker les discussions.",
+    "noChatPlace": "Cet appareil n'a aucun emplacement pour stocker les discussions.",
     "speed": "{{generated}} tok/s",
     "speedWithPrompt": "{{generated}} tok/s · prompt {{prompt}} tok/s",
     "groups": {
@@ -253,7 +253,7 @@
     },
     "empty": {
       "title": "Comment puis-je vous aider ?",
-      "phone": "Parlez à l'IA de cet iPhone. Rien de ce que vous écrivez n'en sort.",
+      "phone": "Parlez à l'IA de cet appareil. Rien de ce que vous écrivez n'en sort.",
       "computer": "Toskar choisit le bon modèle et le bon ordinateur, effectue des recherches si nécessaire et montre ce qu'il a utilisé."
     },
     "unsent": {
@@ -362,7 +362,7 @@
   "realms": {
     "about": "{{norse}}. {{rune}}. À propos de ce nom",
     "chat": {
-      "meaning": "Discussion est l'endroit où vos messages sont portés jusqu'aux modèles de cet iPhone ou de vos ordinateurs, et où les réponses vous reviennent.",
+      "meaning": "Discussion est l'endroit où vos messages sont portés jusqu'aux modèles de cet appareil ou de vos ordinateurs, et où les réponses vous reviennent.",
       "story": "Ratatoskr est l'écureuil qui monte et descend le tronc d'Yggdrasil, portant les messages entre l'aigle au sommet de l'arbre et le dragon Níðhöggr qui en ronge les racines.",
       "runeName": "Ansuz, la rune de la parole"
     },

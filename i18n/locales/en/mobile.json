@@ -96,7 +96,7 @@
     }
   },
   "phoneModels": {
-    "heading": "On this iPhone",
+    "heading": "On this device",
     "copy": "These are the smaller models from the Toskar catalog. The file is downloaded onto this phone and stays here.",
     "meta": "{{parameters}} · {{size}}",
     "chat": "Chat",
@@ -123,9 +123,9 @@
   },
   "onboarding": {
     "welcome": "Welcome to",
-    "lede": "This app can run AI privately on this iPhone.",
-    "thisIPhone": "This iPhone",
-    "hardware": "What this iPhone has for running AI models.",
+    "lede": "This app can run AI privately on this device.",
+    "thisIPhone": "This device",
+    "hardware": "What this device has for running AI models.",
     "device": "Device",
     "memory": "Memory",
     "system": "System",
@@ -137,7 +137,7 @@
       },
       "coding": {
         "title": "Programming",
-        "description": "Code help for quick edits and small tasks on this iPhone."
+        "description": "Code help for quick edits and small tasks on this device."
       },
       "research": {
         "title": "Research",
@@ -145,7 +145,7 @@
       },
       "custom": {
         "title": "Custom",
-        "description": "Pick a model yourself from the ones that fit this iPhone."
+        "description": "Pick a model yourself from the ones that fit this device."
       }
     },
     "continue": "Continue",
@@ -153,7 +153,7 @@
     "recommendedFor": "Recommended for {{purpose}}",
     "modelFacts": "{{parameters}} · {{download}} download · about {{memory}} memory",
     "install": "Install recommended setup",
-    "tooLarge": "This model needs more memory than this iPhone can spare.",
+    "tooLarge": "This model needs more memory than this device can spare.",
     "chooseOther": "Choose a different model",
     "installing": "Installing {{model}}",
     "downloaded": "{{percent}} downloaded",
@@ -164,8 +164,8 @@
   },
   "settings": {
     "title": "Settings",
-    "subtitle": "Models you install on this iPhone stay on this iPhone. Chats with a connected computer stay on that computer.",
-    "thisIPhone": "This iPhone",
+    "subtitle": "Models you install on this device stay on this device. Chats with a connected computer stay on that computer.",
+    "thisIPhone": "This device",
     "whereChatsRun": "Where chats run",
     "onDevice": "On this device, after you install a model",
     "computer": "Computer",
@@ -178,10 +178,10 @@
     "connect": "Connect a computer",
     "about": "About",
     "version": "Version {{version}}",
-    "aboutCopy": "Named after Ratatoskr, the squirrel who carries messages along the world tree. Toskar links your apps to the models on your computers and on this iPhone.",
+    "aboutCopy": "Named after Ratatoskr, the squirrel who carries messages along the world tree. Toskar links your apps to the models on your computers and on this device.",
     "dangerZone": "Danger zone",
-    "resetTitle": "Reset this iPhone",
-    "resetCopy": "Restore the welcome setup. Clears chats on this iPhone and forgets the connected computer.",
+    "resetTitle": "Reset this device",
+    "resetCopy": "Restore the welcome setup. Clears chats on this device and forgets the connected computer.",
     "resetButton": "Reset settings and app data…",
     "resetDeletesModels": "This cannot be undone. Downloaded models will also be deleted.",
     "resetKeepsModels": "This cannot be undone. Downloaded models will be kept.",
@@ -189,21 +189,21 @@
     "resetting": "Resetting…",
     "confirmReset": "Yes, reset",
     "resetFailed": "Could not reset Toskar.",
-    "chatOnPhone": "Chat on this iPhone",
+    "chatOnPhone": "Chat on this device",
     "webLookup": "Look up current information",
-    "webLookupCopy": "When a question needs current information, like weather or news, this iPhone searches the web with DuckDuckGo and reads the best page before answering. Only the search words leave the phone. Answers list their sources.",
+    "webLookupCopy": "When a question needs current information, like weather or news, this device searches the web with DuckDuckGo and reads the best page before answering. Only the search words leave this device. Answers list their sources.",
     "memory": "Memory",
-    "memoryCopy": "Say “Remember that …” in a chat and it is kept on this iPhone for future chats. Turning memory off keeps what is saved.",
+    "memoryCopy": "Say “Remember that …” in a chat and it is kept on this device for future chats. Turning memory off keeps what is saved.",
     "memoryEmpty": "Nothing remembered yet.",
     "forgetMemory": "Forget",
     "forgetMemoryLabel": "Forget “{{memory}}”",
-    "resetCopyMemories": "Restore the welcome setup. Clears chats and memories on this iPhone and forgets the connected computer."
+    "resetCopyMemories": "Restore the welcome setup. Clears chats and memories on this device and forgets the connected computer."
   },
   "language": {
     "title": "Language",
     "appLanguage": "App language",
     "automatic": "Automatic ({{language}})",
-    "automaticHint": "Follows the connected computer's App language, or this iPhone's language when it has none.",
+    "automaticHint": "Follows the connected computer's App language, or this device's language when it has none.",
     "choose": "Choose the app's language",
     "pseudo": "Pseudo-locale (en-XA)"
   },
@@ -243,14 +243,14 @@
     "sending": "Sending",
     "stop": "Stop",
     "working": "Working…",
-    "thinkingOnPhone": "Thinking on this iPhone…",
-    "installFirst": "Install a model to chat on this iPhone.",
+    "thinkingOnPhone": "Thinking on this device…",
+    "installFirst": "Install a model to chat on this device.",
     "setUpModel": "Set up a model",
     "modelMissing": "That model is not installed on this phone.",
     "interrupted": "Response interrupted",
     "couldNotRun": "This phone could not run the model.",
     "noProfile": "That computer has no profile yet. Create one in the Mac app first.",
-    "noChatPlace": "This iPhone has no place to store chats.",
+    "noChatPlace": "This device has no place to store chats.",
     "speed": "{{generated}} tok/s",
     "speedWithPrompt": "{{generated}} tok/s · prompt {{prompt}} tok/s",
     "groups": {
@@ -262,9 +262,9 @@
     },
     "empty": {
       "title": "What can I help you with?",
-      "phone": "Talk to the AI on this iPhone. Nothing you write leaves it.",
+      "phone": "Talk to the AI on this device. Nothing you write leaves it.",
       "computer": "Toskar picks the right model and computer, looks things up when it needs to, and shows what it used.",
-      "phoneLookup": "Talk to the AI on this iPhone. Only search words leave it, when a question needs current information."
+      "phoneLookup": "Talk to the AI on this device. Only search words leave it, when a question needs current information."
     },
     "unsent": {
       "notSent": "Not sent",
@@ -281,7 +281,7 @@
       "deny": "Deny",
       "allowOnce": "Allow once"
     },
-    "phoneAutoHint": "Picks the best model on this iPhone for each message",
+    "phoneAutoHint": "Picks the best model on this device for each message",
     "ranOnGPU": "GPU",
     "ranOnCPU": "CPU"
   },
@@ -373,7 +373,7 @@
   "realms": {
     "about": "{{norse}}. {{rune}}. About this name",
     "chat": {
-      "meaning": "Chat is where your messages are carried to the models on this iPhone or your computers, and the answers carried back.",
+      "meaning": "Chat is where your messages are carried to the models on this device or your computers, and the answers carried back.",
       "story": "Ratatoskr is the squirrel who runs up and down the trunk of Yggdrasil, carrying messages between the eagle at the top of the tree and the dragon Níðhöggr gnawing at its roots.",
       "runeName": "Ansuz, the rune of speech"
     },
@@ -413,12 +413,12 @@
       "fallbackFailed": "{{failed}} could not load, so {{model}} answered instead"
     },
     "notices": {
-      "fallback": "{{failed}} couldn't run on this iPhone, so {{model}} answered. The answer may be less detailed.",
+      "fallback": "{{failed}} couldn't run on this device, so {{model}} answered. The answer may be less detailed.",
       "noWeb": "I couldn't reach the web, so this answer comes from what the model already knows and may be out of date.",
       "webOff": "Web lookup is off in Settings, so this answer may be out of date."
     },
     "errors": {
-      "outOfMemory": "This iPhone ran out of memory for {{model}}. Close other apps, or pick a smaller model.",
+      "outOfMemory": "This device ran out of memory for {{model}}. Close other apps, or pick a smaller model.",
       "couldNotLoad": "{{model}} could not be loaded. Reinstall it from Models, or pick another model.",
       "couldNotAnswer": "{{model}} could not answer this time. Try again, or pick another model."
     },
@@ -457,7 +457,7 @@
     "omitted_one": "The oldest message did not fit and was left out. Every message is still saved.",
     "omitted_other": "The {{count}} oldest messages did not fit and were left out. Every message is still saved.",
     "empty": "Send a message to see how much of this model’s memory the chat is using.",
-    "hint": "The window is how much of the chat the model can read at once on this iPhone."
+    "hint": "The window is how much of the chat the model can read at once on this device."
   },
   "tv": {
     "connectLede": "Toskar on your TV answers with the models on your computer.",
