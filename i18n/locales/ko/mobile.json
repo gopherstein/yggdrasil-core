@@ -96,7 +96,7 @@
     }
   },
   "phoneModels": {
-    "heading": "이 iPhone에 있음",
+    "heading": "이 기기에 있음",
     "copy": "Toskar 카탈로그의 작은 모델들이에요. 파일은 이 휴대폰에 다운로드되어 여기에 보관돼요.",
     "meta": "{{parameters}} · {{size}}",
     "chat": "채팅",
@@ -123,9 +123,9 @@
   },
   "onboarding": {
     "welcome": "환영합니다",
-    "lede": "이 앱은 이 iPhone에서 AI를 비공개로 실행할 수 있어요.",
-    "thisIPhone": "이 iPhone",
-    "hardware": "이 iPhone이 AI 모델을 실행하는 데 갖춘 사양이에요.",
+    "lede": "이 앱은 이 기기에서 AI를 비공개로 실행할 수 있어요.",
+    "thisIPhone": "이 기기",
+    "hardware": "이 기기가 AI 모델을 실행하는 데 갖춘 사양이에요.",
     "device": "기기",
     "memory": "메모리",
     "system": "시스템",
@@ -137,7 +137,7 @@
       },
       "coding": {
         "title": "프로그래밍",
-        "description": "이 iPhone에서 간단한 수정과 작은 작업을 위한 코딩 도움."
+        "description": "이 기기에서 간단한 수정과 작은 작업을 위한 코딩 도움."
       },
       "research": {
         "title": "리서치",
@@ -145,7 +145,7 @@
       },
       "custom": {
         "title": "사용자 지정",
-        "description": "이 iPhone에 맞는 모델 중에서 직접 선택해요."
+        "description": "이 기기에 맞는 모델 중에서 직접 선택해요."
       }
     },
     "continue": "계속",
@@ -153,7 +153,7 @@
     "recommendedFor": "{{purpose}} 추천 설정",
     "modelFacts": "{{parameters}} · {{download}} 다운로드 · 메모리 약 {{memory}}",
     "install": "추천 설정 설치",
-    "tooLarge": "이 모델은 이 iPhone에서 여유롭게 쓸 수 있는 것보다 많은 메모리가 필요해요.",
+    "tooLarge": "이 모델은 이 기기에서 여유롭게 쓸 수 있는 것보다 많은 메모리가 필요해요.",
     "chooseOther": "다른 모델 선택",
     "installing": "{{model}} 설치하는 중",
     "downloaded": "{{percent}} 다운로드됨",
@@ -164,8 +164,8 @@
   },
   "settings": {
     "title": "설정",
-    "subtitle": "이 iPhone에 설치한 모델은 이 iPhone에 머물러요. 연결된 컴퓨터와의 채팅은 그 컴퓨터에 머물러요.",
-    "thisIPhone": "이 iPhone",
+    "subtitle": "이 기기에 설치한 모델은 이 기기에 머물러요. 연결된 컴퓨터와의 채팅은 그 컴퓨터에 머물러요.",
+    "thisIPhone": "이 기기",
     "whereChatsRun": "채팅 실행 위치",
     "onDevice": "모델을 설치한 후 이 기기에서",
     "computer": "컴퓨터",
@@ -178,10 +178,10 @@
     "connect": "컴퓨터 연결",
     "about": "정보",
     "version": "버전 {{version}}",
-    "aboutCopy": "이름은 세계수를 오르내리며 소식을 전하는 다람쥐 Ratatoskr에서 왔어요. Toskar는 앱을 내 컴퓨터와 이 iPhone의 모델에 연결해요.",
+    "aboutCopy": "이름은 세계수를 오르내리며 소식을 전하는 다람쥐 Ratatoskr에서 왔어요. Toskar는 앱을 내 컴퓨터와 이 기기의 모델에 연결해요.",
     "dangerZone": "위험 구역",
-    "resetTitle": "이 iPhone 재설정",
-    "resetCopy": "처음 설정 상태로 되돌려요. 이 iPhone의 채팅을 지우고 연결된 컴퓨터 정보를 삭제해요.",
+    "resetTitle": "이 기기 재설정",
+    "resetCopy": "처음 설정 상태로 되돌려요. 이 기기의 채팅을 지우고 연결된 컴퓨터 정보를 삭제해요.",
     "resetButton": "설정 및 앱 데이터 재설정…",
     "resetDeletesModels": "이 작업은 되돌릴 수 없어요. 다운로드한 모델도 삭제돼요.",
     "resetKeepsModels": "이 작업은 되돌릴 수 없어요. 다운로드한 모델은 유지돼요.",
@@ -194,7 +194,7 @@
     "title": "언어",
     "appLanguage": "앱 언어",
     "automatic": "자동({{language}})",
-    "automaticHint": "연결된 컴퓨터의 앱 언어를 따르며, 설정되어 있지 않으면 이 iPhone의 언어를 따라요.",
+    "automaticHint": "연결된 컴퓨터의 앱 언어를 따르며, 설정되어 있지 않으면 이 기기의 언어를 따라요.",
     "choose": "앱 언어 선택",
     "pseudo": "의사 로캘(en-XA)"
   },
@@ -234,14 +234,14 @@
     "sending": "보내는 중",
     "stop": "중지",
     "working": "작업하는 중…",
-    "thinkingOnPhone": "이 iPhone에서 생각하는 중…",
-    "installFirst": "이 iPhone에서 채팅하려면 모델을 설치하세요.",
+    "thinkingOnPhone": "이 기기에서 생각하는 중…",
+    "installFirst": "이 기기에서 채팅하려면 모델을 설치하세요.",
     "setUpModel": "모델 설정",
     "modelMissing": "해당 모델이 이 휴대폰에 설치되어 있지 않아요.",
     "interrupted": "응답이 중단되었어요",
     "couldNotRun": "이 휴대폰에서 모델을 실행할 수 없어요.",
     "noProfile": "해당 컴퓨터에 아직 프로필이 없어요. 먼저 Mac 앱에서 만드세요.",
-    "noChatPlace": "이 iPhone에는 채팅을 저장할 공간이 없어요.",
+    "noChatPlace": "이 기기에는 채팅을 저장할 공간이 없어요.",
     "speed": "{{generated}} tok/s",
     "speedWithPrompt": "{{generated}} tok/s · 프롬프트 {{prompt}} tok/s",
     "groups": {
@@ -253,7 +253,7 @@
     },
     "empty": {
       "title": "무엇을 도와드릴까요?",
-      "phone": "이 iPhone의 AI와 대화하세요. 작성한 내용은 이 기기 밖으로 나가지 않아요.",
+      "phone": "이 기기의 AI와 대화하세요. 작성한 내용은 이 기기 밖으로 나가지 않아요.",
       "computer": "Toskar가 알맞은 모델과 컴퓨터를 선택하고, 필요하면 정보를 찾아보고, 사용한 내용을 보여 줘요."
     },
     "unsent": {
@@ -354,7 +354,7 @@
   "realms": {
     "about": "{{norse}}. {{rune}}. 이 이름에 관하여",
     "chat": {
-      "meaning": "채팅은 메시지가 이 iPhone이나 내 컴퓨터의 모델로 전해지고, 답변이 다시 돌아오는 곳이에요.",
+      "meaning": "채팅은 메시지가 이 기기나 내 컴퓨터의 모델로 전해지고, 답변이 다시 돌아오는 곳이에요.",
       "story": "Ratatoskr는 Yggdrasil의 줄기를 오르내리며 나무 꼭대기의 독수리와 뿌리를 갉아먹는 용 Níðhöggr 사이에 말을 전하는 다람쥐예요.",
       "runeName": "말의 룬, Ansuz"
     },

@@ -179,19 +179,19 @@
   "phone": {
     "open": "連接裝置",
     "title": "連接裝置",
-    "description": "在 iPhone、iPad 或 Apple TV 上使用 Toskar，用的是這台電腦的模型和聊天。",
+    "description": "在手機、平板電腦或電視上使用 Toskar，用的是這台電腦的模型和聊天。",
     "thisComputer": "這台電腦",
     "lanOff": "裝置透過你的網路連到這台電腦，因此 Toskar 會允許你網路中的裝置連線。每台裝置需要自己的金鑰；這台電腦上的應用程式不需要。",
     "show": "顯示代碼",
     "allowAndShow": "允許並顯示代碼",
     "showing": "正在取得代碼…",
-    "getApp": "還沒有 App？<store>取得 iPhone、iPad 和 Apple TV 版 Toskar</store>。",
+    "getApp": "還沒有 App？<store>取得 Toskar</store>。",
     "connected": "{{name}} 已連接。",
     "manage": "你可以隨時在<access>API 存取</access>中中斷連線。",
     "another": "連接另一台裝置",
     "codeLabel": "代碼 {{code}}",
     "steps": {
-      "open": "在連到同一個網路的 iPhone、iPad 或 Apple TV 上打開 <store>Toskar</store>。",
+      "open": "在連到同一個網路的手機、平板電腦或電視上打開 <store>Toskar</store>。",
       "choose": "在「在這個網路上」下選擇 {{name}}。",
       "typeAddress": "輸入這台電腦的位址：",
       "enter": "輸入這個代碼。"

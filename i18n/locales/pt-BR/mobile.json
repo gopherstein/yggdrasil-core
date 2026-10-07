@@ -96,7 +96,7 @@
     }
   },
   "phoneModels": {
-    "heading": "Neste iPhone",
+    "heading": "Neste dispositivo",
     "copy": "Estes são os modelos menores do catálogo do Toskar. O arquivo é baixado para este celular e fica aqui.",
     "meta": "{{parameters}} · {{size}}",
     "chat": "Chat",
@@ -123,9 +123,9 @@
   },
   "onboarding": {
     "welcome": "Boas-vindas ao",
-    "lede": "Este app pode executar IA de forma privada neste iPhone.",
-    "thisIPhone": "Este iPhone",
-    "hardware": "O que este iPhone tem para executar modelos de IA.",
+    "lede": "Este app pode executar IA de forma privada neste dispositivo.",
+    "thisIPhone": "Este dispositivo",
+    "hardware": "O que este dispositivo tem para executar modelos de IA.",
     "device": "Dispositivo",
     "memory": "Memória",
     "system": "Sistema",
@@ -137,7 +137,7 @@
       },
       "coding": {
         "title": "Programação",
-        "description": "Ajuda com código para edições rápidas e tarefas pequenas neste iPhone."
+        "description": "Ajuda com código para edições rápidas e tarefas pequenas neste dispositivo."
       },
       "research": {
         "title": "Pesquisa",
@@ -145,7 +145,7 @@
       },
       "custom": {
         "title": "Personalizado",
-        "description": "Escolha você mesmo um modelo entre os que cabem neste iPhone."
+        "description": "Escolha você mesmo um modelo entre os que cabem neste dispositivo."
       }
     },
     "continue": "Continuar",
@@ -153,7 +153,7 @@
     "recommendedFor": "Recomendado para {{purpose}}",
     "modelFacts": "{{parameters}} · download de {{download}} · cerca de {{memory}} de memória",
     "install": "Instalar a configuração recomendada",
-    "tooLarge": "Este modelo precisa de mais memória do que este iPhone pode ceder.",
+    "tooLarge": "Este modelo precisa de mais memória do que este dispositivo pode ceder.",
     "chooseOther": "Escolher outro modelo",
     "installing": "Instalando {{model}}",
     "downloaded": "{{percent}} baixado",
@@ -164,8 +164,8 @@
   },
   "settings": {
     "title": "Configurações",
-    "subtitle": "Os modelos que você instala neste iPhone ficam neste iPhone. Os chats com um computador conectado ficam nesse computador.",
-    "thisIPhone": "Este iPhone",
+    "subtitle": "Os modelos que você instala neste dispositivo ficam neste dispositivo. Os chats com um computador conectado ficam nesse computador.",
+    "thisIPhone": "Este dispositivo",
     "whereChatsRun": "Onde os chats são executados",
     "onDevice": "Neste dispositivo, depois que você instalar um modelo",
     "computer": "Computador",
@@ -178,10 +178,10 @@
     "connect": "Conectar um computador",
     "about": "Sobre",
     "version": "Versão {{version}}",
-    "aboutCopy": "O nome vem de Ratatoskr, o esquilo que leva mensagens pela árvore do mundo. O Toskar une seus apps aos modelos nos seus computadores e neste iPhone.",
+    "aboutCopy": "O nome vem de Ratatoskr, o esquilo que leva mensagens pela árvore do mundo. O Toskar une seus apps aos modelos nos seus computadores e neste dispositivo.",
     "dangerZone": "Zona de perigo",
-    "resetTitle": "Redefinir este iPhone",
-    "resetCopy": "Restaura a configuração de boas-vindas. Apaga os chats deste iPhone e esquece o computador conectado.",
+    "resetTitle": "Redefinir este dispositivo",
+    "resetCopy": "Restaura a configuração de boas-vindas. Apaga os chats deste dispositivo e esquece o computador conectado.",
     "resetButton": "Redefinir configurações e dados do app…",
     "resetDeletesModels": "Isso não pode ser desfeito. Os modelos baixados também serão apagados.",
     "resetKeepsModels": "Isso não pode ser desfeito. Os modelos baixados serão mantidos.",
@@ -194,7 +194,7 @@
     "title": "Idioma",
     "appLanguage": "Idioma do app",
     "automatic": "Automático ({{language}})",
-    "automaticHint": "Segue o Idioma do app do computador conectado ou, se ele não tiver um, o idioma deste iPhone.",
+    "automaticHint": "Segue o Idioma do app do computador conectado ou, se ele não tiver um, o idioma deste dispositivo.",
     "choose": "Escolha o idioma do app",
     "pseudo": "Pseudolocalidade (en-XA)"
   },
@@ -234,14 +234,14 @@
     "sending": "Enviando",
     "stop": "Parar",
     "working": "Trabalhando…",
-    "thinkingOnPhone": "Pensando neste iPhone…",
-    "installFirst": "Instale um modelo para conversar neste iPhone.",
+    "thinkingOnPhone": "Pensando neste dispositivo…",
+    "installFirst": "Instale um modelo para conversar neste dispositivo.",
     "setUpModel": "Configurar um modelo",
     "modelMissing": "Esse modelo não está instalado neste celular.",
     "interrupted": "Resposta interrompida",
     "couldNotRun": "Este celular não conseguiu executar o modelo.",
     "noProfile": "Esse computador ainda não tem um perfil. Crie um primeiro no app para Mac.",
-    "noChatPlace": "Este iPhone não tem onde armazenar chats.",
+    "noChatPlace": "Este dispositivo não tem onde armazenar chats.",
     "speed": "{{generated}} tok/s",
     "speedWithPrompt": "{{generated}} tok/s · prompt {{prompt}} tok/s",
     "groups": {
@@ -253,7 +253,7 @@
     },
     "empty": {
       "title": "Como posso ajudar?",
-      "phone": "Converse com a IA neste iPhone. Nada do que você escreve sai dele.",
+      "phone": "Converse com a IA neste dispositivo. Nada do que você escreve sai dele.",
       "computer": "O Toskar escolhe o modelo e o computador certos, pesquisa quando precisa e mostra o que usou."
     },
     "unsent": {
@@ -362,7 +362,7 @@
   "realms": {
     "about": "{{norse}}. {{rune}}. Sobre este nome",
     "chat": {
-      "meaning": "O Chat é onde suas mensagens são levadas até os modelos neste iPhone ou nos seus computadores, e as respostas são trazidas de volta.",
+      "meaning": "O Chat é onde suas mensagens são levadas até os modelos neste dispositivo ou nos seus computadores, e as respostas são trazidas de volta.",
       "story": "Ratatoskr é o esquilo que sobe e desce correndo pelo tronco de Yggdrasil, levando mensagens entre a águia no alto da árvore e o dragão Níðhöggr, que rói suas raízes.",
       "runeName": "Ansuz, a runa da fala"
     },

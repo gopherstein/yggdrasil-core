@@ -184,19 +184,19 @@
   "phone": {
     "open": "Gerät verbinden",
     "title": "Gerät verbinden",
-    "description": "Nutze Toskar auf deinem iPhone, iPad oder Apple TV, mit den Modellen und Chats dieses Computers.",
+    "description": "Nutze Toskar auf deinem Telefon, Tablet oder Fernseher, mit den Modellen und Chats dieses Computers.",
     "thisComputer": "diesen Computer",
     "lanOff": "Dein Gerät erreicht diesen Computer über dein Netzwerk, daher lässt Toskar Geräte in deinem Netzwerk zu. Jedes braucht einen eigenen Schlüssel, Apps auf diesem Computer nicht.",
     "show": "Code anzeigen",
     "allowAndShow": "Zulassen und Code anzeigen",
     "showing": "Code wird erstellt…",
-    "getApp": "Noch keine App? <store>Hol dir Toskar für iPhone, iPad und Apple TV</store>.",
+    "getApp": "Noch keine App? <store>Hol dir Toskar</store>.",
     "connected": "{{name}} ist verbunden.",
     "manage": "Du kannst es jederzeit im <access>API-Zugriff</access> trennen.",
     "another": "Weiteres Gerät verbinden",
     "codeLabel": "Code {{code}}",
     "steps": {
-      "open": "Öffne <store>Toskar</store> auf deinem iPhone, iPad oder Apple TV, im selben Netzwerk.",
+      "open": "Öffne <store>Toskar</store> auf deinem Telefon, Tablet oder Fernseher, im selben Netzwerk.",
       "choose": "Wähle {{name}} unter „In diesem Netzwerk“.",
       "typeAddress": "Gib die Adresse dieses Computers ein:",
       "enter": "Gib diesen Code ein."

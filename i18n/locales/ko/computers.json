@@ -179,19 +179,19 @@
   "phone": {
     "open": "기기 연결",
     "title": "기기 연결",
-    "description": "이 컴퓨터의 모델과 채팅으로 iPhone, iPad, Apple TV에서 Toskar를 사용하세요.",
+    "description": "이 컴퓨터의 모델과 채팅으로 휴대폰, 태블릿, TV에서 Toskar를 사용하세요.",
     "thisComputer": "이 컴퓨터",
     "lanOff": "기기는 네트워크를 통해 이 컴퓨터에 연결되므로, Toskar가 네트워크의 기기 연결을 허용해요. 기기마다 자체 키가 필요하지만 이 컴퓨터의 앱에는 필요하지 않아요.",
     "show": "코드 표시",
     "allowAndShow": "허용하고 코드 표시",
     "showing": "코드를 받는 중…",
-    "getApp": "앱이 없나요? <store>iPhone, iPad, Apple TV용 Toskar 받기</store>.",
+    "getApp": "앱이 없나요? <store>Toskar 받기</store>.",
     "connected": "{{name}}이(가) 연결되었어요.",
     "manage": "<access>API 액세스</access>에서 언제든지 연결을 해제할 수 있어요.",
     "another": "다른 기기 연결",
     "codeLabel": "코드 {{code}}",
     "steps": {
-      "open": "같은 네트워크에 연결된 iPhone, iPad, Apple TV에서 <store>Toskar</store>를 여세요.",
+      "open": "같은 네트워크에 연결된 휴대폰, 태블릿, TV에서 <store>Toskar</store>를 여세요.",
       "choose": "'이 네트워크에 있음'에서 {{name}}을(를) 선택하세요.",
       "typeAddress": "이 컴퓨터의 주소를 입력하세요:",
       "enter": "이 코드를 입력하세요."

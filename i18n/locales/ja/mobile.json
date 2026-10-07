@@ -96,7 +96,7 @@
     }
   },
   "phoneModels": {
-    "heading": "このiPhone上",
+    "heading": "このデバイス上",
     "copy": "Toskarカタログの小さめのモデルです。ファイルはこのスマートフォンにダウンロードされ、ここに保存されます。",
     "meta": "{{parameters}} · {{size}}",
     "chat": "チャット",
@@ -123,9 +123,9 @@
   },
   "onboarding": {
     "welcome": "ようこそ",
-    "lede": "このアプリでは、このiPhone上でプライベートにAIを実行できます。",
-    "thisIPhone": "このiPhone",
-    "hardware": "この iPhone が AI モデルを動かすために備えているものです。",
+    "lede": "このアプリでは、このデバイス上でプライベートにAIを実行できます。",
+    "thisIPhone": "このデバイス",
+    "hardware": "このデバイス が AI モデルを動かすために備えているものです。",
     "device": "デバイス",
     "memory": "メモリ",
     "system": "システム",
@@ -137,7 +137,7 @@
       },
       "coding": {
         "title": "プログラミング",
-        "description": "このiPhone上で、ちょっとした編集や小さな作業のコーディングを手伝います。"
+        "description": "このデバイス上で、ちょっとした編集や小さな作業のコーディングを手伝います。"
       },
       "research": {
         "title": "リサーチ",
@@ -145,7 +145,7 @@
       },
       "custom": {
         "title": "カスタム",
-        "description": "このiPhoneで動作するモデルの中から自分で選びます。"
+        "description": "このデバイスで動作するモデルの中から自分で選びます。"
       }
     },
     "continue": "続ける",
@@ -153,7 +153,7 @@
     "recommendedFor": "{{purpose}}向けのおすすめ",
     "modelFacts": "{{parameters}} · ダウンロード{{download}} · メモリ約{{memory}}",
     "install": "おすすめの構成をインストール",
-    "tooLarge": "このモデルには、このiPhoneで確保できる以上のメモリが必要です。",
+    "tooLarge": "このモデルには、このデバイスで確保できる以上のメモリが必要です。",
     "chooseOther": "別のモデルを選ぶ",
     "installing": "{{model}}をインストールしています",
     "downloaded": "{{percent}}ダウンロード済み",
@@ -164,8 +164,8 @@
   },
   "settings": {
     "title": "設定",
-    "subtitle": "このiPhoneにインストールしたモデルは、このiPhoneから出ません。接続したコンピュータとのチャットは、そのコンピュータにとどまります。",
-    "thisIPhone": "このiPhone",
+    "subtitle": "このデバイスにインストールしたモデルは、このデバイスから出ません。接続したコンピュータとのチャットは、そのコンピュータにとどまります。",
+    "thisIPhone": "このデバイス",
     "whereChatsRun": "チャットの実行場所",
     "onDevice": "モデルをインストールした後、このデバイス上で",
     "computer": "コンピュータ",
@@ -178,10 +178,10 @@
     "connect": "コンピュータに接続",
     "about": "情報",
     "version": "バージョン {{version}}",
-    "aboutCopy": "名前は、世界樹を駆け回って伝言を運ぶリスのRatatoskrから。Toskarは、あなたのアプリを、コンピュータやこのiPhone上のモデルにつなぎます。",
+    "aboutCopy": "名前は、世界樹を駆け回って伝言を運ぶリスのRatatoskrから。Toskarは、あなたのアプリを、コンピュータやこのデバイス上のモデルにつなぎます。",
     "dangerZone": "危険な操作",
-    "resetTitle": "このiPhoneをリセット",
-    "resetCopy": "初期設定の状態に戻します。このiPhoneのチャットを消去し、接続したコンピュータの登録を解除します。",
+    "resetTitle": "このデバイスをリセット",
+    "resetCopy": "初期設定の状態に戻します。このデバイスのチャットを消去し、接続したコンピュータの登録を解除します。",
     "resetButton": "設定とアプリのデータをリセット…",
     "resetDeletesModels": "この操作は取り消せません。ダウンロード済みのモデルも削除されます。",
     "resetKeepsModels": "この操作は取り消せません。ダウンロード済みのモデルは残ります。",
@@ -194,7 +194,7 @@
     "title": "言語",
     "appLanguage": "アプリの言語",
     "automatic": "自動（{{language}}）",
-    "automaticHint": "接続したコンピュータの「アプリの言語」に合わせます。設定がない場合はこのiPhoneの言語に合わせます。",
+    "automaticHint": "接続したコンピュータの「アプリの言語」に合わせます。設定がない場合はこのデバイスの言語に合わせます。",
     "choose": "アプリの言語を選択",
     "pseudo": "疑似ロケール（en-XA）"
   },
@@ -234,14 +234,14 @@
     "sending": "送信中",
     "stop": "停止",
     "working": "処理中…",
-    "thinkingOnPhone": "このiPhoneで考えています…",
-    "installFirst": "このiPhoneでチャットするにはモデルをインストールしてください。",
+    "thinkingOnPhone": "このデバイスで考えています…",
+    "installFirst": "このデバイスでチャットするにはモデルをインストールしてください。",
     "setUpModel": "モデルを設定",
     "modelMissing": "そのモデルはこのスマートフォンにインストールされていません。",
     "interrupted": "応答が中断されました",
     "couldNotRun": "このスマートフォンではモデルを実行できませんでした。",
     "noProfile": "そのコンピュータにはまだプロファイルがありません。まずMacアプリで作成してください。",
-    "noChatPlace": "このiPhoneにはチャットを保存する場所がありません。",
+    "noChatPlace": "このデバイスにはチャットを保存する場所がありません。",
     "speed": "{{generated}} tok/s",
     "speedWithPrompt": "{{generated}} tok/s · プロンプト {{prompt}} tok/s",
     "groups": {
@@ -253,7 +253,7 @@
     },
     "empty": {
       "title": "何をお手伝いしましょうか？",
-      "phone": "このiPhone上のAIと話しましょう。書いた内容がこのiPhoneの外に出ることはありません。",
+      "phone": "このデバイス上のAIと話しましょう。書いた内容がこのデバイスの外に出ることはありません。",
       "computer": "Toskarが適切なモデルとコンピュータを選び、必要に応じて調べものをし、何を使ったかを表示します。"
     },
     "unsent": {
@@ -354,7 +354,7 @@
   "realms": {
     "about": "{{norse}}。{{rune}}。この名前について",
     "chat": {
-      "meaning": "チャットは、あなたのメッセージをこのiPhoneやコンピュータ上のモデルへ運び、答えを持ち帰る場所です。",
+      "meaning": "チャットは、あなたのメッセージをこのデバイスやコンピュータ上のモデルへ運び、答えを持ち帰る場所です。",
       "story": "Ratatoskrは、Yggdrasilの幹を上へ下へと駆け回り、木の頂にいる鷲と、根をかじる竜Níðhöggrのあいだで伝言を運ぶリスです。",
       "runeName": "Ansuz、言葉のルーン"
     },

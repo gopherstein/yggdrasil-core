@@ -189,19 +189,19 @@
   "phone": {
     "open": "Collega un dispositivo",
     "title": "Collega un dispositivo",
-    "description": "Usa Toskar su iPhone, iPad o Apple TV, con i modelli e le chat di questo computer.",
+    "description": "Usa Toskar su telefono, tablet o TV, con i modelli e le chat di questo computer.",
     "thisComputer": "questo computer",
     "lanOff": "Il dispositivo raggiunge questo computer tramite la tua rete, quindi Toskar lascerà collegare i dispositivi della rete. Ognuno ha bisogno della propria chiave; le app su questo computer no.",
     "show": "Mostra un codice",
     "allowAndShow": "Consenti e mostra un codice",
     "showing": "Creazione del codice…",
-    "getApp": "Non hai l'app? <store>Scarica Toskar per iPhone, iPad e Apple TV</store>.",
+    "getApp": "Non hai l'app? <store>Scarica Toskar</store>.",
     "connected": "{{name}} è collegato.",
     "manage": "Puoi scollegarlo quando vuoi in <access>Accesso API</access>.",
     "another": "Collega un altro dispositivo",
     "codeLabel": "Codice {{code}}",
     "steps": {
-      "open": "Apri <store>Toskar</store> su iPhone, iPad o Apple TV, sulla stessa rete.",
+      "open": "Apri <store>Toskar</store> su telefono, tablet o TV, sulla stessa rete.",
       "choose": "Scegli {{name}} in Su questa rete.",
       "typeAddress": "Inserisci l'indirizzo di questo computer:",
       "enter": "Inserisci questo codice."

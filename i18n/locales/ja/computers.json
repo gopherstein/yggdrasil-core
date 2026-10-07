@@ -179,19 +179,19 @@
   "phone": {
     "open": "デバイスを接続",
     "title": "デバイスを接続",
-    "description": "このコンピュータのモデルとチャットを使って、iPhone、iPad、Apple TV で Toskar を使えます。",
+    "description": "このコンピュータのモデルとチャットを使って、スマートフォン、タブレット、テレビで Toskar を使えます。",
     "thisComputer": "このコンピュータ",
     "lanOff": "デバイスはネットワーク経由でこのコンピュータに接続するため、Toskar はネットワーク上のデバイスからの接続を許可します。デバイスごとに専用のキーが必要ですが、このコンピュータのアプリには不要です。",
     "show": "コードを表示",
     "allowAndShow": "許可してコードを表示",
     "showing": "コードを取得中…",
-    "getApp": "アプリをお持ちでない場合は <store>iPhone、iPad、Apple TV 版 Toskar を入手</store>してください。",
+    "getApp": "アプリをお持ちでない場合は <store>Toskar を入手</store>してください。",
     "connected": "{{name}} が接続されました。",
     "manage": "<access>APIアクセス</access>でいつでも接続を解除できます。",
     "another": "別のデバイスを接続",
     "codeLabel": "コード {{code}}",
     "steps": {
-      "open": "同じネットワークに接続した iPhone、iPad、Apple TV で <store>Toskar</store> を開きます。",
+      "open": "同じネットワークに接続したスマートフォン、タブレット、テレビで <store>Toskar</store> を開きます。",
       "choose": "「このネットワーク上」から {{name}} を選びます。",
       "typeAddress": "このコンピュータのアドレスを入力します：",
       "enter": "このコードを入力します。"
