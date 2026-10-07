@@ -1,5 +1,5 @@
 {
-  "version": "1.11",
+  "version": "1.12",
   "types": {
     "ActivityStep": [
       "kind",
@@ -183,7 +183,9 @@
       "node_name",
       "option",
       "request",
-      "size_bytes"
+      "size_bytes",
+      "slow",
+      "tight_memory"
     ],
     "ToolUse": [
       "calls",

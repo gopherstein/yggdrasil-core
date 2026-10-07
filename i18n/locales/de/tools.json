@@ -97,7 +97,8 @@
     "notSetUp": "Die Videoerzeugung ist noch nicht eingerichtet. Die Einrichtung lädt stable-diffusion.cpp von GitHub, falls die Bilderzeugung das noch nicht getan hat, und ein Videomodell von Hugging Face; danach entstehen Clips offline auf diesem Computer.",
     "makesAndEdits": " · erstellt Clips und erweckt Bilder zum Leben",
     "makes": " · erstellt Clips",
-    "setUp": "Videoerzeugung einrichten"
+    "setUp": "Videoerzeugung einrichten",
+    "slow": "Dieser Computer hat dafür keine GPU-Beschleunigung, daher kann ein Clip fast eine Stunde dauern."
   },
   "images": {
     "title": "Bilderzeugung",
@@ -115,7 +116,10 @@
     "use": "Nutzen",
     "remove": "Entfernen",
     "download": "Dieses Modell laden",
-    "setUp": "Bilderzeugung einrichten"
+    "setUp": "Bilderzeugung einrichten",
+    "tooLittleMemory": "Braucht mindestens {{need}} Arbeitsspeicher; dieser Computer hat {{have}}, daher läuft es hier nicht.",
+    "tightMemory": "Dieser Computer hat weniger Arbeitsspeicher, als ideal wäre ({{comfortable}}), daher kann es langsam sein oder fehlschlagen.",
+    "slow": "Dieser Computer hat dafür keine GPU-Beschleunigung, daher dauert jedes Bild ein paar Minuten."
   },
   "status": {
     "off": "Aus",

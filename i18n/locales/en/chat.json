@@ -180,7 +180,10 @@
     "loadingChat": "Loading this chat…",
     "makingImage": "Making the picture…",
     "changingImage": "Changing the picture…",
-    "makingVideo": "Making the clip, which takes a few minutes…"
+    "makingVideo": "Making the clip, which takes a few minutes…",
+    "makingImageSlow": "Making the picture. On this computer it takes a few minutes…",
+    "changingImageSlow": "Changing the picture. On this computer it takes a few minutes…",
+    "makingVideoSlow": "Making the clip. On this computer it can take most of an hour…"
   },
   "tools": {
     "names": {
@@ -362,7 +365,10 @@
     "stop": "Stop",
     "ready": "{{label}} is set up.",
     "continue": "Continue",
-    "continuing": "Set up. Finishing your request…"
+    "continuing": "Set up. Finishing your request…",
+    "tightMemory": "This computer has less memory than it's comfortable with, so it may be slow or fail.",
+    "slowImage": "This computer has no GPU acceleration for it, so each picture takes a few minutes.",
+    "slowVideo": "This computer has no GPU acceleration for it, so a clip can take most of an hour."
   },
   "readAloud": {
     "button": "Read aloud",

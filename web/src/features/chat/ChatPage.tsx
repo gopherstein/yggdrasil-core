@@ -144,7 +144,7 @@ function formatToolArgs(args: Record<string, unknown> | undefined): string {
   }
 }
 
-function toolProgress(toolId?: string, summary?: string): string {
+function toolProgress(toolId?: string, summary?: string, slow = false): string {
   const t = i18n.getFixedT(null, 'chat')
   if (toolId === 'internet.search') return t('status.searchingWeb')
   if (toolId === 'internet.open') return summary ? t('status.readingHost', { host: hostLabel(summary) }) : t('status.readingPage')
@@ -153,9 +153,9 @@ function toolProgress(toolId?: string, summary?: string): string {
   if (toolId === 'spreadsheet.analyze') return t('status.readingSpreadsheet')
   if (toolId === 'files.create') return t('status.creatingFile')
   if (toolId === 'code.execute') return t('status.runningCode')
-  if (toolId === 'image.generate') return t('status.makingImage')
-  if (toolId === 'image.edit') return t('status.changingImage')
-  if (toolId === 'video.generate') return t('status.makingVideo')
+  if (toolId === 'image.generate') return slow ? t('status.makingImageSlow') : t('status.makingImage')
+  if (toolId === 'image.edit') return slow ? t('status.changingImageSlow') : t('status.changingImage')
+  if (toolId === 'video.generate') return slow ? t('status.makingVideoSlow') : t('status.makingVideo')
   if (toolId === 'terminal') return t('status.runningCommand')
   if (toolId === 'git.status' || toolId === 'git.diff' || toolId === 'git.log' || toolId === 'git.show') {
     return t('status.checkingGit')
@@ -289,6 +289,8 @@ export function ChatPage() {
   const [toolFailure, setToolFailure] = useState<string | null>(null)
   const [contextUsage, setContextUsage] = useState<ContextUsage | null>(null)
   const streamingConvRef = useRef<string | null>(null)
+  // The picture or clip being made takes minutes here (chat.making_media).
+  const mediaSlowRef = useRef(false)
   const composerRef = useRef<HTMLTextAreaElement | null>(null)
   const profileSelectRef = useRef<HTMLSelectElement | null>(null)
   const modelSelectRef = useRef<HTMLSelectElement | null>(null)
@@ -640,7 +642,7 @@ export function ChatPage() {
         if (event.type === 'tool.started') {
           const toolId = event.payload?.tool_id as string | undefined
           const summary = event.payload?.summary as string | undefined
-          setStatusMessage(toolProgress(toolId, summary))
+          setStatusMessage(toolProgress(toolId, summary, mediaSlowRef.current))
           if (toolId) {
             setToolTraces((current) => [
               ...current,
@@ -766,7 +768,12 @@ export function ChatPage() {
           const conversationId = event.payload?.conversation_id as string | undefined
           if (conversationId && conversationId !== selectedId && conversationId !== streamingConvRef.current) return
           const kind = event.payload?.kind as string | undefined
-          setStatusMessage(kind === 'video' ? t('status.makingVideo') : kind === 'edit' ? t('status.changingImage') : t('status.makingImage'))
+          // Without a GPU here, or short on memory, say it takes a while.
+          const slow = event.payload?.slow === true
+          mediaSlowRef.current = slow
+          if (kind === 'video') setStatusMessage(slow ? t('status.makingVideoSlow') : t('status.makingVideo'))
+          else if (kind === 'edit') setStatusMessage(slow ? t('status.changingImageSlow') : t('status.changingImage'))
+          else setStatusMessage(slow ? t('status.makingImageSlow') : t('status.makingImage'))
         }
         if (event.type === 'chat.lookup') {
           const conversationId = event.payload?.conversation_id as string | undefined

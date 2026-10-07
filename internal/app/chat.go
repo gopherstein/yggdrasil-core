@@ -1149,6 +1149,14 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 			payload["conversation_id"] = e.conversationID
 		}
 	}
+	// A picture or clip made without GPU acceleration takes minutes; the
+	// app says so while it waits.
+	if eventType == "chat.making_media" && e.app != nil {
+		kind, _ := payload["kind"].(string)
+		if e.app.mediaSlow(kind) {
+			payload["slow"] = true
+		}
+	}
 	if e.taskID != "" {
 		if _, ok := payload["task_id"]; !ok {
 			payload["task_id"] = e.taskID

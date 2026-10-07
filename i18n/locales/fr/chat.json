@@ -184,7 +184,10 @@
     "loadingChat": "Chargement de la conversation…",
     "makingImage": "Création de l’image…",
     "changingImage": "Modification de l’image…",
-    "makingVideo": "Création du clip, ce qui prend quelques minutes…"
+    "makingVideo": "Création du clip, ce qui prend quelques minutes…",
+    "makingImageSlow": "Création de l’image. Sur cet ordinateur, cela prend quelques minutes…",
+    "changingImageSlow": "Modification de l’image. Sur cet ordinateur, cela prend quelques minutes…",
+    "makingVideoSlow": "Création du clip. Sur cet ordinateur, cela peut prendre près d’une heure…"
   },
   "tools": {
     "names": {
@@ -367,7 +370,10 @@
     "stop": "Arrêter",
     "ready": "{{label}} est configuré.",
     "continue": "Continuer",
-    "continuing": "Configuré. Finalisation de votre demande…"
+    "continuing": "Configuré. Finalisation de votre demande…",
+    "tightMemory": "Cet ordinateur a moins de mémoire que recommandé, cela peut donc être lent ou échouer.",
+    "slowImage": "Cet ordinateur n’a pas d’accélération GPU pour cela, chaque image prend donc quelques minutes.",
+    "slowVideo": "Cet ordinateur n’a pas d’accélération GPU pour cela, un clip peut donc prendre près d’une heure."
   },
   "readAloud": {
     "button": "Lire à voix haute",

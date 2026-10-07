@@ -675,6 +675,13 @@ type SetupOffer struct {
 	// Request is the message to send again once it is set up; empty for a
 	// question about the ability.
 	Request string `json:"request,omitempty"`
+	// Slow says the computer it runs on has no GPU acceleration for it, so
+	// each picture takes minutes and a clip can take most of an hour
+	// (contract 1.12).
+	Slow bool `json:"slow,omitempty"`
+	// TightMemory says the computer has less memory than the model is
+	// comfortable with, so it may be slow or fail (contract 1.12).
+	TightMemory bool `json:"tight_memory,omitempty"`
 }
 
 // FileRef points at a stored file (an artifact). Its bytes are at

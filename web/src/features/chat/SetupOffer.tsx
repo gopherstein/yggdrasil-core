@@ -49,6 +49,9 @@ export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onCon
 
   return (
     <div className="mt-3 space-y-2 rounded-xl border border-line/70 bg-surface px-3 py-2.5 text-sm">
+      {/* Said before it's set up: it will be slow here, or may fail. */}
+      {!ready && offer.tight_memory ? <p className="text-xs text-warning">{t('setup.tightMemory')}</p> : null}
+      {!ready && offer.slow ? <p className="text-xs text-ink-muted">{kind === 'video' ? t('setup.slowVideo') : t('setup.slowImage')}</p> : null}
       {ready ? (
         <div className="flex flex-wrap items-center gap-2">
           <span>{started && offer.request ? t('setup.continuing') : t('setup.ready', { label: offer.label })}</span>
