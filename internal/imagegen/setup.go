@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -70,7 +71,36 @@ type ModelStatus struct {
 	SizeBytes   int64 `json:"size_bytes"`
 	Installed   bool  `json:"installed"`
 	Recommended bool  `json:"recommended"`
+	// TooLittleMemory is a model this computer can't hold: it isn't
+	// offered, set up, or run here. TightMemory is one it can, below the
+	// memory it's comfortable with, so it may be slow or fail.
+	TooLittleMemory bool `json:"too_little_memory,omitempty"`
+	TightMemory     bool `json:"tight_memory,omitempty"`
 }
+
+// headroom is memory beyond a model's files that making a picture needs.
+const headroom = 2 << 30
+
+// tooLittleMemory reports a computer that can't hold m's files and what
+// running them needs; it would fail, or freeze the computer swapping.
+func tooLittleMemory(m Model, memory int64) bool {
+	return memory > 0 && memory < m.SizeBytes()+headroom
+}
+
+// tightMemory reports a computer that can hold m, below what it's
+// comfortable with (MemoryBytes).
+func tightMemory(m Model, memory int64) bool {
+	return memory > 0 && memory < m.MemoryBytes && !tooLittleMemory(m, memory)
+}
+
+// memoryShort says why a model can't run on a computer with memory.
+func memoryShort(m Model, memory int64) string {
+	return fmt.Sprintf("%s needs at least %.0f GB of memory, and this computer has %.0f GB, so it can't run here; a paired computer with more memory can", m.Name, gb(m.SizeBytes()+headroom), gb(memory))
+}
+
+// Accelerated reports whether this computer's build uses the GPU; elsewhere
+// a picture takes minutes and a clip can take most of an hour.
+func Accelerated() bool { return runtime.GOOS == "darwin" }
 
 // Status is what is set up.
 type Status struct {
@@ -84,9 +114,13 @@ type Status struct {
 	Program bool   `json:"program"`
 	Release string `json:"release"`
 	// Active is the model used for images.
-	Active string        `json:"active,omitempty"`
-	Models []ModelStatus `json:"models"`
-	Job    *Job          `json:"job,omitempty"`
+	Active string `json:"active,omitempty"`
+	// MemoryBytes is this computer's memory, and Accelerated whether its
+	// build uses the GPU: without it, each picture or clip takes minutes.
+	MemoryBytes int64         `json:"memory_bytes,omitempty"`
+	Accelerated bool          `json:"accelerated"`
+	Models      []ModelStatus `json:"models"`
+	Job         *Job          `json:"job,omitempty"`
 }
 
 func (s *Setup) models() []Model {
@@ -97,6 +131,14 @@ func (s *Setup) models() []Model {
 }
 
 func (s *Setup) lookup(id string) (Model, bool) { return lookupIn(s.models(), id) }
+
+// memory is this computer's memory, or 0 when it isn't known.
+func (s *Setup) memory() int64 {
+	if s.Memory == nil {
+		return 0
+	}
+	return s.Memory()
+}
 
 // programMu keeps two setups, such as images and video, from installing
 // the same stable-diffusion.cpp at once.
@@ -124,13 +166,12 @@ func (s *Setup) Status() Status {
 	why := s.unsupported()
 	st := Status{Supported: why == "", Unsupported: why, Release: Release, Program: s.CLI() != "", Active: s.ActiveModel()}
 	st.Ready = st.Supported && st.Program && st.Active != ""
-	var memory int64
-	if s.Memory != nil {
-		memory = s.Memory()
-	}
+	memory := s.memory()
+	st.MemoryBytes, st.Accelerated = memory, Accelerated()
 	rec := recommendIn(s.models(), memory).ID
 	for _, m := range s.models() {
-		st.Models = append(st.Models, ModelStatus{Model: m, SizeBytes: m.SizeBytes(), Installed: s.installed(m.ID), Recommended: m.ID == rec})
+		st.Models = append(st.Models, ModelStatus{Model: m, SizeBytes: m.SizeBytes(), Installed: s.installed(m.ID), Recommended: m.ID == rec,
+			TooLittleMemory: tooLittleMemory(m, memory), TightMemory: tightMemory(m, memory)})
 	}
 	s.mu.Lock()
 	if j := s.job; j != nil {
@@ -199,6 +240,9 @@ func (s *Setup) Start(id string) error {
 	m, ok := s.lookup(id)
 	if !ok {
 		return fmt.Errorf("unknown model %q", id)
+	}
+	if memory := s.memory(); tooLittleMemory(m, memory) {
+		return errors.New(memoryShort(m, memory))
 	}
 	need := int64(0)
 	if !s.installed(id) {

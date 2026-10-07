@@ -55,6 +55,13 @@ describe('SetupOfferCard', () => {
     expect(onContinue).toHaveBeenCalledTimes(1)
   })
 
+  it('says before setup when it will be slow here, or may fail', async () => {
+    vi.mocked(api.getMediaSetup).mockResolvedValue(status({}))
+    renderIt(vi.fn(), { ...offer, slow: true, tight_memory: true })
+    expect(await screen.findByText(/no GPU acceleration for it, so each picture takes a few minutes/)).toBeInTheDocument()
+    expect(screen.getByText(/less memory than it's comfortable with/)).toBeInTheDocument()
+  })
+
   it('offers to continue when it was set up elsewhere', async () => {
     vi.mocked(api.getMediaSetup).mockResolvedValue(status({ ready: true, program: true, active: 'flux2-klein-4b' }))
     const onContinue = vi.fn()

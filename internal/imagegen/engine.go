@@ -12,7 +12,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -60,9 +59,17 @@ func (e *Engine) Available() (bool, string) {
 		return false, st.Unsupported
 	}
 	if st.Ready {
+		// A model set up before, on a computer that has since less memory
+		// to give, or moved here, isn't run: it would fail or freeze it.
+		if m, ok := e.Setup.lookup(st.Active); ok && tooLittleMemory(m, st.MemoryBytes) {
+			return false, memoryShort(m, st.MemoryBytes)
+		}
 		return true, ""
 	}
 	for _, m := range st.Models {
+		if m.Recommended && m.TooLittleMemory {
+			return false, memoryShort(m.Model, st.MemoryBytes)
+		}
 		if m.Recommended {
 			return false, fmt.Sprintf("%s isn't set up yet. Set it up on the Tools page: %s, %.1f GB to download", e.what(), m.Name, float64(m.SizeBytes)/1e9)
 		}
@@ -73,7 +80,7 @@ func (e *Engine) Available() (bool, string) {
 // provider describes this computer's image provider (Gungnir §16). Only the
 // macOS build uses the GPU (Metal); the others run on the CPU.
 func (e *Engine) provider(tool string) remotetools.Provider {
-	p := remotetools.Provider{Tool: tool, Accelerated: runtime.GOOS == "darwin"}
+	p := remotetools.Provider{Tool: tool, Accelerated: Accelerated()}
 	st := e.Setup.Status()
 	if m, ok := e.Setup.lookup(st.Active); ok {
 		p.Name = m.Name

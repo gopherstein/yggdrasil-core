@@ -97,7 +97,8 @@
     "notSetUp": "La generación de video todavía no está configurada. La configuración descarga stable-diffusion.cpp desde GitHub, si la generación de imágenes no lo hizo ya, y un modelo de video desde Hugging Face; después, los clips se crean en esta computadora, sin conexión.",
     "makesAndEdits": " · crea clips y da vida a imágenes",
     "makes": " · crea clips",
-    "setUp": "Configurar la generación de video"
+    "setUp": "Configurar la generación de video",
+    "slow": "Este ordenador no tiene aceleración por GPU para esto, así que un clip puede tardar casi una hora."
   },
   "images": {
     "title": "Generación de imágenes",
@@ -115,7 +116,10 @@
     "use": "Usar",
     "remove": "Quitar",
     "download": "Descargar este modelo",
-    "setUp": "Configurar la generación de imágenes"
+    "setUp": "Configurar la generación de imágenes",
+    "tooLittleMemory": "Necesita al menos {{need}} de memoria; este ordenador tiene {{have}}, así que no puede ejecutarse aquí.",
+    "tightMemory": "Este ordenador tiene menos memoria de la recomendada ({{comfortable}}), así que puede ir lento o fallar.",
+    "slow": "Este ordenador no tiene aceleración por GPU para esto, así que cada imagen tarda unos minutos."
   },
   "status": {
     "off": "Desactivada",

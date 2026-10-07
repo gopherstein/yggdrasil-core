@@ -97,7 +97,8 @@
     "notSetUp": "尚未設定影片生成。如果尚未設定圖片生成，設定時會從 GitHub 下載 stable-diffusion.cpp，並從 Hugging Face 下載影片模型；之後，短片都會在這台電腦上離線製作。",
     "makesAndEdits": " · 製作短片，並讓圖片動起來",
     "makes": " · 製作短片",
-    "setUp": "設定影片生成"
+    "setUp": "設定影片生成",
+    "slow": "這台電腦沒有可用於此的 GPU 加速，一段短片可能需要將近一小時。"
   },
   "images": {
     "title": "圖片生成",
@@ -115,7 +116,10 @@
     "use": "使用",
     "remove": "移除",
     "download": "下載這個模型",
-    "setUp": "設定圖片生成"
+    "setUp": "設定圖片生成",
+    "tooLittleMemory": "至少需要 {{need}} 記憶體；這台電腦只有 {{have}}，無法在這裡執行。",
+    "tightMemory": "這台電腦的記憶體低於建議值（{{comfortable}}），可能會很慢或失敗。",
+    "slow": "這台電腦沒有可用於此的 GPU 加速，每張圖片需要幾分鐘。"
   },
   "status": {
     "off": "已關閉",

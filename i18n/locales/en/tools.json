@@ -97,7 +97,8 @@
     "notSetUp": "Video generation isn't set up yet. Setup downloads stable-diffusion.cpp from GitHub, if image generation hasn't, and a video model from Hugging Face; after that, clips are made on this computer, offline.",
     "makesAndEdits": " · makes clips, and brings images to life",
     "makes": " · makes clips",
-    "setUp": "Set up video generation"
+    "setUp": "Set up video generation",
+    "slow": "This computer has no GPU acceleration for this, so a clip can take most of an hour."
   },
   "images": {
     "title": "Image generation",
@@ -115,7 +116,10 @@
     "use": "Use",
     "remove": "Remove",
     "download": "Download this model",
-    "setUp": "Set up image generation"
+    "setUp": "Set up image generation",
+    "tooLittleMemory": "Needs at least {{need}} of memory; this computer has {{have}}, so it can't run here.",
+    "tightMemory": "This computer has less memory than it's comfortable with ({{comfortable}}), so it may be slow or fail.",
+    "slow": "This computer has no GPU acceleration for this, so each picture takes a few minutes."
   },
   "status": {
     "off": "Off",

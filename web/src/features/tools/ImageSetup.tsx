@@ -11,7 +11,11 @@ function gb(bytes: number): string {
 
 // Wording that differs by kind is tools:<kind>.<key>; the rest is shared
 // under tools:images.
-const OWN = new Set(['title', 'unsupported', 'ready', 'notSetUp', 'makesAndEdits', 'makes', 'setUp'])
+const OWN = new Set(['title', 'unsupported', 'ready', 'notSetUp', 'makesAndEdits', 'makes', 'setUp', 'slow'])
+
+// headroom is memory beyond a model's files that running it needs, as the
+// daemon counts it.
+const headroom = 2 * 1024 ** 3
 
 /** Image generation (Gungnir §17). */
 export function ImageSetupCard() {
@@ -62,7 +66,10 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
   const job = status.job
   const running = !!job?.running
   const active = status.models.find((m) => m.id === status.active)
-  const selected = choice ?? (status.models.find((m) => m.recommended) ?? status.models[0])?.id
+  // A model this computer can't hold isn't chosen or set up.
+  const fits = status.models.filter((m) => !m.too_little_memory)
+  const selected = choice ?? (fits.find((m) => m.recommended) ?? fits[0])?.id
+  const selectedModel = status.models.find((m) => m.id === selected)
   const failed = start.error ?? remove.error
   const error = failed instanceof Error ? failed.message : job && !job.running ? job.error : undefined
   const percent = job && job.total_bytes > 0 ? Math.round((job.done_bytes / job.total_bytes) * 100) : 0
@@ -81,6 +88,8 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
               : t('images.notSetUp')}
         </p>
       </div>
+
+      {status.supported && status.accelerated === false ? <p className="text-xs text-ink-muted">{t('images.slow')}</p> : null}
 
       {status.supported && running && job ? (
         <div className="space-y-1.5">
@@ -107,6 +116,7 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
                   name={`${kind}-model`}
                   className="mt-1"
                   checked={selected === model.id}
+                  disabled={model.too_little_memory}
                   onChange={() => setChoice(model.id)}
                   aria-label={model.name}
                 />
@@ -122,6 +132,13 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
                   {gb(model.size_bytes)} · {model.license}
                   {model.edits ? t('images.makesAndEdits') : t('images.makes')}
                 </p>
+                {model.too_little_memory ? (
+                  <p className="mt-1 text-xs text-danger">
+                    {t('images.tooLittleMemory', { need: gb(model.size_bytes + headroom), have: gb(status.memory_bytes ?? 0) })}
+                  </p>
+                ) : model.tight_memory ? (
+                  <p className="mt-1 text-xs text-warning">{t('images.tightMemory', { comfortable: gb(model.memory_bytes) })}</p>
+                ) : null}
               </div>
               {model.installed ? (
                 <span className="flex gap-2">
@@ -145,7 +162,7 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
         </ul>
       ) : null}
 
-      {status.supported && !running && selected && !status.models.find((m) => m.id === selected)?.installed ? (
+      {status.supported && !running && selected && !selectedModel?.installed && !selectedModel?.too_little_memory ? (
         <button type="button" className="btn-primary px-4 py-2 text-sm" disabled={start.isPending} onClick={() => start.mutate(selected)}>
           {status.ready ? t('images.download') : t('images.setUp')}
         </button>

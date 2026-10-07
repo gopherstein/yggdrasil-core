@@ -100,6 +100,12 @@ type Setup struct {
 	// Tools are the tools it makes ready; a profile that denies them is
 	// not offered it.
 	Tools []string `json:"tools"`
+	// Slow is a computer without GPU acceleration for it, where each
+	// picture takes minutes and a clip can take most of an hour.
+	Slow bool `json:"slow,omitempty"`
+	// TightMemory is a computer below the memory it's comfortable with,
+	// where it may be slow or fail.
+	TightMemory bool `json:"tight_memory,omitempty"`
 }
 
 // Snapshot is the inventory at one moment.
