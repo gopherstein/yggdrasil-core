@@ -32,6 +32,21 @@ func (s *Storage) TempPath(modelID string) string {
 	return filepath.Join(s.modelsDir, ".partial", modelID+".gguf.part")
 }
 
+// ProjectorPath is where a vision model's projector is kept, beside it.
+func (s *Storage) ProjectorPath(modelID string) string {
+	return filepath.Join(s.modelsDir, modelID+".mmproj.gguf")
+}
+
+func (s *Storage) ProjectorTempPath(modelID string) string {
+	return filepath.Join(s.modelsDir, ".partial", modelID+".mmproj.gguf.part")
+}
+
+// HasProjector reports a downloaded projector for modelID.
+func (s *Storage) HasProjector(modelID string) bool {
+	st, err := os.Stat(s.ProjectorPath(modelID))
+	return err == nil && st.Mode().IsRegular()
+}
+
 func (s *Storage) UpsertCatalogEntry(ctx context.Context, e CatalogEntry) error {
 	caps, _ := json.Marshal(e.Capabilities)
 	src, _ := json.Marshal(e.Source)
@@ -127,6 +142,7 @@ func (s *Storage) DeleteInstalled(ctx context.Context, modelID string) error {
 	if path != "" {
 		_ = os.Remove(path)
 	}
+	_ = os.Remove(s.ProjectorPath(modelID))
 	_, err = s.db.ExecContext(ctx, `DELETE FROM installed_models WHERE model_id = ?`, modelID)
 	return err
 }

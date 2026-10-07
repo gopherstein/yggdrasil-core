@@ -15,11 +15,14 @@ type CatalogEntry struct {
 	Context           int                         `json:"context,omitempty"`
 	Capabilities      contracts.ModelCapabilities `json:"capabilities"`
 	Source            contracts.ModelSource       `json:"source"`
-	Purpose           []string                    `json:"purpose,omitempty"`
-	Tags              []string                    `json:"tags,omitempty"`
-	Runtime           []string                    `json:"runtime,omitempty"`
-	RecommendedRoles  []string                    `json:"recommended_roles,omitempty"`
-	Dynamic           bool                        `json:"dynamic,omitempty"`
+	// Projector is a vision model's image encoder (llama.cpp's mmproj),
+	// downloaded with it. Without it the model reads text only (#191).
+	Projector        *ModelFile `json:"projector,omitempty"`
+	Purpose          []string   `json:"purpose,omitempty"`
+	Tags             []string   `json:"tags,omitempty"`
+	Runtime          []string   `json:"runtime,omitempty"`
+	RecommendedRoles []string   `json:"recommended_roles,omitempty"`
+	Dynamic          bool       `json:"dynamic,omitempty"`
 	// SupportRole marks an embedding, reranker, or classifier model.
 	SupportRole string `json:"support_role,omitempty"`
 	// Training is set when the model can be specialized with LoRA training.
@@ -42,6 +45,13 @@ func chatEntries(list []CatalogEntry) []CatalogEntry {
 		}
 	}
 	return out
+}
+
+// ModelFile is a file a model needs besides its weights.
+type ModelFile struct {
+	URL       string `json:"url"`
+	SHA256    string `json:"sha256,omitempty"`
+	SizeBytes uint64 `json:"size_bytes,omitempty"`
 }
 
 // TrainingInfo describes the trainable weights behind a catalog GGUF.

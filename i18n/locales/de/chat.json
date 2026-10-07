@@ -467,6 +467,7 @@
   },
   "notices": {
     "languageWeak": "{{model}} schreibt {{language}} womöglich weniger gut als Englisch, und kein installiertes Modell, das passt, kann es besser. Modelle mit guter Bewertung für {{language}} findest du unter „Modelle“.",
+    "noVision": "Kein installiertes Modell kann Bilder sehen, deshalb geht die Antwort nicht auf sie ein. Installiere Gemma 3 4B oder ein anderes Bildmodell unter „Modelle“.",
     "unconfirmedFigures": "Toskar konnte {{figures}} in den Quellen nicht bestätigen. Prüfe das, bevor du dich darauf verlässt.",
     "codeErrors": "Ein Teil des Codes lässt sich nicht parsen: {{errors}}. Behebe das, bevor du ihn ausführst.",
     "unsourcedLinks": "Diese Links stammen aus keiner Quelle und funktionieren vielleicht nicht: {{links}}. Wenn einer sich nicht öffnet, suche stattdessen auf der Website.",
@@ -506,6 +507,7 @@
     "profileCoding": "{{model}} genutzt, das Programmiermodell von {{profile}}",
     "profileFast": "{{model}} genutzt, das Modell für kurze Fragen von {{profile}}",
     "currentInfo": "{{model}} genutzt, weil diese Frage aktuelle Informationen aus dem Web braucht",
+    "seesPictures": "{{model}} genutzt, weil es die Bilder sehen kann",
     "fallbackFailed": "{{failed}} konnte nicht antworten, deshalb hat {{model}} geantwortet",
     "fallbackStopped": "{{failed}} hat nicht mehr geantwortet, deshalb hat {{model}} geantwortet",
     "fallbackOutOfMemory": "{{failed}} hatte nicht genug Speicher, deshalb hat {{model}} geantwortet",

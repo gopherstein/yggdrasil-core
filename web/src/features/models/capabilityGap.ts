@@ -102,7 +102,9 @@ export function capabilityGap(
       suggestions: suggest(catalog, model.id, modelUsesTools),
     })
   }
-  if (needsVision(text) && !seesImages(model)) {
+  // With a vision model installed, Toskar answers a picture with it, so the
+  // note is only for when none is.
+  if (needsVision(text) && !seesImages(model) && !catalog.some((m) => m.installed && seesImages(m))) {
     notes.push({
       text: i18n.t('models:capability.noVision', { model: name }),
       suggestions: suggest(catalog, model.id, seesImages),

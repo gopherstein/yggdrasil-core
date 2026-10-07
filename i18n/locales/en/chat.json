@@ -467,6 +467,7 @@
   },
   "notices": {
     "languageWeak": "{{model}} may write {{language}} less well than English, and no installed model that fits writes it better. Models rated good in {{language}} are on the Models page.",
+    "noVision": "No installed model can see pictures, so the answer doesn't look at them. Install Gemma 3 4B or another vision model on the Models page.",
     "unconfirmedFigures": "Toskar could not confirm {{figures}} in the sources. Check before relying on it.",
     "codeErrors": "Some of the code doesn't parse: {{errors}}. Fix it before running it.",
     "unsourcedLinks": "These links didn't come from a source and may not work: {{links}}. Search the site instead if one doesn't open.",
@@ -506,6 +507,7 @@
     "profileCoding": "Used {{model}}, the coding model of {{profile}}",
     "profileFast": "Used {{model}}, the model for quick questions of {{profile}}",
     "currentInfo": "Used {{model}} because this question needs current information from the web",
+    "seesPictures": "Used {{model}} because it can see the pictures",
     "fallbackFailed": "{{failed}} could not answer, so {{model}} answered instead",
     "fallbackStopped": "{{failed}} stopped responding, so {{model}} answered instead",
     "fallbackOutOfMemory": "{{failed}} ran out of memory, so {{model}} answered instead",

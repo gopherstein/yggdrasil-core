@@ -116,3 +116,14 @@ func TestToolIsFoundBesideLlamaServer(t *testing.T) {
 		t.Fatalf("got %q, %v", path, err)
 	}
 }
+
+// A vision model starts with its projector, so it can see pictures (#191).
+func TestStartArgsWithProjector(t *testing.T) {
+	args := strings.Join(startArgs(pluginapi.ModelStartConfig{ModelPath: "v.gguf", Projector: "v.mmproj.gguf"}, 9000), " ")
+	if !strings.Contains(args, "--mmproj v.mmproj.gguf") {
+		t.Fatalf("args = %s", args)
+	}
+	if strings.Contains(strings.Join(startArgs(pluginapi.ModelStartConfig{ModelPath: "m.gguf"}, 9000), " "), "--mmproj") {
+		t.Fatal("a text model was given a projector")
+	}
+}

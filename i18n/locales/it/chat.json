@@ -480,6 +480,7 @@
   },
   "notices": {
     "languageWeak": "{{model}} potrebbe scrivere in {{language}} peggio che in inglese, e nessun modello installato adatto lo fa meglio. Nella pagina Modelli trovi i modelli con buona valutazione in {{language}}.",
+    "noVision": "Nessun modello installato può vedere le immagini, quindi la risposta non le guarda. Installa Gemma 3 4B o un altro modello di visione nella pagina Modelli.",
     "unconfirmedFigures": "Toskar non è riuscito a confermare {{figures}} nelle fonti. Controlla prima di farci affidamento.",
     "codeErrors": "Una parte del codice non si analizza: {{errors}}. Correggila prima di eseguirla.",
     "unsourcedLinks": "Questi link non provengono da nessuna fonte e potrebbero non funzionare: {{links}}. Se uno non si apre, cerca direttamente sul sito.",
@@ -520,6 +521,7 @@
     "profileCoding": "Ho usato {{model}}, il modello per la programmazione di {{profile}}",
     "profileFast": "Ho usato {{model}}, il modello per le domande rapide di {{profile}}",
     "currentInfo": "Ho usato {{model}} perché questa domanda richiede informazioni aggiornate dal web",
+    "seesPictures": "Ho usato {{model}} perché può vedere le immagini",
     "fallbackFailed": "{{failed}} non è riuscito a rispondere, quindi ha risposto {{model}}",
     "fallbackStopped": "{{failed}} ha smesso di rispondere, quindi ha risposto {{model}}",
     "fallbackOutOfMemory": "{{failed}} ha esaurito la memoria, quindi ha risposto {{model}}",
