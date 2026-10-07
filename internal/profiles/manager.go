@@ -124,6 +124,10 @@ func (m *Manager) mergeBuiltinTools(ctx context.Context) error {
 	for _, existing := range list {
 		preset, ok := byID[existing.ID]
 		if !ok {
+			// A profile with no tools at all is one with none; it stays so.
+			if len(existing.Tools) == 0 {
+				continue
+			}
 			// A profile someone made doesn't list tools shipped since. Those
 			// that stay on this computer and only read or make files in
 			// Toskar's store, such as making pictures, are added at their

@@ -209,4 +209,16 @@ func TestCustomProfilesGainLocalTools(t *testing.T) {
 			t.Errorf("%s was added: %v", id, policy[id])
 		}
 	}
+
+	// A profile with no tools is one with none, and stays so.
+	none, err := mgr.Create(ctx, profiles.Profile{Name: "Plain", OrchestratorID: "simple", Roles: []contracts.ModelRole{{Role: "assistant"}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := mgr.EnsurePresets(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := mgr.Get(ctx, none.ID); len(got.Tools) != 0 {
+		t.Fatalf("a profile with no tools gained %v", got.Tools)
+	}
 }
