@@ -5491,6 +5491,10 @@ components:
           type: string
         source_task:
           type: string
+        expires_at:
+          type: string
+          format: date-time
+          description: When a file that belongs to no chat is removed, a week after it was made. A file attached to or made in a chat has none.
       additionalProperties: true
     Memory:
       type: object

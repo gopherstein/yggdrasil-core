@@ -44,8 +44,16 @@ type Artifact struct {
 	Producer   string    `json:"producer"`
 	SourceTask string    `json:"source_task,omitempty"`
 	CreatedAt  time.Time `json:"created_at"`
-	path       string
+	// ExpiresAt is when a file that belongs to no chat is removed (#191).
+	// A file in a chat has none and stays with the chat.
+	ExpiresAt *time.Time `json:"expires_at,omitempty"`
+	path      string
 }
+
+// UnfiledTTL is how long a file that belongs to no chat is kept: one an
+// automation run, an API call, or an MCP client made, or an upload that was
+// never sent. A week leaves time to download it.
+const UnfiledTTL = 7 * 24 * time.Hour
 
 // Input is a file to save.
 type Input struct {
@@ -173,6 +181,10 @@ func (s *Store) Save(ctx context.Context, in Input) (Artifact, error) {
 		Kind: kindOf(name), Size: int64(len(in.Data)), Producer: producer, SourceTask: in.SourceTask,
 		CreatedAt: s.now().UTC(),
 	}
+	if in.ConversationID == "" {
+		exp := a.CreatedAt.Add(UnfiledTTL)
+		a.ExpiresAt = &exp
+	}
 	folder := in.ConversationID
 	if folder == "" {
 		folder = "unfiled"
@@ -186,10 +198,10 @@ func (s *Store) Save(ctx context.Context, in Input) (Artifact, error) {
 		return Artifact{}, err
 	}
 	_, err := s.db.ExecContext(ctx, `
-		INSERT INTO artifacts (id, conversation_id, name, mime_type, kind, size_bytes, producer, source_task, path, created_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		INSERT INTO artifacts (id, conversation_id, name, mime_type, kind, size_bytes, producer, source_task, path, created_at, expires_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		a.ID, nullable(a.ConversationID), a.Name, a.MimeType, a.Kind, a.Size, a.Producer, nullable(a.SourceTask), a.path,
-		a.CreatedAt.Format(time.RFC3339Nano))
+		a.CreatedAt.Format(time.RFC3339Nano), stamp(a.ExpiresAt))
 	if err != nil {
 		_ = os.Remove(full)
 		return Artifact{}, err
@@ -197,16 +209,26 @@ func (s *Store) Save(ctx context.Context, in Input) (Artifact, error) {
 	return a, nil
 }
 
-const columns = `id, COALESCE(conversation_id, ''), name, mime_type, kind, size_bytes, producer, COALESCE(source_task, ''), path, created_at`
+const columns = `id, COALESCE(conversation_id, ''), name, mime_type, kind, size_bytes, producer, COALESCE(source_task, ''), path, created_at, COALESCE(expires_at, '')`
 
 func scan(row interface{ Scan(...any) error }) (Artifact, error) {
 	var a Artifact
-	var created string
-	if err := row.Scan(&a.ID, &a.ConversationID, &a.Name, &a.MimeType, &a.Kind, &a.Size, &a.Producer, &a.SourceTask, &a.path, &created); err != nil {
+	var created, expires string
+	if err := row.Scan(&a.ID, &a.ConversationID, &a.Name, &a.MimeType, &a.Kind, &a.Size, &a.Producer, &a.SourceTask, &a.path, &created, &expires); err != nil {
 		return Artifact{}, err
 	}
 	a.CreatedAt, _ = time.Parse(time.RFC3339Nano, created)
+	if t, err := time.Parse(time.RFC3339Nano, expires); err == nil {
+		a.ExpiresAt = &t
+	}
 	return a, nil
+}
+
+func stamp(t *time.Time) any {
+	if t == nil {
+		return nil
+	}
+	return t.UTC().Format(time.RFC3339Nano)
 }
 
 // Get returns one artifact's record.
@@ -252,8 +274,50 @@ func (s *Store) List(ctx context.Context, conversationID string) ([]Artifact, er
 // Attach files an unfiled artifact under a conversation, such as a file
 // uploaded before the chat it belongs to was created.
 func (s *Store) Attach(ctx context.Context, id, conversationID string) error {
-	_, err := s.db.ExecContext(ctx, `UPDATE artifacts SET conversation_id = ? WHERE id = ? AND conversation_id IS NULL`, conversationID, id)
+	// In a chat, it stays with the chat.
+	_, err := s.db.ExecContext(ctx, `UPDATE artifacts SET conversation_id = ?, expires_at = NULL WHERE id = ? AND conversation_id IS NULL`, conversationID, id)
 	return err
+}
+
+// RemoveExpired removes files whose time is up, with their records, and
+// returns how many (#191).
+func (s *Store) RemoveExpired(ctx context.Context) (int, error) {
+	now := s.now().UTC().Format(time.RFC3339Nano)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, path FROM artifacts WHERE expires_at IS NOT NULL AND expires_at <= ?`, now)
+	if err != nil {
+		return 0, err
+	}
+	type file struct{ id, path string }
+	var expired []file
+	for rows.Next() {
+		var f file
+		if err := rows.Scan(&f.id, &f.path); err != nil {
+			rows.Close()
+			return 0, err
+		}
+		expired = append(expired, f)
+	}
+	rows.Close()
+	if err := rows.Err(); err != nil {
+		return 0, err
+	}
+	n := 0
+	for _, f := range expired {
+		// The record goes first, and only while it still expires: a file
+		// attached to a chat since it was listed is kept.
+		res, err := s.db.ExecContext(ctx, `DELETE FROM artifacts WHERE id = ? AND expires_at IS NOT NULL`, f.id)
+		if err != nil {
+			return n, err
+		}
+		if k, _ := res.RowsAffected(); k == 0 {
+			continue
+		}
+		n++
+		if err := os.Remove(filepath.Join(s.dir, f.path)); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return n, err
+		}
+	}
+	return n, nil
 }
 
 // Delete removes one artifact and its file.

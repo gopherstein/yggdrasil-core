@@ -83,10 +83,29 @@ func (a *App) sweepRunRecords(ctx context.Context) {
 	}
 }
 
-// keepRunRecordsTidy sweeps now and then once a day until ctx ends.
+// sweepExpiredFiles removes files that belong to no chat once their time
+// is up (#191), whatever the run record setting.
+func (a *App) sweepExpiredFiles(ctx context.Context) {
+	if a.Artifacts == nil {
+		return
+	}
+	n, err := a.Artifacts.RemoveExpired(ctx)
+	if a.Logger == nil {
+		return
+	}
+	if err != nil {
+		a.Logger.Warn("expired file removal failed", "error", err)
+	} else if n > 0 {
+		a.Logger.Info("expired files removed", "files", n)
+	}
+}
+
+// keepRunRecordsTidy sweeps now and then once a day until ctx ends: old run
+// records, and files whose time is up.
 func (a *App) keepRunRecordsTidy(ctx context.Context) {
 	go func() {
 		a.sweepRunRecords(ctx)
+		a.sweepExpiredFiles(ctx)
 		t := time.NewTicker(24 * time.Hour)
 		defer t.Stop()
 		for {
@@ -95,6 +114,7 @@ func (a *App) keepRunRecordsTidy(ctx context.Context) {
 				return
 			case <-t.C:
 				a.sweepRunRecords(ctx)
+				a.sweepExpiredFiles(ctx)
 			}
 		}
 	}()
