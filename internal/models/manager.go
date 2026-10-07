@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -23,6 +24,11 @@ type Manager struct {
 	downloader *Downloader
 	bus        *events.Bus
 	presets    []PurposePreset
+
+	// Resolve, when set, reads the repository behind a download address:
+	// the model file's size and SHA-256, and a vision model's projector, or
+	// nil (#191). An error leaves the install as it was asked for.
+	Resolve func(ctx context.Context, sourceURL string) (ModelFile, *ModelFile, error)
 
 	mu          sync.Mutex
 	downloading map[string]struct{}
@@ -213,6 +219,7 @@ func (m *Manager) InstallFromURL(ctx context.Context, req contracts.InstallFromU
 	if len(entry.Tags) == 0 {
 		entry.Tags = []string{"general"}
 	}
+	m.resolveFiles(ctx, &entry)
 	m.catalog.Upsert(entry)
 	if err := m.storage.UpsertCatalogEntry(ctx, entry); err != nil {
 		return "", err
@@ -222,6 +229,34 @@ func (m *Manager) InstallFromURL(ctx context.Context, req contracts.InstallFromU
 		return id, err
 	}
 	return id, nil
+}
+
+// resolveFiles fills in what the repository says about a model installed
+// from an address: its size and SHA-256, and the projector that lets a
+// vision model see pictures.
+func (m *Manager) resolveFiles(ctx context.Context, entry *CatalogEntry) {
+	if m.Resolve == nil {
+		return
+	}
+	model, projector, err := m.Resolve(ctx, entry.Source.URL)
+	if err != nil {
+		return
+	}
+	if entry.Source.SHA256 == "" {
+		entry.Source.SHA256 = model.SHA256
+	}
+	if model.SizeBytes > 0 {
+		entry.SizeBytes = model.SizeBytes
+	}
+	if projector != nil {
+		entry.Projector = projector
+		entry.Capabilities.Vision = true
+		entry.SizeBytes += projector.SizeBytes
+		if !slices.Contains(entry.Tags, "vision") {
+			entry.Tags = append(entry.Tags, "vision")
+		}
+	}
+	entry.MemoryNeededBytes = estimateMemory(entry.SizeBytes)
 }
 
 func deriveIDFromURL(src, filename, variant string) string {

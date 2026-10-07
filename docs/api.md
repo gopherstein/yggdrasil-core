@@ -127,9 +127,9 @@ Control-plane routes are under `/api/v1`. The OpenAI-compatible routes are under
 | GET | `/models` | The catalog and installed models, with `support_role` and fit |
 | GET | `/models/fit` | How well each catalog model fits each computer |
 | GET | `/models/recommend` | A recommended setup. `?purpose=` (`general`, `coding`, `research`) |
-| GET | `/models/browse` | Search Hugging Face GGUF models. `?q=`, `?limit=` |
+| GET | `/models/browse` | Search Hugging Face GGUF models. `?q=`, `?limit=`. A repository with a vision projector (an `mmproj` file) is tagged `vision` |
 | POST | `/models/{id}/install` | Install a catalog model |
-| POST | `/models/install-from-url` | Install a GGUF from a URL |
+| POST | `/models/install-from-url` | Install a GGUF from a URL. For a Hugging Face `resolve` URL, the daemon reads the repository's file list: the download is checked against the file's SHA-256, and a vision model's projector from the same folder (full precision first) downloads with it, so the model can see pictures. The projector is never taken from the request |
 | DELETE | `/models/{id}` | Remove an installed model |
 | POST | `/models/{id}/start`, `/models/{id}/stop` | Load or unload a model |
 | GET | `/diagnostics/gpu` | What this computer still needs for Toskar to use its GPU: each missing piece (`vulkan_loader_missing`, `vulkan_driver_missing`, `render_access_denied`, `nvidia_driver_missing`, `windows_driver_missing`, `cpu_build`) with a fix `command` written for this computer, or a `url` |
