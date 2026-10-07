@@ -4,9 +4,11 @@ import (
 	"context"
 	"path/filepath"
 	"sync"
+	"time"
 
 	"github.com/yeixio/toskar-core/internal/config"
 	"github.com/yeixio/toskar-core/internal/imagegen"
+	"github.com/yeixio/toskar-core/internal/runtimes/llamacpp"
 )
 
 // newImageSetup keeps stable-diffusion.cpp with the runtimes and image
@@ -42,7 +44,18 @@ func (a *App) newSDSetup(cfg config.Config, folder string, catalog func() []imag
 			return int64(inv.Disk.AvailableBytes), nil
 		},
 		Sandboxed: a.python.Sandboxed,
+		// The Vulkan build when a GPU can run it (#154), checked once: it
+		// runs vulkaninfo, and the answer doesn't change while running.
+		GPU: vulkanUsable,
 		// "Can you make images?" and setup offers read the inventory.
 		Changed: a.invalidateCapabilities,
 	}
 }
+
+// vulkanUsable reports, once, whether a Vulkan build would use a GPU here;
+// images, video, and llama.cpp agree on it.
+var vulkanUsable = sync.OnceValue(func() bool {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	return llamacpp.VulkanUsable(ctx)
+})

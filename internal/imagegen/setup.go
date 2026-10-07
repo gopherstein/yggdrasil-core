@@ -34,8 +34,13 @@ type Setup struct {
 	Changed func()
 	// Catalog lists the models this setup offers; nil is the image models.
 	Catalog func() []Model
-	// archive overrides this platform's build; tests set it.
+	// GPU reports whether the Vulkan build would use a GPU here (#154);
+	// nil means it wouldn't, and the CPU build is used.
+	GPU func() bool
+	// archive overrides this platform's build, and builds its choice of
+	// builds; tests set them.
 	archive *Archive
+	builds  []Archive
 	// fileURL overrides where model files come from; tests set it.
 	fileURL func(File) string
 
@@ -98,9 +103,52 @@ func memoryShort(m Model, memory int64) string {
 	return fmt.Sprintf("%s needs at least %.0f GB of memory, and this computer has %.0f GB, so it can't run here; a paired computer with more memory can", m.Name, gb(m.SizeBytes()+headroom), gb(memory))
 }
 
-// Accelerated reports whether this computer's build uses the GPU; elsewhere
-// a picture takes minutes and a clip can take most of an hour.
-func Accelerated() bool { return runtime.GOOS == "darwin" }
+// Accelerated reports whether pictures and clips are made on the GPU here:
+// the installed build, or the one setup would install (#154). Without it a
+// picture takes minutes and a clip can take most of an hour.
+func (s *Setup) Accelerated() bool {
+	if s.CLI() != "" {
+		return gpuBuild(s.InstalledBuild())
+	}
+	a, ok := s.platform()
+	return ok && gpuBuild(a.Build)
+}
+
+// InstalledBuild is the build of the installed stable-diffusion.cpp: metal,
+// vulkan, or cpu, or "" when none is. One installed before builds were
+// recorded is Metal on a Mac and the CPU build elsewhere.
+func (s *Setup) InstalledBuild() string {
+	if s.CLI() == "" {
+		return ""
+	}
+	if raw, err := os.ReadFile(filepath.Join(s.ProgramDir, Release, "build")); err == nil {
+		if b := strings.TrimSpace(string(raw)); b != "" {
+			return b
+		}
+	}
+	if runtime.GOOS == "darwin" {
+		return BuildMetal
+	}
+	return BuildCPU
+}
+
+// preference is the build the person chose: cpu, or "" for the GPU build
+// when one runs here.
+func (s *Setup) preference() string {
+	raw, _ := os.ReadFile(filepath.Join(s.ProgramDir, "prefer"))
+	return strings.TrimSpace(string(raw))
+}
+
+// gpuBuildHere is the GPU build this computer could use, or "".
+func (s *Setup) gpuBuildHere() string {
+	if s.archive != nil {
+		return ""
+	}
+	if a, ok := pickArchive(s.archives(), s.GPU, ""); ok && gpuBuild(a.Build) {
+		return a.Build
+	}
+	return ""
+}
 
 // Status is what is set up.
 type Status struct {
@@ -117,10 +165,14 @@ type Status struct {
 	Active string `json:"active,omitempty"`
 	// MemoryBytes is this computer's memory, and Accelerated whether its
 	// build uses the GPU: without it, each picture or clip takes minutes.
-	MemoryBytes int64         `json:"memory_bytes,omitempty"`
-	Accelerated bool          `json:"accelerated"`
-	Models      []ModelStatus `json:"models"`
-	Job         *Job          `json:"job,omitempty"`
+	MemoryBytes int64 `json:"memory_bytes,omitempty"`
+	Accelerated bool  `json:"accelerated"`
+	// Build is the installed build (metal, vulkan, or cpu), and GPUBuild
+	// the GPU build this computer can use, or "" (#154).
+	Build    string        `json:"build,omitempty"`
+	GPUBuild string        `json:"gpu_build,omitempty"`
+	Models   []ModelStatus `json:"models"`
+	Job      *Job          `json:"job,omitempty"`
 }
 
 func (s *Setup) models() []Model {
@@ -148,7 +200,15 @@ func (s *Setup) platform() (Archive, bool) {
 	if s.archive != nil {
 		return *s.archive, true
 	}
-	return platformArchive()
+	return pickArchive(s.archives(), s.GPU, s.preference())
+}
+
+// archives are this computer's builds, the GPU build first.
+func (s *Setup) archives() []Archive {
+	if s.builds != nil {
+		return s.builds
+	}
+	return platformArchives()
 }
 
 func (s *Setup) unsupported() string {
@@ -167,7 +227,8 @@ func (s *Setup) Status() Status {
 	st := Status{Supported: why == "", Unsupported: why, Release: Release, Program: s.CLI() != "", Active: s.ActiveModel()}
 	st.Ready = st.Supported && st.Program && st.Active != ""
 	memory := s.memory()
-	st.MemoryBytes, st.Accelerated = memory, Accelerated()
+	st.MemoryBytes, st.Accelerated = memory, s.Accelerated()
+	st.Build, st.GPUBuild = s.InstalledBuild(), s.gpuBuildHere()
 	rec := recommendIn(s.models(), memory).ID
 	for _, m := range s.models() {
 		st.Models = append(st.Models, ModelStatus{Model: m, SizeBytes: m.SizeBytes(), Installed: s.installed(m.ID), Recommended: m.ID == rec,
@@ -317,6 +378,10 @@ func (s *Setup) install(ctx context.Context, j *job, m Model, program bool, arch
 			return fmt.Errorf("stable-diffusion.cpp could not be installed: %w", err)
 		}
 	}
+	// Switching builds installs only the program.
+	if m.ID == "" {
+		return nil
+	}
 	if !s.installed(m.ID) {
 		s.setStage(j, "model")
 		dir := s.modelDir(m.ID)
@@ -342,7 +407,7 @@ func (s *Setup) install(ctx context.Context, j *job, m Model, program bool, arch
 func (s *Setup) installProgram(ctx context.Context, archive Archive, add func(int64)) error {
 	programMu.Lock()
 	defer programMu.Unlock()
-	if s.CLI() != "" {
+	if s.CLI() != "" && s.InstalledBuild() == archive.Build {
 		// The other setup installed it meanwhile.
 		add(archive.Size)
 		return nil
@@ -353,7 +418,7 @@ func (s *Setup) installProgram(ctx context.Context, archive Archive, add func(in
 	}
 	zipPath := filepath.Join(s.ProgramDir, archive.Name)
 	url := archive.URL()
-	if s.archive != nil && s.fileURL != nil {
+	if (s.archive != nil || s.builds != nil) && s.fileURL != nil {
 		url = s.fileURL(File{Path: archive.Name})
 	}
 	if err := download(ctx, s.client(), url, zipPath, archive.Size, archive.SHA256, add); err != nil {
@@ -369,7 +434,70 @@ func (s *Setup) installProgram(ctx context.Context, archive Archive, add func(in
 	if err != nil {
 		return err
 	}
+	if err := os.WriteFile(filepath.Join(dir, "build"), []byte(archive.Build+"\n"), 0o644); err != nil {
+		return err
+	}
 	return os.WriteFile(filepath.Join(dir, "cli"), []byte(rel+"\n"), 0o644)
+}
+
+// UseBuild switches to the CPU build (cpu) or back to the GPU build (gpu),
+// and installs it when it isn't the one installed. A setup in progress
+// keeps going; it can be switched after.
+func (s *Setup) UseBuild(build string) error {
+	if why := s.unsupported(); why != "" {
+		return errors.New(why)
+	}
+	prefer := ""
+	switch build {
+	case BuildCPU:
+		prefer = BuildCPU
+	case "gpu":
+		if s.gpuBuildHere() == "" {
+			return errors.New("this computer has no GPU the GPU build can use")
+		}
+	default:
+		return fmt.Errorf("unknown build %q", build)
+	}
+	if err := os.MkdirAll(s.ProgramDir, 0o755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(s.ProgramDir, "prefer"), []byte(prefer+"\n"), 0o644); err != nil {
+		return err
+	}
+	archive, ok := s.platform()
+	if !ok || s.CLI() == "" || s.InstalledBuild() == archive.Build {
+		if s.Changed != nil {
+			s.Changed()
+		}
+		return nil
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.job != nil && s.job.running {
+		return errors.New("image generation is being set up; switch builds when it's done")
+	}
+	j := &job{running: true, total: archive.Size}
+	ctx, cancel := context.WithCancel(context.Background())
+	s.job, s.cancel = j, cancel
+	go s.run(ctx, j, Model{}, true, archive)
+	return nil
+}
+
+// fallBackToCPU installs the CPU build after the GPU build failed to start
+// here, and keeps it: the GPU build doesn't come back on its own (#154).
+func (s *Setup) fallBackToCPU(ctx context.Context) error {
+	if err := os.WriteFile(filepath.Join(s.ProgramDir, "prefer"), []byte(BuildCPU+"\n"), 0o644); err != nil {
+		return err
+	}
+	archive, ok := s.platform()
+	if !ok || archive.Build != BuildCPU {
+		return errors.New("there is no CPU build for this computer")
+	}
+	err := s.installProgram(ctx, archive, func(int64) {})
+	if s.Changed != nil {
+		s.Changed()
+	}
+	return err
 }
 
 // Cancel stops the setup in progress; downloaded parts are kept.

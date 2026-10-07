@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/yeixio/toskar-core/internal/imagegen"
 	"github.com/yeixio/toskar-core/internal/inventory"
 	"github.com/yeixio/toskar-core/internal/profiles"
 	"github.com/yeixio/toskar-core/internal/structured"
@@ -109,15 +108,15 @@ func (a *App) offerSetup(ctx context.Context, profile profiles.Profile, conversa
 // clip (video) here takes minutes: no GPU acceleration, or less memory
 // than its model is comfortable with.
 func (a *App) mediaSlow(kind string) bool {
-	if !imagegen.Accelerated() {
-		return true
-	}
 	setup := a.Images
 	if kind == "video" {
 		setup = a.Video
 	}
 	if setup == nil {
 		return false
+	}
+	if !setup.Accelerated() {
+		return true
 	}
 	for _, m := range setup.Status().Models {
 		if m.ID == setup.ActiveModel() && m.TightMemory {

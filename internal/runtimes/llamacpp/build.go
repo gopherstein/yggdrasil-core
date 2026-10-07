@@ -137,6 +137,11 @@ type vulkanProbe struct {
 	hasGPU func(ctx context.Context) bool
 }
 
+// VulkanUsable reports whether a Vulkan build would use a GPU here: the
+// loader is installed and finds a GPU, not a software renderer. Image and
+// video generation choose their build by it too (#154).
+func VulkanUsable(ctx context.Context) bool { return hostVulkanProbe().usable(ctx) }
+
 func hostVulkanProbe() vulkanProbe {
 	return vulkanProbe{
 		goos: runtime.GOOS,

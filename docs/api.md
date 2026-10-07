@@ -279,7 +279,8 @@ Pictures and clips work the same way. A message that asks for an image ("draw a 
 - **Computers that can't really run it:**
   - **Too little memory:** a computer with less memory than a model's files plus 2 GB isn't offered that model, can't set it up, and isn't asked to run it. The setup and the tool say how much it needs and how much the computer has, and that a paired computer with more memory can make it. The setup status's models carry `too_little_memory`.
   - **Tight memory:** one below the memory the model is comfortable with (`memory_bytes`) is allowed, with a warning that it may be slow or fail (`tight_memory`).
-  - **No GPU:** the setup status says `accelerated`. Only the macOS build uses the GPU, so elsewhere a picture takes minutes and a clip can take most of an hour.
+  - **No GPU:** the setup status says `accelerated`, from the installed build (`build`: `metal`, `vulkan`, or `cpu`), or the one setup would install. `gpu_build` is the GPU build this computer can use, if any: Metal on a Mac, and Vulkan on Linux and Windows with a GPU that has a Vulkan driver. On the CPU build, a picture takes minutes and a clip can take most of an hour.
+  - **Switching builds:** `POST /images/setup/build` (or `/video/setup/build`) with `{"build": "gpu"}` or `{"build": "cpu"}` switches, installing the build when needed; images and video share it. A Vulkan build that can't start on the GPU falls back to the CPU build by itself, and stays there. See [GPU acceleration](gpu.md).
   - **Saying so:** a setup offer carries `slow` and `tight_memory`, the offer's reply says so, and `chat.making_media` carries `slow` so the app says it takes a while.
 
 When a model under 4B parameters answers from attached files or connected knowledge, `meta.notice` says it can mix up numbers and details and suggests a larger model. Auto treats a question about the user's files or knowledge as one that needs a careful answer, so it prefers a larger model that fits.

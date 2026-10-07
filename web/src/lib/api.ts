@@ -846,6 +846,10 @@ export const api = {
   /** Stop the setup; what was downloaded is kept. */
   cancelMediaSetup: (kind: MediaKind) => request<ImageSetup>(`/api/v1/${kind}/setup`, { method: 'DELETE' }),
 
+  /** Switch stable-diffusion.cpp to its CPU build, or back to its GPU build; images and video share it (#154). */
+  useMediaBuild: (kind: MediaKind, build: 'gpu' | 'cpu') =>
+    request<ImageSetup>(`/api/v1/${kind}/setup/build`, { method: 'POST', body: JSON.stringify({ build }) }),
+
   /** Delete an installed model of that kind. */
   removeMediaModel: (kind: MediaKind, id: string) => request<ImageSetup>(`/api/v1/${kind}/models/${id}`, { method: 'DELETE' }),
 

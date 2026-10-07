@@ -545,6 +545,9 @@ export interface ImageSetup {
   /** This computer's memory, and whether its build uses the GPU; without it each picture or clip takes minutes. */
   memory_bytes?: number
   accelerated?: boolean
+  /** The installed build, and the GPU build this computer can use, if any (#154). */
+  build?: 'metal' | 'vulkan' | 'cpu'
+  gpu_build?: 'metal' | 'vulkan'
   models: ImageModel[]
   job?: {
     model_id: string

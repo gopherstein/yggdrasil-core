@@ -32,6 +32,11 @@ The **Performance** overview also shows each computer's live CPU and memory, and
 
 llama.cpp, which runs the models, is downloaded the first time a model starts. On Linux and Windows Toskar picks its Vulkan build when it finds a usable GPU, and its CPU build otherwise. If a GPU becomes usable later, such as after installing a driver, Toskar switches to the Vulkan build the next time it starts with no model running.
 
+Image and video generation (stable-diffusion.cpp) choose their build the same way, with the same check: Metal on a Mac, Vulkan on Linux and Windows when a GPU has a Vulkan driver, and the CPU build otherwise. The Vulkan builds are 30–37 MB, so they're used rather than the CUDA (about 900 MB on Windows) and ROCm (200–280 MB) builds.
+- **Falling back:** a Vulkan build that can't start on the GPU, such as when no device is found or the driver won't load, is replaced by the CPU build, which makes the picture or clip. The computer keeps the CPU build after that. Other errors, such as running out of memory, don't switch builds.
+- **Switching:** the Tools page says which build makes them, with **Use the GPU build** or **Use the CPU build** to switch. Images and video share the program, so switching changes both.
+- **Upgrading an older setup:** a setup from before GPU builds on Linux or Windows keeps the CPU build until **Use the GPU build** is pressed.
+
 ### Linux: AMD and Intel
 
 The packages take care of this. To check, or to set it up by hand where recommended packages were skipped:
