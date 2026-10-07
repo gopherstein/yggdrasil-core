@@ -61,11 +61,11 @@ func (s *Server) handleUploadArtifact(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Audio is kept as it is, to be played and transcribed (speech.transcribe),
-	// and so are images, to be shown and edited (image.edit).
-	kept := artifacts.IsAudio(body.Name) || imagegen.IsEditable(body.Name)
+	// images to be shown and edited (image.edit), and videos to be watched.
+	kept := artifacts.IsAudio(body.Name) || artifacts.IsVideo(body.Name) || imagegen.IsEditable(body.Name)
 	if !kept && !mimir.Attachable(body.Name) {
 		writeErr(w, http.StatusBadRequest, "UNSUPPORTED_FILE",
-			fmt.Sprintf("Toskar can't read %s yet. Attach a document, spreadsheet, PDF, code file, audio, or a PNG or JPEG image.", artifacts.CleanName(body.Name)),
+			fmt.Sprintf("Toskar can't read %s yet. Attach a document, spreadsheet, PDF, code file, audio, video, or a PNG or JPEG image.", artifacts.CleanName(body.Name)),
 			map[string]any{"name": artifacts.CleanName(body.Name)})
 		return
 	}

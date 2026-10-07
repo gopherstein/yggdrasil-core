@@ -138,7 +138,7 @@
   "TRAINING_CANCELLED": "訓練已取消。",
   "UNAUTHORIZED": "這個 Toskar 需要 API 金鑰。",
   "UNREADABLE_FILE": "Toskar 無法讀取 {{name}}：{{cause}}",
-  "UNSUPPORTED_FILE": "Toskar 目前還無法讀取 {{name}}。請附加文件、試算表、PDF、程式碼檔案、音訊，或 PNG、JPEG 圖片。",
+  "UNSUPPORTED_FILE": "Toskar 目前還無法讀取 {{name}}。請附加文件、試算表、PDF、程式碼檔案、音訊、影片，或 PNG、JPEG 圖片。",
   "DEVICE_NOT_ALLOWED": "裝置的金鑰無法執行此操作。請使用 API 存取中的金鑰。",
   "PAIRING_EXPIRED": "此代碼已過期。請在電腦上再次選擇「連接裝置」。",
   "PAIRING_FAILED": "無法連接裝置。",

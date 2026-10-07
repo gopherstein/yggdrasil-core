@@ -513,6 +513,7 @@
     "passages_other": "{{source}}で{{count}}件の抜粋が見つかりました",
     "passagesMore_other": "{{source}}とほか{{more}}件で{{count}}件の抜粋が見つかりました",
     "read": "{{name}}を読みました",
+    "watched": "{{name}}を視聴しました",
     "readParts_other": "{{name}}のうち、質問に一致する{{count}}個のパートを読みました",
     "plannedOne": "回答を書く前に下書きしました",
     "planned_other": "依頼を{{count}}個のパートに分けて処理しました",

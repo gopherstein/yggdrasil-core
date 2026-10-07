@@ -166,6 +166,8 @@ type App struct {
 	work   map[string]int
 	// Speech transcribes audio and reads text aloud (Gungnir §18–19).
 	Speech *speech.Engine
+	// frames keeps recent videos' sampled frames (#191).
+	frames frameCache
 	// toolNet places heavy tools on the computer that suits them, and
 	// portable are the tools it can place (Gungnir §14–16).
 	toolNet  *remotetools.Network

@@ -119,6 +119,16 @@ func (t *turnTrace) attachment(a artifacts.Artifact, picked, total int) {
 	t.addSource(contracts.Citation{Kind: "file", Title: a.Name, Source: locale.T(t.lang, "chat:answer."+source, nil), ArtifactID: a.ID})
 }
 
+// watched records a video whose frames the model was shown (#191).
+func (t *turnTrace) watched(a artifacts.Artifact) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.untrusted = true
+	t.step("file", "watched", map[string]any{"name": a.Name})
+	t.ownFiles = true
+	t.addSource(contracts.Citation{Kind: "file", Title: a.Name, Source: locale.T(t.lang, "chat:answer.attachedFile", nil), ArtifactID: a.ID})
+}
+
 // dataKind reports whether the answer drew on the user's own data: "file"
 // for attached files, "knowledge" for connected knowledge, or "".
 func (t *turnTrace) dataKind() string {

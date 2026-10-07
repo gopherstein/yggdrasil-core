@@ -513,6 +513,7 @@
     "passages_other": "在 {{source}} 中找到 {{count}} 个段落",
     "passagesMore_other": "在 {{source}} 及另外 {{more}} 个来源中找到 {{count}} 个段落",
     "read": "阅读了 {{name}}",
+    "watched": "看了 {{name}}",
     "readParts_other": "阅读了 {{name}} 中与问题相关的 {{count}} 个部分",
     "plannedOne": "先拟好回答，再动笔撰写",
     "planned_other": "将请求分成 {{count}} 个部分逐一处理",

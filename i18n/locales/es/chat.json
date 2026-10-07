@@ -549,6 +549,7 @@
     "passagesMore_many": "Encontré {{count}} fragmentos en {{source}} y {{more}} más",
     "passagesMore_other": "Encontré {{count}} fragmentos en {{source}} y {{more}} más",
     "read": "Leí {{name}}",
+    "watched": "Vi el video {{name}}",
     "readParts_one": "Leí la {{count}} parte de {{name}} que coincide con la pregunta",
     "readParts_many": "Leí las {{count}} partes de {{name}} que coinciden con la pregunta",
     "readParts_other": "Leí las {{count}} partes de {{name}} que coinciden con la pregunta",

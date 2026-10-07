@@ -138,7 +138,7 @@
   "TRAINING_CANCELLED": "トレーニングはキャンセルされました。",
   "UNAUTHORIZED": "このToskarにはAPIキーが必要です。",
   "UNREADABLE_FILE": "Toskarは{{name}}を読み取れません：{{cause}}",
-  "UNSUPPORTED_FILE": "Toskarはまだ{{name}}を読み取れません。ドキュメント、スプレッドシート、PDF、コードファイル、音声、またはPNGかJPEGの画像を添付してください。",
+  "UNSUPPORTED_FILE": "Toskarはまだ{{name}}を読み取れません。ドキュメント、スプレッドシート、PDF、コードファイル、音声、動画、またはPNGかJPEGの画像を添付してください。",
   "DEVICE_NOT_ALLOWED": "デバイスのキーではこの操作はできません。API アクセスのキーを使ってください。",
   "PAIRING_EXPIRED": "このコードは期限切れです。コンピュータでもう一度「デバイスを接続」を選んでください。",
   "PAIRING_FAILED": "デバイスを接続できませんでした。",

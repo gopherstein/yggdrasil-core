@@ -138,7 +138,7 @@
   "TRAINING_CANCELLED": "Das Training wurde abgebrochen.",
   "UNAUTHORIZED": "Dieses Toskar braucht einen API-Schlüssel.",
   "UNREADABLE_FILE": "Toskar kann {{name}} nicht lesen: {{cause}}",
-  "UNSUPPORTED_FILE": "Toskar kann {{name}} noch nicht lesen. Hänge ein Dokument, eine Tabelle, ein PDF, eine Codedatei, Audio oder ein PNG- oder JPEG-Bild an.",
+  "UNSUPPORTED_FILE": "Toskar kann {{name}} noch nicht lesen. Hänge ein Dokument, eine Tabelle, ein PDF, eine Codedatei, Audio, ein Video oder ein PNG- oder JPEG-Bild an.",
   "DEVICE_NOT_ALLOWED": "Der Schlüssel eines Geräts kann das nicht. Verwende einen Schlüssel aus dem API-Zugriff.",
   "PAIRING_EXPIRED": "Dieser Code ist abgelaufen. Wähle auf dem Computer erneut „Gerät verbinden“.",
   "PAIRING_FAILED": "Das Gerät konnte nicht verbunden werden.",

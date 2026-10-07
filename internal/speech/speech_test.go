@@ -24,6 +24,12 @@ if "audio" in cfg:
     open(cfg["models_dir"] + ".seen", "w").write(cfg["model"] + " " + (cfg["language"] or "auto") + " " + open(cfg["audio"], "rb").read().decode())
     json.dump({"language": cfg["language"] or "en", "duration": 2.5, "text": "Hello there. Buy milk.",
                "segments": [{"start": 0, "end": 1.2, "text": "Hello there."}, {"start": 1.2, "end": 2.5, "text": "Buy milk."}]}, sys.stdout)
+elif "video" in cfg:
+    frames = []
+    for i in range(cfg["count"]):
+        open(cfg["out_dir"] + "/frame-%d.jpg" % i, "wb").write(b"JPEG%d" % i)
+        frames.append({"time": i * 2.0, "file": "frame-%d.jpg" % i})
+    json.dump({"duration": 8.0, "has_audio": True, "frames": frames}, sys.stdout)
 else:
     with wave.open(cfg["out"], "wb") as w:
         w.setnchannels(1); w.setsampwidth(2); w.setframerate(16000); w.writeframes(b"\0\0" * 8000)
@@ -176,5 +182,17 @@ func TestFailedInstallHasAPlainCode(t *testing.T) {
 	_, _, err := e.Synthesize(context.Background(), "Hello", "")
 	if code, _ := contracts.ErrorCode(err); code != "SPEECH_SETUP_FAILED" {
 		t.Fatalf("code = %q (%v), want SPEECH_SETUP_FAILED", code, err)
+	}
+}
+
+// A video's frames come back in order, with when each is in the clip.
+func TestFrames(t *testing.T) {
+	eng, _, ctx := setup(t)
+	clip, err := eng.Frames(ctx, "clip.mp4", []byte("VIDEO"), 3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if clip.Duration != 8 || !clip.HasAudio || len(clip.Frames) != 3 || clip.Frames[2].Time != 4 || string(clip.Frames[2].JPEG) != "JPEG2" {
+		t.Fatalf("clip = %+v", clip)
 	}
 }

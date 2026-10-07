@@ -53,7 +53,7 @@ func TestArtifactRoutes(t *testing.T) {
 		t.Fatalf("html disposition = %q", rec.Header().Get("Content-Disposition"))
 	}
 
-	if rec = do(http.MethodPost, "/api/v1/artifacts", `{"name":"movie.mp4","content_base64":"AAAA"}`); rec.Code != http.StatusBadRequest || !strings.Contains(rec.Body.String(), "can't read movie.mp4") {
+	if rec = do(http.MethodPost, "/api/v1/artifacts", `{"name":"model.blend","content_base64":"AAAA"}`); rec.Code != http.StatusBadRequest || !strings.Contains(rec.Body.String(), "can't read model.blend") {
 		t.Fatalf("unsupported: %d %s", rec.Code, rec.Body)
 	}
 	bad := base64.StdEncoding.EncodeToString([]byte("not a pdf"))

@@ -549,6 +549,7 @@
     "passagesMore_many": "Encontrei {{count}} trechos em {{source}} e em mais {{more}}",
     "passagesMore_other": "Encontrei {{count}} trechos em {{source}} e em mais {{more}}",
     "read": "Li {{name}}",
+    "watched": "Assisti a {{name}}",
     "readParts_one": "Li {{count}} parte de {{name}} relacionada à pergunta",
     "readParts_many": "Li {{count}} partes de {{name}} relacionadas à pergunta",
     "readParts_other": "Li {{count}} partes de {{name}} relacionadas à pergunta",
