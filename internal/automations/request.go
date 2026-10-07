@@ -113,7 +113,7 @@ func parseSchedule(text string, w *requestWordList, now time.Time, loc *time.Loc
 		if err != nil {
 			return nil, err
 		}
-		hour, minute := 8, 0
+		var hour, minute int
 		if clock != nil {
 			hour, minute = clock.hour, clock.minute
 		} else {
