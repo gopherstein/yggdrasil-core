@@ -457,6 +457,10 @@ export interface SetupOffer {
   node_name?: string
   /** The message to send again once it is set up; empty for a question. */
   request?: string
+  /** No GPU acceleration for it here, so each picture takes minutes (contract 1.12). */
+  slow?: boolean
+  /** Less memory here than it's comfortable with, so it may be slow or fail (contract 1.12). */
+  tight_memory?: boolean
 }
 
 /** A stored file: an attachment or a file the assistant produced. */
@@ -520,6 +524,10 @@ export interface ImageModel {
   kind: 'image' | 'video'
   installed: boolean
   recommended: boolean
+  /** This computer can't hold it, so it isn't set up or run here. */
+  too_little_memory?: boolean
+  /** This computer has less memory than it's comfortable with, so it may be slow or fail. */
+  tight_memory?: boolean
 }
 
 /** What image generation has installed, and any setup in progress. */
@@ -534,6 +542,9 @@ export interface ImageSetup {
   release: string
   /** The model images are made with. */
   active?: string
+  /** This computer's memory, and whether its build uses the GPU; without it each picture or clip takes minutes. */
+  memory_bytes?: number
+  accelerated?: boolean
   models: ImageModel[]
   job?: {
     model_id: string

@@ -180,7 +180,10 @@
     "loadingChat": "Dieser Chat wird geladen…",
     "makingImage": "Bild wird erstellt…",
     "changingImage": "Bild wird geändert…",
-    "makingVideo": "Clip wird erstellt, das dauert ein paar Minuten…"
+    "makingVideo": "Clip wird erstellt, das dauert ein paar Minuten…",
+    "makingImageSlow": "Bild wird erstellt. Auf diesem Computer dauert das ein paar Minuten…",
+    "changingImageSlow": "Bild wird geändert. Auf diesem Computer dauert das ein paar Minuten…",
+    "makingVideoSlow": "Clip wird erstellt. Auf diesem Computer kann das fast eine Stunde dauern…"
   },
   "tools": {
     "names": {
@@ -362,7 +365,10 @@
     "stop": "Stoppen",
     "ready": "{{label}} ist eingerichtet.",
     "continue": "Weiter",
-    "continuing": "Eingerichtet. Deine Anfrage wird fertiggestellt …"
+    "continuing": "Eingerichtet. Deine Anfrage wird fertiggestellt …",
+    "tightMemory": "Dieser Computer hat weniger Arbeitsspeicher, als ideal wäre, daher kann es langsam sein oder fehlschlagen.",
+    "slowImage": "Dieser Computer hat dafür keine GPU-Beschleunigung, daher dauert jedes Bild ein paar Minuten.",
+    "slowVideo": "Dieser Computer hat dafür keine GPU-Beschleunigung, daher kann ein Clip fast eine Stunde dauern."
   },
   "readAloud": {
     "button": "Vorlesen",

@@ -184,7 +184,10 @@
     "loadingChat": "Caricamento della chat…",
     "makingImage": "Creazione dell’immagine…",
     "changingImage": "Modifica dell’immagine…",
-    "makingVideo": "Creazione del clip, ci vogliono alcuni minuti…"
+    "makingVideo": "Creazione del clip, ci vogliono alcuni minuti…",
+    "makingImageSlow": "Creazione dell’immagine. Su questo computer richiede alcuni minuti…",
+    "changingImageSlow": "Modifica dell’immagine. Su questo computer richiede alcuni minuti…",
+    "makingVideoSlow": "Creazione del clip. Su questo computer può richiedere quasi un’ora…"
   },
   "tools": {
     "names": {
@@ -367,7 +370,10 @@
     "stop": "Interrompi",
     "ready": "{{label}} è configurato.",
     "continue": "Continua",
-    "continuing": "Configurato. Completamento della tua richiesta…"
+    "continuing": "Configurato. Completamento della tua richiesta…",
+    "tightMemory": "Questo computer ha meno memoria di quella consigliata, quindi potrebbe essere lento o non riuscire.",
+    "slowImage": "Questo computer non ha l’accelerazione GPU per questo, quindi ogni immagine richiede alcuni minuti.",
+    "slowVideo": "Questo computer non ha l’accelerazione GPU per questo, quindi un clip può richiedere quasi un’ora."
   },
   "readAloud": {
     "button": "Leggi ad alta voce",
