@@ -12,7 +12,8 @@ func TestSourceRecorder(t *testing.T) {
 		s.add("internet.open", map[string]any{"url": "https://example.com/jobs"}, map[string]any{"content": page})
 		return s.sum()
 	}
-	if read("3 openings") != read("3 openings") {
+	first, again := read("3 openings"), read("3 openings")
+	if first != again {
 		t.Fatal("the same reads gave different fingerprints")
 	}
 	if read("3 openings") == read("4 openings") {
