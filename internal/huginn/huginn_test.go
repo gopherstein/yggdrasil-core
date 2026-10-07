@@ -340,3 +340,16 @@ func TestTellsToMakeFile(t *testing.T) {
 		}
 	}
 }
+
+// "make" offers the shell only when it means the build tool.
+func TestMakeIsntAlwaysAShellCommand(t *testing.T) {
+	all := []string{"terminal", "image.generate"}
+	if got := ToolsFor(Chat, "make a picture of a dog", all); slices.Contains(got, "terminal") {
+		t.Fatalf("make a picture offered the terminal: %v", got)
+	}
+	for _, msg := range []string{"run make test", "make test is failing", "what's in the Makefile?"} {
+		if got := ToolsFor(Chat, msg, all); !slices.Contains(got, "terminal") {
+			t.Errorf("%q didn't offer the terminal: %v", msg, got)
+		}
+	}
+}

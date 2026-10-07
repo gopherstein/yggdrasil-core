@@ -260,6 +260,7 @@ func (o *Orchestrator) Run(
 		retriedPlain := false
 		retriedLookup := false
 		retriedFile := false
+		triedMedia := false
 
 		for {
 			content, m, err := generateText(ctx, env, role, messages)
@@ -375,6 +376,20 @@ func (o *Orchestrator) Run(
 			// when the profile allows files.create, is asked for once more
 			// with files.create offered, though the message didn't ask for a
 			// file in so many words (#281).
+			// A model that won't make a picture the message is about, or
+			// sends the person to another site for one, gets it made: a
+			// backstop for wordings the check before the loop misses.
+			if !triedMedia && !changed && !jsonOnly {
+				triedMedia = true
+				if reply, m, made := makeMediaAfterRefusal(ctx, env, webProfile, role, messages, task.Prompt, parsed.Text); made {
+					promptTokens := 0
+					if m != nil {
+						promptTokens = m.PromptTokens
+					}
+					streamText(ch, role, nodeID, reply, m, contextusage.Measure(count, plainSys, toolPrompt, messages, promptTokens))
+					return
+				}
+			}
 			if !retriedFile && !changed && !jsonOnly && !profile.ModelCallsNoTools && calls < budget.MaxToolCalls && toolEnabled(webProfile, "files.create") && huginn.TellsToMakeFile(parsed.Text) {
 				retriedFile = true
 				env.Emit(events.ToolFailed, map[string]any{"deflected": true, "error": "told the person to make the file"})

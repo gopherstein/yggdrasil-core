@@ -69,10 +69,80 @@ func askedForMedia(prompt, reference string) (mediaRequest, bool) {
 		return req, true
 	case editable != "" && editAskRe.MatchString(prompt) && (refersRe.MatchString(prompt) || !imageAskRe.MatchString(prompt)):
 		return mediaRequest{Tool: "image.edit", File: editable}, true
-	case imageAskRe.MatchString(prompt):
+	case imageAskRe.MatchString(prompt) || looseImageAsk(prompt):
 		return mediaRequest{Tool: "image.generate"}, true
 	}
 	return mediaRequest{}, false
+}
+
+// People type fast: "make a picutre of a dog" asks for a picture too. A
+// verb that makes, then within a few words one of these with a letter or
+// two off, counts (#391 follow-up).
+var (
+	makeVerbs    = map[string]bool{"make": true, "create": true, "generate": true, "design": true, "produce": true, "render": true, "draw": true, "paint": true, "sketch": true, "give": true, "show": true}
+	pictureNouns = []string{"image", "picture", "photo", "illustration", "drawing", "painting", "portrait", "poster", "wallpaper", "artwork"}
+	wordRe       = regexp.MustCompile(`[\pL']+`)
+)
+
+// looseImageAsk reports a request for a picture with the kind of picture
+// misspelled.
+func looseImageAsk(prompt string) bool {
+	words := wordRe.FindAllString(strings.ToLower(prompt), -1)
+	for i, w := range words {
+		if !makeVerbs[w] {
+			continue
+		}
+		for _, next := range words[i+1 : min(len(words), i+7)] {
+			if nearPictureNoun(next) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// nearPictureNoun is a word within reach of a kind of picture: one letter
+// off, or two for a long word, singular or plural. Short words must be
+// exact, so "log" isn't "logo".
+func nearPictureNoun(word string) bool {
+	word = strings.TrimSuffix(word, "s")
+	for _, noun := range pictureNouns {
+		limit := 1
+		if len(noun) >= 9 {
+			limit = 2
+		}
+		if len(word) >= 4 && editDistance(word, noun) <= limit {
+			return true
+		}
+	}
+	return false
+}
+
+// editDistance counts the letters to add, remove, change, or swap with the
+// next one to turn a into b.
+func editDistance(a, b string) int {
+	ra, rb := []rune(a), []rune(b)
+	d := make([][]int, len(ra)+1)
+	for i := range d {
+		d[i] = make([]int, len(rb)+1)
+		d[i][0] = i
+	}
+	for j := range d[0] {
+		d[0][j] = j
+	}
+	for i := 1; i <= len(ra); i++ {
+		for j := 1; j <= len(rb); j++ {
+			cost := 1
+			if ra[i-1] == rb[j-1] {
+				cost = 0
+			}
+			d[i][j] = min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+cost)
+			if i > 1 && j > 1 && ra[i-1] == rb[j-2] && ra[i-2] == rb[j-1] {
+				d[i][j] = min(d[i][j], d[i-2][j-2]+1)
+			}
+		}
+	}
+	return d[len(ra)][len(rb)]
 }
 
 // EventMakingMedia tells the UI that Toskar is making a picture or a clip:
@@ -92,7 +162,49 @@ const maxMediaPrompt = 1500
 // profile allows the tool. It returns the reply to show.
 func makeMediaFirst(ctx context.Context, env pluginapi.ExecutionEnvironment, profile contracts.AIProfile, role string, messages []pluginapi.ChatMessage, prompt, reference string) (string, *pluginapi.GenerationMetrics, bool) {
 	req, ok := askedForMedia(prompt, reference)
-	if !ok || !toolEnabled(profile, req.Tool) {
+	if !ok {
+		return "", nil, false
+	}
+	return makeMedia(ctx, env, profile, role, messages, prompt, req)
+}
+
+// refusesPictureRe is an answer that won't make a picture, or sends the
+// person elsewhere for one: "I can't create images", "try DALL-E", ASCII
+// art.
+var refusesPictureRe = regexp.MustCompile(`(?i)\b(can'?t|cannot|unable to|not able to|don'?t have the (ability|capability) to|not capable of)\s+(directly\s+)?(generate|create|make|draw|produce|render)\b[^.\n]{0,40}\b(images?|pictures?|photos?|drawings?|art(work)?)\b|\b(dall-?e|midjourney|stable diffusion|ascii art|online image generators?|image generator (website|site|tool)s?)\b`)
+
+// pictureTalkRe is a message about pictures at all, so a refusal is about
+// making one.
+var pictureTalkRe = regexp.MustCompile(`(?i)\b(draw|paint|sketch|illustrate|images?|pictures?|photos?|pics?|drawings?|paintings?|illustrations?|portraits?)\b`)
+
+// makeMediaAfterRefusal makes the picture a model declined to, when the
+// message is about one and image generation is allowed: a backstop for a
+// request worded in a way askedForMedia doesn't know.
+func makeMediaAfterRefusal(ctx context.Context, env pluginapi.ExecutionEnvironment, profile contracts.AIProfile, role string, messages []pluginapi.ChatMessage, prompt, answer string) (string, *pluginapi.GenerationMetrics, bool) {
+	if !refusesPictureRe.MatchString(answer) || howToRe.MatchString(prompt) || lookForRe.MatchString(prompt) || aboutAbilityRe.MatchString(prompt) {
+		return "", nil, false
+	}
+	if !pictureTalkRe.MatchString(prompt) && !looseImageAsk(prompt) && !anyNearPictureNoun(prompt) {
+		return "", nil, false
+	}
+	return makeMedia(ctx, env, profile, role, messages, prompt, mediaRequest{Tool: "image.generate"})
+}
+
+// anyNearPictureNoun is a message with a kind of picture in it, however
+// it's spelled.
+func anyNearPictureNoun(prompt string) bool {
+	for _, w := range wordRe.FindAllString(strings.ToLower(prompt), -1) {
+		if nearPictureNoun(w) {
+			return true
+		}
+	}
+	return false
+}
+
+// makeMedia makes a picture or clip for req, when the profile allows the
+// tool. It returns the reply to show.
+func makeMedia(ctx context.Context, env pluginapi.ExecutionEnvironment, profile contracts.AIProfile, role string, messages []pluginapi.ChatMessage, prompt string, req mediaRequest) (string, *pluginapi.GenerationMetrics, bool) {
+	if !toolEnabled(profile, req.Tool) {
 		return "", nil, false
 	}
 	kind, ask := "image", describeImage
