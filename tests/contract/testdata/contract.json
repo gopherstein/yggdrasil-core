@@ -1,5 +1,5 @@
 {
-  "version": "1.12",
+  "version": "1.13",
   "types": {
     "ActivityStep": [
       "kind",
@@ -8,6 +8,7 @@
     "Artifact": [
       "conversation_id",
       "created_at",
+      "expires_at",
       "id",
       "kind",
       "mime_type",

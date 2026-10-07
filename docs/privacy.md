@@ -25,6 +25,7 @@ What you can see and remove:
 - **Chats:** saved while `save_chat_history` is on (the default). Delete a chat from the chat list.
 - **Memories:** listed on the Memory page, where you can edit, pause, mark **This computer only**, or delete them, or turn memory off. A secret such as a password, key, or card number is never saved as a memory.
 - **Run records:** prompts and tool results of past runs. They are kept for 30 days by default and removed daily. Settings → **What left this computer** sets **Keep run records for** (7, 30, or 90 days, or **Keep them**) and has **Delete run records now**. Deleting them also clears cached web searches and pages. Chats are not run records and are not deleted with them.
+- **Files outside chats:** a file that belongs to no chat, made by an automation run, the API, or an MCP client, or uploaded and never sent, is removed a week after it was made. Files in a chat stay until the chat is deleted.
 - **Knowledge, files, specialized AIs:** each has a delete action. Deleting a specialized AI deletes its adapters and exports.
 
 The diagnostic bundle is written to omit secrets, private keys, and API key material. Its `runtime.json` and `profiles/` describe the daemon's memory and goroutines: function names, counts, and sizes, with no prompts, files, or credentials. Do not assume a log file has been redacted. Remove tokens and personal text before you paste a log into an issue.
