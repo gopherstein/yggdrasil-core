@@ -169,7 +169,9 @@ func (o *Orchestrator) Run(
 				planned = true
 			}
 		}
-		if !planned {
+		// A picture or clip to make isn't looked up on the web first.
+		_, wantsMedia := askedForMedia(task.Prompt, reference)
+		if !planned && !wantsMedia {
 			// A message about a connected service is answered from that
 			// service, not the web.
 			if found, ok := serviceFirst(ctx, env, profile); ok {

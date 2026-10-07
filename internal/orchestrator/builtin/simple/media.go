@@ -2,6 +2,7 @@ package simple
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -164,6 +165,17 @@ func makeMediaFirst(ctx context.Context, env pluginapi.ExecutionEnvironment, pro
 	req, ok := askedForMedia(prompt, reference)
 	if !ok {
 		return "", nil, false
+	}
+	// A profile that keeps the tool off says so, rather than leaving the
+	// model to send the person to a website for one.
+	if !toolEnabled(profile, req.Tool) {
+		what := map[string]string{"image.generate": "Making pictures", "image.edit": "Changing pictures", "video.generate": "Making clips"}[req.Tool]
+		tell := fmt.Sprintf("%s is turned off for this chat's profile, %q, so nothing was made. In one or two short sentences, in the language of the user's last message, tell them that, and that they can turn it on for the profile in Profiles & Orchestration (or pick another profile for this chat). Don't suggest other websites or apps.", what, profile.Name)
+		reply, m, err := generateText(ctx, env, role, withInstruction(messages, tell))
+		if err != nil || strings.TrimSpace(reply) == "" {
+			reply = fmt.Sprintf("%s is turned off for the profile %q. Turn it on in Profiles & Orchestration, or pick another profile for this chat.", what, profile.Name)
+		}
+		return strings.TrimSpace(reply), m, true
 	}
 	return makeMedia(ctx, env, profile, role, messages, prompt, req)
 }

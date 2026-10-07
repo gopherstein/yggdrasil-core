@@ -96,6 +96,21 @@ func needsNormalize(p Profile) bool {
 	return false
 }
 
+// localContained are the policies for tools that stay on this computer and
+// can't change anything outside Toskar's store: no web, browser, or
+// connected service, and nothing that writes or runs.
+func localContained(policies []contracts.ToolPolicy) []contracts.ToolPolicy {
+	var out []contracts.ToolPolicy
+	for _, p := range policies {
+		def, ok := tools.Lookup(p.ToolID)
+		if !ok || !tools.Contained(def.Risk) || def.Source != "builtin" || def.Capability == tools.CapInternet || def.Capability == tools.CapBrowser {
+			continue
+		}
+		out = append(out, p)
+	}
+	return out
+}
+
 // mergeBuiltinTools adds newly shipped tools without changing policies the user already saved.
 func (m *Manager) mergeBuiltinTools(ctx context.Context) error {
 	byID := map[string]Profile{}
@@ -109,6 +124,18 @@ func (m *Manager) mergeBuiltinTools(ctx context.Context) error {
 	for _, existing := range list {
 		preset, ok := byID[existing.ID]
 		if !ok {
+			// A profile someone made doesn't list tools shipped since. Those
+			// that stay on this computer and only read or make files in
+			// Toskar's store, such as making pictures, are added at their
+			// default; one turned off is saved as deny and stays off.
+			merged := tools.MergeMissingTools(existing.Tools, localContained(generalToolPolicies()))
+			if samePolicies(merged, existing.Tools) {
+				continue
+			}
+			existing.Tools = merged
+			if err := m.Update(ctx, existing); err != nil {
+				return err
+			}
 			continue
 		}
 		merged := tools.MergeMissingTools(existing.Tools, preset.Tools)

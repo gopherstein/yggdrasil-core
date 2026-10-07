@@ -126,13 +126,21 @@ func TestClipRequestsAndDeniedTools(t *testing.T) {
 	if env.toolID != "video.generate" || env.args["prompt"] != "Waves rolling onto a beach at sunset, slow pan." {
 		t.Fatalf("called %s %+v", env.toolID, env.args)
 	}
-	denied := &mediaEnv{scriptedEnv: scriptedEnv{replies: []string{"I can describe one instead."}}}
-	runText(t, denied, "Draw a dog", contracts.AIProfile{
+	// A profile that keeps it off says so, by name.
+	denied := &mediaEnv{scriptedEnv: scriptedEnv{replies: []string{""}}}
+	text := runText(t, denied, "Draw a dog", contracts.AIProfile{
+		Name:  "Shop helper",
 		Roles: []contracts.ModelRole{{Role: "assistant", ModelID: "m"}},
 		Tools: []contracts.ToolPolicy{{ToolID: "image.generate", Policy: "deny"}},
 	})
 	if denied.tools != 0 {
 		t.Fatal("made a picture the profile denies")
+	}
+	if !strings.Contains(text, `Making pictures is turned off for the profile "Shop helper"`) || !strings.Contains(text, "Profiles & Orchestration") {
+		t.Fatalf("denied reply = %q", text)
+	}
+	if last := denied.seen[0][len(denied.seen[0])-1]; !strings.Contains(last.Content, "turned off for this chat's profile") {
+		t.Fatalf("the model is told: %q", last.Content)
 	}
 }
 
