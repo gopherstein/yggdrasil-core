@@ -35,8 +35,8 @@ const coder = model({
   memory_needed_bytes: 400,
 })
 const llava = model({
-  id: 'llava',
-  display_name: 'LLaVA 1.6',
+  id: 'gemma-3-4b-q4',
+  display_name: 'Gemma 3 4B',
   capabilities: { tool_calling: false, vision: true, coding: false },
 })
 
@@ -80,6 +80,11 @@ describe('capabilityGap', () => {
 
   it('suggests a vision model for an image request', () => {
     const gap = capabilityGap('Describe this screenshot', llama, catalog)
-    expect(gap?.notes[0]?.suggestions.map((item) => item.name)).toEqual(['LLaVA 1.6'])
+    expect(gap?.notes[0]?.suggestions.map((item) => item.name)).toEqual(['Gemma 3 4B'])
+  })
+
+  it('leaves an image request alone when a vision model is installed', () => {
+    const installed = [llama, { ...llava, installed: true }]
+    expect(capabilityGap('Describe this screenshot', llama, installed)).toBeNull()
   })
 })

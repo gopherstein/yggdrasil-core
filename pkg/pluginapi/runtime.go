@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strings"
 )
 
 // RuntimeDetection reports what a runtime found on the host.
@@ -61,6 +62,9 @@ type ModelStartConfig struct {
 	// Mode is ModeEmbedding or ModeReranking for a supporting model, or
 	// empty to chat.
 	Mode string `json:"mode,omitempty"`
+	// Projector is a vision model's image encoder (llama.cpp's mmproj), so
+	// the model can see pictures; empty for a model that reads text only.
+	Projector string `json:"projector,omitempty"`
 }
 
 // Supporting model modes (AI experience spec §61). A model started in one of
@@ -87,6 +91,8 @@ type RunningModel struct {
 	Adapters []string `json:"adapters,omitempty"`
 	// Mode is how the instance was started (see ModelStartConfig.Mode).
 	Mode string `json:"mode,omitempty"`
+	// Projector is the image encoder it was started with, if any.
+	Projector string `json:"projector,omitempty"`
 	// Acceleration is where the instance runs, from the runtime's own
 	// report when it loaded the model; nil when it is not known.
 	Acceleration *Acceleration `json:"acceleration,omitempty"`
@@ -145,6 +151,76 @@ type ChatRequest struct {
 type ChatMessage struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
+	// Images are pictures for a model that can see, as data URLs
+	// ("data:image/png;base64,…"). A message with images is sent in the
+	// OpenAI form, content parts: the text, then each image (#191).
+	Images []string `json:"-"`
+}
+
+type contentPart struct {
+	Type     string    `json:"type"`
+	Text     string    `json:"text,omitempty"`
+	ImageURL *imageURL `json:"image_url,omitempty"`
+}
+
+type imageURL struct {
+	URL string `json:"url"`
+}
+
+// MarshalJSON writes content as a string, or as parts when the message has
+// images.
+func (m ChatMessage) MarshalJSON() ([]byte, error) {
+	if len(m.Images) == 0 {
+		return json.Marshal(struct {
+			Role    string `json:"role"`
+			Content string `json:"content"`
+		}{m.Role, m.Content})
+	}
+	parts := make([]contentPart, 0, len(m.Images)+1)
+	if m.Content != "" {
+		parts = append(parts, contentPart{Type: "text", Text: m.Content})
+	}
+	for _, url := range m.Images {
+		parts = append(parts, contentPart{Type: "image_url", ImageURL: &imageURL{URL: url}})
+	}
+	return json.Marshal(struct {
+		Role    string        `json:"role"`
+		Content []contentPart `json:"content"`
+	}{m.Role, parts})
+}
+
+// UnmarshalJSON reads content as a string or as OpenAI content parts, whose
+// text parts are joined and whose images are kept.
+func (m *ChatMessage) UnmarshalJSON(data []byte) error {
+	var raw struct {
+		Role    string          `json:"role"`
+		Content json.RawMessage `json:"content"`
+	}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	*m = ChatMessage{Role: raw.Role}
+	if len(raw.Content) == 0 || string(raw.Content) == "null" {
+		return nil
+	}
+	if raw.Content[0] == '"' {
+		return json.Unmarshal(raw.Content, &m.Content)
+	}
+	var parts []contentPart
+	if err := json.Unmarshal(raw.Content, &parts); err != nil {
+		return errors.New("message content must be a string or a list of content parts")
+	}
+	var texts []string
+	for _, p := range parts {
+		switch {
+		case p.Type == "text":
+			texts = append(texts, p.Text)
+		case p.Type == "image_url" && p.ImageURL != nil && p.ImageURL.URL != "":
+			m.Images = append(m.Images, p.ImageURL.URL)
+		}
+	}
+	m.Content = strings.Join(texts, "\n")
+	return nil
 }
 
 // ChatChunk is a streaming generation fragment.

@@ -454,6 +454,7 @@
   },
   "notices": {
     "languageWeak": "{{model}}은(는) 영어보다 {{language}}를 덜 잘 쓸 수 있고, 설치된 모델 중 이 컴퓨터에 맞으면서 더 잘 쓰는 모델이 없어요. {{language}} 평가가 좋은 모델은 모델 페이지에서 볼 수 있어요.",
+    "noVision": "그림을 볼 수 있는 모델이 설치되어 있지 않아서 답변이 그림을 보지 않았어요. 모델 페이지에서 Gemma 3 4B 같은 비전 모델을 설치하세요.",
     "unconfirmedFigures": "Toskar가 소스에서 {{figures}}을(를) 확인하지 못했어요. 믿기 전에 확인하세요.",
     "codeErrors": "코드 일부에 구문 오류가 있습니다: {{errors}}. 실행하기 전에 고치세요.",
     "unsourcedLinks": "다음 링크는 출처에서 나온 것이 아니어서 열리지 않을 수 있어요: {{links}}. 열리지 않으면 해당 사이트에서 검색하세요.",
@@ -492,6 +493,7 @@
     "profileCoding": "{{profile}}의 코딩 모델인 {{model}}을(를) 사용했어요",
     "profileFast": "{{profile}}의 간단한 질문용 모델인 {{model}}을(를) 사용했어요",
     "currentInfo": "이 질문에는 웹의 최신 정보가 필요해서 {{model}}을(를) 사용했어요",
+    "seesPictures": "그림을 볼 수 있어서 {{model}}을(를) 사용했어요",
     "fallbackFailed": "{{failed}}이(가) 답하지 못해서 {{model}}이(가) 대신 답했어요",
     "fallbackStopped": "{{failed}}이(가) 응답을 멈춰서 {{model}}이(가) 대신 답했어요",
     "fallbackOutOfMemory": "{{failed}}의 메모리가 부족해서 {{model}}이(가) 대신 답했어요",

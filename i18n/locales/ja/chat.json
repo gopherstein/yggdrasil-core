@@ -454,6 +454,7 @@
   },
   "notices": {
     "languageWeak": "{{model}}は英語に比べて{{language}}の文章が劣る可能性があり、インストール済みで動作するモデルの中にこれより得意なものはありません。{{language}}の評価が高いモデルは「モデル」ページで確認できます。",
+    "noVision": "画像を見られるモデルがインストールされていないため、回答は画像を見ていません。「モデル」ページでGemma 3 4Bなどの画像対応モデルをインストールしてください。",
     "unconfirmedFigures": "Toskarはソースで{{figures}}を確認できませんでした。頼る前に確認してください。",
     "codeErrors": "コードの一部が構文エラーです: {{errors}}。実行する前に修正してください。",
     "unsourcedLinks": "次のリンクは情報源から得たものではなく、開けない可能性があります: {{links}}。開けない場合は、そのサイト内で検索してください。",
@@ -492,6 +493,7 @@
     "profileCoding": "{{profile}}のコーディング用モデル、{{model}}を使用しました",
     "profileFast": "{{profile}}の簡単な質問用モデル、{{model}}を使用しました",
     "currentInfo": "この質問にはWebの最新情報が必要なため、{{model}}を使用しました",
+    "seesPictures": "画像を見られるため、{{model}}を使用しました",
     "fallbackFailed": "{{failed}}が回答できなかったため、{{model}}が代わりに回答しました",
     "fallbackStopped": "{{failed}}が応答しなくなったため、{{model}}が代わりに回答しました",
     "fallbackOutOfMemory": "{{failed}}のメモリが不足したため、{{model}}が代わりに回答しました",

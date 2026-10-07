@@ -34,6 +34,7 @@ type managedProcess struct {
 	modelID     string
 	adapters    []string
 	mode        string
+	projector   string
 	logFile     *os.File
 	logPath     string
 	intentional bool
@@ -89,7 +90,9 @@ func (r *Runtime) StartModel(ctx context.Context, cfg pluginapi.ModelStartConfig
 			if m.ModelID != cfg.ModelID || m.Status != "running" {
 				continue
 			}
-			if m.Mode == cfg.Mode && sameAdapters(m.Adapters, wantAdapters) {
+			// A projector is loaded at start too: a vision model started
+			// before its projector was downloaded is started again with it.
+			if m.Mode == cfg.Mode && m.Projector == cfg.Projector && sameAdapters(m.Adapters, wantAdapters) {
 				return m, nil
 			}
 			_ = r.StopModel(ctx, m.ID)
@@ -98,6 +101,11 @@ func (r *Runtime) StartModel(ctx context.Context, cfg pluginapi.ModelStartConfig
 	for _, a := range cfg.Adapters {
 		if _, err := os.Stat(a.Path); err != nil {
 			return pluginapi.RunningModel{}, fmt.Errorf("adapter %s: %w", a.ID, err)
+		}
+	}
+	if cfg.Projector != "" {
+		if _, err := os.Stat(cfg.Projector); err != nil {
+			return pluginapi.RunningModel{}, fmt.Errorf("image projector: %w", err)
 		}
 	}
 
@@ -145,14 +153,15 @@ func (r *Runtime) StartModel(ctx context.Context, cfg pluginapi.ModelStartConfig
 	r.ensureSupervisor()
 	r.sup.mu.Lock()
 	r.sup.procs[instanceID] = &managedProcess{
-		cmd:      cmd,
-		endpoint: endpoint,
-		modelID:  cfg.ModelID,
-		adapters: wantAdapters,
-		mode:     cfg.Mode,
-		logFile:  logFile,
-		logPath:  logPath,
-		exited:   make(chan struct{}),
+		cmd:       cmd,
+		endpoint:  endpoint,
+		modelID:   cfg.ModelID,
+		adapters:  wantAdapters,
+		mode:      cfg.Mode,
+		projector: cfg.Projector,
+		logFile:   logFile,
+		logPath:   logPath,
+		exited:    make(chan struct{}),
 	}
 	exited := r.sup.procs[instanceID].exited
 	r.sup.mu.Unlock()
@@ -184,6 +193,7 @@ func (r *Runtime) StartModel(ctx context.Context, cfg pluginapi.ModelStartConfig
 		RuntimeID:    runtimeID,
 		Adapters:     wantAdapters,
 		Mode:         cfg.Mode,
+		Projector:    cfg.Projector,
 		Acceleration: acc,
 	}, nil
 }
@@ -212,6 +222,9 @@ func startArgs(cfg pluginapi.ModelStartConfig, port int) []string {
 			"--ctx-size", fmt.Sprintf("%d", n),
 			"--batch-size", fmt.Sprintf("%d", n),
 			"--ubatch-size", fmt.Sprintf("%d", n))
+	}
+	if cfg.Projector != "" {
+		args = append(args, "--mmproj", cfg.Projector)
 	}
 	return append(args, "--ctx-size", fmt.Sprintf("%d", defaultContext(cfg.Context)))
 }
@@ -258,6 +271,7 @@ func (r *Runtime) ListRunning(ctx context.Context) ([]pluginapi.RunningModel, er
 			RuntimeID:    runtimeID,
 			Adapters:     append([]string(nil), p.adapters...),
 			Mode:         p.mode,
+			Projector:    p.projector,
 			Acceleration: p.acceleration,
 		})
 	}

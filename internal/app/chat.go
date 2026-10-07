@@ -55,7 +55,13 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 	opts := turnopts.From(ctx)
 	// A short question about what Yggdrasil can do is answered from its
 	// inventory, not by a model that may claim what it cannot do (§37).
-	if len(structured.SchemaFrom(ctx)) == 0 {
+	// "What's in this picture?" with a picture attached is for a model that
+	// can see, when one is installed.
+	picturesAsked := false
+	if a.attachesPictures(ctx) {
+		_, picturesAsked = a.seeingModel(ctx)
+	}
+	if len(structured.SchemaFrom(ctx)) == 0 && !picturesAsked {
 		if ch, ok := a.answerCapabilityQuestion(ctx, conversationID, message); ok {
 			return ch, nil
 		}
@@ -102,6 +108,10 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			profile.KnowledgeSources = nil
 		}
 		profile.KnowledgeSources = append(append([]string(nil), profile.KnowledgeSources...), opts.KnowledgeSources...)
+	}
+	attached, err := a.resolveAttachments(ctx, conversationID, artifacts.AttachmentsFrom(ctx))
+	if err != nil {
+		return nil, err
 	}
 	// Auto: Huginn picks the installed model that suits this message. A
 	// question about files or connected knowledge counts as one that needs a
@@ -180,6 +190,27 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			}
 		}
 	}
+	// Pictures go to a model that can see them (#191), on this computer,
+	// which has its projector.
+	var images []string
+	var shown []artifacts.Artifact
+	if pictures := a.turnPictures(ctx, conversationID, attached); len(pictures) > 0 && special == nil {
+		switch m, ok := a.seeingModel(ctx); {
+		case a.seesImages(modelID):
+		case ok:
+			modelID = m.ID
+			profile = withChatModel(profile, modelID)
+			routeReason = locale.T(appLang, "chat:steps.seesPictures", map[string]any{"model": a.modelName(modelID)})
+		default:
+			if routeNotice == "" {
+				routeNotice = locale.T(appLang, "chat:notices.noVision", nil)
+			}
+		}
+		if a.seesImages(modelID) {
+			profile = applyExecutionPolicy(profile, "local")
+			images, shown = a.imageURLs(ctx, pictures)
+		}
+	}
 	if routeReason != "" {
 		routedID, routedName := modelID, a.modelName(modelID)
 		if special != nil {
@@ -205,10 +236,6 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		return nil, err
 	}
 
-	attached, err := a.resolveAttachments(ctx, conversationID, artifacts.AttachmentsFrom(ctx))
-	if err != nil {
-		return nil, err
-	}
 	if conversationID != "" {
 		if save, _ := a.Settings.GetBool(ctx, "save_chat_history", true); save {
 			if len(attached) > 0 {
@@ -303,6 +330,8 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			trace:          &turnTrace{runID: task.ID, notice: routeNotice, lang: appLang},
 			startedAt:      turnStart,
 			attachments:    attached,
+			images:         images,
+			pictures:       shown,
 		}
 		if routeReason != "" {
 			env.trace.routed(routeReason)
@@ -956,6 +985,11 @@ type chatExecEnv struct {
 	responseLanguage string
 	// attachments are the files attached to this message.
 	attachments []artifacts.Artifact
+	// images are the pictures shown to the model with this message, as data
+	// URLs, when it can see them (#191).
+	images []string
+	// pictures are the files behind images.
+	pictures []artifacts.Artifact
 	// summarized counts saved messages replaced by a summary this turn.
 	summarized int
 	// startedAt and firstGenerate measure the pipeline's overhead before
@@ -1085,6 +1119,11 @@ func (e *chatExecEnv) Generate(ctx context.Context, role string, messages []plug
 		return nil, err
 	}
 	nodeID = e.keepLocalIfNeeded(role, nodeID)
+	// Pictures go only to a model that can see them here; a fallback that
+	// reads text only gets the text.
+	if local := nodeID == "" || nodeID == e.app.Config.Get().NodeID; !local || !e.app.seesImages(modelID) {
+		messages = withoutImages(messages)
+	}
 	e.app.Bus.Publish(events.New(events.ModelLoadStarted, map[string]any{
 		"model_id": modelID, "node_id": nodeID, "role": role,
 		"node_name": e.app.nodeDisplayName(nodeID),
@@ -1529,3 +1568,6 @@ func (e *chatExecEnv) noteTraining(nodeID string) {
 		e.trace.sharing(busy)
 	}
 }
+
+// TurnImages are the pictures shown to the model with this message.
+func (e *chatExecEnv) TurnImages() []string { return e.images }

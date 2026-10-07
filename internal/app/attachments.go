@@ -106,6 +106,10 @@ func (e *chatExecEnv) attachmentBlock(ctx context.Context, prompt string) string
 	if len(e.attachments) == 0 && len(earlier) == 0 {
 		return ""
 	}
+	shown := map[string]bool{}
+	for _, art := range e.pictures {
+		shown[art.ID] = true
+	}
 	window := e.ContextLimit() * 4
 	budget := func(share float64, files int) int {
 		n := int(float64(window) * share)
@@ -138,9 +142,14 @@ func (e *chatExecEnv) attachmentBlock(ctx context.Context, prompt string) string
 				continue
 			}
 			if art.Kind == "image" {
-				// Images are not text either; they can be changed when image
-				// editing is set up.
-				fmt.Fprintf(&b, "\nImage %s: %s. You cannot see it.", label, art.Name)
+				// Images are not text either. A model that can see is shown
+				// the message's pictures (#191); they can be changed when
+				// image editing is set up.
+				if shown[art.ID] {
+					fmt.Fprintf(&b, "\nImage %s: %s. It is shown to you with this message; look at it to answer.", label, art.Name)
+				} else {
+					fmt.Fprintf(&b, "\nImage %s: %s. You cannot see it.", label, art.Name)
+				}
 				if imagegen.IsEditable(art.Name) && e.app.toolReady(ImageEditToolID) {
 					fmt.Fprintf(&b, " To change it, call %s with {\"file\": %q}.", ImageEditToolID, art.Name)
 				}

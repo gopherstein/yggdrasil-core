@@ -100,6 +100,12 @@ func Measure(count Counter, instructions, toolPrompt string, messages []pluginap
 			continue
 		}
 		n := add(count.Count(msg.Content))
+		if len(msg.Images) > 0 {
+			// A picture's tokens depend on the model's encoder; this is
+			// an estimate whatever the text's count.
+			exact = false
+			n += len(msg.Images) * ImageTokens
+		}
 		if msg.Role == "user" && isToolFeedback(msg.Content) {
 			parts[3] += n
 			continue
@@ -116,6 +122,10 @@ func Measure(count Counter, instructions, toolPrompt string, messages []pluginap
 		Estimated:    promptTokens <= 0 && !exact,
 	}
 }
+
+// ImageTokens estimates the window one picture takes: Gemma 3 uses 256
+// tokens, Qwen 2.5 VL about a thousand for a large photo.
+const ImageTokens = 768
 
 func isToolFeedback(content string) bool {
 	return strings.HasPrefix(content, "Tool result for you") ||

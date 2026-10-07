@@ -454,6 +454,7 @@
   },
   "notices": {
     "languageWeak": "{{model}} 寫{{language}}可能不如寫英文好，而已安裝且能執行的模型中沒有更擅長的。{{language}}評級良好的模型可在「模型」頁面找到。",
+    "noVision": "沒有已安裝的模型能看圖片，所以回答沒有看這些圖片。請在「模型」頁面安裝 Gemma 3 4B 或其他視覺模型。",
     "unconfirmedFigures": "Toskar 無法在來源中確認 {{figures}}。請先檢查再依賴它。",
     "codeErrors": "部分程式碼無法解析：{{errors}}。執行前請先修正。",
     "unsourcedLinks": "這些連結並非來自任何來源，可能無法開啟：{{links}}。如果打不開，請在該網站內搜尋。",
@@ -492,6 +493,7 @@
     "profileCoding": "使用了 {{profile}} 的程式設計模型 {{model}}",
     "profileFast": "使用了 {{profile}} 用於簡單問題的模型 {{model}}",
     "currentInfo": "使用了 {{model}}，因為這個問題需要來自網路的最新資訊",
+    "seesPictures": "使用了 {{model}}，因為它能看圖片",
     "fallbackFailed": "{{failed}} 無法回答，因此改由 {{model}} 回答",
     "fallbackStopped": "{{failed}} 停止回應，因此改由 {{model}} 回答",
     "fallbackOutOfMemory": "{{failed}} 記憶體不足，因此改由 {{model}} 回答",

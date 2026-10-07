@@ -121,7 +121,7 @@ func (m *Manager) Install(ctx context.Context, modelID string, wait bool) error 
 	}
 	if installed, _, err := m.storage.IsInstalled(ctx, modelID); err != nil {
 		return err
-	} else if installed {
+	} else if installed && (entry.Projector == nil || m.storage.HasProjector(modelID)) {
 		return nil
 	}
 	if err := m.storage.UpsertCatalogEntry(ctx, entry); err != nil {
@@ -138,13 +138,8 @@ func (m *Manager) Install(ctx context.Context, modelID string, wait bool) error 
 			case <-ctx.Done():
 				return ctx.Err()
 			case <-time.After(500 * time.Millisecond):
-				if installed, _, err := m.storage.IsInstalled(ctx, modelID); err != nil {
-					return err
-				} else if installed {
-					return nil
-				}
 				if !m.isDownloading(modelID) {
-					if installed, _, _ := m.storage.IsInstalled(ctx, modelID); installed {
+					if installed, _, _ := m.storage.IsInstalled(ctx, modelID); installed && (entry.Projector == nil || m.storage.HasProjector(modelID)) {
 						return nil
 					}
 					return fmt.Errorf("download of %q ended without installing", modelID)
@@ -271,6 +266,22 @@ func (m *Manager) Path(ctx context.Context, modelID string) (string, error) {
 		return "", contracts.Errorf("MODEL_NOT_INSTALLED", map[string]any{"model_id": modelID}, "model %q not installed", modelID)
 	}
 	return path, nil
+}
+
+// ProjectorPath returns an installed vision model's projector, or "" when
+// the model has none here, so it reads text only.
+func (m *Manager) ProjectorPath(modelID string) string {
+	entry, ok := m.catalog.Get(modelID)
+	if !ok || entry.Projector == nil || !m.storage.HasProjector(modelID) {
+		return ""
+	}
+	return m.storage.ProjectorPath(modelID)
+}
+
+// SeesImages reports an installed model that can see pictures here: a vision
+// model with its projector.
+func (m *Manager) SeesImages(modelID string) bool {
+	return m.ProjectorPath(modelID) != ""
 }
 
 // StubModelID is the fake model used when TOSKAR_STUB_INFERENCE is enabled.

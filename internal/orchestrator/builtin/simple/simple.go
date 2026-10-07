@@ -107,7 +107,13 @@ func (o *Orchestrator) Run(
 			budget.Plan, budget.Verify = true, true
 			budget.Corrections = max(budget.Corrections, 1)
 		}
-		if jsonOnly {
+		// A message with pictures is answered by the model that sees them,
+		// in one reply: plan steps and checks would read only text (#191).
+		var images []string
+		if ti, ok := env.(pluginapi.TurnImages); ok {
+			images = ti.TurnImages()
+		}
+		if jsonOnly || len(images) > 0 {
 			budget.Plan, budget.Verify = false, false
 		}
 		env.Emit(EventEffort, map[string]any{"effort": string(budget.Effort), "chosen": string(huginn.EffortFrom(ctx))})
@@ -171,7 +177,7 @@ func (o *Orchestrator) Run(
 		}
 		// A picture or clip to make isn't looked up on the web first.
 		_, wantsMedia := askedForMedia(task.Prompt, reference)
-		if !planned && !wantsMedia {
+		if !planned && !wantsMedia && len(images) == 0 {
 			// A message about a connected service is answered from that
 			// service, not the web.
 			if found, ok := serviceFirst(ctx, env, profile); ok {
@@ -213,7 +219,7 @@ func (o *Orchestrator) Run(
 		messages := []pluginapi.ChatMessage{{Role: "system", Content: sys}}
 		prior := priorMessages(ctx, env, count, userMsg, sys, profile.Orchestration.ContextShare)
 		messages = append(messages, prior...)
-		messages = append(messages, pluginapi.ChatMessage{Role: "user", Content: userMsg})
+		messages = append(messages, pluginapi.ChatMessage{Role: "user", Content: userMsg, Images: images})
 
 		var metrics *pluginapi.GenerationMetrics
 		var usage contextusage.Usage
@@ -421,7 +427,7 @@ func (o *Orchestrator) Run(
 					toolsOn = false
 					rewrite := []pluginapi.ChatMessage{{Role: "system", Content: plainSys + "\n" + lookupGuidance}}
 					rewrite = append(rewrite, prior...)
-					messages = append(rewrite, pluginapi.ChatMessage{Role: "user", Content: withReference(task.Prompt, reference)})
+					messages = append(rewrite, pluginapi.ChatMessage{Role: "user", Content: withReference(task.Prompt, reference), Images: images})
 					continue
 				}
 			}

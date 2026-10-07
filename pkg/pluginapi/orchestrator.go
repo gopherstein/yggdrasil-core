@@ -21,6 +21,12 @@ type ExecutionEnvironment interface {
 	NodeForRole(role string) (nodeID string, err error)
 }
 
+// TurnImages is an environment whose message carries pictures the answering
+// model can see, as data URLs for ChatMessage.Images (#191).
+type TurnImages interface {
+	TurnImages() []string
+}
+
 // OrchestrationEvent is a structured progress event from an orchestrator.
 type OrchestrationEvent struct {
 	Type    string             `json:"type"`
