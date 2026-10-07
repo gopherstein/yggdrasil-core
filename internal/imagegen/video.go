@@ -161,7 +161,7 @@ func (e *Engine) GenerateVideo(ctx context.Context, req VideoRequest) (VideoResu
 		args = append(args, "-i", first)
 	}
 	start := time.Now()
-	data, err := runCLI(ctx, cli, dir, args, out, "clip", videoRunLimit)
+	data, err := e.runWithFallback(ctx, cli, dir, args, out, "clip", videoRunLimit)
 	if err != nil {
 		return VideoResult{}, err
 	}

@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { api } from '@/lib/api'
 import type { ImageModel, ImageSetup } from '@/types/api'
@@ -7,7 +7,7 @@ import { ImageSetupCard } from './ImageSetup'
 
 vi.mock('@/lib/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/api')>()
-  return { ...actual, api: { ...actual.api, getMediaSetup: vi.fn(), startMediaSetup: vi.fn(), cancelMediaSetup: vi.fn(), removeMediaModel: vi.fn() } }
+  return { ...actual, api: { ...actual.api, getMediaSetup: vi.fn(), startMediaSetup: vi.fn(), useMediaBuild: vi.fn(), cancelMediaSetup: vi.fn(), removeMediaModel: vi.fn() } }
 })
 
 const model = (over: Partial<ImageModel>): ImageModel => ({
@@ -39,5 +39,20 @@ describe('ImageSetupCard', () => {
     expect(await screen.findByText(/less memory than it's comfortable with/)).toBeInTheDocument()
     expect(screen.queryByText(/no GPU acceleration/)).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Set up/ })).toBeInTheDocument()
+  })
+
+  it('says which build makes them, and offers the GPU build where one runs', async () => {
+    vi.mocked(api.useMediaBuild).mockResolvedValue(null)
+    renderWith({ supported: true, ready: true, program: true, release: 'r', active: 'flux2-klein-4b', accelerated: false, build: 'cpu', gpu_build: 'vulkan', models: [model({ installed: true })] })
+    expect(await screen.findByText('Makes them on the CPU.')).toBeInTheDocument()
+    expect(screen.queryByText(/no GPU acceleration/)).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Use the GPU build' }))
+    await waitFor(() => expect(api.useMediaBuild).toHaveBeenCalledWith('images', 'gpu'))
+  })
+
+  it('offers the CPU build from the Vulkan build', async () => {
+    renderWith({ supported: true, ready: true, program: true, release: 'r', active: 'flux2-klein-4b', accelerated: true, build: 'vulkan', gpu_build: 'vulkan', models: [model({ installed: true })] })
+    expect(await screen.findByText('Makes them on the GPU (Vulkan).')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Use the CPU build' })).toBeInTheDocument()
   })
 })

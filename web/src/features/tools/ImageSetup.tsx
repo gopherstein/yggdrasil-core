@@ -52,6 +52,7 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
   const start = useMutation({ mutationFn: (id: string) => api.startMediaSetup(kind, id), onSuccess: update })
   const cancel = useMutation({ mutationFn: () => api.cancelMediaSetup(kind), onSuccess: update })
   const remove = useMutation({ mutationFn: (id: string) => api.removeMediaModel(kind, id), onSuccess: update })
+  const switchBuild = useMutation({ mutationFn: (build: 'gpu' | 'cpu') => api.useMediaBuild(kind, build), onSuccess: update })
 
   // When a setup ends, the image tools become ready (or stay not ready).
   const wasRunning = useRef(false)
@@ -70,7 +71,7 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
   const fits = status.models.filter((m) => !m.too_little_memory)
   const selected = choice ?? (fits.find((m) => m.recommended) ?? fits[0])?.id
   const selectedModel = status.models.find((m) => m.id === selected)
-  const failed = start.error ?? remove.error
+  const failed = start.error ?? remove.error ?? switchBuild.error
   const error = failed instanceof Error ? failed.message : job && !job.running ? job.error : undefined
   const percent = job && job.total_bytes > 0 ? Math.round((job.done_bytes / job.total_bytes) * 100) : 0
 
@@ -89,7 +90,24 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
         </p>
       </div>
 
-      {status.supported && status.accelerated === false ? <p className="text-xs text-ink-muted">{t('images.slow')}</p> : null}
+      {status.supported && status.accelerated === false && !status.gpu_build ? <p className="text-xs text-ink-muted">{t('images.slow')}</p> : null}
+
+      {/* Which build makes them, and a way to switch: the GPU build where one runs here, or the CPU build (#154). */}
+      {status.supported && status.program && status.build && !running ? (
+        <div className="flex flex-wrap items-center gap-3 text-xs text-ink-muted">
+          <span>{status.build === 'cpu' ? t('images.onCPU') : t('images.onGPU', { build: status.build === 'metal' ? 'Metal' : 'Vulkan' })}</span>
+          {status.build === 'cpu' && status.gpu_build ? (
+            <button type="button" className="btn-secondary px-3 py-1 text-xs" disabled={switchBuild.isPending} onClick={() => switchBuild.mutate('gpu')}>
+              {t('images.useGPU')}
+            </button>
+          ) : null}
+          {status.build === 'vulkan' ? (
+            <button type="button" className="text-xs text-ink-faint underline-offset-2 hover:text-ink hover:underline" disabled={switchBuild.isPending} onClick={() => switchBuild.mutate('cpu')}>
+              {t('images.useCPU')}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       {status.supported && running && job ? (
         <div className="space-y-1.5">

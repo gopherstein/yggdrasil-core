@@ -58,6 +58,26 @@ func (s *Server) setupRoutes(api *mux.Router, prefix string, setup func() *image
 		}
 		writeJSON(w, http.StatusAccepted, st.Status())
 	}).Methods(http.MethodPost)
+	// Switch to the CPU build (cpu) or back to the GPU build (gpu), which
+	// images and video share (#154).
+	api.HandleFunc(prefix+"/setup/build", func(w http.ResponseWriter, r *http.Request) {
+		st := bound(w)
+		if st == nil {
+			return
+		}
+		var body struct {
+			Build string `json:"build"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			writeErr(w, http.StatusBadRequest, "INVALID_JSON", "invalid body", nil)
+			return
+		}
+		if err := st.UseBuild(body.Build); err != nil {
+			writeErrFrom(w, http.StatusConflict, "SETUP_REFUSED", err)
+			return
+		}
+		writeJSON(w, http.StatusAccepted, st.Status())
+	}).Methods(http.MethodPost)
 	// Stop a setup; what was downloaded is kept.
 	api.HandleFunc(prefix+"/setup", func(w http.ResponseWriter, r *http.Request) {
 		if st := bound(w); st != nil {

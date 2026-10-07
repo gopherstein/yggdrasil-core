@@ -2276,6 +2276,35 @@ paths:
                 $ref: "#/components/schemas/Error"
         "503":
           description: Speech cannot run on this computer
+  /api/v1/images/setup/build:
+    post:
+      summary: Switch stable-diffusion.cpp to its CPU build, or back to its GPU build
+      description: Images and video share the program, so this switches both. The GPU build is Metal on macOS and Vulkan on Linux and Windows, used when a GPU with a Vulkan driver is found; a Vulkan build that can't start on the GPU falls back to the CPU build by itself.
+      operationId: useImageBuild
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [build]
+              properties:
+                build:
+                  type: string
+                  enum: [gpu, cpu]
+      responses:
+        "202":
+          description: The setup status; a switch that installs a build shows as a job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSetup"
+        "409":
+          description: SETUP_REFUSED, such as gpu on a computer without a GPU the build can use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /api/v1/images/setup:
     get:
       summary: What image generation has installed, the models on offer, and any setup in progress
@@ -2340,6 +2369,35 @@ paths:
                 $ref: "#/components/schemas/ImageSetup"
         "409":
           description: The model is being set up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/video/setup/build:
+    post:
+      summary: Switch stable-diffusion.cpp to its CPU build, or back to its GPU build
+      description: Images and video share the program, so this switches both. The GPU build is Metal on macOS and Vulkan on Linux and Windows, used when a GPU with a Vulkan driver is found; a Vulkan build that can't start on the GPU falls back to the CPU build by itself.
+      operationId: useVideoBuild
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [build]
+              properties:
+                build:
+                  type: string
+                  enum: [gpu, cpu]
+      responses:
+        "202":
+          description: The setup status; a switch that installs a build shows as a job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ImageSetup"
+        "409":
+          description: SETUP_REFUSED, such as gpu on a computer without a GPU the build can use
           content:
             application/json:
               schema:
@@ -5377,6 +5435,9 @@ components:
         program: {type: boolean, description: "stable-diffusion.cpp is installed"}
         release: {type: string}
         active: {type: string, description: "The model images are made with"}
+        accelerated: {type: boolean, description: "Pictures and clips are made on the GPU: the installed build, or the one setup would install"}
+        build: {type: string, enum: [metal, vulkan, cpu], description: "The installed stable-diffusion.cpp build"}
+        gpu_build: {type: string, enum: [metal, vulkan], description: "The GPU build this computer can use; absent when it has none"}
         models:
           type: array
           items:

@@ -3,6 +3,7 @@ package imagegen
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"image"
 	_ "image/jpeg" // DecodeConfig reads the size of an image to edit
@@ -80,7 +81,7 @@ func (e *Engine) Available() (bool, string) {
 // provider describes this computer's image provider (Gungnir §16). Only the
 // macOS build uses the GPU (Metal); the others run on the CPU.
 func (e *Engine) provider(tool string) remotetools.Provider {
-	p := remotetools.Provider{Tool: tool, Accelerated: Accelerated()}
+	p := remotetools.Provider{Tool: tool, Accelerated: e.Setup.Accelerated()}
 	st := e.Setup.Status()
 	if m, ok := e.Setup.lookup(st.Active); ok {
 		p.Name = m.Name
@@ -215,11 +216,55 @@ func (e *Engine) Generate(ctx context.Context, req Request) (Result, error) {
 		args = append(args, "-r", ref)
 	}
 	start := time.Now()
-	data, err := runCLI(ctx, cli, dir, args, out, "image", runLimit)
+	data, err := e.runWithFallback(ctx, cli, dir, args, out, "image", runLimit)
 	if err != nil {
 		return Result{}, err
 	}
 	return Result{PNG: data, Width: w, Height: h, Seed: seed, Seconds: time.Since(start).Seconds(), Model: model.Name}, nil
+}
+
+// runWithFallback runs sd-cli, and when the Vulkan build can't start its
+// GPU here, installs the CPU build and runs that instead (#154).
+func (e *Engine) runWithFallback(ctx context.Context, cli, dir string, args []string, out, what string, limit time.Duration) ([]byte, error) {
+	data, err := runCLI(ctx, cli, dir, args, out, what, limit)
+	var failed *cliError
+	if err == nil || !errors.As(err, &failed) || !gpuFailure(failed.output) || e.Setup.InstalledBuild() != BuildVulkan {
+		return data, err
+	}
+	if ferr := e.Setup.fallBackToCPU(ctx); ferr != nil {
+		return nil, fmt.Errorf("%w; the GPU build couldn't start here, and the CPU build couldn't be installed: %v", err, ferr)
+	}
+	return runCLI(ctx, e.Setup.CLI(), dir, args, out, what, limit)
+}
+
+// cliError is sd-cli failing, with the end of what it printed.
+type cliError struct {
+	msg    string
+	output string
+}
+
+func (e *cliError) Error() string { return e.msg }
+
+// gpuStartFailures are what a Vulkan build prints when it can't start on
+// the GPU at all: no device, no loader, or a driver that won't initialize.
+// Anything else, such as running out of memory or a bad prompt, isn't the
+// build's fault, so it doesn't switch to the CPU build.
+var gpuStartFailures = []string{
+	"no vulkan devices", "ggml_vulkan: no devices", "failed to initialize vulkan", "failed to create vulkan instance",
+	"vk_error_initialization_failed", "vk_error_incompatible_driver", "vk_error_layer_not_present", "vk_error_extension_not_present",
+	"libvulkan.so.1: cannot open shared object file", "vulkan-1.dll was not found", "vulkan-1.dll not found",
+}
+
+// gpuFailure reports output from a Vulkan build that couldn't start on the
+// GPU.
+func gpuFailure(output string) bool {
+	lower := strings.ToLower(output)
+	for _, sign := range gpuStartFailures {
+		if strings.Contains(lower, sign) {
+			return true
+		}
+	}
+	return false
 }
 
 // runCLI runs sd-cli in dir and returns the file it wrote to out.
@@ -238,7 +283,7 @@ func runCLI(ctx context.Context, cli, dir string, args []string, out, what strin
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
 		}
-		return nil, fmt.Errorf("the %s could not be made: %s", what, stderr.lastLine(err))
+		return nil, &cliError{msg: fmt.Sprintf("the %s could not be made: %s", what, stderr.lastLine(err)), output: string(stderr.b)}
 	}
 	data, err := os.ReadFile(out)
 	if err != nil {

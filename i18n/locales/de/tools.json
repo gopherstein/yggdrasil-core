@@ -119,7 +119,11 @@
     "setUp": "Bilderzeugung einrichten",
     "tooLittleMemory": "Braucht mindestens {{need}} Arbeitsspeicher; dieser Computer hat {{have}}, daher läuft es hier nicht.",
     "tightMemory": "Dieser Computer hat weniger Arbeitsspeicher, als ideal wäre ({{comfortable}}), daher kann es langsam sein oder fehlschlagen.",
-    "slow": "Dieser Computer hat dafür keine GPU-Beschleunigung, daher dauert jedes Bild ein paar Minuten."
+    "slow": "Dieser Computer hat dafür keine GPU-Beschleunigung, daher dauert jedes Bild ein paar Minuten.",
+    "onGPU": "Erstellt sie auf der GPU ({{build}}).",
+    "onCPU": "Erstellt sie auf der CPU.",
+    "useGPU": "GPU-Version verwenden",
+    "useCPU": "CPU-Version verwenden"
   },
   "status": {
     "off": "Aus",

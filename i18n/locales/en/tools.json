@@ -119,7 +119,11 @@
     "setUp": "Set up image generation",
     "tooLittleMemory": "Needs at least {{need}} of memory; this computer has {{have}}, so it can't run here.",
     "tightMemory": "This computer has less memory than it's comfortable with ({{comfortable}}), so it may be slow or fail.",
-    "slow": "This computer has no GPU acceleration for this, so each picture takes a few minutes."
+    "slow": "This computer has no GPU acceleration for this, so each picture takes a few minutes.",
+    "onGPU": "Makes them on the GPU ({{build}}).",
+    "onCPU": "Makes them on the CPU.",
+    "useGPU": "Use the GPU build",
+    "useCPU": "Use the CPU build"
   },
   "status": {
     "off": "Off",

@@ -119,7 +119,11 @@
     "setUp": "Configurer la génération d'images",
     "tooLittleMemory": "Nécessite au moins {{need}} de mémoire ; cet ordinateur en a {{have}}, il ne peut donc pas fonctionner ici.",
     "tightMemory": "Cet ordinateur a moins de mémoire que recommandé ({{comfortable}}), cela peut donc être lent ou échouer.",
-    "slow": "Cet ordinateur n’a pas d’accélération GPU pour cela, chaque image prend donc quelques minutes."
+    "slow": "Cet ordinateur n’a pas d’accélération GPU pour cela, chaque image prend donc quelques minutes.",
+    "onGPU": "Les crée sur le GPU ({{build}}).",
+    "onCPU": "Les crée sur le CPU.",
+    "useGPU": "Utiliser la version GPU",
+    "useCPU": "Utiliser la version CPU"
   },
   "status": {
     "off": "Désactivé",
