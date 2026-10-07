@@ -7,6 +7,7 @@ import (
 	"github.com/yeixio/toskar-core/internal/cache"
 	"net/http"
 	"net/url"
+	"path"
 	"regexp"
 	"sort"
 	"strings"
@@ -16,6 +17,8 @@ import (
 )
 
 var preferredQuants = []string{"q4_k_m", "q5_k_m", "q4_k_s", "q8_0", "q4_0"}
+
+var splitPart = regexp.MustCompile(`-\d{5}-of-\d{5}\.gguf$`)
 
 var paramRe = regexp.MustCompile(`(?i)(\d+(?:\.\d+)?)\s*[bB]\b`)
 
@@ -63,6 +66,9 @@ func (c *Client) Search(ctx context.Context, query string, limit int) ([]contrac
 	if q != "" {
 		vals.Set("search", q)
 	}
+	// The full listing names each repository's files, so a result has its
+	// real file and shows whether it can see pictures.
+	vals.Set("full", "true")
 	u.RawQuery = vals.Encode()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
@@ -137,7 +143,7 @@ func mapRepo(m hfModel) contracts.BrowseModel {
 	if strings.Contains(low, "code") || strings.Contains(low, "coder") {
 		tags = append(tags, "coding")
 	}
-	if strings.Contains(low, "vision") || strings.Contains(low, "llava") {
+	if hasProjector(m.Siblings) || strings.Contains(low, "vision") || strings.Contains(low, "llava") {
 		tags = append(tags, "vision")
 	}
 	if strings.Contains(low, "reason") || strings.Contains(low, "r1") || strings.Contains(low, "think") {
@@ -162,6 +168,17 @@ func mapRepo(m hfModel) contracts.BrowseModel {
 	}
 }
 
+// hasProjector reports a repository with a vision projector (#191).
+func hasProjector(files []hfFile) bool {
+	for _, f := range files {
+		low := strings.ToLower(f.RFilename)
+		if strings.Contains(low, "mmproj") && strings.HasSuffix(low, ".gguf") {
+			return true
+		}
+	}
+	return false
+}
+
 func pickGGUF(files []hfFile) (name string, size int64, variant string) {
 	type cand struct {
 		f     hfFile
@@ -177,6 +194,11 @@ func pickGGUF(files []hfFile) (name string, size int64, variant string) {
 		if strings.Contains(low, "mmproj") || strings.Contains(low, "encoder") {
 			continue
 		}
+		// A draft head for speculative decoding (MTP) and one part of a
+		// split model can't run alone.
+		if strings.Contains(path.Base(low), "mtp") || splitPart.MatchString(low) {
+			continue
+		}
 		quant := detectQuant(low)
 		rank := 100
 		for i, q := range preferredQuants {
@@ -184,6 +206,10 @@ func pickGGUF(files []hfFile) (name string, size int64, variant string) {
 				rank = i
 				break
 			}
+		}
+		// A file in a subfolder is usually an extra, not the model.
+		if strings.Contains(low, "/") {
+			rank += 200
 		}
 		cands = append(cands, cand{f: f, rank: rank, quant: quant})
 	}

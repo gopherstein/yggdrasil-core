@@ -4,10 +4,12 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"slices"
 	"sync/atomic"
 	"testing"
 
@@ -114,5 +116,64 @@ func TestNoSystemRole(t *testing.T) {
 		if got := m.NoSystemRole(id); got != want {
 			t.Errorf("%s: %v, want %v", id, got, want)
 		}
+	}
+}
+
+// A model installed from a Hugging Face address gets its projector from the
+// repository, and is then a vision model that sees here.
+func TestInstallFromURLFindsTheProjector(t *testing.T) {
+	weights, projector := []byte("weights"), []byte("projector")
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/org/VL-GGUF/resolve/main/vl-Q4_K_M.gguf":
+			_, _ = w.Write(weights)
+		case "/org/VL-GGUF/resolve/main/mmproj-vl-f16.gguf":
+			_, _ = w.Write(projector)
+		default:
+			http.NotFound(w, r)
+		}
+	}))
+	defer srv.Close()
+
+	dir := t.TempDir()
+	db, err := store.Open(filepath.Join(dir, "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	storage := NewStorage(db.SQL, filepath.Join(dir, "models"))
+	bus := events.NewBus(64)
+	m := NewManager(&Catalog{}, storage, NewDownloader(storage, bus, db.SQL), bus)
+	var resolved string
+	m.Resolve = func(_ context.Context, src string) (ModelFile, *ModelFile, error) {
+		resolved = src
+		return ModelFile{SHA256: sha(weights), SizeBytes: uint64(len(weights))},
+			&ModelFile{URL: srv.URL + "/org/VL-GGUF/resolve/main/mmproj-vl-f16.gguf", SHA256: sha(projector), SizeBytes: uint64(len(projector))}, nil
+	}
+	src := srv.URL + "/org/VL-GGUF/resolve/main/vl-Q4_K_M.gguf"
+	id, err := m.InstallFromURL(context.Background(), contracts.InstallFromURLRequest{SourceURL: src, ID: "vl"}, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry, _ := m.Catalog().Get(id)
+	if resolved != src || !entry.Capabilities.Vision || entry.Source.SHA256 != sha(weights) || !slices.Contains(entry.Tags, "vision") ||
+		entry.SizeBytes != uint64(len(weights)+len(projector)) {
+		t.Fatalf("entry = %+v", entry)
+	}
+	if !m.SeesImages(id) {
+		t.Fatal("the projector wasn't downloaded")
+	}
+
+	// Without an answer from the repository, the install goes ahead as a
+	// text model.
+	m.Resolve = func(context.Context, string) (ModelFile, *ModelFile, error) {
+		return ModelFile{}, nil, errors.New("offline")
+	}
+	id, err = m.InstallFromURL(context.Background(), contracts.InstallFromURLRequest{SourceURL: src, ID: "plain"}, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry, _ := m.Catalog().Get(id); entry.Projector != nil || entry.Capabilities.Vision {
+		t.Fatalf("offline entry = %+v", entry)
 	}
 }

@@ -628,6 +628,19 @@ func New(opts Options) (*App, error) {
 	})
 
 	a.HF = hfclient.New()
+	// A model installed from Hugging Face gets its checksum and, for a
+	// vision model, its projector from the repository (#191).
+	modelMgr.Resolve = func(ctx context.Context, sourceURL string) (models.ModelFile, *models.ModelFile, error) {
+		repo, err := a.HF.Resolve(ctx, sourceURL)
+		if err != nil {
+			return models.ModelFile{}, nil, err
+		}
+		model := models.ModelFile{URL: repo.Model.URL, SHA256: repo.Model.SHA256, SizeBytes: repo.Model.Size}
+		if repo.Projector == nil {
+			return model, nil, nil
+		}
+		return model, &models.ModelFile{URL: repo.Projector.URL, SHA256: repo.Projector.SHA256, SizeBytes: repo.Projector.Size}, nil
+	}
 	a.setupCaches()
 	a.Lifecycle = &lifecycle.Sweeper{
 		Logger: logger,
