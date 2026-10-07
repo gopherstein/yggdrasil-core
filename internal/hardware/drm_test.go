@@ -3,6 +3,7 @@ package hardware
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -10,6 +11,12 @@ import (
 // and the processor's own graphics.
 func fakeSys(t *testing.T) (sys, dev string) {
 	t.Helper()
+	// sysfs names have a colon (pci0000:00), which Windows doesn't allow
+	// in a path, and the DRM reading is for Linux (found by
+	// @black-operative in #382).
+	if runtime.GOOS == "windows" {
+		t.Skip("sysfs paths can't be made on Windows")
+	}
 	root := t.TempDir()
 	dev = t.TempDir()
 	card := func(name, slot, vendor, device, vram, render string) {

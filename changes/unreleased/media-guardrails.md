@@ -7,3 +7,9 @@
   acceleration (every build but macOS), the setup offer, the Tools page,
   and the progress line say a picture takes a few minutes and a clip can
   take most of an hour.
+
+### Fixed
+
+- `go test ./internal/hardware/` passes on Windows: the Linux GPU tests,
+  whose fake device paths Windows can't create, are skipped there (found
+  by @black-operative).
