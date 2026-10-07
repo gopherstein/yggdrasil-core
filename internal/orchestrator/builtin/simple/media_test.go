@@ -37,6 +37,11 @@ func TestAskedForMedia(t *testing.T) {
 		"What's in this picture?",
 		"Describe this image",
 		"Write a poem about a dog",
+		// Near misses that aren't pictures.
+		"Make a mixture of flour and water",
+		"Make a log of the errors",
+		"Give me a postcard address",
+		"Create an imaginary friend",
 	} {
 		if got, ok := askedForMedia(msg, ""); ok {
 			t.Errorf("%q is not a request to make one: %+v", msg, got)
@@ -128,5 +133,25 @@ func TestClipRequestsAndDeniedTools(t *testing.T) {
 	})
 	if denied.tools != 0 {
 		t.Fatal("made a picture the profile denies")
+	}
+}
+
+// A request the check before the loop misses, which the model declines
+// or sends elsewhere ("use DALL-E"), still gets its picture.
+func TestRefusedPictureIsMadeAnyway(t *testing.T) {
+	env := &mediaEnv{scriptedEnv: scriptedEnv{replies: []string{
+		"I'm sorry, I can't create images. You could try DALL-E or Midjourney.",
+		"A dog on a lawn.",
+		"It's below.",
+	}}}
+	text := runText(t, env, "a dog picture would be lovely", mediaProfile)
+	if env.toolID != "image.generate" || text != "It's below." {
+		t.Fatalf("called %q, reply %q", env.toolID, text)
+	}
+	// A refusal about something else is left alone.
+	other := &mediaEnv{scriptedEnv: scriptedEnv{replies: []string{"I can't create images of real people."}}}
+	runText(t, other, "What's the capital of France?", mediaProfile)
+	if other.tools != 0 {
+		t.Fatal("made a picture nobody asked about")
 	}
 }

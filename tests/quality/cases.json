@@ -272,6 +272,50 @@
       }
     },
     {
+      "id": "image_make_a_picture",
+      "what": "\"Make a picture of a dog\" makes the picture, not a pointer to DALL-E or Midjourney.",
+      "message": "make a picture of a dog",
+      "stub": [
+        "A friendly dog sitting on a lawn, soft light.",
+        "It's attached below."
+      ],
+      "fixtures": true,
+      "expect": {
+        "tools_run": [
+          "image.generate"
+        ],
+        "files": [
+          ".png"
+        ],
+        "not_run": [
+          "terminal"
+        ],
+        "answer_lacks": "(?i)(can'?t|cannot|unable to|not able to|don'?t have the (ability|capability)) (to )?(draw|create|make|generate|produce)|as an ai|text-based|language model|midjourney|dall-?e|ascii art"
+      }
+    },
+    {
+      "id": "image_request_with_typo",
+      "what": "A request for a picture with the word misspelled, such as \"picutre\", still makes the picture, and doesn't run a command to draw ASCII art.",
+      "message": "make a picutre of a dog",
+      "stub": [
+        "A friendly dog sitting on a lawn, soft light.",
+        "It's attached below."
+      ],
+      "fixtures": true,
+      "expect": {
+        "tools_run": [
+          "image.generate"
+        ],
+        "files": [
+          ".png"
+        ],
+        "not_run": [
+          "terminal"
+        ],
+        "answer_lacks": "(?i)(can'?t|cannot|unable to|not able to|don'?t have the (ability|capability)) (to )?(draw|create|make|generate|produce)|as an ai|text-based|language model|midjourney|dall-?e|ascii art"
+      }
+    },
+    {
       "id": "video_request_makes_clip",
       "what": "Asked for a short video, Toskar makes the clip and attaches it.",
       "message": "Make a short video of waves rolling onto a beach.",
