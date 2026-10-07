@@ -284,6 +284,17 @@ func (m *Manager) SeesImages(modelID string) bool {
 	return m.ProjectorPath(modelID) != ""
 }
 
+// NoSystemRole reports a model whose chat template has no system role: one
+// the catalog marks, or a Gemma model installed from Hugging Face.
+func (m *Manager) NoSystemRole(modelID string) bool {
+	entry, ok := m.catalog.Get(modelID)
+	if ok && entry.NoSystemRole {
+		return true
+	}
+	name := strings.ToLower(modelID + " " + entry.Family)
+	return strings.Contains(name, "gemma")
+}
+
 // StubModelID is the fake model used when TOSKAR_STUB_INFERENCE is enabled.
 const StubModelID = "stub-team"
 
