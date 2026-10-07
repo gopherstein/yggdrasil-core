@@ -2,6 +2,7 @@ package pluginapi
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -32,5 +33,37 @@ func TestChatMessageJSON(t *testing.T) {
 	}
 	if err := json.Unmarshal([]byte(`{"role":"user","content":42}`), &m); err == nil {
 		t.Fatal("a number was read as content")
+	}
+}
+
+// A model without a system role gets the instructions marked in the first
+// user message, so it doesn't answer them as the user's words.
+func TestFoldSystem(t *testing.T) {
+	in := []ChatMessage{
+		{Role: "system", Content: "Answer in English."},
+		{Role: "system", Content: "The date is today."},
+		{Role: "user", Content: "Earlier question"},
+		{Role: "assistant", Content: "Earlier answer"},
+		{Role: "user", Content: "Say hi", Images: []string{"data:x"}},
+	}
+	out := FoldSystem(in)
+	if len(out) != 3 || out[0].Role != "user" || out[2].Images[0] != "data:x" {
+		t.Fatalf("out = %+v", out)
+	}
+	first := out[0].Content
+	if !strings.HasPrefix(first, "Instructions for you, from the app, not from the user.") ||
+		!strings.Contains(first, "Answer in English.\n\nThe date is today.\n</instructions>") ||
+		!strings.HasSuffix(first, "The user's message:\nEarlier question") {
+		t.Fatalf("first = %q", first)
+	}
+	if in[2].Content != "Earlier question" {
+		t.Fatal("the input was changed")
+	}
+	plain := []ChatMessage{{Role: "user", Content: "hi"}}
+	if got := FoldSystem(plain); len(got) != 1 || got[0].Content != "hi" {
+		t.Fatalf("no system = %+v", got)
+	}
+	if got := FoldSystem([]ChatMessage{{Role: "system", Content: "Only this."}}); len(got) != 1 || got[0].Role != "user" || !strings.Contains(got[0].Content, "Only this.") {
+		t.Fatalf("system only = %+v", got)
 	}
 }

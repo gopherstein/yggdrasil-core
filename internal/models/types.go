@@ -15,6 +15,10 @@ type CatalogEntry struct {
 	Context           int                         `json:"context,omitempty"`
 	Capabilities      contracts.ModelCapabilities `json:"capabilities"`
 	Source            contracts.ModelSource       `json:"source"`
+	// NoSystemRole marks a model whose chat template has no system role,
+	// such as Gemma's: Toskar's instructions go in the first user message,
+	// marked as instructions, instead of a system message.
+	NoSystemRole bool `json:"no_system_role,omitempty"`
 	// Projector is a vision model's image encoder (llama.cpp's mmproj),
 	// downloaded with it. Without it the model reads text only (#191).
 	Projector        *ModelFile `json:"projector,omitempty"`

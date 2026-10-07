@@ -238,7 +238,7 @@ func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role, adapter
 		}
 		ch, err := a.Runtimes.Chat(ctx, pluginapi.ChatRequest{
 			ModelEndpoint:  endpoint,
-			Messages:       messages,
+			Messages:       a.forTemplate(modelID, messages),
 			Stream:         true,
 			Adapter:        adapter,
 			ResponseSchema: structured.SchemaFrom(ctx),
@@ -397,6 +397,16 @@ func wrapRemoteChat(in <-chan pluginapi.ChatChunk, n contracts.Node) <-chan plug
 	return out
 }
 
+// forTemplate shapes messages for the model's chat template: a model with
+// no system role, such as Gemma, gets the instructions marked in the first
+// user message.
+func (a *App) forTemplate(modelID string, messages []pluginapi.ChatMessage) []pluginapi.ChatMessage {
+	if a.Models != nil && a.Models.NoSystemRole(modelID) {
+		return pluginapi.FoldSystem(messages)
+	}
+	return messages
+}
+
 func (a *App) ensureLocalModel(ctx context.Context, modelID string) (string, error) {
 	return a.ensureLocalModelWith(ctx, modelID, a.localAdapters(ctx, modelID))
 }
@@ -459,7 +469,7 @@ func (a *App) internalChatStream(ctx context.Context, req nodes.RemoteChatReques
 		}
 		ch, err = a.Runtimes.Chat(ctx, pluginapi.ChatRequest{
 			ModelEndpoint: endpoint,
-			Messages:      req.Messages,
+			Messages:      a.forTemplate(req.ModelID, req.Messages),
 			Stream:        true,
 			Temperature:   req.Temperature,
 			MaxTokens:     req.MaxTokens,

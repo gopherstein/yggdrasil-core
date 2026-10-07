@@ -131,7 +131,7 @@ func (a *App) generateOnce(ctx context.Context, baseModelID, adapter string, loa
 		return "", err
 	}
 	ch, err := a.Runtimes.Chat(ctx, pluginapi.ChatRequest{
-		ModelEndpoint: endpoint, Messages: messages, Adapter: adapter,
+		ModelEndpoint: endpoint, Messages: a.forTemplate(baseModelID, messages), Adapter: adapter,
 		Temperature: 0.2, MaxTokens: 512,
 	})
 	if err != nil {

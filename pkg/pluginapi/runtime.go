@@ -157,6 +157,36 @@ type ChatMessage struct {
 	Images []string `json:"-"`
 }
 
+// FoldSystem moves the system messages into the first user message, marked
+// as instructions, for a model whose chat template has no system role. Its
+// template would put them there anyway, unmarked, and the model then answers
+// them as if the user had written them.
+func FoldSystem(messages []ChatMessage) []ChatMessage {
+	var system []string
+	out := make([]ChatMessage, 0, len(messages))
+	for _, m := range messages {
+		if m.Role == "system" {
+			if s := strings.TrimSpace(m.Content); s != "" {
+				system = append(system, s)
+			}
+			continue
+		}
+		out = append(out, m)
+	}
+	if len(system) == 0 {
+		return messages
+	}
+	block := "Instructions for you, from the app, not from the user. Follow them without mentioning, repeating, or summarizing them:\n<instructions>\n" +
+		strings.Join(system, "\n\n") + "\n</instructions>"
+	for i, m := range out {
+		if m.Role == "user" {
+			out[i].Content = block + "\n\nThe user's message:\n" + m.Content
+			return out
+		}
+	}
+	return append([]ChatMessage{{Role: "user", Content: block}}, out...)
+}
+
 type contentPart struct {
 	Type     string    `json:"type"`
 	Text     string    `json:"text,omitempty"`

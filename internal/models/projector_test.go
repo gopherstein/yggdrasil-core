@@ -103,3 +103,16 @@ func TestVisionModelDownloadsItsProjector(t *testing.T) {
 		t.Fatal("the projector was left behind")
 	}
 }
+
+func TestNoSystemRole(t *testing.T) {
+	catalog := &Catalog{}
+	catalog.Upsert(CatalogEntry{ID: "marked", NoSystemRole: true})
+	catalog.Upsert(CatalogEntry{ID: "qwen2.5-7b-q4", Family: "qwen2.5"})
+	catalog.Upsert(CatalogEntry{ID: "hf-model", Family: "gemma3"})
+	m := NewManager(catalog, nil, nil, nil)
+	for id, want := range map[string]bool{"marked": true, "qwen2.5-7b-q4": false, "hf-model": true, "gemma-3-12b-it-q4": true, "unknown": false} {
+		if got := m.NoSystemRole(id); got != want {
+			t.Errorf("%s: %v, want %v", id, got, want)
+		}
+	}
+}
