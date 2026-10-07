@@ -37,9 +37,6 @@ func watchable(art artifacts.Artifact) bool {
 	return videoExts[strings.ToLower(filepath.Ext(art.Name))]
 }
 
-// visual reports a picture or a video.
-func visual(art artifacts.Artifact) bool { return seeable(art) || watchable(art) }
-
 // imageMIME are the picture types llama.cpp reads, by extension.
 var imageMIME = map[string]string{
 	".png":  "image/png",
