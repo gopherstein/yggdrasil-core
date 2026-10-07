@@ -165,3 +165,60 @@ func TestResetToDefaults(t *testing.T) {
 		t.Fatalf("preset roles not restored: %+v", restored.Roles)
 	}
 }
+
+// A profile someone made before image generation shipped gains the tools
+// that stay on this computer and only make files in Toskar's store, so
+// "make a picture" works with it; web, terminal, and Git aren't added,
+// and a tool turned off stays off (#391 follow-up).
+func TestCustomProfilesGainLocalTools(t *testing.T) {
+	db, err := store.Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+	mgr := profiles.NewManager(db.SQL)
+	ctx := context.Background()
+	if err := mgr.EnsurePresets(ctx); err != nil {
+		t.Fatal(err)
+	}
+	made, err := mgr.Create(ctx, profiles.Profile{Name: "General Assistant", OrchestratorID: "simple",
+		Roles: []contracts.ModelRole{{Role: "assistant"}},
+		Tools: []contracts.ToolPolicy{{ToolID: "internet.search", Policy: "allow"}, {ToolID: "video.generate", Policy: "deny"}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := mgr.EnsurePresets(ctx); err != nil {
+		t.Fatal(err)
+	}
+	got, err := mgr.Get(ctx, made.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	policy := map[string]string{}
+	for _, tool := range got.Tools {
+		policy[tool.ToolID] = tool.Policy
+	}
+	if policy["image.generate"] != "allow" || policy["image.edit"] != "allow" || policy["files.create"] != "allow" || policy["automations.schedule"] != "allow" {
+		t.Fatalf("local tools not added: %v", policy)
+	}
+	if policy["video.generate"] != "deny" {
+		t.Fatalf("a tool turned off was turned on: %v", policy)
+	}
+	for _, id := range []string{"terminal", "git.push", "filesystem.write", "internet.open", "browser.open", "code.execute"} {
+		if _, ok := policy[id]; ok {
+			t.Errorf("%s was added: %v", id, policy[id])
+		}
+	}
+
+	// A profile with no tools is one with none, and stays so.
+	none, err := mgr.Create(ctx, profiles.Profile{Name: "Plain", OrchestratorID: "simple", Roles: []contracts.ModelRole{{Role: "assistant"}}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := mgr.EnsurePresets(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := mgr.Get(ctx, none.ID); len(got.Tools) != 0 {
+		t.Fatalf("a profile with no tools gained %v", got.Tools)
+	}
+}
