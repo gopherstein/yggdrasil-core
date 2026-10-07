@@ -218,6 +218,9 @@ jobs:
   # at desktop and phone widths (#217). Contrast needs a real browser.
   accessibility:
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
+    # It takes about 6 minutes. A hung browser install once held a PR for
+    # over two hours; this fails it instead.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
@@ -239,6 +242,7 @@ jobs:
         working-directory: web
         run: pnpm install && pnpm build
       - name: Install the browser
+        timeout-minutes: 10
         working-directory: scripts/screenshots
         # A self-hosted runner has Chromium's system libraries installed
         # already and no sudo to install them.
