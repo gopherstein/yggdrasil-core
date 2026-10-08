@@ -36,7 +36,7 @@ Toskar does not encrypt its own files, and encryption is not required to use it.
 
 - **At rest:** the database, `artifacts/`, `knowledge/`, and the other files above are plain files on disk. `secrets/` is readable only by your user account (`0700`/`0600`), and API keys are bcrypt hashes. Turn on full-disk encryption to keep everything encrypted while the computer is off or locked: FileVault on macOS, BitLocker or Device Encryption on Windows, and LUKS on Linux.
 - **To the internet:** web search, page reads, model and runtime downloads, community ratings, and the built-in services use HTTPS. Addresses you enter, such as an external server, a webhook, an MCP server, or your own map services, are encrypted when they use `https://`. Email requires TLS or STARTTLS except for a mail server on this computer.
-- **Between your computers:** Bifrost (port 7332) is plain HTTP. Pairing uses a signed handshake and each request carries a token from a paired node, so other machines can't join or call it, but a chat placed on a paired computer, and its answer, cross the network unencrypted.
+- **Between your computers:** Bifrost (port 7332) uses TLS, checked against the key each computer paired with, so a chat placed on a paired computer, its answer, tool jobs, and training runs are encrypted. A paired computer running an older Toskar is still reached over plain HTTP, and the Computers page marks it **Not encrypted** until it's updated. See [encryption between computers](clustering.md#encryption).
 - **Local network access:** the API on port 7331 is plain HTTP with a bearer key. See [API exposure](#api-exposure).
 
 Use paired computers and local network access on a network you trust. Settings → **Your data stays private** states the same in the app.

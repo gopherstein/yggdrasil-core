@@ -135,7 +135,17 @@ func (s *InternalServer) ListenAndServe(addr string) error {
 	if err != nil {
 		return err
 	}
-	s.logger.Info("internal node api listening", "addr", ln.Addr().String())
+	// TLS and plain HTTP on one port (#175): computers that haven't
+	// updated still reach this one.
+	if s.deps.Identity != nil {
+		cfg, err := s.deps.Identity.ServerTLSConfig()
+		if err != nil {
+			_ = ln.Close()
+			return err
+		}
+		ln = newMixedListener(ln, cfg)
+	}
+	s.logger.Info("internal node api listening", "addr", ln.Addr().String(), "tls", s.deps.Identity != nil)
 	return s.http.Serve(ln)
 }
 

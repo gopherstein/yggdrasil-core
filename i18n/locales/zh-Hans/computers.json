@@ -115,6 +115,8 @@
     "removeFromTeam": "从团队中移除",
     "training": "训练中",
     "trainingHint": "正在训练 AI，因此工作会交给有该模型的其他电脑",
+    "plain": "未加密",
+    "plainHint": "{{name}} 上的 Toskar 版本较旧，因此与它之间的通信未加密。请更新 {{name}} 上的 Toskar 以启用加密。",
     "confirmRemove": "要把 {{name}} 移出这个团队吗？它将不再接收工作，再次添加需要重新批准。"
   },
   "deploy": {

@@ -25,7 +25,28 @@ import (
 )
 
 func (a *App) peerClient(n contracts.Node) *nodes.Client {
-	return nodes.NewClient(normalizeNodeAddr(n.Address), a.Identity, n.ID)
+	return nodes.NewClient(normalizeNodeAddr(n.Address), a.Identity, n.ID).Secure(a.peerLink(n.ID))
+}
+
+// peerLink is how a paired computer is reached securely (#175): over TLS
+// checked against the key it paired with.
+func (a *App) peerLink(nodeID string) nodes.Link {
+	if a.Nodes == nil {
+		return nodes.Link{}
+	}
+	pairing := a.Nodes.Pairing()
+	if pairing == nil {
+		return nodes.Link{}
+	}
+	pin, seen, err := pairing.Link(context.Background(), nodeID)
+	if err != nil {
+		return nodes.Link{}
+	}
+	return nodes.Link{Pin: pin, TLSSeen: seen, MarkTLS: func() {
+		if err := pairing.MarkTLS(context.Background(), nodeID); err != nil && a.Logger != nil {
+			a.Logger.Warn("record peer tls", "node_id", nodeID, "error", err)
+		}
+	}}
 }
 
 // listNodesWithHardware returns the cluster node list with fresh hardware (incl. disk)

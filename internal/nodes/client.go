@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -36,11 +37,37 @@ func NewClient(baseURL string, identity *auth.NodeIdentity, peerID string) *Clie
 }
 
 // NewProbeClient is a short-timeout client for pairing / discovery probes.
+// It encrypts when the other computer speaks TLS, without checking its key,
+// which the pairing steps check by signature themselves.
 func NewProbeClient(baseURL string) *Client {
+	base := strings.TrimRight(baseURL, "/")
 	return &Client{
-		baseURL: strings.TrimRight(baseURL, "/"),
-		http:    &http.Client{Timeout: 5 * time.Second},
+		baseURL: base,
+		http:    &http.Client{Timeout: 5 * time.Second, Transport: newLinkTransport("probe "+hostOf(base), Link{})},
 	}
+}
+
+// Secure reaches the paired computer over TLS checked against its key, or
+// over plain HTTP as link allows (#175).
+func (c *Client) Secure(link Link) *Client {
+	hc := *c.http
+	hc.Transport = newLinkTransport(c.peerID, link)
+	c.http = &hc
+	return c
+}
+
+// LinkClient is an HTTP client for a computer's Bifrost address that speaks
+// TLS checked against link's pin, falling back as link allows, such as for
+// the one-line join, which knows the issuer's fingerprint.
+func LinkClient(key string, link Link, timeout time.Duration) *http.Client {
+	return &http.Client{Timeout: timeout, Transport: newLinkTransport(key, link)}
+}
+
+func hostOf(base string) string {
+	if u, err := url.Parse(base); err == nil && u.Host != "" {
+		return u.Host
+	}
+	return base
 }
 
 type NodeInfo struct {
@@ -220,7 +247,7 @@ func (c *Client) Chat(ctx context.Context, req RemoteChatRequest) (<-chan plugin
 	httpReq.Header.Set("Accept", "application/x-ndjson")
 	c.applyAuth(httpReq)
 	// Streaming may exceed default client timeout.
-	streamClient := &http.Client{Timeout: 0}
+	streamClient := &http.Client{Timeout: 0, Transport: c.http.Transport}
 	resp, err := streamClient.Do(httpReq)
 	if err != nil {
 		return nil, err

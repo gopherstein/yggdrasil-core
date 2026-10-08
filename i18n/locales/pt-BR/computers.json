@@ -121,6 +121,8 @@
     "removeFromTeam": "Remover da equipe",
     "training": "Treinando",
     "trainingHint": "Está treinando uma IA, então o trabalho vai para outros computadores que tenham o modelo",
+    "plain": "Sem criptografia",
+    "plainHint": "O tráfego para {{name}} não está criptografado porque o Toskar dele é mais antigo. Atualize o Toskar em {{name}} para criptografá-lo.",
     "confirmRemove": "Remover {{name}} desta equipe? Ele deixa de receber trabalho, e adicioná-lo de novo exige uma nova aprovação."
   },
   "deploy": {

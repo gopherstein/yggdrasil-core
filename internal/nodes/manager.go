@@ -175,6 +175,7 @@ func (m *Manager) List(ctx context.Context) ([]contracts.Node, error) {
 		// Keep persisted status (online/offline) from last liveness probe; discovery
 		// alone must not force "online" — RefreshPairedLiveness owns that.
 		paired[i].Training = training[paired[i].ID] && paired[i].Status == contracts.NodeStatusOnline
+		paired[i].Encryption = Transport(paired[i].ID)
 	}
 
 	seen := map[string]bool{local.ID: true}

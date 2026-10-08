@@ -142,6 +142,12 @@ function ComputerCard({
                 {t('card.training')}
               </span>
             ) : null}
+            {/* Reached without TLS: its Toskar predates it (#175). */}
+            {node.encryption === 'plain' ? (
+              <span className="status-chip shrink-0 bg-warning/15 text-warning" title={t('card.plainHint', { name: node.name })}>
+                {t('card.plain')}
+              </span>
+            ) : null}
             {kind !== 'offline' && (
               <>
                 <span className="text-ink-faint">·</span>

@@ -121,6 +121,8 @@
     "removeFromTeam": "Retirer de l'équipe",
     "training": "Entraînement",
     "trainingHint": "Entraîne une IA : le travail va à d'autres ordinateurs qui ont le modèle",
+    "plain": "Non chiffré",
+    "plainHint": "Le trafic vers {{name}} n’est pas chiffré, car son Toskar est plus ancien. Mettez à jour Toskar sur {{name}} pour le chiffrer.",
     "confirmRemove": "Retirer {{name}} de cette équipe ? Il ne recevra plus de travail, et le rajouter demandera une nouvelle approbation."
   },
   "deploy": {
