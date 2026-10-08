@@ -30,6 +30,8 @@ export function InvitePage() {
       // for someone else, and this person joins a Toskar already set up.
       forgetApiKey()
       setOnboardingComplete(true)
+      // The link is used up; asking about it again would only fail.
+      queryClient.removeQueries({ queryKey: ['invite', token] })
       await queryClient.invalidateQueries()
       navigate('/chat', { replace: true })
     },

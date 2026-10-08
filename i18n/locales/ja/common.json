@@ -104,5 +104,9 @@
       "no_gpu": "このコンピュータにはToskarが使えるGPUがないため、モデルはCPUで動きます。"
     },
     "openDiagnostics": "診断を開く"
+  },
+  "roles": {
+    "adminsOnly": "このページは管理者とオーナー向けです。",
+    "membersOnly": "このページはメンバー、管理者、オーナー向けです。"
   }
 }

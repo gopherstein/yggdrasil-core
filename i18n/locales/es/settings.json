@@ -2,7 +2,8 @@
   "page": {
     "title": "Configuración",
     "subtitle": "Cómo debe comportarse Toskar en esta computadora.",
-    "loading": "Cargando la configuración…"
+    "loading": "Cargando la configuración…",
+    "adminsOnly": "Los demás ajustes cambian Toskar para todos, así que son para los administradores y el propietario."
   },
   "groups": {
     "general": "General",

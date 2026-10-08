@@ -2,7 +2,8 @@
   "page": {
     "title": "设置",
     "subtitle": "Toskar 在这台电脑上应如何运行。",
-    "loading": "正在加载设置…"
+    "loading": "正在加载设置…",
+    "adminsOnly": "其他设置会为所有人更改 Toskar，因此仅供管理员和所有者使用。"
   },
   "groups": {
     "general": "通用",

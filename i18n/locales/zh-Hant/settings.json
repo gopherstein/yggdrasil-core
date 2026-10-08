@@ -2,7 +2,8 @@
   "page": {
     "title": "設定",
     "subtitle": "Toskar 在這台電腦上的運作方式。",
-    "loading": "正在載入設定…"
+    "loading": "正在載入設定…",
+    "adminsOnly": "其他設定會為所有人變更 Toskar，因此僅供管理員和擁有者使用。"
   },
   "groups": {
     "general": "一般",

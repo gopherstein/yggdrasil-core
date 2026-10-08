@@ -130,7 +130,8 @@ function FileSourceChip({ item, id, badge }: { item: SourceItem; id: string; bad
 }
 
 /** Sources and a plain-language summary of the work behind an answer. */
-export function AnswerDetails({ meta }: { meta?: MessageMeta }) {
+/** runs shows the run's record, which is an Admin's to read (#203). */
+export function AnswerDetails({ meta, runs = true }: { meta?: MessageMeta; runs?: boolean }) {
   const { t } = useTranslation('chat')
   const [stepsOpen, setStepsOpen] = useState(false)
   const sources = groupSources(meta?.sources ?? [])
@@ -189,7 +190,7 @@ export function AnswerDetails({ meta }: { meta?: MessageMeta }) {
           ) : null}
         </div>
       ) : null}
-      {runId ? <RunDetails runId={runId} /> : null}
+      {runId && runs ? <RunDetails runId={runId} /> : null}
     </div>
   )
 }

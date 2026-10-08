@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { RequireRole } from '@/components/auth/RequireRole'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LifecycleHost } from '@/components/LifecycleHost'
 import { NotificationHost } from '@/components/NotificationHost'
@@ -70,18 +71,18 @@ export function App() {
               >
                 <Route index element={<Navigate to="/chat" replace />} />
                 <Route path="chat" element={<ChatPage />} />
-                <Route path="automations" element={<AutomationsPage />} />
-                <Route path="models" element={<ModelsPage />} />
-                <Route path="train" element={<TrainPage />} />
-                <Route path="knowledge" element={<KnowledgePage />} />
-                <Route path="memory" element={<MemoryPage />} />
-                <Route path="profiles" element={<ProfilesPage />} />
-                <Route path="tools" element={<ToolsPage />} />
-                <Route path="nodes" element={<NodesPage />} />
+                <Route path="automations" element={<RequireRole min="member"><AutomationsPage /></RequireRole>} />
+                <Route path="models" element={<RequireRole min="admin"><ModelsPage /></RequireRole>} />
+                <Route path="train" element={<RequireRole min="admin"><TrainPage /></RequireRole>} />
+                <Route path="knowledge" element={<RequireRole min="admin"><KnowledgePage /></RequireRole>} />
+                <Route path="memory" element={<RequireRole min="member"><MemoryPage /></RequireRole>} />
+                <Route path="profiles" element={<RequireRole min="admin"><ProfilesPage /></RequireRole>} />
+                <Route path="tools" element={<RequireRole min="admin"><ToolsPage /></RequireRole>} />
+                <Route path="nodes" element={<RequireRole min="admin"><NodesPage /></RequireRole>} />
                 <Route path="people" element={<PeoplePage />} />
-                <Route path="api-access" element={<ApiAccessPage />} />
-                <Route path="diagnostics" element={<DiagnosticsPage />} />
-                <Route path="performance" element={<PerformancePage />} />
+                <Route path="api-access" element={<RequireRole min="admin"><ApiAccessPage /></RequireRole>} />
+                <Route path="diagnostics" element={<RequireRole min="admin"><DiagnosticsPage /></RequireRole>} />
+                <Route path="performance" element={<RequireRole min="admin"><PerformancePage /></RequireRole>} />
                 <Route path="settings" element={<SettingsPage />} />
                 {/* The old "coming soon" Orchestrators page; orchestration is chosen per profile. */}
                 <Route path="orchestrators" element={<Navigate to="/profiles" replace />} />

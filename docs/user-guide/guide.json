@@ -225,7 +225,7 @@
       "title": "Share Toskar with other people",
       "paragraphs": [
         "Everyone in your home or team can use the same Toskar, each with their own chats, memories, files, and automations. Nobody sees anyone else's, not even the Owner. Models, tools, knowledge, and profiles are shared.",
-        "Whoever installed Toskar is the Owner and uses it on this computer without signing in. Admins manage models, tools, computers, and people other than Admins and the Owner. Members use Toskar for themselves. Visitors only chat.",
+        "Whoever installed Toskar is the Owner and uses it on this computer without signing in. Admins manage models, tools, knowledge, computers, settings, and people other than Admins and the Owner. Members chat and have their own memories and automations. Visitors only chat. Each person sees only the pages their role can use.",
         "The People page under Administer lists everyone. Change someone's role there, make them a new password link, or disable them, which signs them out everywhere and stops their keys and automations."
       ],
       "steps": [
