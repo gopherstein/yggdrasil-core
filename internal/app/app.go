@@ -623,6 +623,7 @@ func New(opts Options) (*App, error) {
 		RotateAPIKey:         apiKeyMgr.Rotate,
 		SetAPIKeyPermissions: apiKeyMgr.SetPermissions,
 		VerifyAPIKey:         apiKeyMgr.Verify,
+		People:               auth.NewPeople(db.SQL),
 		Devices:              &auth.DevicePairer{CreateKey: apiKeyMgr.CreateDevice},
 		PhoneAddress:         a.phoneAddress,
 		EnableLANForPhone:    a.enableLANForPhone,

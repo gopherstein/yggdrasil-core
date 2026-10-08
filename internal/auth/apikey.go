@@ -39,6 +39,9 @@ type APIKeyRecord struct {
 	// Kind is empty for a key made in API Access, or KindDevice for one a
 	// phone got by pairing (#216), which reaches only what the phone uses.
 	Kind string `json:"kind,omitempty"`
+	// PersonID is whose key it is (#206); keys from before people are the
+	// Owner's.
+	PersonID string `json:"person_id"`
 }
 
 // KindDevice is a key a phone got by pairing.
@@ -76,7 +79,7 @@ func (m *APIKeyManager) create(ctx context.Context, name, kind string) (record A
 	if err != nil {
 		return record, "", err
 	}
-	return APIKeyRecord{ID: id, Name: name, Prefix: prefix, CreatedAt: now, Permissions: DefaultAPIKeyPermissions(), Kind: kind}, secret, nil
+	return APIKeyRecord{ID: id, Name: name, Prefix: prefix, CreatedAt: now, Permissions: DefaultAPIKeyPermissions(), Kind: kind, PersonID: OwnerID}, secret, nil
 }
 
 // Adopt hashes a caller-supplied key when that key is not already valid.
@@ -108,7 +111,7 @@ func (m *APIKeyManager) Adopt(ctx context.Context, name, secret string) (APIKeyR
 	if err != nil {
 		return APIKeyRecord{}, err
 	}
-	return APIKeyRecord{ID: id, Name: name, Prefix: prefix, CreatedAt: now, Permissions: DefaultAPIKeyPermissions()}, nil
+	return APIKeyRecord{ID: id, Name: name, Prefix: prefix, CreatedAt: now, Permissions: DefaultAPIKeyPermissions(), PersonID: OwnerID}, nil
 }
 
 // Verify checks a presented API key.
@@ -118,12 +121,12 @@ func (m *APIKeyManager) Verify(ctx context.Context, secret string) (APIKeyRecord
 	}
 	prefix := secret[:12]
 	row := m.db.QueryRowContext(ctx, `
-		SELECT id, name, key_prefix, key_hash, created_at, revoked_at, last_used_at, permissions, kind
+		SELECT id, name, key_prefix, key_hash, created_at, revoked_at, last_used_at, permissions, kind, person_id
 		FROM api_keys WHERE key_prefix = ? AND revoked_at IS NULL`, prefix)
 	var rec APIKeyRecord
 	var hash, created string
 	var revoked, lastUsed, perms sql.NullString
-	if err := row.Scan(&rec.ID, &rec.Name, &rec.Prefix, &hash, &created, &revoked, &lastUsed, &perms, &rec.Kind); err != nil {
+	if err := row.Scan(&rec.ID, &rec.Name, &rec.Prefix, &hash, &created, &revoked, &lastUsed, &perms, &rec.Kind, &rec.PersonID); err != nil {
 		return APIKeyRecord{}, fmt.Errorf("invalid api key")
 	}
 	rec.Permissions = parsePermissions(perms)
@@ -142,7 +145,7 @@ func (m *APIKeyManager) Verify(ctx context.Context, secret string) (APIKeyRecord
 // List returns non-revoked keys (metadata only).
 func (m *APIKeyManager) List(ctx context.Context) ([]APIKeyRecord, error) {
 	rows, err := m.db.QueryContext(ctx, `
-		SELECT id, name, key_prefix, created_at, revoked_at, last_used_at, permissions, kind
+		SELECT id, name, key_prefix, created_at, revoked_at, last_used_at, permissions, kind, person_id
 		FROM api_keys ORDER BY created_at DESC`)
 	if err != nil {
 		return nil, err
@@ -153,7 +156,7 @@ func (m *APIKeyManager) List(ctx context.Context) ([]APIKeyRecord, error) {
 		var rec APIKeyRecord
 		var created string
 		var revoked, lastUsed, perms sql.NullString
-		if err := rows.Scan(&rec.ID, &rec.Name, &rec.Prefix, &created, &revoked, &lastUsed, &perms, &rec.Kind); err != nil {
+		if err := rows.Scan(&rec.ID, &rec.Name, &rec.Prefix, &created, &revoked, &lastUsed, &perms, &rec.Kind, &rec.PersonID); err != nil {
 			return nil, err
 		}
 		rec.Permissions = parsePermissions(perms)
