@@ -90,6 +90,10 @@ type Run struct {
 	ContextLimit  int `json:"context_limit,omitempty"`
 	// CacheHits counts tool calls answered from a cache, by tool (§36).
 	CacheHits map[string]int `json:"cache_hits,omitempty"`
+	// Topic is what an Enforce profile's topic check found (#345): on_topic,
+	// small_talk, off_topic when the set reply went out without an answer,
+	// or answer_off_topic when the answer was replaced by it.
+	Topic string `json:"topic,omitempty"`
 }
 
 // Collector gathers a run as it happens. Its methods are safe from any
@@ -150,6 +154,16 @@ func (c *Collector) Strategy(note string) {
 		}
 	}
 	c.run.Strategy = append(c.run.Strategy, note)
+}
+
+// Topic records what the topic check found (#345).
+func (c *Collector) Topic(label string) {
+	if c == nil {
+		return
+	}
+	c.mu.Lock()
+	c.run.Topic = label
+	c.mu.Unlock()
 }
 
 // SetLanguage sets the App language Note writes in (multilingual spec §16).

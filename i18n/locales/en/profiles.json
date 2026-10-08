@@ -386,6 +386,11 @@
     "reply": "When asked something else",
     "replyDefault": "I can only help with {{topic}}. What can I help you with?",
     "replyHint": "The exact reply to anything off topic. Leave empty, and the assistant says in a sentence what it can help with, in the person's language.",
-    "note": "Greetings, thanks, and \"what can you do?\" are always fine. These rules guide the model; no assistant can promise it never strays."
+    "note": "Greetings, thanks, and \"what can you do?\" are always fine. These rules guide the model; no assistant can promise it never strays.",
+    "strictness": "How strict",
+    "guide": "Guide",
+    "guideHint": "The rules lead the instructions. Quickest; fine for your own people.",
+    "enforce": "Enforce",
+    "enforceHint": "Also checks each message before answering and each answer before it's shown, and sends the set reply to anything off topic. For the public and chat portals."
   }
 }

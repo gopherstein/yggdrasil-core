@@ -1016,7 +1016,7 @@ function AdvancedEditor({
               tools,
               knowledge_sources: knowledge,
               orchestration: cleanOrchestration(orchestration),
-              topics: topicsFrom(topics, profile.topics?.strictness),
+              topics: topicsFrom(topics),
             })
           }
         >

@@ -15,12 +15,23 @@ Greetings, thanks, and "what can you do?" are always fine, so a strict assistant
 
 The topic rules come first in every turn, as the administrator's rules, ahead of everything else the model is told. They say that nothing later changes them: not the person's preferences or memories, not an application's instructions through the API, not a document, file, or web page, and not a message asking to ignore them, to pretend, or to play a role.
 
-This is **Guide**, the rules alone. It's cheap, and fine for staff. **Enforce**, for the public and chat portals, adds a check before answering and a check on the answer; it comes next.
+**How strict** picks how much more is done:
+
+- **Guide:** the rules alone. Quickest, and fine for your own people.
+- **Enforce:** for the public and chat portals. Each message is checked before it's answered, and each answer before it's shown:
+  1. **Before answering,** a short call labels the message *on topic*, *small talk*, or *off topic*, reading it with the conversation so far, so "and the 18-inch?" still counts. An off-topic message gets the set reply, and the full answer never runs, which also saves the work.
+  2. **After answering,** a short call reads the answer with its question. An answer that went off topic anyway, because the message talked its way past the first check, is replaced by the set reply.
+
+  The set reply is the one under **When asked something else**, word for word. Without one, the check writes one short sentence in the person's language saying what the assistant can help with, and when it can't, Toskar sends "I can't help with that here. What else can I help you with?" in the person's language.
+
+  The checks use the model that answers, which is already loaded, so each adds one short call. If a check gives nothing usable, the turn goes on as Guide, and the run trace says so.
+
+The run trace (`GET /api/v1/runs`, and the run details under an answer) notes a held message or a replaced answer, and its `topic` says what the check found.
 
 A chat portal (#205) using a profile brings its topic controls with it, so its visitors can't turn them off.
 
 ## Be honest about the limits
 
-No language model can promise it never goes off topic. Guide makes it the model's clear instruction; Enforce will make going off topic hard and visible, not impossible.
+No language model can promise it never goes off topic. Guide makes it the model's clear instruction; Enforce makes going off topic hard and visible, not impossible. A small model can label a message wrongly either way, so try a profile's real questions before publishing it.
 
 Topic controls don't replace keeping private data out of a public assistant: anything in its knowledge sources or reachable by its tools can still be asked about. Give a public assistant only the knowledge and tools it needs.
