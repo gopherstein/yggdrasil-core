@@ -34,6 +34,7 @@ import (
 	"github.com/yeixio/toskar-core/internal/mcp"
 	"github.com/yeixio/toskar-core/internal/models"
 	"github.com/yeixio/toskar-core/internal/muninn"
+	"github.com/yeixio/toskar-core/internal/portals"
 	"github.com/yeixio/toskar-core/internal/runtimes"
 	"github.com/yeixio/toskar-core/internal/speech"
 	"github.com/yeixio/toskar-core/internal/training"
@@ -43,9 +44,11 @@ import (
 
 // Dependencies wires handlers to application services.
 type Dependencies struct {
-	Config   *config.Manager
-	Bus      *events.Bus
-	Logger   *slog.Logger
+	Config *config.Manager
+	Bus    *events.Bus
+	Logger *slog.Logger
+	// Portals keeps chat portals (#205).
+	Portals  *portals.Store
 	OpenAI   *openai.Handler
 	Hardware func(ctx context.Context) (contracts.HardwareInventory, error)
 
@@ -319,6 +322,7 @@ func (s *Server) routes() {
 	s.deviceRoutes(api)
 	s.peopleRoutes(api)
 	s.oidcRoutes(api)
+	s.portalRoutes(api)
 	api.HandleFunc("/tls", s.handleTLS).Methods(http.MethodGet)
 	s.notificationRoutes(api)
 	s.connectorRoutes(api)
@@ -522,13 +526,15 @@ func (s *Server) thisComputer(r *http.Request) *http.Request {
 // a phone's pairing code (#216), a username and password, or an invite's
 // one-time link (#206).
 var publicRoutes = map[string]bool{
-	http.MethodPost + " /api/v1" + pairDeviceRoute: true,
-	http.MethodPost + " /api/v1/session":           true,
-	http.MethodGet + " /api/v1/invites/{token}":    true,
-	http.MethodPost + " /api/v1/invites/{token}":   true,
-	http.MethodGet + " /api/v1/oidc":               true,
-	http.MethodGet + " /api/v1/oidc/start":         true,
-	http.MethodGet + " /api/v1/oidc/callback":      true,
+	http.MethodPost + " /api/v1" + pairDeviceRoute:    true,
+	http.MethodPost + " /api/v1/session":              true,
+	http.MethodGet + " /api/v1/invites/{token}":       true,
+	http.MethodPost + " /api/v1/invites/{token}":      true,
+	http.MethodGet + " /api/v1/oidc":                  true,
+	http.MethodGet + " /api/v1/oidc/start":            true,
+	http.MethodGet + " /api/v1/oidc/callback":         true,
+	http.MethodGet + " /api/v1/portals/{slug}/page":   true,
+	http.MethodPost + " /api/v1/portals/{slug}/enter": true,
 }
 
 // unsafeMethod changes something, so a session's request must come from
@@ -571,6 +577,18 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 			}
 		} else if errors.Is(err, auth.ErrAPIKeyInURL) && !local {
 			writeErrFrom(w, http.StatusBadRequest, "API_KEY_IN_URL", err)
+			return
+		}
+		// A portal page's guest (#205), by the portal's own cookie.
+		if principal, ok, off := s.guestPrincipal(r); off {
+			writeErr(w, http.StatusForbidden, "PORTAL_OFF", "This portal is turned off.", nil)
+			return
+		} else if ok {
+			if unsafeMethod(r.Method) && r.Header.Get("Origin") == "" && r.Header.Get("Sec-Fetch-Site") != "same-origin" {
+				writeErr(w, http.StatusForbidden, "CROSS_SITE", "a signed-in change must come from Toskar's own pages", nil)
+				return
+			}
+			s.serveAs(w, r, principal, route, next)
 			return
 		}
 		if fromProxy && s.deps.People != nil {
@@ -624,6 +642,11 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 // (#203): Visitors chat, Members use Toskar for themselves, and Admins and
 // the Owner run it.
 func (s *Server) serveAs(w http.ResponseWriter, r *http.Request, principal auth.Principal, route string, next http.Handler) {
+	// A portal's guest reaches only its chat (#205).
+	if principal.Person.PortalID != "" && r.Method != http.MethodOptions && !guestRoutes[r.Method+" "+route] {
+		writeErr(w, http.StatusForbidden, "PORTAL_ONLY", "a portal's visitor can only chat in the portal", nil)
+		return
+	}
 	if need := auth.RoleNeeded(r.Method, route); r.Method != http.MethodOptions && !principal.Person.Role.AtLeast(need) {
 		writeErr(w, http.StatusForbidden, "ROLE_REQUIRED", "this needs the "+string(need)+" role", map[string]any{"role": string(need)})
 		return
@@ -1100,8 +1123,10 @@ func (s *Server) handleSSE(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Connection", "keep-alive")
 	w.WriteHeader(http.StatusOK)
 	flusher.Flush()
-	// Each person hears about their own chats, tasks, and the rest (#206).
+	// Each person hears about their own chats, tasks, and the rest (#206);
+	// a portal's guest hears about nothing else (#205).
 	person := auth.PersonID(r.Context())
+	guest := auth.PrincipalFrom(r.Context()).Person.PortalID != ""
 
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
@@ -1114,7 +1139,7 @@ func (s *Server) handleSSE(w http.ResponseWriter, r *http.Request) {
 			if !ok {
 				return
 			}
-			if !evt.VisibleTo(person, auth.OwnerID) {
+			if !evt.VisibleTo(person, auth.OwnerID) || (guest && evt.Person != person) {
 				continue
 			}
 			data, _ := json.Marshal(evt)

@@ -266,6 +266,140 @@ paths:
                     enum: [this_computer, api_key, session]
                   key_id:
                     type: string
+  /api/v1/portals:
+    get:
+      summary: Chat portals (#205)
+      description: Every portal, for Admins and the Owner.
+      operationId: listPortals
+      responses:
+        "200":
+          description: The portals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+    post:
+      summary: Add a chat portal (#205)
+      description: slug (2 to 40 lowercase letters, digits, or dashes) and name are required. It starts with no tools, no memory, passcode access (passcode required), and on.
+      operationId: createPortal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "201":
+          description: The portal
+          content:
+            application/json:
+              schema:
+                type: object
+        "400":
+          description: A setting that can't be used
+        "409":
+          description: Another portal has that address
+  /api/v1/portals/{id}:
+    get:
+      summary: One chat portal (#205)
+      operationId: getPortal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The portal
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: No such portal
+    patch:
+      summary: Change a chat portal (#205)
+      description: Any of slug, name, profile_id, tools (none, read_only, profile), memory, language, access (open, passcode), passcode (empty removes it), branding (a JSON object), and enabled. Turning it off stops its visitors at once.
+      operationId: updatePortal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: The portal
+          content:
+            application/json:
+              schema:
+                type: object
+    delete:
+      summary: Remove a chat portal (#205)
+      description: Its guests can no longer chat.
+      operationId: deletePortal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Removed
+  /api/v1/portals/{slug}/page:
+    get:
+      summary: What a portal's page shows (#205)
+      description: Its name, access, language, and branding, and whether this browser is already its guest. Answers without signing in.
+      operationId: getPortalPage
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The page
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: No portal there, or it's turned off
+  /api/v1/portals/{slug}/enter:
+    post:
+      summary: Enter a portal as its guest (#205)
+      description: With passcode when the portal has one. Makes this browser the portal's guest, signed in by a toskar_portal_<slug> cookie that counts only on requests carrying X-Toskar-Portal. A guest reaches only the portal's chat, with the portal's profile, tools, memory, and language.
+      operationId: enterPortal
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The guest
+          content:
+            application/json:
+              schema:
+                type: object
+        "401":
+          description: Wrong passcode
+        "404":
+          description: No portal there, or it's turned off
   /api/v1/oidc:
     get:
       summary: Whether sign-in with an OpenID Connect provider is offered (#206)

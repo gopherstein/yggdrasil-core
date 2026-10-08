@@ -4,9 +4,11 @@ import (
 	"context"
 	"io"
 	"log/slog"
+	"strings"
 	"testing"
 
 	"github.com/yeixio/toskar-core/internal/events"
+	"github.com/yeixio/toskar-core/internal/turnopts"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 	"github.com/yeixio/toskar-core/pkg/pluginapi"
 )
@@ -77,5 +79,45 @@ func TestSettleInterrupted(t *testing.T) {
 	}
 	if got, _ := a.Tasks.Get(ctx, done.ID); got.Status != contracts.TaskCompleted {
 		t.Errorf("finished task changed: %+v", got)
+	}
+}
+
+// A chat portal's turn keeps its own profile and language, whatever the
+// conversation was set to (#205).
+func TestFixedProfileTurn(t *testing.T) {
+	t.Setenv("TOSKAR_STUB_INFERENCE", "1")
+	t.Setenv("TOSKAR_DISCOVERY_ENABLED", "false")
+	a, err := New(Options{DataDir: t.TempDir(), Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.DB.Close() })
+	var system string
+	a.StubReply = func(_ string, msgs []pluginapi.ChatMessage) string {
+		for _, m := range msgs {
+			if m.Role == "system" {
+				system += m.Content
+			}
+		}
+		return "Hola."
+	}
+	ctx := context.Background()
+	conv, err := a.Conversations.Create(ctx, "portal", "programming", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	turn := turnopts.With(ctx, &turnopts.Options{Knowledge: true, FixedProfile: true, Language: "es"})
+	stream, err := a.RunChat(turn, "", conv.ID, "Hello", false, "", "automatic")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for range stream {
+	}
+	list, _ := a.Tasks.List(ctx)
+	if len(list) != 1 || list[0].ProfileID != "general-assistant" {
+		t.Fatalf("tasks: %+v", list)
+	}
+	if !strings.Contains(system, "Write your reply in Spanish") {
+		t.Fatalf("no Spanish instruction in %q", system)
 	}
 }

@@ -29,6 +29,8 @@ var visitorRoutes = map[string]bool{
 	"GET /api/v1/invites/{token}":              true,
 	"POST /api/v1/invites/{token}":             true,
 	"GET /api/v1/oidc":                         true,
+	"GET /api/v1/portals/{slug}/page":          true,
+	"POST /api/v1/portals/{slug}/enter":        true,
 	"GET /api/v1/oidc/start":                   true,
 	"GET /api/v1/oidc/callback":                true,
 	"GET /api/v1/settings":                     true,

@@ -34,6 +34,12 @@ type Options struct {
 	Progress func(eventType string, payload map[string]any)
 	// Meta, when set, receives the answer's sources, steps, and notice.
 	Meta func(*contracts.MessageMeta)
+	// FixedProfile keeps the turn's profile and model as given, whatever
+	// the conversation was set to, as a chat portal's are (#205).
+	FixedProfile bool
+	// Language answers in this language, such as a portal's; empty
+	// follows the person and the message.
+	Language string
 }
 
 type key struct{}
