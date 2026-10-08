@@ -140,6 +140,8 @@
   "UNREADABLE_FILE": "Toskar kann {{name}} nicht lesen: {{cause}}",
   "UNSUPPORTED_FILE": "Toskar kann {{name}} noch nicht lesen. Hänge ein Dokument, eine Tabelle, ein PDF, eine Codedatei, Audio, ein Video oder ein PNG- oder JPEG-Bild an.",
   "DEVICE_NOT_ALLOWED": "Der Schlüssel eines Geräts kann das nicht. Verwende einen Schlüssel aus dem API-Zugriff.",
+  "DEVICE_NOT_FOUND": "Keines deiner Geräte hat diese ID.",
+  "DEVICES_FAILED": "Deine Geräte konnten nicht gelesen oder geändert werden.",
   "PAIRING_EXPIRED": "Dieser Code ist abgelaufen. Wähle auf dem Computer erneut „Gerät verbinden“.",
   "PAIRING_FAILED": "Das Gerät konnte nicht verbunden werden.",
   "PAIRING_NOT_LOCAL": "Ein Gerät kann sich nur aus dem Netzwerk des Computers verbinden.",

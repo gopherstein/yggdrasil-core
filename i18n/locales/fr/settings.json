@@ -289,5 +289,15 @@
     "models_many": "{{count}} modèles disponibles",
     "models_other": "{{count}} modèles disponibles",
     "privacy": "Les conversations avec ces modèles quittent cet ordinateur et sont enregistrées dans Ce qui a quitté cet ordinateur. Les profils hors ligne, et les conversations qui utilisent des souvenirs ou des connaissances marqués Cet ordinateur uniquement, ne les utilisent jamais."
+  },
+  "devices": {
+    "title": "Vos appareils",
+    "description": "Téléphones, tablettes et téléviseurs connectés en votre nom. Chacun a sa propre clé, et en déconnecter un le déconnecte.",
+    "connect": "Connecter un appareil",
+    "none": "Aucun appareil n'est encore connecté en votre nom.",
+    "disconnect": "Déconnecter",
+    "lastUsed": "Dernière utilisation le {{date}}",
+    "neverUsed": "Pas encore utilisé",
+    "confirm": "Déconnecter {{name}} ? Il lui faudra un nouveau code pour se reconnecter."
   }
 }

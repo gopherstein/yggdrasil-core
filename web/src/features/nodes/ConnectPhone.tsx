@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { api, ApiError } from '@/lib/api'
+import { useRole } from '@/lib/role'
 import type { DevicePairing } from '@/types/api'
 import { clock, useCountdown } from './countdown'
 
@@ -16,11 +17,15 @@ function grouped(code: string): string {
 
 /**
  * Connect a device (#216): a 6-digit code to type on the phone, which then
- * gets a key of its own. Turns on local network access first when it's off,
- * since the phone reaches this computer over the network.
+ * gets a key of its own, the person's who showed the code. For an Admin it
+ * turns on local network access first when it's off, since the phone
+ * reaches this computer over the network.
  */
 export function ConnectPhone({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation('computers')
+  // Anyone connects their own device; turning on network access to do it
+  // is an Admin's (#206).
+  const admin = useRole().atLeast('admin')
   const queryClient = useQueryClient()
   const [shown, setShown] = useState<DevicePairing | null>(null)
 
@@ -45,7 +50,7 @@ export function ConnectPhone({ onClose }: { onClose: () => void }) {
   const connected = state === 'connected'
 
   const start = useMutation({
-    mutationFn: () => api.startDevicePairing(!lanOn),
+    mutationFn: () => api.startDevicePairing(!lanOn && admin),
     onSuccess: (next) => {
       setShown(next ?? null)
       queryClient.setQueryData(['device-pairing'], next)
@@ -55,7 +60,10 @@ export function ConnectPhone({ onClose }: { onClose: () => void }) {
   const cancel = useMutation({ mutationFn: () => api.cancelDevicePairing() })
 
   useEffect(() => {
-    if (connected) void queryClient.invalidateQueries({ queryKey: ['api-keys'] })
+    if (connected) {
+      void queryClient.invalidateQueries({ queryKey: ['api-keys'] })
+      void queryClient.invalidateQueries({ queryKey: ['my-devices'] })
+    }
   }, [connected, queryClient])
 
   // Closing the panel stops showing a code no phone used.
@@ -93,10 +101,12 @@ export function ConnectPhone({ onClose }: { onClose: () => void }) {
 
       {!shown ? (
         <div className="space-y-3">
-          {settings.data && !lanOn ? <p className="text-sm text-ink-muted">{t('phone.lanOff')}</p> : null}
-          <button type="button" className="btn-primary" disabled={start.isPending || settings.isLoading} onClick={() => start.mutate()}>
-            {start.isPending ? t('phone.showing') : lanOn ? t('phone.show') : t('phone.allowAndShow')}
-          </button>
+          {settings.data && !lanOn ? <p className="text-sm text-ink-muted">{admin ? t('phone.lanOff') : t('phone.lanOffAsk')}</p> : null}
+          {admin || lanOn ? (
+            <button type="button" className="btn-primary" disabled={start.isPending || settings.isLoading} onClick={() => start.mutate()}>
+              {start.isPending ? t('phone.showing') : lanOn ? t('phone.show') : t('phone.allowAndShow')}
+            </button>
+          ) : null}
           <p className="text-xs text-ink-muted">
             <Trans t={t} i18nKey="phone.getApp" components={{ store: <a href={IPHONE_APP_URL} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" /> }} />
           </p>
@@ -107,7 +117,11 @@ export function ConnectPhone({ onClose }: { onClose: () => void }) {
             {t('phone.connected', { name: status.data?.device?.name ?? '' })}
           </p>
           <p className="mt-1 text-sm text-ink-muted">
-            <Trans t={t} i18nKey="phone.manage" components={{ access: <Link to="/api-access" className="text-primary hover:underline" /> }} />
+            {admin ? (
+              <Trans t={t} i18nKey="phone.manage" components={{ access: <Link to="/api-access" className="text-primary hover:underline" /> }} />
+            ) : (
+              t('phone.manageYours')
+            )}
           </p>
           <button type="button" className="btn-secondary mt-3 px-3 py-1.5 text-xs" disabled={start.isPending} onClick={() => start.mutate()}>
             {t('phone.another')}

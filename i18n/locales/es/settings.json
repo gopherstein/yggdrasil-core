@@ -289,5 +289,15 @@
     "models_many": "{{count}} modelos disponibles",
     "models_other": "{{count}} modelos disponibles",
     "privacy": "Los chats con estos modelos salen de este equipo y quedan registrados en Lo que salió de esta computadora. Los perfiles sin conexión y los chats que usan recuerdos o conocimiento marcados como Solo este equipo nunca los usan."
+  },
+  "devices": {
+    "title": "Tus dispositivos",
+    "description": "Teléfonos, tabletas y televisores conectados como tú. Cada uno tiene su propia clave, y desconectar uno cierra su sesión.",
+    "connect": "Conectar un dispositivo",
+    "none": "Todavía no hay dispositivos conectados como tú.",
+    "disconnect": "Desconectar",
+    "lastUsed": "Usado por última vez el {{date}}",
+    "neverUsed": "Aún sin usar",
+    "confirm": "¿Desconectar {{name}}? Necesitará un código nuevo para volver a conectarse."
   }
 }

@@ -140,6 +140,8 @@
   "UNREADABLE_FILE": "Toskar can't read {{name}}: {{cause}}",
   "UNSUPPORTED_FILE": "Toskar can't read {{name}} yet. Attach a document, spreadsheet, PDF, code file, audio, video, or a PNG or JPEG image.",
   "DEVICE_NOT_ALLOWED": "A device's key can't do this. Use a key from API Access.",
+  "DEVICE_NOT_FOUND": "No device of yours has that id.",
+  "DEVICES_FAILED": "Couldn't read or change your devices.",
   "PAIRING_EXPIRED": "That code has expired. Choose Connect a device on the computer again.",
   "PAIRING_FAILED": "The device couldn't be connected.",
   "PAIRING_NOT_LOCAL": "A device can connect only from the computer's own network.",

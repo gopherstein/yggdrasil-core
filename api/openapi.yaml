@@ -266,6 +266,35 @@ paths:
                     enum: [this_computer, api_key, session]
                   key_id:
                     type: string
+  /api/v1/me/devices:
+    get:
+      summary: Your connected devices (#206)
+      description: The phones, tablets, and TVs connected as the request's person, whatever their role.
+      operationId: listMyDevices
+      responses:
+        "200":
+          description: The person's device keys
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/v1/me/devices/{id}:
+    delete:
+      summary: Disconnect one of your devices (#206)
+      operationId: disconnectMyDevice
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Disconnected; it needs a new code to connect again
+        "404":
+          description: No device of yours has that id
   /api/v1/me/preferences:
     patch:
       summary: Save your own languages (#206)

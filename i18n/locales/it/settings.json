@@ -289,5 +289,15 @@
     "models_many": "{{count}} modelli disponibili",
     "models_other": "{{count}} modelli disponibili",
     "privacy": "Le chat con questi modelli lasciano questo computer e vengono registrate in Cosa è uscito da questo computer. I profili offline e le chat che usano ricordi o conoscenze contrassegnati come Solo questo computer non li usano mai."
+  },
+  "devices": {
+    "title": "I tuoi dispositivi",
+    "description": "Telefoni, tablet e TV collegati come te. Ognuno ha la sua chiave, e scollegarne uno lo disconnette.",
+    "connect": "Collega un dispositivo",
+    "none": "Nessun dispositivo è ancora collegato come te.",
+    "disconnect": "Scollega",
+    "lastUsed": "Ultimo utilizzo {{date}}",
+    "neverUsed": "Non ancora usato",
+    "confirm": "Scollegare {{name}}? Servirà un nuovo codice per ricollegarlo."
   }
 }

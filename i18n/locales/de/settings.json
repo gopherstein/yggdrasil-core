@@ -287,5 +287,15 @@
     "models_one": "{{count}} Modell verfügbar",
     "models_other": "{{count}} Modelle verfügbar",
     "privacy": "Chats mit diesen Modellen verlassen diesen Computer und erscheinen unter „Was diesen Computer verlassen hat“. Offline-Profile und Chats mit Erinnerungen oder Wissen, die als „Nur dieser Computer“ markiert sind, nutzen sie nie."
+  },
+  "devices": {
+    "title": "Deine Geräte",
+    "description": "Smartphones, Tablets und Fernseher, die als du verbunden sind. Jedes hat seinen eigenen Schlüssel; wenn du eines trennst, wird es abgemeldet.",
+    "connect": "Gerät verbinden",
+    "none": "Noch sind keine Geräte als du verbunden.",
+    "disconnect": "Trennen",
+    "lastUsed": "Zuletzt verwendet {{date}}",
+    "neverUsed": "Noch nicht verwendet",
+    "confirm": "{{name}} trennen? Zum erneuten Verbinden braucht es einen neuen Code."
   }
 }
