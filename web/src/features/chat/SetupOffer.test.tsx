@@ -50,7 +50,7 @@ describe('SetupOfferCard', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Set up' }))
     await waitFor(() => expect(onContinue).toHaveBeenCalledWith('Make me an image of a Viking tree'))
-    expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'flux2-klein-4b')
+    expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'flux2-klein-4b', undefined)
     expect(await screen.findByText('Set up. Finishing your request…')).toBeInTheDocument()
     expect(onContinue).toHaveBeenCalledTimes(1)
   })
@@ -86,7 +86,23 @@ describe('SetupOfferCard', () => {
     renderIt(onContinue, { ...offer, ability: 'video_generation', option: 'wan2.2-ti2v-5b', name: 'Wan 2.2 TI2V 5B', size_bytes: 8_497_662_272, request: 'Make a video of waves' })
     fireEvent.click(await screen.findByRole('button', { name: 'Set up' }))
     await waitFor(() => expect(onContinue).toHaveBeenCalledWith('Make a video of waves'))
-    expect(api.getMediaSetup).toHaveBeenCalledWith('video')
-    expect(api.startMediaSetup).toHaveBeenCalledWith('video', 'wan2.2-ti2v-5b')
+    expect(api.getMediaSetup).toHaveBeenCalledWith('video', undefined)
+    expect(api.startMediaSetup).toHaveBeenCalledWith('video', 'wan2.2-ti2v-5b', undefined)
+  })
+
+  it('sets up on a paired computer, names it and its free space, and follows the download there', async () => {
+    const remote: SetupOffer = { ...offer, node_id: 'ws', node_name: 'Workstation', remote: true, free_bytes: 120_000_000_000, slow: true }
+    vi.mocked(api.getMediaSetup).mockResolvedValue(status({}))
+    renderIt(vi.fn(), remote)
+    expect(await screen.findByText('FLUX.2 [klein] 4B · 5.2 GB download · on Workstation · 120 GB free')).toBeInTheDocument()
+    expect(screen.getByText('Workstation has no GPU acceleration for it, so each picture takes a few minutes.')).toBeInTheDocument()
+    expect(api.getMediaSetup).toHaveBeenCalledWith('images', 'ws')
+
+    vi.mocked(api.startMediaSetup).mockResolvedValue(
+      status({ job: { model_id: 'flux2-klein-4b', stage: 'model', done_bytes: 1_000_000_000, total_bytes: 5_000_000_000, running: true } }),
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Set up' }))
+    expect(await screen.findByText('Downloading… 1 GB of 5 GB')).toBeInTheDocument()
+    expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'flux2-klein-4b', 'ws')
   })
 })

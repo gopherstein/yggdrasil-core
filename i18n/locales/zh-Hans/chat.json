@@ -353,6 +353,10 @@
   },
   "setup": {
     "details": "{{name}} · 下载 {{size}} · 在 {{node}} 上",
+    "detailsRemote": "{{name}} · 下载 {{size}} · 在 {{node}} 上 · 可用 {{free}}",
+    "tightMemoryOn": "{{node}} 的内存低于建议值，可能会很慢或失败。",
+    "slowImageOn": "{{node}} 没有 GPU 加速，每张图片需要几分钟。",
+    "slowVideoOn": "{{node}} 没有 GPU 加速，一段短片可能需要将近一小时。",
     "thisComputer": "这台电脑",
     "install": "设置",
     "installing": "正在安装…",

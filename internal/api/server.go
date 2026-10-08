@@ -177,6 +177,7 @@ type Server struct {
 	speechStore     *artifacts.Store
 	images          *imagegen.Setup
 	video           *imagegen.Setup
+	remoteMedia     RemoteMediaSetup
 	notifications   *gjallarhorn.Hub
 	connectors      *connectors.Manager
 	mcp             *mcp.Manager

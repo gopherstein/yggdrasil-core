@@ -97,6 +97,10 @@ type Setup struct {
 	SizeBytes int64  `json:"size_bytes"`
 	NodeID    string `json:"node_id,omitempty"`
 	NodeName  string `json:"node_name,omitempty"`
+	// Remote is a paired computer, not this one (#153), and FreeBytes its
+	// free disk space, when known.
+	Remote    bool   `json:"remote,omitempty"`
+	FreeBytes uint64 `json:"free_bytes,omitempty"`
 	// Tools are the tools it makes ready; a profile that denies them is
 	// not offered it.
 	Tools []string `json:"tools"`
@@ -360,6 +364,22 @@ func Needs(s Snapshot, message string) (Ability, bool) {
 	all := Abilities(s)
 	for i, r := range rules {
 		if r.cue.MatchString(message) && !all[i].Available && all[i].Setup != nil {
+			return all[i], true
+		}
+	}
+	return Ability{}, false
+}
+
+// Wants returns an ability a request asks for that isn't available, whether
+// or not a setup for it is known yet, so a caller can look further, such as
+// at paired computers, before offering one.
+func Wants(s Snapshot, message string) (Ability, bool) {
+	if IsQuestion(message) {
+		return Ability{}, false
+	}
+	all := Abilities(s)
+	for i, r := range rules {
+		if r.cue.MatchString(message) && !all[i].Available {
 			return all[i], true
 		}
 	}

@@ -120,7 +120,7 @@ func (a *App) buildCapabilities(ctx context.Context) inventory.Snapshot {
 			Scan(&s.Artifacts.Count, &s.Artifacts.Bytes)
 	}
 
-	s.Setups = a.setupOptions(s)
+	s.Setups = a.setupOptions(ctx, s, false)
 	s.Abilities = inventory.Abilities(s)
 	return s
 }

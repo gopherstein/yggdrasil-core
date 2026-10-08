@@ -1,5 +1,5 @@
 {
-  "version": "1.13",
+  "version": "1.14",
   "types": {
     "ActivityStep": [
       "kind",
@@ -178,11 +178,13 @@
     ],
     "SetupOffer": [
       "ability",
+      "free_bytes",
       "label",
       "name",
       "node_id",
       "node_name",
       "option",
+      "remote",
       "request",
       "size_bytes",
       "slow",

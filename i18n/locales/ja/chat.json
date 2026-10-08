@@ -353,6 +353,10 @@
   },
   "setup": {
     "details": "{{name}} · ダウンロード{{size}} · {{node}}上",
+    "detailsRemote": "{{name}} · ダウンロード{{size}} · {{node}}上 · 空き{{free}}",
+    "tightMemoryOn": "{{node}}のメモリは推奨より少ないため、遅くなったり失敗したりすることがあります。",
+    "slowImageOn": "{{node}}では GPU アクセラレーションが使えないため、画像1枚に数分かかります。",
+    "slowVideoOn": "{{node}}では GPU アクセラレーションが使えないため、クリップ1本に1時間近くかかることがあります。",
     "thisComputer": "このコンピュータ",
     "install": "セットアップ",
     "installing": "インストール中…",

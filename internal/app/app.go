@@ -170,8 +170,10 @@ type App struct {
 	frames frameCache
 	// toolNet places heavy tools on the computer that suits them, and
 	// portable are the tools it can place (Gungnir §14–16).
-	toolNet  *remotetools.Network
-	portable []remotetools.Portable
+	toolNet *remotetools.Network
+	// peerMedia remembers paired computers' image and video setup (#153).
+	peerMedia peerMediaCache
+	portable  []remotetools.Portable
 	// Images makes and edits images on this computer (Gungnir §17).
 	Images *imagegen.Setup
 	// Video makes short clips on this computer (Gungnir §27).
@@ -817,6 +819,7 @@ func New(opts Options) (*App, error) {
 	videos := &imagegen.Engine{Setup: a.Video, WorkDir: filepath.Join(cfg.DataDir, "video-jobs"), What: "video generation"}
 	a.registerPortable(&imagegen.VideoTool{Engine: videos, Store: a.Artifacts})
 	a.API.BindVideo(a.Video)
+	a.API.BindRemoteMediaSetup(a.RemoteMediaSetup)
 	a.Training = a.newTrainingService()
 	if err := a.Training.Recover(context.Background()); err != nil {
 		return nil, fmt.Errorf("training: %w", err)
@@ -845,6 +848,7 @@ func New(opts Options) (*App, error) {
 		LookupOutbound:  a.Nodes.LookupOutbound,
 		Training:        a.Training.RemoteHandler(),
 		Tools:           remotetools.Handler(a.portable, a.enterToolWork),
+		Media:           a.mediaSetupHandler(),
 		TrainingActive:  a.isTraining,
 		JoinHello:       acceptor.Hello,
 		Join:            acceptor.Join,

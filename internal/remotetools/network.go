@@ -97,6 +97,21 @@ func (n *Network) Forget(id string) {
 	n.mu.Unlock()
 }
 
+// Refresh asks a computer again what it can run, now, such as after a tool
+// was set up there.
+func (n *Network) Refresh(ctx context.Context, id string) {
+	if n.Peers == nil {
+		return
+	}
+	for _, p := range n.Peers(ctx) {
+		if p.ID == id && p.Client != nil {
+			n.Forget(id)
+			_, _ = n.providers(ctx, p, true)
+			return
+		}
+	}
+}
+
 // candidate is one place a call could run.
 type candidate struct {
 	local    bool
