@@ -41,7 +41,7 @@ import (
 // execution is automatic | local (empty keeps the profile node policy).
 func (a *App) RunChat(ctx context.Context, profileID, conversationID, message string, stream bool, modelID, execution string) (<-chan pluginapi.ChatChunk, error) {
 	turnStart := time.Now()
-	if conversationID != "" {
+	if fixed := turnopts.From(ctx); conversationID != "" && (fixed == nil || !fixed.FixedProfile) {
 		if conv, err := a.Conversations.Get(ctx, conversationID); err == nil {
 			if profileID == "" {
 				profileID = conv.ProfileID
@@ -336,6 +336,10 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			env.trace.routed(routeReason)
 		}
 		env.opts = opts
+		if opts != nil && opts.Language != "" {
+			// A portal answers in its own language (#205).
+			env.responseLanguage = opts.Language
+		}
 		if facts := a.capabilityFacts(ctx, message); facts != "" {
 			env.capabilities = facts
 			env.trace.sharing(locale.T(appLang, "chat:steps.capabilities", nil))

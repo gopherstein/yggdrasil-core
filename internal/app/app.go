@@ -49,6 +49,7 @@ import (
 	"github.com/yeixio/toskar-core/internal/ocr"
 	"github.com/yeixio/toskar-core/internal/orchestrator"
 	"github.com/yeixio/toskar-core/internal/orchestrator/builtin/simple"
+	"github.com/yeixio/toskar-core/internal/portals"
 	"github.com/yeixio/toskar-core/internal/profiles"
 	"github.com/yeixio/toskar-core/internal/pyenv"
 	"github.com/yeixio/toskar-core/internal/ratings"
@@ -628,6 +629,7 @@ func New(opts Options) (*App, error) {
 		SetAPIKeyPermissions: apiKeyMgr.SetPermissions,
 		VerifyAPIKey:         apiKeyMgr.Verify,
 		People:               a.People,
+		Portals:              portals.NewStore(db.SQL),
 		Sessions:             auth.NewSessions(db.SQL),
 		Invites:              auth.NewInvites(db.SQL),
 		Devices:              &auth.DevicePairer{CreateKey: apiKeyMgr.CreateDevice},

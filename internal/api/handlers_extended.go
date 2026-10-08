@@ -3,6 +3,8 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"github.com/yeixio/toskar-core/internal/portals"
+	"github.com/yeixio/toskar-core/internal/turnopts"
 	"net"
 	"net/http"
 	"strconv"
@@ -315,6 +317,23 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	ctx := huginn.WithEffort(artifacts.WithAttachments(r.Context(), body.Attachments), huginn.ParseEffort(body.Effort))
+	// A portal's guest chats with the portal's profile, tools, memory, and
+	// language, whatever the request asks for (#205).
+	if p, ok := s.portalOf(r); ok {
+		body.ProfileID, body.ModelID, body.Execution = p.ProfileID, "", "automatic"
+		ctx = huginn.WithEffort(artifacts.WithAttachments(r.Context(), nil), huginn.ParseEffort(body.Effort))
+		opts := &turnopts.Options{Memory: p.Memory, Knowledge: true, FixedProfile: true, Language: p.Language}
+		switch p.Tools {
+		case portals.ToolsNone:
+			opts.Tools = []string{}
+		case portals.ToolsReadOnly:
+			opts.ReadOnlyTools = true
+		}
+		ctx = turnopts.With(ctx, opts)
+	} else if auth.PrincipalFrom(r.Context()).Person.PortalID != "" {
+		writeErr(w, http.StatusForbidden, "PORTAL_OFF", "This portal is turned off.", nil)
+		return
+	}
 	r = r.WithContext(locale.WithTimeZone(ctx, body.TimeZone))
 	if err := s.deps.Chat(w, r, body.ConversationID, body.ProfileID, body.ModelID, body.Message, body.Stream, body.Execution); err != nil {
 		writeErrFrom(w, http.StatusInternalServerError, "CHAT_FAILED", err)

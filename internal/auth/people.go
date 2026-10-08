@@ -57,6 +57,9 @@ type Person struct {
 	// External shows who they are where they sign in, at a trusted proxy
 	// or an OpenID Connect provider (#206).
 	External string `json:"external,omitempty"`
+	// PortalID is the chat portal a guest belongs to (#205); a guest
+	// reaches only that portal's chat.
+	PortalID string `json:"portal_id,omitempty"`
 }
 
 // ErrNoPerson is an unknown or disabled person.
@@ -70,13 +73,13 @@ type People struct {
 // NewPeople reads people from db.
 func NewPeople(db *sql.DB) *People { return &People{db: db} }
 
-const personColumns = `id, name, COALESCE(username, ''), role, created_at, disabled_at, password_hash IS NOT NULL, COALESCE(external_label, external_id, '')`
+const personColumns = `id, name, COALESCE(username, ''), role, created_at, disabled_at, password_hash IS NOT NULL, COALESCE(external_label, external_id, ''), COALESCE(portal_id, '')`
 
 func scanPerson(row interface{ Scan(...any) error }) (Person, error) {
 	var p Person
 	var created string
 	var disabled sql.NullString
-	if err := row.Scan(&p.ID, &p.Name, &p.Username, &p.Role, &created, &disabled, &p.SignIn, &p.External); err != nil {
+	if err := row.Scan(&p.ID, &p.Name, &p.Username, &p.Role, &created, &disabled, &p.SignIn, &p.External, &p.PortalID); err != nil {
 		return Person{}, err
 	}
 	p.CreatedAt = parseTime(created)
@@ -108,9 +111,9 @@ func (p *People) Active(ctx context.Context, id string) (Person, error) {
 	return person, nil
 }
 
-// List is everyone, the Owner first.
+// List is everyone, the Owner first, without portals' guests.
 func (p *People) List(ctx context.Context) ([]Person, error) {
-	rows, err := p.db.QueryContext(ctx, `SELECT `+personColumns+` FROM people
+	rows, err := p.db.QueryContext(ctx, `SELECT `+personColumns+` FROM people WHERE portal_id IS NULL
 		ORDER BY CASE role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 WHEN 'member' THEN 2 ELSE 3 END, created_at`)
 	if err != nil {
 		return nil, err
@@ -356,4 +359,16 @@ func PrincipalFrom(ctx context.Context) Principal {
 		return p
 	}
 	return Principal{Person: Person{ID: OwnerID, Name: "Owner", Role: RoleOwner}, Via: ViaThisComputer}
+}
+
+// CreateGuest adds an anonymous visitor to a chat portal (#205): a person
+// who belongs to it, so their chats are their own, and who reaches only
+// that portal.
+func (p *People) CreateGuest(ctx context.Context, portalID string) (Person, error) {
+	id := uuid.NewString()
+	if _, err := p.db.ExecContext(ctx, `INSERT INTO people (id, name, role, created_at, portal_id) VALUES (?, ?, ?, ?, ?)`,
+		id, "Guest", string(RoleVisitor), stamp(time.Now()), portalID); err != nil {
+		return Person{}, err
+	}
+	return p.Get(ctx, id)
 }

@@ -31,6 +31,13 @@ func HashPassword(password string) (string, error) {
 	if utf8.RuneCountInString(password) < MinPassword {
 		return "", ErrWeakPassword
 	}
+	return HashSecret(password)
+}
+
+// HashSecret is a secret's argon2id hash, like a password's but of any
+// length, such as a chat portal's shared passcode (#205), which its caller
+// checks.
+func HashSecret(password string) (string, error) {
 	salt := make([]byte, 16)
 	if _, err := rand.Read(salt); err != nil {
 		return "", err
