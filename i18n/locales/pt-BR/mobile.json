@@ -173,6 +173,7 @@
     "connectedComputer": "Computador conectado",
     "encrypted": "Criptografado · certificado {{code}}",
     "notEncrypted": "Sem criptografia. Atualizar o Toskar no computador criptografa as conversas com ele.",
+    "certificateChanged": "O certificado deste computador mudou, então o telefone não vai se conectar. Se o Toskar foi reinstalado nele, esqueça-o abaixo e conecte de novo.",
     "notConnected": "Não conectado",
     "coreVersion": "Toskar nesse computador",
     "updateCore": "Atualize o Toskar nesse computador para a versão 1.4 ou posterior para ver as fontes das respostas, o que o assistente fez, o progresso ao vivo e o esforço.",

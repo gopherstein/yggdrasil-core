@@ -173,6 +173,7 @@
     "connectedComputer": "Connected computer",
     "encrypted": "Encrypted · certificate {{code}}",
     "notEncrypted": "Not encrypted. Updating Toskar on the computer encrypts chats with it.",
+    "certificateChanged": "This computer's certificate changed, so the phone won't connect to it. If Toskar was reinstalled there, forget it below and connect again.",
     "notConnected": "Not connected",
     "coreVersion": "Toskar on that computer",
     "updateCore": "Update Toskar on that computer to 1.4 or later to see answer sources, what the assistant did, live progress, and effort.",

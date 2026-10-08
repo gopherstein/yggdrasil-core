@@ -173,6 +173,7 @@
     "connectedComputer": "Ordinateur connecté",
     "encrypted": "Chiffré · certificat {{code}}",
     "notEncrypted": "Non chiffré. Mettre à jour Toskar sur l’ordinateur chiffre les discussions avec lui.",
+    "certificateChanged": "Le certificat de cet ordinateur a changé, le téléphone ne s’y connecte donc pas. Si Toskar y a été réinstallé, oubliez-le ci-dessous et reconnectez-vous.",
     "notConnected": "Non connecté",
     "coreVersion": "Toskar sur cet ordinateur",
     "updateCore": "Mettez à jour Toskar sur cet ordinateur vers la version 1.4 ou ultérieure pour voir les sources des réponses, ce qu'a fait l'assistant, la progression en direct et l'effort.",
