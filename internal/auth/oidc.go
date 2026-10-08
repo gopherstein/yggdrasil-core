@@ -544,19 +544,22 @@ func (j jwk) publicKey() (crypto.PublicKey, error) {
 		default:
 			return nil, errors.New("unknown curve")
 		}
-		x, err := num(j.X)
-		if err != nil {
-			return nil, err
+		size := (curve.Params().BitSize + 7) / 8
+		x, err := base64.RawURLEncoding.DecodeString(j.X)
+		if err != nil || len(x) == 0 || len(x) > size {
+			return nil, errors.New("bad key coordinate")
 		}
-		y, err := num(j.Y)
-		if err != nil {
-			return nil, err
+		y, err := base64.RawURLEncoding.DecodeString(j.Y)
+		if err != nil || len(y) == 0 || len(y) > size {
+			return nil, errors.New("bad key coordinate")
 		}
-		pub := &ecdsa.PublicKey{Curve: curve, X: x, Y: y}
-		if !curve.IsOnCurve(x, y) { //nolint:staticcheck // checking a published key
-			return nil, errors.New("point not on curve")
-		}
-		return pub, nil
+		// The uncompressed point, each coordinate padded to the curve's
+		// size; parsing checks it's on the curve.
+		point := make([]byte, 1+2*size)
+		point[0] = 4
+		copy(point[1+size-len(x):1+size], x)
+		copy(point[1+2*size-len(y):], y)
+		return ecdsa.ParseUncompressedPublicKey(curve, point)
 	}
 	return nil, errors.New("unknown key type")
 }
