@@ -140,6 +140,7 @@
   "UNREADABLE_FILE": "Toskar 無法讀取 {{name}}：{{cause}}",
   "UNSUPPORTED_FILE": "Toskar 目前還無法讀取 {{name}}。請附加文件、試算表、PDF、程式碼檔案、音訊、影片，或 PNG、JPEG 圖片。",
   "DEVICE_NOT_ALLOWED": "裝置的金鑰無法執行此操作。請使用 API 存取中的金鑰。",
+  "PROXY_REFUSED": "你的登入未在此 Toskar 上給予你角色。請擁有者把你加入有角色的群組。",
   "DEVICE_NOT_FOUND": "你沒有該 ID 的裝置。",
   "DEVICES_FAILED": "無法讀取或變更你的裝置。",
   "PAIRING_EXPIRED": "此代碼已過期。請在電腦上再次選擇「連接裝置」。",

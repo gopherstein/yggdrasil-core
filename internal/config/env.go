@@ -67,6 +67,27 @@ func ApplyEnvOverrides(cfg *Config) {
 	if v := Env("API_TLS_KEY"); v != "" {
 		cfg.APITLSKey = v
 	}
+	// Sign-in by a reverse proxy (#206).
+	if v := Env("TRUSTED_PROXIES"); v != "" {
+		cfg.TrustedProxies = splitCSV(v)
+	}
+	for name, dst := range map[string]*string{
+		"PROXY_USER_HEADER":   &cfg.ProxyAuth.UserHeader,
+		"PROXY_NAME_HEADER":   &cfg.ProxyAuth.NameHeader,
+		"PROXY_GROUPS_HEADER": &cfg.ProxyAuth.GroupsHeader,
+		"PROXY_DEFAULT_ROLE":  &cfg.ProxyAuth.DefaultRole,
+		"PROXY_OWNER_USER":    &cfg.ProxyAuth.OwnerUser,
+	} {
+		if v := Env(name); v != "" {
+			*dst = v
+		}
+	}
+	if v := Env("PROXY_ADMIN_GROUPS"); v != "" {
+		cfg.ProxyAuth.AdminGroups = splitCSV(v)
+	}
+	if v := Env("PROXY_MEMBER_GROUPS"); v != "" {
+		cfg.ProxyAuth.MemberGroups = splitCSV(v)
+	}
 }
 
 // EnvTruthy reports whether the setting Env(name) is a truthy flag.

@@ -4,6 +4,7 @@
   "you": "（你）",
   "ownerNoSignIn": "使用這台電腦；尚未設定其他裝置的登入",
   "notSignedIn": "尚未選擇使用者名稱",
+  "byProxy": "透過你的登入服務以 {{name}} 登入",
   "disabled": "已停用",
   "roleFor": "{{name}} 的角色",
   "signInLink": "登入連結",
@@ -68,6 +69,7 @@
   "account": {
     "label": "你的帳戶",
     "signedInAs": "已登入為 {{name}}（@{{username}}），{{role}}。",
-    "signOut": "登出"
+    "signOut": "登出",
+    "signedInByProxy": "已透過你的登入服務以 {{name}}（{{role}}）登入。請在那裡登出。"
   }
 }

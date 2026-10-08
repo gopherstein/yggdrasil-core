@@ -86,6 +86,10 @@ func (s *Server) hostAllowed(r *http.Request) bool {
 	if isLoopbackName(host) {
 		return true
 	}
+	// A trusted reverse proxy answers for its own name (#206).
+	if s.fromTrustedProxy(r) {
+		return true
+	}
 	if !s.listensBeyondLoopback() {
 		return false
 	}
@@ -110,6 +114,11 @@ func (s *Server) originAllowed(r *http.Request, origin string) bool {
 	}
 	// Same origin: the daemon's own web UI.
 	if strings.EqualFold(u.Host, r.Host) {
+		return true
+	}
+	// Through a trusted proxy that renames the host, the name it was
+	// asked for (#206).
+	if fwd := r.Header.Get("X-Forwarded-Host"); fwd != "" && s.fromTrustedProxy(r) && strings.EqualFold(u.Host, strings.TrimSpace(strings.Split(fwd, ",")[0])) {
 		return true
 	}
 	if !isLoopbackName(u.Hostname()) {
@@ -180,4 +189,14 @@ func remoteIsLoopback(r *http.Request) bool {
 	}
 	ip := net.ParseIP(host)
 	return ip != nil && ip.IsLoopback()
+}
+
+// fromTrustedProxy reports whether a request comes from a reverse proxy
+// the Owner listed (#206).
+func (s *Server) fromTrustedProxy(r *http.Request) bool {
+	if s.deps.Config == nil {
+		return false
+	}
+	proxy, _ := s.deps.Config.Get().Proxy()
+	return proxy.FromProxy(r)
 }

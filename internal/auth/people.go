@@ -54,6 +54,8 @@ type Person struct {
 	Disabled  *time.Time `json:"disabled_at,omitempty"`
 	// SignIn is true once they've set a username and password.
 	SignIn bool `json:"sign_in"`
+	// External is the name a trusted proxy signs them in as (#206).
+	External string `json:"external,omitempty"`
 }
 
 // ErrNoPerson is an unknown or disabled person.
@@ -67,13 +69,13 @@ type People struct {
 // NewPeople reads people from db.
 func NewPeople(db *sql.DB) *People { return &People{db: db} }
 
-const personColumns = `id, name, COALESCE(username, ''), role, created_at, disabled_at, password_hash IS NOT NULL`
+const personColumns = `id, name, COALESCE(username, ''), role, created_at, disabled_at, password_hash IS NOT NULL, COALESCE(external_id, '')`
 
 func scanPerson(row interface{ Scan(...any) error }) (Person, error) {
 	var p Person
 	var created string
 	var disabled sql.NullString
-	if err := row.Scan(&p.ID, &p.Name, &p.Username, &p.Role, &created, &disabled, &p.SignIn); err != nil {
+	if err := row.Scan(&p.ID, &p.Name, &p.Username, &p.Role, &created, &disabled, &p.SignIn, &p.External); err != nil {
 		return Person{}, err
 	}
 	p.CreatedAt = parseTime(created)

@@ -4,6 +4,7 @@
   "you": "(vous)",
   "ownerNoSignIn": "Utilise cet ordinateur ; pas encore de connexion pour d’autres appareils",
   "notSignedIn": "N’a pas encore choisi de nom d’utilisateur",
+  "byProxy": "Se connecte par votre service de connexion en tant que {{name}}",
   "disabled": "Désactivé",
   "roleFor": "Rôle de {{name}}",
   "signInLink": "Lien de connexion",
@@ -68,6 +69,7 @@
   "account": {
     "label": "Votre compte",
     "signedInAs": "Connecté en tant que {{name}} (@{{username}}), {{role}}.",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "signedInByProxy": "Connecté en tant que {{name}} par votre service de connexion, {{role}}. Déconnectez-vous depuis celui-ci."
   }
 }

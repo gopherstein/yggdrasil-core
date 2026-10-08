@@ -933,12 +933,17 @@ func (a *App) authorizeControlRequest(r *http.Request) error {
 }
 
 // someoneCanConnect reports whether anything could use the API from the
-// network: an API key, or a person other than the Owner, who signs in with
-// a password or still has a link to choose one (#206).
+// network: an API key, a trusted proxy that signs people in, or a person
+// other than the Owner, who signs in with a password or still has a link to
+// choose one (#206).
 func (a *App) someoneCanConnect(ctx context.Context) (bool, error) {
 	keys, err := a.APIKeys.List(ctx)
 	if err != nil || len(keys) > 0 {
 		return len(keys) > 0, err
+	}
+	// People a trusted proxy signs in (#206).
+	if proxy, err := a.Config.Get().Proxy(); err == nil && proxy != nil {
+		return true, nil
 	}
 	if a.People == nil {
 		return false, nil
@@ -1028,6 +1033,11 @@ func (a *App) Start(ctx context.Context) error {
 	a.keepRunRecordsTidy(ctx)
 	a.upgradeRuntimeBuilds(ctx)
 	_ = a.syncInternalBind()
+	// A mistake in the trusted proxies stops the start rather than letting
+	// people in another way (#206).
+	if _, err := a.Config.Get().Proxy(); err != nil {
+		return err
+	}
 	if err := a.requireKeyForRemoteBind(ctx); err != nil {
 		return err
 	}

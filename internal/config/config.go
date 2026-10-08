@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/yeixio/toskar-core/internal/auth"
 	"os"
 	"path/filepath"
 	"sync"
@@ -46,6 +47,35 @@ type Config struct {
 	// chosen for a chat (#111); its API key is in the secrets folder.
 	ExternalOpenAIURL string `json:"external_openai_url,omitempty"`
 	RatingsSummaryURL string `json:"ratings_summary_url,omitempty"`
+	// TrustedProxies are the addresses (IPs or CIDRs) of reverse proxies
+	// that sign people in and name them in headers (#206). Their headers
+	// are believed only from these addresses.
+	TrustedProxies []string `json:"trusted_proxies,omitempty"`
+	// ProxyAuth says which headers a trusted proxy names the person in,
+	// and how their groups become roles.
+	ProxyAuth ProxyAuth `json:"proxy_auth,omitempty"`
+}
+
+// ProxyAuth is sign-in by a trusted reverse proxy, such as Authelia,
+// Authentik, Cloudflare Access, or Tailscale (#206).
+type ProxyAuth struct {
+	// UserHeader names the signed-in person; empty is Remote-User.
+	UserHeader string `json:"user_header,omitempty"`
+	// NameHeader is their display name, when the proxy sends one; empty
+	// is Remote-Name.
+	NameHeader string `json:"name_header,omitempty"`
+	// GroupsHeader lists their groups, separated by commas or |; empty is
+	// Remote-Groups.
+	GroupsHeader string `json:"groups_header,omitempty"`
+	// AdminGroups and MemberGroups make someone in them an Admin or a
+	// Member.
+	AdminGroups  []string `json:"admin_groups,omitempty"`
+	MemberGroups []string `json:"member_groups,omitempty"`
+	// DefaultRole is everyone else's: member (the default), visitor, or
+	// none to refuse them.
+	DefaultRole string `json:"default_role,omitempty"`
+	// OwnerUser is the proxy's name for the Owner.
+	OwnerUser string `json:"owner_user,omitempty"`
 }
 
 // Manager loads and persists configuration.
@@ -182,4 +212,19 @@ func (c Config) APIAddr() string {
 // InternalAddr returns host:port for the Bifrost node protocol.
 func (c Config) InternalAddr() string {
 	return fmt.Sprintf("%s:%d", c.InternalHost, c.InternalPort)
+}
+
+// Proxy is sign-in by the trusted reverse proxies (#206), or nil when none
+// are listed.
+func (c Config) Proxy() (*auth.Proxy, error) {
+	return auth.NewProxy(auth.ProxySettings{
+		Trusted:      c.TrustedProxies,
+		UserHeader:   c.ProxyAuth.UserHeader,
+		NameHeader:   c.ProxyAuth.NameHeader,
+		GroupsHeader: c.ProxyAuth.GroupsHeader,
+		AdminGroups:  c.ProxyAuth.AdminGroups,
+		MemberGroups: c.ProxyAuth.MemberGroups,
+		DefaultRole:  c.ProxyAuth.DefaultRole,
+		OwnerUser:    c.ProxyAuth.OwnerUser,
+	})
 }

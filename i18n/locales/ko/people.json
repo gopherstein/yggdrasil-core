@@ -4,6 +4,7 @@
   "you": "(나)",
   "ownerNoSignIn": "이 컴퓨터를 사용 중이에요. 아직 다른 기기용 로그인은 없어요",
   "notSignedIn": "아직 사용자 이름을 정하지 않았어요",
+  "byProxy": "로그인 서비스를 통해 {{name}}(으)로 로그인",
   "disabled": "비활성화됨",
   "roleFor": "{{name}}의 역할",
   "signInLink": "로그인 링크",
@@ -68,6 +69,7 @@
   "account": {
     "label": "내 계정",
     "signedInAs": "{{name}}(@{{username}}, {{role}})(으)로 로그인됨.",
-    "signOut": "로그아웃"
+    "signOut": "로그아웃",
+    "signedInByProxy": "로그인 서비스를 통해 {{name}}({{role}})(으)로 로그인됨. 로그아웃은 그 서비스에서 하세요."
   }
 }

@@ -140,6 +140,7 @@
   "UNREADABLE_FILE": "Toskar가 {{name}}을(를) 읽을 수 없어요: {{cause}}",
   "UNSUPPORTED_FILE": "Toskar는 아직 {{name}}을(를) 읽을 수 없어요. 문서, 스프레드시트, PDF, 코드 파일, 오디오, 동영상 또는 PNG나 JPEG 이미지를 첨부하세요.",
   "DEVICE_NOT_ALLOWED": "기기 키로는 이 작업을 할 수 없습니다. API 액세스의 키를 사용하세요.",
+  "PROXY_REFUSED": "이 로그인으로는 이 Toskar에서 역할이 없어요. 역할이 있는 그룹에 추가해 달라고 소유자에게 요청하세요.",
   "DEVICE_NOT_FOUND": "그 ID를 가진 내 기기가 없어요.",
   "DEVICES_FAILED": "내 기기를 읽거나 바꿀 수 없어요.",
   "PAIRING_EXPIRED": "코드가 만료되었습니다. 컴퓨터에서 '기기 연결'을 다시 선택하세요.",
