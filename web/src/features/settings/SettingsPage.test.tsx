@@ -16,8 +16,8 @@ vi.mock('@/lib/api', async () => {
   }
 })
 
-describe('SettingsPage for a Member (#203)', () => {
-  it('shows their account and appearance, and says the rest is for Admins', async () => {
+describe('SettingsPage for a Member (#203, #206)', () => {
+  it('shows their account, appearance, and languages, and says the rest is for Admins', async () => {
     vi.mocked(api.getMe).mockResolvedValue({
       person: { id: 'sam', name: 'Sam', username: 'sam', role: 'member', created_at: '', sign_in: true },
       via: 'session',
@@ -32,6 +32,8 @@ describe('SettingsPage for a Member (#203)', () => {
     expect(await screen.findByText(/so they're for Admins and the Owner/)).toBeInTheDocument()
     expect(screen.getByText('Signed in as Sam (@sam), Member.')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Appearance' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: 'Language' })).not.toBeInTheDocument()
+    // Their own languages and style are theirs to set (#206).
+    expect(screen.getByRole('heading', { name: 'Language' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Default profile' })).not.toBeInTheDocument()
   })
 })

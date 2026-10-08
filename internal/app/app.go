@@ -1224,9 +1224,10 @@ func (a *App) settingsView(ctx context.Context) (contracts.SettingsView, error) 
 	toolFiles, _ := a.Settings.GetString(ctx, "tool_file_writes", "ask")
 	toolGit, _ := a.Settings.GetString(ctx, "tool_git", "ask")
 	launchAtLogin, _ := a.Settings.GetBool(ctx, "launch_at_login", false)
-	uiLocale, _ := a.Settings.GetString(ctx, "ui_locale", "")
-	assistantMode, _ := a.Settings.GetString(ctx, "assistant_language_mode", replylang.ModeAuto)
-	assistantLanguage, _ := a.Settings.GetString(ctx, "assistant_language", "")
+	// The person's own languages (#206).
+	uiLocale := a.personalString(ctx, "ui_locale", "")
+	assistantMode := a.personalString(ctx, "assistant_language_mode", replylang.ModeAuto)
+	assistantLanguage := a.personalString(ctx, "assistant_language", "")
 	digest, _ := a.Settings.GetString(ctx, settingDigest, "")
 	digestZone, _ := a.Settings.GetString(ctx, settingDigestZone, "")
 	if assistantMode == "" {
@@ -1361,7 +1362,7 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 		if !validLocale(v) {
 			return contracts.Errorf("INVALID_LOCALE", nil, "ui_locale must be a language tag such as en or es-MX, or empty for the system language")
 		}
-		if err := a.Settings.Set(ctx, "ui_locale", v); err != nil {
+		if err := a.setPersonal(ctx, "ui_locale", v); err != nil {
 			return err
 		}
 	}
@@ -1386,7 +1387,7 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 			return contracts.Errorf("INVALID_SETTING", map[string]any{"setting": "assistant_language_mode", "value": v},
 				"assistant_language_mode must be auto, app, or language")
 		}
-		if err := a.Settings.Set(ctx, "assistant_language_mode", v); err != nil {
+		if err := a.setPersonal(ctx, "assistant_language_mode", v); err != nil {
 			return err
 		}
 	}
@@ -1394,7 +1395,7 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 		if !validLocale(v) {
 			return contracts.Errorf("INVALID_LOCALE", nil, "assistant_language must be a language tag such as de or pt-BR")
 		}
-		if err := a.Settings.Set(ctx, "assistant_language", v); err != nil {
+		if err := a.setPersonal(ctx, "assistant_language", v); err != nil {
 			return err
 		}
 	}

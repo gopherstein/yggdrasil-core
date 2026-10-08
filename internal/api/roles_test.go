@@ -13,6 +13,7 @@ import (
 	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/config"
 	"github.com/yeixio/toskar-core/internal/store"
+	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
 // Every route given a role is one the daemon serves, so a typo can't leave
@@ -111,5 +112,53 @@ func TestRolesReachWhatTheyMay(t *testing.T) {
 		if refused == c.allowed {
 			t.Errorf("%s %s %s: %d %s, allowed %v", c.person, c.method, c.path, code, errCode, c.allowed)
 		}
+	}
+}
+
+// Anyone saves their own languages, and nothing else, there (#206).
+func TestMyPreferences(t *testing.T) {
+	dir := t.TempDir()
+	db, err := store.Open(filepath.Join(dir, "t.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+	if _, err := db.SQL.Exec(`INSERT INTO people (id, name, role) VALUES ('vee', 'Vee', 'visitor')`); err != nil {
+		t.Fatal(err)
+	}
+	mgr, err := config.NewManager(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := mgr.Update(func(c *config.Config) { c.APIHost = "0.0.0.0" }); err != nil {
+		t.Fatal(err)
+	}
+	var saved map[string]any
+	var as string
+	srv := NewServer(Dependencies{
+		Config: mgr,
+		People: auth.NewPeople(db.SQL),
+		VerifyAPIKey: func(_ context.Context, secret string) (auth.APIKeyRecord, error) {
+			return auth.APIKeyRecord{ID: "k", PersonID: "vee"}, nil
+		},
+		UpdateSettings: func(ctx context.Context, patch map[string]any) (contracts.SettingsView, error) {
+			saved, as = patch, auth.PersonID(ctx)
+			return contracts.SettingsView{}, nil
+		},
+	})
+	patch := func(body string) int {
+		r := httptest.NewRequest(http.MethodPatch, "/api/v1/me/preferences", strings.NewReader(body))
+		r.Header.Set("Authorization", "Bearer ygg_key_vee")
+		r.Header.Set("X-Forwarded-For", "192.168.1.20")
+		rec := httptest.NewRecorder()
+		srv.Handler().ServeHTTP(rec, r)
+		return rec.Code
+	}
+	if code := patch(`{"ui_locale":"fr","assistant_language_mode":"app"}`); code != http.StatusOK || saved["ui_locale"] != "fr" || as != "vee" {
+		t.Fatalf("own languages: %d %v as %q", code, saved, as)
+	}
+	saved = nil
+	if code := patch(`{"ui_locale":"fr","lan_api_enabled":true}`); code != http.StatusBadRequest || saved != nil {
+		t.Fatalf("another setting: %d %v", code, saved)
 	}
 }

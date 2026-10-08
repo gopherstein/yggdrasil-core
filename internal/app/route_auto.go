@@ -361,9 +361,5 @@ func (a *App) languageWeakNotice(ctx context.Context, m contracts.Model, lang st
 // appLanguage is the App language (the ui_locale setting), which the
 // notices shown with an answer are written in.
 func (a *App) appLanguage(ctx context.Context) string {
-	app := ""
-	if a.Settings != nil {
-		app, _ = a.Settings.GetString(ctx, "ui_locale", "")
-	}
-	return locale.Resolve(app)
+	return locale.Resolve(a.personalString(ctx, "ui_locale", ""))
 }

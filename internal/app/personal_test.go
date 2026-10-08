@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/muninn"
 	"github.com/yeixio/toskar-core/internal/personal"
 	"github.com/yeixio/toskar-core/internal/tools"
@@ -61,5 +62,48 @@ func TestPersonalizationIsSeparateFromPermissions(t *testing.T) {
 	profile := contracts.AIProfile{Tools: []contracts.ToolPolicy{{ToolID: "terminal", Policy: tools.PolicyAsk}}}
 	if tools.PolicyForProfile(profile, "terminal") != tools.PolicyAsk {
 		t.Fatal("policy changed")
+	}
+}
+
+// Each person keeps their own languages and style (#206); until they
+// choose, they have the Owner's.
+func TestPreferencesArePerPerson(t *testing.T) {
+	a, _ := memoryApp(t)
+	owner := context.Background()
+	sam := auth.AsPerson(owner, auth.Person{ID: "sam", Role: auth.RoleMember})
+	ada := auth.AsPerson(owner, auth.Person{ID: "ada", Role: auth.RoleMember})
+
+	for k, v := range map[string]string{"ui_locale": "de", "assistant_language_mode": "app"} {
+		if err := a.setPersonal(owner, k, v); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if got := a.appLanguage(sam); got != "de" {
+		t.Fatalf("sam before choosing: %q", got)
+	}
+	if err := a.setPersonal(sam, "ui_locale", "fr"); err != nil {
+		t.Fatal(err)
+	}
+	if err := a.setPersonal(ada, "ui_locale", ""); err != nil {
+		t.Fatal(err)
+	}
+	if a.appLanguage(sam) != "fr" || a.appLanguage(owner) != "de" {
+		t.Fatalf("sam %q, owner %q", a.appLanguage(sam), a.appLanguage(owner))
+	}
+	if got := a.personalString(ada, "ui_locale", ""); got != "" {
+		t.Fatalf("ada chose the system language, got %q", got)
+	}
+	if got := a.replyLanguage(sam, "", "hello", "").Tag; got != "fr" {
+		t.Fatalf("sam's answers in %q", got)
+	}
+
+	if _, err := a.SetPersonalStyle(sam, personal.Style{Length: "brief"}); err != nil {
+		t.Fatal(err)
+	}
+	if s, _ := a.PersonalStyle(owner); s.Length == "brief" {
+		t.Fatal("sam's style reached the owner")
+	}
+	if s, _ := a.PersonalStyle(sam); s.Length != "brief" {
+		t.Fatalf("sam's style: %+v", s)
 	}
 }

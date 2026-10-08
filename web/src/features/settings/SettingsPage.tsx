@@ -272,11 +272,13 @@ export function SettingsPage() {
           />
         </section>
 
+        {/* Each person's own (#206). */}
+        <LanguageSettings />
+
+        <Personalization />
+
         {admin ? (
           <>
-            <LanguageSettings />
-
-            <Personalization />
 
             <section className="card space-y-4">
               <div className="flex items-start justify-between gap-4">

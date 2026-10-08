@@ -19,7 +19,7 @@ export function AssistantLanguage() {
   const value = mode === 'language' && language ? language : mode === 'app' ? ':app' : ':auto'
   const save = useMutation({
     mutationFn: (choice: string) =>
-      api.updateSettings(
+      api.setMyPreferences(
         choice === ':auto'
           ? { assistant_language_mode: 'auto' }
           : choice === ':app'

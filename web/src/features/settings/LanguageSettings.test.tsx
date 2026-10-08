@@ -7,7 +7,7 @@ import { useUIStore } from '@/stores/uiStore'
 import type { SettingsView } from '@/types/api'
 import { LanguageSettings } from './LanguageSettings'
 
-vi.mock('@/lib/api', () => ({ api: { getSettings: vi.fn(), updateSettings: vi.fn() } }))
+vi.mock('@/lib/api', () => ({ api: { getSettings: vi.fn(), setMyPreferences: vi.fn() } }))
 
 function renderIt() {
   return render(
@@ -19,7 +19,7 @@ function renderIt() {
 
 beforeEach(() => {
   vi.mocked(api.getSettings).mockResolvedValue({ ui_locale: '' } as SettingsView)
-  vi.mocked(api.updateSettings).mockImplementation(async (patch) => ({ ui_locale: patch.ui_locale }) as SettingsView)
+  vi.mocked(api.setMyPreferences).mockImplementation(async (patch) => ({ ui_locale: patch.ui_locale }) as SettingsView)
 })
 
 afterEach(async () => {
@@ -61,7 +61,7 @@ describe('LanguageSettings', () => {
     const select = await screen.findByRole('combobox', { name: 'App language' })
     await waitFor(() => expect(select).toBeEnabled())
     fireEvent.change(select, { target: { value: 'en-XA' } })
-    await waitFor(() => expect(api.updateSettings).toHaveBeenCalledWith({ ui_locale: 'en-XA' }))
+    await waitFor(() => expect(api.setMyPreferences).toHaveBeenCalledWith({ ui_locale: 'en-XA' }))
     // The section itself is now pseudo-localized.
     expect(await screen.findByText(/^\[!! .*Ļáá/)).toBeInTheDocument()
     expect(document.documentElement.lang).toBe('en-XA')
@@ -86,10 +86,10 @@ describe('assistant language', () => {
     await waitFor(() => expect(select).toBeEnabled())
     fireEvent.change(select, { target: { value: 'de' } })
     await waitFor(() =>
-      expect(api.updateSettings).toHaveBeenCalledWith({ assistant_language_mode: 'language', assistant_language: 'de' }),
+      expect(api.setMyPreferences).toHaveBeenCalledWith({ assistant_language_mode: 'language', assistant_language: 'de' }),
     )
     fireEvent.change(select, { target: { value: ':app' } })
-    await waitFor(() => expect(api.updateSettings).toHaveBeenCalledWith({ assistant_language_mode: 'app' }))
+    await waitFor(() => expect(api.setMyPreferences).toHaveBeenCalledWith({ assistant_language_mode: 'app' }))
   })
 
   it('shows the saved choice', async () => {
