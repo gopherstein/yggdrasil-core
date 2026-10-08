@@ -391,6 +391,12 @@
     "guide": "Guide",
     "guideHint": "The rules lead the instructions. Quickest; fine for your own people.",
     "enforce": "Enforce",
-    "enforceHint": "Also checks each message before answering and each answer before it's shown, and sends the set reply to anything off topic. For the public and chat portals."
+    "enforceHint": "Also checks each message before answering and each answer before it's shown, and sends the set reply to anything off topic. For the public and chat portals.",
+    "sites": "Web search only on",
+    "sitesExample": "danastires.com\nmichelin.com",
+    "sitesHint": "Sites, one per line, with their subdomains. Pages elsewhere aren't opened. Leave empty for any site.",
+    "words": "Add to every web search",
+    "wordsExample": "tires",
+    "wordsHint": "Words, one per line, added to each search so results stay on the subject."
   }
 }

@@ -391,6 +391,12 @@
     "guide": "Leiten",
     "guideHint": "Die Regeln stehen vor allen Anweisungen. Am schnellsten; gut für die eigenen Leute.",
     "enforce": "Durchsetzen",
-    "enforceHint": "Prüft außerdem jede Nachricht vor der Antwort und jede Antwort, bevor sie erscheint, und schickt bei allem anderen die festgelegte Antwort. Für die Öffentlichkeit und Chat-Portale."
+    "enforceHint": "Prüft außerdem jede Nachricht vor der Antwort und jede Antwort, bevor sie erscheint, und schickt bei allem anderen die festgelegte Antwort. Für die Öffentlichkeit und Chat-Portale.",
+    "sites": "Websuche nur auf",
+    "sitesExample": "danastires.com\nmichelin.com",
+    "sitesHint": "Websites, eine pro Zeile, mit ihren Subdomains. Seiten anderswo werden nicht geöffnet. Leer lassen für jede Website.",
+    "words": "Zu jeder Websuche hinzufügen",
+    "wordsExample": "Reifen",
+    "wordsHint": "Wörter, eines pro Zeile, die jeder Suche angefügt werden, damit die Ergebnisse beim Thema bleiben."
   }
 }

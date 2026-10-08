@@ -393,6 +393,12 @@
     "guide": "Guiar",
     "guideHint": "Las reglas van antes que las instrucciones. Lo más rápido; bien para tu propia gente.",
     "enforce": "Imponer",
-    "enforceHint": "Además revisa cada mensaje antes de responder y cada respuesta antes de mostrarla, y envía la respuesta fijada a todo lo que se salga del tema. Para el público y los portales de chat."
+    "enforceHint": "Además revisa cada mensaje antes de responder y cada respuesta antes de mostrarla, y envía la respuesta fijada a todo lo que se salga del tema. Para el público y los portales de chat.",
+    "sites": "Buscar en la web solo en",
+    "sitesExample": "danastires.com\nmichelin.com",
+    "sitesHint": "Sitios, uno por línea, con sus subdominios. No se abren páginas de otros sitios. Déjalo vacío para cualquier sitio.",
+    "words": "Añadir a cada búsqueda web",
+    "wordsExample": "neumáticos",
+    "wordsHint": "Palabras, una por línea, que se añaden a cada búsqueda para que los resultados sigan en el tema."
   }
 }

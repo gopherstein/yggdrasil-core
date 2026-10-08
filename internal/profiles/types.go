@@ -57,6 +57,19 @@ func ValidateTopics(t *contracts.TopicPolicy) error {
 			return ErrInvalidProfile("topics: each example and subject can be 200 characters")
 		}
 	}
+	if len(t.WebSites) > 20 || len(t.WebKeywords) > 10 {
+		return ErrInvalidProfile("topics: up to 20 sites and 10 search words")
+	}
+	for _, site := range t.WebSites {
+		if !validSite(site) {
+			return ErrInvalidProfile("topics: " + site + " isn't a site, such as example.com")
+		}
+	}
+	for _, w := range t.WebKeywords {
+		if long(w, 50) {
+			return ErrInvalidProfile("topics: each search word can be 50 characters")
+		}
+	}
 	switch t.Strictness {
 	case "", contracts.TopicsGuide, contracts.TopicsEnforce:
 	default:
@@ -132,3 +145,38 @@ func ValidateOrchestration(o contracts.OrchestrationPolicy) error {
 type ErrInvalidProfile string
 
 func (e ErrInvalidProfile) Error() string { return string(e) }
+
+// validSite reports a site name, such as example.com: letters, digits,
+// dashes, and at least one dot.
+func validSite(site string) bool {
+	if len(site) > 253 || !strings.Contains(site, ".") || strings.HasPrefix(site, ".") || strings.HasSuffix(site, ".") {
+		return false
+	}
+	for _, r := range site {
+		switch {
+		case r >= 'a' && r <= 'z', r >= '0' && r <= '9', r == '-', r == '.':
+		default:
+			return false
+		}
+	}
+	return !strings.Contains(site, "..")
+}
+
+// Site is a site as typed, such as "https://www.Example.com/shop", made a
+// site name: "example.com".
+func Site(s string) string {
+	s = strings.ToLower(strings.TrimSpace(s))
+	if i := strings.Index(s, "://"); i >= 0 {
+		s = s[i+3:]
+	}
+	if i := strings.IndexAny(s, "/?#"); i >= 0 {
+		s = s[:i]
+	}
+	if i := strings.LastIndex(s, "@"); i >= 0 {
+		s = s[i+1:]
+	}
+	if i := strings.Index(s, ":"); i >= 0 {
+		s = s[:i]
+	}
+	return strings.TrimPrefix(strings.TrimSuffix(s, "."), "www.")
+}

@@ -21,8 +21,8 @@ describe('TopicsEditor (#345)', () => {
   it('turns the editor into topic controls, keeping strictness, or none', () => {
     expect(topicsFrom(topicsDraft())).toBeUndefined()
     expect(
-      topicsFrom({ staysOn: ' Tires ', examples: 'Winter tires?\n\n Rotation? ', never: 'politics', reply: '', strict: 'enforce' }),
-    ).toEqual({ stays_on: 'Tires', examples: ['Winter tires?', 'Rotation?'], never_discuss: ['politics'], strictness: 'enforce' })
+      topicsFrom({ staysOn: ' Tires ', examples: 'Winter tires?\n\n Rotation? ', never: 'politics', reply: '', strict: 'enforce', sites: 'danastires.com\n', words: '' }),
+    ).toEqual({ stays_on: 'Tires', examples: ['Winter tires?', 'Rotation?'], never_discuss: ['politics'], strictness: 'enforce', web_sites: ['danastires.com'] })
     expect(topicsDraft({ stays_on: 'Tires', examples: ['a', 'b'] }).examples).toBe('a\nb')
     expect(topicsDraft({ stays_on: 'Tires', strictness: 'enforce' }).strict).toBe('enforce')
     expect(topicsFrom({ ...topicsDraft(), staysOn: 'Tires' })).toEqual({ stays_on: 'Tires' })
@@ -40,5 +40,7 @@ describe('TopicsEditor (#345)', () => {
     expect(screen.getByLabelText(/^Guide/)).toBeChecked()
     fireEvent.click(screen.getByLabelText(/^Enforce/))
     expect(last.strict).toBe('enforce')
+    fireEvent.change(screen.getByLabelText(/^Web search only on/), { target: { value: 'danastires.com' } })
+    expect(last.sites).toBe('danastires.com')
   })
 })

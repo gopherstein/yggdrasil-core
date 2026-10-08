@@ -54,6 +54,32 @@ export function TopicsEditor({ value, onChange, disabled }: { value: TopicsDraft
             />
             <span className="block text-xs text-ink-faint">{t('topics.replyHint')}</span>
           </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block space-y-1 text-sm">
+              <span className="text-ink-muted">{t('topics.sites')}</span>
+              <textarea
+                className="field w-full"
+                rows={3}
+                disabled={disabled}
+                placeholder={t('topics.sitesExample')}
+                value={value.sites}
+                onChange={set('sites')}
+              />
+              <span className="block text-xs text-ink-faint">{t('topics.sitesHint')}</span>
+            </label>
+            <label className="block space-y-1 text-sm">
+              <span className="text-ink-muted">{t('topics.words')}</span>
+              <textarea
+                className="field w-full"
+                rows={3}
+                disabled={disabled}
+                placeholder={t('topics.wordsExample')}
+                value={value.words}
+                onChange={set('words')}
+              />
+              <span className="block text-xs text-ink-faint">{t('topics.wordsHint')}</span>
+            </label>
+          </div>
           <fieldset className="space-y-2 text-sm" disabled={disabled}>
             <legend className="mb-1 text-ink-muted">{t('topics.strictness')}</legend>
             {(['guide', 'enforce'] as const).map((level) => (

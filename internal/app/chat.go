@@ -1188,9 +1188,18 @@ func (e *chatExecEnv) ExecuteTool(ctx context.Context, toolID string, args map[s
 	ctx = withChatProfile(ctx, e.profile.ID)
 	// A heavy tool may run on another computer, as the profile allows.
 	ctx = remotetools.WithPolicy(ctx, e.profile.NodePolicy)
+	// The profile's web limit (#345).
+	args, err := limitWebArgs(e.profile.Topics, toolID, args)
+	if err != nil {
+		e.progress(events.ToolFailed, map[string]any{"tool_id": toolID, "error": err.Error()})
+		return nil, err
+	}
 	e.progress(events.ToolStarted, map[string]any{"tool_id": toolID, "args": args})
 	toolStarted := time.Now()
 	result, err := e.app.Tools.Execute(ctx, toolID, args, policy, "chat requested tool", meta)
+	if err == nil {
+		result, err = limitWebResult(e.profile.Topics, toolID, result)
+	}
 	runlog.From(ctx).ToolCall(tools.Canonical(toolID), time.Since(toolStarted), err != nil)
 	if err == nil && e.trace != nil {
 		e.trace.tool(toolID, args, result)
