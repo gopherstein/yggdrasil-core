@@ -393,6 +393,12 @@
     "guide": "Guider",
     "guideHint": "Les règles passent avant les instructions. Le plus rapide ; convient à vos propres équipes.",
     "enforce": "Imposer",
-    "enforceHint": "Vérifie aussi chaque message avant de répondre et chaque réponse avant de l'afficher, et envoie la réponse prévue pour tout autre sujet. Pour le public et les portails de discussion."
+    "enforceHint": "Vérifie aussi chaque message avant de répondre et chaque réponse avant de l'afficher, et envoie la réponse prévue pour tout autre sujet. Pour le public et les portails de discussion.",
+    "sites": "Recherche web uniquement sur",
+    "sitesExample": "danastires.com\nmichelin.com",
+    "sitesHint": "Des sites, un par ligne, avec leurs sous-domaines. Les pages ailleurs ne sont pas ouvertes. Laissez vide pour tous les sites.",
+    "words": "Ajouter à chaque recherche web",
+    "wordsExample": "pneus",
+    "wordsHint": "Des mots, un par ligne, ajoutés à chaque recherche pour que les résultats restent sur le sujet."
   }
 }

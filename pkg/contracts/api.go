@@ -526,6 +526,11 @@ type TopicPolicy struct {
 	// Strictness is guide (the rules only) or enforce (checked before and
 	// after answering); empty is guide.
 	Strictness string `json:"strictness,omitempty"`
+	// WebSites are the only sites web search and opening pages reach, such
+	// as "danastires.com", with their subdomains; empty is any site.
+	WebSites []string `json:"web_sites,omitempty"`
+	// WebKeywords are added to every web search, such as "tires".
+	WebKeywords []string `json:"web_keywords,omitempty"`
 }
 
 // Topic strictness levels (#345).

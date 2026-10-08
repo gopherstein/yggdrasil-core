@@ -393,6 +393,12 @@
     "guide": "Guida",
     "guideHint": "Le regole vengono prima delle istruzioni. Il più rapido; va bene per le tue persone.",
     "enforce": "Imponi",
-    "enforceHint": "Controlla anche ogni messaggio prima di rispondere e ogni risposta prima di mostrarla, e invia la risposta stabilita a tutto ciò che è fuori tema. Per il pubblico e i portali di chat."
+    "enforceHint": "Controlla anche ogni messaggio prima di rispondere e ogni risposta prima di mostrarla, e invia la risposta stabilita a tutto ciò che è fuori tema. Per il pubblico e i portali di chat.",
+    "sites": "Ricerca web solo su",
+    "sitesExample": "danastires.com\nmichelin.com",
+    "sitesHint": "Siti, uno per riga, con i loro sottodomini. Le pagine altrove non vengono aperte. Lascia vuoto per qualsiasi sito.",
+    "words": "Aggiungi a ogni ricerca web",
+    "wordsExample": "pneumatici",
+    "wordsHint": "Parole, una per riga, aggiunte a ogni ricerca perché i risultati restino in tema."
   }
 }

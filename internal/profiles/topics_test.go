@@ -62,3 +62,25 @@ func TestTopicsAreStored(t *testing.T) {
 		t.Fatalf("topics after removing them: %+v", got.Topics)
 	}
 }
+
+// Sites are kept as site names, whatever was typed (#345).
+func TestTopicSites(t *testing.T) {
+	for in, want := range map[string]string{
+		"https://www.DanasTires.com/shop?x=1": "danastires.com",
+		"michelin.com":                        "michelin.com",
+		" shop.example.com:8443 ":             "shop.example.com",
+	} {
+		if got := Site(in); got != want {
+			t.Errorf("%q: %q", in, got)
+		}
+	}
+	p := Normalize(Profile{Name: "x", Topics: &contracts.TopicPolicy{StaysOn: "Tires", WebSites: []string{"https://danastires.com", "DanasTires.com/", " "}, WebKeywords: []string{" tires ", ""}}})
+	if got := p.Topics.WebSites; len(got) != 1 || got[0] != "danastires.com" || len(p.Topics.WebKeywords) != 1 || p.Topics.WebKeywords[0] != "tires" {
+		t.Fatalf("normalized: %+v", p.Topics)
+	}
+	for _, bad := range []string{"localhost", "exa mple.com", ".com", "a..b"} {
+		if err := ValidateTopics(&contracts.TopicPolicy{StaysOn: "x", WebSites: []string{bad}}); err == nil {
+			t.Errorf("%q passed", bad)
+		}
+	}
+}

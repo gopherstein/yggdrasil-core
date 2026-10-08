@@ -351,6 +351,10 @@ export interface TopicPolicy {
   /** The reply to anything else; empty is Toskar's, in the person's language. */
   off_topic_reply?: string
   strictness?: '' | 'guide' | 'enforce'
+  /** The only sites web search and pages reach, with their subdomains. */
+  web_sites?: string[]
+  /** Words added to every web search. */
+  web_keywords?: string[]
 }
 
 export interface OrchestrationPolicy {

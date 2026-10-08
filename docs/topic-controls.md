@@ -8,6 +8,8 @@ Set them on a profile, under **Profiles → Edit → Topics**:
 - **Example questions:** questions it's for, one per line.
 - **Never discusses:** subjects always off limits, even when they look related, such as "other shops' prices".
 - **When asked something else:** the exact reply to anything off topic. Leave it empty, and the assistant says in one short sentence what it can help with, in the person's language.
+- **Web search only on:** the sites web search and pages keep to, such as the shop's own site and tire makers, one per line, with their subdomains. Leave it empty for any site.
+- **Add to every web search:** words added to each search, such as "tires", so results stay on the subject.
 
 Greetings, thanks, and "what can you do?" are always fine, so a strict assistant doesn't feel broken.
 
@@ -29,6 +31,14 @@ The topic rules come first in every turn, as the administrator's rules, ahead of
 The run trace (`GET /api/v1/runs`, and the run details under an answer) notes a held message or a replaced answer, and its `topic` says what the check found.
 
 A chat portal (#205) using a profile brings its topic controls with it, so its visitors can't turn them off.
+
+## Narrower reach
+
+What an assistant can reach is part of staying on topic:
+
+- **Web:** with sites set, every web search asks only those sites, results from anywhere else are dropped, and pages elsewhere aren't opened, including a page a link or a redirect leads to. This holds for the model's own searches, Toskar's look-ups, and pages followed from results, at either strictness. The words are added to every search.
+- **Tools:** a profile uses only the tools turned on in its **Tools** tab. Give a public assistant only the ones its topic needs: a tire shop's needs web search, maybe maps, and not files or code.
+- **Knowledge:** a turn searches only the profile's own knowledge sources, from its **Knowledge** tab.
 
 ## Be honest about the limits
 

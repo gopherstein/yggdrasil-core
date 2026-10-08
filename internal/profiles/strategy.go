@@ -1,6 +1,7 @@
 package profiles
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/yeixio/toskar-core/pkg/contracts"
@@ -112,6 +113,14 @@ func normalizeTopics(t *contracts.TopicPolicy) *contracts.TopicPolicy {
 		return kept
 	}
 	out.Examples, out.NeverDiscuss = clean(out.Examples), clean(out.NeverDiscuss)
+	out.WebKeywords = clean(out.WebKeywords)
+	var sites []string
+	for _, site := range out.WebSites {
+		if site = Site(site); site != "" && !slices.Contains(sites, site) {
+			sites = append(sites, site)
+		}
+	}
+	out.WebSites = sites
 	if out.StaysOn == "" {
 		return nil
 	}
