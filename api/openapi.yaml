@@ -356,6 +356,93 @@ paths:
       responses:
         "204":
           description: Removed
+  /api/v1/portals/{id}/visitors:
+    get:
+      summary: A portal's invited visitors (#205)
+      operationId: listPortalVisitors
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The visitors, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+    post:
+      summary: Invite a visitor to a portal by name (#205)
+      description: Answers with the visitor and their one-time link (path /p/<slug>?invite=<token>, good for a week).
+      operationId: invitePortalVisitor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "201":
+          description: The visitor and their link
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/v1/portals/{id}/visitors/{vid}/link:
+    post:
+      summary: A new link for an invited visitor (#205)
+      description: Replaces any link they haven't used.
+      operationId: portalVisitorLink
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: vid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The link
+          content:
+            application/json:
+              schema:
+                type: object
+  /api/v1/portals/{id}/visitors/{vid}:
+    delete:
+      summary: Remove an invited visitor (#205)
+      description: They're disabled and signed out at once.
+      operationId: removePortalVisitor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: vid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Removed
   /api/v1/portals/{slug}/page:
     get:
       summary: What a portal's page shows (#205)

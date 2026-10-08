@@ -28,7 +28,11 @@
   "access": {
     "passcode": "Anyone with the passcode",
     "open": "Anyone on the network",
-    "openHint": "Anyone who can reach this Toskar can chat."
+    "openHint": "Anyone who can reach this Toskar can chat.",
+    "members": "Members who sign in",
+    "invited": "People you invite",
+    "membersHint": "People who sign in to this Toskar as Members or Admins chat as themselves.",
+    "invitedHint": "Only the people you invite, each with their own link."
   },
   "edit": {
     "title": "Edit {{name}}",
@@ -79,5 +83,17 @@
     "longest": "Longest message (characters)",
     "most": "Chats at once",
     "hint": "0 messages means no limit. Portal chats wait for your own and for other people's who use Toskar, and come before automations."
+  },
+  "visitors": {
+    "title": "Invited visitors",
+    "name": "Name",
+    "invite": "Invite",
+    "send": "Send {{name}} this link:",
+    "expires": "It works once, until {{date}}.",
+    "none": "No one invited yet.",
+    "removed": "Removed",
+    "newLink": "New link",
+    "removeConfirm": "Remove {{name}}? They stop at once.",
+    "saveFirst": "Save to invite visitors."
   }
 }

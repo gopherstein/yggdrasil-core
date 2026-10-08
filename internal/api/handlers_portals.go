@@ -58,6 +58,10 @@ func (s *Server) portalRoutes(api *mux.Router) {
 	api.HandleFunc("/portals/{id}", s.portalsReady(s.handleGetPortal)).Methods(http.MethodGet)
 	api.HandleFunc("/portals/{id}", s.portalsReady(s.handleUpdatePortal)).Methods(http.MethodPatch)
 	api.HandleFunc("/portals/{id}", s.portalsReady(s.handleDeletePortal)).Methods(http.MethodDelete)
+	api.HandleFunc("/portals/{id}/visitors", s.portalsReady(s.handleListVisitors)).Methods(http.MethodGet)
+	api.HandleFunc("/portals/{id}/visitors", s.portalsReady(s.handleInviteVisitor)).Methods(http.MethodPost)
+	api.HandleFunc("/portals/{id}/visitors/{vid}/link", s.portalsReady(s.handleVisitorLink)).Methods(http.MethodPost)
+	api.HandleFunc("/portals/{id}/visitors/{vid}", s.portalsReady(s.handleRemoveVisitor)).Methods(http.MethodDelete)
 	api.HandleFunc("/portals/{slug}/page", s.portalsReady(s.handlePortalPage)).Methods(http.MethodGet)
 	api.HandleFunc("/portals/{slug}/enter", s.portalsReady(s.handleEnterPortal)).Methods(http.MethodPost)
 }
@@ -177,6 +181,9 @@ func (s *Server) handlePortalPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, entered := s.guestOf(r, p)
+	if p.Access == portals.AccessMembers && member(auth.PrincipalFrom(r.Context())) {
+		entered = true
+	}
 	writeJSON(w, http.StatusOK, portalPage{Slug: p.Slug, Name: p.Name, Access: p.Access, Language: p.Language, Branding: p.Branding, MaxMessage: p.MaxMessage, Entered: entered})
 }
 
@@ -196,11 +203,24 @@ func (s *Server) handleEnterPortal(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, auth.Principal{Person: guest, Via: auth.ViaSession})
 		return
 	}
-	if p.Access == portals.AccessPasscode {
-		var body struct {
-			Passcode string `json:"passcode"`
+	var body struct {
+		Passcode string `json:"passcode"`
+		Invite   string `json:"invite"`
+	}
+	_ = json.NewDecoder(io.LimitReader(r.Body, 4096)).Decode(&body)
+	switch p.Access {
+	case portals.AccessMembers:
+		// Members and up chat as themselves, signed in (#206).
+		if principal := auth.PrincipalFrom(r.Context()); member(principal) {
+			writeJSON(w, http.StatusOK, principal)
+			return
 		}
-		_ = json.NewDecoder(io.LimitReader(r.Body, 4096)).Decode(&body)
+		writeErr(w, http.StatusForbidden, "PORTAL_MEMBERS", "this chat is for the people who sign in to this Toskar", nil)
+		return
+	case portals.AccessInvited:
+		s.enterInvited(w, r, p, strings.TrimSpace(body.Invite))
+		return
+	case portals.AccessPasscode:
 		address := remoteIP(r)
 		if portalByAddress.Blocked(address) {
 			writeErr(w, http.StatusTooManyRequests, "SIGN_IN_THROTTLED", "too many tries; wait 10 minutes and try again", nil)
@@ -217,6 +237,37 @@ func (s *Server) handleEnterPortal(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
 		return
 	}
+	s.signInGuest(w, r, p, guest)
+}
+
+// member reports whether principal may use a Members only portal: a person
+// signed in to this Toskar as a Member or up, not another portal's guest.
+func member(principal auth.Principal) bool {
+	return principal.Via != auth.ViaNone && principal.Person.PortalID == "" && principal.Person.Role.AtLeast(auth.RoleMember)
+}
+
+// enterInvited makes this browser the invited visitor whose one-time link
+// it brings.
+func (s *Server) enterInvited(w http.ResponseWriter, r *http.Request, p portals.Portal, invite string) {
+	if invite == "" || s.deps.Invites == nil {
+		writeErr(w, http.StatusForbidden, "PORTAL_INVITE", "this chat is by invitation; open the link you were sent", nil)
+		return
+	}
+	id, err := s.deps.Invites.UsePortal(r.Context(), invite)
+	if err != nil {
+		writeErr(w, http.StatusForbidden, "PORTAL_INVITE", "this invitation doesn't work anymore; ask for a new one", nil)
+		return
+	}
+	guest, err := s.deps.People.Active(r.Context(), id)
+	if err != nil || guest.PortalID != p.ID {
+		writeErr(w, http.StatusForbidden, "PORTAL_INVITE", "this invitation doesn't work anymore; ask for a new one", nil)
+		return
+	}
+	s.signInGuest(w, r, p, guest)
+}
+
+// signInGuest signs this browser in as guest, by the portal's own cookie.
+func (s *Server) signInGuest(w http.ResponseWriter, r *http.Request, p portals.Portal, guest auth.Person) {
 	token, expires, err := s.deps.Sessions.Create(r.Context(), guest.ID, r.UserAgent(), remoteIP(r))
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
@@ -269,17 +320,33 @@ func (s *Server) guestPrincipal(r *http.Request) (principal auth.Principal, ok, 
 	return auth.Principal{Person: guest, Via: auth.ViaSession}, true, false
 }
 
-// portalOf is the portal a guest belongs to, when ctx's person is one.
-func (s *Server) portalOf(r *http.Request) (portals.Portal, bool) {
-	id := auth.PrincipalFrom(r.Context()).Person.PortalID
-	if id == "" || s.deps.Portals == nil {
-		return portals.Portal{}, false
+// portalOf is the portal a request chats in: a guest's own, or a Members
+// only portal its page names for a signed-in Member (#205). refused is
+// true when the page names a Members only portal the person may not use.
+func (s *Server) portalOf(r *http.Request) (p portals.Portal, ok, refused bool) {
+	if s.deps.Portals == nil {
+		return portals.Portal{}, false, false
 	}
-	p, err := s.deps.Portals.Get(r.Context(), id)
-	if err != nil || !p.Enabled {
-		return portals.Portal{}, false
+	principal := auth.PrincipalFrom(r.Context())
+	if id := principal.Person.PortalID; id != "" {
+		p, err := s.deps.Portals.Get(r.Context(), id)
+		if err != nil || !p.Enabled {
+			return portals.Portal{}, false, false
+		}
+		return p, true, false
 	}
-	return p, true
+	slug := strings.ToLower(strings.TrimSpace(r.Header.Get(portalHeader)))
+	if slug == "" {
+		return portals.Portal{}, false, false
+	}
+	p, live := s.livePortal(r, slug)
+	if !live || p.Access != portals.AccessMembers {
+		return portals.Portal{}, false, false
+	}
+	if !member(principal) {
+		return portals.Portal{}, false, true
+	}
+	return p, true, false
 }
 
 // portalLimiter keeps a portal's limits (#205): how many messages each
@@ -337,4 +404,115 @@ func (l *portalLimiter) allow(guest string, perHour int) bool {
 	}
 	l.sent[guest] = append(recent, now)
 	return true
+}
+
+// visitorLink is an invited visitor's one-time link: the portal's page
+// with the invitation, good for a week.
+type visitorLink struct {
+	Path      string    `json:"path"`
+	ExpiresAt time.Time `json:"expires_at"`
+}
+
+// portalVisitor is the portal, and one of its invited visitors when vid
+// names one.
+func (s *Server) portalVisitor(w http.ResponseWriter, r *http.Request) (portals.Portal, auth.Person, bool) {
+	p, err := s.deps.Portals.Get(r.Context(), mux.Vars(r)["id"])
+	if err != nil {
+		portalError(w, err)
+		return portals.Portal{}, auth.Person{}, false
+	}
+	vid := mux.Vars(r)["vid"]
+	if vid == "" {
+		return p, auth.Person{}, true
+	}
+	guest, err := s.deps.People.Get(r.Context(), vid)
+	if err != nil || guest.PortalID != p.ID {
+		writeErr(w, http.StatusNotFound, "PERSON_NOT_FOUND", "no such visitor", nil)
+		return portals.Portal{}, auth.Person{}, false
+	}
+	return p, guest, true
+}
+
+// handleListVisitors lists a portal's invited visitors (#205).
+func (s *Server) handleListVisitors(w http.ResponseWriter, r *http.Request) {
+	p, _, ok := s.portalVisitor(w, r)
+	if !ok {
+		return
+	}
+	list, err := s.deps.People.Guests(r.Context(), p.ID)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
+		return
+	}
+	writeJSON(w, http.StatusOK, list)
+}
+
+// inviteLink makes a new one-time link for guest.
+func (s *Server) inviteLink(r *http.Request, p portals.Portal, guest auth.Person) (visitorLink, error) {
+	token, expires, err := s.deps.Invites.Create(r.Context(), guest.ID, auth.InvitePortal, auth.PersonID(r.Context()))
+	if err != nil {
+		return visitorLink{}, err
+	}
+	return visitorLink{Path: "/p/" + p.Slug + "?invite=" + token, ExpiresAt: expires}, nil
+}
+
+// handleInviteVisitor invites someone by name and answers with their link.
+func (s *Server) handleInviteVisitor(w http.ResponseWriter, r *http.Request) {
+	p, _, ok := s.portalVisitor(w, r)
+	if !ok || !s.signInReady(w) {
+		return
+	}
+	var body struct {
+		Name string `json:"name"`
+	}
+	if err := json.NewDecoder(io.LimitReader(r.Body, 4096)).Decode(&body); err != nil {
+		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "invalid body", nil)
+		return
+	}
+	guest, err := s.deps.People.CreateInvitedGuest(r.Context(), p.ID, body.Name)
+	if err != nil {
+		if errors.Is(err, auth.ErrBadName) {
+			writeErr(w, http.StatusBadRequest, "NAME_INVALID", err.Error(), nil)
+			return
+		}
+		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
+		return
+	}
+	link, err := s.inviteLink(r, p, guest)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
+		return
+	}
+	writeJSON(w, http.StatusCreated, map[string]any{"person": guest, "link": link})
+}
+
+// handleVisitorLink makes an invited visitor a new link, which replaces
+// any they haven't used.
+func (s *Server) handleVisitorLink(w http.ResponseWriter, r *http.Request) {
+	p, guest, ok := s.portalVisitor(w, r)
+	if !ok || !s.signInReady(w) {
+		return
+	}
+	link, err := s.inviteLink(r, p, guest)
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
+		return
+	}
+	writeJSON(w, http.StatusOK, link)
+}
+
+// handleRemoveVisitor stops an invited visitor at once: they're disabled
+// and signed out.
+func (s *Server) handleRemoveVisitor(w http.ResponseWriter, r *http.Request) {
+	_, guest, ok := s.portalVisitor(w, r)
+	if !ok || !s.signInReady(w) {
+		return
+	}
+	disabled := true
+	if _, err := s.deps.People.Update(r.Context(), guest.ID, auth.Change{Disabled: &disabled}); err != nil {
+		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
+		return
+	}
+	_ = s.deps.Sessions.DeleteFor(r.Context(), guest.ID)
+	w.WriteHeader(http.StatusNoContent)
 }

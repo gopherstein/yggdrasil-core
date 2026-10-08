@@ -17,6 +17,10 @@ vi.mock('@/lib/api', async () => {
       updatePortal: vi.fn(),
       deletePortal: vi.fn(),
       getProfiles: vi.fn(),
+      listPortalVisitors: vi.fn(),
+      invitePortalVisitor: vi.fn(),
+      portalVisitorLink: vi.fn(),
+      removePortalVisitor: vi.fn(),
       getSettings: vi.fn(),
       getNodes: vi.fn(),
       getApiTLS: vi.fn(),
@@ -93,5 +97,23 @@ describe('PortalsPage (#205)', () => {
     )
     expect(api.updatePortal).not.toHaveBeenLastCalledWith('p1', expect.objectContaining({ passcode: expect.anything() }))
     expect(await within(editor).findByText('Saved')).toBeInTheDocument()
+  })
+
+  it('invites visitors to an invited portal, each with a link', async () => {
+    const club: Portal = { ...portal, access: 'invited', has_passcode: false }
+    vi.mocked(api.listPortals).mockResolvedValue([club])
+    vi.mocked(api.listPortalVisitors).mockResolvedValue([])
+    vi.mocked(api.invitePortalVisitor).mockResolvedValue({
+      person: { id: 'g1', name: 'Robin', role: 'visitor', created_at: '', sign_in: false },
+      link: { path: '/p/support?invite=tok-9', expires_at: '2026-10-15T00:00:00Z' },
+    })
+    renderIt()
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    expect(await screen.findByText('No one invited yet.')).toBeInTheDocument()
+    const section = screen.getByText('Invited visitors').closest('div') as HTMLElement
+    fireEvent.change(within(section).getByLabelText('Name'), { target: { value: 'Robin' } })
+    fireEvent.click(within(section).getByRole('button', { name: 'Invite' }))
+    await waitFor(() => expect(api.invitePortalVisitor).toHaveBeenCalledWith('p1', 'Robin'))
+    expect(await within(section).findByText('http://192.168.1.20:7331/p/support?invite=tok-9')).toBeInTheDocument()
   })
 })

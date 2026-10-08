@@ -15,5 +15,12 @@
   "message": "{{name}}에게 메시지",
   "send": "보내기",
   "stop": "중지",
-  "newChat": "새 채팅"
+  "newChat": "새 채팅",
+  "members": {
+    "body": "{{name}}은(는) 이 Toskar에 로그인하는 사람들을 위한 거예요.",
+    "signIn": "로그인하고 채팅하기"
+  },
+  "invited": {
+    "body": "{{name}}은(는) 초대받은 사람만 쓸 수 있어요. 받은 링크를 여세요."
+  }
 }

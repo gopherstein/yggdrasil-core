@@ -28,7 +28,11 @@
   "access": {
     "passcode": "知道存取碼的人",
     "open": "網路上的任何人",
-    "openHint": "任何能連到這個 Toskar 的人都可以聊天。"
+    "openHint": "任何能連到這個 Toskar 的人都可以聊天。",
+    "members": "登入的成員",
+    "invited": "你邀請的人",
+    "membersHint": "以成員或管理員身分登入這個 Toskar 的人以自己的身分聊天。",
+    "invitedHint": "只有你邀請的人，每人有自己的連結。"
   },
   "edit": {
     "title": "編輯 {{name}}",
@@ -79,5 +83,17 @@
     "longest": "最長訊息（字元）",
     "most": "同時聊天數",
     "hint": "0 表示不限制。入口網站聊天會等待你和其他使用 Toskar 的人的聊天，並優先於自動化。"
+  },
+  "visitors": {
+    "title": "受邀訪客",
+    "name": "名稱",
+    "invite": "邀請",
+    "send": "把這個連結傳給 {{name}}：",
+    "expires": "只能使用一次，有效期至 {{date}}。",
+    "none": "還沒有邀請任何人。",
+    "removed": "已移除",
+    "newLink": "新連結",
+    "removeConfirm": "要移除 {{name}} 嗎？對方會立即無法使用。",
+    "saveFirst": "儲存後即可邀請訪客。"
   }
 }

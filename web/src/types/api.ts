@@ -2162,7 +2162,7 @@ export interface Portal {
   tools: 'none' | 'read_only' | 'profile'
   memory: boolean
   language: string
-  access: 'open' | 'passcode'
+  access: 'open' | 'passcode' | 'members' | 'invited'
   has_passcode: boolean
   branding: PortalBranding
   enabled: boolean
@@ -2178,3 +2178,10 @@ export interface Portal {
 
 /** A new chat portal, or a change to one; passcode is write-only. */
 export type PortalInput = Partial<Omit<Portal, 'id' | 'has_passcode' | 'created_at' | 'updated_at'>> & { passcode?: string }
+
+/** An invited visitor's one-time link to a chat portal (#205). */
+export interface PortalVisitorLink {
+  /** /p/<portal>?invite=<token> */
+  path: string
+  expires_at: string
+}

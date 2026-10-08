@@ -87,6 +87,14 @@ describe('SignInForm', () => {
     window.history.pushState({}, '', '/')
   })
 
+  it('goes back to a chat portal a Member signs in for (#205)', async () => {
+    vi.mocked(api.getOIDC).mockResolvedValue({ enabled: true, label: 'Authentik' })
+    window.history.pushState({}, '', '/?next=%2Fp%2Fsupport')
+    renderSignIn(<SignInForm onSignedIn={vi.fn()} onUseKey={vi.fn()} />)
+    expect(await screen.findByRole('link', { name: 'Sign in with Authentik' })).toHaveAttribute('href', '/api/v1/oidc/start?return=%2Fp%2Fsupport')
+    window.history.pushState({}, '', '/')
+  })
+
   it('signs in, or offers an API key instead', async () => {
     const onSignedIn = vi.fn()
     const onUseKey = vi.fn()

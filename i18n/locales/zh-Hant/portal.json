@@ -15,5 +15,12 @@
   "message": "傳訊息給 {{name}}",
   "send": "傳送",
   "stop": "停止",
-  "newChat": "新聊天"
+  "newChat": "新聊天",
+  "members": {
+    "body": "{{name}} 供登入這個 Toskar 的人使用。",
+    "signIn": "登入後聊天"
+  },
+  "invited": {
+    "body": "{{name}} 僅限受邀者。請開啟你收到的連結。"
+  }
 }

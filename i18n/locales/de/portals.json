@@ -28,7 +28,11 @@
   "access": {
     "passcode": "Alle mit dem Code",
     "open": "Alle im Netzwerk",
-    "openHint": "Alle, die dieses Toskar erreichen, können chatten."
+    "openHint": "Alle, die dieses Toskar erreichen, können chatten.",
+    "members": "Mitglieder, die sich anmelden",
+    "invited": "Eingeladene Personen",
+    "membersHint": "Wer sich bei diesem Toskar als Mitglied oder Admin anmeldet, chattet als er selbst.",
+    "invitedHint": "Nur die Personen, die du einlädst, jede mit eigenem Link."
   },
   "edit": {
     "title": "{{name}} bearbeiten",
@@ -79,5 +83,17 @@
     "longest": "Längste Nachricht (Zeichen)",
     "most": "Chats gleichzeitig",
     "hint": "0 Nachrichten bedeutet keine Grenze. Portal-Chats warten auf deine eigenen und die anderer Toskar-Nutzer und kommen vor Automationen."
+  },
+  "visitors": {
+    "title": "Eingeladene Besucher",
+    "name": "Name",
+    "invite": "Einladen",
+    "send": "Schick {{name}} diesen Link:",
+    "expires": "Er funktioniert einmal, bis {{date}}.",
+    "none": "Noch niemand eingeladen.",
+    "removed": "Entfernt",
+    "newLink": "Neuer Link",
+    "removeConfirm": "{{name}} entfernen? Der Zugang endet sofort.",
+    "saveFirst": "Speichern, um Besucher einzuladen."
   }
 }

@@ -365,10 +365,43 @@ func PrincipalFrom(ctx context.Context) Principal {
 // who belongs to it, so their chats are their own, and who reaches only
 // that portal.
 func (p *People) CreateGuest(ctx context.Context, portalID string) (Person, error) {
+	return p.createGuest(ctx, portalID, "Guest", false)
+}
+
+// CreateInvitedGuest adds a chat portal's visitor an Admin invites by name
+// (#205).
+func (p *People) CreateInvitedGuest(ctx context.Context, portalID, name string) (Person, error) {
+	return p.createGuest(ctx, portalID, name, true)
+}
+
+func (p *People) createGuest(ctx context.Context, portalID, name string, invited bool) (Person, error) {
+	name, err := cleanName(name)
+	if err != nil {
+		return Person{}, err
+	}
 	id := uuid.NewString()
-	if _, err := p.db.ExecContext(ctx, `INSERT INTO people (id, name, role, created_at, portal_id) VALUES (?, ?, ?, ?, ?)`,
-		id, "Guest", string(RoleVisitor), stamp(time.Now()), portalID); err != nil {
+	if _, err := p.db.ExecContext(ctx, `INSERT INTO people (id, name, role, created_at, portal_id, invited) VALUES (?, ?, ?, ?, ?, ?)`,
+		id, name, string(RoleVisitor), stamp(time.Now()), portalID, invited); err != nil {
 		return Person{}, err
 	}
 	return p.Get(ctx, id)
+}
+
+// Guests is a chat portal's visitors who were invited by name, newest
+// first (#205).
+func (p *People) Guests(ctx context.Context, portalID string) ([]Person, error) {
+	rows, err := p.db.QueryContext(ctx, `SELECT `+personColumns+` FROM people WHERE portal_id = ? AND invited = 1 ORDER BY created_at DESC`, portalID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	out := []Person{}
+	for rows.Next() {
+		person, err := scanPerson(rows)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, person)
+	}
+	return out, rows.Err()
 }

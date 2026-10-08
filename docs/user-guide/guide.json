@@ -249,7 +249,7 @@
       ],
       "steps": [
         "Open Administer → Portals.",
-        "Under Add a portal, type a name; the address fills in from it. Choose who can chat: anyone with a passcode you set, or anyone on your network.",
+        "Under Add a portal, type a name; the address fills in from it. Choose who can chat: anyone with a passcode you set, anyone on your network, the Members who sign in to this Toskar, or only people you invite. For invited portals, invite each person by name in the portal's editor and send them their link.",
         "Choose the profile, tools, and language, and how it looks: heading, logo, accent colour, theme, welcome message, suggested prompts, and footer. The preview shows the page as visitors will see it.",
         "Copy the link and share it. Local network access has to be on for other devices to open it."
       ]

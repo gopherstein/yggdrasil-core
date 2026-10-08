@@ -36,6 +36,12 @@ const (
 	AccessOpen = "open"
 	// AccessPasscode is anyone with the portal's shared passcode.
 	AccessPasscode = "passcode"
+	// AccessMembers is the people who sign in to this Toskar as Members
+	// and up (#206), as themselves.
+	AccessMembers = "members"
+	// AccessInvited is the visitors an Admin invites by name, each with a
+	// one-time link.
+	AccessInvited = "invited"
 )
 
 // Portal is one chat portal.
@@ -202,7 +208,7 @@ func (in Input) apply(p *Portal) error {
 	}
 	if in.Access != nil {
 		switch *in.Access {
-		case AccessOpen, AccessPasscode:
+		case AccessOpen, AccessPasscode, AccessMembers, AccessInvited:
 			p.Access = *in.Access
 		default:
 			return ErrBadAccess
