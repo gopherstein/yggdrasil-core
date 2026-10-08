@@ -453,6 +453,31 @@ func (p *PairingManager) TrustedCertPEM(ctx context.Context, nodeID string) ([]b
 	return []byte(pem), nil
 }
 
+// Link is how to reach a paired computer securely (#175): the fingerprint
+// of the key it paired with, which its TLS certificate must carry, and
+// whether it has spoken TLS before.
+func (p *PairingManager) Link(ctx context.Context, nodeID string) (pin string, tlsSeen bool, err error) {
+	var pem string
+	var tlsAt sql.NullString
+	err = p.db.QueryRowContext(ctx, `
+		SELECT cert_pem, tls_at FROM node_trust WHERE node_id = ? AND revoked_at IS NULL`, nodeID).Scan(&pem, &tlsAt)
+	if err != nil {
+		return "", false, err
+	}
+	pub, err := PublicKeyFromPEM([]byte(pem))
+	if err != nil {
+		return "", false, err
+	}
+	return KeyFingerprint(pub), tlsAt.Valid, nil
+}
+
+// MarkTLS records that a paired computer spoke TLS, so it is never reached
+// over plain HTTP again.
+func (p *PairingManager) MarkTLS(ctx context.Context, nodeID string) error {
+	_, err := p.db.ExecContext(ctx, `UPDATE node_trust SET tls_at = datetime('now') WHERE node_id = ? AND tls_at IS NULL`, nodeID)
+	return err
+}
+
 // IsTrusted reports whether nodeID is paired and not revoked.
 func (p *PairingManager) IsTrusted(ctx context.Context, nodeID string) bool {
 	_, err := p.TrustedCertPEM(ctx, nodeID)
@@ -515,7 +540,7 @@ func (p *PairingManager) storeTrust(ctx context.Context, nodeID, name, address s
 	_, err = p.db.ExecContext(ctx, `
 		INSERT INTO node_trust (node_id, fingerprint, cert_pem, paired_at)
 		VALUES (?, ?, ?, datetime('now'))
-		ON CONFLICT(node_id) DO UPDATE SET fingerprint=excluded.fingerprint, cert_pem=excluded.cert_pem, revoked_at=NULL, paired_at=datetime('now')`,
+		ON CONFLICT(node_id) DO UPDATE SET fingerprint=excluded.fingerprint, cert_pem=excluded.cert_pem, revoked_at=NULL, paired_at=datetime('now'), tls_at=NULL`,
 		nodeID, fp, string(cert))
 	return err
 }

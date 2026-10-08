@@ -118,6 +118,8 @@
     "removeFromTeam": "Remove from team",
     "training": "Training",
     "trainingHint": "Training an AI, so work goes to other computers when they have the model",
+    "plain": "Not encrypted",
+    "plainHint": "Traffic to {{name}} isn't encrypted, because its Toskar is older. Update Toskar on {{name}} to encrypt it.",
     "confirmRemove": "Remove {{name}} from this team? It stops taking work, and adding it again needs a new approval."
   },
   "deploy": {

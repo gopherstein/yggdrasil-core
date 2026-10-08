@@ -362,6 +362,8 @@ export type NodeStatus = 'online' | 'offline' | 'unknown'
 export interface Node {
   /** Training an AI now, so work goes to another computer when it can. */
   training?: boolean
+  /** How this computer last reached it: tls, or plain when its Toskar predates TLS (contract 1.15, #175). */
+  encryption?: 'tls' | 'plain'
   id: string
   name: string
   os: string

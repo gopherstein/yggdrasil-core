@@ -111,6 +111,10 @@ type Node struct {
 	// Training is true while the computer is training an AI, so placement
 	// sends work elsewhere when it can (#111).
 	Training bool `json:"training,omitempty"`
+	// Encryption is how this computer last reached a paired one: "tls", or
+	// "plain" when its Toskar predates TLS; empty before it was reached
+	// (contract 1.15, #175).
+	Encryption string `json:"encryption,omitempty"`
 }
 
 // ModelCapabilities describes model features.

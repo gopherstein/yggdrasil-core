@@ -179,8 +179,12 @@ func (a *App) JoinNetwork(ctx context.Context, req api.JoinRequest) (api.JoinRes
 		}
 	}
 	result := api.JoinResult{Node: api.NetworkNode{ID: cfg.NodeID, Name: name}}
+	// The join reaches the issuer over TLS checked against the command's
+	// fingerprint, when the issuer speaks it (#175).
+	pin, _ := join.NormalizeFingerprint(req.Fingerprint)
 	c := &join.Client{
 		Server: server, Token: req.Token, Fingerprint: req.Fingerprint,
+		HTTP: nodes.LinkClient("join "+server, nodes.Link{Pin: pin}, 20*time.Second),
 		Node: join.JoiningNode{ID: cfg.NodeID, Name: name, PublicKeyPEM: string(a.identity.CertPEM),
 			Address: a.bifrostAdvertiseAddr(), Version: version.Version},
 		Check: func(h join.HelloResponse) error {
@@ -356,7 +360,7 @@ func (a *App) LeaveNetwork(ctx context.Context) (api.LeaveResult, error) {
 			if p.Address != "" {
 				cctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 				defer cancel()
-				resp, err := nodes.NewClient("http://"+p.Address, a.identity, p.ID).Do(cctx, http.MethodPost, join.LeavePath, nil)
+				resp, err := nodes.NewClient("http://"+p.Address, a.identity, p.ID).Secure(a.peerLink(p.ID)).Do(cctx, http.MethodPost, join.LeavePath, nil)
 				if err == nil {
 					_ = resp.Body.Close()
 					told = resp.StatusCode < 300

@@ -37,6 +37,15 @@ A bearer token names the computer it is for and is good for one request, for up 
 
 Revoke a peer with `POST /api/v1/nodes/{id}/revoke`.
 
+### Encryption
+
+Bifrost speaks TLS (#175). Each computer makes a self-signed certificate from its ed25519 identity key at start, and a paired computer is checked by that key's fingerprint, the one stored when they paired, instead of by a certificate authority or a name. A computer at a paired computer's address with another key is refused: "the computer at this address doesn't have the key expected for it". Requests still carry the one-time bearer token, so each side is authenticated: the server by its certificate, the client by its token. Everything between paired computers is encrypted: chats placed on another computer, tool jobs and their files, training runs, and setups.
+
+- **Older computers:** port 7332 answers TLS and plain HTTP side by side, telling them apart by the first byte, so a computer that hasn't updated still works with this one. This computer reaches it over plain HTTP when it answers without TLS, tries TLS again every 10 minutes, and the Computers page marks it **Not encrypted** until it's updated (`encryption` is `plain` in `GET /api/v1/nodes`, `tls` once encrypted).
+- **No going back:** once a paired computer has spoken TLS, it is never reached over plain HTTP again, so nobody on the network can push the connection back to plain HTTP. An answer without TLS is refused: "this computer answered without encryption, though it used encryption before". Pairing it again starts over.
+- **Before pairing:** pairing and probe requests encrypt when the other computer speaks TLS, without checking its key, since the pairing handshake checks each other's signatures. The one-line join checks the issuer's certificate against the command's fingerprint.
+- A later release will refuse plain HTTP between computers.
+
 ## Joining with one command
 
 For a server or any computer you reach over SSH, without mDNS or a screen, join it with a command made on a computer already in the network.
@@ -63,7 +72,7 @@ The Computers page does the same: **Add by command** makes a command, with tabs 
 
 The token lasts 15 minutes (`--ttl` up to `24h`) and works once. `toskarctl join-token list` shows recent tokens, and `toskarctl join-token revoke <id>` stops an unused one. Only a proof key derived from the token is stored, and the token is never logged.
 
-How the join stays safe over Bifrost's plain HTTP:
+How the join stays safe, whether or not the issuer speaks TLS yet:
 - **The right computer:** the command carries the issuing computer's key fingerprint. Before going on, the new computer checks that computer's signature on a fresh challenge, so a different machine at that address is refused before anything that proves the token is sent.
 - **The token stays put:** the new computer proves it holds the token with an HMAC over the challenge and its own public key. The token itself never crosses the network, and a relay can't swap in its own key.
 - **One use:** the token is used up before the new computer is trusted, so two computers racing with one token can't both get in. Ten failed attempts from one address within 10 minutes pause joins from it.

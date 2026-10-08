@@ -121,6 +121,8 @@
     "removeFromTeam": "Rimuovi dal team",
     "training": "In addestramento",
     "trainingHint": "Sta addestrando un'IA, quindi il lavoro va ad altri computer che hanno il modello",
+    "plain": "Non cifrato",
+    "plainHint": "Il traffico verso {{name}} non è cifrato perché il suo Toskar è più vecchio. Aggiorna Toskar su {{name}} per cifrarlo.",
     "confirmRemove": "Rimuovere {{name}} da questo team? Smetterà di ricevere lavoro, e per aggiungerlo di nuovo servirà una nuova approvazione."
   },
   "deploy": {
