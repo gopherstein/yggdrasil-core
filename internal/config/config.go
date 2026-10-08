@@ -3,10 +3,12 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/yeixio/toskar-core/internal/auth"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
+
+	"github.com/yeixio/toskar-core/internal/auth"
 )
 
 // Config holds daemon runtime configuration.
@@ -54,6 +56,27 @@ type Config struct {
 	// ProxyAuth says which headers a trusted proxy names the person in,
 	// and how their groups become roles.
 	ProxyAuth ProxyAuth `json:"proxy_auth,omitempty"`
+	// OIDC is sign-in with an OpenID Connect provider (#206).
+	OIDC OIDC `json:"oidc,omitempty"`
+}
+
+// OIDC is sign-in with an OpenID Connect provider, such as Google,
+// Microsoft Entra ID, Okta, Authentik, Keycloak, or Authelia (#206). The
+// client secret isn't kept here: it comes from TOSKAR_OIDC_CLIENT_SECRET
+// or the file client_secret_file names.
+type OIDC struct {
+	Issuer           string   `json:"issuer,omitempty"`
+	ClientID         string   `json:"client_id,omitempty"`
+	ClientSecretFile string   `json:"client_secret_file,omitempty"`
+	RedirectURL      string   `json:"redirect_url,omitempty"`
+	Scopes           []string `json:"scopes,omitempty"`
+	GroupsClaim      string   `json:"groups_claim,omitempty"`
+	AdminGroups      []string `json:"admin_groups,omitempty"`
+	MemberGroups     []string `json:"member_groups,omitempty"`
+	DefaultRole      string   `json:"default_role,omitempty"`
+	OwnerEmail       string   `json:"owner_email,omitempty"`
+	OwnerSubject     string   `json:"owner_subject,omitempty"`
+	Label            string   `json:"label,omitempty"`
 }
 
 // ProxyAuth is sign-in by a trusted reverse proxy, such as Authelia,
@@ -227,4 +250,22 @@ func (c Config) Proxy() (*auth.Proxy, error) {
 		DefaultRole:  c.ProxyAuth.DefaultRole,
 		OwnerUser:    c.ProxyAuth.OwnerUser,
 	})
+}
+
+// OIDCSettings are the provider's settings with the client secret, from
+// TOSKAR_OIDC_CLIENT_SECRET or client_secret_file.
+func (c Config) OIDCSettings() (auth.OIDCSettings, error) {
+	secret := Env("OIDC_CLIENT_SECRET")
+	if secret == "" && c.OIDC.ClientSecretFile != "" {
+		b, err := os.ReadFile(c.OIDC.ClientSecretFile)
+		if err != nil {
+			return auth.OIDCSettings{}, fmt.Errorf("oidc.client_secret_file: %w", err)
+		}
+		secret = strings.TrimSpace(string(b))
+	}
+	return auth.OIDCSettings{
+		Issuer: c.OIDC.Issuer, ClientID: c.OIDC.ClientID, ClientSecret: secret, RedirectURL: c.OIDC.RedirectURL,
+		Scopes: c.OIDC.Scopes, GroupsClaim: c.OIDC.GroupsClaim, AdminGroups: c.OIDC.AdminGroups, MemberGroups: c.OIDC.MemberGroups,
+		DefaultRole: c.OIDC.DefaultRole, OwnerEmail: c.OIDC.OwnerEmail, OwnerSubject: c.OIDC.OwnerSubject, Label: c.OIDC.Label,
+	}, nil
 }

@@ -64,12 +64,21 @@
     "password": "密碼",
     "submit": "登入",
     "forgot": "忘記密碼？請向管理員或擁有者索取新密碼連結。",
-    "useKey": "改用 API 金鑰"
+    "useKey": "改用 API 金鑰",
+    "withProvider": "使用 {{name}} 登入",
+    "or": "或",
+    "provider": {
+      "failed": "使用 {{name}} 登入失敗。請再試一次。",
+      "refused": "你在 {{name}} 的帳戶未在此 Toskar 上給予你角色。請擁有者把你加入有角色的群組。",
+      "disabled": "你在此 Toskar 上的帳戶已停用。請聯絡擁有者。",
+      "unavailable": "目前無法使用其他服務登入。"
+    }
   },
   "account": {
     "label": "你的帳戶",
     "signedInAs": "已登入為 {{name}}（@{{username}}），{{role}}。",
     "signOut": "登出",
+    "signedInWith": "已登入為 {{name}}（{{external}}），{{role}}。",
     "signedInByProxy": "已透過你的登入服務以 {{name}}（{{role}}）登入。請在那裡登出。"
   }
 }

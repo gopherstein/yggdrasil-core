@@ -24,7 +24,9 @@ export function YourAccount() {
   return (
     <section className="card flex flex-wrap items-center justify-between gap-3" aria-label={t('account.label')}>
       <p className="text-sm text-ink">
-        {t('account.signedInAs', { name: person.name, username: person.username, role: t(`roles.${person.role}`) })}
+        {person.username
+          ? t('account.signedInAs', { name: person.name, username: person.username, role: t(`roles.${person.role}`) })
+          : t('account.signedInWith', { name: person.name, external: person.external ?? '', role: t(`roles.${person.role}`) })}
       </p>
       <button
         type="button"

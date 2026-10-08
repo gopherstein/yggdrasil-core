@@ -941,8 +941,11 @@ func (a *App) someoneCanConnect(ctx context.Context) (bool, error) {
 	if err != nil || len(keys) > 0 {
 		return len(keys) > 0, err
 	}
-	// People a trusted proxy signs in (#206).
+	// People a trusted proxy or an OpenID Connect provider signs in (#206).
 	if proxy, err := a.Config.Get().Proxy(); err == nil && proxy != nil {
+		return true, nil
+	}
+	if a.Config.Get().OIDC.Issuer != "" {
 		return true, nil
 	}
 	if a.People == nil {
@@ -1036,6 +1039,11 @@ func (a *App) Start(ctx context.Context) error {
 	// A mistake in the trusted proxies stops the start rather than letting
 	// people in another way (#206).
 	if _, err := a.Config.Get().Proxy(); err != nil {
+		return err
+	}
+	if settings, err := a.Config.Get().OIDCSettings(); err != nil {
+		return err
+	} else if _, err := auth.NewOIDC(settings); err != nil {
 		return err
 	}
 	if err := a.requireKeyForRemoteBind(ctx); err != nil {

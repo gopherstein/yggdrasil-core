@@ -64,12 +64,21 @@
     "password": "비밀번호",
     "submit": "로그인",
     "forgot": "비밀번호를 잊었나요? 관리자나 소유자에게 새 비밀번호 링크를 요청하세요.",
-    "useKey": "대신 API 키 사용"
+    "useKey": "대신 API 키 사용",
+    "withProvider": "{{name}}(으)로 로그인",
+    "or": "또는",
+    "provider": {
+      "failed": "{{name}}(으)로 로그인하지 못했어요. 다시 시도하세요.",
+      "refused": "{{name}} 계정으로는 이 Toskar에서 역할이 없어요. 역할이 있는 그룹에 추가해 달라고 소유자에게 요청하세요.",
+      "disabled": "이 Toskar의 내 계정이 비활성화되어 있어요. 소유자에게 문의하세요.",
+      "unavailable": "지금은 다른 서비스로 로그인할 수 없어요."
+    }
   },
   "account": {
     "label": "내 계정",
     "signedInAs": "{{name}}(@{{username}}, {{role}})(으)로 로그인됨.",
     "signOut": "로그아웃",
+    "signedInWith": "{{name}}({{external}}, {{role}})(으)로 로그인됨.",
     "signedInByProxy": "로그인 서비스를 통해 {{name}}({{role}})(으)로 로그인됨. 로그아웃은 그 서비스에서 하세요."
   }
 }

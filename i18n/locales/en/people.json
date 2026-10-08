@@ -64,12 +64,21 @@
     "password": "Password",
     "submit": "Sign in",
     "forgot": "Forgot your password? Ask an Admin or the Owner for a new password link.",
-    "useKey": "Use an API key instead"
+    "useKey": "Use an API key instead",
+    "withProvider": "Sign in with {{name}}",
+    "or": "or",
+    "provider": {
+      "failed": "Signing in with {{name}} didn't work. Try again.",
+      "refused": "Your account at {{name}} doesn't give you a role on this Toskar. Ask its Owner to add you to a group that does.",
+      "disabled": "Your account on this Toskar is turned off. Ask its Owner.",
+      "unavailable": "Signing in with another service isn't available right now."
+    }
   },
   "account": {
     "label": "Your account",
     "signedInAs": "Signed in as {{name}} (@{{username}}), {{role}}.",
     "signOut": "Sign out",
+    "signedInWith": "Signed in as {{name}} ({{external}}), {{role}}.",
     "signedInByProxy": "Signed in as {{name}} by your sign-in service, {{role}}. Sign out there."
   }
 }

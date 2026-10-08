@@ -64,12 +64,21 @@
     "password": "Senha",
     "submit": "Entrar",
     "forgot": "Esqueceu a senha? Peça a um administrador ou ao proprietário um link de nova senha.",
-    "useKey": "Usar uma chave de API"
+    "useKey": "Usar uma chave de API",
+    "withProvider": "Entrar com {{name}}",
+    "or": "ou",
+    "provider": {
+      "failed": "Não foi possível entrar com {{name}}. Tente de novo.",
+      "refused": "Sua conta de {{name}} não lhe dá uma função neste Toskar. Peça ao proprietário para adicioná-lo a um grupo que dê.",
+      "disabled": "Sua conta neste Toskar está desativada. Fale com o proprietário.",
+      "unavailable": "Entrar com outro serviço não está disponível agora."
+    }
   },
   "account": {
     "label": "Sua conta",
     "signedInAs": "Conectado como {{name}} (@{{username}}), {{role}}.",
     "signOut": "Sair",
+    "signedInWith": "Conectado como {{name}} ({{external}}), {{role}}.",
     "signedInByProxy": "Conectado como {{name}} pelo seu serviço de login, {{role}}. Saia por lá."
   }
 }
