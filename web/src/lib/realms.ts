@@ -21,6 +21,7 @@ export type RuneId =
   | 'thurisaz'
   | 'isa'
   | 'gebo'
+  | 'wunjo'
 
 export interface Realm {
   /**
@@ -79,6 +80,14 @@ export const realms: Record<string, Realm> = {
     id: 'people',
     norse: 'Midgard',
     rune: 'gebo',
+    accent: 'text-bifrost',
+  },
+  // Chat portals (#205): Valhalla, the hall that welcomes its guests, and
+  // Wunjo, the rune of joy and of welcome.
+  '/portals': {
+    id: 'portals',
+    norse: 'Valhalla',
+    rune: 'wunjo',
     accent: 'text-bifrost',
   },
   '/nodes': {
@@ -151,4 +160,5 @@ export const runePaths: Record<RuneId, string> = {
   tiwaz: 'M5 15V1M1.5 5 5 1l3.5 4',
   thurisaz: 'M3 1v14M3 4l5 4-5 4',
   isa: 'M5 1v14',
+  wunjo: 'M3 15V1l5 3.5L3 8',
 }

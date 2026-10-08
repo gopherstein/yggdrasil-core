@@ -1,0 +1,76 @@
+{
+  "subtitle": "내가 응대하는 사람들을 위한 브랜드 채팅 페이지예요. Toskar의 다른 부분은 보이지 않아요.",
+  "link": {
+    "copy": "링크 복사",
+    "copied": "복사됨",
+    "lanOff": "로컬 네트워크 접근을 켜기 전까지는 이 컴퓨터에서만 열 수 있어요.",
+    "lanOffAction": "API 접근에서 켜기"
+  },
+  "add": {
+    "title": "포털 추가",
+    "body": "이름과 주소를 정하세요. 방문자는 그 주소에서 열고 선택한 프로필과 채팅해요.",
+    "submit": "포털 추가"
+  },
+  "field": {
+    "name": "이름",
+    "slug": "주소",
+    "access": "채팅할 수 있는 사람",
+    "passcode": "코드",
+    "profile": "프로필",
+    "defaultProfile": "기본 프로필",
+    "tools": "도구",
+    "language": "언어",
+    "followVisitor": "방문자에 맞추기",
+    "memory": "방문자마다 기억하기",
+    "newPasscode": "새 코드",
+    "keepPasscode": "비워 두면 그대로 유지돼요"
+  },
+  "access": {
+    "passcode": "코드를 아는 사람",
+    "open": "네트워크의 누구나",
+    "openHint": "이 Toskar에 접속할 수 있는 누구나 채팅할 수 있어요."
+  },
+  "edit": {
+    "title": "{{name}} 편집",
+    "close": "닫기",
+    "answers": "답하는 방식",
+    "access": "채팅할 수 있는 사람",
+    "looks": "모양",
+    "save": "저장",
+    "saved": "저장됨",
+    "preview": "미리 보기",
+    "open": "편집"
+  },
+  "tools": {
+    "none": "도구 없음",
+    "read_only": "읽기만 하는 도구",
+    "profile": "프로필의 도구"
+  },
+  "brand": {
+    "title": "제목",
+    "logo": "로고 주소",
+    "accent": "강조 색",
+    "background": "배경색",
+    "themeColour": "테마 색",
+    "theme": "테마",
+    "welcome": "환영 메시지",
+    "prompts": "추천 질문(한 줄에 하나)",
+    "footer": "바닥글"
+  },
+  "theme": {
+    "system": "방문자에 맞추기",
+    "light": "라이트",
+    "dark": "다크"
+  },
+  "off": "꺼짐",
+  "enabled": "{{name}} 켜기",
+  "remove": {
+    "confirm": "{{name}}을(를) 삭제할까요? 방문자가 더 이상 채팅할 수 없어요.",
+    "button": "삭제"
+  },
+  "list": {
+    "title": "포털",
+    "none": "아직 포털이 없어요.",
+    "private": "각 방문자의 채팅은 그 사람만의 것이고, 내 메모리나 지식에 들어가지 않아요. 포털을 끄면 바로 멈춰요."
+  }
+}

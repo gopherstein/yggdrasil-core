@@ -1,0 +1,76 @@
+{
+  "subtitle": "为你服务的人提供的品牌聊天页面，不显示 Toskar 的其他部分。",
+  "link": {
+    "copy": "复制链接",
+    "copied": "已复制",
+    "lanOff": "在打开本地网络访问之前，只有这台电脑能打开它。",
+    "lanOffAction": "在 API 访问中打开"
+  },
+  "add": {
+    "title": "添加门户",
+    "body": "给它起个名称和地址。访客在该地址打开它，并与你选择的配置文件聊天。",
+    "submit": "添加门户"
+  },
+  "field": {
+    "name": "名称",
+    "slug": "地址",
+    "access": "谁可以聊天",
+    "passcode": "访问码",
+    "profile": "配置文件",
+    "defaultProfile": "默认配置文件",
+    "tools": "工具",
+    "language": "语言",
+    "followVisitor": "跟随访客",
+    "memory": "为每位访客记住内容",
+    "newPasscode": "新访问码",
+    "keepPasscode": "留空则保持不变"
+  },
+  "access": {
+    "passcode": "知道访问码的人",
+    "open": "网络上的任何人",
+    "openHint": "任何能访问这个 Toskar 的人都可以聊天。"
+  },
+  "edit": {
+    "title": "编辑 {{name}}",
+    "close": "关闭",
+    "answers": "回答方式",
+    "access": "谁可以聊天",
+    "looks": "外观",
+    "save": "保存",
+    "saved": "已保存",
+    "preview": "预览",
+    "open": "编辑"
+  },
+  "tools": {
+    "none": "不使用工具",
+    "read_only": "只读工具",
+    "profile": "配置文件的工具"
+  },
+  "brand": {
+    "title": "标题",
+    "logo": "徽标地址",
+    "accent": "强调色",
+    "background": "背景色",
+    "themeColour": "主题颜色",
+    "theme": "主题",
+    "welcome": "欢迎语",
+    "prompts": "建议的问题（每行一个）",
+    "footer": "页脚"
+  },
+  "theme": {
+    "system": "跟随访客",
+    "light": "浅色",
+    "dark": "深色"
+  },
+  "off": "已关闭",
+  "enabled": "开启 {{name}}",
+  "remove": {
+    "confirm": "要删除 {{name}} 吗？其访客将无法再聊天。",
+    "button": "删除"
+  },
+  "list": {
+    "title": "门户",
+    "none": "还没有门户。",
+    "private": "每位访客的聊天只属于自己，绝不会进入你的记忆或知识。关闭门户会立即停止它。"
+  }
+}

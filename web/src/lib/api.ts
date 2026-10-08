@@ -111,6 +111,8 @@ import type {
   InviteView,
   Role,
   PortalPageView,
+  Portal,
+  PortalInput,
 } from '@/types/api'
 import type { Upload } from '@/lib/upload'
 
@@ -528,6 +530,19 @@ export const api = {
   /** Sign this browser in with a username and password. */
   signIn: (username: string, password: string) =>
     request<Principal>('/api/v1/session', { method: 'POST', body: JSON.stringify({ username, password }) }),
+
+  /** Every chat portal, for Admins (#205). */
+  listPortals: () => request<Portal[]>('/api/v1/portals'),
+
+  /** Add a chat portal (#205). */
+  createPortal: (input: PortalInput) => request<Portal>('/api/v1/portals', { method: 'POST', body: JSON.stringify(input) }),
+
+  /** Change a chat portal; turning it off stops its visitors at once (#205). */
+  updatePortal: (id: string, input: PortalInput) =>
+    request<Portal>(`/api/v1/portals/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(input) }),
+
+  /** Remove a chat portal (#205). */
+  deletePortal: (id: string) => request<null>(`/api/v1/portals/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
   /** What a chat portal's page shows (#205); null when there's none, or it's off. */
   getPortalPage: (slug: string) => request<PortalPageView>(`/api/v1/portals/${encodeURIComponent(slug)}/page`),

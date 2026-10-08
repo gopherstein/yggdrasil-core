@@ -239,6 +239,21 @@
       ]
     },
     {
+      "id": "portals",
+      "title": "Open a chat page for the people you serve",
+      "paragraphs": [
+        "A chat portal is a page with only a chat on it, in your own name, logo, and colours, for customers, students, or anyone you help. It answers with the profile you choose, and none of Toskar's other pages show.",
+        "Each visitor's chats are their own: no other visitor, and none of your own chats, memories, or knowledge sources, appear to them, and their chats never reach your memory or knowledge. A portal starts with no tools and no memory; you can allow tools that only read, or the profile's own.",
+        "Turning a portal off under Administer → Portals stops it at once, even for someone in the middle of a chat."
+      ],
+      "steps": [
+        "Open Administer → Portals.",
+        "Under Add a portal, type a name; the address fills in from it. Choose who can chat: anyone with a passcode you set, or anyone on your network.",
+        "Choose the profile, tools, and language, and how it looks: heading, logo, accent colour, theme, welcome message, suggested prompts, and footer. The preview shows the page as visitors will see it.",
+        "Copy the link and share it. Local network access has to be on for other devices to open it."
+      ]
+    },
+    {
       "id": "server",
       "title": "Run without a desktop",
       "paragraphs": [

@@ -32,6 +32,7 @@ const administerNav = [
   { to: '/train', label: 'nav.train' },
   { to: '/nodes', label: 'nav.computers' },
   { to: '/people', label: 'nav.people' },
+  { to: '/portals', label: 'nav.portals' },
   { to: '/api-access', label: 'nav.apiAccess' },
   { to: '/performance', label: 'nav.performance' },
   { to: '/diagnostics', label: 'nav.diagnostics' },

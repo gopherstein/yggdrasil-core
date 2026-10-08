@@ -1,0 +1,76 @@
+{
+  "subtitle": "Des pages de discussion à vos couleurs pour les personnes que vous servez, sans le reste de Toskar.",
+  "link": {
+    "copy": "Copier le lien",
+    "copied": "Copié",
+    "lanOff": "Seul cet ordinateur peut l'ouvrir tant que l'accès au réseau local est désactivé.",
+    "lanOffAction": "L'activer dans Accès API"
+  },
+  "add": {
+    "title": "Ajouter un portail",
+    "body": "Donnez-lui un nom et une adresse. Les visiteurs l'ouvrent à cette adresse et discutent avec le profil choisi.",
+    "submit": "Ajouter le portail"
+  },
+  "field": {
+    "name": "Nom",
+    "slug": "Adresse",
+    "access": "Qui peut discuter",
+    "passcode": "Code",
+    "profile": "Profil",
+    "defaultProfile": "Profil par défaut",
+    "tools": "Outils",
+    "language": "Langue",
+    "followVisitor": "Celle du visiteur",
+    "memory": "Retenir des choses pour chaque visiteur",
+    "newPasscode": "Nouveau code",
+    "keepPasscode": "Laisser vide pour le garder"
+  },
+  "access": {
+    "passcode": "Toute personne ayant le code",
+    "open": "Tout le monde sur le réseau",
+    "openHint": "Toute personne qui peut joindre ce Toskar peut discuter."
+  },
+  "edit": {
+    "title": "Modifier {{name}}",
+    "close": "Fermer",
+    "answers": "Comment il répond",
+    "access": "Qui peut discuter",
+    "looks": "Son apparence",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "preview": "Aperçu",
+    "open": "Modifier"
+  },
+  "tools": {
+    "none": "Aucun outil",
+    "read_only": "Outils en lecture seule",
+    "profile": "Les outils du profil"
+  },
+  "brand": {
+    "title": "Titre",
+    "logo": "Adresse du logo",
+    "accent": "Couleur d'accent",
+    "background": "Couleur de fond",
+    "themeColour": "Couleur du thème",
+    "theme": "Thème",
+    "welcome": "Message d'accueil",
+    "prompts": "Suggestions, une par ligne",
+    "footer": "Pied de page"
+  },
+  "theme": {
+    "system": "Celui du visiteur",
+    "light": "Clair",
+    "dark": "Sombre"
+  },
+  "off": "Désactivé",
+  "enabled": "{{name}} activé",
+  "remove": {
+    "confirm": "Supprimer {{name}} ? Ses visiteurs ne pourront plus discuter.",
+    "button": "Supprimer"
+  },
+  "list": {
+    "title": "Portails",
+    "none": "Aucun portail pour l'instant.",
+    "private": "Les discussions de chaque visiteur lui appartiennent et n'atteignent jamais vos souvenirs ni vos connaissances. Désactiver un portail l'arrête aussitôt."
+  }
+}

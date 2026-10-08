@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RequireRole } from '@/components/auth/RequireRole'
 import { PortalPage } from '@/features/portal/PortalPage'
+import { PortalsPage } from '@/features/portals/PortalsPage'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LifecycleHost } from '@/components/LifecycleHost'
 import { NotificationHost } from '@/components/NotificationHost'
@@ -100,6 +101,7 @@ export function App() {
                 <Route path="tools" element={<RequireRole min="admin"><ToolsPage /></RequireRole>} />
                 <Route path="nodes" element={<RequireRole min="admin"><NodesPage /></RequireRole>} />
                 <Route path="people" element={<PeoplePage />} />
+                <Route path="portals" element={<RequireRole min="admin"><PortalsPage /></RequireRole>} />
                 <Route path="api-access" element={<RequireRole min="admin"><ApiAccessPage /></RequireRole>} />
                 <Route path="diagnostics" element={<RequireRole min="admin"><DiagnosticsPage /></RequireRole>} />
                 <Route path="performance" element={<RequireRole min="admin"><PerformancePage /></RequireRole>} />

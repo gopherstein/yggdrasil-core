@@ -2150,3 +2150,23 @@ export interface PortalPageView {
   /** True when this browser is already the portal's guest. */
   entered: boolean
 }
+
+/** A chat portal, as Admins see it (#205). */
+export interface Portal {
+  id: string
+  slug: string
+  name: string
+  profile_id: string
+  tools: 'none' | 'read_only' | 'profile'
+  memory: boolean
+  language: string
+  access: 'open' | 'passcode'
+  has_passcode: boolean
+  branding: PortalBranding
+  enabled: boolean
+  created_at: string
+  updated_at: string
+}
+
+/** A new chat portal, or a change to one; passcode is write-only. */
+export type PortalInput = Partial<Omit<Portal, 'id' | 'has_passcode' | 'created_at' | 'updated_at'>> & { passcode?: string }
