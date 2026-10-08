@@ -1384,6 +1384,11 @@ func nowLine(now time.Time, loc *time.Location) string {
 
 func (e *chatExecEnv) TurnInstructions(ctx context.Context, prompt string) string {
 	var parts []string
+	// The administrator's topic rules come first, and nothing after them
+	// changes them (#345).
+	if block := topicBlock(e.profile.Topics); block != "" {
+		parts = append(parts, block)
+	}
 	if s := strings.TrimSpace(e.instructions); s != "" {
 		parts = append(parts, s)
 	}

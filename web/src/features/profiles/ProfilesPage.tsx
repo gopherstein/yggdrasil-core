@@ -35,6 +35,8 @@ import {
   type ProfileFilter,
 } from './profilePresentation'
 import { OrchestrationControls, cleanOrchestration } from './OrchestrationControls'
+import { TopicsEditor } from './TopicsEditor'
+import { topicsDraft, topicsFrom } from './topicsDraft'
 import { EXECUTION_KEYS, MEMORY_KEYS, ORCHESTRATION_KEYS } from './orchestrationKeys'
 import { RealmKicker } from '@/components/ui/Realm'
 import { rovingKeyDown, useMenu } from '@/lib/roving'
@@ -162,6 +164,7 @@ export function ProfilesPage() {
         tools: (profile.tools ?? []).map((t) => ({ ...t })),
         knowledge_sources: profile.knowledge_sources,
         orchestration: profile.orchestration,
+        topics: profile.topics,
       }),
     onSuccess: (created) => {
       queryClient.invalidateQueries({ queryKey: ['profiles'] })
@@ -696,6 +699,7 @@ function AdvancedEditor({
   const [tools, setTools] = useState<ToolPolicy[]>(defaultToolsFrom(profile))
   const [knowledge, setKnowledge] = useState<string[]>(profile.knowledge_sources ?? [])
   const [orchestration, setOrchestration] = useState<OrchestrationPolicy>(editorOrchestration(profile))
+  const [topics, setTopics] = useState(() => topicsDraft(profile.topics))
   const advancedMode = useUIStore((s) => s.advancedMode)
   const profileIdRef = useRef(profile.id)
 
@@ -703,6 +707,7 @@ function AdvancedEditor({
     if (profileIdRef.current === profile.id) return
     profileIdRef.current = profile.id
     setName(profile.name)
+    setTopics(topicsDraft(profile.topics))
     setNodeMode(profile.node_policy?.mode ?? 'automatic')
     setPlacement(placementFrom(profile))
     setRoles(editorRoles(profile))
@@ -917,6 +922,12 @@ function AdvancedEditor({
         </section>
       )}
 
+      {tab === 'topics' && (
+        <section id={panelID('topics')} role="tabpanel" aria-labelledby={tabID('topics')}>
+          <TopicsEditor value={topics} onChange={setTopics} disabled={saving} />
+        </section>
+      )}
+
       {tab === 'behavior' && (
         <section id={panelID('behavior')} role="tabpanel" aria-labelledby={tabID('behavior')} className="grid gap-5 lg:grid-cols-2">
           <div className="space-y-2">
@@ -1005,6 +1016,7 @@ function AdvancedEditor({
               tools,
               knowledge_sources: knowledge,
               orchestration: cleanOrchestration(orchestration),
+              topics: topicsFrom(topics, profile.topics?.strictness),
             })
           }
         >
@@ -1018,8 +1030,8 @@ function AdvancedEditor({
   )
 }
 
-type EditorTab = 'models' | 'tools' | 'knowledge' | 'behavior'
-const EDITOR_TABS: EditorTab[] = ['models', 'tools', 'knowledge', 'behavior']
+type EditorTab = 'models' | 'tools' | 'knowledge' | 'topics' | 'behavior'
+const EDITOR_TABS: EditorTab[] = ['models', 'tools', 'knowledge', 'topics', 'behavior']
 
 /** One row per model role (spec §20), filled from the profile; older role names map onto the current ones. */
 function editorRoles(profile: AIProfile): ModelRole[] {

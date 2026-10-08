@@ -277,7 +277,8 @@
       "models": "Modelos",
       "tools": "Herramientas",
       "knowledge": "Conocimiento y memoria",
-      "behavior": "Estrategia y equipos"
+      "behavior": "Estrategia y equipos",
+      "topics": "Temas"
     },
     "namePlaceholder": "p. ej., Programación",
     "models": "Modelos",
@@ -374,5 +375,19 @@
       "label": "Presupuesto de contexto",
       "help": "Parte máxima de la ventana que pueden usar los mensajes anteriores (0.1–0.9)."
     }
+  },
+  "topics": {
+    "intro": "Mantén este asistente en el tema por el que vienen las personas. Estas reglas van primero en cada chat, y nada de lo que se escriba, configure o pegue puede cambiarlas.",
+    "staysOn": "Se ciñe a",
+    "staysOnExample": "Neumáticos, llantas, alineación y la llantera de Dana: horarios, precios, citas",
+    "staysOnHint": "Para qué sirve el asistente, en palabras sencillas. Déjalo vacío para no usar controles de tema.",
+    "examples": "Preguntas de ejemplo",
+    "perLine": "Una por línea.",
+    "never": "Nunca habla de",
+    "neverHint": "Temas siempre prohibidos, aunque parezcan relacionados. Uno por línea.",
+    "reply": "Cuando le preguntan otra cosa",
+    "replyDefault": "Solo puedo ayudar con {{topic}}. ¿En qué te puedo ayudar?",
+    "replyHint": "La respuesta exacta a cualquier otro tema. Déjalo vacío y el asistente dirá en una frase con qué puede ayudar, en el idioma de la persona.",
+    "note": "Saludos, agradecimientos y «¿qué puedes hacer?» siempre están bien. Estas reglas guían al modelo; ningún asistente puede prometer no desviarse nunca."
   }
 }

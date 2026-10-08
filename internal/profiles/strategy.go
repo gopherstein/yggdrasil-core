@@ -44,6 +44,7 @@ var legacyRoles = map[string]string{
 // main pipeline with the Team strategy, keeping its roles and models (§37).
 // Other profiles are returned unchanged.
 func Normalize(p Profile) Profile {
+	p.Topics = normalizeTopics(p.Topics)
 	if p.OrchestratorID == legacyOrchestrator {
 		p.OrchestratorID = "simple"
 		if p.Orchestration.Strategy == "" {
@@ -90,4 +91,29 @@ func BaseRole(role string) string {
 		return role[:i]
 	}
 	return role
+}
+
+// normalizeTopics trims topic controls and drops empty lines; topics with
+// nothing to stay on are none (#345).
+func normalizeTopics(t *contracts.TopicPolicy) *contracts.TopicPolicy {
+	if t == nil {
+		return nil
+	}
+	out := *t
+	out.StaysOn = strings.TrimSpace(out.StaysOn)
+	out.OffTopicReply = strings.TrimSpace(out.OffTopicReply)
+	clean := func(in []string) []string {
+		var kept []string
+		for _, s := range in {
+			if s = strings.TrimSpace(s); s != "" {
+				kept = append(kept, s)
+			}
+		}
+		return kept
+	}
+	out.Examples, out.NeverDiscuss = clean(out.Examples), clean(out.NeverDiscuss)
+	if out.StaysOn == "" {
+		return nil
+	}
+	return &out
 }

@@ -276,7 +276,8 @@
       "models": "Modelle",
       "tools": "Werkzeuge",
       "knowledge": "Wissen und Gedächtnis",
-      "behavior": "Strategie und Computer"
+      "behavior": "Strategie und Computer",
+      "topics": "Themen"
     },
     "namePlaceholder": "z. B. Programmieren",
     "models": "Modelle",
@@ -372,5 +373,19 @@
       "label": "Kontextbudget",
       "help": "Höchstanteil des Kontextfensters für frühere Nachrichten (0,1–0,9)."
     }
+  },
+  "topics": {
+    "intro": "Halte diesen Assistenten bei dem Thema, für das die Leute kommen. Diese Regeln stehen in jedem Chat an erster Stelle, und nichts, was Leute eingeben, einstellen oder einfügen, kann sie ändern.",
+    "staysOn": "Bleibt bei",
+    "staysOnExample": "Reifen, Felgen, Spureinstellung und Danas Reifenhandel: Öffnungszeiten, Preise, Termine",
+    "staysOnHint": "Wofür der Assistent da ist, in einfachen Worten. Leer lassen für keine Themenregeln.",
+    "examples": "Beispielfragen",
+    "perLine": "Eine pro Zeile.",
+    "never": "Spricht nie über",
+    "neverHint": "Themen, die immer tabu sind, auch wenn sie verwandt wirken. Eines pro Zeile.",
+    "reply": "Bei anderen Fragen",
+    "replyDefault": "Ich kann nur bei {{topic}} helfen. Wobei kann ich dir helfen?",
+    "replyHint": "Die genaue Antwort auf alles andere. Leer lassen, und der Assistent sagt in einem Satz, wobei er helfen kann, in der Sprache der Person.",
+    "note": "Begrüßungen, Dank und „Was kannst du?“ sind immer in Ordnung. Diese Regeln leiten das Modell; kein Assistent kann versprechen, nie abzuschweifen."
   }
 }

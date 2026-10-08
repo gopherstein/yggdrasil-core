@@ -3,6 +3,7 @@ package profiles
 import (
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/yeixio/toskar-core/pkg/contracts"
 )
@@ -29,7 +30,39 @@ func Validate(p Profile) error {
 	if err := ValidateNodePolicy(p.NodePolicy); err != nil {
 		return err
 	}
+	if err := ValidateTopics(p.Topics); err != nil {
+		return err
+	}
 	return ValidateOrchestration(p.Orchestration)
+}
+
+// ValidateTopics checks a profile's topic controls (#345).
+func ValidateTopics(t *contracts.TopicPolicy) error {
+	if t == nil {
+		return nil
+	}
+	long := func(s string, most int) bool { return len([]rune(s)) > most }
+	switch {
+	case strings.TrimSpace(t.StaysOn) == "":
+		return ErrInvalidProfile("topics: say what the assistant stays on")
+	case long(t.StaysOn, 1000):
+		return ErrInvalidProfile("topics: what it stays on can be 1000 characters")
+	case len(t.Examples) > 20 || len(t.NeverDiscuss) > 20:
+		return ErrInvalidProfile("topics: up to 20 examples and 20 subjects it never discusses")
+	case long(t.OffTopicReply, 500):
+		return ErrInvalidProfile("topics: the reply to anything else can be 500 characters")
+	}
+	for _, s := range append(append([]string(nil), t.Examples...), t.NeverDiscuss...) {
+		if long(s, 200) {
+			return ErrInvalidProfile("topics: each example and subject can be 200 characters")
+		}
+	}
+	switch t.Strictness {
+	case "", contracts.TopicsGuide, contracts.TopicsEnforce:
+	default:
+		return ErrInvalidProfile("topics: strictness is guide or enforce")
+	}
+	return nil
 }
 
 // ValidateNodePolicy checks a profile's placement rules.

@@ -277,7 +277,8 @@
       "models": "Modèles",
       "tools": "Outils",
       "knowledge": "Connaissances et mémoire",
-      "behavior": "Stratégie et ordinateurs"
+      "behavior": "Stratégie et ordinateurs",
+      "topics": "Sujets"
     },
     "namePlaceholder": "ex. Programmation",
     "models": "Modèles",
@@ -374,5 +375,19 @@
       "label": "Budget de contexte",
       "help": "Part maximale de la fenêtre que les messages précédents peuvent occuper (0.1–0.9)."
     }
+  },
+  "topics": {
+    "intro": "Gardez cet assistant sur le sujet pour lequel les gens viennent. Ces règles passent en premier dans chaque discussion, et rien de ce que les gens tapent, règlent ou collent ne peut les changer.",
+    "staysOn": "Reste sur",
+    "staysOnExample": "Pneus, jantes, parallélisme et le garage de Dana : horaires, prix, rendez-vous",
+    "staysOnHint": "À quoi sert l'assistant, en mots simples. Laissez vide pour aucun contrôle de sujet.",
+    "examples": "Questions d'exemple",
+    "perLine": "Une par ligne.",
+    "never": "Ne parle jamais de",
+    "neverHint": "Sujets toujours interdits, même s'ils semblent liés. Un par ligne.",
+    "reply": "Quand on lui demande autre chose",
+    "replyDefault": "Je ne peux aider que pour {{topic}}. Que puis-je faire pour vous ?",
+    "replyHint": "La réponse exacte à tout autre sujet. Laissez vide, et l'assistant dit en une phrase pour quoi il peut aider, dans la langue de la personne.",
+    "note": "Les salutations, les remerciements et « que sais-tu faire ? » sont toujours acceptés. Ces règles guident le modèle ; aucun assistant ne peut promettre de ne jamais s'écarter."
   }
 }

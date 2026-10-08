@@ -498,12 +498,41 @@ type AIProfile struct {
 	// Orchestration is how this profile works through a request (§40).
 	// Empty fields keep Yggdrasil's defaults.
 	Orchestration OrchestrationPolicy `json:"orchestration,omitzero"`
+	// Topics keep the assistant on the subject its people came for (#345):
+	// an administrator's rules that a person's messages, style, memories,
+	// and an API caller's instructions can't change.
+	Topics *TopicPolicy `json:"topics,omitempty"`
 	// ModelCallsNoTools is set for a turn whose model cannot call tools,
 	// such as Gemma 2: it is not shown the tool protocol, but the look-ups
 	// Toskar runs itself (web, places, connected services) still run and
 	// reach it as reference material. Never stored or sent.
 	ModelCallsNoTools bool `json:"-"`
 }
+
+// TopicPolicy is a profile's topic controls (#345).
+type TopicPolicy struct {
+	// StaysOn says what the assistant is for, in plain words, such as
+	// "Tires, wheels, alignment, and Dana's Tire Shop: hours, prices,
+	// bookings".
+	StaysOn string `json:"stays_on"`
+	// Examples are questions it's for.
+	Examples []string `json:"examples,omitempty"`
+	// NeverDiscuss are subjects always off limits, even when they look
+	// related.
+	NeverDiscuss []string `json:"never_discuss,omitempty"`
+	// OffTopicReply is the answer to anything else; empty is Toskar's,
+	// in the person's language.
+	OffTopicReply string `json:"off_topic_reply,omitempty"`
+	// Strictness is guide (the rules only) or enforce (checked before and
+	// after answering); empty is guide.
+	Strictness string `json:"strictness,omitempty"`
+}
+
+// Topic strictness levels (#345).
+const (
+	TopicsGuide   = "guide"
+	TopicsEnforce = "enforce"
+)
 
 // OrchestrationPolicy is a profile's advanced controls (spec §40, §56).
 // Every field is optional; empty keeps the default, which follows the
