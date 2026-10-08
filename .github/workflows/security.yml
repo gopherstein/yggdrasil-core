@@ -30,11 +30,15 @@ concurrency:
 jobs:
   govulncheck:
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+          # Self-hosted runners keep Go's caches on disk; uploading them
+          # to GitHub's cache only held jobs up for many minutes.
+          cache: ${{ !vars.CI_RUNS_ON }}
       - name: Install govulncheck
         run: go install golang.org/x/vuln/cmd/govulncheck@latest
       - name: Scan
@@ -42,6 +46,7 @@ jobs:
 
   pnpm-audit:
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: web
@@ -55,7 +60,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "22"
-          cache: pnpm
+          # Not on self-hosted runners, whose pnpm store stays on disk.
+          cache: ${{ !vars.CI_RUNS_ON && 'pnpm' || '' }}
           cache-dependency-path: web/pnpm-lock.yaml
       - run: pnpm install
       - run: pnpm audit --prod || true
