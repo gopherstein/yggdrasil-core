@@ -411,5 +411,21 @@
     "open": "Abre Toskar en la computadora: la app de Toskar o http://localhost:7331 en su navegador.",
     "choose": "Abre Computadoras y elige Conectar un dispositivo.",
     "code": "Luego, aquí, elige la computadora y escribe el código de 6 dígitos que muestra."
+  },
+  "report": {
+    "action": "Denunciar esta respuesta",
+    "title": "Denunciar esta respuesta",
+    "lede": "Cuéntale a Yeix qué falla en esta respuesta. Tu app de correo se abre con el informe, para que veas exactamente lo que se envía.",
+    "reason": "¿Qué falla?",
+    "reasons": {
+      "offensive": "Ofensiva o dañina",
+      "wrong": "Incorrecta o engañosa",
+      "other": "Otra cosa"
+    },
+    "note": "¿Algo más? (opcional)",
+    "send": "Seguir en el correo",
+    "subject": "Toskar: respuesta denunciada ({{reason}})",
+    "body": "Motivo: {{reason}}\nModelo: {{model}}\nNota: {{note}}\n\nRespuesta:\n{{answer}}",
+    "noMail": "No hay ninguna app de correo configurada. Envía el informe a {{email}}."
   }
 }

@@ -403,5 +403,21 @@
     "open": "在电脑上打开 Toskar：Toskar 应用，或在浏览器中打开 http://localhost:7331。",
     "choose": "打开“电脑”，然后选择“连接设备”。",
     "code": "回到这里，选择那台电脑，输入它显示的 6 位代码。"
+  },
+  "report": {
+    "action": "举报此回答",
+    "title": "举报此回答",
+    "lede": "告诉 Yeix 这个回答有什么问题。邮件应用会带着举报内容打开，你可以看到将要发送的全部内容。",
+    "reason": "有什么问题？",
+    "reasons": {
+      "offensive": "冒犯或有害",
+      "wrong": "错误或误导",
+      "other": "其他"
+    },
+    "note": "补充说明（可选）",
+    "send": "在邮件中继续",
+    "subject": "Toskar：被举报的回答（{{reason}}）",
+    "body": "原因：{{reason}}\n模型：{{model}}\n备注：{{note}}\n\n回答：\n{{answer}}",
+    "noMail": "尚未设置邮件应用。请把举报内容发送到 {{email}}。"
   }
 }

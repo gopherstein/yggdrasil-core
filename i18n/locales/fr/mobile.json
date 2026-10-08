@@ -411,5 +411,21 @@
     "open": "Ouvrez Toskar sur l'ordinateur : l'app Toskar, ou http://localhost:7331 dans son navigateur.",
     "choose": "Ouvrez Ordinateurs et choisissez Connecter un appareil.",
     "code": "Ensuite, ici, choisissez l'ordinateur et saisissez le code à 6 chiffres qu'il affiche."
+  },
+  "report": {
+    "action": "Signaler cette réponse",
+    "title": "Signaler cette réponse",
+    "lede": "Dites à Yeix ce qui ne va pas dans cette réponse. Votre app de messagerie s'ouvre avec le signalement, pour que vous voyiez exactement ce qui est envoyé.",
+    "reason": "Quel est le problème ?",
+    "reasons": {
+      "offensive": "Offensante ou nuisible",
+      "wrong": "Fausse ou trompeuse",
+      "other": "Autre chose"
+    },
+    "note": "Autre chose à ajouter (facultatif)",
+    "send": "Continuer dans l'e-mail",
+    "subject": "Toskar : réponse signalée ({{reason}})",
+    "body": "Motif : {{reason}}\nModèle : {{model}}\nRemarque : {{note}}\n\nRéponse :\n{{answer}}",
+    "noMail": "Aucune app de messagerie n'est configurée. Envoyez le signalement à {{email}}."
   }
 }
