@@ -152,3 +152,65 @@ func TestEventsReachOnlyTheirPerson(t *testing.T) {
 		t.Fatalf("sam heard someone else's:\n%s", all)
 	}
 }
+
+// A trusted proxy names the person; its header means nothing from
+// anywhere else, and a request through a proxy on this computer is never
+// the Owner's by default (#206).
+func TestProxySignIn(t *testing.T) {
+	dir := t.TempDir()
+	db, err := store.Open(filepath.Join(dir, "t.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+	mgr, err := config.NewManager(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Listening only here, behind a proxy on this computer.
+	if err := mgr.Update(func(c *config.Config) {
+		c.APIHost = "127.0.0.1"
+		c.TrustedProxies = []string{"127.0.0.1"}
+		c.ProxyAuth = config.ProxyAuth{MemberGroups: []string{"family"}, DefaultRole: "none"}
+	}); err != nil {
+		t.Fatal(err)
+	}
+	srv := NewServer(Dependencies{Config: mgr, People: auth.NewPeople(db.SQL)})
+	call := func(method, path, remote string, headers map[string]string) (int, auth.Principal) {
+		r := httptest.NewRequest(method, path, nil)
+		r.RemoteAddr = remote
+		for k, v := range headers {
+			r.Header.Set(k, v)
+		}
+		rec := httptest.NewRecorder()
+		srv.Handler().ServeHTTP(rec, r)
+		var p auth.Principal
+		_ = json.NewDecoder(rec.Body).Decode(&p)
+		return rec.Code, p
+	}
+	fromProxy := "127.0.0.1:40000"
+	if code, p := call(http.MethodGet, "/api/v1/me", fromProxy, map[string]string{"Remote-User": "sam@example.com", "Remote-Groups": "family"}); code != http.StatusOK || p.Via != auth.ViaProxy || p.Person.Role != auth.RoleMember || p.Person.Name != "sam" {
+		t.Fatalf("sam through the proxy: %d %+v", code, p)
+	}
+	if code, _ := call(http.MethodGet, "/api/v1/me", fromProxy, map[string]string{"Remote-User": "eve@example.com"}); code != http.StatusForbidden {
+		t.Fatalf("someone in no group: %d", code)
+	}
+	if code, _ := call(http.MethodGet, "/api/v1/me", fromProxy, nil); code != http.StatusUnauthorized {
+		t.Fatalf("through the proxy naming nobody: %d", code)
+	}
+	// From the proxied page itself, renamed by the proxy: a Member's
+	// change is still refused, by role.
+	if code, _ := call(http.MethodPatch, "/api/v1/settings", fromProxy, map[string]string{"Remote-User": "sam@example.com", "Remote-Groups": "family",
+		"Origin": "https://toskar.example.com", "X-Forwarded-Host": "toskar.example.com"}); code != http.StatusForbidden {
+		t.Fatalf("a member changing settings through the proxy: %d", code)
+	}
+
+	// With the API on the network, the header from anyone but the proxy
+	// names nobody.
+	if err := mgr.Update(func(c *config.Config) { c.APIHost = "0.0.0.0"; c.TrustedProxies = []string{"10.0.0.2"} }); err != nil {
+		t.Fatal(err)
+	}
+	if code, _ := call(http.MethodGet, "/api/v1/me", "192.168.1.30:5000", map[string]string{"Remote-User": "mike", "X-Forwarded-For": "10.0.0.2"}); code != http.StatusUnauthorized {
+		t.Fatalf("a header from outside the proxy: %d", code)
+	}
+}

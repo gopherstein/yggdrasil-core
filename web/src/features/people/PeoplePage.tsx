@@ -83,12 +83,19 @@ function PersonRow({ person, me, onLink }: { person: Person; me?: Person; onLink
           {self ? <span className="ms-2 text-xs text-ink-faint">{t('you')}</span> : null}
         </p>
         <p className="text-xs text-ink-muted">
-          {person.sign_in && person.username ? `@${person.username}` : person.role === 'owner' ? t('ownerNoSignIn') : t('notSignedIn')}
+          {person.external
+            ? t('byProxy', { name: person.external })
+            : person.sign_in && person.username
+              ? `@${person.username}`
+              : person.role === 'owner'
+                ? t('ownerNoSignIn')
+                : t('notSignedIn')}
           {disabled ? <span className="status-chip ms-2 bg-danger/15 text-danger">{t('disabled')}</span> : null}
         </p>
         {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
       </div>
-      {canManage && !disabled ? (
+      {/* A proxied person's role follows their groups there. */}
+      {canManage && !disabled && !person.external ? (
         <select
           className="field w-auto py-1 text-sm"
           aria-label={t('roleFor', { name: person.name })}
@@ -105,7 +112,7 @@ function PersonRow({ person, me, onLink }: { person: Person; me?: Person; onLink
         <span className="text-sm text-ink-muted">{t(`roles.${person.role}`)}</span>
       )}
       <div className="flex gap-2">
-        {(canManage || self) && !disabled ? (
+        {(canManage || self) && !disabled && !person.external ? (
           <button type="button" className="btn-secondary btn-sm" disabled={link.isPending} onClick={() => link.mutate()}>
             {person.sign_in ? t('newPasswordLink') : t('signInLink')}
           </button>

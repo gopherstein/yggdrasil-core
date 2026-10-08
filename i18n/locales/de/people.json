@@ -4,6 +4,7 @@
   "you": "(du)",
   "ownerNoSignIn": "Nutzt diesen Computer; noch keine Anmeldung für andere Geräte",
   "notSignedIn": "Hat noch keinen Benutzernamen gewählt",
+  "byProxy": "Meldet sich über deinen Anmeldedienst als {{name}} an",
   "disabled": "Deaktiviert",
   "roleFor": "Rolle für {{name}}",
   "signInLink": "Anmeldelink",
@@ -68,6 +69,7 @@
   "account": {
     "label": "Dein Konto",
     "signedInAs": "Angemeldet als {{name}} (@{{username}}), {{role}}.",
-    "signOut": "Abmelden"
+    "signOut": "Abmelden",
+    "signedInByProxy": "Über deinen Anmeldedienst angemeldet als {{name}}, {{role}}. Melde dich dort ab."
   }
 }

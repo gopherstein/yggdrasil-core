@@ -4,6 +4,7 @@
   "you": "（你）",
   "ownerNoSignIn": "使用这台电脑；尚未设置其他设备的登录",
   "notSignedIn": "尚未选择用户名",
+  "byProxy": "通过你的登录服务以 {{name}} 登录",
   "disabled": "已停用",
   "roleFor": "{{name}} 的角色",
   "signInLink": "登录链接",
@@ -68,6 +69,7 @@
   "account": {
     "label": "你的账户",
     "signedInAs": "已登录为 {{name}}（@{{username}}），{{role}}。",
-    "signOut": "退出登录"
+    "signOut": "退出登录",
+    "signedInByProxy": "已通过你的登录服务以 {{name}}（{{role}}）登录。请在那里退出登录。"
   }
 }

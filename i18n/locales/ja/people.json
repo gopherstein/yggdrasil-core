@@ -4,6 +4,7 @@
   "you": "（あなた）",
   "ownerNoSignIn": "このコンピュータを使用中。他のデバイスからのサインインはまだありません",
   "notSignedIn": "まだユーザー名を選んでいません",
+  "byProxy": "サインインサービス経由で {{name}} としてサインイン",
   "disabled": "無効",
   "roleFor": "{{name}}の役割",
   "signInLink": "サインイン用リンク",
@@ -68,6 +69,7 @@
   "account": {
     "label": "あなたのアカウント",
     "signedInAs": "{{name}}（@{{username}}、{{role}}）としてサインイン中。",
-    "signOut": "サインアウト"
+    "signOut": "サインアウト",
+    "signedInByProxy": "サインインサービス経由で{{name}}（{{role}}）としてサインイン中です。サインアウトはそちらで行ってください。"
   }
 }

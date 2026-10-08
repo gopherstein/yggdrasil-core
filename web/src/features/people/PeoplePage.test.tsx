@@ -102,4 +102,15 @@ describe('PeoplePage', () => {
     expect(await screen.findByText('Only Admins and the Owner manage people.')).toBeInTheDocument()
     expect(screen.queryByLabelText('Name')).not.toBeInTheDocument()
   })
+
+  it('shows who a proxy signs in, whose role follows their groups there', async () => {
+    vi.mocked(api.getMe).mockResolvedValue({ person: owner, via: 'this_computer' })
+    vi.mocked(api.listPeople).mockResolvedValue([owner, { ...kid, external: 'sam@example.com' }])
+    renderIt()
+    expect(await screen.findByText('Signs in through your sign-in service as sam@example.com')).toBeInTheDocument()
+    const row = screen.getByText('Sam').closest('li') as HTMLElement
+    expect(within(row).queryByLabelText('Role for Sam')).not.toBeInTheDocument()
+    expect(within(row).queryByRole('button', { name: 'Sign-in link' })).not.toBeInTheDocument()
+    expect(within(row).getByRole('button', { name: 'Disable' })).toBeInTheDocument()
+  })
 })

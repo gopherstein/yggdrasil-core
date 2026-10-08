@@ -537,8 +537,14 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 			next.ServeHTTP(w, s.thisComputer(r))
 			return
 		}
-		local := auth.FromThisComputer(r)
-		beyond := config.ListensBeyondLoopback(s.deps.Config.Get().APIHost)
+		cfg := s.deps.Config.Get()
+		// A trusted reverse proxy signs people in and names them (#206);
+		// a request through it is never this computer's, though the proxy
+		// may run here.
+		proxy, _ := cfg.Proxy()
+		fromProxy := proxy.FromProxy(r)
+		local := auth.FromThisComputer(r) && !fromProxy
+		beyond := config.ListensBeyondLoopback(cfg.APIHost)
 		if !local && !beyond && !loopbackAddr(r.RemoteAddr) {
 			// Bound to loopback, so nothing needs a key, but a device's
 			// connection from before network access was turned off is
@@ -547,8 +553,9 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		route := routeTemplate(r)
-		// Who the request is from (#206): a key's person, then a signed-in
-		// browser's, then this computer's Owner.
+		// Who the request is from (#206): a key's person, then the person a
+		// trusted proxy names, then a signed-in browser's, then this
+		// computer's Owner.
 		if token, err := auth.BearerToken(r); err == nil {
 			if principal, ok := s.keyPrincipal(w, r, token, route); ok {
 				s.serveAs(w, r, principal, route, next)
@@ -559,6 +566,28 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 		} else if errors.Is(err, auth.ErrAPIKeyInURL) && !local {
 			writeErrFrom(w, http.StatusBadRequest, "API_KEY_IN_URL", err)
 			return
+		}
+		if fromProxy && s.deps.People != nil {
+			if id, ok := proxy.Identity(r); ok {
+				person, err := s.deps.People.Proxied(r.Context(), proxy, id)
+				switch {
+				case errors.Is(err, auth.ErrProxyRefused):
+					writeErrFrom(w, http.StatusForbidden, "PROXY_REFUSED", err)
+					return
+				case errors.Is(err, auth.ErrNoPerson):
+					writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "this person can no longer use Toskar", nil)
+					return
+				case err != nil:
+					writeErrFrom(w, http.StatusInternalServerError, "INTERNAL_ERROR", err)
+					return
+				}
+				if unsafeMethod(r.Method) && r.Header.Get("Origin") == "" && r.Header.Get("Sec-Fetch-Site") != "same-origin" {
+					writeErr(w, http.StatusForbidden, "CROSS_SITE", "a signed-in change must come from Toskar's own pages", nil)
+					return
+				}
+				s.serveAs(w, r, auth.Principal{Person: person, Via: auth.ViaProxy}, route, next)
+				return
+			}
 		}
 		if principal, ok := s.sessionPrincipal(r); ok {
 			// A signed-in browser's change must come from Toskar's own
@@ -571,7 +600,9 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 			s.serveAs(w, r, principal, route, next)
 			return
 		}
-		if local || !beyond {
+		// Listening only here makes anyone here the Owner, but not someone
+		// a proxy here let through without naming them.
+		if (local || !beyond) && !fromProxy {
 			next.ServeHTTP(w, s.thisComputer(r))
 			return
 		}
@@ -597,7 +628,8 @@ func (s *Server) serveAs(w http.ResponseWriter, r *http.Request, principal auth.
 // keyPrincipal is a valid key's person. ok is false when the key isn't
 // good; from another computer, the refusal has been written.
 func (s *Server) keyPrincipal(w http.ResponseWriter, r *http.Request, token, route string) (auth.Principal, bool) {
-	local := auth.FromThisComputer(r)
+	proxy, _ := s.deps.Config.Get().Proxy()
+	local := auth.FromThisComputer(r) && !proxy.FromProxy(r)
 	if s.deps.VerifyAPIKey == nil {
 		if !local {
 			writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "authorization required", nil)

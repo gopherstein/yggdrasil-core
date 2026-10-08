@@ -4,6 +4,7 @@
   "you": "(tú)",
   "ownerNoSignIn": "Usa esta computadora; aún sin inicio de sesión para otros dispositivos",
   "notSignedIn": "Aún no eligió un nombre de usuario",
+  "byProxy": "Inicia sesión con tu servicio de inicio de sesión como {{name}}",
   "disabled": "Desactivado",
   "roleFor": "Rol de {{name}}",
   "signInLink": "Enlace de inicio de sesión",
@@ -68,6 +69,7 @@
   "account": {
     "label": "Tu cuenta",
     "signedInAs": "Sesión iniciada como {{name}} (@{{username}}), {{role}}.",
-    "signOut": "Cerrar sesión"
+    "signOut": "Cerrar sesión",
+    "signedInByProxy": "Sesión iniciada como {{name}} mediante tu servicio de inicio de sesión, {{role}}. Cierra la sesión allí."
   }
 }

@@ -734,13 +734,15 @@ export interface Person {
   disabled_at?: string
   /** True once they've chosen a username and password. */
   sign_in: boolean
+  /** The name a trusted proxy signs them in as (#206). */
+  external?: string
 }
 
 /** Who a request is from: GET /api/v1/me. */
 export interface Principal {
   person: Person
   /** this_computer, api_key, or session. */
-  via: 'this_computer' | 'api_key' | 'session' | 'system' | 'none' | string
+  via: 'this_computer' | 'api_key' | 'session' | 'proxy' | 'system' | 'none' | string
   key_id?: string
 }
 

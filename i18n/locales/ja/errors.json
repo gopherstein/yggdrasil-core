@@ -140,6 +140,7 @@
   "UNREADABLE_FILE": "Toskarは{{name}}を読み取れません：{{cause}}",
   "UNSUPPORTED_FILE": "Toskarはまだ{{name}}を読み取れません。ドキュメント、スプレッドシート、PDF、コードファイル、音声、動画、またはPNGかJPEGの画像を添付してください。",
   "DEVICE_NOT_ALLOWED": "デバイスのキーではこの操作はできません。API アクセスのキーを使ってください。",
+  "PROXY_REFUSED": "このサインインでは、この Toskar での役割がありません。役割のあるグループに追加するようオーナーに頼んでください。",
   "DEVICE_NOT_FOUND": "その ID のデバイスはあなたのものではありません。",
   "DEVICES_FAILED": "デバイスを読み込めないか、変更できませんでした。",
   "PAIRING_EXPIRED": "このコードは期限切れです。コンピュータでもう一度「デバイスを接続」を選んでください。",

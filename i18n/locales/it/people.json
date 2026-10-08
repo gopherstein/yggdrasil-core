@@ -4,6 +4,7 @@
   "you": "(tu)",
   "ownerNoSignIn": "Usa questo computer; ancora nessun accesso per altri dispositivi",
   "notSignedIn": "Non ha ancora scelto un nome utente",
+  "byProxy": "Accede tramite il tuo servizio di accesso come {{name}}",
   "disabled": "Disattivato",
   "roleFor": "Ruolo di {{name}}",
   "signInLink": "Link di accesso",
@@ -68,6 +69,7 @@
   "account": {
     "label": "Il tuo account",
     "signedInAs": "Accesso come {{name}} (@{{username}}), {{role}}.",
-    "signOut": "Esci"
+    "signOut": "Esci",
+    "signedInByProxy": "Accesso come {{name}} tramite il tuo servizio di accesso, {{role}}. Esci da lì."
   }
 }
