@@ -9,6 +9,7 @@ vi.mock('@/lib/api', async () => {
   const actual = await vi.importActual<typeof import('@/lib/api')>('@/lib/api')
   return {
     ApiError: actual.ApiError,
+    errorText: actual.errorText,
     setPortal: vi.fn(),
     streamChat: vi.fn(),
     api: { getPortalPage: vi.fn(), enterPortal: vi.fn(), getMessages: vi.fn(), createConversation: vi.fn(), stopChat: vi.fn() },
@@ -24,6 +25,7 @@ function page(over: Partial<PortalPageView> = {}): PortalPageView {
     access: 'passcode',
     language: 'en',
     entered: false,
+    max_message: 2000,
     branding: { welcome: 'Hi! Ask about your order.', prompts: ['Where is my order?'], footer: 'Run by the Juneau shop', accent: '#0a7d6f' },
     ...over,
   }
@@ -88,5 +90,18 @@ describe('PortalPage (#205)', () => {
     vi.mocked(api.getPortalPage).mockResolvedValue(null)
     renderIt()
     expect(await screen.findByRole('heading', { name: "This chat isn't available" })).toBeInTheDocument()
+  })
+
+  it('says which limit stopped a message', async () => {
+    vi.mocked(api.getPortalPage).mockResolvedValue(page({ access: 'open', entered: true }))
+    vi.mocked(api.createConversation).mockResolvedValue({ id: 'c2' } as never)
+    vi.mocked(streamChat).mockImplementation(async ({ onError }) => {
+      onError?.("you've sent a lot of messages", 'PORTAL_RATE')
+    })
+    renderIt()
+    fireEvent.click(await screen.findByRole('button', { name: 'Where is my order?' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent("You've sent a lot of messages. Try again later.")
+    expect(screen.queryByText('Thinking…')).not.toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Message Help desk' })).toHaveAttribute('maxlength', '2000')
   })
 })

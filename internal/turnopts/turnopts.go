@@ -40,6 +40,9 @@ type Options struct {
 	// Language answers in this language, such as a portal's; empty
 	// follows the person and the message.
 	Language string
+	// Portal is the chat portal the turn is a visitor's in (#205), which
+	// waits for the people who run Toskar.
+	Portal string
 }
 
 type key struct{}

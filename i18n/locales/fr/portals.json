@@ -39,7 +39,8 @@
     "save": "Enregistrer",
     "saved": "Enregistré",
     "preview": "Aperçu",
-    "open": "Modifier"
+    "open": "Modifier",
+    "limits": "Limites"
   },
   "tools": {
     "none": "Aucun outil",
@@ -72,5 +73,11 @@
     "title": "Portails",
     "none": "Aucun portail pour l'instant.",
     "private": "Les discussions de chaque visiteur lui appartiennent et n'atteignent jamais vos souvenirs ni vos connaissances. Désactiver un portail l'arrête aussitôt."
+  },
+  "limit": {
+    "hourly": "Messages par visiteur et par heure",
+    "longest": "Message le plus long (caractères)",
+    "most": "Discussions simultanées",
+    "hint": "0 message signifie aucune limite. Les discussions du portail attendent les vôtres et celles des autres personnes qui utilisent Toskar, et passent avant les automatisations."
   }
 }

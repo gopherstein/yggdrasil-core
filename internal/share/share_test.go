@@ -124,3 +124,25 @@ func TestIndexingWaitsForAutomationsButNotTraining(t *testing.T) {
 	}
 	idx.Done()
 }
+
+// A portal's visitor waits for the people who run Toskar, and scheduled
+// work waits for the visitor (#205).
+func TestPortalChatComesAfterChatBeforeAutomations(t *testing.T) {
+	g := New(30 * time.Millisecond)
+	chat := enter(t, g, Interactive)
+	if _, _, ok := admitted(g, Portal, 20*time.Millisecond); ok {
+		t.Fatal("a portal's chat ran during the owner's")
+	}
+	chat.Done()
+	portal, _, ok := admitted(g, Portal, time.Second)
+	if !ok {
+		t.Fatal("a portal's chat never ran")
+	}
+	if _, reasons, ok := admitted(g, Automation, 20*time.Millisecond); ok || len(reasons) == 0 || reasons[0] != "Waiting for a portal's chat to finish" {
+		t.Fatalf("automation during a portal's chat: %v %v", ok, reasons)
+	}
+	portal.Done()
+	if _, _, ok := admitted(g, Interactive, 20*time.Millisecond); !ok {
+		t.Fatal("chat waited")
+	}
+}

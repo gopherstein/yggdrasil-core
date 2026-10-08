@@ -23,6 +23,13 @@ const (
 	ToolsProfile  = "profile"
 )
 
+// A new portal's limits.
+const (
+	DefaultHourlyLimit = 30
+	DefaultMaxMessage  = 2000
+	DefaultConcurrency = 2
+)
+
 // Access is who may chat in a portal.
 const (
 	// AccessOpen is anyone who can reach this Toskar.
@@ -47,6 +54,13 @@ type Portal struct {
 	// Access is open or passcode.
 	Access      string `json:"access"`
 	HasPasscode bool   `json:"has_passcode"`
+	// HourlyLimit is how many messages each visitor may send an hour;
+	// 0 is no limit.
+	HourlyLimit int `json:"hourly_limit"`
+	// MaxMessage is the longest message, in characters.
+	MaxMessage int `json:"max_message"`
+	// Concurrency is how many of the portal's chats may run at once.
+	Concurrency int `json:"concurrency"`
 	// Branding is how the page looks, as the page reads it.
 	Branding  json.RawMessage `json:"branding"`
 	Enabled   bool            `json:"enabled"`
@@ -68,6 +82,7 @@ var (
 	ErrBadBranding   = errors.New("branding must be a JSON object under 16 KB")
 	ErrBadLanguage   = errors.New("language must be a language tag such as en or pt-BR, or empty to follow the visitor")
 	ErrWrongPasscode = errors.New("that passcode isn't right")
+	ErrBadLimits     = errors.New("limits: 0 to 1000 messages an hour, 100 to 20000 characters a message, and 1 to 20 chats at once")
 )
 
 var (
@@ -84,12 +99,12 @@ type Store struct {
 // NewStore keeps portals in db.
 func NewStore(db *sql.DB) *Store { return &Store{db: db, now: time.Now} }
 
-const columns = `id, slug, name, profile_id, tools, memory, language, access, COALESCE(passcode_hash, ''), branding, enabled, created_at, updated_at`
+const columns = `id, slug, name, profile_id, tools, memory, language, access, COALESCE(passcode_hash, ''), branding, enabled, created_at, updated_at, hourly_limit, max_message, concurrency`
 
 func scan(row interface{ Scan(...any) error }) (Portal, error) {
 	var p Portal
 	var branding, created, updated string
-	if err := row.Scan(&p.ID, &p.Slug, &p.Name, &p.ProfileID, &p.Tools, &p.Memory, &p.Language, &p.Access, &p.passcodeHash, &branding, &p.Enabled, &created, &updated); err != nil {
+	if err := row.Scan(&p.ID, &p.Slug, &p.Name, &p.ProfileID, &p.Tools, &p.Memory, &p.Language, &p.Access, &p.passcodeHash, &branding, &p.Enabled, &created, &updated, &p.HourlyLimit, &p.MaxMessage, &p.Concurrency); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return Portal{}, ErrNotFound
 		}
@@ -142,6 +157,10 @@ type Input struct {
 	Passcode  *string          `json:"passcode,omitempty"`
 	Branding  *json.RawMessage `json:"branding,omitempty"`
 	Enabled   *bool            `json:"enabled,omitempty"`
+	// Limits.
+	HourlyLimit *int `json:"hourly_limit,omitempty"`
+	MaxMessage  *int `json:"max_message,omitempty"`
+	Concurrency *int `json:"concurrency,omitempty"`
 }
 
 // apply checks in and sets it on p.
@@ -218,6 +237,18 @@ func (in Input) apply(p *Portal) error {
 	if in.Enabled != nil {
 		p.Enabled = *in.Enabled
 	}
+	if in.HourlyLimit != nil {
+		p.HourlyLimit = *in.HourlyLimit
+	}
+	if in.MaxMessage != nil {
+		p.MaxMessage = *in.MaxMessage
+	}
+	if in.Concurrency != nil {
+		p.Concurrency = *in.Concurrency
+	}
+	if p.HourlyLimit < 0 || p.HourlyLimit > 1000 || p.MaxMessage < 100 || p.MaxMessage > 20000 || p.Concurrency < 1 || p.Concurrency > 20 {
+		return ErrBadLimits
+	}
 	p.HasPasscode = p.passcodeHash != ""
 	return nil
 }
@@ -225,7 +256,8 @@ func (in Input) apply(p *Portal) error {
 // Create adds a portal; slug and name are required. It starts with no
 // tools, no memory, passcode access, and on.
 func (s *Store) Create(ctx context.Context, in Input) (Portal, error) {
-	p := Portal{ID: uuid.NewString(), Tools: ToolsNone, Access: AccessPasscode, Branding: json.RawMessage(`{}`), Enabled: true}
+	p := Portal{ID: uuid.NewString(), Tools: ToolsNone, Access: AccessPasscode, Branding: json.RawMessage(`{}`), Enabled: true,
+		HourlyLimit: DefaultHourlyLimit, MaxMessage: DefaultMaxMessage, Concurrency: DefaultConcurrency}
 	if in.Slug == nil {
 		return Portal{}, ErrBadSlug
 	}
@@ -236,9 +268,9 @@ func (s *Store) Create(ctx context.Context, in Input) (Portal, error) {
 		return Portal{}, err
 	}
 	now := s.now().UTC().Format(time.RFC3339Nano)
-	_, err := s.db.ExecContext(ctx, `INSERT INTO portals (id, slug, name, profile_id, tools, memory, language, access, passcode_hash, branding, enabled, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		p.ID, p.Slug, p.Name, p.ProfileID, p.Tools, p.Memory, p.Language, p.Access, nullable(p.passcodeHash), string(p.Branding), p.Enabled, now, now)
+	_, err := s.db.ExecContext(ctx, `INSERT INTO portals (id, slug, name, profile_id, tools, memory, language, access, passcode_hash, branding, enabled, created_at, updated_at, hourly_limit, max_message, concurrency)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		p.ID, p.Slug, p.Name, p.ProfileID, p.Tools, p.Memory, p.Language, p.Access, nullable(p.passcodeHash), string(p.Branding), p.Enabled, now, now, p.HourlyLimit, p.MaxMessage, p.Concurrency)
 	if err != nil {
 		if strings.Contains(err.Error(), "UNIQUE") {
 			return Portal{}, ErrSlugTaken
@@ -257,8 +289,8 @@ func (s *Store) Update(ctx context.Context, id string, in Input) (Portal, error)
 	if err := in.apply(&p); err != nil {
 		return Portal{}, err
 	}
-	_, err = s.db.ExecContext(ctx, `UPDATE portals SET slug = ?, name = ?, profile_id = ?, tools = ?, memory = ?, language = ?, access = ?, passcode_hash = ?, branding = ?, enabled = ?, updated_at = ? WHERE id = ?`,
-		p.Slug, p.Name, p.ProfileID, p.Tools, p.Memory, p.Language, p.Access, nullable(p.passcodeHash), string(p.Branding), p.Enabled, s.now().UTC().Format(time.RFC3339Nano), id)
+	_, err = s.db.ExecContext(ctx, `UPDATE portals SET slug = ?, name = ?, profile_id = ?, tools = ?, memory = ?, language = ?, access = ?, passcode_hash = ?, branding = ?, enabled = ?, updated_at = ?, hourly_limit = ?, max_message = ?, concurrency = ? WHERE id = ?`,
+		p.Slug, p.Name, p.ProfileID, p.Tools, p.Memory, p.Language, p.Access, nullable(p.passcodeHash), string(p.Branding), p.Enabled, s.now().UTC().Format(time.RFC3339Nano), p.HourlyLimit, p.MaxMessage, p.Concurrency, id)
 	if err != nil {
 		if strings.Contains(err.Error(), "UNIQUE") {
 			return Portal{}, ErrSlugTaken

@@ -1,5 +1,6 @@
 // Package share decides who gets this computer when several kinds of work
-// want it at once (spec §60). Interactive chat comes first, then scheduled
+// want it at once (spec §60). Interactive chat comes first, then chat
+// portals' visitors (#205), then scheduled
 // automations, then knowledge indexing, then benchmarks, then training. Lower-priority work waits for
 // higher-priority work to finish instead of competing with it for memory.
 package share
@@ -17,6 +18,9 @@ type Class int
 const (
 	// Interactive is a chat or API request someone is waiting on.
 	Interactive Class = iota
+	// Portal is a chat portal visitor's chat (#205), which waits for the
+	// people who run Toskar, but not for scheduled work.
+	Portal
 	// Automation is a scheduled automation run.
 	Automation
 	// Indexing is background embedding of knowledge passages for semantic
@@ -33,6 +37,8 @@ func (c Class) String() string {
 	switch c {
 	case Interactive:
 		return "chat"
+	case Portal:
+		return "portal chat"
 	case Automation:
 		return "automation"
 	case Indexing:
@@ -50,6 +56,8 @@ func (c Class) waitingFor() string {
 	switch c {
 	case Interactive:
 		return "Waiting for your chat to finish"
+	case Portal:
+		return "Waiting for a portal's chat to finish"
 	case Automation:
 		return "Waiting for an automation to finish"
 	case Indexing:

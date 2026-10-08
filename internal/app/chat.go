@@ -317,7 +317,17 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		}()
 		// Chat comes first: automations, benchmarks, and training wait
 		// for it (§60). Chat itself never waits.
-		work, _ := a.enterWork(ctx, share.Interactive, "chat", nil)
+		class := share.Interactive
+		if opts != nil && opts.Portal != "" {
+			// A portal's visitor waits for the people who run Toskar (#205).
+			class = share.Portal
+		}
+		work, err := a.enterWork(ctx, class, "chat", nil)
+		if err != nil {
+			// The visitor left while waiting.
+			runErr = err
+			return
+		}
 		defer work.Done()
 		env := &chatExecEnv{
 			app:            a,

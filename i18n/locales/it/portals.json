@@ -39,7 +39,8 @@
     "save": "Salva",
     "saved": "Salvato",
     "preview": "Anteprima",
-    "open": "Modifica"
+    "open": "Modifica",
+    "limits": "Limiti"
   },
   "tools": {
     "none": "Nessuno strumento",
@@ -72,5 +73,11 @@
     "title": "Portali",
     "none": "Ancora nessun portale.",
     "private": "Le chat di ogni visitatore sono sue e non arrivano mai ai tuoi ricordi o alla tua conoscenza. Disattivare un portale lo ferma subito."
+  },
+  "limit": {
+    "hourly": "Messaggi per visitatore all'ora",
+    "longest": "Messaggio più lungo (caratteri)",
+    "most": "Chat contemporanee",
+    "hint": "0 messaggi significa nessun limite. Le chat del portale aspettano le tue e quelle delle altre persone che usano Toskar, e vengono prima delle automazioni."
   }
 }

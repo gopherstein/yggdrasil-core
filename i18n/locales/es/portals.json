@@ -39,7 +39,8 @@
     "save": "Guardar",
     "saved": "Guardado",
     "preview": "Vista previa",
-    "open": "Editar"
+    "open": "Editar",
+    "limits": "Límites"
   },
   "tools": {
     "none": "Sin herramientas",
@@ -72,5 +73,11 @@
     "title": "Portales",
     "none": "Todavía no hay portales.",
     "private": "Los chats de cada visitante son suyos y nunca llegan a tus recuerdos ni a tu conocimiento. Desactivar un portal lo detiene al instante."
+  },
+  "limit": {
+    "hourly": "Mensajes por visitante y hora",
+    "longest": "Mensaje más largo (caracteres)",
+    "most": "Chats a la vez",
+    "hint": "0 mensajes significa sin límite. Los chats del portal esperan a los tuyos y a los de otras personas que usan Toskar, y van antes que las automatizaciones."
   }
 }

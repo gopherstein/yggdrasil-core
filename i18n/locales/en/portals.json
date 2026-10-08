@@ -39,7 +39,8 @@
     "save": "Save",
     "saved": "Saved",
     "preview": "Preview",
-    "open": "Edit"
+    "open": "Edit",
+    "limits": "Limits"
   },
   "tools": {
     "none": "No tools",
@@ -72,5 +73,11 @@
     "title": "Portals",
     "none": "No portals yet.",
     "private": "Each visitor's chats are their own and never reach your memory or knowledge. Turning a portal off stops it at once."
+  },
+  "limit": {
+    "hourly": "Messages per visitor an hour",
+    "longest": "Longest message (characters)",
+    "most": "Chats at once",
+    "hint": "0 messages means no limit. Portal chats wait for your own and for other people's who use Toskar, and come before automations."
   }
 }
