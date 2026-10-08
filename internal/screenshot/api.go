@@ -49,6 +49,8 @@ func screenshotGET(path string) (string, bool) {
 	switch {
 	case path == "/api/v1/health":
 		return `{"status":"ok","product":"Yggdrasil","version":"0.1.0","acceleration":"gpu"}`, true
+	case path == "/api/v1/me":
+		return `{"person":{"id":"owner","name":"Owner","role":"owner","created_at":"2026-09-24T00:00:00Z","sign_in":false},"via":"this_computer"}`, true
 	case path == "/api/v1/version":
 		return `{"version":"0.1.0","commit":"screenshot","build_date":"2026-09-24T00:00:00Z","product":"Yggdrasil"}`, true
 	case path == "/api/v1/hardware":
