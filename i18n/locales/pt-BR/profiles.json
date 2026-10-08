@@ -277,7 +277,8 @@
       "models": "Modelos",
       "tools": "Ferramentas",
       "knowledge": "Conhecimento e memória",
-      "behavior": "Estratégia e computadores"
+      "behavior": "Estratégia e computadores",
+      "topics": "Temas"
     },
     "namePlaceholder": "ex.: Programação",
     "models": "Modelos",
@@ -374,5 +375,19 @@
       "label": "Orçamento de contexto",
       "help": "Parte máxima da janela que as mensagens anteriores podem usar (0,1–0,9)."
     }
+  },
+  "topics": {
+    "intro": "Mantenha este assistente no assunto que as pessoas vieram buscar. Estas regras vêm primeiro em cada conversa, e nada que as pessoas digitem, configurem ou colem pode mudá-las.",
+    "staysOn": "Fica em",
+    "staysOnExample": "Pneus, rodas, alinhamento e a borracharia da Dana: horários, preços, agendamentos",
+    "staysOnHint": "Para que serve o assistente, em palavras simples. Deixe vazio para não usar controles de tema.",
+    "examples": "Perguntas de exemplo",
+    "perLine": "Uma por linha.",
+    "never": "Nunca fala sobre",
+    "neverHint": "Assuntos sempre proibidos, mesmo quando parecem relacionados. Um por linha.",
+    "reply": "Quando perguntam outra coisa",
+    "replyDefault": "Só posso ajudar com {{topic}}. Em que posso ajudar?",
+    "replyHint": "A resposta exata a qualquer outro assunto. Deixe vazio, e o assistente diz em uma frase com o que pode ajudar, no idioma da pessoa.",
+    "note": "Cumprimentos, agradecimentos e “o que você faz?” sempre podem. Estas regras guiam o modelo; nenhum assistente pode prometer nunca se desviar."
   }
 }

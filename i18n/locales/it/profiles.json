@@ -277,7 +277,8 @@
       "models": "Modelli",
       "tools": "Strumenti",
       "knowledge": "Conoscenza e memoria",
-      "behavior": "Strategia e computer"
+      "behavior": "Strategia e computer",
+      "topics": "Argomenti"
     },
     "namePlaceholder": "es. Programmazione",
     "models": "Modelli",
@@ -374,5 +375,19 @@
       "label": "Budget di contesto",
       "help": "Quota massima della finestra che i messaggi precedenti possono usare (0.1–0.9)."
     }
+  },
+  "topics": {
+    "intro": "Mantieni questo assistente sull'argomento per cui le persone vengono. Queste regole vengono prima in ogni chat, e niente di ciò che si scrive, imposta o incolla può cambiarle.",
+    "staysOn": "Resta su",
+    "staysOnExample": "Pneumatici, cerchi, convergenza e il gommista di Dana: orari, prezzi, appuntamenti",
+    "staysOnHint": "A cosa serve l'assistente, in parole semplici. Lascia vuoto per nessun controllo degli argomenti.",
+    "examples": "Domande di esempio",
+    "perLine": "Una per riga.",
+    "never": "Non parla mai di",
+    "neverHint": "Argomenti sempre vietati, anche se sembrano collegati. Uno per riga.",
+    "reply": "Quando gli chiedono altro",
+    "replyDefault": "Posso aiutare solo con {{topic}}. Come posso aiutarti?",
+    "replyHint": "La risposta esatta a qualsiasi altro argomento. Lascia vuoto e l'assistente dice in una frase con cosa può aiutare, nella lingua della persona.",
+    "note": "Saluti, ringraziamenti e «cosa sai fare?» vanno sempre bene. Queste regole guidano il modello; nessun assistente può promettere di non divagare mai."
   }
 }

@@ -339,6 +339,18 @@ export interface AIProfile {
   knowledge_sources?: string[]
   /** How this profile works through a request (spec §40). Empty keeps defaults. */
   orchestration?: OrchestrationPolicy
+  /** Topic controls that keep the assistant on its subject (#345). */
+  topics?: TopicPolicy
+}
+
+/** A profile's topic controls (#345). */
+export interface TopicPolicy {
+  stays_on: string
+  examples?: string[]
+  never_discuss?: string[]
+  /** The reply to anything else; empty is Toskar's, in the person's language. */
+  off_topic_reply?: string
+  strictness?: '' | 'guide' | 'enforce'
 }
 
 export interface OrchestrationPolicy {

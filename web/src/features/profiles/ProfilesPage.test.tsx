@@ -73,4 +73,15 @@ describe('ProfilesPage editor', () => {
     const saved = vi.mocked(api.updateProfile).mock.calls[0][1]
     expect((saved.tools ?? []).filter((t) => t.policy !== 'deny')).toEqual([])
   })
+
+  it('saves topic controls from the Topics tab (#345)', async () => {
+    renderPage()
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Topics' }))
+    fireEvent.change(screen.getByLabelText(/^Stays on/), { target: { value: 'Tires and bookings' } })
+    fireEvent.change(screen.getByLabelText(/^Never discusses/), { target: { value: 'politics' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save profile' }))
+    await waitFor(() => expect(api.updateProfile).toHaveBeenCalled())
+    expect(vi.mocked(api.updateProfile).mock.calls[0][1].topics).toEqual({ stays_on: 'Tires and bookings', never_discuss: ['politics'] })
+  })
 })

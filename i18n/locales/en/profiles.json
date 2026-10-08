@@ -276,7 +276,8 @@
       "models": "Models",
       "tools": "Tools",
       "knowledge": "Knowledge and memory",
-      "behavior": "Strategy and computers"
+      "behavior": "Strategy and computers",
+      "topics": "Topics"
     },
     "namePlaceholder": "e.g. Programming",
     "models": "Models",
@@ -372,5 +373,19 @@
       "label": "Context budget",
       "help": "Most of the window earlier messages may use (0.1–0.9)."
     }
+  },
+  "topics": {
+    "intro": "Keep this assistant on the subject its people came for. These rules come first in every chat, and nothing people type, set, or paste can change them.",
+    "staysOn": "Stays on",
+    "staysOnExample": "Tires, wheels, alignment, and Dana's Tire Shop: hours, prices, bookings",
+    "staysOnHint": "What the assistant is for, in plain words. Leave empty for no topic controls.",
+    "examples": "Example questions",
+    "perLine": "One per line.",
+    "never": "Never discusses",
+    "neverHint": "Subjects always off limits, even when they look related. One per line.",
+    "reply": "When asked something else",
+    "replyDefault": "I can only help with {{topic}}. What can I help you with?",
+    "replyHint": "The exact reply to anything off topic. Leave empty, and the assistant says in a sentence what it can help with, in the person's language.",
+    "note": "Greetings, thanks, and \"what can you do?\" are always fine. These rules guide the model; no assistant can promise it never strays."
   }
 }
