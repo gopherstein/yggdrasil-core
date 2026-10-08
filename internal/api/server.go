@@ -1043,14 +1043,16 @@ func (s *Server) handleSSE(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusInternalServerError, "SSE_UNSUPPORTED", "Streaming is not supported.", nil)
 		return
 	}
+	// Subscribed before the answer starts, so nothing after it is missed.
+	id, ch := s.deps.Bus.Subscribe()
+	defer s.deps.Bus.Unsubscribe(id)
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 	w.WriteHeader(http.StatusOK)
 	flusher.Flush()
-
-	id, ch := s.deps.Bus.Subscribe()
-	defer s.deps.Bus.Unsubscribe(id)
+	// Each person hears about their own chats, tasks, and the rest (#206).
+	person := auth.PersonID(r.Context())
 
 	ticker := time.NewTicker(15 * time.Second)
 	defer ticker.Stop()
@@ -1062,6 +1064,9 @@ func (s *Server) handleSSE(w http.ResponseWriter, r *http.Request) {
 		case evt, ok := <-ch:
 			if !ok {
 				return
+			}
+			if !evt.VisibleTo(person, auth.OwnerID) {
+				continue
 			}
 			data, _ := json.Marshal(evt)
 			fmt.Fprintf(w, "event: %s\ndata: %s\n\n", evt.Type, data)

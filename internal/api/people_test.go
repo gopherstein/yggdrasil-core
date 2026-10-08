@@ -1,15 +1,18 @@
 package api
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/config"
+	"github.com/yeixio/toskar-core/internal/events"
 	"github.com/yeixio/toskar-core/internal/store"
 )
 
@@ -74,5 +77,78 @@ func TestRequestsCarryTheirPerson(t *testing.T) {
 	}
 	if code, _ := me(keyed("ygg_samkey0000")); code != http.StatusUnauthorized {
 		t.Fatalf("disabled person's key: %d", code)
+	}
+}
+
+// The live events say only the listener's own chats and tasks, with the
+// computers' and models' events everyone sees (#206).
+func TestEventsReachOnlyTheirPerson(t *testing.T) {
+	dir := t.TempDir()
+	db, err := store.Open(filepath.Join(dir, "t.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+	if _, err := db.SQL.Exec(`INSERT INTO people (id, name, role) VALUES ('sam', 'Sam', 'member')`); err != nil {
+		t.Fatal(err)
+	}
+	mgr, err := config.NewManager(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := mgr.Update(func(c *config.Config) { c.APIHost = "0.0.0.0" }); err != nil {
+		t.Fatal(err)
+	}
+	bus := events.NewBus(16)
+	srv := NewServer(Dependencies{
+		Config: mgr,
+		Bus:    bus,
+		People: auth.NewPeople(db.SQL),
+		VerifyAPIKey: func(_ context.Context, secret string) (auth.APIKeyRecord, error) {
+			if secret == "ygg_samkey0000" {
+				return auth.APIKeyRecord{ID: "k2", PersonID: "sam"}, nil
+			}
+			return auth.APIKeyRecord{}, auth.ErrNoPerson
+		},
+	})
+	ts := httptest.NewServer(srv.Handler())
+	t.Cleanup(ts.Close)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, ts.URL+"/api/v1/events", nil)
+	req.Header.Set("Authorization", "Bearer ygg_samkey0000")
+	req.Header.Set("X-Forwarded-For", "192.168.1.20") // from another device
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("events: %d", resp.StatusCode)
+	}
+
+	bus.Publish(events.New(events.ChatToken, map[string]any{"content": "the owner's secret"}).For(auth.OwnerID))
+	bus.Publish(events.New(events.ToolRequested, map[string]any{"tool_id": "untagged"}))
+	bus.Publish(events.New(events.ModelLoadCompleted, map[string]any{"model_id": "llama"}))
+	bus.Publish(events.New(events.ChatToken, map[string]any{"content": "sam's words"}).For("sam"))
+	bus.Publish(events.New(events.ChatComplete, map[string]any{"end": true}).For("sam"))
+
+	var got []string
+	scanner := bufio.NewScanner(resp.Body)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "data: ") {
+			got = append(got, line)
+			if strings.Contains(line, `"end":true`) {
+				break
+			}
+		}
+	}
+	all := strings.Join(got, "\n")
+	if len(got) != 3 || !strings.Contains(all, "llama") || !strings.Contains(all, "sam's words") {
+		t.Fatalf("sam heard:\n%s", all)
+	}
+	if strings.Contains(all, "secret") || strings.Contains(all, "untagged") {
+		t.Fatalf("sam heard someone else's:\n%s", all)
 	}
 }

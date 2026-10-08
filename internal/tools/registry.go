@@ -199,7 +199,7 @@ func (r *Registry) Execute(ctx context.Context, toolID string, args map[string]a
 		var argErr error
 		if args, argErr = CheckArgs(def, args); argErr != nil {
 			r.record(Activity{ToolID: toolID, Status: "malformed", Summary: activitySummary(args), Error: argErr.Error(), At: time.Now()})
-			r.bus.Publish(events.New(events.ToolFailed, mergeMeta(meta, map[string]any{
+			r.bus.PublishFor(ctx, events.New(events.ToolFailed, mergeMeta(meta, map[string]any{
 				"tool_id": toolID, "error": argErr.Error(), "malformed": true, "kind": ErrKindInvalid,
 			})))
 			r.audit(ctx, toolID, RunRefused, "", activitySummary(args), time.Time{}, argErr, meta)
@@ -208,7 +208,7 @@ func (r *Registry) Execute(ctx context.Context, toolID string, args map[string]a
 	}
 	if err := implausibleCall(toolID, args); err != nil {
 		r.record(Activity{ToolID: toolID, Status: "malformed", Summary: activitySummary(args), Error: err.Error(), At: time.Now()})
-		r.bus.Publish(events.New(events.ToolFailed, mergeMeta(meta, map[string]any{
+		r.bus.PublishFor(ctx, events.New(events.ToolFailed, mergeMeta(meta, map[string]any{
 			"tool_id": toolID, "error": err.Error(), "malformed": true,
 		})))
 		r.audit(ctx, toolID, RunRefused, "", activitySummary(args), time.Time{}, err, meta)
@@ -252,7 +252,7 @@ func (r *Registry) Execute(ctx context.Context, toolID string, args map[string]a
 		// nothing leaves this computer.
 		if result, ok := cache.Lookup(toolID, args); ok {
 			r.record(Activity{ToolID: toolID, Status: "cached", Summary: summary, At: started})
-			r.bus.Publish(events.New(events.ToolCompleted, mergeMeta(meta, map[string]any{
+			r.bus.PublishFor(ctx, events.New(events.ToolCompleted, mergeMeta(meta, map[string]any{
 				"tool_id": toolID, "duration_ms": int64(0), "summary": summary, "cached": true,
 			})))
 			runlog.From(ctx).CacheHit(toolID)
@@ -261,7 +261,7 @@ func (r *Registry) Execute(ctx context.Context, toolID string, args map[string]a
 		}
 	}
 	r.record(Activity{ToolID: toolID, Status: "started", Summary: summary, At: started})
-	r.bus.Publish(events.New(events.ToolStarted, mergeMeta(meta, map[string]any{"tool_id": toolID, "summary": summary})))
+	r.bus.PublishFor(ctx, events.New(events.ToolStarted, mergeMeta(meta, map[string]any{"tool_id": toolID, "summary": summary})))
 	// Every call has a time limit; cancelling the turn stops it sooner.
 	callCtx, cancel := context.WithTimeout(ctx, Timeout(toolID))
 	r.mu.Lock()
@@ -275,7 +275,7 @@ func (r *Registry) Execute(ctx context.Context, toolID string, args map[string]a
 	elapsed := time.Since(started).Milliseconds()
 	if err != nil {
 		r.record(Activity{ToolID: toolID, Status: "failed", Summary: summary, DurationMS: elapsed, Error: err.Error(), At: time.Now()})
-		r.bus.Publish(events.New(events.ToolFailed, mergeMeta(meta, map[string]any{
+		r.bus.PublishFor(ctx, events.New(events.ToolFailed, mergeMeta(meta, map[string]any{
 			"tool_id": toolID, "error": err.Error(), "kind": ErrorKind(err), "duration_ms": elapsed, "summary": summary,
 		})))
 		r.audit(ctx, toolID, RunFailed, approval, summary, started, err, meta)
@@ -285,7 +285,7 @@ func (r *Registry) Execute(ctx context.Context, toolID string, args map[string]a
 		cache.Store(toolID, args, result)
 	}
 	r.record(Activity{ToolID: toolID, Status: "completed", Summary: summary, DurationMS: elapsed, At: time.Now()})
-	r.bus.Publish(events.New(events.ToolCompleted, mergeMeta(meta, map[string]any{
+	r.bus.PublishFor(ctx, events.New(events.ToolCompleted, mergeMeta(meta, map[string]any{
 		"tool_id": toolID, "duration_ms": elapsed, "summary": summary,
 	})))
 	r.audit(ctx, toolID, RunCompleted, approval, summary, started, nil, meta)
@@ -380,7 +380,7 @@ func (r *Registry) requestApproval(ctx context.Context, toolID string, args map[
 		"args":       sanitizeArgs(args),
 		"reason":     reason,
 	})
-	r.bus.Publish(events.New(events.ToolRequested, payload))
+	r.bus.PublishFor(ctx, events.New(events.ToolRequested, payload))
 
 	select {
 	case <-ctx.Done():

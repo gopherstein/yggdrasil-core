@@ -1,10 +1,13 @@
 package events
 
 import (
+	"context"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
@@ -18,6 +21,45 @@ type Event struct {
 	Payload   map[string]any `json:"payload,omitempty"`
 	// Contract is the client contract the event is written in (§68).
 	Contract string `json:"contract"`
+	// Person is whose chat, task, tool call, memory, automation, or
+	// notification this is (#206); only they see it. It isn't sent.
+	Person string `json:"-"`
+}
+
+// For is the event as person's.
+func (e Event) For(person string) Event {
+	e.Person = person
+	return e
+}
+
+// personalTypes are the kinds of event that belong to someone: what they
+// asked, what was said, and what was done for them.
+var personalTypes = []string{
+	"chat.", "task.", "tool.", "agent.", "plan.", "orchestration.",
+	"memory.", "automation.", "notification.", "artifact.",
+}
+
+// Personal reports whether events of this type belong to someone.
+func Personal(eventType string) bool {
+	for _, prefix := range personalTypes {
+		if strings.HasPrefix(eventType, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+// VisibleTo reports whether person may see the event: anything about the
+// computers and models, and their own. A personal event nobody was named
+// for goes to the Owner, whose everything was before people (#206).
+func (e Event) VisibleTo(person, owner string) bool {
+	if !Personal(e.Type) {
+		return true
+	}
+	if e.Person == "" {
+		return person == owner
+	}
+	return e.Person == person
 }
 
 // Common event type constants.
@@ -141,6 +183,18 @@ func (b *Bus) Publish(evt Event) {
 			// Drop if subscriber is slow to avoid blocking the bus.
 		}
 	}
+}
+
+// PublishFor sends an event as the person ctx is acting for, so only they
+// hear about their own chats, tasks, and tool calls (#206).
+func (b *Bus) PublishFor(ctx context.Context, evt Event) {
+	if b == nil {
+		return
+	}
+	if ctx != nil {
+		evt.Person = auth.PersonID(ctx)
+	}
+	b.Publish(evt)
 }
 
 // New creates an Event with the given type and optional payload.

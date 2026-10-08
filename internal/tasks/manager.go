@@ -95,7 +95,7 @@ func (m *Manager) Create(ctx context.Context, profileID, conversationID, prompt 
 	if err != nil {
 		return task, err
 	}
-	m.bus.Publish(events.New(events.TaskCreated, map[string]any{"task_id": task.ID}))
+	m.bus.PublishFor(ctx, events.New(events.TaskCreated, map[string]any{"task_id": task.ID}))
 	return task, nil
 }
 
@@ -193,7 +193,7 @@ func (m *Manager) Run(ctx context.Context, taskID string) error {
 	}
 
 	_, _ = m.db.ExecContext(ctx, `UPDATE tasks SET status = ? WHERE id = ?`, contracts.TaskRunning, taskID)
-	m.bus.Publish(events.New(events.TaskStarted, map[string]any{"task_id": taskID}))
+	m.bus.PublishFor(ctx, events.New(events.TaskStarted, map[string]any{"task_id": taskID}))
 
 	go m.runTask(context.Background(), task, profile, orch)
 	return nil
@@ -218,14 +218,14 @@ func (m *Manager) runTask(ctx context.Context, task contracts.Task, profile prof
 	now := time.Now().UTC()
 	_, _ = m.db.ExecContext(ctx, `UPDATE tasks SET status = ?, result = ?, completed_at = ? WHERE id = ?`,
 		contracts.TaskCompleted, result.String(), now.Format(time.RFC3339Nano), task.ID)
-	m.bus.Publish(events.New(events.TaskCompleted, map[string]any{"task_id": task.ID, "result": result.String()}))
+	m.bus.PublishFor(ctx, events.New(events.TaskCompleted, map[string]any{"task_id": task.ID, "result": result.String()}))
 }
 
 func (m *Manager) failTask(ctx context.Context, taskID string, err error) {
 	now := time.Now().UTC()
 	_, _ = m.db.ExecContext(ctx, `UPDATE tasks SET status = ?, error = ?, completed_at = ? WHERE id = ?`,
 		contracts.TaskFailed, err.Error(), now.Format(time.RFC3339Nano), taskID)
-	m.bus.Publish(events.New(events.TaskFailed, map[string]any{"task_id": taskID, "error": err.Error()}))
+	m.bus.PublishFor(ctx, events.New(events.TaskFailed, map[string]any{"task_id": taskID, "error": err.Error()}))
 }
 
 func (m *Manager) recordStep(ctx context.Context, taskID string, idx int, evt pluginapi.OrchestrationEvent) {
@@ -270,7 +270,7 @@ func (e *execEnv) ExecuteTool(ctx context.Context, toolID string, args map[strin
 }
 
 func (e *execEnv) Emit(eventType string, payload map[string]any) {
-	e.m.bus.Publish(events.New(eventType, payload))
+	e.m.bus.PublishFor(e.ctx, events.New(eventType, payload))
 }
 
 func (e *execEnv) NodeForRole(role string) (string, error) {

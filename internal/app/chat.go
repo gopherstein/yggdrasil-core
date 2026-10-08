@@ -222,7 +222,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			"model_name":      routedName,
 			"reason":          routeReason,
 		}
-		a.Bus.Publish(events.New(events.ChatModelRouted, routed))
+		a.publish(ctx, events.New(events.ChatModelRouted, routed))
 		if opts != nil && opts.Progress != nil {
 			opts.Progress(events.ChatModelRouted, routed)
 		}
@@ -428,7 +428,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 							env.trace.recovered(step, notice)
 							profile = a.withModelTools(applyExecutionPolicy(withChatModel(profile, next.ID), execution), next.ID)
 							env.switchModel(profile, next.ID)
-							a.Bus.Publish(events.New(events.ChatModelRouted, map[string]any{
+							a.publish(ctx, events.New(events.ChatModelRouted, map[string]any{
 								"conversation_id": conversationID,
 								"model_id":        next.ID,
 								"model_name":      huginn.Name(next),
@@ -495,7 +495,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 					}
 					full += visible
 					ch <- pluginapi.ChatChunk{Content: visible}
-					a.Bus.Publish(events.New(events.ChatToken, map[string]any{
+					a.publish(ctx, events.New(events.ChatToken, map[string]any{
 						"conversation_id": conversationID,
 						"content":         visible,
 					}))
@@ -573,13 +573,13 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		// Summarize with the model that answered, only when it ran here, so a
 		// turn placed on a paired computer never loads a model on this one.
 		if conversationID != "" && full != "" && env.ranLocally() {
-			a.summarizeLater(conversationID, env.modelID(), env.ContextLimit())
+			a.summarizeLater(ctx, conversationID, env.modelID(), env.ContextLimit())
 		}
 		if len(roleSteps) > 0 {
 			payload["role_steps"] = roleSteps
 			payload["cross_machine"] = distinctNodeCount(roleSteps) > 1
 		}
-		a.Bus.Publish(events.New(events.ChatComplete, payload))
+		a.publish(ctx, events.New(events.ChatComplete, payload))
 	}()
 	return ch, nil
 }
@@ -1266,7 +1266,7 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 			}
 		}
 	}
-	e.app.Bus.Publish(events.New(eventType, payload))
+	e.app.publish(e.ctx, events.New(eventType, payload))
 }
 
 func (e *chatExecEnv) NodeForRole(role string) (string, error) {
@@ -1536,7 +1536,7 @@ func (a *App) keepStopped(ctx context.Context, env *chatExecEnv, conversationID,
 			_, _ = a.Conversations.AddMessageWithMeta(ctx, conversationID, "assistant", content, env.trace.meta())
 		}
 	}
-	a.Bus.Publish(events.New(events.ChatStopped, map[string]any{
+	a.publish(ctx, events.New(events.ChatStopped, map[string]any{
 		"conversation_id": conversationID,
 		"kept":            kept,
 	}))

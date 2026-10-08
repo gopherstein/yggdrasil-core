@@ -293,7 +293,7 @@ func (h *Handler) writeStream(sw *streamWriter, r *http.Request, stream <-chan p
 			"choices": []any{map[string]any{"index": 0, "delta": map[string]any{"content": chunk.Content}, "finish_reason": finishReason(chunk.Done)}},
 		})
 		if h.Bus != nil && chunk.Content != "" {
-			h.Bus.Publish(events.New(events.ChatToken, map[string]any{"content": chunk.Content}))
+			h.Bus.PublishFor(r.Context(), events.New(events.ChatToken, map[string]any{"content": chunk.Content}))
 		}
 	}
 	if ext := extension(); progress && ext != nil {
@@ -304,7 +304,7 @@ func (h *Handler) writeStream(sw *streamWriter, r *http.Request, stream <-chan p
 	}
 	sw.done()
 	if h.Bus != nil {
-		h.Bus.Publish(events.New(events.ChatComplete, map[string]any{}))
+		h.Bus.PublishFor(r.Context(), events.New(events.ChatComplete, map[string]any{}))
 	}
 	_ = r.Context().Err()
 }
