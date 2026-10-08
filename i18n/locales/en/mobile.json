@@ -46,6 +46,7 @@
     "connect": "Connect",
     "connecting": "Connecting",
     "notReady": "Toskar answered, but it is not ready.",
+    "certificateMismatch": "The computer's certificate didn't match the one it reported, so the connection was stopped. Try again on your own network.",
     "pairUnsupported": "That computer's Toskar is too old to connect with a code. Update it, or use an API key.",
     "lede": "The phone uses the computer that already runs your models."
   },
@@ -170,6 +171,9 @@
     "onDevice": "On this device, after you install a model",
     "computer": "Computer",
     "connectedComputer": "Connected computer",
+    "encrypted": "Encrypted · certificate {{code}}",
+    "notEncrypted": "Not encrypted. Updating Toskar on the computer encrypts chats with it.",
+    "certificateChanged": "This computer's certificate changed, so the phone won't connect to it. If Toskar was reinstalled there, forget it below and connect again.",
     "notConnected": "Not connected",
     "coreVersion": "Toskar on that computer",
     "updateCore": "Update Toskar on that computer to 1.4 or later to see answer sources, what the assistant did, live progress, and effort.",

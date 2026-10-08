@@ -745,6 +745,8 @@ export interface DevicePairing {
   address?: string
   /** False while the API answers only on this computer. */
   reachable: boolean
+  /** The start of the API certificate's fingerprint, which the phone shows once it connects (#213). */
+  tls_short?: string
 }
 
 export interface APIKeyPermissions {

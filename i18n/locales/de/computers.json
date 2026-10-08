@@ -205,6 +205,7 @@
     },
     "address": "Oder gib diese Adresse auf dem Gerät ein:",
     "unreachable": "Der Zugriff aus dem lokalen Netzwerk ist noch aus, daher erreicht das Gerät diesen Computer noch nicht.",
+    "encrypted": "Chats mit dem Telefon sind verschlüsselt. Sobald es verbunden ist, zeigt es in den Einstellungen {{code}}; zeigt es einen anderen Code, trenne es.",
     "newCode": "Neuen Code anzeigen",
     "http": "Über einfaches HTTP könnten andere in diesem Netzwerk den Code und den Schlüssel des Geräts sehen.",
     "cancelled": "Der Code wurde nach zu vielen falschen Versuchen ungültig.",

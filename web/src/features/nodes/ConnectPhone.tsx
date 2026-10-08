@@ -137,6 +137,10 @@ export function ConnectPhone({ onClose }: { onClose: () => void }) {
             </p>
           ) : null}
           {shown.reachable === false ? <p className="text-xs text-warning">{t('phone.unreachable')}</p> : null}
+          {/* The phone saves this certificate and shows its code (#213). */}
+          {shown.reachable !== false && shown.tls_short ? (
+            <p className="text-xs text-ink-muted">{t('phone.encrypted', { code: shown.tls_short })}</p>
+          ) : null}
           <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
             <p className="text-ink-muted" aria-live="polite">
               {t('join.expiresIn', { time: clock(left) })}

@@ -210,6 +210,7 @@
     },
     "address": "O escribe esta dirección en el dispositivo:",
     "unreachable": "El acceso desde la red local sigue desactivado, así que el dispositivo aún no puede llegar a esta computadora.",
+    "encrypted": "Los chats con el teléfono están cifrados. Cuando se conecte, mostrará {{code}} en Ajustes; si muestra otro código, desconéctalo.",
     "newCode": "Mostrar un código nuevo",
     "http": "Por HTTP sin cifrar, otros en esta red podrían ver el código y la clave del dispositivo.",
     "cancelled": "El código se canceló tras demasiados intentos fallidos.",

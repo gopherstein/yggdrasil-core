@@ -210,6 +210,7 @@
     },
     "address": "Ou saisissez cette adresse sur l'appareil :",
     "unreachable": "L'accès depuis le réseau local est encore désactivé : l'appareil ne peut pas encore joindre cet ordinateur.",
+    "encrypted": "Les discussions avec le téléphone sont chiffrées. Une fois connecté, il affiche {{code}} dans Réglages ; s’il affiche un autre code, déconnectez-le.",
     "newCode": "Afficher un nouveau code",
     "http": "En HTTP simple, d'autres personnes sur ce réseau pourraient voir le code et la clé de l'appareil.",
     "cancelled": "Le code a été annulé après trop d'essais erronés.",
