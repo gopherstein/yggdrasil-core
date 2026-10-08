@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -166,9 +167,12 @@ type Server struct {
 	// connections, so turning network access off can close other devices'.
 	listenMu sync.Mutex
 	listen   net.Listener
-	replaced map[net.Listener]bool
-	conns    map[net.Conn]bool
-	closed   chan struct{}
+	// tlsConfig and tlsInfo are the API's HTTPS (#213).
+	tlsConfig *tls.Config
+	tlsInfo   APITLS
+	replaced  map[net.Listener]bool
+	conns     map[net.Conn]bool
+	closed    chan struct{}
 
 	knowledge       KnowledgeService
 	memory          *muninn.Store
@@ -305,6 +309,7 @@ func (s *Server) routes() {
 	s.memoryRoutes(api)
 	s.artifactRoutes(api)
 	s.deviceRoutes(api)
+	api.HandleFunc("/tls", s.handleTLS).Methods(http.MethodGet)
 	s.notificationRoutes(api)
 	s.connectorRoutes(api)
 	s.mcpRoutes(api)
@@ -358,9 +363,10 @@ func (s *Server) ListenAndServe(addr string) error {
 		s.listenMu.Unlock()
 		return err
 	}
+	ln = s.withTLS(ln)
 	s.listen = ln
 	s.listenMu.Unlock()
-	s.deps.Logger.Info("api listening", "addr", ln.Addr().String())
+	s.deps.Logger.Info("api listening", "addr", ln.Addr().String(), "https", s.tlsConfig != nil)
 	return s.serve(ln)
 }
 
@@ -404,10 +410,12 @@ func (s *Server) Rebind(addr string) error {
 		if backErr != nil {
 			return fmt.Errorf("listen on %s: %w; and %s again: %v", addr, err, oldAddr, backErr)
 		}
+		back = s.withTLS(back)
 		s.listen = back
 		go func() { _ = s.serve(back) }()
 		return fmt.Errorf("listen on %s: %w", addr, err)
 	}
+	ln = s.withTLS(ln)
 	s.listen = ln
 	go func() { _ = s.serve(ln) }()
 	if loopbackAddr(addr) {

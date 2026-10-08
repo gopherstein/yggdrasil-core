@@ -10,17 +10,22 @@ import (
 
 // Config holds daemon runtime configuration.
 type Config struct {
-	DataDir          string `json:"data_dir"`
-	DBPath           string `json:"db_path"`
-	ModelsDir        string `json:"models_dir"`
-	RuntimesDir      string `json:"runtimes_dir"`
-	LogsDir          string `json:"logs_dir"`
-	WebUIDir         string `json:"web_ui_dir"`
-	APIHost          string `json:"api_host"`
-	APIPort          int    `json:"api_port"`
-	InternalHost     string `json:"internal_host"`
-	InternalPort     int    `json:"internal_port"`
-	LANAPIEnabled    bool   `json:"lan_api_enabled"`
+	DataDir       string `json:"data_dir"`
+	DBPath        string `json:"db_path"`
+	ModelsDir     string `json:"models_dir"`
+	RuntimesDir   string `json:"runtimes_dir"`
+	LogsDir       string `json:"logs_dir"`
+	WebUIDir      string `json:"web_ui_dir"`
+	APIHost       string `json:"api_host"`
+	APIPort       int    `json:"api_port"`
+	InternalHost  string `json:"internal_host"`
+	InternalPort  int    `json:"internal_port"`
+	LANAPIEnabled bool   `json:"lan_api_enabled"`
+	// APITLSCert and APITLSKey are the person's own certificate and key, in
+	// PEM files, for HTTPS on the API (#213). Empty uses the certificate
+	// Toskar makes.
+	APITLSCert       string `json:"api_tls_cert,omitempty"`
+	APITLSKey        string `json:"api_tls_key,omitempty"`
 	WebUIEnabled     bool   `json:"web_ui_enabled"`
 	DiscoveryEnabled bool   `json:"discovery_enabled"`
 	NodeName         string `json:"node_name"`

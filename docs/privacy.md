@@ -37,7 +37,7 @@ Toskar does not encrypt its own files, and encryption is not required to use it.
 - **At rest:** the database, `artifacts/`, `knowledge/`, and the other files above are plain files on disk. `secrets/` is readable only by your user account (`0700`/`0600`), and API keys are bcrypt hashes. Turn on full-disk encryption to keep everything encrypted while the computer is off or locked: FileVault on macOS, BitLocker or Device Encryption on Windows, and LUKS on Linux.
 - **To the internet:** web search, page reads, model and runtime downloads, community ratings, and the built-in services use HTTPS. Addresses you enter, such as an external server, a webhook, an MCP server, or your own map services, are encrypted when they use `https://`. Email requires TLS or STARTTLS except for a mail server on this computer.
 - **Between your computers:** Bifrost (port 7332) uses TLS, checked against the key each computer paired with, so a chat placed on a paired computer, its answer, tool jobs, and training runs are encrypted. A paired computer running an older Toskar is still reached over plain HTTP, and the Computers page marks it **Not encrypted** until it's updated. See [encryption between computers](clustering.md#encryption).
-- **Local network access:** the API on port 7331 is plain HTTP with a bearer key. See [API exposure](#api-exposure).
+- **Local network access:** the API on port 7331 answers HTTPS, with a certificate whose fingerprint API Access shows, and plain HTTP for phones on an older app. Use `https://` from other devices. See [API exposure](#api-exposure).
 
 Use paired computers and local network access on a network you trust. Settings → **Your data stays private** states the same in the app.
 
@@ -103,7 +103,7 @@ Any other bind requires `Authorization: Bearer YOUR_API_KEY` on `/api/v1/*` and 
 
 The Docker image listens on `0.0.0.0`. Set `TOSKAR_API_KEY` or the process exits before it accepts connections. See [API](api.md).
 
-An API key on plain HTTP does not encrypt traffic. It limits who can call the API. TLS or mTLS for remote access is not implemented.
+The API answers HTTPS on the same port, with a certificate Toskar makes or your own, so other devices can reach it encrypted. An API key on plain HTTP limits who can call the API but doesn't encrypt traffic. See [HTTPS](api.md#https).
 
 ## Logging
 

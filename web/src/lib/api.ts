@@ -104,6 +104,7 @@ import type {
   LiveFigures,
   GPUSetup,
   UpdatesStatus,
+  APITLS,
 } from '@/types/api'
 import type { Upload } from '@/lib/upload'
 
@@ -495,6 +496,9 @@ function mediaSetupPath(kind: MediaKind, nodeId?: string): string {
 }
 
 export const api = {
+  /** How the API speaks HTTPS on the local network (#213). */
+  getApiTLS: () => request<APITLS>('/api/v1/tls'),
+
   getHealth: () => request<HealthResponse>('/api/v1/health'),
 
   getVersion: () => request<VersionResponse>('/api/v1/version'),

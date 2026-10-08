@@ -721,6 +721,19 @@ export interface APIKeyRecord {
 }
 
 /** A code a phone connects with (#216). */
+/** How the API speaks HTTPS (#213): GET /api/v1/tls. */
+export interface APITLS {
+  enabled: boolean
+  /** The certificate's SHA-256, and its start for a person to compare, such as "4F2A-9C1B". */
+  fingerprint?: string
+  short?: string
+  not_after?: string
+  /** The person's own certificate (api_tls_cert, api_tls_key). */
+  custom?: boolean
+  /** Why their certificate couldn't be used, so Toskar's own is. */
+  error?: string
+}
+
 export interface DevicePairing {
   /** The 6 digits; only when the code is made. */
   code?: string

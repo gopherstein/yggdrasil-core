@@ -14,6 +14,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/config"
+	"github.com/yeixio/toskar-core/internal/mixtls"
 	"github.com/yeixio/toskar-core/internal/version"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 	"github.com/yeixio/toskar-core/pkg/pluginapi"
@@ -143,7 +144,7 @@ func (s *InternalServer) ListenAndServe(addr string) error {
 			_ = ln.Close()
 			return err
 		}
-		ln = newMixedListener(ln, cfg)
+		ln = mixtls.NewListener(ln, cfg)
 	}
 	s.logger.Info("internal node api listening", "addr", ln.Addr().String(), "tls", s.deps.Identity != nil)
 	return s.http.Serve(ln)

@@ -43,10 +43,14 @@ type pairingView struct {
 	// Reachable is false while the API answers only on this computer: a
 	// phone can't connect until local network access is on.
 	Reachable bool `json:"reachable"`
+	// TLSShort is the start of the API certificate's fingerprint, which
+	// the phone shows too, so the person can see it reached this computer
+	// (#213).
+	TLSShort string `json:"tls_short,omitempty"`
 }
 
 func (s *Server) pairingView(p auth.DevicePairing) pairingView {
-	v := pairingView{DevicePairing: p}
+	v := pairingView{DevicePairing: p, TLSShort: s.TLS().Short}
 	if s.deps.PhoneAddress != nil {
 		v.Address, v.Reachable = s.deps.PhoneAddress()
 	}
@@ -128,5 +132,10 @@ func (s *Server) handlePairDevice(w http.ResponseWriter, r *http.Request) {
 		writeErrFrom(w, status, "PAIRING_FAILED", err)
 		return
 	}
-	writeJSON(w, http.StatusCreated, map[string]any{"api_key": secret, "key": rec})
+	// The certificate's fingerprint, for a phone to keep and check from
+	// now on (#213); over plain HTTP the phone checks it on its next HTTPS
+	// connection.
+	tlsInfo := s.TLS()
+	writeJSON(w, http.StatusCreated, map[string]any{"api_key": secret, "key": rec,
+		"tls_fingerprint": tlsInfo.Fingerprint, "tls_short": tlsInfo.Short})
 }

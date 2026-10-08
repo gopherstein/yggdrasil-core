@@ -1,10 +1,8 @@
 package nodes
 
 import (
-	"bufio"
 	"crypto/tls"
 	"errors"
-	"net"
 	"net/http"
 	"sync"
 	"time"
@@ -133,81 +131,3 @@ func (t *linkTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	}
 	return t.plain.RoundTrip(req)
 }
-
-// mixedListener accepts TLS and plain HTTP connections on one port, by the
-// first byte each sends: 0x16 starts a TLS handshake.
-type mixedListener struct {
-	net.Listener
-	config *tls.Config
-	conns  chan net.Conn
-	errs   chan error
-	done   chan struct{}
-	once   sync.Once
-}
-
-// sniffWait is how long a new connection has to send its first byte.
-const sniffWait = 10 * time.Second
-
-func newMixedListener(ln net.Listener, config *tls.Config) *mixedListener {
-	m := &mixedListener{Listener: ln, config: config, conns: make(chan net.Conn), errs: make(chan error, 1), done: make(chan struct{})}
-	go m.loop()
-	return m
-}
-
-func (m *mixedListener) loop() {
-	for {
-		c, err := m.Listener.Accept()
-		if err != nil {
-			select {
-			case m.errs <- err:
-			case <-m.done:
-			}
-			return
-		}
-		go m.sniff(c)
-	}
-}
-
-func (m *mixedListener) sniff(c net.Conn) {
-	_ = c.SetReadDeadline(time.Now().Add(sniffWait))
-	br := bufio.NewReader(c)
-	first, err := br.Peek(1)
-	_ = c.SetReadDeadline(time.Time{})
-	if err != nil {
-		_ = c.Close()
-		return
-	}
-	var out net.Conn = &peekedConn{Conn: c, r: br}
-	if first[0] == 0x16 {
-		out = tls.Server(out, m.config)
-	}
-	select {
-	case m.conns <- out:
-	case <-m.done:
-		_ = c.Close()
-	}
-}
-
-func (m *mixedListener) Accept() (net.Conn, error) {
-	select {
-	case c := <-m.conns:
-		return c, nil
-	case err := <-m.errs:
-		return nil, err
-	case <-m.done:
-		return nil, net.ErrClosed
-	}
-}
-
-func (m *mixedListener) Close() error {
-	m.once.Do(func() { close(m.done) })
-	return m.Listener.Close()
-}
-
-// peekedConn reads the bytes sniffing peeked before the rest.
-type peekedConn struct {
-	net.Conn
-	r *bufio.Reader
-}
-
-func (c *peekedConn) Read(p []byte) (int, error) { return c.r.Read(p) }
