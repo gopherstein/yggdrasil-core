@@ -205,6 +205,7 @@
     },
     "address": "Or enter this address on the device:",
     "unreachable": "Local network access is still off, so the device can't reach this computer yet.",
+    "encrypted": "Chats with the phone are encrypted. Once it connects, it shows {{code}} in Settings; if it shows another code, disconnect it.",
     "newCode": "Show a new code",
     "http": "Over plain HTTP, others on this network could see the code and the device's key.",
     "cancelled": "The code was cancelled after too many wrong tries.",

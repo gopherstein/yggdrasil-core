@@ -46,6 +46,7 @@
     "connect": "連線",
     "connecting": "正在連線",
     "notReady": "Toskar 有回應，但尚未就緒。",
+    "certificateMismatch": "電腦的憑證與它回報的憑證不符，因此已停止連線。請在你自己的網路中重試。",
     "pairUnsupported": "那台電腦上的 Toskar 版本太舊，無法用代碼連接。請更新它，或改用 API 金鑰。",
     "lede": "手機會使用已在執行你的模型的電腦。"
   },
@@ -170,6 +171,8 @@
     "onDevice": "在你安裝模型後，於這部裝置上執行",
     "computer": "電腦",
     "connectedComputer": "已連線的電腦",
+    "encrypted": "已加密 · 憑證 {{code}}",
+    "notEncrypted": "未加密。更新電腦上的 Toskar 即可加密與它的聊天。",
     "notConnected": "未連線",
     "coreVersion": "那台電腦上的 Toskar",
     "updateCore": "請將那台電腦上的 Toskar 更新到 1.4 或以上版本，才能查看回答來源、助理做了什麼、即時進度和投入程度。",

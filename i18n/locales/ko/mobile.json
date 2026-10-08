@@ -46,6 +46,7 @@
     "connect": "연결",
     "connecting": "연결하는 중",
     "notReady": "Toskar가 응답했지만 준비되지 않았어요.",
+    "certificateMismatch": "컴퓨터의 인증서가 알려 준 인증서와 일치하지 않아 연결을 중단했어요. 내 네트워크에서 다시 시도하세요.",
     "pairUnsupported": "해당 컴퓨터의 Toskar가 오래되어 코드로 연결할 수 없어요. 업데이트하거나 API 키를 사용하세요.",
     "lede": "휴대폰은 이미 모델을 실행 중인 컴퓨터를 사용해요."
   },
@@ -170,6 +171,8 @@
     "onDevice": "모델을 설치한 후 이 기기에서",
     "computer": "컴퓨터",
     "connectedComputer": "연결된 컴퓨터",
+    "encrypted": "암호화됨 · 인증서 {{code}}",
+    "notEncrypted": "암호화되지 않았어요. 컴퓨터의 Toskar를 업데이트하면 채팅이 암호화돼요.",
     "notConnected": "연결되지 않음",
     "coreVersion": "해당 컴퓨터의 Toskar",
     "updateCore": "답변 소스, 어시스턴트가 수행한 작업, 실시간 진행 상황, 노력 수준을 보려면 해당 컴퓨터의 Toskar를 1.4 이상으로 업데이트하세요.",

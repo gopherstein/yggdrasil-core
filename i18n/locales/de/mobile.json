@@ -46,6 +46,7 @@
     "connect": "Verbinden",
     "connecting": "Verbindung wird hergestellt",
     "notReady": "Toskar hat geantwortet, ist aber nicht bereit.",
+    "certificateMismatch": "Das Zertifikat des Computers passte nicht zu dem, das er gemeldet hat, deshalb wurde die Verbindung beendet. Versuche es in deinem eigenen Netzwerk erneut.",
     "pairUnsupported": "Toskar auf diesem Computer ist zu alt für die Verbindung per Code. Aktualisiere es oder verwende einen API-Schlüssel.",
     "lede": "Das Handy nutzt den Computer, auf dem deine Modelle bereits laufen."
   },
@@ -170,6 +171,8 @@
     "onDevice": "Auf diesem Gerät, nachdem du ein Modell installiert hast",
     "computer": "Computer",
     "connectedComputer": "Verbundener Computer",
+    "encrypted": "Verschlüsselt · Zertifikat {{code}}",
+    "notEncrypted": "Nicht verschlüsselt. Ein Update von Toskar auf dem Computer verschlüsselt Chats mit ihm.",
     "notConnected": "Nicht verbunden",
     "coreVersion": "Toskar auf diesem Computer",
     "updateCore": "Aktualisiere Toskar auf diesem Computer auf 1.4 oder neuer, um Antwortquellen, die Schritte des Assistenten, Live-Fortschritt und Aufwand zu sehen.",
