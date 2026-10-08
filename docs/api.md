@@ -664,7 +664,7 @@ A chat that fails while streaming sends `event: error_code` with the same `code`
 
 ## Events
 
-`GET /api/v1/events` is a server-sent event stream. Each event has `type`, `payload`, a timestamp, and `contract`. Clients should ignore types they do not know.
+`GET /api/v1/events` is a server-sent event stream. Each event has `type`, `payload`, a timestamp, and `contract`. Clients should ignore types they do not know. Each person hears only their own chats, tasks, tool calls, memories, automations, and notifications (`chat.*`, `task.*`, `tool.*`, `agent.*`, `plan.*`, `orchestration.*`, `memory.*`, `automation.*`, `notification.*`, `artifact.*`); events about the computers and models go to everyone (#206).
 
 | Type | Sent when |
 | --- | --- |

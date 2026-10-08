@@ -1684,3 +1684,10 @@ func updateCheckSupported() bool {
 	}
 	return true
 }
+
+// publish sends an event as the person ctx is acting for (#206).
+func (a *App) publish(ctx context.Context, evt events.Event) {
+	if a.Bus != nil {
+		a.Bus.PublishFor(ctx, evt)
+	}
+}

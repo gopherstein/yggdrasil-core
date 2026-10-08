@@ -265,7 +265,7 @@ func (h *Hub) Notify(ctx context.Context, req Request) (Notification, error) {
 		return Notification{}, err
 	}
 	if h.bus != nil {
-		h.bus.Publish(events.New(EventCreated, map[string]any{
+		h.bus.PublishFor(ctx, events.New(EventCreated, map[string]any{
 			"id": n.ID, "category": n.Category, "severity": n.Severity, "title": n.Title, "body": n.Body, "message": n.Message, "link": n.Link,
 		}))
 	}

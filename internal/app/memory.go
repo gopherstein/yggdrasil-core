@@ -60,7 +60,7 @@ func (a *App) handleMemoryCommand(ctx context.Context, conversationID, message s
 		default:
 			reply = fmt.Sprintf("Got it. I'll remember: “%s”.", m.Content)
 			step = &contracts.ActivityStep{Kind: "memory", Text: "Saved to memory: " + m.Content}
-			a.Bus.Publish(events.New("memory.saved", map[string]any{"memory": m, "conversation_id": conversationID}))
+			a.publish(ctx, events.New("memory.saved", map[string]any{"memory": m, "conversation_id": conversationID}))
 		}
 		if err == nil && !on {
 			reply += " Memory is off for this chat, so I'll use it in your other chats."
@@ -78,7 +78,7 @@ func (a *App) handleMemoryCommand(ctx context.Context, conversationID, message s
 			} else {
 				reply = fmt.Sprintf("Done. I forgot: “%s”.", m.Content)
 				step = &contracts.ActivityStep{Kind: "memory", Text: "Removed from memory: " + m.Content}
-				a.Bus.Publish(events.New("memory.deleted", map[string]any{"id": m.ID, "conversation_id": conversationID}))
+				a.publish(ctx, events.New("memory.deleted", map[string]any{"id": m.ID, "conversation_id": conversationID}))
 			}
 		}
 	case muninn.CommandList:
@@ -101,12 +101,12 @@ func (a *App) replyDirectly(ctx context.Context, conversationID, message, reply 
 			_, _ = a.Conversations.AddMessageWithMeta(ctx, conversationID, "assistant", reply, meta)
 		}
 	}
-	a.Bus.Publish(events.New(events.ChatToken, map[string]any{"conversation_id": conversationID, "content": reply}))
+	a.publish(ctx, events.New(events.ChatToken, map[string]any{"conversation_id": conversationID, "content": reply}))
 	complete := map[string]any{"conversation_id": conversationID}
 	if meta != nil {
 		complete["meta"] = meta
 	}
-	a.Bus.Publish(events.New(events.ChatComplete, complete))
+	a.publish(ctx, events.New(events.ChatComplete, complete))
 
 	ch := make(chan pluginapi.ChatChunk, 2)
 	ch <- pluginapi.ChatChunk{Content: reply}
@@ -148,12 +148,14 @@ func (a *App) describeMemories(ctx context.Context, on bool) string {
 // summarizeLater checks, after a reply, whether a long conversation needs a
 // new summary, and writes one in the background with the model that just
 // answered. The reply is never delayed by it.
-func (a *App) summarizeLater(conversationID, modelID string, windowTokens int) {
+func (a *App) summarizeLater(turn context.Context, conversationID, modelID string, windowTokens int) {
 	if a.Muninn == nil || a.summarizer == nil || a.stubInference || modelID == "" || strings.HasPrefix(modelID, "sai:") {
 		return
 	}
 	go func() {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		// As the chat's person, whose conversation and memories these are
+		// (#206), past the end of the turn.
+		ctx, cancel := context.WithTimeout(context.WithoutCancel(turn), 5*time.Minute)
 		defer cancel()
 		stored, err := a.Conversations.ListMessages(ctx, conversationID)
 		if err != nil {
@@ -168,7 +170,7 @@ func (a *App) summarizeLater(conversationID, modelID string, windowTokens int) {
 		case err != nil:
 			a.Logger.Warn("summarize conversation", "conversation_id", conversationID, "error", err)
 		case ran:
-			a.Bus.Publish(events.New("chat.summarized", map[string]any{"conversation_id": conversationID}))
+			a.publish(ctx, events.New("chat.summarized", map[string]any{"conversation_id": conversationID}))
 		}
 	}()
 }
