@@ -69,16 +69,21 @@ export function PortalPage({ slug }: { slug: string }) {
   }, [view])
 
   const enter = useMutation({
-    mutationFn: (passcode: string) => api.enterPortal(slug, passcode),
+    mutationFn: ({ passcode = '', invite = '' }: { passcode?: string; invite?: string }) => api.enterPortal(slug, passcode, invite),
     onSuccess: () => setEntered(true),
   })
-  // An open portal lets anyone in at once.
-  const enterOpen = enter.mutate
+  // An open portal lets anyone in at once, and an invitation link its
+  // visitor; the link's one-time token leaves the address once used.
+  const enterNow = enter.mutate
   useEffect(() => {
     if (!view) return
+    const invite = new URLSearchParams(window.location.search).get('invite') ?? ''
+    if (invite) window.history.replaceState(null, '', window.location.pathname)
     if (view.entered) setEntered(true)
-    else if (view.access === 'open') enterOpen('')
-  }, [view, enterOpen])
+    else if (view.access === 'open') enterNow({})
+    else if (view.access === 'invited' && invite) enterNow({ invite })
+  }, [view, enterNow])
+  const refusal = enter.error instanceof ApiError && enter.error.code ? errorText(enter.error.code, enter.error.message) : ''
 
   const branding = view?.branding ?? {}
   const title = text(branding.title, view?.name ?? '', 80)
@@ -108,8 +113,21 @@ export function PortalPage({ slug }: { slug: string }) {
               name={title}
               busy={enter.isPending}
               error={enter.error instanceof ApiError && enter.error.status === 401 ? t('enter.wrong') : enter.error ? t('error') : ''}
-              onSubmit={(code) => enter.mutate(code)}
+              onSubmit={(code) => enter.mutate({ passcode: code })}
             />
+          ) : view.access === 'members' ? (
+            <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-3 px-6 text-center">
+              <p className="text-sm text-ink-muted">{t('members.body', { name: title })}</p>
+              <a className="btn-primary" href={`/?next=${encodeURIComponent(`/p/${slug}`)}`}>
+                {t('members.signIn')}
+              </a>
+            </div>
+          ) : view.access === 'invited' && !enter.isPending ? (
+            <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center px-6 text-center">
+              <p className="text-sm text-ink-muted" role={refusal ? 'alert' : undefined}>
+                {refusal || t('invited.body', { name: title })}
+              </p>
+            </div>
           ) : enter.isError ? (
             <p className="m-6 text-sm text-danger" role="alert">
               {t('error')}

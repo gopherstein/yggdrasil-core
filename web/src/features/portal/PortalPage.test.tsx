@@ -68,7 +68,7 @@ describe('PortalPage (#205)', () => {
     expect(await screen.findByText("That passcode isn't right.")).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('Passcode'), { target: { value: 'tide-pool' } })
     fireEvent.click(screen.getByRole('button', { name: 'Start chatting' }))
-    await waitFor(() => expect(api.enterPortal).toHaveBeenLastCalledWith('support', 'tide-pool'))
+    await waitFor(() => expect(api.enterPortal).toHaveBeenLastCalledWith('support', 'tide-pool', ''))
 
     expect(await screen.findByText('Hi! Ask about your order.')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Where is my order?' }))
@@ -82,7 +82,7 @@ describe('PortalPage (#205)', () => {
     vi.mocked(api.enterPortal).mockResolvedValue(guest)
     renderIt()
     expect(await screen.findByText('Hi! Ask about your order.')).toBeInTheDocument()
-    expect(api.enterPortal).toHaveBeenCalledWith('support', '')
+    expect(api.enterPortal).toHaveBeenCalledWith('support', '', '')
     expect(screen.queryByLabelText('Passcode')).not.toBeInTheDocument()
   })
 
@@ -103,5 +103,26 @@ describe('PortalPage (#205)', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent("You've sent a lot of messages. Try again later.")
     expect(screen.queryByText('Thinking…')).not.toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Message Help desk' })).toHaveAttribute('maxlength', '2000')
+  })
+
+  it('enters with an invitation link, and takes the token out of the address', async () => {
+    window.history.pushState({}, '', '/p/support?invite=tok-1')
+    vi.mocked(api.getPortalPage).mockResolvedValue(page({ access: 'invited' }))
+    vi.mocked(api.enterPortal).mockResolvedValue(guest)
+    renderIt()
+    expect(await screen.findByText('Hi! Ask about your order.')).toBeInTheDocument()
+    expect(api.enterPortal).toHaveBeenCalledWith('support', '', 'tok-1')
+    expect(window.location.search).toBe('')
+    window.history.pushState({}, '', '/')
+  })
+
+  it('says an invited portal needs its link, and a Members one a sign-in', async () => {
+    vi.mocked(api.getPortalPage).mockResolvedValue(page({ access: 'invited' }))
+    const { unmount } = renderIt()
+    expect(await screen.findByText('Help desk is by invitation. Open the link you were sent.')).toBeInTheDocument()
+    unmount()
+    vi.mocked(api.getPortalPage).mockResolvedValue(page({ access: 'members' }))
+    renderIt()
+    expect(await screen.findByRole('link', { name: 'Sign in to chat' })).toHaveAttribute('href', '/?next=%2Fp%2Fsupport')
   })
 })

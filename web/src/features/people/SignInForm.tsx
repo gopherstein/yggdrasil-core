@@ -24,7 +24,10 @@ export function SignInForm({ onSignedIn, onUseKey }: { onSignedIn: () => void; o
   const providerError = new URLSearchParams(window.location.search).get('oidc_error')
   const providerMessage = providerErrors.find((e) => e === providerError)
   const providerName = provider.data?.label ?? ''
-  const returnTo = window.location.pathname === '/' ? '/chat' : window.location.pathname
+  // Back to a chat portal a Member signed in for (#205), or where they were.
+  const next = new URLSearchParams(window.location.search).get('next') ?? ''
+  const portalNext = /^\/p\/[a-z0-9-]+$/.test(next) ? next : ''
+  const returnTo = portalNext || (window.location.pathname === '/' ? '/chat' : window.location.pathname)
   return (
     <form
       className="flex h-full min-h-0 flex-col items-center justify-center bg-canvas px-6 text-center"
@@ -39,6 +42,10 @@ export function SignInForm({ onSignedIn, onUseKey }: { onSignedIn: () => void; o
           forgetApiKey()
           setOnboardingComplete(true)
           setPassword('')
+          if (portalNext) {
+            window.location.assign(portalNext)
+            return
+          }
           onSignedIn()
         } catch (err) {
           setError(err instanceof Error ? err.message : String(err))

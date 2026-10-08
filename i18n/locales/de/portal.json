@@ -15,5 +15,12 @@
   "message": "Nachricht an {{name}}",
   "send": "Senden",
   "stop": "Stopp",
-  "newChat": "Neuer Chat"
+  "newChat": "Neuer Chat",
+  "members": {
+    "body": "{{name}} ist für die Menschen, die sich bei diesem Toskar anmelden.",
+    "signIn": "Zum Chatten anmelden"
+  },
+  "invited": {
+    "body": "{{name}} ist nur auf Einladung. Öffne den Link, den du bekommen hast."
+  }
 }

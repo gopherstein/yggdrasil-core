@@ -7,8 +7,9 @@ import { Toggle } from '@/components/ui/Toggle'
 import { useShareBase } from '@/features/people/shareBase'
 import { PortalPreview } from '@/features/portal/PortalPreview'
 import { availableLanguages, languages } from '@/i18n'
+import { formatDate } from '@/i18n/format'
 import { api, ApiError } from '@/lib/api'
-import type { Portal, PortalBranding, PortalInput } from '@/types/api'
+import type { Person, Portal, PortalBranding, PortalInput, PortalVisitorLink } from '@/types/api'
 import { slugFrom } from './slug'
 
 function errorText(err: unknown): string {
@@ -55,7 +56,7 @@ function AddPortal({ onAdded }: { onAdded: (p: Portal) => void }) {
   const [name, setName] = useState('')
   const [slug, setSlug] = useState('')
   const [slugTouched, setSlugTouched] = useState(false)
-  const [access, setAccess] = useState<'passcode' | 'open'>('passcode')
+  const [access, setAccess] = useState<Portal['access']>('passcode')
   const [passcode, setPasscode] = useState('')
   const add = useMutation({
     mutationFn: () => api.createPortal({ name: name.trim(), slug, access, ...(access === 'passcode' ? { passcode } : {}) }),
@@ -107,9 +108,11 @@ function AddPortal({ onAdded }: { onAdded: (p: Portal) => void }) {
         </label>
         <label className="space-y-1 text-sm">
           <span className="text-ink-muted">{t('field.access')}</span>
-          <select className="field w-full" value={access} onChange={(e) => setAccess(e.target.value as 'passcode' | 'open')}>
+          <select className="field w-full" value={access} onChange={(e) => setAccess(e.target.value as Portal['access'])}>
             <option value="passcode">{t('access.passcode')}</option>
             <option value="open">{t('access.open')}</option>
+            <option value="members">{t('access.members')}</option>
+            <option value="invited">{t('access.invited')}</option>
           </select>
         </label>
         {access === 'passcode' ? (
@@ -118,7 +121,7 @@ function AddPortal({ onAdded }: { onAdded: (p: Portal) => void }) {
             <input className="field w-full" value={passcode} autoComplete="off" onChange={(e) => setPasscode(e.target.value)} />
           </label>
         ) : (
-          <p className="self-end text-xs text-ink-faint">{t('access.openHint')}</p>
+          <p className="self-end text-xs text-ink-faint">{t(`access.${access}Hint`)}</p>
         )}
         {add.error ? (
           <p className="text-sm text-danger sm:col-span-2" role="alert">
@@ -168,6 +171,104 @@ function fromDraft(d: BrandingDraft): PortalBranding {
     .slice(0, 6)
   if (lines.length) out.prompts = lines
   return out
+}
+
+/** A portal's invited visitors, each with a one-time link (#205). */
+function InvitedVisitors({ portal }: { portal: Portal }) {
+  const { t } = useTranslation('portals')
+  const queryClient = useQueryClient()
+  const { base } = useShareBase()
+  const [name, setName] = useState('')
+  const [shown, setShown] = useState<{ name: string; url: string; expires: string } | null>(null)
+  const [copied, setCopied] = useState(false)
+  const visitors = useQuery({ queryKey: ['portal-visitors', portal.id], queryFn: () => api.listPortalVisitors(portal.id) })
+  const refresh = () => void queryClient.invalidateQueries({ queryKey: ['portal-visitors', portal.id] })
+  const show = (who: string, link: PortalVisitorLink | null) => {
+    if (!link) return
+    setCopied(false)
+    setShown({ name: who, url: `${base}${link.path}`, expires: link.expires_at })
+  }
+  const invite = useMutation({
+    mutationFn: () => api.invitePortalVisitor(portal.id, name.trim()),
+    onSuccess: (made) => {
+      setName('')
+      refresh()
+      if (made) show(made.person.name, made.link)
+    },
+  })
+  const relink = useMutation({
+    mutationFn: (v: Person) => api.portalVisitorLink(portal.id, v.id).then((link) => ({ v, link })),
+    onSuccess: ({ v, link }) => show(v.name, link),
+  })
+  const remove = useMutation({ mutationFn: (v: Person) => api.removePortalVisitor(portal.id, v.id), onSuccess: refresh })
+  const error = invite.error ?? relink.error ?? remove.error
+  return (
+    <div className="space-y-3 rounded-lg border border-line/60 p-3">
+      <p className="text-sm font-medium text-ink">{t('visitors.title')}</p>
+      <form
+        className="flex flex-wrap items-end gap-2"
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (name.trim()) invite.mutate()
+        }}
+      >
+        <label className="min-w-[10rem] flex-1 space-y-1 text-sm">
+          <span className="text-ink-muted">{t('visitors.name')}</span>
+          <input className="field w-full" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} />
+        </label>
+        <button type="submit" className="btn-secondary" disabled={!name.trim() || invite.isPending}>
+          {t('visitors.invite')}
+        </button>
+      </form>
+      {shown ? (
+        <div className="space-y-1.5 rounded-lg bg-primary/5 p-2 text-sm" role="status">
+          <p className="text-ink">{t('visitors.send', { name: shown.name })}</p>
+          <div className="flex min-w-0 items-stretch gap-2">
+            <code className="field min-w-0 flex-1 truncate py-1.5 font-mono text-xs">{shown.url}</code>
+            <button
+              type="button"
+              className="btn-secondary btn-sm shrink-0"
+              onClick={() => void navigator.clipboard?.writeText(shown.url).then(() => setCopied(true))}
+            >
+              {copied ? t('link.copied') : t('link.copy')}
+            </button>
+          </div>
+          <p className="text-xs text-ink-muted">
+            {t('visitors.expires', { date: formatDate(shown.expires, { dateStyle: 'medium', timeStyle: 'short' }) })}
+          </p>
+        </div>
+      ) : null}
+      {error ? <p className="text-xs text-danger">{errorText(error)}</p> : null}
+      {visitors.isSuccess && (visitors.data ?? []).length === 0 ? <p className="text-xs text-ink-faint">{t('visitors.none')}</p> : null}
+      <ul className="divide-y divide-line">
+        {(visitors.data ?? []).map((v) => (
+          <li key={v.id} className="flex flex-wrap items-center gap-2 py-2">
+            <span className="min-w-0 flex-1 truncate text-sm text-ink">
+              {v.name}
+              {v.disabled_at ? <span className="status-chip ms-2 bg-ink/10 text-ink-muted">{t('visitors.removed')}</span> : null}
+            </span>
+            {!v.disabled_at ? (
+              <>
+                <button type="button" className="btn-secondary btn-sm" disabled={relink.isPending} onClick={() => relink.mutate(v)}>
+                  {t('visitors.newLink')}
+                </button>
+                <button
+                  type="button"
+                  className="btn-secondary btn-sm"
+                  disabled={remove.isPending}
+                  onClick={() => {
+                    if (window.confirm(t('visitors.removeConfirm', { name: v.name }))) remove.mutate(v)
+                  }}
+                >
+                  {t('remove.button')}
+                </button>
+              </>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void }) {
@@ -286,6 +387,8 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
               <select className="field w-full" value={access} onChange={(e) => setAccess(e.target.value as Portal['access'])}>
                 <option value="passcode">{t('access.passcode')}</option>
                 <option value="open">{t('access.open')}</option>
+                <option value="members">{t('access.members')}</option>
+                <option value="invited">{t('access.invited')}</option>
               </select>
             </label>
             {access === 'passcode' ? (
@@ -300,8 +403,13 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
                 />
               </label>
             ) : (
-              <p className="self-end text-xs text-ink-faint">{t('access.openHint')}</p>
+              <p className="self-end text-xs text-ink-faint">{t(`access.${access}Hint`)}</p>
             )}
+            {access === 'invited' ? (
+              <div className="sm:col-span-2">
+                {portal.access === 'invited' ? <InvitedVisitors portal={portal} /> : <p className="text-xs text-ink-faint">{t('visitors.saveFirst')}</p>}
+              </div>
+            ) : null}
           </fieldset>
 
           <fieldset className="grid gap-3 sm:grid-cols-3">
@@ -418,7 +526,7 @@ function PortalRow({ portal, onEdit }: { portal: Portal; onEdit: () => void }) {
             {!portal.enabled ? <span className="status-chip ms-2 bg-ink/10 text-ink-muted">{t('off')}</span> : null}
           </p>
           <p className="text-xs text-ink-muted">
-            {portal.access === 'open' ? t('access.open') : t('access.passcode')} · {t(`tools.${portal.tools}`)}
+            {t(`access.${portal.access}`)} · {t(`tools.${portal.tools}`)}
           </p>
         </div>
         <Toggle label={t('enabled', { name: portal.name })} checked={portal.enabled} disabled={change.isPending} onChange={() => change.mutate(!portal.enabled)} />

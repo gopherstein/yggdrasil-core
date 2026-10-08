@@ -321,7 +321,11 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 	ctx := huginn.WithEffort(artifacts.WithAttachments(r.Context(), body.Attachments), huginn.ParseEffort(body.Effort))
 	// A portal's guest chats with the portal's profile, tools, memory, and
 	// language, whatever the request asks for (#205).
-	if p, ok := s.portalOf(r); ok {
+	if _, _, refused := s.portalOf(r); refused {
+		writeErr(w, http.StatusForbidden, "PORTAL_MEMBERS", "this chat is for the people who sign in to this Toskar", nil)
+		return
+	}
+	if p, ok, _ := s.portalOf(r); ok {
 		if n := utf8.RuneCountInString(body.Message); n > p.MaxMessage {
 			writeErr(w, http.StatusBadRequest, "PORTAL_TOO_LONG", fmt.Sprintf("a message here can be %d characters at most", p.MaxMessage), map[string]any{"max": p.MaxMessage})
 			return

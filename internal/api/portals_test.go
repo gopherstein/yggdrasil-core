@@ -242,3 +242,136 @@ func TestPortalLimits(t *testing.T) {
 		t.Fatalf("third message: %d", rec.Code)
 	}
 }
+
+// A Members only portal answers its signed-in Members as themselves, and
+// an invited one the visitors an Admin invited, each by a one-time link
+// that can't set a password (#205, #206 item 6).
+func TestPortalMembersAndInvited(t *testing.T) {
+	dir := t.TempDir()
+	db, err := store.Open(filepath.Join(dir, "t.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+	if _, err := db.SQL.Exec(`INSERT INTO people (id, name, role) VALUES ('sam', 'Sam', 'member'), ('vee', 'Vee', 'visitor')`); err != nil {
+		t.Fatal(err)
+	}
+	mgr, err := config.NewManager(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := mgr.Update(func(c *config.Config) { c.APIHost = "0.0.0.0" }); err != nil {
+		t.Fatal(err)
+	}
+	ps := portals.NewStore(db.SQL)
+	ctx := context.Background()
+	mk := func(slug, access string) portals.Portal {
+		name := slug
+		p, err := ps.Create(ctx, portals.Input{Slug: &slug, Name: &name, Access: &access})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return p
+	}
+	team, club := mk("team", portals.AccessMembers), mk("club", portals.AccessInvited)
+	var chats []string
+	sessions := auth.NewSessions(db.SQL)
+	srv := NewServer(Dependencies{
+		Config: mgr, People: auth.NewPeople(db.SQL), Sessions: sessions, Invites: auth.NewInvites(db.SQL), Portals: ps,
+		Chat: func(w http.ResponseWriter, r *http.Request, _, _, _, _ string, _ bool, _ string) error {
+			if o := turnopts.From(r.Context()); o != nil {
+				chats = append(chats, auth.PersonID(r.Context())+"@"+o.Portal)
+			}
+			writeJSON(w, http.StatusOK, map[string]string{"ok": "yes"})
+			return nil
+		},
+	})
+	signedIn := func(id string) *http.Cookie {
+		token, _, err := sessions.Create(ctx, id, "test", "192.168.1.40")
+		if err != nil {
+			t.Fatal(err)
+		}
+		return &http.Cookie{Name: auth.SessionCookie, Value: token}
+	}
+	call := func(method, path, slug, body string, cookies ...*http.Cookie) *httptest.ResponseRecorder {
+		r := httptest.NewRequest(method, path, strings.NewReader(body))
+		r.RemoteAddr = "192.168.1.40:5000"
+		r.Header.Set("Origin", "http://example.com")
+		if slug != "" {
+			r.Header.Set("X-Toskar-Portal", slug)
+		}
+		for _, c := range cookies {
+			r.AddCookie(c)
+		}
+		rec := httptest.NewRecorder()
+		srv.Handler().ServeHTTP(rec, r)
+		return rec
+	}
+
+	// Members only: Sam chats as Sam, with the portal's settings; Vee and
+	// someone signed out don't.
+	sam, vee := signedIn("sam"), signedIn("vee")
+	if rec := call(http.MethodGet, "/api/v1/portals/team/page", "team", "", sam); !strings.Contains(rec.Body.String(), `"entered":true`) {
+		t.Fatalf("sam's page: %s", rec.Body)
+	}
+	if rec := call(http.MethodPost, "/api/v1/chat", "team", `{"message":"hi"}`, sam); rec.Code != http.StatusOK || len(chats) != 1 || chats[0] != "sam@"+team.ID {
+		t.Fatalf("sam's chat: %d %v", rec.Code, chats)
+	}
+	if rec := call(http.MethodPost, "/api/v1/chat", "team", `{"message":"hi"}`, vee); rec.Code != http.StatusForbidden {
+		t.Fatalf("vee's chat: %d", rec.Code)
+	}
+	if rec := call(http.MethodPost, "/api/v1/portals/team/enter", "team", `{}`); rec.Code != http.StatusForbidden && rec.Code != http.StatusUnauthorized {
+		t.Fatalf("signed out: %d", rec.Code)
+	}
+
+	// Invited: the Admin (this computer's Owner here) invites Robin.
+	owner := func(method, path, body string) *httptest.ResponseRecorder {
+		r := httptest.NewRequest(method, path, strings.NewReader(body))
+		r.RemoteAddr = "127.0.0.1:5000"
+		r.Host = "127.0.0.1:7331"
+		r.Header.Set("Origin", "http://127.0.0.1:7331")
+		rec := httptest.NewRecorder()
+		srv.Handler().ServeHTTP(rec, r)
+		return rec
+	}
+	invited := owner(http.MethodPost, "/api/v1/portals/"+club.ID+"/visitors", `{"name":"Robin"}`)
+	var made struct {
+		Person auth.Person `json:"person"`
+		Link   struct {
+			Path string `json:"path"`
+		} `json:"link"`
+	}
+	_ = json.NewDecoder(invited.Body).Decode(&made)
+	if invited.Code != http.StatusCreated || !strings.HasPrefix(made.Link.Path, "/p/club?invite=") || made.Person.Name != "Robin" {
+		t.Fatalf("invite: %d %+v", invited.Code, made)
+	}
+	token := strings.TrimPrefix(made.Link.Path, "/p/club?invite=")
+
+	// The link can't be spent to choose a username and password.
+	if rec := call(http.MethodGet, "/api/v1/invites/"+token, "", ""); rec.Code == http.StatusOK {
+		t.Fatalf("a portal invitation read as a sign-in link: %s", rec.Body)
+	}
+	if rec := call(http.MethodPost, "/api/v1/portals/club/enter", "club", `{}`); rec.Code != http.StatusForbidden {
+		t.Fatalf("without the invitation: %d", rec.Code)
+	}
+	enter := call(http.MethodPost, "/api/v1/portals/club/enter", "club", `{"invite":"`+token+`"}`)
+	if enter.Code != http.StatusOK {
+		t.Fatalf("with the invitation: %d %s", enter.Code, enter.Body)
+	}
+	robin := enter.Result().Cookies()[0]
+	if rec := call(http.MethodPost, "/api/v1/chat", "club", `{"message":"hi"}`, robin); rec.Code != http.StatusOK || chats[len(chats)-1] != made.Person.ID+"@"+club.ID {
+		t.Fatalf("robin's chat: %d %v", rec.Code, chats)
+	}
+	if rec := call(http.MethodPost, "/api/v1/portals/club/enter", "club", `{"invite":"`+token+`"}`); rec.Code != http.StatusForbidden {
+		t.Fatalf("the invitation twice: %d", rec.Code)
+	}
+	if list := owner(http.MethodGet, "/api/v1/portals/"+club.ID+"/visitors", ""); !strings.Contains(list.Body.String(), "Robin") {
+		t.Fatalf("visitors: %s", list.Body)
+	}
+	if rec := owner(http.MethodDelete, "/api/v1/portals/"+club.ID+"/visitors/"+made.Person.ID, ""); rec.Code != http.StatusNoContent {
+		t.Fatalf("remove: %d", rec.Code)
+	}
+	if rec := call(http.MethodPost, "/api/v1/chat", "club", `{"message":"still here?"}`, robin); rec.Code == http.StatusOK {
+		t.Fatalf("a removed visitor chatted: %d", rec.Code)
+	}
+}

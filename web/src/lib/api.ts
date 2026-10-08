@@ -113,6 +113,7 @@ import type {
   PortalPageView,
   Portal,
   PortalInput,
+  PortalVisitorLink,
 } from '@/types/api'
 import type { Upload } from '@/lib/upload'
 
@@ -541,6 +542,24 @@ export const api = {
   updatePortal: (id: string, input: PortalInput) =>
     request<Portal>(`/api/v1/portals/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(input) }),
 
+  /** A chat portal's invited visitors (#205). */
+  listPortalVisitors: (id: string) => request<Person[]>(`/api/v1/portals/${encodeURIComponent(id)}/visitors`),
+
+  /** Invite someone to a chat portal by name; the answer has their one-time link (#205). */
+  invitePortalVisitor: (id: string, name: string) =>
+    request<{ person: Person; link: PortalVisitorLink }>(`/api/v1/portals/${encodeURIComponent(id)}/visitors`, {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    }),
+
+  /** A new one-time link for an invited visitor (#205). */
+  portalVisitorLink: (id: string, visitor: string) =>
+    request<PortalVisitorLink>(`/api/v1/portals/${encodeURIComponent(id)}/visitors/${encodeURIComponent(visitor)}/link`, { method: 'POST' }),
+
+  /** Remove an invited visitor; they're signed out at once (#205). */
+  removePortalVisitor: (id: string, visitor: string) =>
+    request<null>(`/api/v1/portals/${encodeURIComponent(id)}/visitors/${encodeURIComponent(visitor)}`, { method: 'DELETE' }),
+
   /** Remove a chat portal (#205). */
   deletePortal: (id: string) => request<null>(`/api/v1/portals/${encodeURIComponent(id)}`, { method: 'DELETE' }),
 
@@ -548,8 +567,8 @@ export const api = {
   getPortalPage: (slug: string) => request<PortalPageView>(`/api/v1/portals/${encodeURIComponent(slug)}/page`),
 
   /** Enter a chat portal as its guest, with its passcode when it has one (#205). */
-  enterPortal: (slug: string, passcode = '') =>
-    request<Principal>(`/api/v1/portals/${encodeURIComponent(slug)}/enter`, { method: 'POST', body: JSON.stringify({ passcode }) }),
+  enterPortal: (slug: string, passcode = '', invite = '') =>
+    request<Principal>(`/api/v1/portals/${encodeURIComponent(slug)}/enter`, { method: 'POST', body: JSON.stringify({ passcode, invite }) }),
 
   /** Whether sign-in with an OpenID Connect provider is offered, and its name (#206). */
   getOIDC: () => request<{ enabled: boolean; label?: string }>('/api/v1/oidc'),

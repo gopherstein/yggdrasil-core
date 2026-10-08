@@ -145,6 +145,8 @@
   "PORTAL_TOO_LONG": "Aquí un mensaje puede tener {{max}} caracteres como máximo.",
   "PORTAL_BUSY": "Este chat está ocupado. Inténtalo de nuevo en un momento.",
   "PORTAL_RATE": "Has enviado muchos mensajes. Inténtalo más tarde.",
+  "PORTAL_MEMBERS": "Este chat es para las personas que inician sesión en este Toskar.",
+  "PORTAL_INVITE": "Este chat es solo con invitación. Abre el enlace que te enviaron o pide uno nuevo.",
   "PORTAL_INVALID": "Ese ajuste del portal no se puede usar.",
   "PORTAL_PASSCODE": "Ese código no es correcto.",
   "PORTAL_OFF": "Este portal está desactivado.",

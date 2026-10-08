@@ -11,6 +11,9 @@ import (
 const (
 	InviteNew   = "invite"
 	InviteReset = "reset"
+	// InvitePortal makes its browser a chat portal's invited visitor
+	// (#205); it never sets a username or password.
+	InvitePortal = "portal"
 )
 
 // Invite lifetimes: a week to accept an invitation, a day for a new
@@ -37,7 +40,7 @@ func NewInvites(db *sql.DB) *Invites { return &Invites{db: db, now: time.Now} }
 // Create makes a link for person, replacing any unused one, and returns
 // its token.
 func (i *Invites) Create(ctx context.Context, personID, kind, createdBy string) (string, time.Time, error) {
-	if kind != InviteNew && kind != InviteReset {
+	if kind != InviteNew && kind != InviteReset && kind != InvitePortal {
 		return "", time.Time{}, errors.New("unknown invite kind")
 	}
 	token, err := newToken()
@@ -65,10 +68,19 @@ func (i *Invites) Create(ctx context.Context, personID, kind, createdBy string) 
 	return token, expires, tx.Commit()
 }
 
-// Peek is whose a link is and its kind, while it's good.
+// Peek is whose a sign-in link is and its kind, while it's good. A chat
+// portal's invitation is never one (#205).
 func (i *Invites) Peek(ctx context.Context, token string) (personID, kind string, err error) {
+	return i.peek(ctx, token, false)
+}
+
+func (i *Invites) peek(ctx context.Context, token string, portal bool) (personID, kind string, err error) {
 	var expires string
-	err = i.db.QueryRowContext(ctx, `SELECT person_id, kind, expires_at FROM invites WHERE token_hash = ? AND used_at IS NULL`,
+	op := "!="
+	if portal {
+		op = "="
+	}
+	err = i.db.QueryRowContext(ctx, `SELECT person_id, kind, expires_at FROM invites WHERE token_hash = ? AND used_at IS NULL AND kind `+op+` 'portal'`,
 		secretHash(token)).Scan(&personID, &kind, &expires)
 	if err != nil || !i.now().UTC().Before(parseTime(expires)) {
 		return "", "", ErrNoInvite
@@ -76,9 +88,20 @@ func (i *Invites) Peek(ctx context.Context, token string) (personID, kind string
 	return personID, kind, nil
 }
 
-// Use spends a link, once: two uses at the same moment can't both succeed.
+// Use spends a sign-in link, once: two uses at the same moment can't both
+// succeed.
 func (i *Invites) Use(ctx context.Context, token string) (personID, kind string, err error) {
-	personID, kind, err = i.Peek(ctx, token)
+	return i.use(ctx, token, false)
+}
+
+// UsePortal spends a chat portal's invitation, once, and says whose it is.
+func (i *Invites) UsePortal(ctx context.Context, token string) (personID string, err error) {
+	personID, _, err = i.use(ctx, token, true)
+	return personID, err
+}
+
+func (i *Invites) use(ctx context.Context, token string, portal bool) (personID, kind string, err error) {
+	personID, kind, err = i.peek(ctx, token, portal)
 	if err != nil {
 		return "", "", err
 	}

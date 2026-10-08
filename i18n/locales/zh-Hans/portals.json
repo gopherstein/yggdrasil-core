@@ -28,7 +28,11 @@
   "access": {
     "passcode": "知道访问码的人",
     "open": "网络上的任何人",
-    "openHint": "任何能访问这个 Toskar 的人都可以聊天。"
+    "openHint": "任何能访问这个 Toskar 的人都可以聊天。",
+    "members": "登录的成员",
+    "invited": "你邀请的人",
+    "membersHint": "以成员或管理员身份登录这个 Toskar 的人以自己的身份聊天。",
+    "invitedHint": "只有你邀请的人，每人有自己的链接。"
   },
   "edit": {
     "title": "编辑 {{name}}",
@@ -79,5 +83,17 @@
     "longest": "最长消息（字符）",
     "most": "同时聊天数",
     "hint": "0 表示不限制。门户聊天会等待你和其他使用 Toskar 的人的聊天，并优先于自动化。"
+  },
+  "visitors": {
+    "title": "受邀访客",
+    "name": "名称",
+    "invite": "邀请",
+    "send": "把这个链接发给 {{name}}：",
+    "expires": "只能使用一次，有效期至 {{date}}。",
+    "none": "还没有邀请任何人。",
+    "removed": "已移除",
+    "newLink": "新链接",
+    "removeConfirm": "要移除 {{name}} 吗？对方会立即无法使用。",
+    "saveFirst": "保存后即可邀请访客。"
   }
 }

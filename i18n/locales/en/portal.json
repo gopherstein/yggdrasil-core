@@ -15,5 +15,12 @@
   "message": "Message {{name}}",
   "send": "Send",
   "stop": "Stop",
-  "newChat": "New chat"
+  "newChat": "New chat",
+  "members": {
+    "body": "{{name}} is for the people who sign in to this Toskar.",
+    "signIn": "Sign in to chat"
+  },
+  "invited": {
+    "body": "{{name}} is by invitation. Open the link you were sent."
+  }
 }

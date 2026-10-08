@@ -28,7 +28,11 @@
   "access": {
     "passcode": "Quien tenga el código",
     "open": "Cualquiera en la red",
-    "openHint": "Cualquiera que llegue a este Toskar puede chatear."
+    "openHint": "Cualquiera que llegue a este Toskar puede chatear.",
+    "members": "Miembros que inician sesión",
+    "invited": "Personas que invitas",
+    "membersHint": "Quienes inician sesión en este Toskar como miembros o administradores chatean como ellos mismos.",
+    "invitedHint": "Solo las personas que invites, cada una con su propio enlace."
   },
   "edit": {
     "title": "Editar {{name}}",
@@ -79,5 +83,17 @@
     "longest": "Mensaje más largo (caracteres)",
     "most": "Chats a la vez",
     "hint": "0 mensajes significa sin límite. Los chats del portal esperan a los tuyos y a los de otras personas que usan Toskar, y van antes que las automatizaciones."
+  },
+  "visitors": {
+    "title": "Visitantes invitados",
+    "name": "Nombre",
+    "invite": "Invitar",
+    "send": "Envía a {{name}} este enlace:",
+    "expires": "Funciona una vez, hasta el {{date}}.",
+    "none": "Todavía no has invitado a nadie.",
+    "removed": "Quitado",
+    "newLink": "Enlace nuevo",
+    "removeConfirm": "¿Quitar a {{name}}? Su acceso termina al instante.",
+    "saveFirst": "Guarda para invitar visitantes."
   }
 }

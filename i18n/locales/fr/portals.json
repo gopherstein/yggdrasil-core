@@ -28,7 +28,11 @@
   "access": {
     "passcode": "Toute personne ayant le code",
     "open": "Tout le monde sur le réseau",
-    "openHint": "Toute personne qui peut joindre ce Toskar peut discuter."
+    "openHint": "Toute personne qui peut joindre ce Toskar peut discuter.",
+    "members": "Membres qui se connectent",
+    "invited": "Personnes invitées",
+    "membersHint": "Les personnes qui se connectent à ce Toskar comme membres ou admins discutent en leur nom.",
+    "invitedHint": "Seulement les personnes que vous invitez, chacune avec son propre lien."
   },
   "edit": {
     "title": "Modifier {{name}}",
@@ -79,5 +83,17 @@
     "longest": "Message le plus long (caractères)",
     "most": "Discussions simultanées",
     "hint": "0 message signifie aucune limite. Les discussions du portail attendent les vôtres et celles des autres personnes qui utilisent Toskar, et passent avant les automatisations."
+  },
+  "visitors": {
+    "title": "Visiteurs invités",
+    "name": "Nom",
+    "invite": "Inviter",
+    "send": "Envoyez ce lien à {{name}} :",
+    "expires": "Il fonctionne une fois, jusqu'au {{date}}.",
+    "none": "Personne n'est encore invité.",
+    "removed": "Retiré",
+    "newLink": "Nouveau lien",
+    "removeConfirm": "Retirer {{name}} ? Son accès s'arrête aussitôt.",
+    "saveFirst": "Enregistrez pour inviter des visiteurs."
   }
 }
