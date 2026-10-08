@@ -84,7 +84,7 @@ func (s *Server) handleDismissNotification(w http.ResponseWriter, r *http.Reques
 
 // handleGetNotification returns one notification with each channel's delivery.
 func (s *Server) handleGetNotification(w http.ResponseWriter, r *http.Request) {
-	n, err := s.notifications.Get(r.Context(), mux.Vars(r)["id"])
+	n, err := s.notifications.GetVisible(r.Context(), mux.Vars(r)["id"])
 	if errors.Is(err, sql.ErrNoRows) {
 		writeErr(w, http.StatusNotFound, "NOTIFICATION_NOT_FOUND", "notification not found", nil)
 		return

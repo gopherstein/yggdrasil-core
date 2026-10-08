@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/automations"
 	"github.com/yeixio/toskar-core/internal/store/repositories"
 )
@@ -106,19 +107,48 @@ func TestRunnerChangeUsesTheFirstResultAsBaseline(t *testing.T) {
 	}
 }
 
-type recordingNotifier struct {
-	mu    sync.Mutex
-	items []automations.Notice
-	err   error
+// An automation's notices are its person's, though the scheduler runs it
+// (#206).
+func TestRunnerNotifiesAsTheAutomationsPerson(t *testing.T) {
+	db := openAutomationDB(t)
+	repo := repositories.NewAutomationRepo(db.SQL)
+	sam := auth.AsPerson(context.Background(), auth.Person{ID: "sam"})
+	createdAt := time.Date(2026, 9, 24, 7, 0, 0, 0, time.UTC)
+	if _, err := repo.Create(sam, automations.CreateInput{
+		ModelID:      "model-a",
+		Name:         "Sam's brief",
+		Prompt:       "Summarize the news",
+		Notification: automations.Notification{Mode: automations.NotifyAlways},
+		Schedule:     automations.Schedule{Kind: automations.KindDaily, TimeZone: "UTC", Hour: 8},
+	}, createdAt); err != nil {
+		t.Fatal(err)
+	}
+	notes := &recordingNotifier{}
+	clock := createdAt.Add(90 * time.Minute)
+	runner := &automations.Runner{Store: repo, Exec: &scriptedExec{texts: []string{"Quiet day."}}, Notify: notes, Now: func() time.Time { return clock }, Lease: time.Hour}
+	if err := runner.Tick(auth.WithSystem(context.Background())); err != nil {
+		t.Fatal(err)
+	}
+	if notes.count() != 1 || notes.people[0] != "sam" {
+		t.Fatalf("notices %+v for %v", notes.notices(), notes.people)
+	}
 }
 
-func (n *recordingNotifier) Notify(_ context.Context, notice automations.Notice) error {
+type recordingNotifier struct {
+	mu     sync.Mutex
+	items  []automations.Notice
+	people []string
+	err    error
+}
+
+func (n *recordingNotifier) Notify(ctx context.Context, notice automations.Notice) error {
 	n.mu.Lock()
 	defer n.mu.Unlock()
 	if n.err != nil {
 		return n.err
 	}
 	n.items = append(n.items, notice)
+	n.people = append(n.people, auth.PersonID(ctx))
 	return nil
 }
 

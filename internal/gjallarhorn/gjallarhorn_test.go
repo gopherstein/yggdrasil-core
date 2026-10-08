@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/events"
 	"github.com/yeixio/toskar-core/internal/store"
 )
@@ -101,5 +102,58 @@ func TestDedupeReadAndDismiss(t *testing.T) {
 	}
 	if _, err := hub.Notify(ctx, Request{}); err == nil {
 		t.Fatal("a title is required")
+	}
+}
+
+// Each person sees their own notices, Admins and the Owner also see the
+// install's, and another person's own never leave the app (#206).
+func TestNotificationsBelongToTheirPerson(t *testing.T) {
+	desktop := &fakeChannel{name: "desktop"}
+	hub, _ := newHub(t, desktop)
+	owner := context.Background()
+	as := func(id string, role auth.Role) context.Context {
+		return auth.WithPrincipal(owner, auth.Principal{Person: auth.Person{ID: id, Role: role}, Via: auth.ViaSession})
+	}
+	sam, ada := as("sam", auth.RoleMember), as("ada", auth.RoleAdmin)
+
+	ownerRun, _ := hub.Notify(owner, Request{Category: CategoryAutomation, Title: "Owner's report", Channels: []string{"desktop"}})
+	samRun, _ := hub.Notify(auth.AsPerson(owner, auth.Person{ID: "sam"}), Request{Category: CategoryAutomation, Title: "Sam's report", Channels: []string{"desktop"}})
+	_, _ = hub.Notify(owner, Request{Category: CategoryModel, Title: "Model ready", Channels: []string{"desktop"}})
+
+	titles := func(ctx context.Context) []string {
+		list, _, err := hub.List(ctx, false, 50)
+		if err != nil {
+			t.Fatal(err)
+		}
+		var out []string
+		for _, n := range list {
+			out = append(out, n.Title)
+		}
+		return out
+	}
+	if got := titles(sam); len(got) != 1 || got[0] != "Sam's report" {
+		t.Fatalf("sam sees %v", got)
+	}
+	if got := titles(ada); len(got) != 1 || got[0] != "Model ready" {
+		t.Fatalf("ada sees %v", got)
+	}
+	if got := titles(owner); len(got) != 2 {
+		t.Fatalf("the owner sees %v", got)
+	}
+	if len(desktop.got) != 2 || len(samRun.Deliveries) != 0 {
+		t.Fatalf("delivered %d to the desktop, sam's deliveries %v", len(desktop.got), samRun.Deliveries)
+	}
+
+	if _, err := hub.GetVisible(sam, ownerRun.ID); err == nil {
+		t.Fatal("sam read the owner's notice")
+	}
+	if err := hub.Dismiss(ada, ownerRun.ID); err == nil {
+		t.Fatal("ada dismissed the owner's notice")
+	}
+	if err := hub.MarkRead(sam, nil); err != nil {
+		t.Fatal(err)
+	}
+	if _, unread, _ := hub.List(owner, true, 50); unread != 2 {
+		t.Fatalf("sam's mark-all-read reached others: %d unread", unread)
 	}
 }
