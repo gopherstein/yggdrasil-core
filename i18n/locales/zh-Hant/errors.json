@@ -158,5 +158,17 @@
   "AUTOMATION_NOT_WEBHOOK": "此自動化不透過 Webhook 啟動。",
   "AUTOMATION_PAUSED": "此自動化已暫停。",
   "HOOK_TOO_SOON": "此 Webhook 剛剛被呼叫過。請幾秒後再試。",
-  "HOOK_TOO_LARGE": "請求內容超過 64 KB。"
+  "HOOK_TOO_LARGE": "請求內容超過 64 KB。",
+  "SIGN_IN_FAILED": "使用者名稱和密碼不符。",
+  "SIGN_IN_THROTTLED": "嘗試次數過多。請等 15 分鐘後再試。",
+  "INVITE_INVALID": "此連結已過期或已被使用。請索取新的連結。",
+  "USERNAME_TAKEN": "此使用者名稱已被使用。",
+  "USERNAME_INVALID": "使用者名稱為 3 到 32 個字母、數字、點、連字號或底線。",
+  "PASSWORD_TOO_SHORT": "密碼至少需要 10 個字元。",
+  "ROLE_INVALID": "沒有這個角色。",
+  "OWNER_FIXED": "擁有者的角色無法變更，任何人也不能變更自己的角色或停用自己。",
+  "NAME_INVALID": "名稱為 1 到 80 個字元。",
+  "PERSON_NOT_FOUND": "此人不在這裡。",
+  "ROLE_REQUIRED": "這需要 {{role}} 角色。",
+  "CROSS_SITE": "此變更不是來自 Toskar 自己的頁面，因此被拒絕。"
 }

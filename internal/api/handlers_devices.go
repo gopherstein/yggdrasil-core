@@ -74,7 +74,7 @@ func (s *Server) handleStartDevicePairing(w http.ResponseWriter, r *http.Request
 			return
 		}
 	}
-	p, err := s.deps.Devices.Start()
+	p, err := s.deps.Devices.StartFor(auth.PrincipalFrom(r.Context()).Person)
 	if err != nil {
 		writeErrFrom(w, http.StatusInternalServerError, "PAIRING_FAILED", err)
 		return

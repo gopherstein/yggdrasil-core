@@ -35,6 +35,204 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VersionResponse"
+  /api/v1/session:
+    post:
+      summary: Sign in with a username and password (#206)
+      description: Sets the session cookie. Five failures for a username in 15 minutes, or twenty from an address in ten, answer 429 SIGN_IN_THROTTLED for a while.
+      operationId: signIn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Signed in; the body is the request's person, as GET /api/v1/me
+        "401":
+          description: SIGN_IN_FAILED, the same whichever of username or password was wrong
+        "429":
+          description: SIGN_IN_THROTTLED
+    delete:
+      summary: Sign out this browser
+      operationId: signOut
+      responses:
+        "204":
+          description: Signed out
+  /api/v1/invites/{token}:
+    get:
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: What a one-time sign-in link is for (#206)
+      operationId: peekInvite
+      responses:
+        "200":
+          description: Whose link it is, and whether it sets up a sign-in (invite) or a new password (reset)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  kind:
+                    type: string
+                    enum: [invite, reset]
+                  username:
+                    type: string
+        "410":
+          description: INVITE_INVALID, used or expired
+    post:
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Use a one-time link to set a username and password, or a new password, and sign in
+      operationId: acceptInvite
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: For an invite; a reset keeps the username
+                password:
+                  type: string
+                  minLength: 10
+      responses:
+        "200":
+          description: Set and signed in
+        "400":
+          description: USERNAME_INVALID or PASSWORD_TOO_SHORT; the link is still good
+        "409":
+          description: USERNAME_TAKEN; the link is still good
+        "410":
+          description: INVITE_INVALID
+  /api/v1/people:
+    get:
+      summary: Everyone who uses this Toskar (Admins and the Owner)
+      operationId: listPeople
+      responses:
+        "200":
+          description: People, the Owner first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    username:
+                      type: string
+                    role:
+                      type: string
+                      enum: [owner, admin, member, visitor]
+                    sign_in:
+                      type: boolean
+                    disabled_at:
+                      type: string
+                      format: date-time
+    post:
+      summary: Add a person and make their invite link (Admins add Members and Visitors; the Owner adds Admins too)
+      operationId: addPerson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                role:
+                  type: string
+                  enum: [admin, member, visitor]
+      responses:
+        "201":
+          description: The person, and link with path (/invite/<token>), kind, and expires_at
+        "403":
+          description: ROLE_REQUIRED
+  /api/v1/people/{id}:
+    patch:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Rename, change the role of, disable, or enable a person
+      description: The Owner's role is fixed and they can't be disabled; nobody changes their own role or disables themselves. Disabling signs the person out everywhere and stops their keys.
+      operationId: changePerson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                role:
+                  type: string
+                  enum: [admin, member, visitor]
+                disabled:
+                  type: boolean
+      responses:
+        "200":
+          description: The person
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  username:
+                    type: string
+                  role:
+                    type: string
+                    enum: [owner, admin, member, visitor]
+                  sign_in:
+                    type: boolean
+                  disabled_at:
+                    type: string
+                    format: date-time
+        "403":
+          description: ROLE_REQUIRED or OWNER_FIXED
+  /api/v1/people/{id}/link:
+    post:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: A new one-time link for a person; a reset link once they have a sign-in
+      operationId: personLink
+      responses:
+        "201":
+          description: path (/invite/<token>), kind (invite or reset), and expires_at (a week for an invite, a day for a reset)
   /api/v1/me:
     get:
       summary: Who the request is from (#206)
@@ -65,7 +263,7 @@ paths:
                         format: date-time
                   via:
                     type: string
-                    enum: [this_computer, api_key]
+                    enum: [this_computer, api_key, session]
                   key_id:
                     type: string
   /api/v1/tls:

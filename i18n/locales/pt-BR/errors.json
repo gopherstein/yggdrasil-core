@@ -158,5 +158,17 @@
   "AUTOMATION_NOT_WEBHOOK": "Esta automação não é iniciada por um webhook.",
   "AUTOMATION_PAUSED": "Esta automação está pausada.",
   "HOOK_TOO_SOON": "Este webhook foi chamado agora há pouco. Tente de novo em alguns segundos.",
-  "HOOK_TOO_LARGE": "O corpo da solicitação é maior que 64 KB."
+  "HOOK_TOO_LARGE": "O corpo da solicitação é maior que 64 KB.",
+  "SIGN_IN_FAILED": "Esse usuário e essa senha não conferem.",
+  "SIGN_IN_THROTTLED": "Tentativas demais. Espere 15 minutos e tente de novo.",
+  "INVITE_INVALID": "Este link expirou ou já foi usado. Peça um novo.",
+  "USERNAME_TAKEN": "Esse nome de usuário já existe.",
+  "USERNAME_INVALID": "Um nome de usuário tem de 3 a 32 letras, dígitos, pontos, hifens ou sublinhados.",
+  "PASSWORD_TOO_SHORT": "Uma senha precisa de pelo menos 10 caracteres.",
+  "ROLE_INVALID": "Isso não é uma função.",
+  "OWNER_FIXED": "A função do proprietário não muda, e ninguém muda a própria função nem se desativa.",
+  "NAME_INVALID": "Um nome tem de 1 a 80 caracteres.",
+  "PERSON_NOT_FOUND": "Essa pessoa não está aqui.",
+  "ROLE_REQUIRED": "Isso exige a função {{role}}.",
+  "CROSS_SITE": "Essa alteração não veio das páginas do Toskar, então foi recusada."
 }

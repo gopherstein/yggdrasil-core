@@ -628,6 +628,8 @@ func New(opts Options) (*App, error) {
 		SetAPIKeyPermissions: apiKeyMgr.SetPermissions,
 		VerifyAPIKey:         apiKeyMgr.Verify,
 		People:               a.People,
+		Sessions:             auth.NewSessions(db.SQL),
+		Invites:              auth.NewInvites(db.SQL),
 		Devices:              &auth.DevicePairer{CreateKey: apiKeyMgr.CreateDevice},
 		PhoneAddress:         a.phoneAddress,
 		EnableLANForPhone:    a.enableLANForPhone,
