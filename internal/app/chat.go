@@ -273,7 +273,10 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		}
 		// What leaves this computer is recorded against this turn (§63).
 		source := egress.SourceChat
-		if opts != nil {
+		switch {
+		case opts != nil && opts.Portal != "":
+			source = egress.SourcePortal
+		case opts != nil:
 			source = egress.SourceAPI
 		}
 		ctx = egress.WithRun(ctx, egress.Run{Source: source, ConversationID: conversationID, TaskID: task.ID})

@@ -83,7 +83,11 @@
     "hourly": "Messages per visitor an hour",
     "longest": "Longest message (characters)",
     "most": "Chats at once",
-    "hint": "0 messages means no limit. Portal chats wait for your own and for other people's who use Toskar, and come before automations."
+    "hint": "0 messages means no limit. Portal chats wait for your own and for other people's who use Toskar, and come before automations.",
+    "keep": "Keep visitors' chats",
+    "keepForever": "Keep them",
+    "keepDays_one": "{{count}} day",
+    "keepDays_other": "{{count}} days"
   },
   "visitors": {
     "title": "Invited visitors",
@@ -102,5 +106,16 @@
     "hint": "One per line, such as https://shop.example.com. Only these websites can put the portal on their pages; any other gets a blank frame.",
     "button": "A chat button for your website",
     "frame": "Or the chat itself, in a frame"
+  },
+  "conversations": {
+    "open": "Conversations",
+    "none": "No conversations yet.",
+    "untitled": "Untitled",
+    "assistant": "Answer",
+    "hint": "Visitors are told the people who run this portal can read their chats.",
+    "members": "A Members only portal's chats are each Member's own, so they don't show here."
+  },
+  "usage": {
+    "month": "This month: visitors {{visitors}} · messages {{messages}}"
   }
 }

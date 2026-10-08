@@ -83,7 +83,10 @@
     "hourly": "每位访客每小时消息数",
     "longest": "最长消息（字符）",
     "most": "同时聊天数",
-    "hint": "0 表示不限制。门户聊天会等待你和其他使用 Toskar 的人的聊天，并优先于自动化。"
+    "hint": "0 表示不限制。门户聊天会等待你和其他使用 Toskar 的人的聊天，并优先于自动化。",
+    "keep": "访客聊天保留时间",
+    "keepForever": "一直保留",
+    "keepDays_other": "{{count}} 天"
   },
   "visitors": {
     "title": "受邀访客",
@@ -102,5 +105,16 @@
     "hint": "每行一个，例如 https://shop.example.com。只有这些网站能把门户放到自己的页面上；其他网站只会看到空白框。",
     "button": "为你的网站添加聊天按钮",
     "frame": "或在框中直接显示聊天"
+  },
+  "conversations": {
+    "open": "对话",
+    "none": "还没有对话。",
+    "untitled": "无标题",
+    "assistant": "回答",
+    "hint": "访客会被告知此门户的管理者可以阅读他们的聊天。",
+    "members": "仅限成员门户的聊天属于各成员自己，因此不会显示在这里。"
+  },
+  "usage": {
+    "month": "本月：访客 {{visitors}} · 消息 {{messages}}"
   }
 }

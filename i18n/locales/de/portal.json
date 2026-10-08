@@ -22,5 +22,6 @@
   },
   "invited": {
     "body": "{{name}} ist nur auf Einladung. Öffne den Link, den du bekommen hast."
-  }
+  },
+  "notice": "Die Betreiber von {{name}} können diese Chats lesen."
 }

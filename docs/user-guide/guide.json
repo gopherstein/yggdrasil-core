@@ -246,7 +246,8 @@
         "Each visitor's chats are their own: no other visitor, and none of your own chats, memories, or knowledge sources, appear to them, and their chats never reach your memory or knowledge. A portal starts with no tools and no memory; you can allow tools that only read, or the profile's own.",
         "Each portal has limits: how many messages a visitor may send an hour, how long a message may be, and how many of its chats run at once. Portal chats wait for your own and for other people's who use Toskar, so a busy portal never slows you down.",
         "Turning a portal off under Administer → Portals stops it at once, even for someone in the middle of a chat.",
-        "To put a portal on your own website, list the website's address under Embedding in the portal's editor, such as https://shop.example.com, then copy the chat button or the frame snippet onto your pages. Only the websites you list can show it."
+        "To put a portal on your own website, list the website's address under Embedding in the portal's editor, such as https://shop.example.com, then copy the chat button or the frame snippet onto your pages. Only the websites you list can show it.",
+        "Conversations, next to each portal, lists its visitors' chats for you to read, and the portal page tells visitors that the people who run it can read them. Each portal shows how many visitors wrote and how many messages they sent this month, and keeps visitors' chats for the time you choose, 30 days to start. A Members only portal's chats stay each Member's own."
       ],
       "steps": [
         "Open Administer → Portals.",

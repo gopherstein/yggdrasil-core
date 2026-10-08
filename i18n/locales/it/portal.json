@@ -22,5 +22,6 @@
   },
   "invited": {
     "body": "{{name}} è su invito. Apri il link che hai ricevuto."
-  }
+  },
+  "notice": "Chi gestisce {{name}} può leggere queste chat."
 }

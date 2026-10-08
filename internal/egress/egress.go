@@ -38,6 +38,8 @@ const (
 	SourceAPI        = "api"
 	SourceAutomation = "automation"
 	SourceTraining   = "training"
+	// SourcePortal is a chat portal visitor's chat (#205).
+	SourcePortal = "portal"
 )
 
 // Record is one time data left this computer.

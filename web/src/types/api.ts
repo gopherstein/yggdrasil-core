@@ -2174,6 +2174,8 @@ export interface Portal {
   concurrency: number
   /** The websites that may show it in a frame, such as https://shop.example.com. */
   embed_origins: string[]
+  /** How long visitors' conversations are kept, in days; 0 keeps them. */
+  retention_days: number
   created_at: string
   updated_at: string
 }
@@ -2186,4 +2188,31 @@ export interface PortalVisitorLink {
   /** /p/<portal>?invite=<token> */
   path: string
   expires_at: string
+}
+
+/** One of a chat portal's visitors' conversations, as Admins see it (#205). */
+export interface PortalConversation {
+  id: string
+  title: string
+  visitor: string
+  messages: number
+  created_at: string
+  updated_at: string
+}
+
+/** A message of a portal visitor's conversation. */
+export interface PortalMessage {
+  role: 'user' | 'assistant'
+  content: string
+  created_at: string
+}
+
+/** How much a chat portal is used, over the last 7 and 30 days. */
+export interface PortalUsage {
+  visitors_7: number
+  conversations_7: number
+  messages_7: number
+  visitors_30: number
+  conversations_30: number
+  messages_30: number
 }

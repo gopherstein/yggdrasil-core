@@ -8,7 +8,7 @@ import { formatDate } from '@/i18n/format'
 // What left, in order; the names are settings:whatLeft.kinds.<kind> in the catalog.
 const KINDS: EgressKind[] = ['web_search', 'web_page', 'places', 'paired_computer', 'external_server', 'connector', 'notification', 'community_ratings', 'update_check']
 // What sent it; the names are settings:whatLeft.sources.<source>.
-const SOURCES = ['chat', 'api', 'automation', 'training']
+const SOURCES = ['chat', 'api', 'automation', 'training', 'portal']
 
 const RETENTION_DAYS = [7, 30, 90, 365, 0]
 

@@ -114,6 +114,9 @@ import type {
   Portal,
   PortalInput,
   PortalVisitorLink,
+  PortalConversation,
+  PortalMessage,
+  PortalUsage,
 } from '@/types/api'
 import type { Upload } from '@/lib/upload'
 
@@ -553,6 +556,16 @@ export const api = {
   /** Change a chat portal; turning it off stops its visitors at once (#205). */
   updatePortal: (id: string, input: PortalInput) =>
     request<Portal>(`/api/v1/portals/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(input) }),
+
+  /** A chat portal's visitors' conversations, for Admins (#205). */
+  listPortalConversations: (id: string) => request<PortalConversation[]>(`/api/v1/portals/${encodeURIComponent(id)}/conversations`),
+
+  /** One visitor's conversation in a chat portal, to read (#205). */
+  getPortalMessages: (id: string, conversation: string) =>
+    request<PortalMessage[]>(`/api/v1/portals/${encodeURIComponent(id)}/conversations/${encodeURIComponent(conversation)}/messages`),
+
+  /** How much a chat portal is used (#205). */
+  getPortalUsage: (id: string) => request<PortalUsage>(`/api/v1/portals/${encodeURIComponent(id)}/usage`),
 
   /** A chat portal's invited visitors (#205). */
   listPortalVisitors: (id: string) => request<Person[]>(`/api/v1/portals/${encodeURIComponent(id)}/visitors`),

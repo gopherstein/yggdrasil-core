@@ -85,7 +85,9 @@ type App struct {
 
 	Conversations *repositories.ConversationRepo
 	Settings      *repositories.SettingsRepo
-	Metrics       *repositories.MetricsRepo
+	// Portals keeps chat portals (#205).
+	Portals *portals.Store
+	Metrics *repositories.MetricsRepo
 
 	Models       *models.Manager
 	Runtimes     *runtimes.Manager
@@ -356,6 +358,7 @@ func New(opts Options) (*App, error) {
 		Logger:        logger,
 		Conversations: convRepo,
 		Settings:      settingsRepo,
+		Portals:       portals.NewStore(db.SQL),
 		Metrics:       metricsRepo,
 		Models:        modelMgr,
 		Runtimes:      rtMgr,
@@ -629,7 +632,7 @@ func New(opts Options) (*App, error) {
 		SetAPIKeyPermissions: apiKeyMgr.SetPermissions,
 		VerifyAPIKey:         apiKeyMgr.Verify,
 		People:               a.People,
-		Portals:              portals.NewStore(db.SQL),
+		Portals:              a.Portals,
 		Sessions:             auth.NewSessions(db.SQL),
 		Invites:              auth.NewInvites(db.SQL),
 		Devices:              &auth.DevicePairer{CreateKey: apiKeyMgr.CreateDevice},
@@ -1147,6 +1150,13 @@ func (a *App) Start(ctx context.Context) error {
 		go func() {
 			defer a.wg.Done()
 			a.digestLoop(ctx)
+		}()
+	}
+	if a.Portals != nil {
+		a.wg.Add(1)
+		go func() {
+			defer a.wg.Done()
+			a.portalRetentionLoop(ctx)
 		}()
 	}
 	if a.Health != nil {
@@ -1710,5 +1720,24 @@ func updateCheckSupported() bool {
 func (a *App) publish(ctx context.Context, evt events.Event) {
 	if a.Bus != nil {
 		a.Bus.PublishFor(ctx, evt)
+	}
+}
+
+// portalRetentionLoop deletes chat portal visitors' conversations older
+// than their portal keeps, once an hour (#205).
+func (a *App) portalRetentionLoop(ctx context.Context) {
+	ticker := time.NewTicker(time.Hour)
+	defer ticker.Stop()
+	for {
+		if n, err := a.Portals.Prune(ctx); err != nil {
+			a.Logger.Warn("portal retention", "error", err)
+		} else if n > 0 {
+			a.Logger.Info("portal retention", "conversations_deleted", n)
+		}
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+		}
 	}
 }

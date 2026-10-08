@@ -217,7 +217,8 @@
       "chat": "聊天",
       "api": "API",
       "automation": "自動化",
-      "training": "訓練"
+      "training": "訓練",
+      "portal": "入口網站"
     },
     "keepFor": "執行紀錄保留期限",
     "retention": {

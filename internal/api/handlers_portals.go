@@ -62,6 +62,9 @@ func (s *Server) portalRoutes(api *mux.Router) {
 	api.HandleFunc("/portals/{id}", s.portalsReady(s.handleGetPortal)).Methods(http.MethodGet)
 	api.HandleFunc("/portals/{id}", s.portalsReady(s.handleUpdatePortal)).Methods(http.MethodPatch)
 	api.HandleFunc("/portals/{id}", s.portalsReady(s.handleDeletePortal)).Methods(http.MethodDelete)
+	api.HandleFunc("/portals/{id}/conversations", s.portalsReady(s.handlePortalConversations)).Methods(http.MethodGet)
+	api.HandleFunc("/portals/{id}/conversations/{cid}/messages", s.portalsReady(s.handlePortalMessages)).Methods(http.MethodGet)
+	api.HandleFunc("/portals/{id}/usage", s.portalsReady(s.handlePortalUsage)).Methods(http.MethodGet)
 	api.HandleFunc("/portals/{id}/visitors", s.portalsReady(s.handleListVisitors)).Methods(http.MethodGet)
 	api.HandleFunc("/portals/{id}/visitors", s.portalsReady(s.handleInviteVisitor)).Methods(http.MethodPost)
 	api.HandleFunc("/portals/{id}/visitors/{vid}/link", s.portalsReady(s.handleVisitorLink)).Methods(http.MethodPost)
@@ -88,7 +91,7 @@ func portalError(w http.ResponseWriter, err error) {
 		writeErr(w, http.StatusConflict, "PORTAL_SLUG_TAKEN", err.Error(), nil)
 	case errors.Is(err, portals.ErrBadSlug), errors.Is(err, portals.ErrBadName), errors.Is(err, portals.ErrBadTools),
 		errors.Is(err, portals.ErrBadAccess), errors.Is(err, portals.ErrNoPasscode), errors.Is(err, portals.ErrBadBranding),
-		errors.Is(err, portals.ErrBadLanguage), errors.Is(err, portals.ErrBadLimits), errors.Is(err, portals.ErrBadOrigins):
+		errors.Is(err, portals.ErrBadLanguage), errors.Is(err, portals.ErrBadLimits), errors.Is(err, portals.ErrBadOrigins), errors.Is(err, portals.ErrBadRetention):
 		writeErr(w, http.StatusBadRequest, "PORTAL_INVALID", err.Error(), nil)
 	default:
 		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
@@ -600,3 +603,38 @@ const embedScript = `(function () {
   document.body.appendChild(button);
 })();
 `
+
+// handlePortalConversations lists a portal's visitors' conversations for
+// Admins (#205); visitors are told the people who run it can read them.
+func (s *Server) handlePortalConversations(w http.ResponseWriter, r *http.Request) {
+	list, err := s.deps.Portals.Conversations(r.Context(), mux.Vars(r)["id"], 200)
+	if err != nil {
+		portalError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, list)
+}
+
+// handlePortalMessages is one visitor's conversation, to read.
+func (s *Server) handlePortalMessages(w http.ResponseWriter, r *http.Request) {
+	list, err := s.deps.Portals.Messages(r.Context(), mux.Vars(r)["id"], mux.Vars(r)["cid"])
+	if err != nil {
+		portalError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, list)
+}
+
+// handlePortalUsage counts a portal's use over the last 7 and 30 days.
+func (s *Server) handlePortalUsage(w http.ResponseWriter, r *http.Request) {
+	if _, err := s.deps.Portals.Get(r.Context(), mux.Vars(r)["id"]); err != nil {
+		portalError(w, err)
+		return
+	}
+	u, err := s.deps.Portals.Usage(r.Context(), mux.Vars(r)["id"])
+	if err != nil {
+		portalError(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, u)
+}

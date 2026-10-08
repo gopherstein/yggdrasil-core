@@ -83,7 +83,11 @@
     "hourly": "Nachrichten pro Besucher und Stunde",
     "longest": "Längste Nachricht (Zeichen)",
     "most": "Chats gleichzeitig",
-    "hint": "0 Nachrichten bedeutet keine Grenze. Portal-Chats warten auf deine eigenen und die anderer Toskar-Nutzer und kommen vor Automationen."
+    "hint": "0 Nachrichten bedeutet keine Grenze. Portal-Chats warten auf deine eigenen und die anderer Toskar-Nutzer und kommen vor Automationen.",
+    "keep": "Chats der Besucher aufbewahren",
+    "keepForever": "Immer aufbewahren",
+    "keepDays_one": "{{count}} Tag",
+    "keepDays_other": "{{count}} Tage"
   },
   "visitors": {
     "title": "Eingeladene Besucher",
@@ -102,5 +106,16 @@
     "hint": "Eine pro Zeile, z. B. https://shop.example.com. Nur diese Websites können das Portal auf ihren Seiten zeigen; jede andere bekommt einen leeren Rahmen.",
     "button": "Ein Chat-Knopf für deine Website",
     "frame": "Oder der Chat selbst in einem Rahmen"
+  },
+  "conversations": {
+    "open": "Unterhaltungen",
+    "none": "Noch keine Unterhaltungen.",
+    "untitled": "Ohne Titel",
+    "assistant": "Antwort",
+    "hint": "Besucher erfahren, dass die Betreiber dieses Portals ihre Chats lesen können.",
+    "members": "Die Chats eines Portals nur für Mitglieder gehören dem jeweiligen Mitglied und erscheinen hier nicht."
+  },
+  "usage": {
+    "month": "Diesen Monat: Besucher {{visitors}} · Nachrichten {{messages}}"
   }
 }

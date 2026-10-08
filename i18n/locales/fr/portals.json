@@ -83,7 +83,12 @@
     "hourly": "Messages par visiteur et par heure",
     "longest": "Message le plus long (caractères)",
     "most": "Discussions simultanées",
-    "hint": "0 message signifie aucune limite. Les discussions du portail attendent les vôtres et celles des autres personnes qui utilisent Toskar, et passent avant les automatisations."
+    "hint": "0 message signifie aucune limite. Les discussions du portail attendent les vôtres et celles des autres personnes qui utilisent Toskar, et passent avant les automatisations.",
+    "keep": "Conserver les discussions des visiteurs",
+    "keepForever": "Les conserver",
+    "keepDays_one": "{{count}} jour",
+    "keepDays_many": "{{count}} jours",
+    "keepDays_other": "{{count}} jours"
   },
   "visitors": {
     "title": "Visiteurs invités",
@@ -102,5 +107,16 @@
     "hint": "Un par ligne, comme https://shop.example.com. Seuls ces sites peuvent mettre le portail sur leurs pages ; tout autre affiche un cadre vide.",
     "button": "Un bouton de discussion pour votre site",
     "frame": "Ou la discussion elle-même, dans un cadre"
+  },
+  "conversations": {
+    "open": "Discussions",
+    "none": "Aucune discussion pour l'instant.",
+    "untitled": "Sans titre",
+    "assistant": "Réponse",
+    "hint": "Les visiteurs sont prévenus que les personnes qui gèrent ce portail peuvent lire leurs discussions.",
+    "members": "Les discussions d'un portail réservé aux membres appartiennent à chaque membre ; elles n'apparaissent pas ici."
+  },
+  "usage": {
+    "month": "Ce mois-ci : visiteurs {{visitors}} · messages {{messages}}"
   }
 }

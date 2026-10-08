@@ -217,7 +217,8 @@
       "chat": "チャット",
       "api": "API",
       "automation": "自動化",
-      "training": "トレーニング"
+      "training": "トレーニング",
+      "portal": "ポータル"
     },
     "keepFor": "実行記録の保存期間",
     "retention": {

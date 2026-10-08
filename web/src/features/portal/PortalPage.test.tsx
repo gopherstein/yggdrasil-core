@@ -13,7 +13,7 @@ vi.mock('@/lib/api', async () => {
     setPortal: vi.fn(),
     setPortalSession: vi.fn(),
     streamChat: vi.fn(),
-    api: { getPortalPage: vi.fn(), enterPortal: vi.fn(), getMessages: vi.fn(), createConversation: vi.fn(), stopChat: vi.fn() },
+    api: { getPortalPage: vi.fn(), enterPortal: vi.fn(), getMessages: vi.fn(), createConversation: vi.fn(), stopChat: vi.fn(), getConversations: vi.fn() },
   }
 })
 
@@ -85,6 +85,8 @@ describe('PortalPage (#205)', () => {
     expect(await screen.findByText('Hi! Ask about your order.')).toBeInTheDocument()
     expect(api.enterPortal).toHaveBeenCalledWith('support', '', '', false)
     expect(screen.queryByLabelText('Passcode')).not.toBeInTheDocument()
+    // Visitors are told their chats can be read.
+    expect(screen.getByText('The people who run Help desk can read these chats.')).toBeInTheDocument()
   })
 
   it('says when there’s no portal, or it’s off', async () => {
@@ -142,5 +144,19 @@ describe('PortalPage (#205)', () => {
       if (top) Object.defineProperty(window, 'top', top)
       sessionStorage.clear()
     }
+  })
+
+  it('starts a new chat when the saved one is no longer the visitor’s', async () => {
+    localStorage.setItem('toskar.portal.support.conversation', 'gone-1')
+    vi.mocked(api.getPortalPage).mockResolvedValue(page({ access: 'open', entered: true }))
+    vi.mocked(api.getConversations).mockResolvedValue([])
+    vi.mocked(api.createConversation).mockResolvedValue({ id: 'c9' } as never)
+    vi.mocked(streamChat).mockImplementation(async ({ onToken }) => onToken('Hello again.'))
+    renderIt()
+    fireEvent.click(await screen.findByRole('button', { name: 'Where is my order?' }))
+    expect(await screen.findByText('Hello again.')).toBeInTheDocument()
+    expect(api.getMessages).not.toHaveBeenCalledWith('gone-1')
+    expect(streamChat).toHaveBeenLastCalledWith(expect.objectContaining({ body: { conversation_id: 'c9', message: 'Where is my order?' } }))
+    expect(localStorage.getItem('toskar.portal.support.conversation')).toBe('c9')
   })
 })
