@@ -1103,6 +1103,7 @@ func (a *App) Start(ctx context.Context) error {
 	a.wg.Add(1)
 	go func() {
 		defer a.wg.Done()
+		a.setAPITLS()
 		if err := a.API.ListenAndServe(cfg.APIAddr()); err != nil && ctx.Err() == nil {
 			errCh <- err
 		}

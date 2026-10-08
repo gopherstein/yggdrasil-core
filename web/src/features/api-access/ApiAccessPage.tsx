@@ -81,13 +81,13 @@ async function probeLocalApi(lanEnabled: boolean): Promise<ApiProbeResult> {
   return { healthOk, openaiOk, openaiStatus, detail }
 }
 
-function lanUrlFromNodeAddress(address: string | undefined, port: number): string | null {
+function lanUrlFromNodeAddress(address: string | undefined, port: number, https: boolean): string | null {
   if (!address) return null
   const host = address.split(':')[0]?.trim()
   if (!host || host === '127.0.0.1' || host === 'localhost' || host === '::1') {
     return null
   }
-  return `http://${host}:${port}/v1`
+  return `${https ? 'https' : 'http'}://${host}:${port}/v1`
 }
 
 function listensBeyondLoopback(host: string): boolean {
@@ -143,10 +143,13 @@ export function ApiAccessPage() {
   const localEndpoint = `http://localhost:${port}/v1`
   const friendlyLocal = `localhost:${port}`
 
+  // Other devices use HTTPS when the API has a certificate (#213).
+  const tlsQuery = useQuery({ queryKey: ['api-tls'], queryFn: () => api.getApiTLS(), retry: false, staleTime: 60_000 })
+  const tls = tlsQuery.data
   const lanEndpoint = useMemo(() => {
     const local = (nodesQuery.data ?? []).find((n) => n.is_local)
-    return lanUrlFromNodeAddress(local?.address, port)
-  }, [nodesQuery.data, port])
+    return lanUrlFromNodeAddress(local?.address, port, !!tls?.enabled)
+  }, [nodesQuery.data, port, tls?.enabled])
 
   const probeQuery = useQuery({
     queryKey: ['api-access-probe', lanEnabled, probeTick],
@@ -344,6 +347,20 @@ export function ApiAccessPage() {
                   />
                 </p>
               )}
+              {tls?.enabled && tls.short ? (
+                <div className="space-y-1 pt-1 text-xs text-ink-muted">
+                  <p>
+                    <Trans
+                      t={t}
+                      i18nKey={tls.custom ? 'service.httpsCustom' : 'service.https'}
+                      values={{ short: tls.short }}
+                      components={{ mono: <span className="font-mono text-ink" title={tls.fingerprint} /> }}
+                    />
+                  </p>
+                  {!tls.custom ? <p>{t('service.httpsTrust', { short: tls.short })}</p> : null}
+                  {tls.error ? <p className="text-warning">{t('service.httpsError', { error: tls.error })}</p> : null}
+                </div>
+              ) : null}
             </div>
           )}
         </div>

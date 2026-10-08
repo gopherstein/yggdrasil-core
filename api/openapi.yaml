@@ -35,6 +35,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VersionResponse"
+  /api/v1/tls:
+    get:
+      summary: How the API speaks HTTPS on the local network (#213)
+      operationId: getApiTLS
+      responses:
+        "200":
+          description: The certificate the API serves over HTTPS
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  fingerprint:
+                    type: string
+                    description: sha256 and the hex of the certificate
+                  short:
+                    type: string
+                    description: The fingerprint's start for a person to compare, such as E863-B509
+                  not_after:
+                    type: string
+                    format: date-time
+                  custom:
+                    type: boolean
+                    description: The operator's own certificate (api_tls_cert, api_tls_key)
+                  error:
+                    type: string
+                    description: Why the operator's certificate could not be used
   /about:
     get:
       summary: AGPL corresponding-source offer

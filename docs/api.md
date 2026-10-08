@@ -38,7 +38,15 @@ Anything else returns `403` `DEVICE_NOT_ALLOWED`. It appears in `GET /api-keys` 
 
 `TOSKAR_API_KEY`, when set, is hashed at startup if that secret is not already valid. The Docker image binds `0.0.0.0` and will not start until that variable is set or a key is already in the data directory. The cluster compose file sets a local test key for that reason.
 
-A bearer token on plain HTTP does not encrypt traffic. It stops anonymous use of a trusted LAN. TLS or mTLS for remote access is not implemented.
+A bearer token on plain HTTP does not encrypt traffic; use HTTPS on the same port from other devices (see below).
+
+### HTTPS
+
+The API answers HTTPS and plain HTTP on the same port (#213), told apart by the first byte of each connection. The desktop app and this computer's browser use plain HTTP over loopback; phones, browsers, and apps on the local network can use `https://` and the same port.
+- **Certificate:** Toskar makes an ECDSA P-256 certificate at first start, for `localhost`, the computer's name (and `.local`), and its local network addresses, and keeps it in `secrets/api-tls.crt` and `secrets/api-tls.key` (`0600`), so its fingerprint stays the same. It's self-signed: a browser or app asks you to trust it the first time. API Access shows the start of its SHA-256 fingerprint, such as `E863-B509`, to compare with what the browser shows.
+- **Your own certificate:** set `api_tls_cert` and `api_tls_key` in `config.json`, or `TOSKAR_API_TLS_CERT` and `TOSKAR_API_TLS_KEY`, to PEM files, such as one from your own certificate authority. If they can't be read, Toskar's own certificate is used, and `GET /api/v1/tls` says why in `error`.
+- **`GET /api/v1/tls`:** `enabled`, `fingerprint` (`sha256:` and the hex of the certificate), `short`, `not_after`, `custom`, and `error`. Connecting a device returns the fingerprint with the phone's key (`tls_fingerprint`, `tls_short`), so the phone can keep it and check it from then on.
+- **Plain HTTP:** still answered from the network for now, so phones on an older Toskar app keep working; a key on plain HTTP limits who can call the API but doesn't encrypt traffic. A later release will require HTTPS from the network.
 
 ### Browsers and websites
 

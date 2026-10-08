@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/yeixio/toskar-core/internal/auth"
+	"github.com/yeixio/toskar-core/internal/mixtls"
 )
 
 func identity(t *testing.T, id string) *auth.NodeIdentity {
@@ -37,7 +38,7 @@ func serveMixed(t *testing.T, ident *auth.NodeIdentity, h http.Handler) string {
 		t.Fatal(err)
 	}
 	srv := &http.Server{Handler: h, ReadHeaderTimeout: 5 * time.Second}
-	go func() { _ = srv.Serve(newMixedListener(ln, cfg)) }()
+	go func() { _ = srv.Serve(mixtls.NewListener(ln, cfg)) }()
 	t.Cleanup(func() { _ = srv.Close() })
 	return "http://" + ln.Addr().String()
 }

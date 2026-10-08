@@ -61,6 +61,12 @@ func ApplyEnvOverrides(cfg *Config) {
 	if v := Env("WEB_UI_ENABLED"); v != "" {
 		cfg.WebUIEnabled = parseBool(v)
 	}
+	if v := Env("API_TLS_CERT"); v != "" {
+		cfg.APITLSCert = v
+	}
+	if v := Env("API_TLS_KEY"); v != "" {
+		cfg.APITLSKey = v
+	}
 }
 
 // EnvTruthy reports whether the setting Env(name) is a truthy flag.
