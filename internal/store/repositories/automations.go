@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/automations"
 )
 
@@ -27,8 +28,19 @@ const automationSelect = `
 		created_at, updated_at, next_run_at, last_run_at,
 		consecutive_failures, COALESCE(last_error, ''), COALESCE(response_language, ''),
 		COALESCE(conversation_id, ''), COALESCE(draft_id, ''), COALESCE(save_folder, ''),
-		COALESCE(trigger_json, ''), COALESCE(watch_state, ''), last_checked_at, COALESCE(hook_hash, '')
+		COALESCE(trigger_json, ''), COALESCE(watch_state, ''), last_checked_at, COALESCE(hook_hash, ''), person_id
 	FROM automations`
+
+// mine narrows a query to the request's person's automations (#206); the
+// scheduler, working for everyone, sees all. where is the clause's
+// keyword: "WHERE" or "AND".
+func mine(ctx context.Context, where string) (string, []any) {
+	person, everyone := auth.Scope(ctx)
+	if everyone {
+		return "", nil
+	}
+	return " " + where + " person_id = ?", []any{person}
+}
 
 // Create stores an automation and computes its first next run.
 // now is the creation time, so tests can pin the clock.
@@ -62,6 +74,7 @@ func (r *AutomationRepo) Create(ctx context.Context, in automations.CreateInput,
 		Trigger:          in.Trigger,
 		CreatedAt:        now,
 		UpdatedAt:        now,
+		PersonID:         auth.PersonID(ctx),
 	}
 	if err := prepareAutomation(&a); err != nil {
 		return automations.Automation{}, err
@@ -80,12 +93,14 @@ func (r *AutomationRepo) Create(ctx context.Context, in automations.CreateInput,
 
 // byDraft is the automation a chat's draft made.
 func (r *AutomationRepo) byDraft(ctx context.Context, draftID string) (automations.Automation, error) {
-	return scanAutomation(r.db.QueryRowContext(ctx, automationSelect+` WHERE draft_id = ?`, draftID))
+	clause, args := mine(ctx, "AND")
+	return scanAutomation(r.db.QueryRowContext(ctx, automationSelect+` WHERE draft_id = ?`+clause, append([]any{draftID}, args...)...))
 }
 
 // Get loads one automation by id.
 func (r *AutomationRepo) Get(ctx context.Context, id string) (automations.Automation, error) {
-	row := r.db.QueryRowContext(ctx, automationSelect+` WHERE id = ?`, id)
+	clause, args := mine(ctx, "AND")
+	row := r.db.QueryRowContext(ctx, automationSelect+` WHERE id = ?`+clause, append([]any{id}, args...)...)
 	a, err := scanAutomation(row)
 	if err == sql.ErrNoRows {
 		return automations.Automation{}, fmt.Errorf("automation %q not found", id)
@@ -95,8 +110,9 @@ func (r *AutomationRepo) Get(ctx context.Context, id string) (automations.Automa
 
 // List returns every automation, soonest next run first.
 func (r *AutomationRepo) List(ctx context.Context) ([]automations.Automation, error) {
-	rows, err := r.db.QueryContext(ctx, automationSelect+`
-		ORDER BY (next_run_at IS NULL), next_run_at, name`)
+	clause, args := mine(ctx, "WHERE")
+	rows, err := r.db.QueryContext(ctx, automationSelect+clause+`
+		ORDER BY (next_run_at IS NULL), next_run_at, name`, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -241,7 +257,8 @@ func (r *AutomationRepo) RefreshNextRuns(ctx context.Context, now time.Time) err
 
 // Delete removes an automation and its run rows.
 func (r *AutomationRepo) Delete(ctx context.Context, id string) error {
-	res, err := r.db.ExecContext(ctx, `DELETE FROM automations WHERE id = ?`, id)
+	clause, args := mine(ctx, "AND")
+	res, err := r.db.ExecContext(ctx, `DELETE FROM automations WHERE id = ?`+clause, append([]any{id}, args...)...)
 	if err != nil {
 		return err
 	}
@@ -262,13 +279,13 @@ func (r *AutomationRepo) insert(ctx context.Context, a automations.Automation) e
 			id, name, enabled, schedule_json, time_zone, prompt, profile_id, model_id,
 			tools_json, notification_json, created_at, updated_at, next_run_at, last_run_at,
 			consecutive_failures, last_error, response_language, conversation_id, draft_id, save_folder,
-			trigger_json, watch_state, last_checked_at
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			trigger_json, watch_state, last_checked_at, person_id
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		a.ID, a.Name, boolInt(a.Enabled), sched, a.Schedule.TimeZone, a.Prompt, nullIfEmpty(a.ProfileID), nullIfEmpty(a.ModelID),
 		tools, note, formatTime(a.CreatedAt), formatTime(a.UpdatedAt), formatTimePtr(a.NextRunAt), formatTimePtr(a.LastRunAt),
 		a.ConsecutiveFailures, nullIfEmpty(a.LastError), nullIfEmpty(a.ResponseLanguage),
 		nullIfEmpty(a.ConversationID), nullIfEmpty(a.DraftID), nullIfEmpty(a.SaveFolder),
-		triggerJSON(a.Trigger), nullIfEmpty(string(a.WatchState)), formatTimePtr(a.LastCheckedAt))
+		triggerJSON(a.Trigger), nullIfEmpty(string(a.WatchState)), formatTimePtr(a.LastCheckedAt), a.PersonID)
 	return err
 }
 
@@ -376,7 +393,7 @@ func scanAutomation(s automationScanner) (automations.Automation, error) {
 	if err := s.Scan(
 		&a.ID, &a.Name, &enabled, &sched, &zone, &a.Prompt, &a.ProfileID, &a.ModelID, &tools, &note,
 		&created, &updated, &next, &last, &a.ConsecutiveFailures, &a.LastError, &a.ResponseLanguage,
-		&a.ConversationID, &a.DraftID, &a.SaveFolder, &trigger, &watchState, &checked, &a.HookHash,
+		&a.ConversationID, &a.DraftID, &a.SaveFolder, &trigger, &watchState, &checked, &a.HookHash, &a.PersonID,
 	); err != nil {
 		return automations.Automation{}, err
 	}
@@ -447,7 +464,8 @@ func (r *AutomationRepo) Checked(ctx context.Context, id string, state []byte, c
 
 // Followers are the automations with an after trigger on id (#204).
 func (r *AutomationRepo) Followers(ctx context.Context, id string) ([]automations.Automation, error) {
-	rows, err := r.db.QueryContext(ctx, automationSelect+` WHERE trigger_json IS NOT NULL ORDER BY name`)
+	clause, args := mine(ctx, "AND")
+	rows, err := r.db.QueryContext(ctx, automationSelect+` WHERE trigger_json IS NOT NULL`+clause+` ORDER BY name`, args...)
 	if err != nil {
 		return nil, err
 	}

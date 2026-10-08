@@ -30,6 +30,12 @@ type automationExecutor struct {
 
 // Execute runs an automation and traces the run (§35).
 func (e automationExecutor) Execute(ctx context.Context, automation automations.Automation) (automations.Execution, error) {
+	// It runs as the person whose it is, with their chats, memories, and
+	// files (#206), while they may still use Toskar.
+	ctx, err := e.app.asAutomationPerson(ctx, automation)
+	if err != nil {
+		return automations.Execution{}, err
+	}
 	run := runlog.New(uuid.NewString(), "", automation.ProfileID, egress.SourceAutomation)
 	run.SetLanguage(e.app.appLanguage(ctx))
 	run.Note("automation", map[string]any{"name": automation.Name})

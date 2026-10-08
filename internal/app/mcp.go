@@ -35,11 +35,11 @@ type mcpPermsKey struct{}
 // mcpAuthorize checks an MCP request as /v1 checks one, and carries what
 // its key allows into the calls.
 func (a *App) mcpAuthorize(r *http.Request) (context.Context, error) {
-	perms, err := a.openAIPermissions(r)
+	perms, ctx, err := a.openAIPermissions(r)
 	if err != nil {
 		return nil, err
 	}
-	return context.WithValue(r.Context(), mcpPermsKey{}, perms), nil
+	return context.WithValue(ctx, mcpPermsKey{}, perms), nil
 }
 
 func mcpPerms(ctx context.Context) auth.APIKeyPermissions {

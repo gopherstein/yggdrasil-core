@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
@@ -31,7 +32,7 @@ type ConversationPatch struct {
 func (r *ConversationRepo) List(ctx context.Context) ([]contracts.Conversation, error) {
 	rows, err := r.db.QueryContext(ctx, `
 		SELECT id, COALESCE(title,''), COALESCE(profile_id,''), COALESCE(model_id,''), memory_off, created_at, updated_at
-		FROM conversations ORDER BY updated_at DESC`)
+		FROM conversations WHERE person_id = ? ORDER BY updated_at DESC`, auth.PersonID(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +54,7 @@ func (r *ConversationRepo) List(ctx context.Context) ([]contracts.Conversation, 
 func (r *ConversationRepo) Get(ctx context.Context, id string) (contracts.Conversation, error) {
 	row := r.db.QueryRowContext(ctx, `
 		SELECT id, COALESCE(title,''), COALESCE(profile_id,''), COALESCE(model_id,''), memory_off, created_at, updated_at
-		FROM conversations WHERE id = ?`, id)
+		FROM conversations WHERE id = ? AND person_id = ?`, id, auth.PersonID(ctx))
 	c, err := scanConversation(row)
 	if err == sql.ErrNoRows {
 		return contracts.Conversation{}, fmt.Errorf("conversation %q not found", id)
@@ -75,10 +76,10 @@ func (r *ConversationRepo) Create(ctx context.Context, title, profileID, modelID
 		UpdatedAt: now,
 	}
 	_, err := r.db.ExecContext(ctx, `
-		INSERT INTO conversations (id, title, profile_id, model_id, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, ?)`,
+		INSERT INTO conversations (id, title, profile_id, model_id, created_at, updated_at, person_id)
+		VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		c.ID, c.Title, nullIfEmpty(c.ProfileID), nullIfEmpty(c.ModelID),
-		c.CreatedAt.Format(time.RFC3339Nano), c.UpdatedAt.Format(time.RFC3339Nano))
+		c.CreatedAt.Format(time.RFC3339Nano), c.UpdatedAt.Format(time.RFC3339Nano), auth.PersonID(ctx))
 	return c, err
 }
 
@@ -110,9 +111,9 @@ func (r *ConversationRepo) Update(ctx context.Context, id string, patch Conversa
 	_, err = r.db.ExecContext(ctx, `
 		UPDATE conversations
 		SET title = ?, profile_id = ?, model_id = ?, memory_off = ?, updated_at = ?
-		WHERE id = ?`,
+		WHERE id = ? AND person_id = ?`,
 		existing.Title, nullIfEmpty(existing.ProfileID), nullIfEmpty(existing.ModelID), memoryOff,
-		existing.UpdatedAt.Format(time.RFC3339Nano), id)
+		existing.UpdatedAt.Format(time.RFC3339Nano), id, auth.PersonID(ctx))
 	if err != nil {
 		return contracts.Conversation{}, err
 	}
@@ -120,7 +121,7 @@ func (r *ConversationRepo) Update(ctx context.Context, id string, patch Conversa
 }
 
 func (r *ConversationRepo) Delete(ctx context.Context, id string) error {
-	res, err := r.db.ExecContext(ctx, `DELETE FROM conversations WHERE id = ?`, id)
+	res, err := r.db.ExecContext(ctx, `DELETE FROM conversations WHERE id = ? AND person_id = ?`, id, auth.PersonID(ctx))
 	if err != nil {
 		return err
 	}
@@ -162,12 +163,13 @@ func (r *ConversationRepo) AddMessageWithMeta(ctx context.Context, conversationI
 	return m, nil
 }
 
-// DeleteAll removes every conversation and message.
+// DeleteAll removes every conversation and message of the request's person.
 func (r *ConversationRepo) DeleteAll(ctx context.Context) error {
-	if _, err := r.db.ExecContext(ctx, `DELETE FROM messages`); err != nil {
+	person := auth.PersonID(ctx)
+	if _, err := r.db.ExecContext(ctx, `DELETE FROM messages WHERE conversation_id IN (SELECT id FROM conversations WHERE person_id = ?)`, person); err != nil {
 		return err
 	}
-	_, err := r.db.ExecContext(ctx, `DELETE FROM conversations`)
+	_, err := r.db.ExecContext(ctx, `DELETE FROM conversations WHERE person_id = ?`, person)
 	return err
 }
 
@@ -178,7 +180,8 @@ func (r *ConversationRepo) DeleteAll(ctx context.Context) error {
 func (r *ConversationRepo) ListMessages(ctx context.Context, conversationID string) ([]contracts.Message, error) {
 	rows, err := r.db.QueryContext(ctx, `
 		SELECT id, conversation_id, role, content, COALESCE(meta_json, ''), created_at
-		FROM messages WHERE conversation_id = ? ORDER BY rowid ASC`, conversationID)
+		FROM messages WHERE conversation_id = ?
+		AND conversation_id IN (SELECT id FROM conversations WHERE person_id = ?) ORDER BY rowid ASC`, conversationID, auth.PersonID(ctx))
 	if err != nil {
 		return nil, err
 	}

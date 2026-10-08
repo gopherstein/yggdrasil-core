@@ -1,6 +1,7 @@
 package openai
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -49,7 +50,7 @@ func TestControlsWithinTheKeysPermissions(t *testing.T) {
 	chat := &scriptChat{chunks: []pluginapi.ChatChunk{{Content: "ok", Done: true}}}
 	h.Chat = chat
 	perms := auth.DefaultAPIKeyPermissions()
-	h.Permissions = func(*http.Request) (auth.APIKeyPermissions, error) { return perms, nil }
+	h.Permissions = func(r *http.Request) (auth.APIKeyPermissions, context.Context, error) { return perms, r.Context(), nil }
 
 	rec := post(h, `{"model":"profile:general","reasoning_effort":"high","messages":[{"role":"user","content":"hi"}],
 		"yggdrasil":{"memory":true,"knowledge_sources":["src-1"],"tools":["internet.search"],"placement":"local"}}`)
@@ -142,7 +143,7 @@ func TestToskarAndYggdrasilExtension(t *testing.T) {
 	chat := &scriptChat{chunks: []pluginapi.ChatChunk{{Content: "ok", Done: true}}, emit: func(o *turnopts.Options) { o.Meta(meta) }}
 	h.Chat = chat
 	perms := auth.DefaultAPIKeyPermissions()
-	h.Permissions = func(*http.Request) (auth.APIKeyPermissions, error) { return perms, nil }
+	h.Permissions = func(r *http.Request) (auth.APIKeyPermissions, context.Context, error) { return perms, r.Context(), nil }
 
 	rec := post(h, `{"model":"profile:general","messages":[{"role":"user","content":"hi"}],"toskar":{"memory":true}}`)
 	if rec.Code != http.StatusOK || !chat.opts.Memory {

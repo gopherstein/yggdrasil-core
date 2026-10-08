@@ -86,12 +86,14 @@ type App struct {
 	Settings      *repositories.SettingsRepo
 	Metrics       *repositories.MetricsRepo
 
-	Models           *models.Manager
-	Runtimes         *runtimes.Manager
-	Profiles         *profiles.Manager
-	OrchRegistry     *orchestrator.Registry
-	Tasks            *tasks.Manager
-	Automations      *repositories.AutomationRepo
+	Models       *models.Manager
+	Runtimes     *runtimes.Manager
+	Profiles     *profiles.Manager
+	OrchRegistry *orchestrator.Registry
+	Tasks        *tasks.Manager
+	Automations  *repositories.AutomationRepo
+	// People are who use this Toskar, and their roles (#206).
+	People           *auth.People
 	AutomationRunner *automations.Runner
 	Scheduler        *scheduler.Scheduler
 	Tools            *tools.Registry
@@ -259,6 +261,7 @@ func New(opts Options) (*App, error) {
 
 	bus := events.NewBus(128)
 	convRepo := repositories.NewConversationRepo(db.SQL)
+	people := auth.NewPeople(db.SQL)
 	settingsRepo := repositories.NewSettingsRepo(db.SQL)
 	metricsRepo := repositories.NewMetricsRepo(db.SQL)
 
@@ -342,6 +345,7 @@ func New(opts Options) (*App, error) {
 		extRuntime.SetConfig(c)
 	}
 	a := &App{
+		People:        people,
 		External:      extRuntime,
 		secrets:       secrets,
 		Share:         share.New(0),
@@ -623,7 +627,7 @@ func New(opts Options) (*App, error) {
 		RotateAPIKey:         apiKeyMgr.Rotate,
 		SetAPIKeyPermissions: apiKeyMgr.SetPermissions,
 		VerifyAPIKey:         apiKeyMgr.Verify,
-		People:               auth.NewPeople(db.SQL),
+		People:               a.People,
 		Devices:              &auth.DevicePairer{CreateKey: apiKeyMgr.CreateDevice},
 		PhoneAddress:         a.phoneAddress,
 		EnableLANForPhone:    a.enableLANForPhone,
@@ -729,7 +733,7 @@ func New(opts Options) (*App, error) {
 	autoRepo := repositories.NewAutomationRepo(db.SQL)
 	a.Automations = autoRepo
 	a.AutomationRunner = &automations.Runner{
-		Store:  autoRepo,
+		Store:  systemAutomations{autoRepo},
 		Exec:   automationExecutor{app: a},
 		Notify: automationNotifier{settings: settingsRepo, send: automations.OSSender{}, hub: a.Notifications},
 		Bus:    bus,
@@ -738,7 +742,7 @@ func New(opts Options) (*App, error) {
 		Watch:  triggerWatcher{},
 		Pause: func(ctx context.Context, id string) error {
 			enabled := false
-			_, err := a.Automations.Update(ctx, id, automations.Patch{Enabled: &enabled}, time.Now())
+			_, err := a.Automations.Update(auth.WithSystem(ctx), id, automations.Patch{Enabled: &enabled}, time.Now())
 			return err
 		},
 	}
@@ -874,25 +878,42 @@ func (a *App) openAIAuth(r *http.Request) error {
 }
 
 // openAIPermissions authorizes a chat completion and returns what its key
-// may ask of the assistant. A key's limits apply even on this computer; a
-// request here without a key gets the defaults.
-func (a *App) openAIPermissions(r *http.Request) (auth.APIKeyPermissions, error) {
+// may ask of the assistant, and the request's context carrying whose it is
+// (#206): the key's person, or the Owner for a request from this computer
+// without one. A key's limits apply even on this computer; a request here
+// without a key gets the defaults.
+func (a *App) openAIPermissions(r *http.Request) (auth.APIKeyPermissions, context.Context, error) {
 	if err := a.authorizeControlRequest(r); err != nil {
-		return auth.APIKeyPermissions{}, err
+		return auth.APIKeyPermissions{}, nil, err
 	}
+	owner := auth.PrincipalFrom(r.Context())
+	if a.People != nil {
+		if p, err := a.People.Get(r.Context(), auth.OwnerID); err == nil {
+			owner.Person = p
+		}
+	}
+	ownerCtx := auth.WithPrincipal(r.Context(), owner)
 	token, err := auth.BearerToken(r)
 	if err != nil || token == "" {
-		return auth.DefaultAPIKeyPermissions(), nil
+		return auth.DefaultAPIKeyPermissions(), ownerCtx, nil
 	}
 	rec, err := a.APIKeys.Verify(r.Context(), token)
 	if err != nil {
 		if config.ListensBeyondLoopback(a.Config.Get().APIHost) && !auth.FromThisComputer(r) {
-			return auth.APIKeyPermissions{}, err
+			return auth.APIKeyPermissions{}, nil, err
 		}
 		// On this computer a key is optional; a wrong one gets the defaults.
-		return auth.DefaultAPIKeyPermissions(), nil
+		return auth.DefaultAPIKeyPermissions(), ownerCtx, nil
 	}
-	return rec.Permissions, nil
+	principal := auth.Principal{Person: auth.Person{ID: rec.PersonID, Role: auth.RoleOwner}, Via: auth.ViaAPIKey, KeyID: rec.ID}
+	if a.People != nil {
+		person, err := a.People.Active(r.Context(), rec.PersonID)
+		if err != nil {
+			return auth.APIKeyPermissions{}, nil, fmt.Errorf("this key's person can no longer use Toskar")
+		}
+		principal.Person = person
+	}
+	return rec.Permissions, auth.WithPrincipal(r.Context(), principal), nil
 }
 
 func (a *App) authorizeControlRequest(r *http.Request) error {

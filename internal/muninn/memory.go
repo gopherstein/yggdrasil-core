@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/personal"
 	"github.com/yeixio/toskar-core/internal/replylang"
 	"github.com/yeixio/toskar-core/pkg/contracts"
@@ -129,7 +130,7 @@ func (s *Store) Add(ctx context.Context, content, category, sourceType, sourceRe
 	}
 	if dup, ok := s.duplicate(ctx, content); ok {
 		dup.Enabled = true
-		_, err := s.db.ExecContext(ctx, `UPDATE memories SET enabled = 1, updated_at = ? WHERE id = ?`, ts(s.now()), dup.ID)
+		_, err := s.db.ExecContext(ctx, `UPDATE memories SET enabled = 1, updated_at = ? WHERE id = ? AND person_id = ?`, ts(s.now()), dup.ID, auth.PersonID(ctx))
 		return dup, false, err
 	}
 	m := Memory{ID: uuid.NewString(), Content: content, Category: category, SourceType: sourceType, SourceRef: sourceRef,
@@ -140,8 +141,8 @@ func (s *Store) Add(ctx context.Context, content, category, sourceType, sourceRe
 	}
 	defer func() { _ = tx.Rollback() }()
 	if _, err := tx.ExecContext(ctx, `
-		INSERT INTO memories (id, content, category, source_type, source_ref, enabled, language, created_at, updated_at)
-		VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?)`, m.ID, m.Content, m.Category, m.SourceType, nullable(m.SourceRef), nullable(m.Language), ts(m.CreatedAt), ts(m.UpdatedAt)); err != nil {
+		INSERT INTO memories (id, content, category, source_type, source_ref, enabled, language, created_at, updated_at, person_id)
+		VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?)`, m.ID, m.Content, m.Category, m.SourceType, nullable(m.SourceRef), nullable(m.Language), ts(m.CreatedAt), ts(m.UpdatedAt), auth.PersonID(ctx)); err != nil {
 		return Memory{}, false, err
 	}
 	if _, err := tx.ExecContext(ctx, `INSERT INTO memories_fts (content, memory_id) VALUES (?, ?)`, m.Content, m.ID); err != nil {
@@ -211,8 +212,8 @@ func (s *Store) Update(ctx context.Context, id string, p Patch) (Memory, error) 
 		return Memory{}, err
 	}
 	defer func() { _ = tx.Rollback() }()
-	if _, err := tx.ExecContext(ctx, `UPDATE memories SET content=?, category=?, enabled=?, local_only=?, language=?, updated_at=? WHERE id=?`,
-		m.Content, m.Category, boolInt(m.Enabled), boolInt(m.LocalOnly), nullable(m.Language), ts(s.now()), id); err != nil {
+	if _, err := tx.ExecContext(ctx, `UPDATE memories SET content=?, category=?, enabled=?, local_only=?, language=?, updated_at=? WHERE id=? AND person_id=?`,
+		m.Content, m.Category, boolInt(m.Enabled), boolInt(m.LocalOnly), nullable(m.Language), ts(s.now()), id, auth.PersonID(ctx)); err != nil {
 		return Memory{}, err
 	}
 	if _, err := tx.ExecContext(ctx, `UPDATE memories_fts SET content=? WHERE memory_id=?`, m.Content, id); err != nil {
@@ -231,7 +232,7 @@ func (s *Store) Delete(ctx context.Context, id string) error {
 		return err
 	}
 	defer func() { _ = tx.Rollback() }()
-	res, err := tx.ExecContext(ctx, `DELETE FROM memories WHERE id = ?`, id)
+	res, err := tx.ExecContext(ctx, `DELETE FROM memories WHERE id = ? AND person_id = ?`, id, auth.PersonID(ctx))
 	if err != nil {
 		return err
 	}
@@ -264,7 +265,7 @@ func scan(row interface{ Scan(...any) error }) (Memory, error) {
 
 // Get returns one memory.
 func (s *Store) Get(ctx context.Context, id string) (Memory, error) {
-	m, err := scan(s.db.QueryRowContext(ctx, `SELECT `+columns+` FROM memories WHERE id = ?`, id))
+	m, err := scan(s.db.QueryRowContext(ctx, `SELECT `+columns+` FROM memories WHERE id = ? AND person_id = ?`, id, auth.PersonID(ctx)))
 	if errors.Is(err, sql.ErrNoRows) {
 		return Memory{}, ErrNotFound
 	}
@@ -273,7 +274,7 @@ func (s *Store) Get(ctx context.Context, id string) (Memory, error) {
 
 // List returns every memory, newest first.
 func (s *Store) List(ctx context.Context) ([]Memory, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT `+columns+` FROM memories ORDER BY updated_at DESC`)
+	rows, err := s.db.QueryContext(ctx, `SELECT `+columns+` FROM memories WHERE person_id = ? ORDER BY updated_at DESC`, auth.PersonID(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -364,8 +365,8 @@ func (s *Store) byWords(ctx context.Context, terms []string, add func(Memory) bo
 	rows, err := s.db.QueryContext(ctx, `
 		SELECT m.id, m.content, m.category, m.source_type, COALESCE(m.source_ref, ''), m.enabled, m.local_only, COALESCE(m.language, ''), m.created_at, m.updated_at
 		FROM memories_fts f JOIN memories m ON m.id = f.memory_id
-		WHERE memories_fts MATCH ? AND m.enabled = 1
-		ORDER BY bm25(memories_fts) LIMIT ?`, strings.Join(terms, " OR "), maxRelevant*2)
+		WHERE memories_fts MATCH ? AND m.enabled = 1 AND m.person_id = ?
+		ORDER BY bm25(memories_fts) LIMIT ?`, strings.Join(terms, " OR "), auth.PersonID(ctx), maxRelevant*2)
 	if err != nil {
 		return 0, err
 	}
@@ -477,9 +478,9 @@ func (s *Store) Find(ctx context.Context, text string) (Memory, bool, error) {
 		return Memory{}, false, nil
 	}
 	rows, err := s.db.QueryContext(ctx, `
-		SELECT m.id, m.content, m.category, m.source_type, COALESCE(m.source_ref, ''), m.enabled, m.local_only, m.created_at, m.updated_at
+		SELECT m.id, m.content, m.category, m.source_type, COALESCE(m.source_ref, ''), m.enabled, m.local_only, COALESCE(m.language, ''), m.created_at, m.updated_at
 		FROM memories_fts f JOIN memories m ON m.id = f.memory_id
-		WHERE memories_fts MATCH ? ORDER BY bm25(memories_fts) LIMIT 1`, strings.Join(terms, " AND "))
+		WHERE memories_fts MATCH ? AND m.person_id = ? ORDER BY bm25(memories_fts) LIMIT 1`, strings.Join(terms, " AND "), auth.PersonID(ctx))
 	if err != nil {
 		return Memory{}, false, err
 	}

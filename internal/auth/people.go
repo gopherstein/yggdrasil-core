@@ -132,7 +132,33 @@ type Principal struct {
 const (
 	ViaThisComputer = "this_computer"
 	ViaAPIKey       = "api_key"
+	// ViaSystem is Toskar's own work across everyone, such as the
+	// scheduler finding what's due. It reaches every person's data; what it
+	// then does for one person runs as them.
+	ViaSystem = "system"
 )
+
+// WithSystem marks Toskar's own work across everyone.
+func WithSystem(ctx context.Context) context.Context {
+	return WithPrincipal(ctx, Principal{Person: Person{ID: OwnerID, Name: "Owner", Role: RoleOwner}, Via: ViaSystem})
+}
+
+// Scope is whose data ctx may reach: one person's, or everyone's for
+// Toskar's own work.
+func Scope(ctx context.Context) (personID string, everyone bool) {
+	p := PrincipalFrom(ctx)
+	return p.Person.ID, p.Via == ViaSystem
+}
+
+// AsPerson is ctx acting for person, such as an automation running as the
+// person whose it is.
+func AsPerson(ctx context.Context, person Person) context.Context {
+	return WithPrincipal(ctx, Principal{Person: person, Via: ViaSystem + ":" + person.ID})
+}
+
+// PersonID is whose a request or job is: the person whose data it reads
+// and writes (#206).
+func PersonID(ctx context.Context) string { return PrincipalFrom(ctx).Person.ID }
 
 type principalKey struct{}
 
