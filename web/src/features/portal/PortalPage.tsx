@@ -223,11 +223,27 @@ function PortalChat({ slug, view, onLeft }: { slug: string; view: PortalPageView
   const branding = view.branding ?? {}
   const suggestions = prompts(branding)
 
-  // The chat this browser had here before, if it's still theirs.
+  // The chat this browser had here before, if it's still theirs: it may
+  // have gone with the portal's retention, or be from another portal that
+  // had this address, and a message to it would be lost.
+  const mine = useQuery({
+    queryKey: ['portal-own-conversations', slug],
+    queryFn: () => api.getConversations(),
+    enabled: restoreId !== '',
+    retry: false,
+  })
+  const stillMine = mine.isSuccess && (mine.data ?? []).some((c) => c.id === restoreId)
+  useEffect(() => {
+    if (restoreId && mine.isSuccess && !stillMine) {
+      setConversationId('')
+      setRestoreId('')
+      saveConversation(slug, '')
+    }
+  }, [restoreId, mine.isSuccess, stillMine, slug])
   const history = useQuery({
     queryKey: ['portal-messages', slug, restoreId],
     queryFn: () => api.getMessages(restoreId),
-    enabled: restoreId !== '',
+    enabled: restoreId !== '' && stillMine,
     retry: false,
   })
   useEffect(() => {
@@ -302,7 +318,7 @@ function PortalChat({ slug, view, onLeft }: { slug: string; view: PortalPageView
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6">
         <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-          {turns.length === 0 && history.isLoading ? null : turns.length === 0 ? (
+          {turns.length === 0 && restoreId && (mine.isLoading || history.isLoading) ? null : turns.length === 0 ? (
             <div className="space-y-4 py-10 text-center">
               <p className="text-ink-muted">{text(branding.welcome, t('welcome', { name: view.name }), 1000)}</p>
               {suggestions.length > 0 ? (
@@ -369,6 +385,11 @@ function PortalChat({ slug, view, onLeft }: { slug: string; view: PortalPageView
             </button>
           )}
         </div>
+        {view.access !== 'members' ? (
+          // Visitors are told the people who run the portal can read their
+          // chats (#205).
+          <p className="mx-auto mt-2 w-full max-w-2xl text-center text-[11px] text-ink-faint">{t('notice', { name: view.name })}</p>
+        ) : null}
         {turns.length > 0 && !sending ? (
           <div className="mx-auto mt-2 flex w-full max-w-2xl justify-end">
             <button

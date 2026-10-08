@@ -18,6 +18,9 @@ vi.mock('@/lib/api', async () => {
       deletePortal: vi.fn(),
       getProfiles: vi.fn(),
       listPortalVisitors: vi.fn(),
+      listPortalConversations: vi.fn(),
+      getPortalMessages: vi.fn(),
+      getPortalUsage: vi.fn(),
       invitePortalVisitor: vi.fn(),
       portalVisitorLink: vi.fn(),
       removePortalVisitor: vi.fn(),
@@ -30,7 +33,7 @@ vi.mock('@/lib/api', async () => {
 
 const portal: Portal = {
   id: 'p1', slug: 'support', name: 'Help desk', profile_id: '', tools: 'none', memory: false, language: '', access: 'passcode',
-  has_passcode: true, branding: { welcome: 'Hi!' }, enabled: true, hourly_limit: 30, max_message: 2000, concurrency: 2, embed_origins: [],
+  has_passcode: true, branding: { welcome: 'Hi!' }, enabled: true, hourly_limit: 30, max_message: 2000, concurrency: 2, embed_origins: [], retention_days: 30,
   created_at: '', updated_at: '',
 }
 
@@ -129,5 +132,32 @@ describe('PortalsPage (#205)', () => {
     await waitFor(() =>
       expect(api.updatePortal).toHaveBeenLastCalledWith('p1', expect.objectContaining({ embed_origins: ['https://shop.example.com', 'https://blog.example.com'] })),
     )
+  })
+
+  it("shows a portal's use, and lets an Admin read its visitors' conversations", async () => {
+    vi.mocked(api.getPortalUsage).mockResolvedValue({ visitors_7: 2, conversations_7: 2, messages_7: 5, visitors_30: 4, conversations_30: 6, messages_30: 19 })
+    vi.mocked(api.listPortalConversations).mockResolvedValue([
+      { id: 'c1', title: 'Winter tires', visitor: 'Robin', messages: 2, created_at: '2026-10-08T12:00:00Z', updated_at: '2026-10-08T12:01:00Z' },
+    ])
+    vi.mocked(api.getPortalMessages).mockResolvedValue([
+      { role: 'user', content: 'Do you have winter tires?', created_at: '' },
+      { role: 'assistant', content: 'Yes, from $90.', created_at: '' },
+    ])
+    renderIt()
+    expect(await screen.findByText('This month: visitors 4 · messages 19')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Conversations' }))
+    fireEvent.click(await screen.findByRole('button', { name: /Winter tires/ }))
+    expect(await screen.findByText('Yes, from $90.')).toBeInTheDocument()
+    expect(api.getPortalMessages).toHaveBeenCalledWith('p1', 'c1')
+  })
+
+  it("saves how long visitors' chats are kept", async () => {
+    vi.mocked(api.updatePortal).mockResolvedValue(portal)
+    renderIt()
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    const editor = (await screen.findByRole('heading', { name: 'Edit Help desk' })).closest('section') as HTMLElement
+    fireEvent.change(within(editor).getByLabelText("Keep visitors' chats"), { target: { value: '7' } })
+    fireEvent.click(within(editor).getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(api.updatePortal).toHaveBeenLastCalledWith('p1', expect.objectContaining({ retention_days: 7 })))
   })
 })

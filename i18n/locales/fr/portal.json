@@ -22,5 +22,6 @@
   },
   "invited": {
     "body": "{{name}} est sur invitation. Ouvrez le lien que vous avez reçu."
-  }
+  },
+  "notice": "Les personnes qui gèrent {{name}} peuvent lire ces discussions."
 }

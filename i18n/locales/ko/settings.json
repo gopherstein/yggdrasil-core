@@ -217,7 +217,8 @@
       "chat": "채팅",
       "api": "API",
       "automation": "자동화",
-      "training": "학습"
+      "training": "학습",
+      "portal": "포털"
     },
     "keepFor": "실행 기록 보관 기간",
     "retention": {

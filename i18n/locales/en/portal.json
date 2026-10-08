@@ -22,5 +22,6 @@
   },
   "invited": {
     "body": "{{name}} is by invitation. Open the link you were sent."
-  }
+  },
+  "notice": "The people who run {{name}} can read these chats."
 }

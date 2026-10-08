@@ -22,5 +22,6 @@
   },
   "invited": {
     "body": "{{name}} es solo con invitación. Abre el enlace que te enviaron."
-  }
+  },
+  "notice": "Quienes gestionan {{name}} pueden leer estos chats."
 }

@@ -83,7 +83,12 @@
     "hourly": "Mensajes por visitante y hora",
     "longest": "Mensaje más largo (caracteres)",
     "most": "Chats a la vez",
-    "hint": "0 mensajes significa sin límite. Los chats del portal esperan a los tuyos y a los de otras personas que usan Toskar, y van antes que las automatizaciones."
+    "hint": "0 mensajes significa sin límite. Los chats del portal esperan a los tuyos y a los de otras personas que usan Toskar, y van antes que las automatizaciones.",
+    "keep": "Conservar los chats de visitantes",
+    "keepForever": "Conservarlos",
+    "keepDays_one": "{{count}} día",
+    "keepDays_many": "{{count}} días",
+    "keepDays_other": "{{count}} días"
   },
   "visitors": {
     "title": "Visitantes invitados",
@@ -102,5 +107,16 @@
     "hint": "Uno por línea, como https://shop.example.com. Solo estos sitios pueden poner el portal en sus páginas; cualquier otro ve un marco vacío.",
     "button": "Un botón de chat para tu sitio web",
     "frame": "O el chat en sí, en un marco"
+  },
+  "conversations": {
+    "open": "Conversaciones",
+    "none": "Todavía no hay conversaciones.",
+    "untitled": "Sin título",
+    "assistant": "Respuesta",
+    "hint": "A los visitantes se les avisa que quienes gestionan este portal pueden leer sus chats.",
+    "members": "Los chats de un portal solo para miembros son de cada miembro, así que no aparecen aquí."
+  },
+  "usage": {
+    "month": "Este mes: visitantes {{visitors}} · mensajes {{messages}}"
   }
 }

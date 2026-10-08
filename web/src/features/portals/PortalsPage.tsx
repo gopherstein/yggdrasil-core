@@ -316,6 +316,7 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
   const [access, setAccess] = useState(portal.access)
   const [passcode, setPasscode] = useState('')
   const [origins, setOrigins] = useState((portal.embed_origins ?? []).join('\n'))
+  const [retention, setRetention] = useState(String(portal.retention_days ?? 30))
   const [hourly, setHourly] = useState(String(portal.hourly_limit))
   const [longest, setLongest] = useState(String(portal.max_message))
   const [most, setMost] = useState(String(portal.concurrency))
@@ -333,6 +334,7 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
         name: name.trim(), slug, profile_id: profileId, tools, memory, language, access, branding,
         hourly_limit: Number(hourly), max_message: Number(longest), concurrency: Number(most),
         embed_origins: origins.split('\n').map((o) => o.trim()).filter(Boolean),
+        retention_days: Number(retention),
       }
       if (passcode.trim()) input.passcode = passcode.trim()
       return api.updatePortal(portal.id, input)
@@ -343,7 +345,7 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
       void queryClient.invalidateQueries({ queryKey: ['portals'] })
     },
   })
-  useEffect(() => setSaved(false), [name, slug, profileId, tools, memory, language, access, passcode, hourly, longest, most, origins])
+  useEffect(() => setSaved(false), [name, slug, profileId, tools, memory, language, access, passcode, hourly, longest, most, origins, retention])
 
   const choices = languages.filter((l) => availableLanguages.includes(l.code))
   const field = 'space-y-1 text-sm'
@@ -445,7 +447,7 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
             ) : null}
           </fieldset>
 
-          <fieldset className="grid gap-3 sm:grid-cols-3">
+          <fieldset className="grid gap-3 sm:grid-cols-2">
             <legend className="label-caps mb-2">{t('edit.limits')}</legend>
             <label className={field}>
               <span className={label}>{t('limit.hourly')}</span>
@@ -459,7 +461,17 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
               <span className={label}>{t('limit.most')}</span>
               <input className="field w-full" type="number" min={1} max={20} value={most} onChange={(e) => setMost(e.target.value)} />
             </label>
-            <p className="text-xs text-ink-faint sm:col-span-3">{t('limit.hint')}</p>
+            <label className={field}>
+              <span className={label}>{t('limit.keep')}</span>
+              <select className="field w-full" value={retention} onChange={(e) => setRetention(e.target.value)}>
+                {['7', '30', '90', '365', '0'].map((d) => (
+                  <option key={d} value={d}>
+                    {d === '0' ? t('limit.keepForever') : t('limit.keepDays', { count: Number(d) })}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="text-xs text-ink-faint sm:col-span-2">{t('limit.hint')}</p>
           </fieldset>
 
           <fieldset className="grid gap-3 sm:grid-cols-2">
@@ -555,9 +567,59 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
   )
 }
 
+/** A portal's visitors' conversations, to read (#205). */
+function PortalConversations({ portal }: { portal: Portal }) {
+  const { t } = useTranslation('portals')
+  const [open, setOpen] = useState<string | null>(null)
+  const list = useQuery({ queryKey: ['portal-conversations', portal.id], queryFn: () => api.listPortalConversations(portal.id) })
+  const messages = useQuery({
+    queryKey: ['portal-messages-admin', portal.id, open],
+    queryFn: () => api.getPortalMessages(portal.id, open ?? ''),
+    enabled: open !== null,
+  })
+  const items = list.data ?? []
+  return (
+    <div className="space-y-2 rounded-lg border border-line/60 p-3">
+      <p className="text-xs text-ink-faint">
+        {portal.access === 'members' ? t('conversations.members') : t('conversations.hint')}
+      </p>
+      {list.isSuccess && items.length === 0 ? <p className="text-sm text-ink-faint">{t('conversations.none')}</p> : null}
+      <ul className="divide-y divide-line">
+        {items.map((c) => (
+          <li key={c.id} className="py-1.5">
+            <button
+              type="button"
+              className="flex w-full items-baseline gap-2 text-start text-sm hover:text-primary"
+              aria-expanded={open === c.id}
+              onClick={() => setOpen(open === c.id ? null : c.id)}
+            >
+              <span className="min-w-0 flex-1 truncate text-ink">{c.title || t('conversations.untitled')}</span>
+              <span className="shrink-0 text-xs text-ink-muted">
+                {c.visitor} · {formatDate(c.updated_at, { dateStyle: 'medium', timeStyle: 'short' })}
+              </span>
+            </button>
+            {open === c.id ? (
+              <div className="mt-2 space-y-2 rounded-md bg-ink/5 p-2">
+                {(messages.data ?? []).map((m, i) => (
+                  <div key={i} className={m.role === 'user' ? 'text-sm text-ink' : 'text-sm text-ink-muted'}>
+                    <span className="label-caps me-2">{m.role === 'user' ? c.visitor : t('conversations.assistant')}</span>
+                    <span className="whitespace-pre-wrap">{m.content}</span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 function PortalRow({ portal, onEdit }: { portal: Portal; onEdit: () => void }) {
   const { t } = useTranslation('portals')
   const queryClient = useQueryClient()
+  const [reading, setReading] = useState(false)
+  const usage = useQuery({ queryKey: ['portal-usage', portal.id], queryFn: () => api.getPortalUsage(portal.id), retry: false })
   const change = useMutation({
     mutationFn: (enabled: boolean) => api.updatePortal(portal.id, { enabled }),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['portals'] }),
@@ -577,8 +639,16 @@ function PortalRow({ portal, onEdit }: { portal: Portal; onEdit: () => void }) {
           <p className="text-xs text-ink-muted">
             {t(`access.${portal.access}`)} · {t(`tools.${portal.tools}`)}
           </p>
+          {usage.data ? (
+            <p className="text-xs text-ink-faint">
+              {t('usage.month', { visitors: usage.data.visitors_30, messages: usage.data.messages_30 })}
+            </p>
+          ) : null}
         </div>
         <Toggle label={t('enabled', { name: portal.name })} checked={portal.enabled} disabled={change.isPending} onChange={() => change.mutate(!portal.enabled)} />
+        <button type="button" className="btn-secondary btn-sm" aria-expanded={reading} onClick={() => setReading(!reading)}>
+          {t('conversations.open')}
+        </button>
         <button type="button" className="btn-secondary btn-sm" onClick={onEdit}>
           {t('edit.open')}
         </button>
@@ -594,6 +664,7 @@ function PortalRow({ portal, onEdit }: { portal: Portal; onEdit: () => void }) {
         </button>
       </div>
       {portal.enabled ? <PortalLink slug={portal.slug} /> : null}
+      {reading ? <PortalConversations portal={portal} /> : null}
       {change.error || remove.error ? <p className="text-xs text-danger">{errorText(change.error ?? remove.error)}</p> : null}
     </li>
   )

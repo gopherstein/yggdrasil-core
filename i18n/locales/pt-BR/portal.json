@@ -22,5 +22,6 @@
   },
   "invited": {
     "body": "{{name}} é só para convidados. Abra o link que você recebeu."
-  }
+  },
+  "notice": "Quem administra {{name}} pode ler estas conversas."
 }

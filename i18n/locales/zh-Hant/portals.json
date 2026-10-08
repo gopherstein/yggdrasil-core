@@ -83,7 +83,10 @@
     "hourly": "每位訪客每小時訊息數",
     "longest": "最長訊息（字元）",
     "most": "同時聊天數",
-    "hint": "0 表示不限制。入口網站聊天會等待你和其他使用 Toskar 的人的聊天，並優先於自動化。"
+    "hint": "0 表示不限制。入口網站聊天會等待你和其他使用 Toskar 的人的聊天，並優先於自動化。",
+    "keep": "訪客聊天保留時間",
+    "keepForever": "一直保留",
+    "keepDays_other": "{{count}} 天"
   },
   "visitors": {
     "title": "受邀訪客",
@@ -102,5 +105,16 @@
     "hint": "每行一個，例如 https://shop.example.com。只有這些網站能把入口網站放到自己的頁面上；其他網站只會看到空白框。",
     "button": "為你的網站加入聊天按鈕",
     "frame": "或在框中直接顯示聊天"
+  },
+  "conversations": {
+    "open": "對話",
+    "none": "還沒有對話。",
+    "untitled": "無標題",
+    "assistant": "回答",
+    "hint": "訪客會被告知此入口網站的管理者可以閱讀他們的聊天。",
+    "members": "僅限成員入口網站的聊天屬於各成員自己，因此不會顯示在這裡。"
+  },
+  "usage": {
+    "month": "本月：訪客 {{visitors}} · 訊息 {{messages}}"
   }
 }

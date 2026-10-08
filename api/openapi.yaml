@@ -356,6 +356,70 @@ paths:
       responses:
         "204":
           description: Removed
+  /api/v1/portals/{id}/conversations:
+    get:
+      summary: A portal's visitors' conversations (#205)
+      description: Newest first, for Admins. A Members only portal's chats are each Member's own, so they aren't here.
+      operationId: listPortalConversations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: id, title, visitor, messages, created_at, updated_at
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/v1/portals/{id}/conversations/{cid}/messages:
+    get:
+      summary: One visitor's conversation, to read (#205)
+      operationId: listPortalMessages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: role, content, created_at, oldest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        "404":
+          description: Not one of the portal's conversations
+  /api/v1/portals/{id}/usage:
+    get:
+      summary: How much a portal is used (#205)
+      description: Visitors who wrote, conversations, and messages they sent, over the last 7 and 30 days.
+      operationId: getPortalUsage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The counts
+          content:
+            application/json:
+              schema:
+                type: object
   /api/v1/portals/{id}/visitors:
     get:
       summary: A portal's invited visitors (#205)

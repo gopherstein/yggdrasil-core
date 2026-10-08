@@ -217,7 +217,8 @@
       "chat": "Chat",
       "api": "API",
       "automation": "Automatización",
-      "training": "Entrenamiento"
+      "training": "Entrenamiento",
+      "portal": "Portal"
     },
     "keepFor": "Conservar los registros de ejecución durante",
     "retention": {
