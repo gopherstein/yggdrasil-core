@@ -1,0 +1,19 @@
+{
+  "gone": {
+    "title": "此聊天不可用",
+    "body": "此地址没有聊天，或它已关闭。"
+  },
+  "enter": {
+    "body": "{{name}} 需要访问码才能开始聊天。",
+    "passcode": "访问码",
+    "submit": "开始聊天",
+    "wrong": "该访问码不正确。"
+  },
+  "error": "出了点问题。请重试。",
+  "welcome": "有什么都可以问 {{name}}。",
+  "thinking": "正在思考…",
+  "message": "发消息给 {{name}}",
+  "send": "发送",
+  "stop": "停止",
+  "newChat": "新聊天"
+}

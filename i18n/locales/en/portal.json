@@ -1,0 +1,19 @@
+{
+  "gone": {
+    "title": "This chat isn't available",
+    "body": "There's no chat at this address, or it's turned off."
+  },
+  "enter": {
+    "body": "{{name}} asks for a passcode to start chatting.",
+    "passcode": "Passcode",
+    "submit": "Start chatting",
+    "wrong": "That passcode isn't right."
+  },
+  "error": "Something went wrong. Try again.",
+  "welcome": "Ask {{name}} anything.",
+  "thinking": "Thinking…",
+  "message": "Message {{name}}",
+  "send": "Send",
+  "stop": "Stop",
+  "newChat": "New chat"
+}

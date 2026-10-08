@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { RequireRole } from '@/components/auth/RequireRole'
+import { PortalPage } from '@/features/portal/PortalPage'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { LifecycleHost } from '@/components/LifecycleHost'
 import { NotificationHost } from '@/components/NotificationHost'
@@ -48,7 +49,26 @@ function OnboardingGate({ children }: { children: ReactNode }) {
   return <Navigate to="/onboarding" replace />
 }
 
+/**
+ * The chat portal at /p/<portal> (#205), or null. A portal's page is its
+ * own small app, without the app's hosts around it, which would ask the
+ * service things a portal's visitor may not.
+ */
+function portalSlug(): string | null {
+  if (typeof window === 'undefined') return null
+  const match = /^\/p\/([a-z0-9-]{2,40})\/?$/i.exec(window.location.pathname)
+  return match ? match[1].toLowerCase() : null
+}
+
 export function App() {
+  const portal = portalSlug()
+  if (portal) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <PortalPage slug={portal} />
+      </QueryClientProvider>
+    )
+  }
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeSync />

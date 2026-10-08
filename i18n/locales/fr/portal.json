@@ -1,0 +1,19 @@
+{
+  "gone": {
+    "title": "Cette discussion n'est pas disponible",
+    "body": "Il n'y a pas de discussion à cette adresse, ou elle est désactivée."
+  },
+  "enter": {
+    "body": "{{name}} demande un code pour commencer à discuter.",
+    "passcode": "Code",
+    "submit": "Commencer à discuter",
+    "wrong": "Ce code n'est pas correct."
+  },
+  "error": "Un problème est survenu. Réessayez.",
+  "welcome": "Posez vos questions à {{name}}.",
+  "thinking": "Réflexion…",
+  "message": "Message à {{name}}",
+  "send": "Envoyer",
+  "stop": "Arrêter",
+  "newChat": "Nouvelle discussion"
+}

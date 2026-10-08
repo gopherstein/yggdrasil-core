@@ -2123,3 +2123,30 @@ export interface UpdatesStatus {
   checked_at?: string
   latest?: LatestRelease
 }
+
+/** How a chat portal looks (#205). Every field is optional; the page checks each. */
+export interface PortalBranding {
+  /** The heading; the portal's name when empty. */
+  title?: string
+  /** An http(s) or data:image address. */
+  logo_url?: string
+  /** Hex colours, such as #0a7d6f. */
+  accent?: string
+  background?: string
+  theme?: 'dark' | 'light' | 'system'
+  welcome?: string
+  /** Up to six suggested first messages. */
+  prompts?: string[]
+  footer?: string
+}
+
+/** What a chat portal's page shows before anyone enters (#205). */
+export interface PortalPageView {
+  slug: string
+  name: string
+  access: 'open' | 'passcode' | string
+  language: string
+  branding: PortalBranding
+  /** True when this browser is already the portal's guest. */
+  entered: boolean
+}
