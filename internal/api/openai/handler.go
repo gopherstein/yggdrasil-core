@@ -33,8 +33,9 @@ type Handler struct {
 	Bus      *events.Bus
 	Auth     func(r *http.Request) error
 	// Permissions authorizes a request and returns what its key may ask of
-	// the assistant (§62). When set, it replaces Auth for chat completions.
-	Permissions func(r *http.Request) (auth.APIKeyPermissions, error)
+	// the assistant (§62), and the request's context carrying whose it is
+	// (#206). When set, it replaces Auth for chat completions.
+	Permissions func(r *http.Request) (auth.APIKeyPermissions, context.Context, error)
 	// Specialized lists deployed specialized AIs (sai: ids) for /v1/models.
 	Specialized func(ctx context.Context) ([]contracts.Model, error)
 }
@@ -118,12 +119,13 @@ func (h *Handler) HandleChatCompletions(w http.ResponseWriter, r *http.Request) 
 	perms := auth.DefaultAPIKeyPermissions()
 	switch {
 	case h.Permissions != nil:
-		p, err := h.Permissions(r)
+		p, ctx, err := h.Permissions(r)
 		if err != nil {
 			writeError(w, http.StatusUnauthorized, "UNAUTHORIZED", err.Error())
 			return
 		}
 		perms = p
+		r = r.WithContext(ctx)
 	case h.Auth != nil:
 		if err := h.Auth(r); err != nil {
 			writeError(w, http.StatusUnauthorized, "UNAUTHORIZED", err.Error())

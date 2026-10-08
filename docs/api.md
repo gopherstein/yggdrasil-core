@@ -44,7 +44,9 @@ A bearer token on plain HTTP does not encrypt traffic; use HTTPS on the same por
 
 Toskar is getting people and roles (#206). Today there is one person, the **Owner**, and everything belongs to them: API keys, chats, memories, files, and automations each record their person (`person_id`, `owner` for everything from before). Roles, from the most to the least: `owner`, `admin`, `member`, and `visitor`.
 
-Every `/api/v1` request is known to be someone's: one from this computer, or answered without a key while the API listens only here, is the Owner's (`via: this_computer`); one with an API key is the key's person's (`via: api_key`), and stops working if that person is disabled. `GET /api/v1/me` returns the request's `person` (`id`, `name`, `username`, `role`), `via`, and `key_id`. Sign-in for other people, private data per person, and role checks follow.
+Every `/api/v1` request is known to be someone's: one from this computer, or answered without a key while the API listens only here, is the Owner's (`via: this_computer`); one with an API key is the key's person's (`via: api_key`), and stops working if that person is disabled. `GET /api/v1/me` returns the request's `person` (`id`, `name`, `username`, `role`), `via`, and `key_id`. `/v1/chat/completions` and MCP calls are their key's person's too.
+
+Chats and their messages, memories, files, and automations are private to their person: lists, reads, changes, and deletes reach only the request's own, even for the Owner, and "delete all chats" deletes only theirs. A chat's turn draws only on its person's memories. An automation runs as its person, so its chat, memories, and files are theirs, and a disabled person's automations don't run; the scheduler itself finds what's due across everyone. Knowledge sources, profiles, models, tools, and settings are shared. Sign-in for other people and role checks follow.
 
 ### HTTPS
 

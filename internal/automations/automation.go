@@ -123,7 +123,10 @@ type Automation struct {
 	// the draft that chat showed (#204). Both are empty for one made
 	// elsewhere.
 	ConversationID string `json:"conversation_id,omitempty"`
-	DraftID        string `json:"draft_id,omitempty"`
+	// PersonID is whose automation it is (#206): it runs as them, and only
+	// they see it.
+	PersonID string `json:"-"`
+	DraftID  string `json:"draft_id,omitempty"`
 	// SaveFolder, when set, is a folder each result is also saved to as a
 	// Markdown file (#204), such as ~/Documents/Toskar/News.
 	SaveFolder string `json:"save_folder,omitempty"`

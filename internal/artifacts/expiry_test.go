@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/yeixio/toskar-core/internal/auth"
 )
 
 // A file that belongs to no chat expires after a week; one attached to a
@@ -69,5 +71,38 @@ func TestSQLiteExpiryReads(t *testing.T) {
 	got, err := s.Get(ctx, a.ID)
 	if err != nil || got.ExpiresAt == nil || time.Until(*got.ExpiresAt) < 6*24*time.Hour {
 		t.Fatalf("expires = %v, %v", got.ExpiresAt, err)
+	}
+}
+
+// Files are their person's (#206).
+func TestFilesArePrivate(t *testing.T) {
+	s, dir := newStore(t)
+	owner := auth.WithPrincipal(context.Background(), auth.Principal{Person: auth.Person{ID: auth.OwnerID}})
+	sam := auth.WithPrincipal(context.Background(), auth.Principal{Person: auth.Person{ID: "sam"}})
+	theirs, err := s.Save(sam, Input{ConversationID: "c1", Name: "plans.md", Data: []byte("secret")})
+	if err != nil {
+		t.Fatal(err)
+	}
+	mine, _ := s.Save(owner, Input{ConversationID: "c1", Name: "notes.md", Data: []byte("mine")})
+	if _, _, err := s.Read(owner, theirs.ID); err == nil {
+		t.Fatal("the owner read sam's file")
+	}
+	if list, _ := s.List(owner, "c1"); len(list) != 1 || list[0].ID != mine.ID {
+		t.Fatalf("owner lists %+v", list)
+	}
+	if err := s.Delete(owner, theirs.ID); err == nil {
+		// Delete of another's file finds nothing.
+		if _, _, err := s.Read(sam, theirs.ID); err != nil {
+			t.Fatal("the owner deleted sam's file")
+		}
+	}
+	if err := s.DeleteAll(owner); err != nil {
+		t.Fatal(err)
+	}
+	if _, data, err := s.Read(sam, theirs.ID); err != nil || string(data) != "secret" {
+		t.Fatalf("deleting the owner's files removed sam's: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(dir, "c1", mine.ID+".md")); !os.IsNotExist(err) {
+		t.Fatal("the owner's file is still on disk")
 	}
 }

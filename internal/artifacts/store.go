@@ -17,6 +17,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
@@ -198,10 +199,10 @@ func (s *Store) Save(ctx context.Context, in Input) (Artifact, error) {
 		return Artifact{}, err
 	}
 	_, err := s.db.ExecContext(ctx, `
-		INSERT INTO artifacts (id, conversation_id, name, mime_type, kind, size_bytes, producer, source_task, path, created_at, expires_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		INSERT INTO artifacts (id, conversation_id, name, mime_type, kind, size_bytes, producer, source_task, path, created_at, expires_at, person_id)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		a.ID, nullable(a.ConversationID), a.Name, a.MimeType, a.Kind, a.Size, a.Producer, nullable(a.SourceTask), a.path,
-		a.CreatedAt.Format(time.RFC3339Nano), stamp(a.ExpiresAt))
+		a.CreatedAt.Format(time.RFC3339Nano), stamp(a.ExpiresAt), auth.PersonID(ctx))
 	if err != nil {
 		_ = os.Remove(full)
 		return Artifact{}, err
@@ -233,7 +234,7 @@ func stamp(t *time.Time) any {
 
 // Get returns one artifact's record.
 func (s *Store) Get(ctx context.Context, id string) (Artifact, error) {
-	a, err := scan(s.db.QueryRowContext(ctx, `SELECT `+columns+` FROM artifacts WHERE id = ?`, id))
+	a, err := scan(s.db.QueryRowContext(ctx, `SELECT `+columns+` FROM artifacts WHERE id = ? AND person_id = ?`, id, auth.PersonID(ctx)))
 	if errors.Is(err, sql.ErrNoRows) {
 		return Artifact{}, ErrNotFound
 	}
@@ -255,7 +256,7 @@ func (s *Store) Read(ctx context.Context, id string) (Artifact, []byte, error) {
 
 // List returns a conversation's artifacts, oldest first.
 func (s *Store) List(ctx context.Context, conversationID string) ([]Artifact, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT `+columns+` FROM artifacts WHERE conversation_id = ? ORDER BY created_at`, conversationID)
+	rows, err := s.db.QueryContext(ctx, `SELECT `+columns+` FROM artifacts WHERE conversation_id = ? AND person_id = ? ORDER BY created_at`, conversationID, auth.PersonID(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +276,7 @@ func (s *Store) List(ctx context.Context, conversationID string) ([]Artifact, er
 // uploaded before the chat it belongs to was created.
 func (s *Store) Attach(ctx context.Context, id, conversationID string) error {
 	// In a chat, it stays with the chat.
-	_, err := s.db.ExecContext(ctx, `UPDATE artifacts SET conversation_id = ?, expires_at = NULL WHERE id = ? AND conversation_id IS NULL`, conversationID, id)
+	_, err := s.db.ExecContext(ctx, `UPDATE artifacts SET conversation_id = ?, expires_at = NULL WHERE id = ? AND conversation_id IS NULL AND person_id = ?`, conversationID, id, auth.PersonID(ctx))
 	return err
 }
 
@@ -326,7 +327,7 @@ func (s *Store) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	if _, err := s.db.ExecContext(ctx, `DELETE FROM artifacts WHERE id = ?`, id); err != nil {
+	if _, err := s.db.ExecContext(ctx, `DELETE FROM artifacts WHERE id = ? AND person_id = ?`, id, auth.PersonID(ctx)); err != nil {
 		return err
 	}
 	if err := os.Remove(filepath.Join(s.dir, a.path)); err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -341,18 +342,45 @@ func (s *Store) DeleteConversation(ctx context.Context, conversationID string) e
 	if conversationID == "" || strings.ContainsAny(conversationID, `/\`) || strings.Contains(conversationID, "..") {
 		return nil
 	}
-	if _, err := s.db.ExecContext(ctx, `DELETE FROM artifacts WHERE conversation_id = ?`, conversationID); err != nil {
+	if _, err := s.db.ExecContext(ctx, `DELETE FROM artifacts WHERE conversation_id = ? AND person_id = ?`, conversationID, auth.PersonID(ctx)); err != nil {
 		return err
 	}
 	return os.RemoveAll(filepath.Join(s.dir, conversationID))
 }
 
-// DeleteAll removes every artifact, for "delete all chats".
+// DeleteAll removes every file of the request's person, for "delete all
+// chats" (#206): other people's stay.
 func (s *Store) DeleteAll(ctx context.Context) error {
-	if _, err := s.db.ExecContext(ctx, `DELETE FROM artifacts`); err != nil {
+	person := auth.PersonID(ctx)
+	rows, err := s.db.QueryContext(ctx, `SELECT path FROM artifacts WHERE person_id = ?`, person)
+	if err != nil {
 		return err
 	}
-	return os.RemoveAll(s.dir)
+	var paths []string
+	for rows.Next() {
+		var p string
+		if err := rows.Scan(&p); err != nil {
+			rows.Close()
+			return err
+		}
+		paths = append(paths, p)
+	}
+	rows.Close()
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if _, err := s.db.ExecContext(ctx, `DELETE FROM artifacts WHERE person_id = ?`, person); err != nil {
+		return err
+	}
+	for _, p := range paths {
+		full := filepath.Join(s.dir, p)
+		if err := os.Remove(full); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
+		// A chat's folder goes once it's empty.
+		_ = os.Remove(filepath.Dir(full))
+	}
+	return nil
 }
 
 func nullable(s string) any {

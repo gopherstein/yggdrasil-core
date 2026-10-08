@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/inventory"
 	"github.com/yeixio/toskar-core/internal/tools"
 	"github.com/yeixio/toskar-core/pkg/contracts"
@@ -116,7 +117,7 @@ func (a *App) buildCapabilities(ctx context.Context) inventory.Snapshot {
 	}
 
 	if a.DB != nil {
-		_ = a.DB.SQL.QueryRowContext(ctx, `SELECT COUNT(*), COALESCE(SUM(size_bytes), 0) FROM artifacts`).
+		_ = a.DB.SQL.QueryRowContext(ctx, `SELECT COUNT(*), COALESCE(SUM(size_bytes), 0) FROM artifacts WHERE person_id = ?`, auth.PersonID(ctx)).
 			Scan(&s.Artifacts.Count, &s.Artifacts.Bytes)
 	}
 

@@ -73,13 +73,15 @@ func (m *APIKeyManager) create(ctx context.Context, name, kind string) (record A
 	id := uuid.NewString()
 	prefix := secret[:12]
 	now := time.Now().UTC()
+	// The key is its maker's (#206).
+	person := PersonID(ctx)
 	_, err = m.db.ExecContext(ctx, `
-		INSERT INTO api_keys (id, name, key_prefix, key_hash, created_at, kind)
-		VALUES (?, ?, ?, ?, ?, ?)`, id, name, prefix, string(hash), now.Format(time.RFC3339Nano), kind)
+		INSERT INTO api_keys (id, name, key_prefix, key_hash, created_at, kind, person_id)
+		VALUES (?, ?, ?, ?, ?, ?, ?)`, id, name, prefix, string(hash), now.Format(time.RFC3339Nano), kind, person)
 	if err != nil {
 		return record, "", err
 	}
-	return APIKeyRecord{ID: id, Name: name, Prefix: prefix, CreatedAt: now, Permissions: DefaultAPIKeyPermissions(), Kind: kind, PersonID: OwnerID}, secret, nil
+	return APIKeyRecord{ID: id, Name: name, Prefix: prefix, CreatedAt: now, Permissions: DefaultAPIKeyPermissions(), Kind: kind, PersonID: person}, secret, nil
 }
 
 // Adopt hashes a caller-supplied key when that key is not already valid.
