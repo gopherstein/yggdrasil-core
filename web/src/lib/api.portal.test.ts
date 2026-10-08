@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { api, forgetApiKey, rememberApiKey, setPortal } from './api'
+import { api, forgetApiKey, rememberApiKey, setPortal, setPortalSession } from './api'
 
 afterEach(() => {
   setPortal('')
@@ -23,5 +23,17 @@ describe('portal requests', () => {
     const headers = fetchMock.mock.calls[1][1].headers
     expect(headers['X-Toskar-Portal']).toBe('support')
     expect(headers.Authorization).toBeUndefined()
+  })
+
+  it('send a framed guest\'s session in a header (#205)', async () => {
+    const fetchMock = vi.fn().mockImplementation(async () => new Response('[]', { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+    setPortal('shop')
+    setPortalSession('sess-1')
+    await api.getConversations()
+    expect(fetchMock.mock.calls[0][1].headers['X-Toskar-Portal-Session']).toBe('sess-1')
+    setPortal('shop')
+    await api.getConversations()
+    expect(fetchMock.mock.calls[1][1].headers['X-Toskar-Portal-Session']).toBeUndefined()
   })
 })

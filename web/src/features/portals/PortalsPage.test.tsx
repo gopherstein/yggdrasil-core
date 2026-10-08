@@ -30,7 +30,7 @@ vi.mock('@/lib/api', async () => {
 
 const portal: Portal = {
   id: 'p1', slug: 'support', name: 'Help desk', profile_id: '', tools: 'none', memory: false, language: '', access: 'passcode',
-  has_passcode: true, branding: { welcome: 'Hi!' }, enabled: true, hourly_limit: 30, max_message: 2000, concurrency: 2,
+  has_passcode: true, branding: { welcome: 'Hi!' }, enabled: true, hourly_limit: 30, max_message: 2000, concurrency: 2, embed_origins: [],
   created_at: '', updated_at: '',
 }
 
@@ -115,5 +115,19 @@ describe('PortalsPage (#205)', () => {
     fireEvent.click(within(section).getByRole('button', { name: 'Invite' }))
     await waitFor(() => expect(api.invitePortalVisitor).toHaveBeenCalledWith('p1', 'Robin'))
     expect(await within(section).findByText('http://192.168.1.20:7331/p/support?invite=tok-9')).toBeInTheDocument()
+  })
+
+  it('lists the websites that may show a portal, and gives the snippets once there are some', async () => {
+    vi.mocked(api.listPortals).mockResolvedValue([{ ...portal, embed_origins: ['https://shop.example.com'] }])
+    vi.mocked(api.updatePortal).mockResolvedValue(portal)
+    renderIt()
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    const editor = (await screen.findByRole('heading', { name: 'Edit Help desk' })).closest('section') as HTMLElement
+    expect(within(editor).getByText('<script src="http://192.168.1.20:7331/embed.js" data-portal="support" data-label="Help desk"></script>')).toBeInTheDocument()
+    fireEvent.change(within(editor).getByLabelText('Websites that may show it'), { target: { value: 'https://shop.example.com\n\nhttps://blog.example.com ' } })
+    fireEvent.click(within(editor).getByRole('button', { name: 'Save' }))
+    await waitFor(() =>
+      expect(api.updatePortal).toHaveBeenLastCalledWith('p1', expect.objectContaining({ embed_origins: ['https://shop.example.com', 'https://blog.example.com'] })),
+    )
   })
 })

@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -67,6 +68,9 @@ type Portal struct {
 	MaxMessage int `json:"max_message"`
 	// Concurrency is how many of the portal's chats may run at once.
 	Concurrency int `json:"concurrency"`
+	// EmbedOrigins are the websites that may show the portal in a frame,
+	// such as https://shop.example.com.
+	EmbedOrigins []string `json:"embed_origins"`
 	// Branding is how the page looks, as the page reads it.
 	Branding  json.RawMessage `json:"branding"`
 	Enabled   bool            `json:"enabled"`
@@ -88,6 +92,7 @@ var (
 	ErrBadBranding   = errors.New("branding must be a JSON object under 16 KB")
 	ErrBadLanguage   = errors.New("language must be a language tag such as en or pt-BR, or empty to follow the visitor")
 	ErrWrongPasscode = errors.New("that passcode isn't right")
+	ErrBadOrigins    = errors.New("each website is an origin such as https://shop.example.com, with no path, and there can be 20")
 	ErrBadLimits     = errors.New("limits: 0 to 1000 messages an hour, 100 to 20000 characters a message, and 1 to 20 chats at once")
 )
 
@@ -105,18 +110,21 @@ type Store struct {
 // NewStore keeps portals in db.
 func NewStore(db *sql.DB) *Store { return &Store{db: db, now: time.Now} }
 
-const columns = `id, slug, name, profile_id, tools, memory, language, access, COALESCE(passcode_hash, ''), branding, enabled, created_at, updated_at, hourly_limit, max_message, concurrency`
+const columns = `id, slug, name, profile_id, tools, memory, language, access, COALESCE(passcode_hash, ''), branding, enabled, created_at, updated_at, hourly_limit, max_message, concurrency, embed_origins`
 
 func scan(row interface{ Scan(...any) error }) (Portal, error) {
 	var p Portal
-	var branding, created, updated string
-	if err := row.Scan(&p.ID, &p.Slug, &p.Name, &p.ProfileID, &p.Tools, &p.Memory, &p.Language, &p.Access, &p.passcodeHash, &branding, &p.Enabled, &created, &updated, &p.HourlyLimit, &p.MaxMessage, &p.Concurrency); err != nil {
+	var branding, created, updated, origins string
+	if err := row.Scan(&p.ID, &p.Slug, &p.Name, &p.ProfileID, &p.Tools, &p.Memory, &p.Language, &p.Access, &p.passcodeHash, &branding, &p.Enabled, &created, &updated, &p.HourlyLimit, &p.MaxMessage, &p.Concurrency, &origins); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return Portal{}, ErrNotFound
 		}
 		return Portal{}, err
 	}
 	p.Branding = json.RawMessage(branding)
+	if json.Unmarshal([]byte(origins), &p.EmbedOrigins) != nil || p.EmbedOrigins == nil {
+		p.EmbedOrigins = []string{}
+	}
 	p.HasPasscode = p.passcodeHash != ""
 	p.CreatedAt, _ = time.Parse(time.RFC3339Nano, created)
 	p.UpdatedAt, _ = time.Parse(time.RFC3339Nano, updated)
@@ -153,16 +161,17 @@ func (s *Store) BySlug(ctx context.Context, slug string) (Portal, error) {
 
 // Input is a new portal, or a change to one; nil fields stay.
 type Input struct {
-	Slug      *string          `json:"slug,omitempty"`
-	Name      *string          `json:"name,omitempty"`
-	ProfileID *string          `json:"profile_id,omitempty"`
-	Tools     *string          `json:"tools,omitempty"`
-	Memory    *bool            `json:"memory,omitempty"`
-	Language  *string          `json:"language,omitempty"`
-	Access    *string          `json:"access,omitempty"`
-	Passcode  *string          `json:"passcode,omitempty"`
-	Branding  *json.RawMessage `json:"branding,omitempty"`
-	Enabled   *bool            `json:"enabled,omitempty"`
+	Slug         *string          `json:"slug,omitempty"`
+	Name         *string          `json:"name,omitempty"`
+	ProfileID    *string          `json:"profile_id,omitempty"`
+	Tools        *string          `json:"tools,omitempty"`
+	Memory       *bool            `json:"memory,omitempty"`
+	Language     *string          `json:"language,omitempty"`
+	Access       *string          `json:"access,omitempty"`
+	Passcode     *string          `json:"passcode,omitempty"`
+	Branding     *json.RawMessage `json:"branding,omitempty"`
+	Enabled      *bool            `json:"enabled,omitempty"`
+	EmbedOrigins *[]string        `json:"embed_origins,omitempty"`
 	// Limits.
 	HourlyLimit *int `json:"hourly_limit,omitempty"`
 	MaxMessage  *int `json:"max_message,omitempty"`
@@ -243,6 +252,13 @@ func (in Input) apply(p *Portal) error {
 	if in.Enabled != nil {
 		p.Enabled = *in.Enabled
 	}
+	if in.EmbedOrigins != nil {
+		origins, err := cleanOrigins(*in.EmbedOrigins)
+		if err != nil {
+			return err
+		}
+		p.EmbedOrigins = origins
+	}
 	if in.HourlyLimit != nil {
 		p.HourlyLimit = *in.HourlyLimit
 	}
@@ -263,7 +279,7 @@ func (in Input) apply(p *Portal) error {
 // tools, no memory, passcode access, and on.
 func (s *Store) Create(ctx context.Context, in Input) (Portal, error) {
 	p := Portal{ID: uuid.NewString(), Tools: ToolsNone, Access: AccessPasscode, Branding: json.RawMessage(`{}`), Enabled: true,
-		HourlyLimit: DefaultHourlyLimit, MaxMessage: DefaultMaxMessage, Concurrency: DefaultConcurrency}
+		HourlyLimit: DefaultHourlyLimit, MaxMessage: DefaultMaxMessage, Concurrency: DefaultConcurrency, EmbedOrigins: []string{}}
 	if in.Slug == nil {
 		return Portal{}, ErrBadSlug
 	}
@@ -274,9 +290,9 @@ func (s *Store) Create(ctx context.Context, in Input) (Portal, error) {
 		return Portal{}, err
 	}
 	now := s.now().UTC().Format(time.RFC3339Nano)
-	_, err := s.db.ExecContext(ctx, `INSERT INTO portals (id, slug, name, profile_id, tools, memory, language, access, passcode_hash, branding, enabled, created_at, updated_at, hourly_limit, max_message, concurrency)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		p.ID, p.Slug, p.Name, p.ProfileID, p.Tools, p.Memory, p.Language, p.Access, nullable(p.passcodeHash), string(p.Branding), p.Enabled, now, now, p.HourlyLimit, p.MaxMessage, p.Concurrency)
+	_, err := s.db.ExecContext(ctx, `INSERT INTO portals (id, slug, name, profile_id, tools, memory, language, access, passcode_hash, branding, enabled, created_at, updated_at, hourly_limit, max_message, concurrency, embed_origins)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		p.ID, p.Slug, p.Name, p.ProfileID, p.Tools, p.Memory, p.Language, p.Access, nullable(p.passcodeHash), string(p.Branding), p.Enabled, now, now, p.HourlyLimit, p.MaxMessage, p.Concurrency, originsJSON(p.EmbedOrigins))
 	if err != nil {
 		if strings.Contains(err.Error(), "UNIQUE") {
 			return Portal{}, ErrSlugTaken
@@ -295,8 +311,8 @@ func (s *Store) Update(ctx context.Context, id string, in Input) (Portal, error)
 	if err := in.apply(&p); err != nil {
 		return Portal{}, err
 	}
-	_, err = s.db.ExecContext(ctx, `UPDATE portals SET slug = ?, name = ?, profile_id = ?, tools = ?, memory = ?, language = ?, access = ?, passcode_hash = ?, branding = ?, enabled = ?, updated_at = ?, hourly_limit = ?, max_message = ?, concurrency = ? WHERE id = ?`,
-		p.Slug, p.Name, p.ProfileID, p.Tools, p.Memory, p.Language, p.Access, nullable(p.passcodeHash), string(p.Branding), p.Enabled, s.now().UTC().Format(time.RFC3339Nano), p.HourlyLimit, p.MaxMessage, p.Concurrency, id)
+	_, err = s.db.ExecContext(ctx, `UPDATE portals SET slug = ?, name = ?, profile_id = ?, tools = ?, memory = ?, language = ?, access = ?, passcode_hash = ?, branding = ?, enabled = ?, updated_at = ?, hourly_limit = ?, max_message = ?, concurrency = ?, embed_origins = ? WHERE id = ?`,
+		p.Slug, p.Name, p.ProfileID, p.Tools, p.Memory, p.Language, p.Access, nullable(p.passcodeHash), string(p.Branding), p.Enabled, s.now().UTC().Format(time.RFC3339Nano), p.HourlyLimit, p.MaxMessage, p.Concurrency, originsJSON(p.EmbedOrigins), id)
 	if err != nil {
 		if strings.Contains(err.Error(), "UNIQUE") {
 			return Portal{}, ErrSlugTaken
@@ -330,4 +346,39 @@ func nullable(s string) any {
 		return nil
 	}
 	return s
+}
+
+// cleanOrigins checks websites that may frame a portal: each an http or
+// https origin with no path, at most 20, without repeats.
+func cleanOrigins(in []string) ([]string, error) {
+	out := []string{}
+	seen := map[string]bool{}
+	for _, raw := range in {
+		o := strings.TrimRight(strings.TrimSpace(raw), "/")
+		if o == "" {
+			continue
+		}
+		u, err := url.Parse(o)
+		if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" || u.Path != "" || u.RawQuery != "" || u.Fragment != "" || u.User != nil ||
+			strings.ContainsAny(o, " ;'\"*") {
+			return nil, ErrBadOrigins
+		}
+		o = strings.ToLower(u.Scheme + "://" + u.Host)
+		if !seen[o] {
+			seen[o] = true
+			out = append(out, o)
+		}
+	}
+	if len(out) > 20 {
+		return nil, ErrBadOrigins
+	}
+	return out, nil
+}
+
+func originsJSON(origins []string) string {
+	if origins == nil {
+		origins = []string{}
+	}
+	b, _ := json.Marshal(origins)
+	return string(b)
 }

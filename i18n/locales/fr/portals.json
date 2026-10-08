@@ -44,7 +44,8 @@
     "saved": "Enregistré",
     "preview": "Aperçu",
     "open": "Modifier",
-    "limits": "Limites"
+    "limits": "Limites",
+    "embed": "Intégration"
   },
   "tools": {
     "none": "Aucun outil",
@@ -95,5 +96,11 @@
     "newLink": "Nouveau lien",
     "removeConfirm": "Retirer {{name}} ? Son accès s'arrête aussitôt.",
     "saveFirst": "Enregistrez pour inviter des visiteurs."
+  },
+  "embed": {
+    "origins": "Sites qui peuvent l'afficher",
+    "hint": "Un par ligne, comme https://shop.example.com. Seuls ces sites peuvent mettre le portail sur leurs pages ; tout autre affiche un cadre vide.",
+    "button": "Un bouton de discussion pour votre site",
+    "frame": "Ou la discussion elle-même, dans un cadre"
   }
 }

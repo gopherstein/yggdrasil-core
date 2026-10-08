@@ -3,11 +3,13 @@ package api
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"path/filepath"
 	"strings"
 	"testing"
+	"testing/fstest"
 	"time"
 
 	"github.com/yeixio/toskar-core/internal/auth"
@@ -373,5 +375,81 @@ func TestPortalMembersAndInvited(t *testing.T) {
 	}
 	if rec := call(http.MethodPost, "/api/v1/chat", "club", `{"message":"still here?"}`, robin); rec.Code == http.StatusOK {
 		t.Fatalf("a removed visitor chatted: %d", rec.Code)
+	}
+}
+
+// Only Toskar frames its own pages, except a portal's in the websites its
+// Admin lists; a portal in such a frame keeps its session in a header,
+// since browsers hold back its cookie there (#205).
+func TestPortalEmbedding(t *testing.T) {
+	dir := t.TempDir()
+	db, err := store.Open(filepath.Join(dir, "t.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+	mgr, err := config.NewManager(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := mgr.Update(func(c *config.Config) { c.APIHost = "0.0.0.0" }); err != nil {
+		t.Fatal(err)
+	}
+	ps := portals.NewStore(db.SQL)
+	slug, name, access := "shop", "Shop", portals.AccessOpen
+	origins := []string{"https://Shop.Example.com/", "https://shop.example.com"}
+	p, err := ps.Create(context.Background(), portals.Input{Slug: &slug, Name: &name, Access: &access, EmbedOrigins: &origins})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(p.EmbedOrigins) != 1 || p.EmbedOrigins[0] != "https://shop.example.com" {
+		t.Fatalf("origins %v", p.EmbedOrigins)
+	}
+	bad := []string{"https://shop.example.com/page"}
+	if _, err := ps.Update(context.Background(), p.ID, portals.Input{EmbedOrigins: &bad}); !errors.Is(err, portals.ErrBadOrigins) {
+		t.Fatalf("an origin with a path: %v", err)
+	}
+	web := fstest.MapFS{"index.html": {Data: []byte("<!doctype html><title>Toskar</title>")}}
+	srv := NewServer(Dependencies{Config: mgr, People: auth.NewPeople(db.SQL), Sessions: auth.NewSessions(db.SQL), Invites: auth.NewInvites(db.SQL), Portals: ps, WebRoot: web})
+	get := func(path string, headers map[string]string) *httptest.ResponseRecorder {
+		r := httptest.NewRequest(http.MethodGet, path, nil)
+		r.RemoteAddr = "192.168.1.40:5000"
+		for k, v := range headers {
+			r.Header.Set(k, v)
+		}
+		rec := httptest.NewRecorder()
+		srv.Handler().ServeHTTP(rec, r)
+		return rec
+	}
+	if csp := get("/chat", nil).Header().Get("Content-Security-Policy"); csp != "frame-ancestors 'self'" {
+		t.Fatalf("the app's frame policy: %q", csp)
+	}
+	if csp := get("/p/shop", nil).Header().Get("Content-Security-Policy"); csp != "frame-ancestors 'self' https://shop.example.com" {
+		t.Fatalf("the portal's frame policy: %q", csp)
+	}
+	if csp := get("/p/other", nil).Header().Get("Content-Security-Policy"); csp != "frame-ancestors 'self'" {
+		t.Fatalf("an unknown portal's frame policy: %q", csp)
+	}
+	if script := get("/embed.js", nil); !strings.Contains(script.Body.String(), "data-portal") || !strings.HasPrefix(script.Header().Get("Content-Type"), "text/javascript") {
+		t.Fatalf("embed.js: %s", script.Header().Get("Content-Type"))
+	}
+
+	r := httptest.NewRequest(http.MethodPost, "/api/v1/portals/shop/enter", strings.NewReader(`{"embed":true}`))
+	r.RemoteAddr = "192.168.1.40:5000"
+	r.Header.Set("X-Toskar-Portal", "shop")
+	r.Header.Set("Origin", "http://example.com")
+	rec := httptest.NewRecorder()
+	srv.Handler().ServeHTTP(rec, r)
+	var entered struct {
+		Person  auth.Person `json:"person"`
+		Session string      `json:"session"`
+	}
+	_ = json.NewDecoder(rec.Body).Decode(&entered)
+	if rec.Code != http.StatusOK || entered.Session == "" || entered.Person.PortalID != p.ID {
+		t.Fatalf("enter for a frame: %d %+v", rec.Code, entered)
+	}
+	me := get("/api/v1/me", map[string]string{"X-Toskar-Portal": "shop", "X-Toskar-Portal-Session": entered.Session})
+	if !strings.Contains(me.Body.String(), `"portal_id":"`+p.ID+`"`) {
+		t.Fatalf("the session by header: %d %s", me.Code, me.Body)
 	}
 }

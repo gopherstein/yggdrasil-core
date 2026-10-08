@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChatMarkdown } from '@/features/chat/ChatMarkdown'
 import i18n, { resolveLanguage, systemLanguages } from '@/i18n'
-import { api, ApiError, errorText, setPortal, streamChat } from '@/lib/api'
+import { api, ApiError, errorText, setPortal, setPortalSession, streamChat } from '@/lib/api'
 import type { PortalPageView } from '@/types/api'
 import { prompts, safeLogo, text, theme, themeVars } from './branding'
 
@@ -30,6 +30,35 @@ function saveConversation(slug: string, id: string) {
   }
 }
 
+/** Whether the page is in another website's frame (#205). */
+function framed(): boolean {
+  try {
+    return window.self !== window.top
+  } catch {
+    return true
+  }
+}
+
+function sessionKey(slug: string) {
+  return `toskar.portal.${slug}.session`
+}
+
+function savedSession(slug: string): string {
+  try {
+    return sessionStorage.getItem(sessionKey(slug)) ?? ''
+  } catch {
+    return ''
+  }
+}
+
+function saveSession(slug: string, token: string) {
+  try {
+    sessionStorage.setItem(sessionKey(slug), token)
+  } catch {
+    // Without storage, the visitor enters again after a reload.
+  }
+}
+
 function usePrefersDark(): boolean {
   const query = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null
   const [dark, setDark] = useState(query?.matches ?? true)
@@ -53,10 +82,13 @@ export function PortalPage({ slug }: { slug: string }) {
   const [entered, setEntered] = useState(false)
 
   // Every request from here is the portal's; leaving goes back to the app.
+  // In another website's frame, the guest's session goes in a header.
+  const embedded = framed()
   useEffect(() => {
     setPortal(slug)
+    if (embedded) setPortalSession(savedSession(slug))
     return () => setPortal('')
-  }, [slug])
+  }, [slug, embedded])
 
   const page = useQuery({ queryKey: ['portal', slug], queryFn: () => api.getPortalPage(slug), retry: false })
   const view = page.data
@@ -69,8 +101,14 @@ export function PortalPage({ slug }: { slug: string }) {
   }, [view])
 
   const enter = useMutation({
-    mutationFn: ({ passcode = '', invite = '' }: { passcode?: string; invite?: string }) => api.enterPortal(slug, passcode, invite),
-    onSuccess: () => setEntered(true),
+    mutationFn: ({ passcode = '', invite = '' }: { passcode?: string; invite?: string }) => api.enterPortal(slug, passcode, invite, embedded),
+    onSuccess: (guest) => {
+      if (embedded && guest?.session) {
+        saveSession(slug, guest.session)
+        setPortalSession(guest.session)
+      }
+      setEntered(true)
+    },
   })
   // An open portal lets anyone in at once, and an invitation link its
   // visitor; the link's one-time token leaves the address once used.
