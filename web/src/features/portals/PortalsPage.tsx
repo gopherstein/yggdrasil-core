@@ -271,6 +271,37 @@ function InvitedVisitors({ portal }: { portal: Portal }) {
   )
 }
 
+/** Snippets that put a portal on another website (#205). */
+function EmbedSnippets({ slug, name }: { slug: string; name: string }) {
+  const { t } = useTranslation('portals')
+  const { base } = useShareBase()
+  const [copied, setCopied] = useState('')
+  const quoted = name.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] ?? c)
+  const snippets = [
+    { id: 'button', label: t('embed.button'), code: `<script src="${base}/embed.js" data-portal="${slug}" data-label="${quoted}"></script>` },
+    { id: 'frame', label: t('embed.frame'), code: `<iframe src="${base}/p/${slug}" title="${quoted}" style="width:380px;height:600px;border:0"></iframe>` },
+  ]
+  return (
+    <div className="space-y-2">
+      {snippets.map((s) => (
+        <div key={s.id} className="space-y-1">
+          <p className="text-xs text-ink-muted">{s.label}</p>
+          <div className="flex min-w-0 items-stretch gap-2">
+            <code className="field min-w-0 flex-1 truncate py-1.5 font-mono text-xs">{s.code}</code>
+            <button
+              type="button"
+              className="btn-secondary btn-sm shrink-0"
+              onClick={() => void navigator.clipboard?.writeText(s.code).then(() => setCopied(s.id))}
+            >
+              {copied === s.id ? t('link.copied') : t('link.copy')}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void }) {
   const { t } = useTranslation('portals')
   const queryClient = useQueryClient()
@@ -284,6 +315,7 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
   const [language, setLanguage] = useState(portal.language)
   const [access, setAccess] = useState(portal.access)
   const [passcode, setPasscode] = useState('')
+  const [origins, setOrigins] = useState((portal.embed_origins ?? []).join('\n'))
   const [hourly, setHourly] = useState(String(portal.hourly_limit))
   const [longest, setLongest] = useState(String(portal.max_message))
   const [most, setMost] = useState(String(portal.concurrency))
@@ -300,6 +332,7 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
       const input: PortalInput = {
         name: name.trim(), slug, profile_id: profileId, tools, memory, language, access, branding,
         hourly_limit: Number(hourly), max_message: Number(longest), concurrency: Number(most),
+        embed_origins: origins.split('\n').map((o) => o.trim()).filter(Boolean),
       }
       if (passcode.trim()) input.passcode = passcode.trim()
       return api.updatePortal(portal.id, input)
@@ -310,7 +343,7 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
       void queryClient.invalidateQueries({ queryKey: ['portals'] })
     },
   })
-  useEffect(() => setSaved(false), [name, slug, profileId, tools, memory, language, access, passcode, hourly, longest, most])
+  useEffect(() => setSaved(false), [name, slug, profileId, tools, memory, language, access, passcode, hourly, longest, most, origins])
 
   const choices = languages.filter((l) => availableLanguages.includes(l.code))
   const field = 'space-y-1 text-sm'
@@ -479,6 +512,22 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
               <span className={label}>{t('brand.footer')}</span>
               <textarea className="field w-full" rows={3} value={draft.footer} onChange={(e) => set('footer')(e.target.value)} />
             </label>
+          </fieldset>
+
+          <fieldset className="space-y-3">
+            <legend className="label-caps mb-2">{t('edit.embed')}</legend>
+            <label className={field}>
+              <span className={label}>{t('embed.origins')}</span>
+              <textarea
+                className="field w-full font-mono"
+                rows={2}
+                placeholder="https://shop.example.com"
+                value={origins}
+                onChange={(e) => setOrigins(e.target.value)}
+              />
+            </label>
+            <p className="text-xs text-ink-faint">{t('embed.hint')}</p>
+            {portal.embed_origins.length > 0 ? <EmbedSnippets slug={portal.slug} name={portal.name} /> : null}
           </fieldset>
 
           {save.error ? (

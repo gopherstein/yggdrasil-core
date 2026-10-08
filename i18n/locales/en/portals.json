@@ -44,7 +44,8 @@
     "saved": "Saved",
     "preview": "Preview",
     "open": "Edit",
-    "limits": "Limits"
+    "limits": "Limits",
+    "embed": "Embedding"
   },
   "tools": {
     "none": "No tools",
@@ -95,5 +96,11 @@
     "newLink": "New link",
     "removeConfirm": "Remove {{name}}? They stop at once.",
     "saveFirst": "Save to invite visitors."
+  },
+  "embed": {
+    "origins": "Websites that may show it",
+    "hint": "One per line, such as https://shop.example.com. Only these websites can put the portal on their pages; any other gets a blank frame.",
+    "button": "A chat button for your website",
+    "frame": "Or the chat itself, in a frame"
   }
 }

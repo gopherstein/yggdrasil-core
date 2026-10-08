@@ -354,7 +354,8 @@ func (s *Server) routes() {
 
 	if s.deps.WebRoot != nil {
 		fileServer := http.FileServer(http.FS(s.deps.WebRoot))
-		s.router.PathPrefix("/").Handler(spaFallback(s.deps.WebRoot, fileServer))
+		s.router.HandleFunc("/embed.js", s.handleEmbedScript).Methods(http.MethodGet)
+		s.router.PathPrefix("/").Handler(s.framing(spaFallback(s.deps.WebRoot, fileServer)))
 	}
 }
 

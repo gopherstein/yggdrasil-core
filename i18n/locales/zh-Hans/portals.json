@@ -44,7 +44,8 @@
     "saved": "已保存",
     "preview": "预览",
     "open": "编辑",
-    "limits": "限制"
+    "limits": "限制",
+    "embed": "嵌入"
   },
   "tools": {
     "none": "不使用工具",
@@ -95,5 +96,11 @@
     "newLink": "新链接",
     "removeConfirm": "要移除 {{name}} 吗？对方会立即无法使用。",
     "saveFirst": "保存后即可邀请访客。"
+  },
+  "embed": {
+    "origins": "可以显示它的网站",
+    "hint": "每行一个，例如 https://shop.example.com。只有这些网站能把门户放到自己的页面上；其他网站只会看到空白框。",
+    "button": "为你的网站添加聊天按钮",
+    "frame": "或在框中直接显示聊天"
   }
 }

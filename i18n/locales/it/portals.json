@@ -44,7 +44,8 @@
     "saved": "Salvato",
     "preview": "Anteprima",
     "open": "Modifica",
-    "limits": "Limiti"
+    "limits": "Limiti",
+    "embed": "Incorporamento"
   },
   "tools": {
     "none": "Nessuno strumento",
@@ -95,5 +96,11 @@
     "newLink": "Nuovo link",
     "removeConfirm": "Rimuovere {{name}}? L'accesso termina subito.",
     "saveFirst": "Salva per invitare visitatori."
+  },
+  "embed": {
+    "origins": "Siti che possono mostrarlo",
+    "hint": "Uno per riga, come https://shop.example.com. Solo questi siti possono mettere il portale nelle loro pagine; gli altri vedono un riquadro vuoto.",
+    "button": "Un pulsante di chat per il tuo sito",
+    "frame": "Oppure la chat stessa, in un riquadro"
   }
 }

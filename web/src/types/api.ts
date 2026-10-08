@@ -2172,6 +2172,8 @@ export interface Portal {
   max_message: number
   /** How many of its chats may run at once. */
   concurrency: number
+  /** The websites that may show it in a frame, such as https://shop.example.com. */
+  embed_origins: string[]
   created_at: string
   updated_at: string
 }

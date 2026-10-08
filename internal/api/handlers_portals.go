@@ -24,6 +24,10 @@ import (
 // portalHeader names the portal a portal page's request is for.
 const portalHeader = "X-Toskar-Portal"
 
+// portalSessionHeader carries a portal guest's session when the portal is
+// shown in another website's frame, where browsers hold back cookies.
+const portalSessionHeader = "X-Toskar-Portal-Session"
+
 // portalCookie holds a portal guest's session.
 func portalCookie(slug string) string { return "toskar_portal_" + slug }
 
@@ -84,7 +88,7 @@ func portalError(w http.ResponseWriter, err error) {
 		writeErr(w, http.StatusConflict, "PORTAL_SLUG_TAKEN", err.Error(), nil)
 	case errors.Is(err, portals.ErrBadSlug), errors.Is(err, portals.ErrBadName), errors.Is(err, portals.ErrBadTools),
 		errors.Is(err, portals.ErrBadAccess), errors.Is(err, portals.ErrNoPasscode), errors.Is(err, portals.ErrBadBranding),
-		errors.Is(err, portals.ErrBadLanguage), errors.Is(err, portals.ErrBadLimits):
+		errors.Is(err, portals.ErrBadLanguage), errors.Is(err, portals.ErrBadLimits), errors.Is(err, portals.ErrBadOrigins):
 		writeErr(w, http.StatusBadRequest, "PORTAL_INVALID", err.Error(), nil)
 	default:
 		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
@@ -206,6 +210,9 @@ func (s *Server) handleEnterPortal(w http.ResponseWriter, r *http.Request) {
 	var body struct {
 		Passcode string `json:"passcode"`
 		Invite   string `json:"invite"`
+		// Embed asks for the session in the answer, for a page in another
+		// website's frame to send in a header.
+		Embed bool `json:"embed"`
 	}
 	_ = json.NewDecoder(io.LimitReader(r.Body, 4096)).Decode(&body)
 	switch p.Access {
@@ -218,7 +225,7 @@ func (s *Server) handleEnterPortal(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusForbidden, "PORTAL_MEMBERS", "this chat is for the people who sign in to this Toskar", nil)
 		return
 	case portals.AccessInvited:
-		s.enterInvited(w, r, p, strings.TrimSpace(body.Invite))
+		s.enterInvited(w, r, p, strings.TrimSpace(body.Invite), body.Embed)
 		return
 	case portals.AccessPasscode:
 		address := remoteIP(r)
@@ -237,7 +244,7 @@ func (s *Server) handleEnterPortal(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
 		return
 	}
-	s.signInGuest(w, r, p, guest)
+	s.signInGuest(w, r, p, guest, body.Embed)
 }
 
 // member reports whether principal may use a Members only portal: a person
@@ -248,7 +255,7 @@ func member(principal auth.Principal) bool {
 
 // enterInvited makes this browser the invited visitor whose one-time link
 // it brings.
-func (s *Server) enterInvited(w http.ResponseWriter, r *http.Request, p portals.Portal, invite string) {
+func (s *Server) enterInvited(w http.ResponseWriter, r *http.Request, p portals.Portal, invite string, embed bool) {
 	if invite == "" || s.deps.Invites == nil {
 		writeErr(w, http.StatusForbidden, "PORTAL_INVITE", "this chat is by invitation; open the link you were sent", nil)
 		return
@@ -263,11 +270,19 @@ func (s *Server) enterInvited(w http.ResponseWriter, r *http.Request, p portals.
 		writeErr(w, http.StatusForbidden, "PORTAL_INVITE", "this invitation doesn't work anymore; ask for a new one", nil)
 		return
 	}
-	s.signInGuest(w, r, p, guest)
+	s.signInGuest(w, r, p, guest, embed)
 }
 
-// signInGuest signs this browser in as guest, by the portal's own cookie.
-func (s *Server) signInGuest(w http.ResponseWriter, r *http.Request, p portals.Portal, guest auth.Person) {
+// enteredGuest is a portal's guest, with their session when the page asked
+// for it to send in a header.
+type enteredGuest struct {
+	auth.Principal
+	Session string `json:"session,omitempty"`
+}
+
+// signInGuest signs this browser in as guest, by the portal's own cookie,
+// and in the answer too when embed asks.
+func (s *Server) signInGuest(w http.ResponseWriter, r *http.Request, p portals.Portal, guest auth.Person, embed bool) {
 	token, expires, err := s.deps.Sessions.Create(r.Context(), guest.ID, r.UserAgent(), remoteIP(r))
 	if err != nil {
 		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
@@ -277,7 +292,11 @@ func (s *Server) signInGuest(w http.ResponseWriter, r *http.Request, p portals.P
 		Name: portalCookie(p.Slug), Value: token, Path: "/", Expires: expires,
 		HttpOnly: true, SameSite: http.SameSiteLaxMode, Secure: r.TLS != nil,
 	})
-	writeJSON(w, http.StatusOK, auth.Principal{Person: guest, Via: auth.ViaSession})
+	answer := enteredGuest{Principal: auth.Principal{Person: guest, Via: auth.ViaSession}}
+	if embed {
+		answer.Session = token
+	}
+	writeJSON(w, http.StatusOK, answer)
 }
 
 // guestOf is this browser's guest of portal p, while the guest and their
@@ -286,11 +305,17 @@ func (s *Server) guestOf(r *http.Request, p portals.Portal) (auth.Person, bool) 
 	if s.deps.Sessions == nil || s.deps.People == nil {
 		return auth.Person{}, false
 	}
-	cookie, err := r.Cookie(portalCookie(p.Slug))
-	if err != nil {
-		return auth.Person{}, false
+	// A portal shown in another website's frame sends its session in a
+	// header, since browsers hold back cookies there.
+	token := strings.TrimSpace(r.Header.Get(portalSessionHeader))
+	if token == "" {
+		cookie, err := r.Cookie(portalCookie(p.Slug))
+		if err != nil {
+			return auth.Person{}, false
+		}
+		token = cookie.Value
 	}
-	id, err := s.deps.Sessions.Person(r.Context(), cookie.Value)
+	id, err := s.deps.Sessions.Person(r.Context(), token)
 	if err != nil {
 		return auth.Person{}, false
 	}
@@ -516,3 +541,62 @@ func (s *Server) handleRemoveVisitor(w http.ResponseWriter, r *http.Request) {
 	_ = s.deps.Sessions.DeleteFor(r.Context(), guest.ID)
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// framing lets only Toskar's own pages show its pages in a frame, so no
+// other website can dress them up to be clicked, except a portal's page in
+// the websites its Admin lists (#205).
+func (s *Server) framing(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ancestors := "'self'"
+		if slug, ok := strings.CutPrefix(r.URL.Path, "/p/"); ok && s.deps.Portals != nil {
+			if p, live := s.livePortal(r, strings.Trim(slug, "/")); live {
+				for _, o := range p.EmbedOrigins {
+					ancestors += " " + o
+				}
+			}
+		}
+		w.Header().Set("Content-Security-Policy", "frame-ancestors "+ancestors)
+		next.ServeHTTP(w, r)
+	})
+}
+
+// handleEmbedScript is a script a website adds to show a portal's chat
+// behind a button: <script src="…/embed.js" data-portal="slug"></script>.
+func (s *Server) handleEmbedScript(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "text/javascript; charset=utf-8")
+	w.Header().Set("Cache-Control", "max-age=300")
+	_, _ = io.WriteString(w, embedScript)
+}
+
+// embedScript adds a chat button to the page that loads it, opening the
+// portal named by its data-portal attribute in a frame from Toskar's own
+// address, which only the websites the portal lists may show.
+const embedScript = `(function () {
+  var me = document.currentScript;
+  if (!me) return;
+  var slug = (me.getAttribute('data-portal') || '').toLowerCase();
+  if (!/^[a-z0-9-]{2,40}$/.test(slug)) return;
+  var base = new URL(me.src).origin;
+  var label = me.getAttribute('data-label') || 'Chat';
+  var color = /^#[0-9a-f]{3,6}$/i.test(me.getAttribute('data-color') || '') ? me.getAttribute('data-color') : '#0f766e';
+  var button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = label;
+  button.setAttribute('aria-expanded', 'false');
+  button.style.cssText = 'position:fixed;right:20px;bottom:20px;z-index:2147483646;border:0;border-radius:999px;padding:12px 20px;font:600 15px system-ui,sans-serif;color:#fff;background:' + color + ';box-shadow:0 4px 16px rgba(0,0,0,.25);cursor:pointer';
+  var frame = null;
+  button.addEventListener('click', function () {
+    if (!frame) {
+      frame = document.createElement('iframe');
+      frame.src = base + '/p/' + slug;
+      frame.title = label;
+      frame.style.cssText = 'position:fixed;right:20px;bottom:80px;z-index:2147483646;width:min(380px,calc(100vw - 40px));height:min(600px,calc(100vh - 120px));border:0;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.3);background:#fff';
+      document.body.appendChild(frame);
+    } else {
+      frame.style.display = frame.style.display === 'none' ? '' : 'none';
+    }
+    button.setAttribute('aria-expanded', frame.style.display === 'none' ? 'false' : 'true');
+  });
+  document.body.appendChild(button);
+})();
+`

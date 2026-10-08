@@ -242,10 +242,22 @@ let portalSlug = ''
  */
 export function setPortal(slug: string) {
   portalSlug = slug
+  portalSession = ''
+}
+
+/** A portal guest's session, when the page is in another website's frame. */
+let portalSession = ''
+
+/**
+ * Sends a portal guest's session in a header (#205): in another website's
+ * frame, browsers hold back the portal's cookie.
+ */
+export function setPortalSession(token: string) {
+  portalSession = token
 }
 
 function authHeaders(): Record<string, string> {
-  if (portalSlug) return { 'X-Toskar-Portal': portalSlug }
+  if (portalSlug) return { 'X-Toskar-Portal': portalSlug, ...(portalSession ? { 'X-Toskar-Portal-Session': portalSession } : {}) }
   const key = storedApiKey()
   if (!key) return {}
   return { Authorization: `Bearer ${key}` }
@@ -567,8 +579,11 @@ export const api = {
   getPortalPage: (slug: string) => request<PortalPageView>(`/api/v1/portals/${encodeURIComponent(slug)}/page`),
 
   /** Enter a chat portal as its guest, with its passcode when it has one (#205). */
-  enterPortal: (slug: string, passcode = '', invite = '') =>
-    request<Principal>(`/api/v1/portals/${encodeURIComponent(slug)}/enter`, { method: 'POST', body: JSON.stringify({ passcode, invite }) }),
+  enterPortal: (slug: string, passcode = '', invite = '', embed = false) =>
+    request<Principal & { session?: string }>(`/api/v1/portals/${encodeURIComponent(slug)}/enter`, {
+      method: 'POST',
+      body: JSON.stringify({ passcode, invite, embed }),
+    }),
 
   /** Whether sign-in with an OpenID Connect provider is offered, and its name (#206). */
   getOIDC: () => request<{ enabled: boolean; label?: string }>('/api/v1/oidc'),

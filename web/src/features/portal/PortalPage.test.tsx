@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { api, ApiError, setPortal, streamChat } from '@/lib/api'
+import { api, ApiError, setPortal, setPortalSession, streamChat } from '@/lib/api'
 import type { PortalPageView } from '@/types/api'
 import { PortalPage } from './PortalPage'
 
@@ -11,6 +11,7 @@ vi.mock('@/lib/api', async () => {
     ApiError: actual.ApiError,
     errorText: actual.errorText,
     setPortal: vi.fn(),
+    setPortalSession: vi.fn(),
     streamChat: vi.fn(),
     api: { getPortalPage: vi.fn(), enterPortal: vi.fn(), getMessages: vi.fn(), createConversation: vi.fn(), stopChat: vi.fn() },
   }
@@ -68,7 +69,7 @@ describe('PortalPage (#205)', () => {
     expect(await screen.findByText("That passcode isn't right.")).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('Passcode'), { target: { value: 'tide-pool' } })
     fireEvent.click(screen.getByRole('button', { name: 'Start chatting' }))
-    await waitFor(() => expect(api.enterPortal).toHaveBeenLastCalledWith('support', 'tide-pool', ''))
+    await waitFor(() => expect(api.enterPortal).toHaveBeenLastCalledWith('support', 'tide-pool', '', false))
 
     expect(await screen.findByText('Hi! Ask about your order.')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Where is my order?' }))
@@ -82,7 +83,7 @@ describe('PortalPage (#205)', () => {
     vi.mocked(api.enterPortal).mockResolvedValue(guest)
     renderIt()
     expect(await screen.findByText('Hi! Ask about your order.')).toBeInTheDocument()
-    expect(api.enterPortal).toHaveBeenCalledWith('support', '', '')
+    expect(api.enterPortal).toHaveBeenCalledWith('support', '', '', false)
     expect(screen.queryByLabelText('Passcode')).not.toBeInTheDocument()
   })
 
@@ -111,7 +112,7 @@ describe('PortalPage (#205)', () => {
     vi.mocked(api.enterPortal).mockResolvedValue(guest)
     renderIt()
     expect(await screen.findByText('Hi! Ask about your order.')).toBeInTheDocument()
-    expect(api.enterPortal).toHaveBeenCalledWith('support', '', 'tok-1')
+    expect(api.enterPortal).toHaveBeenCalledWith('support', '', 'tok-1', false)
     expect(window.location.search).toBe('')
     window.history.pushState({}, '', '/')
   })
@@ -124,5 +125,22 @@ describe('PortalPage (#205)', () => {
     vi.mocked(api.getPortalPage).mockResolvedValue(page({ access: 'members' }))
     renderIt()
     expect(await screen.findByRole('link', { name: 'Sign in to chat' })).toHaveAttribute('href', '/?next=%2Fp%2Fsupport')
+  })
+
+  it('keeps its session in a header when shown in another website', async () => {
+    const top = Object.getOwnPropertyDescriptor(window, 'top')
+    Object.defineProperty(window, 'top', { configurable: true, value: {} })
+    try {
+      vi.mocked(api.getPortalPage).mockResolvedValue(page({ access: 'open' }))
+      vi.mocked(api.enterPortal).mockResolvedValue({ ...guest, session: 'sess-1' })
+      renderIt()
+      expect(await screen.findByText('Hi! Ask about your order.')).toBeInTheDocument()
+      expect(api.enterPortal).toHaveBeenCalledWith('support', '', '', true)
+      expect(setPortalSession).toHaveBeenCalledWith('sess-1')
+      expect(sessionStorage.getItem('toskar.portal.support.session')).toBe('sess-1')
+    } finally {
+      if (top) Object.defineProperty(window, 'top', top)
+      sessionStorage.clear()
+    }
   })
 })

@@ -44,7 +44,8 @@
     "saved": "Gespeichert",
     "preview": "Vorschau",
     "open": "Bearbeiten",
-    "limits": "Grenzen"
+    "limits": "Grenzen",
+    "embed": "Einbetten"
   },
   "tools": {
     "none": "Keine Tools",
@@ -95,5 +96,11 @@
     "newLink": "Neuer Link",
     "removeConfirm": "{{name}} entfernen? Der Zugang endet sofort.",
     "saveFirst": "Speichern, um Besucher einzuladen."
+  },
+  "embed": {
+    "origins": "Websites, die es zeigen dürfen",
+    "hint": "Eine pro Zeile, z. B. https://shop.example.com. Nur diese Websites können das Portal auf ihren Seiten zeigen; jede andere bekommt einen leeren Rahmen.",
+    "button": "Ein Chat-Knopf für deine Website",
+    "frame": "Oder der Chat selbst in einem Rahmen"
   }
 }

@@ -44,7 +44,8 @@
     "saved": "已儲存",
     "preview": "預覽",
     "open": "編輯",
-    "limits": "限制"
+    "limits": "限制",
+    "embed": "嵌入"
   },
   "tools": {
     "none": "不使用工具",
@@ -95,5 +96,11 @@
     "newLink": "新連結",
     "removeConfirm": "要移除 {{name}} 嗎？對方會立即無法使用。",
     "saveFirst": "儲存後即可邀請訪客。"
+  },
+  "embed": {
+    "origins": "可以顯示它的網站",
+    "hint": "每行一個，例如 https://shop.example.com。只有這些網站能把入口網站放到自己的頁面上；其他網站只會看到空白框。",
+    "button": "為你的網站加入聊天按鈕",
+    "frame": "或在框中直接顯示聊天"
   }
 }
