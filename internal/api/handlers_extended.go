@@ -353,6 +353,15 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 	} else if auth.PrincipalFrom(r.Context()).Person.PortalID != "" {
 		writeErr(w, http.StatusForbidden, "PORTAL_OFF", "This portal is turned off.", nil)
 		return
+	} else if pinned := auth.PrincipalFrom(r.Context()).KeyProfile; pinned != "" {
+		// A key pinned to a profile chats with it alone (#345).
+		var err error
+		if body.ProfileID, err = (auth.APIKeyPermissions{Profile: pinned}).Pinned(body.ProfileID, body.ModelID); err != nil {
+			writeErr(w, http.StatusForbidden, "PROFILE_PINNED", "this key answers only with profile "+pinned, map[string]any{"profile_id": pinned})
+			return
+		}
+		body.ModelID = ""
+		ctx = turnopts.With(ctx, &turnopts.Options{Memory: true, Knowledge: true, FixedProfile: true})
 	}
 	r = r.WithContext(locale.WithTimeZone(ctx, body.TimeZone))
 	if err := s.deps.Chat(w, r, body.ConversationID, body.ProfileID, body.ModelID, body.Message, body.Stream, body.Execution); err != nil {
@@ -418,6 +427,14 @@ func (s *Server) handleCreateTask(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "invalid body", nil)
 		return
+	}
+	if pinned := auth.PrincipalFrom(r.Context()).KeyProfile; pinned != "" {
+		// A key pinned to a profile runs tasks with it alone (#345).
+		var err error
+		if body.ProfileID, err = (auth.APIKeyPermissions{Profile: pinned}).Pinned(body.ProfileID, ""); err != nil {
+			writeErr(w, http.StatusForbidden, "PROFILE_PINNED", "this key answers only with profile "+pinned, map[string]any{"profile_id": pinned})
+			return
+		}
 	}
 	task, err := s.deps.CreateTask(r.Context(), body.ProfileID, body.ConversationID, body.Prompt)
 	if err != nil {

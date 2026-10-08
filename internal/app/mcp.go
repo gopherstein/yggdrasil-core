@@ -71,8 +71,16 @@ func (a *App) mcpAsk(ctx context.Context, prompt, model string) (string, error) 
 	if perms.Tools == auth.ToolsNone {
 		opts.Tools = []string{}
 	}
+	// A key pinned to a profile answers with it alone (#345).
+	profileID, err := perms.Pinned("", model)
+	if err != nil {
+		return "", err
+	}
+	if profileID != "" {
+		model, opts.FixedProfile = "", true
+	}
 	ctx = turnopts.With(ctx, opts)
-	stream, err := a.RunChat(ctx, "", "", prompt, false, model, "")
+	stream, err := a.RunChat(ctx, profileID, "", prompt, false, model, "")
 	if err != nil {
 		return "", err
 	}

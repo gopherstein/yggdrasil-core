@@ -103,7 +103,10 @@
     },
     "placement": "Peut choisir où s'exécutent les requêtes",
     "note": "Les requêtes peuvent demander moins, jamais plus. Sur le réseau, ces limites s'appliquent toujours ; sur cet ordinateur, elles s'appliquent lorsque l'app envoie cette clé.",
-    "saveFailed": "Impossible d'enregistrer."
+    "saveFailed": "Impossible d'enregistrer.",
+    "profile": "Répond avec",
+    "anyProfile": "Le profil indiqué par chaque requête",
+    "pinnedHint": "Chaque requête répond avec ce profil et ses contrôles de sujet, et ne peut indiquer ni un autre profil ni un modèle."
   },
   "share": {
     "title": "Utiliser Toskar dans d'autres apps d'IA",

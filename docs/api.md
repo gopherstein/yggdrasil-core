@@ -802,6 +802,7 @@ Each API key has `permissions` that a request can only narrow:
 - `memory` and `knowledge` are `never`, `on_request`, or `always`. The defaults are `on_request` for memory and `always` for knowledge.
 - `tools` is `profile` (the default), `read_only`, or `none`.
 - `placement` (true by default) lets a request choose where it runs.
+- `profile` pins the key to one profile (#345; empty by default). Every request with the key answers with that profile and its topic controls: on `/v1/chat/completions` (`model` may be only `profile:<id>`, the bare id, `auto`, or left out), over MCP, and on `POST /api/v1/chat` and `POST /api/v1/tasks` (`profile_id` may be only that profile, and `model_id` only `auto` or empty). Naming another profile or a model returns `403 PROFILE_PINNED`, and `GET /v1/models` lists only that profile. A key can be pinned only to a profile that exists; if the profile is deleted later, the key's requests fail rather than fall back to another.
 
 Asking for something a key does not allow returns 403 and says what was refused. Change a key's permissions with `PUT /api/v1/api-keys/{id}/permissions` or on the API Access page; rotating a key keeps them. When the API listens beyond this computer, every request from another machine needs a key, so its limits always apply there. On this computer a key is optional; its limits apply when the app sends it, and a request without one gets the defaults.
 

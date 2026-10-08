@@ -103,7 +103,10 @@
     },
     "placement": "Può scegliere dove eseguire le richieste",
     "note": "Le richieste possono chiedere di meno, mai di più. In rete questi limiti valgono sempre; su questo computer valgono quando l'app invia questa chiave.",
-    "saveFailed": "Impossibile salvare."
+    "saveFailed": "Impossibile salvare.",
+    "profile": "Risponde con",
+    "anyProfile": "Il profilo indicato da ogni richiesta",
+    "pinnedHint": "Ogni richiesta risponde con questo profilo e i suoi controlli sugli argomenti, e non può indicare un altro profilo né un modello."
   },
   "share": {
     "title": "Usa Toskar in altre app di IA",

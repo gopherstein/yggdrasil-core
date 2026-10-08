@@ -53,6 +53,16 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 	}
 	// Memory requests are answered by Yggdrasil, not the model.
 	opts := turnopts.From(ctx)
+	if profileID == "" {
+		profileID = a.defaultProfileID(ctx)
+	}
+	// A profile with topic controls answers only by its own rules, so none
+	// of Toskar's own replies below, about itself, its memory, or what to
+	// install, are given in its place (#345).
+	topical := false
+	if p, err := a.Profiles.Get(ctx, profileID); err == nil && p.Topics != nil {
+		topical = true
+	}
 	// A short question about what Yggdrasil can do is answered from its
 	// inventory, not by a model that may claim what it cannot do (§37).
 	// "What's in this picture?" with a picture attached is for a model that
@@ -61,7 +71,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 	if a.attachesPictures(ctx) {
 		_, picturesAsked = a.seeingModel(ctx)
 	}
-	if len(structured.SchemaFrom(ctx)) == 0 && !picturesAsked {
+	if len(structured.SchemaFrom(ctx)) == 0 && !picturesAsked && !topical {
 		if ch, ok := a.answerCapabilityQuestion(ctx, conversationID, message); ok {
 			return ch, nil
 		}
@@ -71,13 +81,10 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		}
 	}
 	// An API caller changes memories only when it opted into memory (§62).
-	if opts != nil && !opts.Memory {
+	if (opts != nil && !opts.Memory) || topical {
 		// Fall through: "Remember …" is an ordinary message for this caller.
 	} else if ch, ok := a.handleMemoryCommand(ctx, conversationID, message); ok {
 		return ch, nil
-	}
-	if profileID == "" {
-		profileID = a.defaultProfileID(ctx)
 	}
 	profile, err := a.Profiles.Get(ctx, profileID)
 	if err != nil {
@@ -95,8 +102,10 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 	}
 	// A request for something that is not installed but can be, such as an
 	// image before image generation is set up, is offered the setup (§29).
-	if ch, ok := a.offerSetup(ctx, profile, conversationID, message); ok {
-		return ch, nil
+	if !topical {
+		if ch, ok := a.offerSetup(ctx, profile, conversationID, message); ok {
+			return ch, nil
+		}
 	}
 	// A profile's own effort applies when the chat leaves effort on Auto (§40).
 	if pe := profile.Orchestration.Effort; pe != "" && huginn.EffortFrom(ctx) == huginn.EffortAuto {

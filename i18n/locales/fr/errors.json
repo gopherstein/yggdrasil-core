@@ -145,6 +145,7 @@
   "PORTAL_TOO_LONG": "Ici, un message peut faire {{max}} caractères au maximum.",
   "PORTAL_BUSY": "Cette discussion est occupée. Réessayez dans un instant.",
   "PORTAL_RATE": "Vous avez envoyé beaucoup de messages. Réessayez plus tard.",
+  "PROFILE_PINNED": "Cette clé ne répond qu'avec son propre profil. Omettez le profil et le modèle, ou indiquez ce profil.",
   "PORTAL_MEMBERS": "Cette discussion est réservée aux personnes qui se connectent à ce Toskar.",
   "PORTAL_INVITE": "Cette discussion est sur invitation. Ouvrez le lien reçu ou demandez-en un nouveau.",
   "PORTAL_INVALID": "Ce réglage du portail ne peut pas être utilisé.",

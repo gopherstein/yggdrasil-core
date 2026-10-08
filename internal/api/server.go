@@ -681,7 +681,7 @@ func (s *Server) keyPrincipal(w http.ResponseWriter, r *http.Request, token, rou
 		writeErr(w, http.StatusForbidden, "DEVICE_NOT_ALLOWED", "a phone's key can't do this; use a key from API Access", nil)
 		return auth.Principal{}, false
 	}
-	principal := auth.Principal{Person: auth.Person{ID: rec.PersonID, Role: auth.RoleOwner}, Via: auth.ViaAPIKey, KeyID: rec.ID}
+	principal := auth.Principal{Person: auth.Person{ID: rec.PersonID, Role: auth.RoleOwner}, Via: auth.ViaAPIKey, KeyID: rec.ID, KeyProfile: rec.Permissions.Profile}
 	if s.deps.People != nil {
 		person, err := s.deps.People.Active(r.Context(), rec.PersonID)
 		if err != nil {

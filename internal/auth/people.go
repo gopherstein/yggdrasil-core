@@ -304,6 +304,8 @@ type Principal struct {
 	Via string `json:"via"`
 	// KeyID is the API key the request used, when Via is api_key.
 	KeyID string `json:"key_id,omitempty"`
+	// KeyProfile is the profile that key is pinned to (#345), or "".
+	KeyProfile string `json:"key_profile,omitempty"`
 }
 
 // Ways a request is known to be from someone.

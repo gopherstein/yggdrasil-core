@@ -629,7 +629,7 @@ func New(opts Options) (*App, error) {
 		CreateAPIKey:         apiKeyMgr.Create,
 		RevokeAPIKey:         apiKeyMgr.Revoke,
 		RotateAPIKey:         apiKeyMgr.Rotate,
-		SetAPIKeyPermissions: apiKeyMgr.SetPermissions,
+		SetAPIKeyPermissions: a.setAPIKeyPermissions,
 		VerifyAPIKey:         apiKeyMgr.Verify,
 		People:               a.People,
 		Portals:              a.Portals,
@@ -912,7 +912,7 @@ func (a *App) openAIPermissions(r *http.Request) (auth.APIKeyPermissions, contex
 		// On this computer a key is optional; a wrong one gets the defaults.
 		return auth.DefaultAPIKeyPermissions(), ownerCtx, nil
 	}
-	principal := auth.Principal{Person: auth.Person{ID: rec.PersonID, Role: auth.RoleOwner}, Via: auth.ViaAPIKey, KeyID: rec.ID}
+	principal := auth.Principal{Person: auth.Person{ID: rec.PersonID, Role: auth.RoleOwner}, Via: auth.ViaAPIKey, KeyID: rec.ID, KeyProfile: rec.Permissions.Profile}
 	if a.People != nil {
 		person, err := a.People.Active(r.Context(), rec.PersonID)
 		if err != nil {
@@ -1740,4 +1740,15 @@ func (a *App) portalRetentionLoop(ctx context.Context) {
 		case <-ticker.C:
 		}
 	}
+}
+
+// setAPIKeyPermissions changes what a key may do; a key is pinned only to
+// a profile that exists (#345).
+func (a *App) setAPIKeyPermissions(ctx context.Context, id string, p auth.APIKeyPermissions) (auth.APIKeyRecord, error) {
+	if p.Profile != "" {
+		if _, err := a.Profiles.Get(ctx, p.Profile); err != nil {
+			return auth.APIKeyRecord{}, fmt.Errorf("no profile %q to pin the key to", p.Profile)
+		}
+	}
+	return a.APIKeys.SetPermissions(ctx, id, p)
 }
