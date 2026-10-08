@@ -104,5 +104,9 @@
       "no_gpu": "這台電腦沒有 Toskar 能使用的 GPU，所以模型在 CPU 上執行。"
     },
     "openDiagnostics": "開啟診斷"
+  },
+  "roles": {
+    "adminsOnly": "此頁面供管理員和擁有者使用。",
+    "membersOnly": "此頁面供成員、管理員和擁有者使用。"
   }
 }

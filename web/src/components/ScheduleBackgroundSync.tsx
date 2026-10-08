@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
+import { useRole } from '@/lib/role'
 import { notifyDesktopBackgroundMode } from '@/lib/desktopBridge'
 import { readScreenshotLaunch } from '@/lib/screenshotMode'
 
@@ -9,16 +10,18 @@ export function ScheduleBackgroundSync() {
   const queryClient = useQueryClient()
   const screenshot = readScreenshotLaunch()?.enabled ?? false
   const toldDesktop = useRef(false)
+  // Keeping the service running is an Admin's setting (#203).
+  const admin = useRole().atLeast('admin')
   const automations = useQuery({
     queryKey: ['automations'],
     queryFn: () => api.listAutomations(),
-    enabled: !screenshot,
+    enabled: !screenshot && admin,
     retry: false,
   })
   const settings = useQuery({
     queryKey: ['settings'],
     queryFn: () => api.getSettings(),
-    enabled: !screenshot,
+    enabled: !screenshot && admin,
     retry: false,
   })
   const scheduled = (automations.data?.length ?? 0) > 0

@@ -2,7 +2,8 @@
   "page": {
     "title": "Impostazioni",
     "subtitle": "Come deve comportarsi Toskar su questo computer.",
-    "loading": "Caricamento delle impostazioni…"
+    "loading": "Caricamento delle impostazioni…",
+    "adminsOnly": "Le altre impostazioni cambiano Toskar per tutti, quindi sono per gli admin e il proprietario."
   },
   "groups": {
     "general": "Generali",

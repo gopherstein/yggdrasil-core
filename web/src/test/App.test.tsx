@@ -14,6 +14,10 @@ vi.mock('@/lib/api', async () => {
         product: 'yggdrasil',
         version: 'test',
       })),
+      getMe: vi.fn(async () => ({
+        person: { id: 'owner', name: 'Owner', role: 'owner', created_at: '', sign_in: false },
+        via: 'this_computer',
+      })),
       getSettings: vi.fn(async () => ({
         data_dir: '/tmp',
         models_dir: '/tmp/models',

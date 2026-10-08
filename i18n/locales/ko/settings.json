@@ -2,7 +2,8 @@
   "page": {
     "title": "설정",
     "subtitle": "이 컴퓨터에서 Toskar가 작동하는 방식이에요.",
-    "loading": "설정을 불러오는 중…"
+    "loading": "설정을 불러오는 중…",
+    "adminsOnly": "나머지 설정은 모두의 Toskar를 바꾸기 때문에 관리자와 소유자만 바꿀 수 있어요."
   },
   "groups": {
     "general": "일반",

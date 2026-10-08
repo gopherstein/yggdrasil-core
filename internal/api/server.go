@@ -551,7 +551,7 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 		// browser's, then this computer's Owner.
 		if token, err := auth.BearerToken(r); err == nil {
 			if principal, ok := s.keyPrincipal(w, r, token, route); ok {
-				next.ServeHTTP(w, r.WithContext(auth.WithPrincipal(r.Context(), principal)))
+				s.serveAs(w, r, principal, route, next)
 				return
 			} else if !local {
 				return
@@ -568,7 +568,7 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 				writeErr(w, http.StatusForbidden, "CROSS_SITE", "a signed-in change must come from Toskar's own pages", nil)
 				return
 			}
-			next.ServeHTTP(w, r.WithContext(auth.WithPrincipal(r.Context(), principal)))
+			s.serveAs(w, r, principal, route, next)
 			return
 		}
 		if local || !beyond {
@@ -581,6 +581,17 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 		}
 		writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "authorization required", nil)
 	})
+}
+
+// serveAs serves a request as principal, when their role reaches its route
+// (#203): Visitors chat, Members use Toskar for themselves, and Admins and
+// the Owner run it.
+func (s *Server) serveAs(w http.ResponseWriter, r *http.Request, principal auth.Principal, route string, next http.Handler) {
+	if need := auth.RoleNeeded(r.Method, route); r.Method != http.MethodOptions && !principal.Person.Role.AtLeast(need) {
+		writeErr(w, http.StatusForbidden, "ROLE_REQUIRED", "this needs the "+string(need)+" role", map[string]any{"role": string(need)})
+		return
+	}
+	next.ServeHTTP(w, r.WithContext(auth.WithPrincipal(r.Context(), principal)))
 }
 
 // keyPrincipal is a valid key's person. ok is false when the key isn't

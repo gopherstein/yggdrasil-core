@@ -32,12 +32,18 @@ func (a *App) mcpBackend() mcp.Backend {
 
 type mcpPermsKey struct{}
 
+var errMCPRole = errors.New("this needs the member role")
+
 // mcpAuthorize checks an MCP request as /v1 checks one, and carries what
 // its key allows into the calls.
 func (a *App) mcpAuthorize(r *http.Request) (context.Context, error) {
 	perms, ctx, err := a.openAIPermissions(r)
 	if err != nil {
 		return nil, err
+	}
+	// Its tools and memories are a Member's to use, not a Visitor's (#203).
+	if !auth.PrincipalFrom(ctx).Person.Role.AtLeast(auth.RoleMember) {
+		return nil, errMCPRole
 	}
 	return context.WithValue(ctx, mcpPermsKey{}, perms), nil
 }

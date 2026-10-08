@@ -2,7 +2,8 @@
   "page": {
     "title": "設定",
     "subtitle": "このコンピュータでのToskarの動作を設定します。",
-    "loading": "設定を読み込んでいます…"
+    "loading": "設定を読み込んでいます…",
+    "adminsOnly": "その他の設定は全員の Toskar を変えるため、管理者とオーナーだけが変更できます。"
   },
   "groups": {
     "general": "一般",

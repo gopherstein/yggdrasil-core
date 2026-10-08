@@ -4,6 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { HowItWorks, stepIcons } from '@/components/ui/HowItWorks'
 import { Toggle } from '@/components/ui/Toggle'
+import { useRole } from '@/lib/role'
 import { api } from '@/lib/api'
 import { rovingKeyDown, useMenu } from '@/lib/roving'
 import { subscribeEvents } from '@/lib/events'
@@ -25,6 +26,9 @@ function useCategoryLabel(): (category: MemoryCategory) => string {
 
 export function MemoryPage() {
   const { t } = useTranslation('memory')
+  // Memory for every chat is an Admin's switch (#203).
+  const { role, atLeast } = useRole()
+  const admin = role === undefined || atLeast('admin')
   const categoryLabel = useCategoryLabel()
   const queryClient = useQueryClient()
   const memory = useQuery({ queryKey: ['memory'], queryFn: () => api.listMemory() })
@@ -75,12 +79,14 @@ export function MemoryPage() {
               {showIntro ? t('page.hideHowItWorks') : t('page.howItWorks')}
             </button>
           ) : null}
-          <div className="flex items-center gap-2.5" title={t('page.useInChatsHint')}>
-            <Toggle checked={on} disabled={toggleAll.isPending || !settings.data} label={t('page.useInChats')} onChange={() => toggleAll.mutate(!on)} />
-            <span className="text-sm font-medium text-ink" aria-hidden>
-              {t('page.useInChats')}
-            </span>
-          </div>
+          {admin ? (
+            <div className="flex items-center gap-2.5" title={t('page.useInChatsHint')}>
+              <Toggle checked={on} disabled={toggleAll.isPending || !settings.data} label={t('page.useInChats')} onChange={() => toggleAll.mutate(!on)} />
+              <span className="text-sm font-medium text-ink" aria-hidden>
+                {t('page.useInChats')}
+              </span>
+            </div>
+          ) : null}
         </div>
       </div>
       {!on && (

@@ -2,7 +2,8 @@
   "page": {
     "title": "Einstellungen",
     "subtitle": "Wie sich Toskar auf diesem Computer verhalten soll.",
-    "loading": "Einstellungen werden geladen …"
+    "loading": "Einstellungen werden geladen …",
+    "adminsOnly": "Die übrigen Einstellungen ändern Toskar für alle, deshalb sind sie für Admins und den Eigentümer."
   },
   "groups": {
     "general": "Allgemein",

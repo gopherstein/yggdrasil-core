@@ -105,5 +105,9 @@
       "no_gpu": "Dieser Computer hat keine GPU, die Toskar verwenden kann, daher laufen Modelle auf der CPU."
     },
     "openDiagnostics": "Diagnose öffnen"
+  },
+  "roles": {
+    "adminsOnly": "Diese Seite ist für Admins und den Eigentümer.",
+    "membersOnly": "Diese Seite ist für Mitglieder, Admins und den Eigentümer."
   }
 }

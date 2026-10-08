@@ -6,6 +6,7 @@ import i18n from '@/i18n'
 import { RealmKicker } from '@/components/ui/Realm'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
 import { useMascotState } from '@/lib/ratatoskr/useMascotState'
+import { useRole } from '@/lib/role'
 import { ApiError, api, streamChat } from '@/lib/api'
 import { ATTACH_ACCEPT, MAX_ATTACH_BYTES, isAttachable, readUpload } from '@/lib/upload'
 import { subscribeEvents } from '@/lib/events'
@@ -178,6 +179,12 @@ function ReplyMark() {
 
 export function ChatPage() {
   const { t } = useTranslation('chat')
+  // Setting up and rating models and tools is for Admins, automations for
+  // Members (#203); until the role is known, the Owner's view, but nothing
+  // an Admin's is asked for.
+  const { role, atLeast } = useRole()
+  const admin = role === undefined || atLeast('admin')
+  const member = role === undefined || atLeast('member')
   const queryClient = useQueryClient()
   const [searchParams, setSearchParams] = useSearchParams()
   const activeProfileId = useUIStore((s) => s.activeProfileId)
@@ -1734,11 +1741,11 @@ export function ChatPage() {
                         <ReplyMark />
                         {message.meta?.automation_run ? <AutomationRunNote run={message.meta.automation_run} /> : null}
                         <ChatMarkdown text={text} />
-                        <AnswerDetails meta={message.meta} />
-                        {message.meta?.setup ? (
+                        <AnswerDetails meta={message.meta} runs={admin} />
+                        {message.meta?.setup && admin ? (
                           <SetupOfferCard offer={message.meta.setup} onContinue={continueAfterSetup} />
                         ) : null}
-                        {message.meta?.automation ? (
+                        {message.meta?.automation && member ? (
                           <AutomationDraftCard draft={message.meta.automation} conversationId={message.conversation_id} />
                         ) : null}
                         {canReadAloud ? (
@@ -1859,7 +1866,7 @@ export function ChatPage() {
                       setModel(modelId)
                       setCapabilityNotice(null)
                     }}
-                    onEnableInternet={() => void enableInternet()}
+                    onEnableInternet={admin ? () => void enableInternet() : undefined}
                   />
                 )}
                 {modelFailure ? (
@@ -1888,7 +1895,7 @@ export function ChatPage() {
                     onNewChat={startNewChat}
                   />
                 )}
-                {routedModel && routedModel.chatId === selectedId && !isSending ? (
+                {routedModel && routedModel.chatId === selectedId && !isSending && atLeast('admin') ? (
                   <RatingPrompt
                     modelId={routedModel.modelId}
                     modelName={(modelsQuery.data ?? []).find((m) => m.id === routedModel.modelId)?.display_name ?? routedModel.modelId}
@@ -1933,7 +1940,7 @@ export function ChatPage() {
                       setModel(modelId)
                       setCapabilityNotice(null)
                     }}
-                    onEnableInternet={() => void enableInternet()}
+                    onEnableInternet={admin ? () => void enableInternet() : undefined}
                   />
                 </div>
               ) : null}

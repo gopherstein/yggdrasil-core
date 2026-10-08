@@ -104,6 +104,14 @@ function HealthGate({ children }: { children: ReactNode }) {
 
   const ready = healthQuery.data?.status === 'ok'
   const askForKey = needsApiKey(healthQuery.error)
+  // Who is signed in, before the shell shows what their role may use (#203).
+  const meQuery = useQuery({
+    queryKey: ['me'],
+    queryFn: () => api.getMe(),
+    enabled: ready,
+    retry: false,
+    staleTime: 60_000,
+  })
 
   useEffect(() => {
     if (ready) {
@@ -117,6 +125,10 @@ function HealthGate({ children }: { children: ReactNode }) {
     }, 400)
     return () => window.clearInterval(id)
   }, [ready, deadline])
+
+  if (ready && meQuery.isPending) {
+    return null
+  }
 
   if (ready) {
     return (

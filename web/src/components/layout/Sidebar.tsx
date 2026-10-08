@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { NavLink, useLocation } from 'react-router-dom'
 import { Rune } from '@/components/ui/Realm'
 import { api } from '@/lib/api'
+import { useRole } from '@/lib/role'
 import { realms } from '@/lib/realms'
 import { displayVersion } from '@/lib/appVersion'
 import { useUIStore } from '@/stores/uiStore'
@@ -16,9 +17,9 @@ import { NotificationBell } from './NotificationBell'
 // the common namespace (i18n/locales/<language>/common.json).
 const useNav = [
   { to: '/chat', label: 'nav.chat' },
-  { to: '/automations', label: 'nav.automations' },
-  { to: '/knowledge', label: 'nav.knowledge' },
-  { to: '/memory', label: 'nav.memory' },
+  { to: '/automations', label: 'nav.automations', member: true },
+  { to: '/knowledge', label: 'nav.knowledge', admin: true },
+  { to: '/memory', label: 'nav.memory', member: true },
 ] as const
 
 const customizeNav = [
@@ -72,6 +73,11 @@ function NavGroup({ heading, items }: { heading: string; items: readonly { to: s
 export function Sidebar({ open = false, ref }: { open?: boolean; ref?: Ref<HTMLDivElement> }) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
+  // Visitors see Chat, Members their automations and memories, and Admins
+  // and the Owner everything (#203); until the role is known, the Owner's view.
+  const { role, atLeast } = useRole()
+  const member = role === undefined || atLeast('member')
+  const admin = role === undefined || atLeast('admin')
   const administerChosen = useUIStore((s) => s.administerOpen)
   const setAdministerOpen = useUIStore((s) => s.setAdministerOpen)
   // A page in Administer that is open shows its group, so the current page is always in view.
@@ -180,47 +186,51 @@ export function Sidebar({ open = false, ref }: { open?: boolean; ref?: Ref<HTMLD
               </div>
             </div>
           </a>
-          <NotificationBell />
+          {atLeast('admin') ? <NotificationBell /> : null}
         </div>
       </header>
 
       <nav className="flex min-h-0 flex-1 flex-col px-2.5 pb-3" aria-label={t('nav.label')}>
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
-          <NavGroup heading={t('nav.use')} items={useNav} />
-          <NavGroup heading={t('nav.customize')} items={customizeNav} />
+          <NavGroup heading={t('nav.use')} items={useNav.filter((item) => ('admin' in item ? admin : 'member' in item ? member : true))} />
+          {admin ? (
+            <>
+              <NavGroup heading={t('nav.customize')} items={customizeNav} />
 
-          <div>
-            <button
-              type="button"
-              className="label-caps mb-1 flex w-full items-center justify-between rounded-md px-2.5 py-1 hover:text-ink"
-              aria-expanded={administerOpen}
-              aria-controls="nav-administer"
-              disabled={onAdministerPage}
-              title={onAdministerPage ? undefined : t('nav.administerHint')}
-              onClick={() => setAdministerOpen(!administerChosen)}
-            >
-              <span>{t('nav.administer')}</span>
-              <svg
-                viewBox="0 0 16 16"
-                className={['h-3 w-3 transition-transform', administerOpen ? 'rotate-90' : 'rtl:rotate-180'].join(' ')}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.75}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden
-              >
-                <path d="m6 3.5 4.5 4.5L6 12.5" />
-              </svg>
-            </button>
-            {administerOpen ? (
-              <div id="nav-administer" className="flex flex-col gap-0.5">
-                {administerNav.map(({ to, label }) => (
-                  <NavItem key={to} to={to} label={t(label)} />
-                ))}
+              <div>
+                <button
+                  type="button"
+                  className="label-caps mb-1 flex w-full items-center justify-between rounded-md px-2.5 py-1 hover:text-ink"
+                  aria-expanded={administerOpen}
+                  aria-controls="nav-administer"
+                  disabled={onAdministerPage}
+                  title={onAdministerPage ? undefined : t('nav.administerHint')}
+                  onClick={() => setAdministerOpen(!administerChosen)}
+                >
+                  <span>{t('nav.administer')}</span>
+                  <svg
+                    viewBox="0 0 16 16"
+                    className={['h-3 w-3 transition-transform', administerOpen ? 'rotate-90' : 'rtl:rotate-180'].join(' ')}
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={1.75}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <path d="m6 3.5 4.5 4.5L6 12.5" />
+                  </svg>
+                </button>
+                {administerOpen ? (
+                  <div id="nav-administer" className="flex flex-col gap-0.5">
+                    {administerNav.map(({ to, label }) => (
+                      <NavItem key={to} to={to} label={t(label)} />
+                    ))}
+                  </div>
+                ) : null}
               </div>
-            ) : null}
-          </div>
+            </>
+          ) : null}
         </div>
 
         {/* Settings stays in view below the groups, however far they scroll. */}

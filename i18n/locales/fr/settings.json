@@ -2,7 +2,8 @@
   "page": {
     "title": "Paramètres",
     "subtitle": "Comment Toskar doit se comporter sur cet ordinateur.",
-    "loading": "Chargement des paramètres…"
+    "loading": "Chargement des paramètres…",
+    "adminsOnly": "Les autres réglages modifient Toskar pour tout le monde ; ils sont donc réservés aux admins et au propriétaire."
   },
   "groups": {
     "general": "Général",

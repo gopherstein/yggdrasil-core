@@ -56,7 +56,12 @@ Chats and their messages, memories, files, and automations are private to their 
 - **Phones:** a phone paired with a code gets the key of the person who showed the code.
 - **Network access:** turning on `lan_api_enabled` needs an API key, or a person other than the Owner who isn't disabled, since they sign in with a password or still have a link to; otherwise it answers `API_KEY_REQUIRED`. The app's People page (`/people`) adds people and shows their links, and `/invite/<token>` is the page a link opens.
 
-Role checks across the rest of the API follow.
+**Roles.** Every `/api/v1` request from a key or a signed-in browser is checked against its person's role; one that needs more answers `403 ROLE_REQUIRED` with `details.role`, the least role that may.
+- **Visitors** chat: `/chat`, their conversations and their files, `/tools/decide`, `/speech`, and reading settings, profiles, models, tools, specialized AIs, and computers.
+- **Members** also have their memories and automations, and read knowledge sources and search them.
+- **Admins** have everything else: models, runtimes, tools, profiles, knowledge sources, computers, keys, devices, people, settings, notifications, runs, training, performance, and diagnostics.
+- **The Owner** alone erases everything (`POST /settings/reset`).
+- A route not given a role needs an Admin. `/v1/chat/completions` answers any key's person; `/mcp` needs a Member. From this computer, a request without a key or session is the Owner's, as before.
 
 ### HTTPS
 
