@@ -196,7 +196,9 @@ type Server struct {
 	mcp           *mcp.Manager
 	mcpServer     *mcp.Server
 	// oidcState is the OpenID Connect provider's client (#206).
-	oidcState       oidcHolder
+	oidcState oidcHolder
+	// portalLimits keeps chat portals' limits (#205).
+	portalLimits    portalLimiter
 	ctl             func() string
 	personal        PersonalStore
 	privacy         Privacy

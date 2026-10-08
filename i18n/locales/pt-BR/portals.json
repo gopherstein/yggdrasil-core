@@ -39,7 +39,8 @@
     "save": "Salvar",
     "saved": "Salvo",
     "preview": "Prévia",
-    "open": "Editar"
+    "open": "Editar",
+    "limits": "Limites"
   },
   "tools": {
     "none": "Sem ferramentas",
@@ -72,5 +73,11 @@
     "title": "Portais",
     "none": "Ainda não há portais.",
     "private": "As conversas de cada visitante são só dele e nunca chegam às suas memórias nem ao seu conhecimento. Desativar um portal o interrompe na hora."
+  },
+  "limit": {
+    "hourly": "Mensagens por visitante por hora",
+    "longest": "Mensagem mais longa (caracteres)",
+    "most": "Chats ao mesmo tempo",
+    "hint": "0 mensagens significa sem limite. Os chats do portal esperam os seus e os de outras pessoas que usam o Toskar, e vêm antes das automações."
   }
 }

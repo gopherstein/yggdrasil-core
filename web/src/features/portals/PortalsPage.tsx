@@ -183,6 +183,9 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
   const [language, setLanguage] = useState(portal.language)
   const [access, setAccess] = useState(portal.access)
   const [passcode, setPasscode] = useState('')
+  const [hourly, setHourly] = useState(String(portal.hourly_limit))
+  const [longest, setLongest] = useState(String(portal.max_message))
+  const [most, setMost] = useState(String(portal.concurrency))
   const [draft, setDraft] = useState(() => toDraft(portal.branding ?? {}))
   const [saved, setSaved] = useState(false)
   const branding = useMemo(() => fromDraft(draft), [draft])
@@ -193,7 +196,10 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
 
   const save = useMutation({
     mutationFn: () => {
-      const input: PortalInput = { name: name.trim(), slug, profile_id: profileId, tools, memory, language, access, branding }
+      const input: PortalInput = {
+        name: name.trim(), slug, profile_id: profileId, tools, memory, language, access, branding,
+        hourly_limit: Number(hourly), max_message: Number(longest), concurrency: Number(most),
+      }
       if (passcode.trim()) input.passcode = passcode.trim()
       return api.updatePortal(portal.id, input)
     },
@@ -203,7 +209,7 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
       void queryClient.invalidateQueries({ queryKey: ['portals'] })
     },
   })
-  useEffect(() => setSaved(false), [name, slug, profileId, tools, memory, language, access, passcode])
+  useEffect(() => setSaved(false), [name, slug, profileId, tools, memory, language, access, passcode, hourly, longest, most])
 
   const choices = languages.filter((l) => availableLanguages.includes(l.code))
   const field = 'space-y-1 text-sm'
@@ -296,6 +302,23 @@ function PortalEditor({ portal, onClose }: { portal: Portal; onClose: () => void
             ) : (
               <p className="self-end text-xs text-ink-faint">{t('access.openHint')}</p>
             )}
+          </fieldset>
+
+          <fieldset className="grid gap-3 sm:grid-cols-3">
+            <legend className="label-caps mb-2">{t('edit.limits')}</legend>
+            <label className={field}>
+              <span className={label}>{t('limit.hourly')}</span>
+              <input className="field w-full" type="number" min={0} max={1000} value={hourly} onChange={(e) => setHourly(e.target.value)} />
+            </label>
+            <label className={field}>
+              <span className={label}>{t('limit.longest')}</span>
+              <input className="field w-full" type="number" min={100} max={20000} step={100} value={longest} onChange={(e) => setLongest(e.target.value)} />
+            </label>
+            <label className={field}>
+              <span className={label}>{t('limit.most')}</span>
+              <input className="field w-full" type="number" min={1} max={20} value={most} onChange={(e) => setMost(e.target.value)} />
+            </label>
+            <p className="text-xs text-ink-faint sm:col-span-3">{t('limit.hint')}</p>
           </fieldset>
 
           <fieldset className="grid gap-3 sm:grid-cols-2">

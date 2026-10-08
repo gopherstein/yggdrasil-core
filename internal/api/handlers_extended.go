@@ -3,11 +3,13 @@ package api
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/yeixio/toskar-core/internal/portals"
 	"github.com/yeixio/toskar-core/internal/turnopts"
 	"net"
 	"net/http"
 	"strconv"
+	"unicode/utf8"
 
 	"github.com/gorilla/mux"
 	"github.com/yeixio/toskar-core/internal/artifacts"
@@ -320,9 +322,23 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 	// A portal's guest chats with the portal's profile, tools, memory, and
 	// language, whatever the request asks for (#205).
 	if p, ok := s.portalOf(r); ok {
+		if n := utf8.RuneCountInString(body.Message); n > p.MaxMessage {
+			writeErr(w, http.StatusBadRequest, "PORTAL_TOO_LONG", fmt.Sprintf("a message here can be %d characters at most", p.MaxMessage), map[string]any{"max": p.MaxMessage})
+			return
+		}
+		done, ok := s.portalLimits.enter(p.ID, p.Concurrency)
+		if !ok {
+			writeErr(w, http.StatusTooManyRequests, "PORTAL_BUSY", "this chat is busy; try again in a moment", nil)
+			return
+		}
+		defer done()
+		if !s.portalLimits.allow(auth.PersonID(r.Context()), p.HourlyLimit) {
+			writeErr(w, http.StatusTooManyRequests, "PORTAL_RATE", "you've sent a lot of messages; try again later", map[string]any{"per_hour": p.HourlyLimit})
+			return
+		}
 		body.ProfileID, body.ModelID, body.Execution = p.ProfileID, "", "automatic"
 		ctx = huginn.WithEffort(artifacts.WithAttachments(r.Context(), nil), huginn.ParseEffort(body.Effort))
-		opts := &turnopts.Options{Memory: p.Memory, Knowledge: true, FixedProfile: true, Language: p.Language}
+		opts := &turnopts.Options{Memory: p.Memory, Knowledge: true, FixedProfile: true, Language: p.Language, Portal: p.ID}
 		switch p.Tools {
 		case portals.ToolsNone:
 			opts.Tools = []string{}

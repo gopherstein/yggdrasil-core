@@ -2147,6 +2147,8 @@ export interface PortalPageView {
   access: 'open' | 'passcode' | string
   language: string
   branding: PortalBranding
+  /** The longest message the portal takes. */
+  max_message: number
   /** True when this browser is already the portal's guest. */
   entered: boolean
 }
@@ -2164,6 +2166,12 @@ export interface Portal {
   has_passcode: boolean
   branding: PortalBranding
   enabled: boolean
+  /** Messages each visitor may send an hour; 0 is no limit. */
+  hourly_limit: number
+  /** The longest message, in characters. */
+  max_message: number
+  /** How many of its chats may run at once. */
+  concurrency: number
   created_at: string
   updated_at: string
 }

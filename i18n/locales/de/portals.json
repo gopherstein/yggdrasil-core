@@ -39,7 +39,8 @@
     "save": "Speichern",
     "saved": "Gespeichert",
     "preview": "Vorschau",
-    "open": "Bearbeiten"
+    "open": "Bearbeiten",
+    "limits": "Grenzen"
   },
   "tools": {
     "none": "Keine Tools",
@@ -72,5 +73,11 @@
     "title": "Portale",
     "none": "Noch keine Portale.",
     "private": "Die Chats jedes Besuchers gehören ihm und erreichen nie deine Erinnerungen oder dein Wissen. Ein ausgeschaltetes Portal stoppt sofort."
+  },
+  "limit": {
+    "hourly": "Nachrichten pro Besucher und Stunde",
+    "longest": "Längste Nachricht (Zeichen)",
+    "most": "Chats gleichzeitig",
+    "hint": "0 Nachrichten bedeutet keine Grenze. Portal-Chats warten auf deine eigenen und die anderer Toskar-Nutzer und kommen vor Automationen."
   }
 }

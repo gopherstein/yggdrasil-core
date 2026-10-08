@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/config"
@@ -137,5 +138,107 @@ func TestPortalGuests(t *testing.T) {
 	}
 	if rec := do(http.MethodGet, "/api/v1/portals/support/page", "", nil); rec.Code != http.StatusNotFound {
 		t.Fatalf("page after turning it off: %d", rec.Code)
+	}
+}
+
+func TestPortalLimiter(t *testing.T) {
+	var l portalLimiter
+	now := time.Date(2026, 10, 8, 12, 0, 0, 0, time.UTC)
+	l.now = func() time.Time { return now }
+	for i := 0; i < 3; i++ {
+		if !l.allow("g", 3) {
+			t.Fatalf("message %d refused", i)
+		}
+	}
+	if l.allow("g", 3) || !l.allow("other", 3) || !l.allow("g", 0) {
+		t.Fatal("hourly limit")
+	}
+	now = now.Add(61 * time.Minute)
+	if !l.allow("g", 3) {
+		t.Fatal("an hour later")
+	}
+	done1, ok1 := l.enter("p", 2)
+	_, ok2 := l.enter("p", 2)
+	if _, ok3 := l.enter("p", 2); !ok1 || !ok2 || ok3 {
+		t.Fatalf("concurrency %v %v %v", ok1, ok2, ok3)
+	}
+	done1()
+	if _, ok := l.enter("p", 2); !ok {
+		t.Fatal("a chat that ended still counted")
+	}
+}
+
+// A portal's guest is held to its limits (#205).
+func TestPortalLimits(t *testing.T) {
+	dir := t.TempDir()
+	db, err := store.Open(filepath.Join(dir, "t.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+	mgr, err := config.NewManager(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := mgr.Update(func(c *config.Config) { c.APIHost = "0.0.0.0" }); err != nil {
+		t.Fatal(err)
+	}
+	ps := portals.NewStore(db.SQL)
+	slug, name, access, hourly, longest, most := "help", "Help", portals.AccessOpen, 2, 100, 1
+	if _, err := ps.Create(context.Background(), portals.Input{Slug: &slug, Name: &name, Access: &access, HourlyLimit: &hourly, MaxMessage: &longest, Concurrency: &most}); err != nil {
+		t.Fatal(err)
+	}
+	release := make(chan struct{})
+	started := make(chan struct{}, 4)
+	srv := NewServer(Dependencies{
+		Config: mgr, People: auth.NewPeople(db.SQL), Sessions: auth.NewSessions(db.SQL), Invites: auth.NewInvites(db.SQL), Portals: ps,
+		Chat: func(w http.ResponseWriter, r *http.Request, _, _, _, message string, _ bool, _ string) error {
+			if message == "slow" {
+				started <- struct{}{}
+				<-release
+			}
+			writeJSON(w, http.StatusOK, map[string]string{"ok": "yes"})
+			return nil
+		},
+	})
+	call := func(method, path, body string, c *http.Cookie) *httptest.ResponseRecorder {
+		r := httptest.NewRequest(method, path, strings.NewReader(body))
+		r.RemoteAddr = "192.168.1.40:5000"
+		r.Header.Set("X-Toskar-Portal", "help")
+		r.Header.Set("Origin", "http://example.com")
+		if c != nil {
+			r.AddCookie(c)
+		}
+		rec := httptest.NewRecorder()
+		srv.Handler().ServeHTTP(rec, r)
+		return rec
+	}
+	enter := call(http.MethodPost, "/api/v1/portals/help/enter", `{}`, nil)
+	cookie := enter.Result().Cookies()[0]
+	code := func(rec *httptest.ResponseRecorder) string {
+		var b struct {
+			Error struct{ Code string } `json:"error"`
+		}
+		_ = json.NewDecoder(rec.Body).Decode(&b)
+		return b.Error.Code
+	}
+
+	if rec := call(http.MethodPost, "/api/v1/chat", `{"message":"`+strings.Repeat("x", 101)+`"}`, cookie); rec.Code != http.StatusBadRequest || code(rec) != "PORTAL_TOO_LONG" {
+		t.Fatalf("too long: %d", rec.Code)
+	}
+	// One chat at a time: a second waits its turn with PORTAL_BUSY.
+	go call(http.MethodPost, "/api/v1/chat", `{"message":"slow"}`, cookie)
+	<-started
+	if rec := call(http.MethodPost, "/api/v1/chat", `{"message":"hi"}`, cookie); rec.Code != http.StatusTooManyRequests || code(rec) != "PORTAL_BUSY" {
+		t.Fatalf("busy: %d", rec.Code)
+	}
+	close(release)
+	time.Sleep(50 * time.Millisecond)
+	// Two an hour: "slow" was one, this is two, the next is refused.
+	if rec := call(http.MethodPost, "/api/v1/chat", `{"message":"hi"}`, cookie); rec.Code != http.StatusOK {
+		t.Fatalf("second message: %d %s", rec.Code, rec.Body)
+	}
+	if rec := call(http.MethodPost, "/api/v1/chat", `{"message":"hi"}`, cookie); rec.Code != http.StatusTooManyRequests || code(rec) != "PORTAL_RATE" {
+		t.Fatalf("third message: %d", rec.Code)
 	}
 }

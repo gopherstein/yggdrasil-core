@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -79,7 +80,7 @@ func portalError(w http.ResponseWriter, err error) {
 		writeErr(w, http.StatusConflict, "PORTAL_SLUG_TAKEN", err.Error(), nil)
 	case errors.Is(err, portals.ErrBadSlug), errors.Is(err, portals.ErrBadName), errors.Is(err, portals.ErrBadTools),
 		errors.Is(err, portals.ErrBadAccess), errors.Is(err, portals.ErrNoPasscode), errors.Is(err, portals.ErrBadBranding),
-		errors.Is(err, portals.ErrBadLanguage):
+		errors.Is(err, portals.ErrBadLanguage), errors.Is(err, portals.ErrBadLimits):
 		writeErr(w, http.StatusBadRequest, "PORTAL_INVALID", err.Error(), nil)
 	default:
 		writeErr(w, http.StatusInternalServerError, "INTERNAL_ERROR", err.Error(), nil)
@@ -154,6 +155,8 @@ type portalPage struct {
 	Access   string          `json:"access"`
 	Language string          `json:"language"`
 	Branding json.RawMessage `json:"branding"`
+	// MaxMessage is the longest message the portal takes.
+	MaxMessage int `json:"max_message"`
 	// Entered is true when this browser is already the portal's guest.
 	Entered bool `json:"entered"`
 }
@@ -174,7 +177,7 @@ func (s *Server) handlePortalPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, entered := s.guestOf(r, p)
-	writeJSON(w, http.StatusOK, portalPage{Slug: p.Slug, Name: p.Name, Access: p.Access, Language: p.Language, Branding: p.Branding, Entered: entered})
+	writeJSON(w, http.StatusOK, portalPage{Slug: p.Slug, Name: p.Name, Access: p.Access, Language: p.Language, Branding: p.Branding, MaxMessage: p.MaxMessage, Entered: entered})
 }
 
 // handleEnterPortal makes this browser the portal's guest: again the same
@@ -277,4 +280,61 @@ func (s *Server) portalOf(r *http.Request) (portals.Portal, bool) {
 		return portals.Portal{}, false
 	}
 	return p, true
+}
+
+// portalLimiter keeps a portal's limits (#205): how many messages each
+// visitor sent in the last hour, and how many of each portal's chats are
+// running.
+type portalLimiter struct {
+	mu      sync.Mutex
+	sent    map[string][]time.Time
+	running map[string]int
+	now     func() time.Time
+}
+
+// enter admits one of a portal's chats while fewer than most run, and
+// returns what ends it.
+func (l *portalLimiter) enter(portal string, most int) (func(), bool) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	if l.running == nil {
+		l.running = map[string]int{}
+	}
+	if l.running[portal] >= most {
+		return nil, false
+	}
+	l.running[portal]++
+	return func() {
+		l.mu.Lock()
+		defer l.mu.Unlock()
+		if l.running[portal]--; l.running[portal] <= 0 {
+			delete(l.running, portal)
+		}
+	}, true
+}
+
+// allow counts a visitor's message when they've sent fewer than perHour in
+// the last hour; 0 is no limit.
+func (l *portalLimiter) allow(guest string, perHour int) bool {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	now := time.Now()
+	if l.now != nil {
+		now = l.now()
+	}
+	if l.sent == nil {
+		l.sent = map[string][]time.Time{}
+	}
+	recent := l.sent[guest][:0]
+	for _, t := range l.sent[guest] {
+		if now.Sub(t) < time.Hour {
+			recent = append(recent, t)
+		}
+	}
+	if perHour > 0 && len(recent) >= perHour {
+		l.sent[guest] = recent
+		return false
+	}
+	l.sent[guest] = append(recent, now)
+	return true
 }

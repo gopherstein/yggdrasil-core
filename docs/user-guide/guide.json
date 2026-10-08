@@ -244,6 +244,7 @@
       "paragraphs": [
         "A chat portal is a page with only a chat on it, in your own name, logo, and colours, for customers, students, or anyone you help. It answers with the profile you choose, and none of Toskar's other pages show.",
         "Each visitor's chats are their own: no other visitor, and none of your own chats, memories, or knowledge sources, appear to them, and their chats never reach your memory or knowledge. A portal starts with no tools and no memory; you can allow tools that only read, or the profile's own.",
+        "Each portal has limits: how many messages a visitor may send an hour, how long a message may be, and how many of its chats run at once. Portal chats wait for your own and for other people's who use Toskar, so a busy portal never slows you down.",
         "Turning a portal off under Administer → Portals stops it at once, even for someone in the middle of a chat."
       ],
       "steps": [

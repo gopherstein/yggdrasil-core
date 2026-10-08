@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChatMarkdown } from '@/features/chat/ChatMarkdown'
 import i18n, { resolveLanguage, systemLanguages } from '@/i18n'
-import { api, ApiError, setPortal, streamChat } from '@/lib/api'
+import { api, ApiError, errorText, setPortal, streamChat } from '@/lib/api'
 import type { PortalPageView } from '@/types/api'
 import { prompts, safeLogo, text, theme, themeVars } from './branding'
 
@@ -219,13 +219,21 @@ function PortalChat({ slug, view, onLeft }: { slug: string; view: PortalPageView
             if (last?.role !== 'assistant') return [...cur, { role: 'assistant', content: piece }]
             return [...cur.slice(0, -1), { ...last, content: last.content + piece }]
           }),
-        onError: () => setError(t('error')),
+        // A limit says which, in the visitor's language (#205).
+        onError: (message, code) => setError(code?.startsWith('PORTAL_') ? errorText(code, message, { max: view.max_message }) : t('error')),
       })
     } catch (err) {
-      if (!(err instanceof DOMException && err.name === 'AbortError')) setError(t('error'))
+      if (err instanceof ApiError && err.code?.startsWith('PORTAL_')) setError(errorText(err.code, err.message, { max: view.max_message, ...err.details }))
+      else if (!(err instanceof DOMException && err.name === 'AbortError')) setError(t('error'))
     } finally {
       abort.current = null
       setSending(false)
+      // A reply that never came, such as one a limit stopped, leaves no
+      // empty bubble behind.
+      setTurns((cur) => {
+        const last = cur[cur.length - 1]
+        return last?.role === 'assistant' && last.content === '' ? cur.slice(0, -1) : cur
+      })
     }
   }
 
@@ -283,6 +291,7 @@ function PortalChat({ slug, view, onLeft }: { slug: string; view: PortalPageView
           <textarea
             className="field min-h-[2.75rem] flex-1 resize-none"
             rows={1}
+            maxLength={view.max_message || undefined}
             aria-label={t('message', { name: view.name })}
             placeholder={t('message', { name: view.name })}
             value={draft}

@@ -26,7 +26,8 @@ vi.mock('@/lib/api', async () => {
 
 const portal: Portal = {
   id: 'p1', slug: 'support', name: 'Help desk', profile_id: '', tools: 'none', memory: false, language: '', access: 'passcode',
-  has_passcode: true, branding: { welcome: 'Hi!' }, enabled: true, created_at: '', updated_at: '',
+  has_passcode: true, branding: { welcome: 'Hi!' }, enabled: true, hourly_limit: 30, max_message: 2000, concurrency: 2,
+  created_at: '', updated_at: '',
 }
 
 function renderIt() {
@@ -81,12 +82,13 @@ describe('PortalsPage (#205)', () => {
     fireEvent.change(within(editor).getByLabelText('Heading'), { target: { value: 'Tire questions' } })
     fireEvent.change(within(editor).getByLabelText('Suggested prompts, one per line'), { target: { value: 'Winter tires?\n\nBook a rotation' } })
     fireEvent.change(within(editor).getByLabelText('Tools'), { target: { value: 'read_only' } })
+    fireEvent.change(within(editor).getByLabelText('Messages per visitor an hour'), { target: { value: '10' } })
     expect(within(editor).getByText('Tire questions')).toBeInTheDocument() // the preview
     fireEvent.click(within(editor).getByRole('button', { name: 'Save' }))
     await waitFor(() =>
       expect(api.updatePortal).toHaveBeenLastCalledWith(
         'p1',
-        expect.objectContaining({ tools: 'read_only', branding: expect.objectContaining({ title: 'Tire questions', prompts: ['Winter tires?', 'Book a rotation'], welcome: 'Hi!' }) }),
+        expect.objectContaining({ tools: 'read_only', hourly_limit: 10, max_message: 2000, concurrency: 2, branding: expect.objectContaining({ title: 'Tire questions', prompts: ['Winter tires?', 'Book a rotation'], welcome: 'Hi!' }) }),
       ),
     )
     expect(api.updatePortal).not.toHaveBeenLastCalledWith('p1', expect.objectContaining({ passcode: expect.anything() }))
