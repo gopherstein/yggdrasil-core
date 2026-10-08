@@ -39,11 +39,15 @@ jobs:
   # not wait for the tests.
   go:
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+          # Self-hosted runners keep Go's caches on disk; uploading them
+          # to GitHub's cache only held jobs up for many minutes.
+          cache: ${{ !vars.CI_RUNS_ON }}
       - name: User guide
         run: |
           python3 scripts/test_publish_docs.py
@@ -101,6 +105,7 @@ jobs:
   # change that breaks one OS fails here, not at release.
   cross-compile:
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -111,6 +116,9 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+          # Self-hosted runners keep Go's caches on disk; uploading them
+          # to GitHub's cache only held jobs up for many minutes.
+          cache: ${{ !vars.CI_RUNS_ON }}
       - name: Build toskar and toskarctl
         env:
           CGO_ENABLED: "0"
@@ -168,6 +176,7 @@ jobs:
     needs: go
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
+    timeout-minutes: 15
     permissions:
       contents: write
     concurrency:
@@ -178,6 +187,9 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+          # Self-hosted runners keep Go's caches on disk; uploading them
+          # to GitHub's cache only held jobs up for many minutes.
+          cache: ${{ !vars.CI_RUNS_ON }}
       - uses: actions/download-artifact@v8
         with:
           name: coverage-profile
@@ -193,6 +205,7 @@ jobs:
 
   frontend:
     runs-on: ${{ fromJSON(vars.CI_RUNS_ON || '"ubuntu-latest"') }}
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: web
@@ -206,7 +219,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "22"
-          cache: pnpm
+          # Not on self-hosted runners, whose pnpm store stays on disk.
+          cache: ${{ !vars.CI_RUNS_ON && 'pnpm' || '' }}
           cache-dependency-path: web/pnpm-lock.yaml
       - run: pnpm install
       - run: pnpm lint
@@ -226,6 +240,9 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+          # Self-hosted runners keep Go's caches on disk; uploading them
+          # to GitHub's cache only held jobs up for many minutes.
+          cache: ${{ !vars.CI_RUNS_ON }}
       # Each job gets its own pnpm: self-hosted runners share a home folder,
       # and two jobs installing into ~/setup-pnpm at once break each other.
       - uses: pnpm/action-setup@v6
@@ -234,7 +251,8 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: "22"
-          cache: pnpm
+          # Not on self-hosted runners, whose pnpm store stays on disk.
+          cache: ${{ !vars.CI_RUNS_ON && 'pnpm' || '' }}
           cache-dependency-path: |
             web/pnpm-lock.yaml
             scripts/screenshots/pnpm-lock.yaml
