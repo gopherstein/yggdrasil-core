@@ -1,0 +1,19 @@
+{
+  "gone": {
+    "title": "此聊天無法使用",
+    "body": "此位址沒有聊天，或它已關閉。"
+  },
+  "enter": {
+    "body": "{{name}} 需要存取碼才能開始聊天。",
+    "passcode": "存取碼",
+    "submit": "開始聊天",
+    "wrong": "該存取碼不正確。"
+  },
+  "error": "發生問題。請再試一次。",
+  "welcome": "有什麼都可以問 {{name}}。",
+  "thinking": "正在思考…",
+  "message": "傳訊息給 {{name}}",
+  "send": "傳送",
+  "stop": "停止",
+  "newChat": "新聊天"
+}

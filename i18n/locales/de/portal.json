@@ -1,0 +1,19 @@
+{
+  "gone": {
+    "title": "Dieser Chat ist nicht verfügbar",
+    "body": "Unter dieser Adresse gibt es keinen Chat, oder er ist ausgeschaltet."
+  },
+  "enter": {
+    "body": "{{name}} fragt nach einem Code, bevor du chatten kannst.",
+    "passcode": "Code",
+    "submit": "Chat starten",
+    "wrong": "Dieser Code stimmt nicht."
+  },
+  "error": "Etwas ist schiefgelaufen. Versuche es erneut.",
+  "welcome": "Frag {{name}}, was du möchtest.",
+  "thinking": "Denkt nach…",
+  "message": "Nachricht an {{name}}",
+  "send": "Senden",
+  "stop": "Stopp",
+  "newChat": "Neuer Chat"
+}

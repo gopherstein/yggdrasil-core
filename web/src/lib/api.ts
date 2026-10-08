@@ -110,6 +110,7 @@ import type {
   PersonLink,
   InviteView,
   Role,
+  PortalPageView,
 } from '@/types/api'
 import type { Upload } from '@/lib/upload'
 
@@ -228,7 +229,20 @@ export function forgetApiKey(id?: string) {
   window.localStorage.removeItem(storedApiKeyIdName)
 }
 
+/** The chat portal this page is (#205), or '' for the app. */
+let portalSlug = ''
+
+/**
+ * Makes every request a chat portal's (#205): it names the portal, so the
+ * portal's guest cookie counts, and sends no stored key, which would speak
+ * for whoever made it instead of the visitor. '' goes back to the app.
+ */
+export function setPortal(slug: string) {
+  portalSlug = slug
+}
+
 function authHeaders(): Record<string, string> {
+  if (portalSlug) return { 'X-Toskar-Portal': portalSlug }
   const key = storedApiKey()
   if (!key) return {}
   return { Authorization: `Bearer ${key}` }
@@ -514,6 +528,13 @@ export const api = {
   /** Sign this browser in with a username and password. */
   signIn: (username: string, password: string) =>
     request<Principal>('/api/v1/session', { method: 'POST', body: JSON.stringify({ username, password }) }),
+
+  /** What a chat portal's page shows (#205); null when there's none, or it's off. */
+  getPortalPage: (slug: string) => request<PortalPageView>(`/api/v1/portals/${encodeURIComponent(slug)}/page`),
+
+  /** Enter a chat portal as its guest, with its passcode when it has one (#205). */
+  enterPortal: (slug: string, passcode = '') =>
+    request<Principal>(`/api/v1/portals/${encodeURIComponent(slug)}/enter`, { method: 'POST', body: JSON.stringify({ passcode }) }),
 
   /** Whether sign-in with an OpenID Connect provider is offered, and its name (#206). */
   getOIDC: () => request<{ enabled: boolean; label?: string }>('/api/v1/oidc'),
