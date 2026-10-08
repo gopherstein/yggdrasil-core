@@ -70,6 +70,11 @@ var memberRoutes = map[string]bool{
 	"POST /api/v1/automations/{id}/runs/{run_id}/chat": true,
 	"POST /api/v1/automations/{id}/hook":               true,
 
+	"GET /api/v1/notifications":               true,
+	"GET /api/v1/notifications/{id}":          true,
+	"POST /api/v1/notifications/read":         true,
+	"POST /api/v1/notifications/{id}/dismiss": true,
+
 	"GET /api/v1/knowledge/sources":              true,
 	"GET /api/v1/knowledge/sources/{id}":         true,
 	"GET /api/v1/knowledge/sources/{id}/content": true,

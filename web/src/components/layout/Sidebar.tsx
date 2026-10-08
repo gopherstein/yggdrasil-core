@@ -186,7 +186,7 @@ export function Sidebar({ open = false, ref }: { open?: boolean; ref?: Ref<HTMLD
               </div>
             </div>
           </a>
-          {atLeast('admin') ? <NotificationBell /> : null}
+          {atLeast('member') ? <NotificationBell /> : null}
         </div>
       </header>
 

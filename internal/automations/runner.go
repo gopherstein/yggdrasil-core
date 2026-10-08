@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/yeixio/toskar-core/internal/auth"
 	"log/slog"
 	"strings"
 	"sync"
@@ -521,7 +522,7 @@ func (r *Runner) notifyRepeated(ctx context.Context, automation Automation, run 
 	}
 	notice := Notice{AutomationID: automation.ID, Failure: true,
 		Message: &locale.Message{Body: []locale.Text{what, reason}}}
-	if err := r.Notify.Notify(ctx, noticeTitle(automation.Name, notice)); err != nil {
+	if err := r.Notify.Notify(forPerson(ctx, automation), noticeTitle(automation.Name, notice)); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -554,7 +555,7 @@ func (r *Runner) deliver(ctx context.Context, automation Automation, run Run, re
 			}
 		}
 	}
-	if err := r.Notify.Notify(ctx, noticeTitle(automation.Name, notice)); err != nil {
+	if err := r.Notify.Notify(forPerson(ctx, automation), noticeTitle(automation.Name, notice)); err != nil {
 		return false, err
 	}
 	return true, nil
@@ -697,4 +698,13 @@ func (r *Runner) lease() time.Duration {
 		return defaultLease
 	}
 	return r.Lease
+}
+
+// forPerson is ctx acting for the person whose automation it is, so its
+// notices are theirs (#206).
+func forPerson(ctx context.Context, automation Automation) context.Context {
+	if automation.PersonID == "" {
+		return ctx
+	}
+	return auth.AsPerson(ctx, auth.Person{ID: automation.PersonID})
 }

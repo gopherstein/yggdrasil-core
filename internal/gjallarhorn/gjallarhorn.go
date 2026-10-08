@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/events"
 	"github.com/yeixio/toskar-core/internal/locale"
 )
@@ -101,6 +102,8 @@ type Notification struct {
 	// window, shown as "4 times" (§22).
 	RepeatCount int        `json:"repeat_count,omitempty"`
 	Deliveries  []Delivery `json:"deliveries,omitempty"`
+	// PersonID is whose it is (#206).
+	PersonID string `json:"-"`
 	// lang is the language Title and Body are written in, once a delivery
 	// has localized them (see Hub.localized); "" is English.
 	lang string
@@ -133,6 +136,30 @@ type Channel interface {
 // ErrSuppressed means a channel chose not to deliver, such as desktop
 // notifications turned off in settings. The notification is still stored.
 var ErrSuppressed = errors.New("delivery suppressed")
+
+// Whose a notification is (#206). Results of a person's automations and
+// questions waiting for their approval are theirs alone; notices about the
+// install, such as models, training, and health, are also seen by Admins
+// and the Owner. Destinations and desktop notices are the install's, so
+// they carry the install's notices and the Owner's own, never another
+// person's.
+var personalCategories = map[string]bool{CategoryAutomation: true, CategoryApproval: true}
+
+// visible is the SQL condition, with its arguments, for the notifications
+// ctx's person may see.
+func visible(ctx context.Context) (string, []any) {
+	p := auth.PrincipalFrom(ctx)
+	if p.Person.Role.AtLeast(auth.RoleAdmin) {
+		return `(person_id = ? OR category NOT IN ('automation', 'approval'))`, []any{p.Person.ID}
+	}
+	return `person_id = ?`, []any{p.Person.ID}
+}
+
+// leaves reports whether a notification may go to the install's
+// destinations and the desktop.
+func leaves(n Notification) bool {
+	return n.PersonID == auth.OwnerID || !personalCategories[n.Category]
+}
 
 // Hub stores notifications and fans them out.
 type Hub struct {
@@ -243,10 +270,11 @@ func (h *Hub) Notify(ctx context.Context, req Request) (Notification, error) {
 		req.Severity = SeverityInfo
 	}
 	now := h.now().UTC()
+	person := auth.PersonID(ctx)
 	if req.DedupeKey != "" {
 		var id string
-		err := h.db.QueryRowContext(ctx, `SELECT id FROM notifications WHERE dedupe_key = ? AND created_at >= ? AND dismissed_at IS NULL ORDER BY created_at DESC LIMIT 1`,
-			req.DedupeKey, ts(now.Add(-dedupeWindow))).Scan(&id)
+		err := h.db.QueryRowContext(ctx, `SELECT id FROM notifications WHERE dedupe_key = ? AND person_id = ? AND created_at >= ? AND dismissed_at IS NULL ORDER BY created_at DESC LIMIT 1`,
+			req.DedupeKey, person, ts(now.Add(-dedupeWindow))).Scan(&id)
 		if err == nil {
 			_, _ = h.db.ExecContext(ctx, `UPDATE notifications SET updated_at = ?, read_at = NULL, body = ?, message = ?, repeat_count = repeat_count + 1 WHERE id = ?`,
 				ts(now), req.Body, messageJSON(req.Message), id)
@@ -256,11 +284,12 @@ func (h *Hub) Notify(ctx context.Context, req Request) (Notification, error) {
 	n := Notification{
 		ID: uuid.NewString(), CreatedAt: now, RepeatCount: 1, SourceType: req.SourceType, SourceID: req.SourceID,
 		Category: req.Category, Severity: req.Severity, Title: req.Title, Body: strings.TrimSpace(req.Body), Message: req.Message, Link: req.Link,
+		PersonID: person,
 	}
 	_, err := h.db.ExecContext(ctx, `
-		INSERT INTO notifications (id, created_at, updated_at, source_type, source_id, category, severity, title, body, message, link, dedupe_key)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		n.ID, ts(now), ts(now), n.SourceType, nullable(n.SourceID), n.Category, n.Severity, n.Title, n.Body, messageJSON(n.Message), nullable(n.Link), nullable(req.DedupeKey))
+		INSERT INTO notifications (id, created_at, updated_at, source_type, source_id, category, severity, title, body, message, link, dedupe_key, person_id)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		n.ID, ts(now), ts(now), n.SourceType, nullable(n.SourceID), n.Category, n.Severity, n.Title, n.Body, messageJSON(n.Message), nullable(n.Link), nullable(req.DedupeKey), person)
 	if err != nil {
 		return Notification{}, err
 	}
@@ -268,6 +297,10 @@ func (h *Hub) Notify(ctx context.Context, req Request) (Notification, error) {
 		h.bus.PublishFor(ctx, events.New(EventCreated, map[string]any{
 			"id": n.ID, "category": n.Category, "severity": n.Severity, "title": n.Title, "body": n.Body, "message": n.Message, "link": n.Link,
 		}))
+	}
+	if !leaves(n) {
+		// Another person's own notice stays in their notification center.
+		return n, nil
 	}
 	heldUntil, held := h.QuietHours(ctx).HeldUntil(n.Severity, now)
 	for _, name := range req.Channels {
@@ -335,13 +368,13 @@ func (h *Hub) deliver(ctx context.Context, n Notification, name string) Delivery
 	return d
 }
 
-const columns = `id, created_at, source_type, COALESCE(source_id, ''), category, severity, title, body, COALESCE(message, ''), COALESCE(link, ''), read_at, repeat_count`
+const columns = `id, created_at, source_type, COALESCE(source_id, ''), category, severity, title, body, COALESCE(message, ''), COALESCE(link, ''), read_at, repeat_count, person_id`
 
 func scan(row interface{ Scan(...any) error }) (Notification, error) {
 	var n Notification
 	var created, message string
 	var read sql.NullString
-	if err := row.Scan(&n.ID, &created, &n.SourceType, &n.SourceID, &n.Category, &n.Severity, &n.Title, &n.Body, &message, &n.Link, &read, &n.RepeatCount); err != nil {
+	if err := row.Scan(&n.ID, &created, &n.SourceType, &n.SourceID, &n.Category, &n.Severity, &n.Title, &n.Body, &message, &n.Link, &read, &n.RepeatCount, &n.PersonID); err != nil {
 		return Notification{}, err
 	}
 	if message != "" {
@@ -355,6 +388,16 @@ func scan(row interface{ Scan(...any) error }) (Notification, error) {
 	}
 	n.ReadAt = parseTS(read)
 	return n, nil
+}
+
+// GetVisible returns one notification ctx's person may see (#206).
+func (h *Hub) GetVisible(ctx context.Context, id string) (Notification, error) {
+	mine, args := visible(ctx)
+	var found string
+	if err := h.db.QueryRowContext(ctx, `SELECT id FROM notifications WHERE id = ? AND `+mine, append([]any{id}, args...)...).Scan(&found); err != nil {
+		return Notification{}, err
+	}
+	return h.Get(ctx, id)
 }
 
 // Get returns one notification with its deliveries.
@@ -387,8 +430,8 @@ func (h *Hub) List(ctx context.Context, unreadOnly bool, limit int, category ...
 	if limit <= 0 || limit > 200 {
 		limit = 50
 	}
-	where := `dismissed_at IS NULL`
-	args := []any{}
+	mine, args := visible(ctx)
+	where := `dismissed_at IS NULL AND ` + mine
 	if unreadOnly {
 		where += ` AND read_at IS NULL`
 	}
@@ -413,19 +456,21 @@ func (h *Hub) List(ctx context.Context, unreadOnly bool, limit int, category ...
 		return nil, 0, err
 	}
 	var unread int
-	err = h.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM notifications WHERE dismissed_at IS NULL AND read_at IS NULL`).Scan(&unread)
+	mine, mineArgs := visible(ctx)
+	err = h.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM notifications WHERE dismissed_at IS NULL AND read_at IS NULL AND `+mine, mineArgs...).Scan(&unread)
 	return out, unread, err
 }
 
 // MarkRead marks notifications read; no ids marks all of them.
 func (h *Hub) MarkRead(ctx context.Context, ids []string) error {
 	now := ts(h.now())
+	mine, mineArgs := visible(ctx)
 	if len(ids) == 0 {
-		_, err := h.db.ExecContext(ctx, `UPDATE notifications SET read_at = ? WHERE read_at IS NULL`, now)
+		_, err := h.db.ExecContext(ctx, `UPDATE notifications SET read_at = ? WHERE read_at IS NULL AND `+mine, append([]any{now}, mineArgs...)...)
 		return err
 	}
 	for _, id := range ids {
-		if _, err := h.db.ExecContext(ctx, `UPDATE notifications SET read_at = COALESCE(read_at, ?) WHERE id = ?`, now, id); err != nil {
+		if _, err := h.db.ExecContext(ctx, `UPDATE notifications SET read_at = COALESCE(read_at, ?) WHERE id = ? AND `+mine, append([]any{now, id}, mineArgs...)...); err != nil {
 			return err
 		}
 	}
@@ -434,7 +479,9 @@ func (h *Hub) MarkRead(ctx context.Context, ids []string) error {
 
 // Dismiss hides a notification from the notification center.
 func (h *Hub) Dismiss(ctx context.Context, id string) error {
-	res, err := h.db.ExecContext(ctx, `UPDATE notifications SET dismissed_at = ?, read_at = COALESCE(read_at, ?) WHERE id = ?`, ts(h.now()), ts(h.now()), id)
+	mine, mineArgs := visible(ctx)
+	res, err := h.db.ExecContext(ctx, `UPDATE notifications SET dismissed_at = ?, read_at = COALESCE(read_at, ?) WHERE id = ? AND `+mine,
+		append([]any{ts(h.now()), ts(h.now()), id}, mineArgs...)...)
 	if err != nil {
 		return err
 	}

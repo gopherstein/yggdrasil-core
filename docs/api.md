@@ -58,7 +58,7 @@ Chats and their messages, memories, files, and automations are private to their 
 
 **Roles.** Every `/api/v1` request from a key or a signed-in browser is checked against its person's role; one that needs more answers `403 ROLE_REQUIRED` with `details.role`, the least role that may.
 - **Visitors** chat: `/chat`, their conversations and their files, `/tools/decide`, `/speech`, and reading settings, profiles, models, tools, specialized AIs, and computers.
-- **Members** also have their memories and automations, and read knowledge sources and search them.
+- **Members** also have their memories, automations, and notifications, and read knowledge sources and search them.
 - **Admins** have everything else: models, runtimes, tools, profiles, knowledge sources, computers, keys, devices, people, settings, notifications, runs, training, performance, and diagnostics.
 - **The Owner** alone erases everything (`POST /settings/reset`).
 - **Your own preferences:** everyone keeps their own App language, assistant language, and personalization. `PATCH /api/v1/me/preferences` (`ui_locale`, `assistant_language_mode`, `assistant_language`) and `GET`/`PUT /api/v1/personalization` save the request's person's, whatever their role, and `GET /settings` shows theirs. The Owner's are the install's, which everyone else has until they choose; their answers, notices, and automations follow their own. `PATCH /settings` sets the same three for whoever sends it.
@@ -245,7 +245,7 @@ Uploads send `text`, or `content_base64` for binary files such as `.xlsx` and `.
 | GET | `/automations/{id}/runs` | Older runs, a page at a time (`before`, `limit`) |
 | POST | `/automations/{id}/runs/{run_id}/chat` | Open a run's result in a chat to reply to; returns `conversation_id` |
 | POST | `/automations/parse` | Read a request such as "every morning at 8, tell me if the price is below $500" into an automation to review |
-| GET | `/notifications` | The notification center: `{"notifications": [...], "unread": n}`. `?unread=1` lists unread ones; `?category=` lists one category. |
+| GET | `/notifications` | The notification center: `{"notifications": [...], "unread": n}`. `?unread=1` lists unread ones; `?category=` lists one category. Each person sees their own: automation results and approval requests are their person's alone, and Admins and the Owner also see notices about the install (models, training, health, system). Desktop notices, email, push, and webhooks carry the install's notices and the Owner's own, never another person's (#206). |
 | GET | `/notifications/{id}` | One notification with each channel's delivery |
 | GET, POST | `/notifications/destinations` | Email and webhook destinations; creating a webhook returns its signing `secret` once |
 | GET, PATCH, DELETE | `/notifications/destinations/{id}` | Read, change, or remove a destination. A blank `password` keeps the stored one |
