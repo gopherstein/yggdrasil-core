@@ -1,0 +1,76 @@
+{
+  "subtitle": "Gebrandete Chatseiten für die Menschen, denen du dienst, ohne den Rest von Toskar.",
+  "link": {
+    "copy": "Link kopieren",
+    "copied": "Kopiert",
+    "lanOff": "Nur dieser Computer kann sie öffnen, bis der Zugriff im lokalen Netzwerk eingeschaltet ist.",
+    "lanOffAction": "Unter API-Zugriff einschalten"
+  },
+  "add": {
+    "title": "Portal hinzufügen",
+    "body": "Gib ihm einen Namen und eine Adresse. Besucher öffnen es unter dieser Adresse und chatten mit dem Profil, das du wählst.",
+    "submit": "Portal hinzufügen"
+  },
+  "field": {
+    "name": "Name",
+    "slug": "Adresse",
+    "access": "Wer chatten darf",
+    "passcode": "Code",
+    "profile": "Profil",
+    "defaultProfile": "Standardprofil",
+    "tools": "Tools",
+    "language": "Sprache",
+    "followVisitor": "Wie der Besucher",
+    "memory": "Für jeden Besucher Dinge merken",
+    "newPasscode": "Neuer Code",
+    "keepPasscode": "Leer lassen, um ihn zu behalten"
+  },
+  "access": {
+    "passcode": "Alle mit dem Code",
+    "open": "Alle im Netzwerk",
+    "openHint": "Alle, die dieses Toskar erreichen, können chatten."
+  },
+  "edit": {
+    "title": "{{name}} bearbeiten",
+    "close": "Schließen",
+    "answers": "Wie es antwortet",
+    "access": "Wer chatten darf",
+    "looks": "Wie es aussieht",
+    "save": "Speichern",
+    "saved": "Gespeichert",
+    "preview": "Vorschau",
+    "open": "Bearbeiten"
+  },
+  "tools": {
+    "none": "Keine Tools",
+    "read_only": "Nur lesende Tools",
+    "profile": "Die Tools des Profils"
+  },
+  "brand": {
+    "title": "Überschrift",
+    "logo": "Logo-Adresse",
+    "accent": "Akzentfarbe",
+    "background": "Hintergrundfarbe",
+    "themeColour": "Farbe des Designs",
+    "theme": "Design",
+    "welcome": "Begrüßung",
+    "prompts": "Vorschläge, einer pro Zeile",
+    "footer": "Fußzeile"
+  },
+  "theme": {
+    "system": "Wie der Besucher",
+    "light": "Hell",
+    "dark": "Dunkel"
+  },
+  "off": "Aus",
+  "enabled": "{{name}} an",
+  "remove": {
+    "confirm": "{{name}} entfernen? Seine Besucher können nicht mehr chatten.",
+    "button": "Entfernen"
+  },
+  "list": {
+    "title": "Portale",
+    "none": "Noch keine Portale.",
+    "private": "Die Chats jedes Besuchers gehören ihm und erreichen nie deine Erinnerungen oder dein Wissen. Ein ausgeschaltetes Portal stoppt sofort."
+  }
+}

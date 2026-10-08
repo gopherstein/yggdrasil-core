@@ -1,0 +1,76 @@
+{
+  "subtitle": "Branded chat pages for the people you serve, without the rest of Toskar.",
+  "link": {
+    "copy": "Copy link",
+    "copied": "Copied",
+    "lanOff": "Only this computer can open it until local network access is on.",
+    "lanOffAction": "Turn it on in API Access"
+  },
+  "add": {
+    "title": "Add a portal",
+    "body": "Give it a name and an address. Visitors open it at that address and chat with the profile you choose.",
+    "submit": "Add portal"
+  },
+  "field": {
+    "name": "Name",
+    "slug": "Address",
+    "access": "Who can chat",
+    "passcode": "Passcode",
+    "profile": "Profile",
+    "defaultProfile": "Default profile",
+    "tools": "Tools",
+    "language": "Language",
+    "followVisitor": "Follow the visitor",
+    "memory": "Remember things for each visitor",
+    "newPasscode": "New passcode",
+    "keepPasscode": "Leave empty to keep it"
+  },
+  "access": {
+    "passcode": "Anyone with the passcode",
+    "open": "Anyone on the network",
+    "openHint": "Anyone who can reach this Toskar can chat."
+  },
+  "edit": {
+    "title": "Edit {{name}}",
+    "close": "Close",
+    "answers": "How it answers",
+    "access": "Who can chat",
+    "looks": "How it looks",
+    "save": "Save",
+    "saved": "Saved",
+    "preview": "Preview",
+    "open": "Edit"
+  },
+  "tools": {
+    "none": "No tools",
+    "read_only": "Tools that only read",
+    "profile": "The profile's tools"
+  },
+  "brand": {
+    "title": "Heading",
+    "logo": "Logo address",
+    "accent": "Accent colour",
+    "background": "Background colour",
+    "themeColour": "Theme's colour",
+    "theme": "Theme",
+    "welcome": "Welcome message",
+    "prompts": "Suggested prompts, one per line",
+    "footer": "Footer"
+  },
+  "theme": {
+    "system": "Follow the visitor",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "off": "Off",
+  "enabled": "{{name}} on",
+  "remove": {
+    "confirm": "Remove {{name}}? Its visitors can no longer chat.",
+    "button": "Remove"
+  },
+  "list": {
+    "title": "Portals",
+    "none": "No portals yet.",
+    "private": "Each visitor's chats are their own and never reach your memory or knowledge. Turning a portal off stops it at once."
+  }
+}

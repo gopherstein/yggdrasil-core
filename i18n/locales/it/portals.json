@@ -1,0 +1,76 @@
+{
+  "subtitle": "Pagine di chat con il tuo marchio per le persone che servi, senza il resto di Toskar.",
+  "link": {
+    "copy": "Copia link",
+    "copied": "Copiato",
+    "lanOff": "Solo questo computer può aprirla finché l'accesso dalla rete locale è disattivato.",
+    "lanOffAction": "Attivalo in Accesso API"
+  },
+  "add": {
+    "title": "Aggiungi un portale",
+    "body": "Dagli un nome e un indirizzo. I visitatori lo aprono a quell'indirizzo e chattano con il profilo che scegli.",
+    "submit": "Aggiungi portale"
+  },
+  "field": {
+    "name": "Nome",
+    "slug": "Indirizzo",
+    "access": "Chi può chattare",
+    "passcode": "Codice",
+    "profile": "Profilo",
+    "defaultProfile": "Profilo predefinito",
+    "tools": "Strumenti",
+    "language": "Lingua",
+    "followVisitor": "Come il visitatore",
+    "memory": "Ricorda cose per ogni visitatore",
+    "newPasscode": "Nuovo codice",
+    "keepPasscode": "Lascia vuoto per mantenerlo"
+  },
+  "access": {
+    "passcode": "Chiunque abbia il codice",
+    "open": "Chiunque sulla rete",
+    "openHint": "Chiunque raggiunga questo Toskar può chattare."
+  },
+  "edit": {
+    "title": "Modifica {{name}}",
+    "close": "Chiudi",
+    "answers": "Come risponde",
+    "access": "Chi può chattare",
+    "looks": "Come appare",
+    "save": "Salva",
+    "saved": "Salvato",
+    "preview": "Anteprima",
+    "open": "Modifica"
+  },
+  "tools": {
+    "none": "Nessuno strumento",
+    "read_only": "Strumenti che leggono soltanto",
+    "profile": "Gli strumenti del profilo"
+  },
+  "brand": {
+    "title": "Intestazione",
+    "logo": "Indirizzo del logo",
+    "accent": "Colore d'accento",
+    "background": "Colore di sfondo",
+    "themeColour": "Colore del tema",
+    "theme": "Tema",
+    "welcome": "Messaggio di benvenuto",
+    "prompts": "Suggerimenti, uno per riga",
+    "footer": "Piè di pagina"
+  },
+  "theme": {
+    "system": "Come il visitatore",
+    "light": "Chiaro",
+    "dark": "Scuro"
+  },
+  "off": "Disattivato",
+  "enabled": "{{name}} attivo",
+  "remove": {
+    "confirm": "Rimuovere {{name}}? I suoi visitatori non potranno più chattare.",
+    "button": "Rimuovi"
+  },
+  "list": {
+    "title": "Portali",
+    "none": "Ancora nessun portale.",
+    "private": "Le chat di ogni visitatore sono sue e non arrivano mai ai tuoi ricordi o alla tua conoscenza. Disattivare un portale lo ferma subito."
+  }
+}

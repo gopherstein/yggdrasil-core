@@ -1,0 +1,76 @@
+{
+  "subtitle": "Páginas de chat com a sua marca para as pessoas que você atende, sem o resto do Toskar.",
+  "link": {
+    "copy": "Copiar link",
+    "copied": "Copiado",
+    "lanOff": "Só este computador consegue abri-la até o acesso pela rede local ser ativado.",
+    "lanOffAction": "Ativar em Acesso à API"
+  },
+  "add": {
+    "title": "Adicionar um portal",
+    "body": "Dê um nome e um endereço. Os visitantes abrem nesse endereço e conversam com o perfil que você escolher.",
+    "submit": "Adicionar portal"
+  },
+  "field": {
+    "name": "Nome",
+    "slug": "Endereço",
+    "access": "Quem pode conversar",
+    "passcode": "Código",
+    "profile": "Perfil",
+    "defaultProfile": "Perfil padrão",
+    "tools": "Ferramentas",
+    "language": "Idioma",
+    "followVisitor": "Seguir o visitante",
+    "memory": "Lembrar coisas de cada visitante",
+    "newPasscode": "Novo código",
+    "keepPasscode": "Deixe vazio para manter"
+  },
+  "access": {
+    "passcode": "Quem tiver o código",
+    "open": "Qualquer pessoa na rede",
+    "openHint": "Qualquer pessoa que alcance este Toskar pode conversar."
+  },
+  "edit": {
+    "title": "Editar {{name}}",
+    "close": "Fechar",
+    "answers": "Como responde",
+    "access": "Quem pode conversar",
+    "looks": "Aparência",
+    "save": "Salvar",
+    "saved": "Salvo",
+    "preview": "Prévia",
+    "open": "Editar"
+  },
+  "tools": {
+    "none": "Sem ferramentas",
+    "read_only": "Ferramentas que só leem",
+    "profile": "As ferramentas do perfil"
+  },
+  "brand": {
+    "title": "Título",
+    "logo": "Endereço do logo",
+    "accent": "Cor de destaque",
+    "background": "Cor de fundo",
+    "themeColour": "Cor do tema",
+    "theme": "Tema",
+    "welcome": "Mensagem de boas-vindas",
+    "prompts": "Sugestões, uma por linha",
+    "footer": "Rodapé"
+  },
+  "theme": {
+    "system": "Seguir o visitante",
+    "light": "Claro",
+    "dark": "Escuro"
+  },
+  "off": "Desativado",
+  "enabled": "{{name}} ativado",
+  "remove": {
+    "confirm": "Remover {{name}}? Os visitantes não poderão mais conversar.",
+    "button": "Remover"
+  },
+  "list": {
+    "title": "Portais",
+    "none": "Ainda não há portais.",
+    "private": "As conversas de cada visitante são só dele e nunca chegam às suas memórias nem ao seu conhecimento. Desativar um portal o interrompe na hora."
+  }
+}

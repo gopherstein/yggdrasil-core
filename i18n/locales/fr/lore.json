@@ -84,6 +84,11 @@
       "meaning": "Midgard est le monde des humains. C’est qui utilise ce Toskar.",
       "story": "Midgard, l’enclos du milieu, est le monde des humains, qu’Odin et ses frères firent du géant Ymir et relièrent à Asgard par le Bifröst.",
       "rune": "Gebo, la rune du don"
+    },
+    "portals": {
+      "meaning": "Le Valhalla est la salle qui accueille les invités. Ici, vous ouvrez des discussions pour les personnes que vous servez.",
+      "story": "Le Valhalla, la grande salle d'Odin en Asgard, a cinq cent quarante portes, et chaque invité y est accueilli et servi.",
+      "rune": "Wunjo, la rune de la joie"
     }
   }
 }

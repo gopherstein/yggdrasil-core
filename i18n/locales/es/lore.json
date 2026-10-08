@@ -84,6 +84,11 @@
       "meaning": "Midgard es el mundo de las personas. Aquí está quién usa este Toskar.",
       "story": "Midgard, el recinto del medio, es el mundo de la humanidad, que Odín y sus hermanos hicieron con el gigante Ymir y unieron a Asgard mediante el Bifröst.",
       "rune": "Gebo, la runa del regalo"
+    },
+    "portals": {
+      "meaning": "Valhalla es la sala que da la bienvenida a los invitados. Aquí abres chats para las personas a las que atiendes.",
+      "story": "Valhalla, el gran salón de Odín en Asgard, tiene quinientas cuarenta puertas, y cada invitado es recibido y atendido.",
+      "rune": "Wunjo, la runa de la alegría"
     }
   }
 }

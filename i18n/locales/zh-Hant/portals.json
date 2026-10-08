@@ -1,0 +1,76 @@
+{
+  "subtitle": "為你服務的人提供的品牌聊天頁面，不顯示 Toskar 的其他部分。",
+  "link": {
+    "copy": "複製連結",
+    "copied": "已複製",
+    "lanOff": "在開啟本機網路存取之前，只有這台電腦能開啟它。",
+    "lanOffAction": "在 API 存取中開啟"
+  },
+  "add": {
+    "title": "新增入口網站",
+    "body": "為它取個名稱和位址。訪客在該位址開啟它，並與你選擇的設定檔聊天。",
+    "submit": "新增入口網站"
+  },
+  "field": {
+    "name": "名稱",
+    "slug": "位址",
+    "access": "誰可以聊天",
+    "passcode": "存取碼",
+    "profile": "設定檔",
+    "defaultProfile": "預設設定檔",
+    "tools": "工具",
+    "language": "語言",
+    "followVisitor": "跟隨訪客",
+    "memory": "為每位訪客記住內容",
+    "newPasscode": "新存取碼",
+    "keepPasscode": "留空則保持不變"
+  },
+  "access": {
+    "passcode": "知道存取碼的人",
+    "open": "網路上的任何人",
+    "openHint": "任何能連到這個 Toskar 的人都可以聊天。"
+  },
+  "edit": {
+    "title": "編輯 {{name}}",
+    "close": "關閉",
+    "answers": "回答方式",
+    "access": "誰可以聊天",
+    "looks": "外觀",
+    "save": "儲存",
+    "saved": "已儲存",
+    "preview": "預覽",
+    "open": "編輯"
+  },
+  "tools": {
+    "none": "不使用工具",
+    "read_only": "唯讀工具",
+    "profile": "設定檔的工具"
+  },
+  "brand": {
+    "title": "標題",
+    "logo": "標誌位址",
+    "accent": "強調色",
+    "background": "背景色",
+    "themeColour": "主題顏色",
+    "theme": "主題",
+    "welcome": "歡迎訊息",
+    "prompts": "建議的問題（每行一個）",
+    "footer": "頁尾"
+  },
+  "theme": {
+    "system": "跟隨訪客",
+    "light": "淺色",
+    "dark": "深色"
+  },
+  "off": "已關閉",
+  "enabled": "開啟 {{name}}",
+  "remove": {
+    "confirm": "要刪除 {{name}} 嗎？其訪客將無法再聊天。",
+    "button": "刪除"
+  },
+  "list": {
+    "title": "入口網站",
+    "none": "還沒有入口網站。",
+    "private": "每位訪客的聊天只屬於自己，絕不會進入你的記憶或知識。關閉入口網站會立即停止它。"
+  }
+}
