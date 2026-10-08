@@ -160,3 +160,23 @@ func TestDeviceMayReach(t *testing.T) {
 		}
 	}
 }
+
+// Only the person who showed a code sees how it's going or cancels it
+// (#206).
+func TestDevicePairingIsItsStartersOwn(t *testing.T) {
+	p, _, _ := newPairer(t)
+	if _, err := p.StartFor(auth.Person{ID: "sam", Role: auth.RoleMember}); err != nil {
+		t.Fatal(err)
+	}
+	if st := p.StatusFor("owner"); st.State != "" {
+		t.Fatalf("the owner sees sam's code: %+v", st)
+	}
+	p.CancelFor("owner")
+	if st := p.StatusFor("sam"); st.State != "waiting" {
+		t.Fatalf("sam's code after the owner's cancel: %+v", st)
+	}
+	p.CancelFor("sam")
+	if st := p.StatusFor("sam"); st.State != "cancelled" {
+		t.Fatalf("sam's code after sam's cancel: %+v", st)
+	}
+}

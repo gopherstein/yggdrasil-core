@@ -121,6 +121,27 @@ func (p *DevicePairer) Cancel() {
 	}
 }
 
+// StatusFor is the code's state for the person who showed it; anyone
+// else sees none (#206).
+func (p *DevicePairer) StatusFor(person string) DevicePairing {
+	p.mu.Lock()
+	starter := p.starter.ID
+	p.mu.Unlock()
+	if starter != person {
+		return DevicePairing{}
+	}
+	return p.Status()
+}
+
+// CancelFor stops showing the code, when person showed it.
+func (p *DevicePairer) CancelFor(person string) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.state == "waiting" && p.starter.ID == person {
+		p.state = "cancelled"
+	}
+}
+
 // Pair exchanges a code for a key named after the phone. address is where
 // the request came from, for the per-address limit.
 func (p *DevicePairer) Pair(ctx context.Context, code, deviceName, address string) (APIKeyRecord, string, error) {

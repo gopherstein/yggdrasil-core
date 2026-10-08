@@ -19,6 +19,7 @@ import { UpdateCheckSetting, UpdateNotice } from './Updates'
 import { WhatLeft } from './WhatLeft'
 import { YourData } from './YourData'
 import { YourAccount } from '@/features/people/YourAccount'
+import { YourDevices } from './YourDevices'
 import { useRole } from '@/lib/role'
 import { Toggle } from '@/components/ui/Toggle'
 import { LanguageSettings } from './LanguageSettings'
@@ -249,6 +250,8 @@ export function SettingsPage() {
       </header>
 
       <YourAccount />
+
+      <YourDevices />
 
       {(settingsQuery.isLoading || versionQuery.isLoading) && (
         <LoadingSpinner label={t('page.loading')} />

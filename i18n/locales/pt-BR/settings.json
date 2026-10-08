@@ -289,5 +289,15 @@
     "models_many": "{{count}} modelos disponíveis",
     "models_other": "{{count}} modelos disponíveis",
     "privacy": "Conversas com esses modelos saem deste computador e ficam registradas em O que saiu deste computador. Perfis offline e conversas que usam memórias ou conhecimento marcados como Somente este computador nunca os usam."
+  },
+  "devices": {
+    "title": "Seus dispositivos",
+    "description": "Celulares, tablets e TVs conectados como você. Cada um tem sua própria chave, e desconectar um encerra a sessão dele.",
+    "connect": "Conectar um dispositivo",
+    "none": "Ainda não há dispositivos conectados como você.",
+    "disconnect": "Desconectar",
+    "lastUsed": "Usado pela última vez em {{date}}",
+    "neverUsed": "Ainda não usado",
+    "confirm": "Desconectar {{name}}? Ele vai precisar de um novo código para se conectar de novo."
   }
 }

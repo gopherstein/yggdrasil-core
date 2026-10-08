@@ -19,6 +19,8 @@ func (s *Server) deviceRoutes(api *mux.Router) {
 	api.HandleFunc("/devices/pairing", s.handleDevicePairingStatus).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/devices/pairing", s.handleCancelDevicePairing).Methods(http.MethodDelete)
 	api.HandleFunc(pairDeviceRoute, s.handlePairDevice).Methods(http.MethodPost)
+	api.HandleFunc("/me/devices", s.handleMyDevices).Methods(http.MethodGet)
+	api.HandleFunc("/me/devices/{id}", s.handleDisconnectMyDevice).Methods(http.MethodDelete)
 }
 
 // pairDeviceRoute is the one control API route that needs no key.
@@ -68,6 +70,12 @@ func (s *Server) handleStartDevicePairing(w http.ResponseWriter, r *http.Request
 		EnableLAN bool `json:"enable_lan"`
 	}
 	_ = json.NewDecoder(io.LimitReader(r.Body, 1024)).Decode(&body)
+	// Turning on network access is an Admin's (#203); anyone may show a
+	// code for their own device.
+	if body.EnableLAN && !auth.PrincipalFrom(r.Context()).Person.Role.AtLeast(auth.RoleAdmin) {
+		writeErr(w, http.StatusForbidden, "ROLE_REQUIRED", "turning on local network access needs the admin role", map[string]any{"role": string(auth.RoleAdmin)})
+		return
+	}
 	if body.EnableLAN && s.deps.EnableLANForPhone != nil {
 		if err := s.deps.EnableLANForPhone(r.Context()); err != nil {
 			writeErrFrom(w, http.StatusInternalServerError, "LAN_ACCESS_FAILED", err)
@@ -88,13 +96,13 @@ func (s *Server) handleDevicePairingStatus(w http.ResponseWriter, r *http.Reques
 		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Connecting a device isn't available.", nil)
 		return
 	}
-	writeJSON(w, http.StatusOK, s.pairingView(s.deps.Devices.Status()))
+	writeJSON(w, http.StatusOK, s.pairingView(s.deps.Devices.StatusFor(auth.PersonID(r.Context()))))
 }
 
 // handleCancelDevicePairing stops showing the code.
 func (s *Server) handleCancelDevicePairing(w http.ResponseWriter, r *http.Request) {
 	if s.deps.Devices != nil {
-		s.deps.Devices.Cancel()
+		s.deps.Devices.CancelFor(auth.PersonID(r.Context()))
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
@@ -138,4 +146,60 @@ func (s *Server) handlePairDevice(w http.ResponseWriter, r *http.Request) {
 	tlsInfo := s.TLS()
 	writeJSON(w, http.StatusCreated, map[string]any{"api_key": secret, "key": rec,
 		"tls_fingerprint": tlsInfo.Fingerprint, "tls_short": tlsInfo.Short})
+}
+
+// myDevices are the request's person's connected devices (#206).
+func (s *Server) myDevices(r *http.Request) ([]auth.APIKeyRecord, error) {
+	all, err := s.deps.ListAPIKeys(r.Context())
+	if err != nil {
+		return nil, err
+	}
+	me := auth.PersonID(r.Context())
+	out := []auth.APIKeyRecord{}
+	for _, k := range all {
+		if k.Kind == auth.KindDevice && k.PersonID == me {
+			out = append(out, k)
+		}
+	}
+	return out, nil
+}
+
+// handleMyDevices lists the devices connected as the request's person,
+// whatever their role.
+func (s *Server) handleMyDevices(w http.ResponseWriter, r *http.Request) {
+	if s.deps.ListAPIKeys == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Devices aren't available.", nil)
+		return
+	}
+	list, err := s.myDevices(r)
+	if err != nil {
+		writeErrFrom(w, http.StatusInternalServerError, "DEVICES_FAILED", err)
+		return
+	}
+	writeJSON(w, http.StatusOK, list)
+}
+
+// handleDisconnectMyDevice revokes one of the person's own devices' keys.
+func (s *Server) handleDisconnectMyDevice(w http.ResponseWriter, r *http.Request) {
+	if s.deps.ListAPIKeys == nil || s.deps.RevokeAPIKey == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Devices aren't available.", nil)
+		return
+	}
+	list, err := s.myDevices(r)
+	if err != nil {
+		writeErrFrom(w, http.StatusInternalServerError, "DEVICES_FAILED", err)
+		return
+	}
+	id := mux.Vars(r)["id"]
+	for _, k := range list {
+		if k.ID == id {
+			if err := s.deps.RevokeAPIKey(r.Context(), id); err != nil {
+				writeErrFrom(w, http.StatusInternalServerError, "DEVICES_FAILED", err)
+				return
+			}
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+	}
+	writeErr(w, http.StatusNotFound, "DEVICE_NOT_FOUND", "No device of yours has that id.", nil)
 }

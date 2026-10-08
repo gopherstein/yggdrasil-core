@@ -164,3 +164,71 @@ func TestMyPreferences(t *testing.T) {
 		t.Fatalf("another setting: %d %v", code, saved)
 	}
 }
+
+// Anyone connects their own devices and sees and disconnects only theirs,
+// but only an Admin turns network access on to do it (#206).
+func TestMyDevices(t *testing.T) {
+	dir := t.TempDir()
+	db, err := store.Open(filepath.Join(dir, "t.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+	if _, err := db.SQL.Exec(`INSERT INTO people (id, name, role) VALUES ('sam', 'Sam', 'member')`); err != nil {
+		t.Fatal(err)
+	}
+	mgr, err := config.NewManager(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := mgr.Update(func(c *config.Config) { c.APIHost = "0.0.0.0" }); err != nil {
+		t.Fatal(err)
+	}
+	keys := []auth.APIKeyRecord{
+		{ID: "d-sam", Name: "Sam's phone", Kind: auth.KindDevice, PersonID: "sam"},
+		{ID: "d-owner", Name: "Owner's tablet", Kind: auth.KindDevice, PersonID: auth.OwnerID},
+		{ID: "k-sam", Name: "Sam's script", PersonID: "sam"},
+	}
+	var revoked []string
+	lanTurnedOn := false
+	srv := NewServer(Dependencies{
+		Config:  mgr,
+		People:  auth.NewPeople(db.SQL),
+		Devices: &auth.DevicePairer{},
+		VerifyAPIKey: func(_ context.Context, secret string) (auth.APIKeyRecord, error) {
+			return auth.APIKeyRecord{ID: "k-sam", PersonID: "sam"}, nil
+		},
+		ListAPIKeys:  func(context.Context) ([]auth.APIKeyRecord, error) { return keys, nil },
+		RevokeAPIKey: func(_ context.Context, id string) error { revoked = append(revoked, id); return nil },
+		EnableLANForPhone: func(context.Context) error {
+			lanTurnedOn = true
+			return nil
+		},
+	})
+	call := func(method, path, body string) *httptest.ResponseRecorder {
+		r := httptest.NewRequest(method, path, strings.NewReader(body))
+		r.Header.Set("Authorization", "Bearer ygg_key_sam")
+		r.Header.Set("X-Forwarded-For", "192.168.1.20")
+		rec := httptest.NewRecorder()
+		srv.Handler().ServeHTTP(rec, r)
+		return rec
+	}
+	rec := call(http.MethodGet, "/api/v1/me/devices", "")
+	var mine []auth.APIKeyRecord
+	_ = json.NewDecoder(rec.Body).Decode(&mine)
+	if rec.Code != http.StatusOK || len(mine) != 1 || mine[0].ID != "d-sam" {
+		t.Fatalf("sam's devices: %d %+v", rec.Code, mine)
+	}
+	if rec := call(http.MethodDelete, "/api/v1/me/devices/d-owner", ""); rec.Code != http.StatusNotFound || len(revoked) != 0 {
+		t.Fatalf("sam disconnected the owner's tablet: %d %v", rec.Code, revoked)
+	}
+	if rec := call(http.MethodDelete, "/api/v1/me/devices/d-sam", ""); rec.Code != http.StatusNoContent || len(revoked) != 1 {
+		t.Fatalf("sam's own: %d %v", rec.Code, revoked)
+	}
+	if rec := call(http.MethodPost, "/api/v1/devices/pairing", `{"enable_lan":true}`); rec.Code != http.StatusForbidden || lanTurnedOn {
+		t.Fatalf("sam turned on network access: %d", rec.Code)
+	}
+	if rec := call(http.MethodPost, "/api/v1/devices/pairing", `{}`); rec.Code != http.StatusCreated {
+		t.Fatalf("sam's code: %d %s", rec.Code, rec.Body)
+	}
+}

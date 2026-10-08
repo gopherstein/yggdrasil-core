@@ -287,5 +287,15 @@
     "models_one": "{{count}} model available",
     "models_other": "{{count}} models available",
     "privacy": "Chats with these models leave this computer and are recorded in What left this computer. Offline profiles, and chats using memories or knowledge marked This computer only, never use them."
+  },
+  "devices": {
+    "title": "Your devices",
+    "description": "Phones, tablets, and TVs connected as you. Each has its own key, and disconnecting one signs it out.",
+    "connect": "Connect a device",
+    "none": "No devices are connected as you yet.",
+    "disconnect": "Disconnect",
+    "lastUsed": "Last used {{date}}",
+    "neverUsed": "Not used yet",
+    "confirm": "Disconnect {{name}}? It will need a new code to connect again."
   }
 }
