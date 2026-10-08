@@ -79,6 +79,11 @@
       "meaning": "Forseti resuelve cada asunto con justicia. La configuración son las reglas que sigue Toskar.",
       "story": "Forseti, hijo de Baldr, se sienta en Glitnir, un salón con columnas de oro y techo de plata. Todo el que le lleva una disputa se va reconciliado.",
       "rune": "Isa, la runa de la quietud"
+    },
+    "people": {
+      "meaning": "Midgard es el mundo de las personas. Aquí está quién usa este Toskar.",
+      "story": "Midgard, el recinto del medio, es el mundo de la humanidad, que Odín y sus hermanos hicieron con el gigante Ymir y unieron a Asgard mediante el Bifröst.",
+      "rune": "Gebo, la runa del regalo"
     }
   }
 }

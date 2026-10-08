@@ -40,6 +40,27 @@ func TestLANEnableRequiresAPIKey(t *testing.T) {
 	if !errors.Is(err, auth.ErrAPIKeyRequired) {
 		t.Fatalf("lan enable: %v", err)
 	}
+
+	// A person added to sign in from other devices is enough (#206): their
+	// link, and then their password, need the network.
+	sam, err := application.People.Create(context.Background(), "Sam", auth.RoleMember)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := application.applySettingsPatch(context.Background(), map[string]any{"lan_api_enabled": true}); err != nil {
+		t.Fatalf("lan enable with a person: %v", err)
+	}
+	if err := application.applySettingsPatch(context.Background(), map[string]any{"lan_api_enabled": false}); err != nil {
+		t.Fatal(err)
+	}
+	disabled := true
+	if _, err := application.People.Update(context.Background(), sam.ID, auth.Change{Disabled: &disabled}); err != nil {
+		t.Fatal(err)
+	}
+	err = application.applySettingsPatch(context.Background(), map[string]any{"lan_api_enabled": true})
+	if !errors.Is(err, auth.ErrAPIKeyRequired) {
+		t.Fatalf("lan enable with only a disabled person: %v", err)
+	}
 }
 
 func TestStartAcceptsBootstrapKey(t *testing.T) {

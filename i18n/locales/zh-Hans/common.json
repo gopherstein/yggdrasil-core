@@ -6,7 +6,7 @@
     "use": "使用",
     "customize": "自定义",
     "administer": "管理",
-    "administerHint": "显示或隐藏训练、电脑、API 访问、性能和诊断",
+    "administerHint": "显示或隐藏训练、电脑、人员、API 访问、性能和诊断",
     "chat": "聊天",
     "automations": "自动化",
     "models": "模型",
@@ -14,6 +14,7 @@
     "knowledge": "知识库",
     "memory": "记忆",
     "computers": "电脑",
+    "people": "人员",
     "performance": "性能",
     "diagnostics": "诊断",
     "profiles": "配置与编排",
@@ -50,7 +51,8 @@
     "tryAgain": "重试",
     "keyRequired": "需要 API 密钥",
     "keyBody": "此 Toskar 接受来自其他设备的连接，因此需要 API 密钥。请输入密钥以继续。在普通 HTTP 上，密钥不会加密你的通信。",
-    "continue": "继续"
+    "continue": "继续",
+    "signInInstead": "改用用户名登录"
   },
   "units": {
     "ms": "{{value}} ms",

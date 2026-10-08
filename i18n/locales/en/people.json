@@ -1,0 +1,73 @@
+{
+  "subtitle": "Who uses this Toskar, and what each person may do.",
+  "adminsOnly": "Only Admins and the Owner manage people.",
+  "you": "(you)",
+  "ownerNoSignIn": "Uses this computer; no sign-in for other devices yet",
+  "notSignedIn": "Hasn't chosen a username yet",
+  "disabled": "Disabled",
+  "roleFor": "Role for {{name}}",
+  "signInLink": "Sign-in link",
+  "newPasswordLink": "New password link",
+  "enable": "Enable",
+  "disable": "Disable",
+  "everyone": "Everyone",
+  "private": "Each person's chats, memories, files, and automations are private to them, the Owner's too. Models, tools, knowledge, and profiles are shared.",
+  "roles": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "member": "Member",
+    "visitor": "Visitor"
+  },
+  "add": {
+    "title": "Add a person",
+    "body": "They get a one-time link to choose a username and password.",
+    "name": "Name",
+    "role": "Role",
+    "submit": "Add",
+    "roleHint": {
+      "admin": "Admins manage models, tools, computers, and people other than Admins and the Owner.",
+      "member": "Members use Toskar: their own chats, memories, files, and automations.",
+      "visitor": "Visitors chat, and nothing more."
+    }
+  },
+  "link": {
+    "invite": "Send {{name}} this link to choose a username and password:",
+    "reset": "Send {{name}} this link to choose a new password:",
+    "copy": "Copy link",
+    "copied": "Copied",
+    "expires": "It works once, until {{date}}.",
+    "lanOff": "Only this computer can open it until local network access is on.",
+    "lanOffAction": "Turn it on in API Access",
+    "done": "Done"
+  },
+  "invite": {
+    "loading": "Opening your link…",
+    "goneTitle": "This link doesn't work anymore",
+    "goneBody": "It expired or was already used. Ask whoever sent it for a new one.",
+    "title": "Welcome, {{name}}",
+    "body": "Choose a username and password to sign in to this Toskar.",
+    "resetTitle": "A new password for {{name}}",
+    "resetBody": "Choose a new password. Other devices signed in as you will be signed out.",
+    "usernameHint": "3 to 32 letters, digits, dots, dashes, or underscores.",
+    "password": "Password",
+    "passwordHint": "At least 10 characters.",
+    "again": "Password again",
+    "mismatch": "The passwords don't match.",
+    "submit": "Sign in",
+    "resetSubmit": "Save and sign in"
+  },
+  "signIn": {
+    "title": "Sign in to Toskar",
+    "body": "This Toskar is shared. Sign in with the username and password you chose from your invitation.",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in",
+    "forgot": "Forgot your password? Ask an Admin or the Owner for a new password link.",
+    "useKey": "Use an API key instead"
+  },
+  "account": {
+    "label": "Your account",
+    "signedInAs": "Signed in as {{name}} (@{{username}}), {{role}}.",
+    "signOut": "Sign out"
+  }
+}

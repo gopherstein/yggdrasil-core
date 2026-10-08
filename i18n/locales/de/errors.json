@@ -1,7 +1,7 @@
 {
   "API_KEYS_LIST_FAILED": "{{detail}}",
   "API_KEY_IN_URL": "Sende den API-Schlüssel im Authorization-Header, nicht in der Adresse.",
-  "API_KEY_REQUIRED": "Erstelle einen API-Schlüssel, bevor du den Zugriff von anderen Computern erlaubst.",
+  "API_KEY_REQUIRED": "Erstelle einen API-Schlüssel oder füge eine Person hinzu, bevor du den Zugriff von anderen Geräten erlaubst.",
   "APPROVE_FAILED": "{{detail}}",
   "AUTOMATION_INVALID": "{{detail}}",
   "BAD_REQUEST": "{{detail}}",

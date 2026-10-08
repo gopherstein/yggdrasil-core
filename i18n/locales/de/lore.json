@@ -79,6 +79,11 @@
       "meaning": "Forseti schlichtet jede Sache gerecht. Einstellungen sind die Regeln, an die sich Toskar hält.",
       "story": "Forseti, Sohn Baldrs, sitzt in Glitnir, einer Halle mit goldenen Säulen und silbernem Dach. Wer einen Streit vor ihn bringt, geht versöhnt davon.",
       "rune": "Isa, die Rune der Stille"
+    },
+    "people": {
+      "meaning": "Midgard ist die Welt der Menschen. Hier steht, wer dieses Toskar nutzt.",
+      "story": "Midgard, der mittlere Hof, ist die Welt der Menschen, die Odin und seine Brüder aus dem Riesen Ymir schufen und durch Bifröst mit Asgard verbanden.",
+      "rune": "Gebo, die Rune der Gabe"
     }
   }
 }

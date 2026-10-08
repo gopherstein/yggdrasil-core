@@ -6,7 +6,7 @@
     "use": "Usa",
     "customize": "Personalizza",
     "administer": "Amministra",
-    "administerHint": "Mostra o nascondi Addestra, Computer, Accesso API, Prestazioni e Diagnostica",
+    "administerHint": "Mostra o nascondi Addestra, Computer, Persone, Accesso API, Prestazioni e Diagnostica",
     "chat": "Chat",
     "automations": "Automazioni",
     "models": "Modelli",
@@ -14,6 +14,7 @@
     "knowledge": "Conoscenza",
     "memory": "Memoria",
     "computers": "Computer",
+    "people": "Persone",
     "performance": "Prestazioni",
     "diagnostics": "Diagnostica",
     "profiles": "Profili e orchestrazione",
@@ -52,7 +53,8 @@
     "tryAgain": "Riprova",
     "keyRequired": "Chiave API richiesta",
     "keyBody": "Questo Toskar accetta connessioni da altri dispositivi, quindi chiede una chiave API. Inseriscine una per continuare. Con HTTP semplice, una chiave non cifra il tuo traffico.",
-    "continue": "Continua"
+    "continue": "Continua",
+    "signInInstead": "Accedi invece con un nome utente"
   },
   "units": {
     "ms": "{{value}} ms",

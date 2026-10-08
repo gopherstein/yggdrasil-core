@@ -6,7 +6,7 @@
     "use": "使う",
     "customize": "カスタマイズ",
     "administer": "管理",
-    "administerHint": "トレーニング、コンピュータ、APIアクセス、パフォーマンス、診断を表示または非表示",
+    "administerHint": "トレーニング、コンピュータ、人、API アクセス、パフォーマンス、診断の表示を切り替える",
     "chat": "チャット",
     "automations": "自動化",
     "models": "モデル",
@@ -14,6 +14,7 @@
     "knowledge": "ナレッジ",
     "memory": "メモリ",
     "computers": "コンピュータ",
+    "people": "人",
     "performance": "パフォーマンス",
     "diagnostics": "診断",
     "profiles": "プロファイルとオーケストレーション",
@@ -50,7 +51,8 @@
     "tryAgain": "再試行",
     "keyRequired": "APIキーが必要です",
     "keyBody": "この Toskar は他のデバイスからの接続を受け付けているため、APIキーが必要です。続けるにはキーを入力してください。通常のHTTPでは、キーを使っても通信は暗号化されません。",
-    "continue": "続ける"
+    "continue": "続ける",
+    "signInInstead": "代わりにユーザー名でサインイン"
   },
   "units": {
     "ms": "{{value}} ms",

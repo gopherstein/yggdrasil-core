@@ -6,7 +6,7 @@
     "use": "Use",
     "customize": "Customize",
     "administer": "Administer",
-    "administerHint": "Show or hide Train, Computers, API Access, Performance, and Diagnostics",
+    "administerHint": "Show or hide Train, Computers, People, API Access, Performance, and Diagnostics",
     "chat": "Chat",
     "automations": "Automations",
     "models": "Models",
@@ -14,6 +14,7 @@
     "knowledge": "Knowledge",
     "memory": "Memory",
     "computers": "Computers",
+    "people": "People",
     "performance": "Performance",
     "diagnostics": "Diagnostics",
     "profiles": "Profiles & Orchestration",
@@ -51,7 +52,8 @@
     "tryAgain": "Try again",
     "keyRequired": "API key required",
     "keyBody": "This Toskar accepts connections from other devices, so it asks for an API key. Enter one to continue. Over plain HTTP, a key doesn't encrypt your traffic.",
-    "continue": "Continue"
+    "continue": "Continue",
+    "signInInstead": "Sign in with a username instead"
   },
   "units": {
     "ms": "{{value}} ms",

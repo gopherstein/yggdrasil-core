@@ -79,6 +79,11 @@
       "meaning": "Forseti règle chaque différend avec équité. Les paramètres sont les règles que suit Toskar.",
       "story": "Forseti, fils de Baldr, siège à Glitnir, une salle aux piliers d'or et au toit d'argent. Tous ceux qui lui soumettent un différend repartent réconciliés.",
       "rune": "Isa, la rune de l'immobilité"
+    },
+    "people": {
+      "meaning": "Midgard est le monde des humains. C’est qui utilise ce Toskar.",
+      "story": "Midgard, l’enclos du milieu, est le monde des humains, qu’Odin et ses frères firent du géant Ymir et relièrent à Asgard par le Bifröst.",
+      "rune": "Gebo, la rune du don"
     }
   }
 }

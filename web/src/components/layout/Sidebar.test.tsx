@@ -50,7 +50,7 @@ describe('Sidebar', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
     expect(links()).toEqual([
       '/chat', '/automations', '/knowledge', '/memory', '/models', '/tools', '/profiles',
-      '/train', '/nodes', '/api-access', '/performance', '/diagnostics', '/settings',
+      '/train', '/nodes', '/people', '/api-access', '/performance', '/diagnostics', '/settings',
     ])
     expect(useUIStore.getState().administerOpen).toBe(true)
 

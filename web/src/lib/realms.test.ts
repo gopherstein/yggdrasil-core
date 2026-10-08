@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { realmFor, realms, runePaths } from './realms'
 
 const tabs = [
-  '/chat', '/automations', '/models', '/train', '/knowledge', '/memory', '/nodes',
+  '/chat', '/automations', '/models', '/train', '/knowledge', '/memory', '/nodes', '/people',
   '/performance', '/diagnostics', '/profiles', '/tools', '/api-access', '/settings',
 ]
 

@@ -23,6 +23,8 @@ import { ToolsPage } from '@/features/tools/ToolsPage'
 import { KnowledgePage } from '@/features/knowledge/KnowledgePage'
 import { MemoryPage } from '@/features/memory/MemoryPage'
 import { TrainPage } from '@/features/train/TrainPage'
+import { InvitePage } from '@/features/people/InvitePage'
+import { PeoplePage } from '@/features/people/PeoplePage'
 import { useUIStore } from '@/stores/uiStore'
 
 const queryClient = new QueryClient({
@@ -56,6 +58,8 @@ export function App() {
           <ScreenshotMode />
           <ServiceBootGate>
             <Routes>
+              {/* A one-time sign-in link answers before sign-in (#206). */}
+              <Route path="/invite/:token" element={<InvitePage />} />
               <Route path="/onboarding" element={<OnboardingPage />} />
               <Route
                 element={
@@ -74,6 +78,7 @@ export function App() {
                 <Route path="profiles" element={<ProfilesPage />} />
                 <Route path="tools" element={<ToolsPage />} />
                 <Route path="nodes" element={<NodesPage />} />
+                <Route path="people" element={<PeoplePage />} />
                 <Route path="api-access" element={<ApiAccessPage />} />
                 <Route path="diagnostics" element={<DiagnosticsPage />} />
                 <Route path="performance" element={<PerformancePage />} />

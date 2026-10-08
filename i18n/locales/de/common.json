@@ -6,7 +6,7 @@
     "use": "Nutzen",
     "customize": "Anpassen",
     "administer": "Verwalten",
-    "administerHint": "Trainieren, Computer, API-Zugriff, Leistung und Diagnose ein- oder ausblenden",
+    "administerHint": "Training, Computer, Personen, API-Zugriff, Leistung und Diagnose ein- oder ausblenden",
     "chat": "Chat",
     "automations": "Automationen",
     "models": "Modelle",
@@ -14,6 +14,7 @@
     "knowledge": "Wissen",
     "memory": "Gedächtnis",
     "computers": "Computer",
+    "people": "Personen",
     "performance": "Leistung",
     "diagnostics": "Diagnose",
     "profiles": "Profile & Orchestrierung",
@@ -51,7 +52,8 @@
     "tryAgain": "Erneut versuchen",
     "keyRequired": "API-Schlüssel erforderlich",
     "keyBody": "Dieses Toskar nimmt Verbindungen von anderen Geräten an und verlangt deshalb einen API-Schlüssel. Gib einen ein, um fortzufahren. Über einfaches HTTP verschlüsselt ein Schlüssel deinen Datenverkehr nicht.",
-    "continue": "Weiter"
+    "continue": "Weiter",
+    "signInInstead": "Stattdessen mit Benutzernamen anmelden"
   },
   "units": {
     "ms": "{{value}} ms",
