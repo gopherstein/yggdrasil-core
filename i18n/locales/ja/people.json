@@ -64,12 +64,21 @@
     "password": "パスワード",
     "submit": "サインイン",
     "forgot": "パスワードを忘れた場合は、管理者またはオーナーに新しいパスワード用リンクを頼んでください。",
-    "useKey": "代わりに API キーを使う"
+    "useKey": "代わりに API キーを使う",
+    "withProvider": "{{name}} でサインイン",
+    "or": "または",
+    "provider": {
+      "failed": "{{name}} でのサインインに失敗しました。もう一度お試しください。",
+      "refused": "{{name}} のアカウントには、この Toskar での役割がありません。役割のあるグループに追加するようオーナーに頼んでください。",
+      "disabled": "この Toskar でのあなたのアカウントは無効です。オーナーに確認してください。",
+      "unavailable": "現在、ほかのサービスでのサインインは利用できません。"
+    }
   },
   "account": {
     "label": "あなたのアカウント",
     "signedInAs": "{{name}}（@{{username}}、{{role}}）としてサインイン中。",
     "signOut": "サインアウト",
+    "signedInWith": "{{name}}（{{external}}、{{role}}）としてサインイン中。",
     "signedInByProxy": "サインインサービス経由で{{name}}（{{role}}）としてサインイン中です。サインアウトはそちらで行ってください。"
   }
 }

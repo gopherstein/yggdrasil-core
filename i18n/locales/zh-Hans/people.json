@@ -64,12 +64,21 @@
     "password": "密码",
     "submit": "登录",
     "forgot": "忘记密码？请向管理员或所有者索取新密码链接。",
-    "useKey": "改用 API 密钥"
+    "useKey": "改用 API 密钥",
+    "withProvider": "使用 {{name}} 登录",
+    "or": "或",
+    "provider": {
+      "failed": "使用 {{name}} 登录失败。请重试。",
+      "refused": "你在 {{name}} 的账户未在此 Toskar 上给予你角色。请让所有者把你加入有角色的组。",
+      "disabled": "你在此 Toskar 上的账户已停用。请联系所有者。",
+      "unavailable": "目前无法使用其他服务登录。"
+    }
   },
   "account": {
     "label": "你的账户",
     "signedInAs": "已登录为 {{name}}（@{{username}}），{{role}}。",
     "signOut": "退出登录",
+    "signedInWith": "已登录为 {{name}}（{{external}}），{{role}}。",
     "signedInByProxy": "已通过你的登录服务以 {{name}}（{{role}}）登录。请在那里退出登录。"
   }
 }

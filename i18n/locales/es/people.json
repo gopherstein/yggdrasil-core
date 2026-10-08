@@ -64,12 +64,21 @@
     "password": "Contraseña",
     "submit": "Iniciar sesión",
     "forgot": "¿Olvidaste tu contraseña? Pide a un administrador o al propietario un enlace de nueva contraseña.",
-    "useKey": "Usar una clave de API"
+    "useKey": "Usar una clave de API",
+    "withProvider": "Iniciar sesión con {{name}}",
+    "or": "o",
+    "provider": {
+      "failed": "No se pudo iniciar sesión con {{name}}. Inténtalo de nuevo.",
+      "refused": "Tu cuenta de {{name}} no te da un rol en este Toskar. Pide a su propietario que te añada a un grupo que sí lo haga.",
+      "disabled": "Tu cuenta en este Toskar está desactivada. Pregunta a su propietario.",
+      "unavailable": "Iniciar sesión con otro servicio no está disponible ahora."
+    }
   },
   "account": {
     "label": "Tu cuenta",
     "signedInAs": "Sesión iniciada como {{name}} (@{{username}}), {{role}}.",
     "signOut": "Cerrar sesión",
+    "signedInWith": "Sesión iniciada como {{name}} ({{external}}), {{role}}.",
     "signedInByProxy": "Sesión iniciada como {{name}} mediante tu servicio de inicio de sesión, {{role}}. Cierra la sesión allí."
   }
 }

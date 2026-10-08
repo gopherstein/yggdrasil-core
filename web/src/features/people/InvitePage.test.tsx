@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import type { ReactElement } from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { api, forgetApiKey } from '@/lib/api'
@@ -8,8 +9,9 @@ import { InvitePage } from './InvitePage'
 import { SignInForm } from './SignInForm'
 
 vi.mock('@/lib/api', () => ({
-  api: { peekInvite: vi.fn(), acceptInvite: vi.fn(), signIn: vi.fn() },
+  api: { peekInvite: vi.fn(), acceptInvite: vi.fn(), signIn: vi.fn(), getOIDC: vi.fn() },
   forgetApiKey: vi.fn(),
+  getApiBase: () => '',
 }))
 
 function renderInvite() {
@@ -70,13 +72,28 @@ describe('InvitePage', () => {
   })
 })
 
+function renderSignIn(ui: ReactElement) {
+  return render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{ui}</QueryClientProvider>)
+}
+
 describe('SignInForm', () => {
+  it('offers the provider, and says why it sent someone back (#206)', async () => {
+    vi.mocked(api.getOIDC).mockResolvedValue({ enabled: true, label: 'Authentik' })
+    window.history.pushState({}, '', '/chat?oidc_error=refused')
+    renderSignIn(<SignInForm onSignedIn={vi.fn()} onUseKey={vi.fn()} />)
+    const link = await screen.findByRole('link', { name: 'Sign in with Authentik' })
+    expect(link).toHaveAttribute('href', '/api/v1/oidc/start?return=%2Fchat')
+    expect(screen.getByRole('alert')).toHaveTextContent("Your account at Authentik doesn't give you a role")
+    window.history.pushState({}, '', '/')
+  })
+
   it('signs in, or offers an API key instead', async () => {
     const onSignedIn = vi.fn()
     const onUseKey = vi.fn()
     vi.mocked(api.signIn).mockRejectedValueOnce(new Error('That username and password don’t match.'))
     vi.mocked(api.signIn).mockResolvedValueOnce({ person: { id: 'p', name: 'Grace', role: 'admin', created_at: '', sign_in: true }, via: 'session' })
-    render(<SignInForm onSignedIn={onSignedIn} onUseKey={onUseKey} />)
+    vi.mocked(api.getOIDC).mockResolvedValue({ enabled: false })
+    renderSignIn(<SignInForm onSignedIn={onSignedIn} onUseKey={onUseKey} />)
     fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'grace' } })
     fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'wrong' } })
     fireEvent.click(screen.getByRole('button', { name: 'Sign in' }))

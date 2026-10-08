@@ -64,12 +64,21 @@
     "password": "Passwort",
     "submit": "Anmelden",
     "forgot": "Passwort vergessen? Bitte einen Admin oder den Eigentümer um einen Link für ein neues Passwort.",
-    "useKey": "Stattdessen einen API-Schlüssel verwenden"
+    "useKey": "Stattdessen einen API-Schlüssel verwenden",
+    "withProvider": "Mit {{name}} anmelden",
+    "or": "oder",
+    "provider": {
+      "failed": "Die Anmeldung mit {{name}} hat nicht funktioniert. Versuche es erneut.",
+      "refused": "Dein Konto bei {{name}} gibt dir keine Rolle in diesem Toskar. Bitte den Eigentümer, dich einer passenden Gruppe hinzuzufügen.",
+      "disabled": "Dein Konto in diesem Toskar ist deaktiviert. Frag den Eigentümer.",
+      "unavailable": "Die Anmeldung mit einem anderen Dienst ist gerade nicht verfügbar."
+    }
   },
   "account": {
     "label": "Dein Konto",
     "signedInAs": "Angemeldet als {{name}} (@{{username}}), {{role}}.",
     "signOut": "Abmelden",
+    "signedInWith": "Angemeldet als {{name}} ({{external}}), {{role}}.",
     "signedInByProxy": "Über deinen Anmeldedienst angemeldet als {{name}}, {{role}}. Melde dich dort ab."
   }
 }

@@ -266,6 +266,57 @@ paths:
                     enum: [this_computer, api_key, session]
                   key_id:
                     type: string
+  /api/v1/oidc:
+    get:
+      summary: Whether sign-in with an OpenID Connect provider is offered (#206)
+      operationId: getOIDC
+      security: []
+      responses:
+        "200":
+          description: Whether it's on, and the provider's name for the button
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  label:
+                    type: string
+  /api/v1/oidc/start:
+    get:
+      summary: Go to the provider to sign in (#206)
+      description: Redirects to the provider with PKCE, and sets a short-lived cookie with the sign-in's state. return is the path in Toskar to go to afterwards.
+      operationId: startOIDC
+      security: []
+      parameters:
+        - name: return
+          in: query
+          schema:
+            type: string
+      responses:
+        "302":
+          description: To the provider
+        "303":
+          description: Back to Toskar with oidc_error, when sign-in can't start
+  /api/v1/oidc/callback:
+    get:
+      summary: Where the provider sends people back (#206)
+      description: Checks the state against this browser's cookie, swaps the code for an ID token and checks it, signs the browser in, and redirects to the path it started from. A failure redirects to /?oidc_error= failed, refused, disabled, or unavailable.
+      operationId: oidcCallback
+      security: []
+      parameters:
+        - name: state
+          in: query
+          schema:
+            type: string
+        - name: code
+          in: query
+          schema:
+            type: string
+      responses:
+        "303":
+          description: Signed in, or back to the sign-in screen with oidc_error
   /api/v1/me/devices:
     get:
       summary: Your connected devices (#206)

@@ -82,6 +82,32 @@ func ApplyEnvOverrides(cfg *Config) {
 			*dst = v
 		}
 	}
+	// Sign-in with an OpenID Connect provider (#206); the secret is read
+	// where it's used, never saved.
+	for name, dst := range map[string]*string{
+		"OIDC_ISSUER":             &cfg.OIDC.Issuer,
+		"OIDC_CLIENT_ID":          &cfg.OIDC.ClientID,
+		"OIDC_CLIENT_SECRET_FILE": &cfg.OIDC.ClientSecretFile,
+		"OIDC_REDIRECT_URL":       &cfg.OIDC.RedirectURL,
+		"OIDC_GROUPS_CLAIM":       &cfg.OIDC.GroupsClaim,
+		"OIDC_DEFAULT_ROLE":       &cfg.OIDC.DefaultRole,
+		"OIDC_OWNER_EMAIL":        &cfg.OIDC.OwnerEmail,
+		"OIDC_OWNER_SUBJECT":      &cfg.OIDC.OwnerSubject,
+		"OIDC_LABEL":              &cfg.OIDC.Label,
+	} {
+		if v := Env(name); v != "" {
+			*dst = v
+		}
+	}
+	for name, dst := range map[string]*[]string{
+		"OIDC_SCOPES":        &cfg.OIDC.Scopes,
+		"OIDC_ADMIN_GROUPS":  &cfg.OIDC.AdminGroups,
+		"OIDC_MEMBER_GROUPS": &cfg.OIDC.MemberGroups,
+	} {
+		if v := Env(name); v != "" {
+			*dst = splitCSV(v)
+		}
+	}
 	if v := Env("PROXY_ADMIN_GROUPS"); v != "" {
 		cfg.ProxyAuth.AdminGroups = splitCSV(v)
 	}

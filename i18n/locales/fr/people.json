@@ -64,12 +64,21 @@
     "password": "Mot de passe",
     "submit": "Se connecter",
     "forgot": "Mot de passe oublié ? Demandez un lien de nouveau mot de passe à un admin ou au propriétaire.",
-    "useKey": "Utiliser plutôt une clé API"
+    "useKey": "Utiliser plutôt une clé API",
+    "withProvider": "Se connecter avec {{name}}",
+    "or": "ou",
+    "provider": {
+      "failed": "La connexion avec {{name}} n'a pas fonctionné. Réessayez.",
+      "refused": "Votre compte {{name}} ne vous donne pas de rôle sur ce Toskar. Demandez à son propriétaire de vous ajouter à un groupe qui en donne un.",
+      "disabled": "Votre compte sur ce Toskar est désactivé. Demandez à son propriétaire.",
+      "unavailable": "La connexion avec un autre service n'est pas disponible pour le moment."
+    }
   },
   "account": {
     "label": "Votre compte",
     "signedInAs": "Connecté en tant que {{name}} (@{{username}}), {{role}}.",
     "signOut": "Se déconnecter",
+    "signedInWith": "Connecté en tant que {{name}} ({{external}}), {{role}}.",
     "signedInByProxy": "Connecté en tant que {{name}} par votre service de connexion, {{role}}. Déconnectez-vous depuis celui-ci."
   }
 }

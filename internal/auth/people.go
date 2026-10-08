@@ -54,7 +54,8 @@ type Person struct {
 	Disabled  *time.Time `json:"disabled_at,omitempty"`
 	// SignIn is true once they've set a username and password.
 	SignIn bool `json:"sign_in"`
-	// External is the name a trusted proxy signs them in as (#206).
+	// External shows who they are where they sign in, at a trusted proxy
+	// or an OpenID Connect provider (#206).
 	External string `json:"external,omitempty"`
 }
 
@@ -69,7 +70,7 @@ type People struct {
 // NewPeople reads people from db.
 func NewPeople(db *sql.DB) *People { return &People{db: db} }
 
-const personColumns = `id, name, COALESCE(username, ''), role, created_at, disabled_at, password_hash IS NOT NULL, COALESCE(external_id, '')`
+const personColumns = `id, name, COALESCE(username, ''), role, created_at, disabled_at, password_hash IS NOT NULL, COALESCE(external_label, external_id, '')`
 
 func scanPerson(row interface{ Scan(...any) error }) (Person, error) {
 	var p Person

@@ -1,12 +1,17 @@
+import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { YggdrasilMark } from '@/components/ui/YggdrasilMark'
-import { api, forgetApiKey } from '@/lib/api'
+import { api, forgetApiKey, getApiBase } from '@/lib/api'
 import { useUIStore } from '@/stores/uiStore'
+
+/** Why sign-in with the provider sent the browser back, from ?oidc_error=. */
+const providerErrors = ['failed', 'refused', 'disabled', 'unavailable'] as const
 
 /**
  * Signing in to a Toskar shared with other people (#206), with a username
- * and password from an invite link. An API key still works instead.
+ * and password from an invite link, or with an OpenID Connect provider when
+ * one is set up. An API key still works instead.
  */
 export function SignInForm({ onSignedIn, onUseKey }: { onSignedIn: () => void; onUseKey: () => void }) {
   const { t } = useTranslation('people')
@@ -15,6 +20,11 @@ export function SignInForm({ onSignedIn, onUseKey }: { onSignedIn: () => void; o
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const provider = useQuery({ queryKey: ['oidc'], queryFn: () => api.getOIDC(), retry: false, staleTime: 60_000 })
+  const providerError = new URLSearchParams(window.location.search).get('oidc_error')
+  const providerMessage = providerErrors.find((e) => e === providerError)
+  const providerName = provider.data?.label ?? ''
+  const returnTo = window.location.pathname === '/' ? '/chat' : window.location.pathname
   return (
     <form
       className="flex h-full min-h-0 flex-col items-center justify-center bg-canvas px-6 text-center"
@@ -41,6 +51,19 @@ export function SignInForm({ onSignedIn, onUseKey }: { onSignedIn: () => void; o
       <h1 className="mt-6 font-display text-2xl font-semibold tracking-tight text-ink">{t('signIn.title')}</h1>
       <p className="mt-2 max-w-md text-sm leading-relaxed text-ink-muted">{t('signIn.body')}</p>
       <div className="mt-6 flex w-full max-w-sm flex-col gap-3 text-start">
+        {providerMessage ? (
+          <p className="text-sm text-danger" role="alert">
+            {t(`signIn.provider.${providerMessage}`, { name: providerName })}
+          </p>
+        ) : null}
+        {provider.data?.enabled ? (
+          <>
+            <a className="btn-primary text-center" href={`${getApiBase()}/api/v1/oidc/start?return=${encodeURIComponent(returnTo)}`}>
+              {t('signIn.withProvider', { name: providerName })}
+            </a>
+            <p className="text-center text-xs text-ink-faint">{t('signIn.or')}</p>
+          </>
+        ) : null}
         <label className="space-y-1 text-sm">
           <span className="text-ink-muted">{t('signIn.username')}</span>
           <input
@@ -66,7 +89,7 @@ export function SignInForm({ onSignedIn, onUseKey }: { onSignedIn: () => void; o
             {error}
           </p>
         ) : null}
-        <button type="submit" className="btn-primary" disabled={busy || !username.trim() || !password}>
+        <button type="submit" className={provider.data?.enabled ? 'btn-secondary' : 'btn-primary'} disabled={busy || !username.trim() || !password}>
           {t('signIn.submit')}
         </button>
         <p className="text-center text-xs text-ink-faint">{t('signIn.forgot')}</p>

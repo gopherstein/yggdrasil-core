@@ -180,18 +180,20 @@ type Server struct {
 	conns     map[net.Conn]bool
 	closed    chan struct{}
 
-	knowledge       KnowledgeService
-	memory          *muninn.Store
-	artifacts       *artifacts.Store
-	speech          *speech.Engine
-	speechStore     *artifacts.Store
-	images          *imagegen.Setup
-	video           *imagegen.Setup
-	remoteMedia     RemoteMediaSetup
-	notifications   *gjallarhorn.Hub
-	connectors      *connectors.Manager
-	mcp             *mcp.Manager
-	mcpServer       *mcp.Server
+	knowledge     KnowledgeService
+	memory        *muninn.Store
+	artifacts     *artifacts.Store
+	speech        *speech.Engine
+	speechStore   *artifacts.Store
+	images        *imagegen.Setup
+	video         *imagegen.Setup
+	remoteMedia   RemoteMediaSetup
+	notifications *gjallarhorn.Hub
+	connectors    *connectors.Manager
+	mcp           *mcp.Manager
+	mcpServer     *mcp.Server
+	// oidcState is the OpenID Connect provider's client (#206).
+	oidcState       oidcHolder
 	ctl             func() string
 	personal        PersonalStore
 	privacy         Privacy
@@ -316,6 +318,7 @@ func (s *Server) routes() {
 	s.artifactRoutes(api)
 	s.deviceRoutes(api)
 	s.peopleRoutes(api)
+	s.oidcRoutes(api)
 	api.HandleFunc("/tls", s.handleTLS).Methods(http.MethodGet)
 	s.notificationRoutes(api)
 	s.connectorRoutes(api)
@@ -523,6 +526,9 @@ var publicRoutes = map[string]bool{
 	http.MethodPost + " /api/v1/session":           true,
 	http.MethodGet + " /api/v1/invites/{token}":    true,
 	http.MethodPost + " /api/v1/invites/{token}":   true,
+	http.MethodGet + " /api/v1/oidc":               true,
+	http.MethodGet + " /api/v1/oidc/start":         true,
+	http.MethodGet + " /api/v1/oidc/callback":      true,
 }
 
 // unsafeMethod changes something, so a session's request must come from

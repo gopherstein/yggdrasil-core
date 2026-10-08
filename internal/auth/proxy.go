@@ -31,9 +31,7 @@ type Proxy struct {
 	userHeader   string
 	nameHeader   string
 	groupsHeader string
-	adminGroups  map[string]bool
-	memberGroups map[string]bool
-	defaultRole  Role // "" refuses
+	roles        groupRoles
 	ownerUser    string
 }
 
@@ -57,8 +55,6 @@ func NewProxy(s ProxySettings) (*Proxy, error) {
 		userHeader:   orDefault(s.UserHeader, "Remote-User"),
 		nameHeader:   orDefault(s.NameHeader, "Remote-Name"),
 		groupsHeader: orDefault(s.GroupsHeader, "Remote-Groups"),
-		adminGroups:  set(s.AdminGroups),
-		memberGroups: set(s.MemberGroups),
 		ownerUser:    strings.TrimSpace(s.OwnerUser),
 	}
 	for _, t := range s.Trusted {
@@ -77,17 +73,47 @@ func NewProxy(s ProxySettings) (*Proxy, error) {
 		addr = addr.Unmap()
 		p.trusted = append(p.trusted, netip.PrefixFrom(addr, addr.BitLen()))
 	}
-	switch strings.ToLower(strings.TrimSpace(s.DefaultRole)) {
-	case "", "member":
-		p.defaultRole = RoleMember
-	case "visitor":
-		p.defaultRole = RoleVisitor
-	case "none":
-		p.defaultRole = ""
-	default:
-		return nil, errors.New("proxy_auth.default_role must be member, visitor, or none")
+	roles, err := newGroupRoles(s.AdminGroups, s.MemberGroups, s.DefaultRole)
+	if err != nil {
+		return nil, errors.New("proxy_auth." + err.Error())
 	}
+	p.roles = roles
 	return p, nil
+}
+
+// groupRoles gives roles by the groups someone is in where they sign in.
+type groupRoles struct {
+	admin, member map[string]bool
+	def           Role // "" refuses
+}
+
+func newGroupRoles(admin, member []string, def string) (groupRoles, error) {
+	g := groupRoles{admin: set(admin), member: set(member)}
+	switch strings.ToLower(strings.TrimSpace(def)) {
+	case "", "member":
+		g.def = RoleMember
+	case "visitor":
+		g.def = RoleVisitor
+	case "none":
+	default:
+		return groupRoles{}, errors.New("default_role must be member, visitor, or none")
+	}
+	return g, nil
+}
+
+// role is the role groups give, or false when none lets them in.
+func (g groupRoles) role(groups []string) (Role, bool) {
+	for _, x := range groups {
+		if g.admin[x] {
+			return RoleAdmin, true
+		}
+	}
+	for _, x := range groups {
+		if g.member[x] {
+			return RoleMember, true
+		}
+	}
+	return g.def, g.def != ""
 }
 
 func orDefault(v, def string) string {
@@ -153,19 +179,7 @@ func (p *Proxy) Identity(r *http.Request) (ProxyIdentity, bool) {
 }
 
 // Role is the role id's groups give, or false when none lets them in.
-func (p *Proxy) Role(id ProxyIdentity) (Role, bool) {
-	for _, g := range id.Groups {
-		if p.adminGroups[g] {
-			return RoleAdmin, true
-		}
-	}
-	for _, g := range id.Groups {
-		if p.memberGroups[g] {
-			return RoleMember, true
-		}
-	}
-	return p.defaultRole, p.defaultRole != ""
-}
+func (p *Proxy) Role(id ProxyIdentity) (Role, bool) { return p.roles.role(id.Groups) }
 
 // IsOwner reports whether id is the Owner.
 func (p *Proxy) IsOwner(id ProxyIdentity) bool {
@@ -191,18 +205,42 @@ func (p *People) Proxied(ctx context.Context, proxy *Proxy, id ProxyIdentity) (P
 			name = name[:at]
 		}
 	}
+	return p.External(ctx, ExternalSignIn{ID: id.User, Label: id.User, Name: name, Role: role})
+}
+
+// ExternalSignIn is someone signed in elsewhere (#206): by a trusted proxy
+// or an OpenID Connect provider.
+type ExternalSignIn struct {
+	// ID is who they are there, unique and unchanging.
+	ID string
+	// Label shows who they are there, such as an email address.
+	Label string
+	// Name is their display name, for a new person.
+	Name string
+	// Role is what their groups there give.
+	Role Role
+}
+
+// External is the person signed in elsewhere as in: the one with that ID,
+// made the first time, with the role in gives each time. A disabled
+// person is refused.
+func (p *People) External(ctx context.Context, in ExternalSignIn) (Person, error) {
+	name := strings.TrimSpace(in.Name)
+	if name == "" {
+		name = in.Label
+	}
 	if len([]rune(name)) > 80 {
 		name = string([]rune(name)[:80])
 	}
 	var personID string
-	err := p.db.QueryRowContext(ctx, `SELECT id FROM people WHERE external_id = ?`, id.User).Scan(&personID)
+	err := p.db.QueryRowContext(ctx, `SELECT id FROM people WHERE external_id = ?`, in.ID).Scan(&personID)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		personID = uuid.NewString()
-		if _, err := p.db.ExecContext(ctx, `INSERT INTO people (id, name, role, created_at, external_id) VALUES (?, ?, ?, ?, ?)`,
-			personID, name, string(role), stamp(time.Now()), id.User); err != nil {
+		if _, err := p.db.ExecContext(ctx, `INSERT INTO people (id, name, role, created_at, external_id, external_label) VALUES (?, ?, ?, ?, ?, ?)`,
+			personID, name, string(in.Role), stamp(time.Now()), in.ID, in.Label); err != nil {
 			// Made at the same moment by another request.
-			if err2 := p.db.QueryRowContext(ctx, `SELECT id FROM people WHERE external_id = ?`, id.User).Scan(&personID); err2 != nil {
+			if err2 := p.db.QueryRowContext(ctx, `SELECT id FROM people WHERE external_id = ?`, in.ID).Scan(&personID); err2 != nil {
 				return Person{}, err
 			}
 		}
@@ -213,11 +251,11 @@ func (p *People) Proxied(ctx context.Context, proxy *Proxy, id ProxyIdentity) (P
 	if err != nil {
 		return Person{}, err
 	}
-	if person.Role != role && person.Role != RoleOwner {
-		if _, err := p.db.ExecContext(ctx, `UPDATE people SET role = ? WHERE id = ?`, string(role), personID); err != nil {
+	if person.Role != RoleOwner && (person.Role != in.Role || person.External != in.Label) {
+		if _, err := p.db.ExecContext(ctx, `UPDATE people SET role = ?, external_label = ? WHERE id = ?`, string(in.Role), in.Label, personID); err != nil {
 			return Person{}, err
 		}
-		person.Role = role
+		person.Role, person.External = in.Role, in.Label
 	}
 	return person, nil
 }

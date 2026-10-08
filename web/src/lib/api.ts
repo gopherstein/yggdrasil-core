@@ -515,6 +515,9 @@ export const api = {
   signIn: (username: string, password: string) =>
     request<Principal>('/api/v1/session', { method: 'POST', body: JSON.stringify({ username, password }) }),
 
+  /** Whether sign-in with an OpenID Connect provider is offered, and its name (#206). */
+  getOIDC: () => request<{ enabled: boolean; label?: string }>('/api/v1/oidc'),
+
   /** Sign this browser out. */
   signOut: () => request<void>('/api/v1/session', { method: 'DELETE' }),
 
