@@ -40,6 +40,12 @@ Anything else returns `403` `DEVICE_NOT_ALLOWED`. It appears in `GET /api-keys` 
 
 A bearer token on plain HTTP does not encrypt traffic; use HTTPS on the same port from other devices (see below).
 
+### People
+
+Toskar is getting people and roles (#206). Today there is one person, the **Owner**, and everything belongs to them: API keys, chats, memories, files, and automations each record their person (`person_id`, `owner` for everything from before). Roles, from the most to the least: `owner`, `admin`, `member`, and `visitor`.
+
+Every `/api/v1` request is known to be someone's: one from this computer, or answered without a key while the API listens only here, is the Owner's (`via: this_computer`); one with an API key is the key's person's (`via: api_key`), and stops working if that person is disabled. `GET /api/v1/me` returns the request's `person` (`id`, `name`, `username`, `role`), `via`, and `key_id`. Sign-in for other people, private data per person, and role checks follow.
+
 ### HTTPS
 
 The API answers HTTPS and plain HTTP on the same port (#213), told apart by the first byte of each connection. The desktop app and this computer's browser use plain HTTP over loopback; phones, browsers, and apps on the local network can use `https://` and the same port.

@@ -125,6 +125,8 @@ type Dependencies struct {
 	RotateAPIKey         func(ctx context.Context, id string) (auth.APIKeyRecord, string, error)
 	SetAPIKeyPermissions func(ctx context.Context, id string, p auth.APIKeyPermissions) (auth.APIKeyRecord, error)
 	VerifyAPIKey         func(ctx context.Context, secret string) (auth.APIKeyRecord, error)
+	// People are who use this Toskar and their roles (#206).
+	People *auth.People
 	// Devices makes the codes a phone connects with (#216).
 	Devices *auth.DevicePairer
 	// PhoneAddress is where a phone reaches this computer, and whether it
@@ -309,6 +311,7 @@ func (s *Server) routes() {
 	s.memoryRoutes(api)
 	s.artifactRoutes(api)
 	s.deviceRoutes(api)
+	api.HandleFunc("/me", s.handleMe).Methods(http.MethodGet)
 	api.HandleFunc("/tls", s.handleTLS).Methods(http.MethodGet)
 	s.notificationRoutes(api)
 	s.connectorRoutes(api)
@@ -496,10 +499,22 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	return srv.Shutdown(ctx)
 }
 
+// thisComputer is a request from this computer, or one Toskar answers
+// without a key: it is the Owner's (#206).
+func (s *Server) thisComputer(r *http.Request) *http.Request {
+	owner := auth.PrincipalFrom(r.Context())
+	if s.deps.People != nil {
+		if p, err := s.deps.People.Get(r.Context(), auth.OwnerID); err == nil {
+			owner.Person = p
+		}
+	}
+	return r.WithContext(auth.WithPrincipal(r.Context(), owner))
+}
+
 func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if s.deps.Config == nil || auth.FromThisComputer(r) {
-			next.ServeHTTP(w, r)
+			next.ServeHTTP(w, s.thisComputer(r))
 			return
 		}
 		if !config.ListensBeyondLoopback(s.deps.Config.Get().APIHost) {
@@ -510,7 +525,7 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 				writeErr(w, http.StatusForbidden, "LAN_ACCESS_OFF", "local network access is off on this computer", nil)
 				return
 			}
-			next.ServeHTTP(w, r)
+			next.ServeHTTP(w, s.thisComputer(r))
 			return
 		}
 		route := routeTemplate(r)
@@ -543,7 +558,17 @@ func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 			writeErr(w, http.StatusForbidden, "DEVICE_NOT_ALLOWED", "a phone's key can't do this; use a key from API Access", nil)
 			return
 		}
-		next.ServeHTTP(w, r)
+		// The request is its person's, while they may still use Toskar.
+		principal := auth.Principal{Person: auth.Person{ID: rec.PersonID, Role: auth.RoleOwner}, Via: auth.ViaAPIKey, KeyID: rec.ID}
+		if s.deps.People != nil {
+			person, err := s.deps.People.Active(r.Context(), rec.PersonID)
+			if err != nil {
+				writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "this key's person can no longer use Toskar", nil)
+				return
+			}
+			principal.Person = person
+		}
+		next.ServeHTTP(w, r.WithContext(auth.WithPrincipal(r.Context(), principal)))
 	})
 }
 

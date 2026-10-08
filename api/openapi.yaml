@@ -35,6 +35,39 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/VersionResponse"
+  /api/v1/me:
+    get:
+      summary: Who the request is from (#206)
+      description: The person, their role, and how Toskar knows. A request from this computer is the Owner's; one with an API key is its person's.
+      operationId: getMe
+      responses:
+        "200":
+          description: The request's person
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  person:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      username:
+                        type: string
+                      role:
+                        type: string
+                        enum: [owner, admin, member, visitor]
+                      created_at:
+                        type: string
+                        format: date-time
+                  via:
+                    type: string
+                    enum: [this_computer, api_key]
+                  key_id:
+                    type: string
   /api/v1/tls:
     get:
       summary: How the API speaks HTTPS on the local network (#213)
