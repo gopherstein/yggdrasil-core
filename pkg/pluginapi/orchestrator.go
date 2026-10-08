@@ -27,6 +27,13 @@ type TurnImages interface {
 	TurnImages() []string
 }
 
+// AnswerCheck is an environment that checks each answer before it is
+// shown, such as for a profile's topic controls (#345). CheckAnswer returns
+// the answer to show: the one given, or what replaces it.
+type AnswerCheck interface {
+	CheckAnswer(ctx context.Context, role, prompt, answer string) string
+}
+
 // OrchestrationEvent is a structured progress event from an orchestrator.
 type OrchestrationEvent struct {
 	Type    string             `json:"type"`

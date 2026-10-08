@@ -388,6 +388,11 @@
     "reply": "Cuando le preguntan otra cosa",
     "replyDefault": "Solo puedo ayudar con {{topic}}. ¿En qué te puedo ayudar?",
     "replyHint": "La respuesta exacta a cualquier otro tema. Déjalo vacío y el asistente dirá en una frase con qué puede ayudar, en el idioma de la persona.",
-    "note": "Saludos, agradecimientos y «¿qué puedes hacer?» siempre están bien. Estas reglas guían al modelo; ningún asistente puede prometer no desviarse nunca."
+    "note": "Saludos, agradecimientos y «¿qué puedes hacer?» siempre están bien. Estas reglas guían al modelo; ningún asistente puede prometer no desviarse nunca.",
+    "strictness": "Qué tan estricto",
+    "guide": "Guiar",
+    "guideHint": "Las reglas van antes que las instrucciones. Lo más rápido; bien para tu propia gente.",
+    "enforce": "Imponer",
+    "enforceHint": "Además revisa cada mensaje antes de responder y cada respuesta antes de mostrarla, y envía la respuesta fijada a todo lo que se salga del tema. Para el público y los portales de chat."
   }
 }

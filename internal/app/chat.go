@@ -388,6 +388,18 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		var metrics *pluginapi.GenerationMetrics
 		var roleSteps []contracts.GenerationRoleStep
 		var contextUsage map[string]any
+		// A profile that enforces its topic checks the message first, and
+		// an off-topic one gets the set reply without the full answer (#345).
+		held := false
+		if reply, ok := env.holdOffTopic(ctx, message); ok {
+			held, full = true, reply
+			ch <- pluginapi.ChatChunk{Content: reply}
+			a.publish(ctx, events.New(events.ChatToken, map[string]any{
+				"conversation_id": conversationID,
+				"content":         reply,
+			}))
+			ch <- pluginapi.ChatChunk{Done: true}
+		}
 		// Quiet retries when the model fails before showing or changing
 		// anything (spec §14, §26): first the same model on another
 		// computer, then another model, up to the profile's retry count.
@@ -395,7 +407,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		if maxRetries == 0 {
 			maxRetries = 1
 		}
-		for attempt := 0; ; attempt++ {
+		for attempt := 0; !held; attempt++ {
 			eventsCh, err := orch.Run(ctx, task, profile, env)
 			if err != nil {
 				runErr = codedError(err)
@@ -525,7 +537,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 				break
 			}
 		}
-		if full != "" {
+		if full != "" && !held {
 			env.trace.noticeIfNone(a.smallModelNotice(ctx, env.trace.lang, env.trace.dataKind(), env.modelID(), routeReason != ""))
 		}
 		if ctx.Err() != nil {

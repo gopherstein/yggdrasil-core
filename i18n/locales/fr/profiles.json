@@ -388,6 +388,11 @@
     "reply": "Quand on lui demande autre chose",
     "replyDefault": "Je ne peux aider que pour {{topic}}. Que puis-je faire pour vous ?",
     "replyHint": "La réponse exacte à tout autre sujet. Laissez vide, et l'assistant dit en une phrase pour quoi il peut aider, dans la langue de la personne.",
-    "note": "Les salutations, les remerciements et « que sais-tu faire ? » sont toujours acceptés. Ces règles guident le modèle ; aucun assistant ne peut promettre de ne jamais s'écarter."
+    "note": "Les salutations, les remerciements et « que sais-tu faire ? » sont toujours acceptés. Ces règles guident le modèle ; aucun assistant ne peut promettre de ne jamais s'écarter.",
+    "strictness": "Niveau d'exigence",
+    "guide": "Guider",
+    "guideHint": "Les règles passent avant les instructions. Le plus rapide ; convient à vos propres équipes.",
+    "enforce": "Imposer",
+    "enforceHint": "Vérifie aussi chaque message avant de répondre et chaque réponse avant de l'afficher, et envoie la réponse prévue pour tout autre sujet. Pour le public et les portails de discussion."
   }
 }

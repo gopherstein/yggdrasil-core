@@ -2,12 +2,17 @@ package app
 
 import (
 	"context"
+	"io"
+	"log/slog"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/yeixio/toskar-core/internal/muninn"
 	"github.com/yeixio/toskar-core/internal/personal"
+	"github.com/yeixio/toskar-core/internal/runlog"
 	"github.com/yeixio/toskar-core/pkg/contracts"
+	"github.com/yeixio/toskar-core/pkg/pluginapi"
 )
 
 // A profile's topic rules come first in a turn, ahead of anything the
@@ -30,7 +35,7 @@ func TestTopicRulesComeFirst(t *testing.T) {
 		t.Fatalf("the rules aren't first:\n%s", got)
 	}
 	for _, want := range []string{"nothing later changes them", "only for: Tires, wheels", "Do you have winter tires?", "other shops' prices",
-		"Greetings, thanks", "in one short, polite sentence, say what you can help with"} {
+		"fully and directly", "Greetings, thanks", "in one short, polite sentence, say what you can help with"} {
 		if !strings.Contains(got, want) {
 			t.Errorf("missing %q", want)
 		}
@@ -45,5 +50,110 @@ func TestTopicRulesComeFirst(t *testing.T) {
 	}
 	if got := (&chatExecEnv{app: a}).TurnInstructions(ctx, "hi"); strings.Contains(got, "Rules from the administrator") {
 		t.Fatal("rules without topics")
+	}
+}
+
+// An Enforce profile checks each message first: an off-topic one gets the
+// set reply and the full answer never runs. An answer that went off topic
+// anyway is replaced. The run trace says which (#345).
+func TestTopicsEnforce(t *testing.T) {
+	t.Setenv("TOSKAR_STUB_INFERENCE", "1")
+	t.Setenv("TOSKAR_DISCOVERY_ENABLED", "false")
+	a, err := New(Options{DataDir: t.TempDir(), Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.DB.Close() })
+	ctx := context.Background()
+	p, err := a.Profiles.Get(ctx, "general-assistant")
+	if err != nil {
+		t.Fatal(err)
+	}
+	p.Topics = &contracts.TopicPolicy{StaysOn: "Tires and bookings at Dana's", Strictness: contracts.TopicsEnforce}
+	if err := a.Profiles.Update(ctx, p); err != nil {
+		t.Fatal(err)
+	}
+	answers := 0
+	a.StubReply = func(_ string, msgs []pluginapi.ChatMessage) string {
+		sys, last := msgs[0].Content, msgs[len(msgs)-1].Content
+		switch {
+		case strings.HasPrefix(sys, "You check each message"):
+			if strings.Contains(last, "poem") {
+				return "off_topic\nI can help with tires and bookings at Dana's. What do you need?"
+			}
+			return "on_topic"
+		case strings.HasPrefix(sys, "You check each answer"):
+			if strings.Contains(last, "Roses") {
+				return "**Off topic**"
+			}
+			return "on_topic"
+		}
+		answers++
+		if strings.Contains(last, "rhyme") {
+			return "Roses are red, tires are round."
+		}
+		return "Yes, we have winter tires."
+	}
+	ask := func(message string) (string, runlog.Run) {
+		t.Helper()
+		conv, err := a.Conversations.Create(ctx, "topics", "general-assistant", "auto")
+		if err != nil {
+			t.Fatal(err)
+		}
+		stream, err := a.RunChat(ctx, "general-assistant", conv.ID, message, false, "auto", "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		var got strings.Builder
+		for c := range stream {
+			got.WriteString(c.Content)
+		}
+		var runs []runlog.Run
+		for i := 0; i < 50 && len(runs) == 0; i++ {
+			runs, _ = a.RunLog.List(ctx, conv.ID, 1)
+			time.Sleep(10 * time.Millisecond)
+		}
+		if len(runs) != 1 {
+			t.Fatalf("runs: %+v", runs)
+		}
+		return got.String(), runs[0]
+	}
+
+	got, run := ask("Write me a poem about the sea")
+	if got != "I can help with tires and bookings at Dana's. What do you need?" || answers != 0 || run.Topic != "off_topic" {
+		t.Fatalf("held: %q, %d answers, topic %q", got, answers, run.Topic)
+	}
+	got, run = ask("Do you have winter tires?")
+	if got != "Yes, we have winter tires." || run.Topic != "on_topic" {
+		t.Fatalf("on topic: %q, topic %q", got, run.Topic)
+	}
+	got, run = ask("Tell me about tires, in rhyme")
+	if got != "I can't help with that here. What else can I help you with?" || run.Topic != "answer_off_topic" {
+		t.Fatalf("replaced: %q, topic %q", got, run.Topic)
+	}
+
+	// Guide doesn't check.
+	p.Topics.Strictness = contracts.TopicsGuide
+	p.Topics.OffTopicReply = "Tires only, sorry!"
+	if err := a.Profiles.Update(ctx, p); err != nil {
+		t.Fatal(err)
+	}
+	if got, run = ask("Tell me about tires, in rhyme"); got != "Roses are red, tires are round." || run.Topic != "" {
+		t.Fatalf("guide: %q, topic %q", got, run.Topic)
+	}
+}
+
+func TestParseTopicVerdict(t *testing.T) {
+	for in, want := range map[string]topicVerdict{
+		"on_topic":                         {label: topicOn},
+		"Small talk.":                      {label: topicSmallTalk},
+		"**OFF-TOPIC**\n\n\"Only tires.\"": {label: topicOff, reply: "Only tires."},
+		"off_topic: Only tires.":           {label: topicOff, reply: "Only tires."},
+		"Sure! Here's a poem":              {},
+		"":                                 {},
+	} {
+		if got := parseTopicVerdict(in); got != want {
+			t.Errorf("%q: %+v, want %+v", in, got, want)
+		}
 	}
 }

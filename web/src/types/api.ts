@@ -1896,6 +1896,8 @@ export interface RunTrace {
   context_limit?: number
   /** Tool calls answered from a cache, by tool (spec §36). */
   cache_hits?: Record<string, number>
+  /** What an Enforce profile's topic check found (#345). */
+  topic?: 'on_topic' | 'small_talk' | 'off_topic' | 'answer_off_topic'
 }
 
 /** An environment variable or header of a tool source. Secret values show only their last four characters. */

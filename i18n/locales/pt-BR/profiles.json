@@ -388,6 +388,11 @@
     "reply": "Quando perguntam outra coisa",
     "replyDefault": "Só posso ajudar com {{topic}}. Em que posso ajudar?",
     "replyHint": "A resposta exata a qualquer outro assunto. Deixe vazio, e o assistente diz em uma frase com o que pode ajudar, no idioma da pessoa.",
-    "note": "Cumprimentos, agradecimentos e “o que você faz?” sempre podem. Estas regras guiam o modelo; nenhum assistente pode prometer nunca se desviar."
+    "note": "Cumprimentos, agradecimentos e “o que você faz?” sempre podem. Estas regras guiam o modelo; nenhum assistente pode prometer nunca se desviar.",
+    "strictness": "Rigor",
+    "guide": "Orientar",
+    "guideHint": "As regras vêm antes das instruções. O mais rápido; bom para a sua própria equipe.",
+    "enforce": "Impor",
+    "enforceHint": "Também confere cada mensagem antes de responder e cada resposta antes de mostrá-la, e envia a resposta definida a tudo fora do tema. Para o público e portais de chat."
   }
 }

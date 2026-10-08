@@ -21,9 +21,11 @@ describe('TopicsEditor (#345)', () => {
   it('turns the editor into topic controls, keeping strictness, or none', () => {
     expect(topicsFrom(topicsDraft())).toBeUndefined()
     expect(
-      topicsFrom({ staysOn: ' Tires ', examples: 'Winter tires?\n\n Rotation? ', never: 'politics', reply: '' }, 'enforce'),
+      topicsFrom({ staysOn: ' Tires ', examples: 'Winter tires?\n\n Rotation? ', never: 'politics', reply: '', strict: 'enforce' }),
     ).toEqual({ stays_on: 'Tires', examples: ['Winter tires?', 'Rotation?'], never_discuss: ['politics'], strictness: 'enforce' })
     expect(topicsDraft({ stays_on: 'Tires', examples: ['a', 'b'] }).examples).toBe('a\nb')
+    expect(topicsDraft({ stays_on: 'Tires', strictness: 'enforce' }).strict).toBe('enforce')
+    expect(topicsFrom({ ...topicsDraft(), staysOn: 'Tires' })).toEqual({ stays_on: 'Tires' })
   })
 
   it('shows the rest once there is something to stay on, with the default reply', () => {
@@ -35,5 +37,8 @@ describe('TopicsEditor (#345)', () => {
     expect(screen.getByPlaceholderText('I can only help with Tires and bookings. What can I help you with?')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText(/^Example questions/), { target: { value: 'Winter tires?' } })
     expect(last.examples).toBe('Winter tires?')
+    expect(screen.getByLabelText(/^Guide/)).toBeChecked()
+    fireEvent.click(screen.getByLabelText(/^Enforce/))
+    expect(last.strict).toBe('enforce')
   })
 })

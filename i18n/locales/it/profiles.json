@@ -388,6 +388,11 @@
     "reply": "Quando gli chiedono altro",
     "replyDefault": "Posso aiutare solo con {{topic}}. Come posso aiutarti?",
     "replyHint": "La risposta esatta a qualsiasi altro argomento. Lascia vuoto e l'assistente dice in una frase con cosa può aiutare, nella lingua della persona.",
-    "note": "Saluti, ringraziamenti e «cosa sai fare?» vanno sempre bene. Queste regole guidano il modello; nessun assistente può promettere di non divagare mai."
+    "note": "Saluti, ringraziamenti e «cosa sai fare?» vanno sempre bene. Queste regole guidano il modello; nessun assistente può promettere di non divagare mai.",
+    "strictness": "Quanto rigido",
+    "guide": "Guida",
+    "guideHint": "Le regole vengono prima delle istruzioni. Il più rapido; va bene per le tue persone.",
+    "enforce": "Imponi",
+    "enforceHint": "Controlla anche ogni messaggio prima di rispondere e ogni risposta prima di mostrarla, e invia la risposta stabilita a tutto ciò che è fuori tema. Per il pubblico e i portali di chat."
   }
 }

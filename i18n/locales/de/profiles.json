@@ -386,6 +386,11 @@
     "reply": "Bei anderen Fragen",
     "replyDefault": "Ich kann nur bei {{topic}} helfen. Wobei kann ich dir helfen?",
     "replyHint": "Die genaue Antwort auf alles andere. Leer lassen, und der Assistent sagt in einem Satz, wobei er helfen kann, in der Sprache der Person.",
-    "note": "Begrüßungen, Dank und „Was kannst du?“ sind immer in Ordnung. Diese Regeln leiten das Modell; kein Assistent kann versprechen, nie abzuschweifen."
+    "note": "Begrüßungen, Dank und „Was kannst du?“ sind immer in Ordnung. Diese Regeln leiten das Modell; kein Assistent kann versprechen, nie abzuschweifen.",
+    "strictness": "Wie streng",
+    "guide": "Leiten",
+    "guideHint": "Die Regeln stehen vor allen Anweisungen. Am schnellsten; gut für die eigenen Leute.",
+    "enforce": "Durchsetzen",
+    "enforceHint": "Prüft außerdem jede Nachricht vor der Antwort und jede Antwort, bevor sie erscheint, und schickt bei allem anderen die festgelegte Antwort. Für die Öffentlichkeit und Chat-Portale."
   }
 }

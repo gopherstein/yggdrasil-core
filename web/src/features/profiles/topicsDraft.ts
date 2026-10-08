@@ -6,6 +6,8 @@ export interface TopicsDraft {
   examples: string
   never: string
   reply: string
+  /** Guide gives the rules only; Enforce also checks each message and answer. */
+  strict: 'guide' | 'enforce'
 }
 
 export function topicsDraft(t?: TopicPolicy): TopicsDraft {
@@ -14,6 +16,7 @@ export function topicsDraft(t?: TopicPolicy): TopicsDraft {
     examples: (t?.examples ?? []).join('\n'),
     never: (t?.never_discuss ?? []).join('\n'),
     reply: t?.off_topic_reply ?? '',
+    strict: t?.strictness === 'enforce' ? 'enforce' : 'guide',
   }
 }
 
@@ -23,8 +26,8 @@ const lines = (s: string) =>
     .map((l) => l.trim())
     .filter(Boolean)
 
-/** The topic controls to save, keeping the profile's strictness, or undefined for none. */
-export function topicsFrom(d: TopicsDraft, strictness?: TopicPolicy['strictness']): TopicPolicy | undefined {
+/** The topic controls to save, or undefined for none. */
+export function topicsFrom(d: TopicsDraft): TopicPolicy | undefined {
   const staysOn = d.staysOn.trim()
   if (!staysOn) return undefined
   const out: TopicPolicy = { stays_on: staysOn }
@@ -33,6 +36,6 @@ export function topicsFrom(d: TopicsDraft, strictness?: TopicPolicy['strictness'
   if (examples.length) out.examples = examples
   if (never.length) out.never_discuss = never
   if (d.reply.trim()) out.off_topic_reply = d.reply.trim()
-  if (strictness) out.strictness = strictness
+  if (d.strict === 'enforce') out.strictness = 'enforce'
   return out
 }

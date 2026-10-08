@@ -453,7 +453,10 @@
       "drafted": "工作者先擬好了回答",
       "partsParallel_other": "並行處理了 {{count}} 個部分",
       "partsInOrder_other": "依序處理了 {{count}} 個部分",
-      "lookedUp": "先在網路上查詢"
+      "lookedUp": "先在網路上查詢",
+      "topicHeld": "離題：未回答，已傳送設定的回覆",
+      "topicReplaced": "回答偏離了主題，已改為傳送設定的回覆",
+      "topicUnchecked": "主題檢查沒有結果，因此只套用了規則"
     }
   },
   "notices": {
@@ -561,5 +564,8 @@
   "help": {
     "mcpTools": "MCP 本身不需要安裝：Toskar 已經支援它。要新增 MCP 伺服器的工具，請開啟 **{{tools}} → {{addTools}}**，然後從四種方式中擇一：\n\n- **圖庫：** 選擇一個伺服器，例如資料夾、瀏覽器、Notion、Linear 或 GitHub，最多回答一兩個問題。需要登入的服務會開啟登入視窗。\n- **貼上：** 貼上伺服器說明中的內容：適用於 Claude Desktop、Cursor 或 VS Code 的 JSON、一行指令、一行 `claude mcp add` 或一個網址。\n- **從其他應用程式匯入：** 新增你已在 Claude Desktop、Claude Code、Cursor、VS Code、Windsurf、Gemini CLI 或 LM Studio 中設定好的伺服器。\n- **自訂：** 一個要執行的指令或一個網址。\n\nToskar 會先連線到伺服器並列出其工具，然後才儲存。在這台電腦上執行的伺服器需要 Node.js 或 uv；缺少時錯誤訊息會說明缺哪一個。會變更內容的工具會先徵求你的同意。",
     "mcpServer": "要在 Claude Desktop、Claude Code、Cursor、VS Code 或其他支援 MCP 的應用程式中使用 Toskar，請開啟 **{{apiAccess}} → {{useElsewhere}}**。那裡會顯示要貼到每個應用程式中的內容。之後該應用程式就能向你的本機 AI 提問、列出其模型，並搜尋你連結的知識。"
+  },
+  "topics": {
+    "offTopic": "這裡幫不了這個忙。還有什麼可以幫你的嗎？"
   }
 }

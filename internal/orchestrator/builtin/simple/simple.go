@@ -70,7 +70,7 @@ func (o *Orchestrator) Run(
 	profile contracts.AIProfile,
 	env pluginapi.ExecutionEnvironment,
 ) (<-chan pluginapi.OrchestrationEvent, error) {
-	role := pickRole(profile.Roles)
+	role := PickRole(profile.Roles)
 	ch := make(chan pluginapi.OrchestrationEvent, 8)
 	go func() {
 		defer close(ch)
@@ -444,6 +444,11 @@ func (o *Orchestrator) Run(
 			if strat.team && escalate {
 				answer = reviewAnswer(ctx, env, ch, reviewerRole(profile, role), task.Prompt, answer, evidence)
 			}
+			// The environment's own check comes last, so nothing rewrites
+			// what it allowed (#345).
+			if c, ok := env.(pluginapi.AnswerCheck); ok && ctx.Err() == nil {
+				answer = c.CheckAnswer(ctx, reviewerRole(profile, role), task.Prompt, answer)
+			}
 			// An answer that says it changed something, when nothing that
 			// changes things ran, is called out (§24; found by §64).
 			if !changed && huginn.ClaimsAction(answer) {
@@ -593,7 +598,8 @@ func userVisibleReply(content string) string {
 	return tools.VisibleText(content)
 }
 
-func pickRole(roles []contracts.ModelRole) string {
+// PickRole is the role that answers: the first required one, else the first.
+func PickRole(roles []contracts.ModelRole) string {
 	for _, r := range roles {
 		if r.Required && r.Role != "" {
 			return r.Role

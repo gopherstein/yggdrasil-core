@@ -466,7 +466,10 @@
       "partsParallel_other": "{{count}} Teile parallel bearbeitet",
       "partsInOrder_one": "{{count}} Teil bearbeitet",
       "partsInOrder_other": "{{count}} Teile nacheinander bearbeitet",
-      "lookedUp": "Zuerst im Web nachgeschlagen"
+      "lookedUp": "Zuerst im Web nachgeschlagen",
+      "topicHeld": "Außerhalb des Themas: festgelegte Antwort ohne Beantwortung gesendet",
+      "topicReplaced": "Die Antwort wich vom Thema ab, daher wurde stattdessen die festgelegte Antwort gesendet",
+      "topicUnchecked": "Die Themenprüfung ergab nichts, daher galten nur die Regeln"
     }
   },
   "notices": {
@@ -587,5 +590,8 @@
   "help": {
     "mcpTools": "Für MCP selbst musst du nichts installieren: Toskar beherrscht es bereits. Um die Werkzeuge eines MCP-Servers hinzuzufügen, öffne **{{tools}} → {{addTools}}** und wähle einen von vier Wegen:\n\n- **Galerie:** Wähle einen Server, etwa Ordner, einen Browser, Notion, Linear oder GitHub, und beantworte höchstens ein, zwei Fragen. Dienste mit Anmeldung öffnen eine.\n- **Einfügen:** Füge ein, was die Anleitung des Servers sagt: JSON für Claude Desktop, Cursor oder VS Code, eine Befehlszeile, eine `claude mcp add`-Zeile oder eine Webadresse.\n- **Aus deinen anderen Apps:** Übernimm Server, die du schon in Claude Desktop, Claude Code, Cursor, VS Code, Windsurf, Gemini CLI oder LM Studio eingerichtet hast.\n- **Eigener:** Ein Befehl zum Ausführen oder eine Webadresse.\n\nToskar verbindet sich und listet die Werkzeuge des Servers, bevor es ihn speichert. Server auf diesem Computer brauchen Node.js oder uv; die Fehlermeldung sagt, was fehlt. Werkzeuge, die etwas ändern, fragen dich vorher.",
     "mcpServer": "Um Toskar aus Claude Desktop, Claude Code, Cursor, VS Code oder einer anderen MCP-fähigen App zu nutzen, öffne **{{apiAccess}} → {{useElsewhere}}**. Dort steht, was du in jede App einfügst. Die App kann dann deine lokale KI fragen, ihre Modelle auflisten und dein verbundenes Wissen durchsuchen."
+  },
+  "topics": {
+    "offTopic": "Dabei kann ich hier nicht helfen. Wobei kann ich dir sonst helfen?"
   }
 }
