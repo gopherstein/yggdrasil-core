@@ -403,5 +403,21 @@
     "open": "在電腦上打開 Toskar：Toskar App，或在瀏覽器中打開 http://localhost:7331。",
     "choose": "打開「電腦」，然後選擇「連接裝置」。",
     "code": "回到這裡，選擇那台電腦，輸入它顯示的 6 位代碼。"
+  },
+  "report": {
+    "action": "檢舉此回答",
+    "title": "檢舉此回答",
+    "lede": "告訴 Yeix 這個回答有什麼問題。郵件 App 會帶著檢舉內容開啟，你可以看到將要傳送的全部內容。",
+    "reason": "有什麼問題？",
+    "reasons": {
+      "offensive": "冒犯或有害",
+      "wrong": "錯誤或誤導",
+      "other": "其他"
+    },
+    "note": "補充說明（選填）",
+    "send": "在郵件中繼續",
+    "subject": "Toskar：被檢舉的回答（{{reason}}）",
+    "body": "原因：{{reason}}\n模型：{{model}}\n備註：{{note}}\n\n回答：\n{{answer}}",
+    "noMail": "尚未設定郵件 App。請將檢舉內容傳送到 {{email}}。"
   }
 }

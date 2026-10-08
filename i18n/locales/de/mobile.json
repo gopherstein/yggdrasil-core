@@ -407,5 +407,21 @@
     "open": "Öffne Toskar auf dem Computer: die Toskar-App oder http://localhost:7331 in seinem Browser.",
     "choose": "Öffne „Computer“ und wähle „Gerät verbinden“.",
     "code": "Wähle dann hier den Computer und gib den 6-stelligen Code ein, den er zeigt."
+  },
+  "report": {
+    "action": "Diese Antwort melden",
+    "title": "Diese Antwort melden",
+    "lede": "Sag Yeix, was an dieser Antwort nicht stimmt. Deine E-Mail-App öffnet sich mit der Meldung, damit du genau siehst, was gesendet wird.",
+    "reason": "Was stimmt nicht?",
+    "reasons": {
+      "offensive": "Anstößig oder schädlich",
+      "wrong": "Falsch oder irreführend",
+      "other": "Etwas anderes"
+    },
+    "note": "Ergänzungen (optional)",
+    "send": "In E-Mail fortfahren",
+    "subject": "Toskar: gemeldete Antwort ({{reason}})",
+    "body": "Grund: {{reason}}\nModell: {{model}}\nNotiz: {{note}}\n\nAntwort:\n{{answer}}",
+    "noMail": "Es ist keine E-Mail-App eingerichtet. Sende die Meldung an {{email}}."
   }
 }

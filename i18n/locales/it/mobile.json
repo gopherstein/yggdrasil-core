@@ -411,5 +411,21 @@
     "open": "Apri Toskar sul computer: l'app Toskar oppure http://localhost:7331 nel suo browser.",
     "choose": "Apri Computer e scegli Collega un dispositivo.",
     "code": "Poi, qui, scegli il computer e inserisci il codice di 6 cifre che mostra."
+  },
+  "report": {
+    "action": "Segnala questa risposta",
+    "title": "Segnala questa risposta",
+    "lede": "Di' a Yeix cosa non va in questa risposta. La tua app di posta si apre con la segnalazione, così vedi esattamente cosa viene inviato.",
+    "reason": "Cosa non va?",
+    "reasons": {
+      "offensive": "Offensiva o dannosa",
+      "wrong": "Errata o fuorviante",
+      "other": "Altro"
+    },
+    "note": "Altro da aggiungere (facoltativo)",
+    "send": "Continua nell'email",
+    "subject": "Toskar: risposta segnalata ({{reason}})",
+    "body": "Motivo: {{reason}}\nModello: {{model}}\nNota: {{note}}\n\nRisposta:\n{{answer}}",
+    "noMail": "Non è configurata nessuna app di posta. Invia la segnalazione a {{email}}."
   }
 }
