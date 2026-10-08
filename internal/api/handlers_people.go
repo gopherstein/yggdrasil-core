@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/yeixio/toskar-core/internal/auth"
+	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
 // Signing in and people (#206). A person signs in with a username and
@@ -26,6 +27,7 @@ var (
 
 func (s *Server) peopleRoutes(api *mux.Router) {
 	api.HandleFunc("/me", s.handleMe).Methods(http.MethodGet)
+	api.HandleFunc("/me/preferences", s.handleMyPreferences).Methods(http.MethodPatch)
 	api.HandleFunc("/session", s.handleSignIn).Methods(http.MethodPost)
 	api.HandleFunc("/session", s.handleSignOut).Methods(http.MethodDelete)
 	api.HandleFunc("/invites/{token}", s.handlePeekInvite).Methods(http.MethodGet)
@@ -45,6 +47,46 @@ func (s *Server) atLeast(min auth.Role, h http.HandlerFunc) http.HandlerFunc {
 		}
 		h(w, r)
 	}
+}
+
+// myPreferences are the settings each person keeps for themselves (#206).
+var myPreferences = map[string]bool{"ui_locale": true, "assistant_language_mode": true, "assistant_language": true}
+
+// handleMyPreferences saves the request's person's own App language and
+// assistant language, whatever their role, and answers with their
+// settings.
+func (s *Server) handleMyPreferences(w http.ResponseWriter, r *http.Request) {
+	if s.deps.UpdateSettings == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Settings are not available.", nil)
+		return
+	}
+	var in map[string]any
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 16<<10)).Decode(&in); err != nil {
+		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "Request body must be JSON.", nil)
+		return
+	}
+	patch := map[string]any{}
+	for k, v := range in {
+		if !myPreferences[k] {
+			writeErr(w, http.StatusBadRequest, "INVALID_SETTING", "Only ui_locale, assistant_language_mode, and assistant_language are your own.", map[string]any{"setting": k})
+			return
+		}
+		if _, ok := v.(string); !ok {
+			writeErr(w, http.StatusBadRequest, "INVALID_SETTING", "Each preference is a string.", map[string]any{"setting": k})
+			return
+		}
+		patch[k] = v
+	}
+	view, err := s.deps.UpdateSettings(r.Context(), patch)
+	if err != nil {
+		if code, _ := contracts.ErrorCode(err); code != "" {
+			writeErrFrom(w, http.StatusBadRequest, code, err)
+			return
+		}
+		writeErr(w, http.StatusInternalServerError, "SETTINGS_UPDATE_FAILED", "Could not update settings.", map[string]any{"cause": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusOK, view)
 }
 
 func (s *Server) signInReady(w http.ResponseWriter) bool {

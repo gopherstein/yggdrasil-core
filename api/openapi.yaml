@@ -266,6 +266,35 @@ paths:
                     enum: [this_computer, api_key, session]
                   key_id:
                     type: string
+  /api/v1/me/preferences:
+    patch:
+      summary: Save your own languages (#206)
+      description: The request's person's App language and assistant language, whatever their role. The Owner's are the install's, which others start from until they choose. Answers with the person's settings.
+      operationId: setMyPreferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                ui_locale:
+                  type: string
+                assistant_language_mode:
+                  type: string
+                  enum: [auto, app, language]
+                assistant_language:
+                  type: string
+      responses:
+        "200":
+          description: The person's settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettingsView"
+        "400":
+          description: A setting that isn't the person's own, or an invalid value
   /api/v1/tls:
     get:
       summary: How the API speaks HTTPS on the local network (#213)

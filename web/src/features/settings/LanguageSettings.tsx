@@ -13,7 +13,7 @@ export function LanguageSettings() {
   const settings = useQuery({ queryKey: ['settings'], queryFn: () => api.getSettings(), retry: false })
   const saved = settings.data?.ui_locale ?? ''
   const save = useMutation({
-    mutationFn: (uiLocale: string) => api.updateSettings({ ui_locale: uiLocale }),
+    mutationFn: (uiLocale: string) => api.setMyPreferences({ ui_locale: uiLocale }),
     onSuccess: async (_, uiLocale) => {
       await applyLanguage(uiLocale)
       await queryClient.invalidateQueries({ queryKey: ['settings'] })

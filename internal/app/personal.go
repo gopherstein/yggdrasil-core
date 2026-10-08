@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"github.com/yeixio/toskar-core/internal/auth"
 
 	"github.com/yeixio/toskar-core/internal/personal"
 )
@@ -12,12 +13,9 @@ const personalKey = "personalization"
 
 // PersonalStyle returns how the person likes answers (spec §38).
 func (a *App) PersonalStyle(ctx context.Context) (personal.Style, error) {
-	if a.Settings == nil {
+	raw := a.personalString(ctx, personalKey, "")
+	if raw == "" {
 		return personal.Style{}, nil
-	}
-	raw, err := a.Settings.GetString(ctx, personalKey, "")
-	if err != nil || raw == "" {
-		return personal.Style{}, err
 	}
 	var s personal.Style
 	if err := json.Unmarshal([]byte(raw), &s); err != nil {
@@ -37,7 +35,50 @@ func (a *App) SetPersonalStyle(ctx context.Context, s personal.Style) (personal.
 	if err != nil {
 		return personal.Style{}, err
 	}
-	return s, a.Settings.Set(ctx, personalKey, string(raw))
+	return s, a.setPersonal(ctx, personalKey, string(raw))
+}
+
+// Each person keeps their own App language, assistant language, and
+// personalization (#206). The Owner's are the install's, which everyone
+// else starts from until they choose their own, and which notifications
+// and the desktop use.
+var personalKeys = map[string]bool{
+	"ui_locale":               true,
+	"assistant_language_mode": true,
+	"assistant_language":      true,
+	personalKey:               true,
+}
+
+// personalSettingKey is where ctx's person keeps key.
+func personalSettingKey(ctx context.Context, key string) string {
+	if id := auth.PersonID(ctx); personalKeys[key] && id != "" && id != auth.OwnerID {
+		return key + "@" + id
+	}
+	return key
+}
+
+// personalString is ctx's person's value for key, or the Owner's while
+// they haven't chosen one, or def. A choice of "" (such as the system
+// language) is a choice too.
+func (a *App) personalString(ctx context.Context, key, def string) string {
+	if a.Settings == nil {
+		return def
+	}
+	if own := personalSettingKey(ctx, key); own != key {
+		if v, ok, err := a.Settings.Get(ctx, own); err == nil && ok {
+			if v == "" {
+				return def
+			}
+			return v
+		}
+	}
+	v, _ := a.Settings.GetString(ctx, key, def)
+	return v
+}
+
+// setPersonal saves ctx's person's value for key.
+func (a *App) setPersonal(ctx context.Context, key, value string) error {
+	return a.Settings.Set(ctx, personalSettingKey(ctx, key), value)
 }
 
 // personalBlock is the style as instructions for a turn, or "".

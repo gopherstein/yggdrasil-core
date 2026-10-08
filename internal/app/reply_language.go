@@ -22,9 +22,9 @@ import (
 func (a *App) replyLanguage(ctx context.Context, conversationID, message, response string) replylang.Decision {
 	in := replylang.Input{Mode: replylang.ModeAuto, Message: message, System: systemLanguage()}
 	if a.Settings != nil {
-		in.Mode, _ = a.Settings.GetString(ctx, "assistant_language_mode", replylang.ModeAuto)
-		in.Setting, _ = a.Settings.GetString(ctx, "assistant_language", "")
-		in.App, _ = a.Settings.GetString(ctx, "ui_locale", "")
+		in.Mode = a.personalString(ctx, "assistant_language_mode", replylang.ModeAuto)
+		in.Setting = a.personalString(ctx, "assistant_language", "")
+		in.App = a.personalString(ctx, "ui_locale", "")
 	}
 	switch response {
 	case "", automations.ResponseAccount:
