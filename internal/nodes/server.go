@@ -59,6 +59,9 @@ type InternalDeps struct {
 	// Tools serves /internal/v1/tools/ for paired computers that run tools
 	// here (Gungnir §38).
 	Tools http.Handler
+	// Media serves /internal/v1/media/ for paired computers that set up
+	// image or video generation here (#153).
+	Media http.Handler
 
 	// JoinHello and Join answer the one-line join handshake (#40); they
 	// check the join token themselves.
@@ -115,6 +118,9 @@ func NewInternalServer(deps InternalDeps) *InternalServer {
 	}
 	if deps.Tools != nil {
 		api.PathPrefix("/tools/").Handler(http.StripPrefix("/internal/v1", deps.Tools))
+	}
+	if deps.Media != nil {
+		api.PathPrefix("/media/").Handler(http.StripPrefix("/internal/v1", deps.Media))
 	}
 
 	s.http = &http.Server{

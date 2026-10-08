@@ -22,9 +22,12 @@ export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onCon
   const continued = useRef(false)
   // The setup each installable ability uses.
   const kind: MediaKind | null = offer.ability === 'image_generation' ? 'images' : offer.ability === 'video_generation' ? 'video' : null
+  // A paired computer's setup is started and followed there (#153).
+  const nodeId = offer.remote ? offer.node_id : undefined
+  const statusKey = nodeId ? [kind ?? 'none', 'setup', nodeId] : [kind ?? 'none', 'setup']
   const statusQuery = useQuery({
-    queryKey: [kind ?? 'none', 'setup'],
-    queryFn: () => api.getMediaSetup(kind!),
+    queryKey: statusKey,
+    queryFn: () => api.getMediaSetup(kind!, nodeId),
     enabled: kind !== null,
     retry: false,
     refetchInterval: (query) => (query.state.data?.job?.running ? 1000 : false),
@@ -44,14 +47,30 @@ export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onCon
   if (!kind || !status) return null
 
   const where = offer.node_name ? `${offer.node_name} (${t('setup.thisComputer')})` : t('setup.thisComputer')
+  const details =
+    offer.remote && offer.node_name
+      ? offer.free_bytes
+        ? t('setup.detailsRemote', { name: offer.name, size: gb(offer.size_bytes), node: offer.node_name, free: gb(offer.free_bytes) })
+        : t('setup.details', { name: offer.name, size: gb(offer.size_bytes), node: offer.node_name })
+      : t('setup.details', { name: offer.name, size: gb(offer.size_bytes), node: where })
+  // Slow or tight is said of the computer that would make them.
+  const there = offer.remote ? offer.node_name : undefined
   const percent = job && job.total_bytes > 0 ? Math.round((job.done_bytes / job.total_bytes) * 100) : 0
   const failed = error ?? (job && !job.running ? job.error : undefined)
 
   return (
     <div className="mt-3 space-y-2 rounded-xl border border-line/70 bg-surface px-3 py-2.5 text-sm">
       {/* Said before it's set up: it will be slow here, or may fail. */}
-      {!ready && offer.tight_memory ? <p className="text-xs text-warning">{t('setup.tightMemory')}</p> : null}
-      {!ready && offer.slow ? <p className="text-xs text-ink-muted">{kind === 'video' ? t('setup.slowVideo') : t('setup.slowImage')}</p> : null}
+      {!ready && offer.tight_memory ? (
+        <p className="text-xs text-warning">{there ? t('setup.tightMemoryOn', { node: there }) : t('setup.tightMemory')}</p>
+      ) : null}
+      {!ready && offer.slow ? (
+        <p className="text-xs text-ink-muted">
+          {there
+            ? t(kind === 'video' ? 'setup.slowVideoOn' : 'setup.slowImageOn', { node: there })
+            : t(kind === 'video' ? 'setup.slowVideo' : 'setup.slowImage')}
+        </p>
+      ) : null}
       {ready ? (
         <div className="flex flex-wrap items-center gap-2">
           <span>{started && offer.request ? t('setup.continuing') : t('setup.ready', { label: offer.label })}</span>
@@ -72,7 +91,7 @@ export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onCon
             <button
               type="button"
               className="text-xs text-ink-faint underline-offset-2 hover:text-ink hover:underline"
-              onClick={() => void api.cancelMediaSetup(kind).then(() => statusQuery.refetch())}
+              onClick={() => void api.cancelMediaSetup(kind, nodeId).then(() => statusQuery.refetch())}
             >
               {t('setup.stop')}
             </button>
@@ -83,18 +102,16 @@ export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onCon
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <span className="min-w-0 flex-1 text-xs text-ink-muted">
-            {t('setup.details', { name: offer.name, size: gb(offer.size_bytes), node: where })}
-          </span>
+          <span className="min-w-0 flex-1 text-xs text-ink-muted">{details}</span>
           <button
             type="button"
             className="btn-primary px-3 py-1.5 text-xs"
             onClick={async () => {
               setError(null)
               try {
-                const next = await api.startMediaSetup(kind, offer.option)
+                const next = await api.startMediaSetup(kind, offer.option, nodeId)
                 setStarted(true)
-                if (next) queryClient.setQueryData([kind, 'setup'], next)
+                if (next) queryClient.setQueryData(statusKey, next)
                 else void statusQuery.refetch()
               } catch (err) {
                 setError(err instanceof Error ? err.message : String(err))

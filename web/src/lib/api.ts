@@ -488,6 +488,12 @@ async function readChatStream({
   onDone?.()
 }
 
+/** A setup route, on a paired computer when nodeId is set. */
+function mediaSetupPath(kind: MediaKind, nodeId?: string): string {
+  const path = `/api/v1/${kind}/setup`
+  return nodeId ? `${path}?node_id=${encodeURIComponent(nodeId)}` : path
+}
+
 export const api = {
   getHealth: () => request<HealthResponse>('/api/v1/health'),
 
@@ -836,15 +842,15 @@ export const api = {
       body: JSON.stringify({ text, conversation_id: conversationId }),
     }),
 
-  /** What image (images) or video generation has installed, and any setup in progress. */
-  getMediaSetup: (kind: MediaKind) => request<ImageSetup>(`/api/v1/${kind}/setup`),
+  /** What image (images) or video generation has installed, and any setup in progress; on a paired computer with nodeId (#153). */
+  getMediaSetup: (kind: MediaKind, nodeId?: string) => request<ImageSetup>(mediaSetupPath(kind, nodeId)),
 
-  /** Install stable-diffusion.cpp and a model of that kind in the background. */
-  startMediaSetup: (kind: MediaKind, modelId: string) =>
-    request<ImageSetup>(`/api/v1/${kind}/setup`, { method: 'POST', body: JSON.stringify({ model_id: modelId }) }),
+  /** Install stable-diffusion.cpp and a model of that kind in the background, here or on a paired computer. */
+  startMediaSetup: (kind: MediaKind, modelId: string, nodeId?: string) =>
+    request<ImageSetup>(mediaSetupPath(kind, nodeId), { method: 'POST', body: JSON.stringify({ model_id: modelId }) }),
 
   /** Stop the setup; what was downloaded is kept. */
-  cancelMediaSetup: (kind: MediaKind) => request<ImageSetup>(`/api/v1/${kind}/setup`, { method: 'DELETE' }),
+  cancelMediaSetup: (kind: MediaKind, nodeId?: string) => request<ImageSetup>(mediaSetupPath(kind, nodeId), { method: 'DELETE' }),
 
   /** Switch stable-diffusion.cpp to its CPU build, or back to its GPU build; images and video share it (#154). */
   useMediaBuild: (kind: MediaKind, build: 'gpu' | 'cpu') =>

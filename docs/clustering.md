@@ -131,6 +131,8 @@ Stop closes the connection, which stops the work on the other computer. Each job
 
 `GET /internal/v1/tools/providers` is what a computer can run. It is asked at most every 30 seconds per computer, and again after a failed call. A computer whose Toskar predates remote tools answers 404 and is listed as needing a newer Toskar. Diagnostics → **Tools on each computer** shows every computer's providers and their state: Ready (healthy), Installing, Failed, or Not set up (unavailable). `GET /api/v1/tools/providers` returns the same list.
 
+**Setting tools up on another computer:** `GET`, `POST {model_id}`, and `DELETE /internal/v1/media/{kind}/setup` (`kind` is `images` or `video`) read, start, and stop a computer's image or video setup for a paired computer, with its free disk space, so a chat on a laptop can offer and follow the setup on a workstation ([guided installation](capabilities.md#guided-installation)). The app reaches it through `?node_id=` on its own setup routes. When the setup there is ready, its tools are asked again at once, so the request sent next runs there.
+
 A manual pass is written up in [two-machine-team-demo.md](two-machine-team-demo.md). Continuous integration does not run that pass on physical hardware. The Docker cluster check uses stub inference.
 
 ## Ports

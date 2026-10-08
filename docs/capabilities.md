@@ -33,11 +33,13 @@ A tool that is on but cannot run here yet, such as image generation before it is
 
 ### Guided installation
 
-When a missing ability can be installed, the inventory lists the setup (`setups`, and `setup` on the ability): what would be installed, its download size, and the computer it would run on. Today that is image generation, with the model recommended for this computer.
+When a missing ability can be installed, the inventory lists the setup (`setups`, and `setup` on the ability): what would be installed, its download size, and the computer it would run on. Today that is image and video generation, with the model recommended for the computer it would run on.
 
 A chat request that needs it, such as "Make me an image of a Viking tree", is answered by Toskar instead of the model. The answer says what is missing and what would be installed, and the answer's `setup` (client contract 1.2) carries the offer, which the app shows as a card:
 1. **Set up** starts the install.
 2. The card shows the download as it goes.
 3. When it is ready, the card sends the request again, so it is finished.
+
+**On a paired computer:** the offer picks the best computer among this one and the online paired computers that can set it up (#153). A computer whose GPU would do the work comes first, then one with memory to spare, and this computer when they're equal. A computer without the memory or the disk space for the model, with a gigabyte to spare, isn't offered. A laptop that would make pictures on its CPU is offered the workstation instead: "I can set it up on Workstation: FLUX.2 [klein] 4B, 5.2 GB to download. Its GPU will do the work. Workstation has 120 GB free." The card names the computer and its free space, starts the setup there, and shows its download. Once it's ready, the request runs there through [tools on other computers](clustering.md#tools-on-other-computers). Downloading to another computer is still the person's choice on the card. A paired computer running an older Toskar isn't offered. Paired computers' setups are remembered for 30 seconds; a request that needs a setup asks them again first.
 
 "Can you generate images?" gets the same card, without a request to finish. Offers appear only in chats in the app, and only when the chat's profile allows the tools the setup would add; an API caller gets the model's answer as before.

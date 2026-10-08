@@ -363,6 +363,10 @@
   },
   "setup": {
     "details": "{{name}} · descarga de {{size}} · en {{node}}",
+    "detailsRemote": "{{name}} · descarga de {{size}} · en {{node}} · {{free}} libres",
+    "tightMemoryOn": "{{node}} tiene menos memoria de la recomendada, así que puede ir lento o fallar.",
+    "slowImageOn": "{{node}} no tiene aceleración por GPU para esto, así que cada imagen tarda unos minutos.",
+    "slowVideoOn": "{{node}} no tiene aceleración por GPU para esto, así que un clip puede tardar casi una hora.",
     "thisComputer": "esta computadora",
     "install": "Configurar",
     "installing": "Instalando…",

@@ -461,6 +461,9 @@ export interface SetupOffer {
   slow?: boolean
   /** Less memory here than it's comfortable with, so it may be slow or fail (contract 1.12). */
   tight_memory?: boolean
+  /** node_id is a paired computer, set up there with ?node_id=, and free_bytes its free disk space (contract 1.14, #153). */
+  remote?: boolean
+  free_bytes?: number
 }
 
 /** A stored file: an attachment or a file the assistant produced. */
