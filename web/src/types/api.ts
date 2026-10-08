@@ -1778,10 +1778,18 @@ export interface EgressRecord {
   task_id?: string
 }
 
+/** Full-disk encryption of the data's disk (#213). */
+export interface DiskEncryption {
+  state: 'on' | 'off' | 'encrypting' | 'unknown'
+  method?: 'FileVault' | 'BitLocker' | 'LUKS'
+}
+
 export interface PrivacyOverview {
   /** Days run records are kept; 0 keeps them. */
   retention_days: number
   last_30_days: Partial<Record<EgressKind, number>>
+  /** Whether the disk holding Toskar's data is encrypted, and with what (#213). */
+  disk_encryption?: DiskEncryption
 }
 
 export interface RunRecordCounts {

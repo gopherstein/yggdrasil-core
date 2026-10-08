@@ -29,6 +29,7 @@ import (
 	"github.com/yeixio/toskar-core/internal/connectors"
 	"github.com/yeixio/toskar-core/internal/diagnostics"
 	"github.com/yeixio/toskar-core/internal/discovery"
+	"github.com/yeixio/toskar-core/internal/diskcrypt"
 	"github.com/yeixio/toskar-core/internal/egress"
 	"github.com/yeixio/toskar-core/internal/events"
 	"github.com/yeixio/toskar-core/internal/gjallarhorn"
@@ -1601,7 +1602,11 @@ func (a *App) exportDiagnostics(ctx context.Context, includeConversations bool) 
 	path := diagnostics.DefaultBundlePath(cfg)
 	var hwJSON []byte
 	if inv, err := a.hw.Detect(ctx); err == nil {
-		hwJSON, _ = json.MarshalIndent(inv, "", "  ")
+		// With whether the data's disk is encrypted (#213).
+		hwJSON, _ = json.MarshalIndent(struct {
+			contracts.HardwareInventory
+			DiskEncryption diskcrypt.Status `json:"disk_encryption"`
+		}{inv, diskcrypt.Detect(ctx, cfg.DataDir)}, "", "  ")
 	}
 	if err := diagnostics.WriteBundle(path, diagnostics.Options{
 		IncludeConversations: includeConversations,

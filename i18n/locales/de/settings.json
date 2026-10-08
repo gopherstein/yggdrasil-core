@@ -176,7 +176,12 @@
       "stored": "Deine Chats, Erinnerungen, Wissensquellen, Dateien und spezialisierten KIs werden auf diesem Computer gespeichert, im Datenordner von Toskar. Es gibt kein Toskar-Konto und keine Cloud, und es werden keine Nutzungsdaten an irgendwen gesendet.",
       "leaves": "Etwas verlässt diesen Computer nur, wenn du eine Funktion nutzt, die online geht, etwa eine Websuche, einen verbundenen Dienst oder einen gekoppelten Computer. Jedes Mal steht unten unter „Was diesen Computer verlassen hat“.",
       "atRest": "Toskar verschlüsselt seine eigenen Dateien nicht und verlangt das auch nicht. Damit sie verschlüsselt sind, während der Computer aus oder gesperrt ist, schalte die Festplattenverschlüsselung ein: FileVault unter macOS, BitLocker unter Windows oder LUKS unter Linux.",
-      "inTransit": "Websites und Onlinedienste werden über verschlüsselte HTTPS-Verbindungen erreicht. Der Verkehr zwischen deinen eigenen Computern und von anderen Geräten in deinem Netzwerk zu diesem ist noch nicht verschlüsselt. Nutze diese Funktionen daher nur in einem Netzwerk, dem du vertraust."
+      "inTransit": "Websites und Onlinedienste werden über verschlüsseltes HTTPS erreicht. Auch der Verkehr zwischen deinen eigenen Computern ist verschlüsselt, und andere Geräte in deinem Netzwerk erreichen diesen über HTTPS. Ein Computer mit einem älteren Toskar wird auf der Seite Computer als Nicht verschlüsselt angezeigt.",
+      "atRestOn": "Deine Festplatte ist mit {{method}} verschlüsselt, daher bleiben diese Dateien verschlüsselt, während der Computer aus oder gesperrt ist.",
+      "atRestEncrypting": "Deine Festplatte wird gerade mit {{method}} verschlüsselt. Danach bleiben diese Dateien verschlüsselt, während der Computer aus oder gesperrt ist.",
+      "atRestOffFileVault": "Deine Festplatte ist nicht verschlüsselt, daher kann jeder, der diesen Computer hat, diese Dateien lesen. Schalte FileVault unter Systemeinstellungen → Datenschutz & Sicherheit ein.",
+      "atRestOffBitLocker": "Deine Festplatte ist nicht verschlüsselt, daher kann jeder, der diesen Computer hat, diese Dateien lesen. Schalte die Geräteverschlüsselung unter Einstellungen → Datenschutz und Sicherheit ein oder BitLocker in der Systemsteuerung.",
+      "atRestOffLUKS": "Deine Festplatte ist nicht verschlüsselt, daher kann jeder, der diesen Computer hat, diese Dateien lesen. Unter Linux wird die Festplattenverschlüsselung (LUKS) meist bei der Installation gewählt; die Anleitung deiner Distribution erklärt, wie du sie hinzufügst."
     }
   },
   "whatLeft": {

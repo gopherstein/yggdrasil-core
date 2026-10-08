@@ -176,7 +176,12 @@
       "stored": "Vos conversations, souvenirs, connaissances, fichiers et IA spécialisées sont stockés sur cet ordinateur, dans le dossier de données de Toskar. Il n'y a ni compte Toskar ni cloud, et aucune donnée d'utilisation n'est envoyée à qui que ce soit.",
       "leaves": "Quelque chose quitte cet ordinateur seulement quand vous utilisez une fonction qui va en ligne, comme une recherche web, un service connecté ou un ordinateur associé. Chaque fois est listée ci-dessous, dans Ce qui a quitté cet ordinateur.",
       "atRest": "Toskar ne chiffre pas ses propres fichiers et ne vous oblige pas à le faire. Pour qu'ils restent chiffrés quand l'ordinateur est éteint ou verrouillé, activez le chiffrement du disque : FileVault sur macOS, BitLocker sur Windows ou LUKS sur Linux.",
-      "inTransit": "Les sites web et services en ligne sont joints par des connexions HTTPS chiffrées. Le trafic entre vos propres ordinateurs, et des autres appareils de votre réseau vers celui-ci, n'est pas encore chiffré : utilisez ces fonctions uniquement sur un réseau de confiance."
+      "inTransit": "Les sites web et services en ligne sont joints en HTTPS chiffré. Le trafic entre vos propres ordinateurs est aussi chiffré, et les autres appareils de votre réseau peuvent joindre celui-ci en HTTPS. Un ordinateur avec un Toskar plus ancien apparaît comme Non chiffré sur la page Ordinateurs.",
+      "atRestOn": "Votre disque est chiffré avec {{method}} : ces fichiers restent chiffrés quand l’ordinateur est éteint ou verrouillé.",
+      "atRestEncrypting": "Votre disque est en cours de chiffrement avec {{method}}. Une fois terminé, ces fichiers resteront chiffrés quand l’ordinateur est éteint ou verrouillé.",
+      "atRestOffFileVault": "Votre disque n’est pas chiffré : toute personne qui a cet ordinateur peut lire ces fichiers. Activez FileVault dans Réglages Système → Confidentialité et sécurité.",
+      "atRestOffBitLocker": "Votre disque n’est pas chiffré : toute personne qui a cet ordinateur peut lire ces fichiers. Activez le chiffrement de l’appareil dans Paramètres → Confidentialité et sécurité, ou BitLocker dans le Panneau de configuration.",
+      "atRestOffLUKS": "Votre disque n’est pas chiffré : toute personne qui a cet ordinateur peut lire ces fichiers. Sous Linux, le chiffrement du disque (LUKS) se choisit généralement à l’installation ; le guide de votre distribution explique comment l’ajouter."
     }
   },
   "whatLeft": {
