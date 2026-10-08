@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/yeixio/toskar-core/internal/diskcrypt"
 	"github.com/yeixio/toskar-core/internal/egress"
 	"github.com/yeixio/toskar-core/internal/retention"
 )
@@ -26,6 +27,9 @@ type PrivacyOverview struct {
 	RetentionDays int `json:"retention_days"`
 	// Last30Days counts what left this computer in the last 30 days, by kind.
 	Last30Days map[string]int `json:"last_30_days"`
+	// DiskEncryption is whether the disk holding Toskar's data is
+	// encrypted, and with what (#213).
+	DiskEncryption *diskcrypt.Status `json:"disk_encryption,omitempty"`
 }
 
 // BindPrivacy attaches the privacy routes.

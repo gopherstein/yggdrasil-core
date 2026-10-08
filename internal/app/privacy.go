@@ -7,6 +7,7 @@ import (
 
 	"github.com/yeixio/toskar-core/internal/api"
 	"github.com/yeixio/toskar-core/internal/cache"
+	"github.com/yeixio/toskar-core/internal/diskcrypt"
 	"github.com/yeixio/toskar-core/internal/egress"
 	"github.com/yeixio/toskar-core/internal/retention"
 )
@@ -36,7 +37,8 @@ func (a *App) PrivacyOverview(ctx context.Context) (api.PrivacyOverview, error) 
 	if err != nil {
 		return api.PrivacyOverview{}, err
 	}
-	return api.PrivacyOverview{RetentionDays: a.runRetentionDays(ctx), Last30Days: counts}, nil
+	disk := diskcrypt.Detect(ctx, a.Config.Get().DataDir)
+	return api.PrivacyOverview{RetentionDays: a.runRetentionDays(ctx), Last30Days: counts, DiskEncryption: &disk}, nil
 }
 
 // SetRunRetention sets how long run records are kept; 0 keeps them.

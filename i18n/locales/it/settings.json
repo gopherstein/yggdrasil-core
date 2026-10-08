@@ -176,7 +176,12 @@
       "stored": "Le tue chat, i ricordi, le conoscenze, i file e le IA specializzate sono salvati su questo computer, nella cartella dati di Toskar. Non c'è un account Toskar né un cloud, e nessun dato di utilizzo viene inviato a nessuno.",
       "leaves": "Qualcosa lascia questo computer solo quando usi una funzione che va online, come una ricerca web, un servizio collegato o un computer associato. Ogni volta è elencata qui sotto, in Cosa è uscito da questo computer.",
       "atRest": "Toskar non cifra i propri file e non ti chiede di farlo. Per tenerli cifrati quando il computer è spento o bloccato, attiva la cifratura del disco: FileVault su macOS, BitLocker su Windows o LUKS su Linux.",
-      "inTransit": "Siti web e servizi online vengono raggiunti tramite connessioni HTTPS cifrate. Il traffico tra i tuoi computer, e dagli altri dispositivi della tua rete verso questo, non è ancora cifrato: usa queste funzioni solo su una rete di cui ti fidi."
+      "inTransit": "Siti web e servizi online vengono raggiunti tramite HTTPS cifrato. Anche il traffico tra i tuoi computer è cifrato, e gli altri dispositivi della tua rete possono raggiungere questo tramite HTTPS. Un computer con un Toskar più vecchio compare come Non cifrato nella pagina Computer.",
+      "atRestOn": "Il tuo disco è cifrato con {{method}}, quindi questi file restano cifrati quando il computer è spento o bloccato.",
+      "atRestEncrypting": "Il tuo disco è in fase di cifratura con {{method}}. Al termine, questi file resteranno cifrati quando il computer è spento o bloccato.",
+      "atRestOffFileVault": "Il tuo disco non è cifrato, quindi chiunque abbia questo computer può leggere questi file. Attiva FileVault in Impostazioni di Sistema → Privacy e sicurezza.",
+      "atRestOffBitLocker": "Il tuo disco non è cifrato, quindi chiunque abbia questo computer può leggere questi file. Attiva la crittografia del dispositivo in Impostazioni → Privacy e sicurezza, o BitLocker nel Pannello di controllo.",
+      "atRestOffLUKS": "Il tuo disco non è cifrato, quindi chiunque abbia questo computer può leggere questi file. Su Linux la cifratura del disco (LUKS) si sceglie di solito durante l’installazione; la guida della tua distribuzione spiega come aggiungerla."
     }
   },
   "whatLeft": {
