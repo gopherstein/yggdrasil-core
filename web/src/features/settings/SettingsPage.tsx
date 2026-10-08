@@ -18,6 +18,7 @@ import { NotificationDestinations } from './NotificationDestinations'
 import { UpdateCheckSetting, UpdateNotice } from './Updates'
 import { WhatLeft } from './WhatLeft'
 import { YourData } from './YourData'
+import { YourAccount } from '@/features/people/YourAccount'
 import { Toggle } from '@/components/ui/Toggle'
 import { LanguageSettings } from './LanguageSettings'
 import { Personalization } from './Personalization'
@@ -241,6 +242,8 @@ export function SettingsPage() {
         <h1 className="page-title">{t('page.title')}</h1>
         <p className="page-subtitle">{t('page.subtitle')}</p>
       </header>
+
+      <YourAccount />
 
       {(settingsQuery.isLoading || versionQuery.isLoading) && (
         <LoadingSpinner label={t('page.loading')} />

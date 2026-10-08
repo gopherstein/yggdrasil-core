@@ -54,6 +54,7 @@ Chats and their messages, memories, files, and automations are private to their 
 - **Passwords:** at least 10 characters, hashed with argon2id (19 MiB, 2 passes). A wrong username and a wrong password take the same time and say the same: `SIGN_IN_FAILED`. Five misses for a username in 15 minutes, or twenty from an address in 10, answer `429 SIGN_IN_THROTTLED`.
 - **Changing people:** `PATCH /api/v1/people/{id}` (`name`, `role`, `disabled`). The Owner's role is fixed and they can't be disabled; nobody changes their own role or disables themselves; an Admin changes Members and Visitors only. Disabling signs the person out everywhere and stops their keys and automations.
 - **Phones:** a phone paired with a code gets the key of the person who showed the code.
+- **Network access:** turning on `lan_api_enabled` needs an API key, or a person other than the Owner who isn't disabled, since they sign in with a password or still have a link to; otherwise it answers `API_KEY_REQUIRED`. The app's People page (`/people`) adds people and shows their links, and `/invite/<token>` is the page a link opens.
 
 Role checks across the rest of the API follow.
 

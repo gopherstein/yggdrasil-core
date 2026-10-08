@@ -721,6 +721,44 @@ export interface APIKeyRecord {
 }
 
 /** A code a phone connects with (#216). */
+/** A role, from the most to the least (#206). */
+export type Role = 'owner' | 'admin' | 'member' | 'visitor'
+
+/** Someone who uses this Toskar. */
+export interface Person {
+  id: string
+  name: string
+  username?: string
+  role: Role
+  created_at: string
+  disabled_at?: string
+  /** True once they've chosen a username and password. */
+  sign_in: boolean
+}
+
+/** Who a request is from: GET /api/v1/me. */
+export interface Principal {
+  person: Person
+  /** this_computer, api_key, or session. */
+  via: 'this_computer' | 'api_key' | 'session' | 'system' | 'none' | string
+  key_id?: string
+}
+
+/** A one-time link to give a person: its page's path on this Toskar. */
+export interface PersonLink {
+  path: string
+  /** invite (choose a username and password) or reset (a new password). */
+  kind: 'invite' | 'reset'
+  expires_at: string
+}
+
+/** What an invite link is for, before it's used. */
+export interface InviteView {
+  name: string
+  kind: 'invite' | 'reset'
+  username?: string
+}
+
 /** How the API speaks HTTPS (#213): GET /api/v1/tls. */
 export interface APITLS {
   enabled: boolean

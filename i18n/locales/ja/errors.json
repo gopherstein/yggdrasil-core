@@ -1,7 +1,7 @@
 {
   "API_KEYS_LIST_FAILED": "{{detail}}",
   "API_KEY_IN_URL": "APIキーはアドレスではなく、Authorizationヘッダーで送信してください。",
-  "API_KEY_REQUIRED": "ほかのコンピュータからのアクセスを許可する前に、APIキーを作成してください。",
+  "API_KEY_REQUIRED": "ほかのデバイスからのアクセスを許可する前に、APIキーを作成するか人を追加してください。",
   "APPROVE_FAILED": "{{detail}}",
   "AUTOMATION_INVALID": "{{detail}}",
   "BAD_REQUEST": "{{detail}}",

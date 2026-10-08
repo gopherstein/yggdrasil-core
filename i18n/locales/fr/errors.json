@@ -1,7 +1,7 @@
 {
   "API_KEYS_LIST_FAILED": "{{detail}}",
   "API_KEY_IN_URL": "Envoyez la clé API dans l'en-tête Authorization, pas dans l'adresse.",
-  "API_KEY_REQUIRED": "Créez une clé API avant d'autoriser l'accès depuis d'autres ordinateurs.",
+  "API_KEY_REQUIRED": "Créez une clé API ou ajoutez une personne avant d'autoriser l'accès depuis d'autres appareils.",
   "APPROVE_FAILED": "{{detail}}",
   "AUTOMATION_INVALID": "{{detail}}",
   "BAD_REQUEST": "{{detail}}",

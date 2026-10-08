@@ -105,6 +105,11 @@ import type {
   GPUSetup,
   UpdatesStatus,
   APITLS,
+  Principal,
+  Person,
+  PersonLink,
+  InviteView,
+  Role,
 } from '@/types/api'
 import type { Upload } from '@/lib/upload'
 
@@ -498,6 +503,40 @@ function mediaSetupPath(kind: MediaKind, nodeId?: string): string {
 export const api = {
   /** How the API speaks HTTPS on the local network (#213). */
   getApiTLS: () => request<APITLS>('/api/v1/tls'),
+
+  /** Who this browser is (#206). */
+  getMe: () => request<Principal>('/api/v1/me'),
+
+  /** Sign this browser in with a username and password. */
+  signIn: (username: string, password: string) =>
+    request<Principal>('/api/v1/session', { method: 'POST', body: JSON.stringify({ username, password }) }),
+
+  /** Sign this browser out. */
+  signOut: () => request<void>('/api/v1/session', { method: 'DELETE' }),
+
+  /** What a one-time sign-in link is for. */
+  peekInvite: (token: string) => request<InviteView>(`/api/v1/invites/${encodeURIComponent(token)}`),
+
+  /** Use a one-time link: choose a username and password (or a new password) and sign in. */
+  acceptInvite: (token: string, username: string, password: string) =>
+    request<Principal>(`/api/v1/invites/${encodeURIComponent(token)}`, {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    }),
+
+  /** Everyone who uses this Toskar (Admins and the Owner). */
+  listPeople: () => request<Person[]>('/api/v1/people'),
+
+  /** Add a person; the answer has their one-time invite link. */
+  addPerson: (name: string, role: Role) =>
+    request<{ person: Person; link: PersonLink }>('/api/v1/people', { method: 'POST', body: JSON.stringify({ name, role }) }),
+
+  /** Rename, change the role of, disable, or enable a person. */
+  changePerson: (id: string, change: { name?: string; role?: Role; disabled?: boolean }) =>
+    request<Person>(`/api/v1/people/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(change) }),
+
+  /** A new one-time link for a person: an invite, or a reset once they have a sign-in. */
+  personLink: (id: string) => request<PersonLink>(`/api/v1/people/${encodeURIComponent(id)}/link`, { method: 'POST' }),
 
   getHealth: () => request<HealthResponse>('/api/v1/health'),
 

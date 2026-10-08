@@ -1,0 +1,73 @@
+{
+  "subtitle": "Wer dieses Toskar nutzt und was jede Person darf.",
+  "adminsOnly": "Nur Admins und der Eigentümer verwalten Personen.",
+  "you": "(du)",
+  "ownerNoSignIn": "Nutzt diesen Computer; noch keine Anmeldung für andere Geräte",
+  "notSignedIn": "Hat noch keinen Benutzernamen gewählt",
+  "disabled": "Deaktiviert",
+  "roleFor": "Rolle für {{name}}",
+  "signInLink": "Anmeldelink",
+  "newPasswordLink": "Link für neues Passwort",
+  "enable": "Aktivieren",
+  "disable": "Deaktivieren",
+  "everyone": "Alle",
+  "private": "Chats, Erinnerungen, Dateien und Automationen sind privat für die jeweilige Person, auch die des Eigentümers. Modelle, Tools, Wissen und Profile werden geteilt.",
+  "roles": {
+    "owner": "Eigentümer",
+    "admin": "Admin",
+    "member": "Mitglied",
+    "visitor": "Gast"
+  },
+  "add": {
+    "title": "Person hinzufügen",
+    "body": "Sie bekommt einen einmaligen Link, um Benutzername und Passwort zu wählen.",
+    "name": "Name",
+    "role": "Rolle",
+    "submit": "Hinzufügen",
+    "roleHint": {
+      "admin": "Admins verwalten Modelle, Tools, Computer und Personen außer Admins und dem Eigentümer.",
+      "member": "Mitglieder nutzen Toskar: ihre eigenen Chats, Erinnerungen, Dateien und Automationen.",
+      "visitor": "Gäste chatten, mehr nicht."
+    }
+  },
+  "link": {
+    "invite": "Schick {{name}} diesen Link, um Benutzername und Passwort zu wählen:",
+    "reset": "Schick {{name}} diesen Link, um ein neues Passwort zu wählen:",
+    "copy": "Link kopieren",
+    "copied": "Kopiert",
+    "expires": "Er funktioniert einmal, bis {{date}}.",
+    "lanOff": "Nur dieser Computer kann ihn öffnen, bis der Zugriff im lokalen Netzwerk eingeschaltet ist.",
+    "lanOffAction": "Unter API-Zugriff einschalten",
+    "done": "Fertig"
+  },
+  "invite": {
+    "loading": "Dein Link wird geöffnet …",
+    "goneTitle": "Dieser Link funktioniert nicht mehr",
+    "goneBody": "Er ist abgelaufen oder wurde schon verwendet. Bitte die Person, die ihn geschickt hat, um einen neuen.",
+    "title": "Willkommen, {{name}}",
+    "body": "Wähle einen Benutzernamen und ein Passwort, um dich bei diesem Toskar anzumelden.",
+    "resetTitle": "Ein neues Passwort für {{name}}",
+    "resetBody": "Wähle ein neues Passwort. Andere Geräte, die mit deinem Konto angemeldet sind, werden abgemeldet.",
+    "usernameHint": "3 bis 32 Buchstaben, Ziffern, Punkte, Bindestriche oder Unterstriche.",
+    "password": "Passwort",
+    "passwordHint": "Mindestens 10 Zeichen.",
+    "again": "Passwort wiederholen",
+    "mismatch": "Die Passwörter stimmen nicht überein.",
+    "submit": "Anmelden",
+    "resetSubmit": "Speichern und anmelden"
+  },
+  "signIn": {
+    "title": "Bei Toskar anmelden",
+    "body": "Dieses Toskar wird geteilt. Melde dich mit dem Benutzernamen und Passwort an, die du über deine Einladung gewählt hast.",
+    "username": "Benutzername",
+    "password": "Passwort",
+    "submit": "Anmelden",
+    "forgot": "Passwort vergessen? Bitte einen Admin oder den Eigentümer um einen Link für ein neues Passwort.",
+    "useKey": "Stattdessen einen API-Schlüssel verwenden"
+  },
+  "account": {
+    "label": "Dein Konto",
+    "signedInAs": "Angemeldet als {{name}} (@{{username}}), {{role}}.",
+    "signOut": "Abmelden"
+  }
+}

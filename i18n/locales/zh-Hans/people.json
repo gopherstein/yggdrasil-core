@@ -1,0 +1,73 @@
+{
+  "subtitle": "谁在使用这个 Toskar，以及每个人能做什么。",
+  "adminsOnly": "只有管理员和所有者可以管理人员。",
+  "you": "（你）",
+  "ownerNoSignIn": "使用这台电脑；尚未设置其他设备的登录",
+  "notSignedIn": "尚未选择用户名",
+  "disabled": "已停用",
+  "roleFor": "{{name}} 的角色",
+  "signInLink": "登录链接",
+  "newPasswordLink": "新密码链接",
+  "enable": "启用",
+  "disable": "停用",
+  "everyone": "所有人",
+  "private": "每个人的聊天、记忆、文件和自动化都只属于自己，所有者也一样。模型、工具、知识和配置文件是共享的。",
+  "roles": {
+    "owner": "所有者",
+    "admin": "管理员",
+    "member": "成员",
+    "visitor": "访客"
+  },
+  "add": {
+    "title": "添加人员",
+    "body": "对方会收到一个一次性链接，用来选择用户名和密码。",
+    "name": "名称",
+    "role": "角色",
+    "submit": "添加",
+    "roleHint": {
+      "admin": "管理员管理模型、工具、电脑，以及除管理员和所有者之外的人员。",
+      "member": "成员使用 Toskar：自己的聊天、记忆、文件和自动化。",
+      "visitor": "访客只能聊天。"
+    }
+  },
+  "link": {
+    "invite": "把这个链接发给 {{name}}，让对方选择用户名和密码：",
+    "reset": "把这个链接发给 {{name}}，让对方选择新密码：",
+    "copy": "复制链接",
+    "copied": "已复制",
+    "expires": "只能使用一次，有效期至 {{date}}。",
+    "lanOff": "在打开本地网络访问之前，只有这台电脑能打开它。",
+    "lanOffAction": "在 API 访问中打开",
+    "done": "完成"
+  },
+  "invite": {
+    "loading": "正在打开你的链接…",
+    "goneTitle": "此链接已失效",
+    "goneBody": "它已过期或已被使用。请向发送者索取新的链接。",
+    "title": "欢迎，{{name}}",
+    "body": "选择用户名和密码来登录这个 Toskar。",
+    "resetTitle": "为 {{name}} 设置新密码",
+    "resetBody": "请选择新密码。以你身份登录的其他设备将被退出登录。",
+    "usernameHint": "3 到 32 个字母、数字、点、短横线或下划线。",
+    "password": "密码",
+    "passwordHint": "至少 10 个字符。",
+    "again": "再次输入密码",
+    "mismatch": "两次输入的密码不一致。",
+    "submit": "登录",
+    "resetSubmit": "保存并登录"
+  },
+  "signIn": {
+    "title": "登录 Toskar",
+    "body": "这个 Toskar 是共享的。请用你通过邀请选择的用户名和密码登录。",
+    "username": "用户名",
+    "password": "密码",
+    "submit": "登录",
+    "forgot": "忘记密码？请向管理员或所有者索取新密码链接。",
+    "useKey": "改用 API 密钥"
+  },
+  "account": {
+    "label": "你的账户",
+    "signedInAs": "已登录为 {{name}}（@{{username}}），{{role}}。",
+    "signOut": "退出登录"
+  }
+}

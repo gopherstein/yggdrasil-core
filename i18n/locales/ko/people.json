@@ -1,0 +1,73 @@
+{
+  "subtitle": "이 Toskar를 쓰는 사람과 각자 할 수 있는 일이에요.",
+  "adminsOnly": "관리자와 소유자만 사람을 관리할 수 있어요.",
+  "you": "(나)",
+  "ownerNoSignIn": "이 컴퓨터를 사용 중이에요. 아직 다른 기기용 로그인은 없어요",
+  "notSignedIn": "아직 사용자 이름을 정하지 않았어요",
+  "disabled": "비활성화됨",
+  "roleFor": "{{name}}의 역할",
+  "signInLink": "로그인 링크",
+  "newPasswordLink": "새 비밀번호 링크",
+  "enable": "활성화",
+  "disable": "비활성화",
+  "everyone": "모두",
+  "private": "각 사람의 채팅, 메모리, 파일, 자동화는 그 사람만 볼 수 있어요. 소유자도 마찬가지예요. 모델, 도구, 지식, 프로필은 공유돼요.",
+  "roles": {
+    "owner": "소유자",
+    "admin": "관리자",
+    "member": "멤버",
+    "visitor": "방문자"
+  },
+  "add": {
+    "title": "사람 추가",
+    "body": "사용자 이름과 비밀번호를 정하는 일회용 링크를 받아요.",
+    "name": "이름",
+    "role": "역할",
+    "submit": "추가",
+    "roleHint": {
+      "admin": "관리자는 모델, 도구, 컴퓨터, 그리고 관리자와 소유자를 제외한 사람을 관리해요.",
+      "member": "멤버는 Toskar를 사용해요. 자신의 채팅, 메모리, 파일, 자동화예요.",
+      "visitor": "방문자는 채팅만 할 수 있어요."
+    }
+  },
+  "link": {
+    "invite": "{{name}}에게 이 링크를 보내 사용자 이름과 비밀번호를 정하게 하세요:",
+    "reset": "{{name}}에게 이 링크를 보내 새 비밀번호를 정하게 하세요:",
+    "copy": "링크 복사",
+    "copied": "복사됨",
+    "expires": "{{date}}까지 한 번만 쓸 수 있어요.",
+    "lanOff": "로컬 네트워크 접근을 켜기 전까지는 이 컴퓨터에서만 열 수 있어요.",
+    "lanOffAction": "API 접근에서 켜기",
+    "done": "완료"
+  },
+  "invite": {
+    "loading": "링크를 여는 중…",
+    "goneTitle": "이 링크는 더 이상 쓸 수 없어요",
+    "goneBody": "만료되었거나 이미 사용되었어요. 보낸 사람에게 새 링크를 요청하세요.",
+    "title": "환영해요, {{name}}",
+    "body": "이 Toskar에 로그인할 사용자 이름과 비밀번호를 정하세요.",
+    "resetTitle": "{{name}}의 새 비밀번호",
+    "resetBody": "새 비밀번호를 정하세요. 내 계정으로 로그인한 다른 기기는 로그아웃돼요.",
+    "usernameHint": "영문자, 숫자, 마침표, 하이픈, 밑줄로 3~32자예요.",
+    "password": "비밀번호",
+    "passwordHint": "10자 이상이에요.",
+    "again": "비밀번호 확인",
+    "mismatch": "비밀번호가 일치하지 않아요.",
+    "submit": "로그인",
+    "resetSubmit": "저장하고 로그인"
+  },
+  "signIn": {
+    "title": "Toskar에 로그인",
+    "body": "이 Toskar는 함께 써요. 초대에서 정한 사용자 이름과 비밀번호로 로그인하세요.",
+    "username": "사용자 이름",
+    "password": "비밀번호",
+    "submit": "로그인",
+    "forgot": "비밀번호를 잊었나요? 관리자나 소유자에게 새 비밀번호 링크를 요청하세요.",
+    "useKey": "대신 API 키 사용"
+  },
+  "account": {
+    "label": "내 계정",
+    "signedInAs": "{{name}}(@{{username}}, {{role}})(으)로 로그인됨.",
+    "signOut": "로그아웃"
+  }
+}

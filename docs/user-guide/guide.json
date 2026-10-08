@@ -221,6 +221,22 @@
       ]
     },
     {
+      "id": "people",
+      "title": "Share Toskar with other people",
+      "paragraphs": [
+        "Everyone in your home or team can use the same Toskar, each with their own chats, memories, files, and automations. Nobody sees anyone else's, not even the Owner. Models, tools, knowledge, and profiles are shared.",
+        "Whoever installed Toskar is the Owner and uses it on this computer without signing in. Admins manage models, tools, computers, and people other than Admins and the Owner. Members use Toskar for themselves. Visitors only chat.",
+        "The People page under Administer lists everyone. Change someone's role there, make them a new password link, or disable them, which signs them out everywhere and stops their keys and automations."
+      ],
+      "steps": [
+        "Turn on local network access under API Access, so other devices can open Toskar.",
+        "Open People, type the person's name, choose a role, and choose Add.",
+        "Copy the link and send it to them. It works once, for a week.",
+        "They open it, choose a username and password, and are signed in. Next time, they sign in at the same address.",
+        "Forgot a password? Choose New password link next to their name and send them the new link."
+      ]
+    },
+    {
       "id": "server",
       "title": "Run without a desktop",
       "paragraphs": [

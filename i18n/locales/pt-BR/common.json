@@ -6,7 +6,7 @@
     "use": "Usar",
     "customize": "Personalizar",
     "administer": "Administrar",
-    "administerHint": "Mostrar ou ocultar Treinar, Computadores, Acesso à API, Desempenho e Diagnóstico",
+    "administerHint": "Mostrar ou ocultar Treinar, Computadores, Pessoas, Acesso à API, Desempenho e Diagnóstico",
     "chat": "Chat",
     "automations": "Automações",
     "models": "Modelos",
@@ -14,6 +14,7 @@
     "knowledge": "Conhecimento",
     "memory": "Memória",
     "computers": "Computadores",
+    "people": "Pessoas",
     "performance": "Desempenho",
     "diagnostics": "Diagnóstico",
     "profiles": "Perfis e orquestração",
@@ -52,7 +53,8 @@
     "tryAgain": "Tentar novamente",
     "keyRequired": "Chave de API necessária",
     "keyBody": "Este Toskar aceita conexões de outros dispositivos, então pede uma chave de API. Digite uma para continuar. Em HTTP simples, uma chave não criptografa seu tráfego.",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "signInInstead": "Entrar com um nome de usuário"
   },
   "units": {
     "ms": "{{value}} ms",

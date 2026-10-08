@@ -1,7 +1,7 @@
 {
   "API_KEYS_LIST_FAILED": "{{detail}}",
   "API_KEY_IN_URL": "Send the API key in the Authorization header, not in the address.",
-  "API_KEY_REQUIRED": "Create an API key before allowing access from other computers.",
+  "API_KEY_REQUIRED": "Create an API key or add a person before allowing access from other devices.",
   "APPROVE_FAILED": "{{detail}}",
   "AUTOMATION_INVALID": "{{detail}}",
   "BAD_REQUEST": "{{detail}}",

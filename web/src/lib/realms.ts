@@ -20,6 +20,7 @@ export type RuneId =
   | 'tiwaz'
   | 'thurisaz'
   | 'isa'
+  | 'gebo'
 
 export interface Realm {
   /**
@@ -71,6 +72,14 @@ export const realms: Record<string, Realm> = {
     norse: 'Muninn',
     rune: 'othala',
     accent: 'text-muninn',
+  },
+  // People share this Toskar (#206): Midgard, the world of people, and
+  // Gebo, the rune of the gift and of fellowship.
+  '/people': {
+    id: 'people',
+    norse: 'Midgard',
+    rune: 'gebo',
+    accent: 'text-bifrost',
   },
   '/nodes': {
     id: 'nodes',
@@ -137,6 +146,7 @@ export const runePaths: Record<RuneId, string> = {
   raidho: 'M3 15V1l5 3.5L3 8l5 7',
   ehwaz: 'M2 15V1l3 4 3-4v14',
   algiz: 'M5 15V1M5 7 1.5 2M5 7l3.5-5',
+  gebo: 'M1 1l8 14M9 1L1 15',
   mannaz: 'M2 15V1l6 6V1v14M2 7l6-6',
   tiwaz: 'M5 15V1M1.5 5 5 1l3.5 4',
   thurisaz: 'M3 1v14M3 4l5 4-5 4',

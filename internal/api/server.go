@@ -817,7 +817,7 @@ func (s *Server) handlePatchSettings(w http.ResponseWriter, r *http.Request) {
 		view, err := s.deps.UpdateSettings(r.Context(), patch)
 		if err != nil {
 			if errors.Is(err, auth.ErrAPIKeyRequired) {
-				writeErr(w, http.StatusBadRequest, "API_KEY_REQUIRED", "Create an API key before allowing access from other computers.", nil)
+				writeErr(w, http.StatusBadRequest, "API_KEY_REQUIRED", "Create an API key or add a person before allowing access from other devices.", nil)
 				return
 			}
 			// A setting with an invalid value says which, with its own code.

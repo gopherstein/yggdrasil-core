@@ -6,7 +6,7 @@
     "use": "사용",
     "customize": "맞춤 설정",
     "administer": "관리",
-    "administerHint": "학습, 컴퓨터, API 액세스, 성능, 진단 표시 또는 숨기기",
+    "administerHint": "학습, 컴퓨터, 사람, API 접근, 성능, 진단 표시 또는 숨기기",
     "chat": "채팅",
     "automations": "자동화",
     "models": "모델",
@@ -14,6 +14,7 @@
     "knowledge": "지식",
     "memory": "메모리",
     "computers": "컴퓨터",
+    "people": "사람",
     "performance": "성능",
     "diagnostics": "진단",
     "profiles": "프로필 및 오케스트레이션",
@@ -50,7 +51,8 @@
     "tryAgain": "다시 시도",
     "keyRequired": "API 키 필요",
     "keyBody": "이 Toskar는 다른 기기의 연결을 받기 때문에 API 키가 필요해요. 계속하려면 키를 입력하세요. 일반 HTTP에서는 키가 트래픽을 암호화하지 않아요.",
-    "continue": "계속"
+    "continue": "계속",
+    "signInInstead": "대신 사용자 이름으로 로그인"
   },
   "units": {
     "ms": "{{value}}ms",

@@ -10,7 +10,7 @@ import (
 )
 
 // ErrAPIKeyRequired means a non-loopback listener has no API key configured.
-var ErrAPIKeyRequired = contracts.NewError("API_KEY_REQUIRED", nil, errors.New("create an API key before listening beyond loopback"))
+var ErrAPIKeyRequired = contracts.NewError("API_KEY_REQUIRED", nil, errors.New("create an API key or add a person before listening beyond loopback"))
 
 // ErrAPIKeyInURL means the caller put a credential in the request URL.
 var ErrAPIKeyInURL = contracts.NewError("API_KEY_IN_URL", nil, errors.New("send the API key as Authorization: Bearer, not in the URL"))

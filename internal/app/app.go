@@ -932,6 +932,29 @@ func (a *App) authorizeControlRequest(r *http.Request) error {
 	return nil
 }
 
+// someoneCanConnect reports whether anything could use the API from the
+// network: an API key, or a person other than the Owner, who signs in with
+// a password or still has a link to choose one (#206).
+func (a *App) someoneCanConnect(ctx context.Context) (bool, error) {
+	keys, err := a.APIKeys.List(ctx)
+	if err != nil || len(keys) > 0 {
+		return len(keys) > 0, err
+	}
+	if a.People == nil {
+		return false, nil
+	}
+	people, err := a.People.List(ctx)
+	if err != nil {
+		return false, err
+	}
+	for _, p := range people {
+		if p.Disabled == nil && (p.SignIn || p.Role != auth.RoleOwner) {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 // requireKeyForRemoteBind refuses a non-loopback control API with no key.
 // TOSKAR_API_KEY (or YGGDRASIL_API_KEY), when set, is hashed and stored if it is not already valid.
 func (a *App) requireKeyForRemoteBind(ctx context.Context) error {
@@ -945,11 +968,11 @@ func (a *App) requireKeyForRemoteBind(ctx context.Context) error {
 		}
 		return nil
 	}
-	keys, err := a.APIKeys.List(ctx)
+	can, err := a.someoneCanConnect(ctx)
 	if err != nil {
 		return err
 	}
-	if len(keys) == 0 {
+	if !can {
 		// Turned on in the app, such as by Connect a device, with no device
 		// ever connecting: nothing could connect without a key, so go back
 		// to this computer only rather than refuse to start (#216). A host
@@ -1397,11 +1420,11 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 	lanBefore := a.Config.Get()
 	lanTouched := false
 	if v, ok := patch["lan_api_enabled"].(bool); ok && v {
-		keys, err := a.APIKeys.List(ctx)
+		can, err := a.someoneCanConnect(ctx)
 		if err != nil {
 			return err
 		}
-		if len(keys) == 0 {
+		if !can {
 			return auth.ErrAPIKeyRequired
 		}
 	}

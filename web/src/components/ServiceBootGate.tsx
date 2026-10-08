@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useLocation } from 'react-router-dom'
+import { SignInForm } from '@/features/people/SignInForm'
 import { ScheduleBackgroundSync } from '@/components/ScheduleBackgroundSync'
 import { ApiError, api, rememberApiKey } from '@/lib/api'
 import { readScreenshotLaunch } from '@/lib/screenshotMode'
@@ -68,6 +70,17 @@ function needsApiKey(error: unknown): boolean {
 }
 
 function DaemonBootGate({ children }: { children: ReactNode }) {
+  // A one-time sign-in link's page answers before sign-in (#206).
+  const { pathname } = useLocation()
+  if (pathname.startsWith('/invite/')) {
+    return <div className="h-full min-h-0 min-w-0 overflow-hidden">{children}</div>
+  }
+  return <HealthGate>{children}</HealthGate>
+}
+
+function HealthGate({ children }: { children: ReactNode }) {
+  // Sign in with a username and password, or with an API key (#206).
+  const [useKey, setUseKey] = useState(false)
   const [deadline, setDeadline] = useState(() => Date.now() + BOOT_GIVE_UP_MS)
   const [timedOut, setTimedOut] = useState(false)
   const [keyDraft, setKeyDraft] = useState('')
@@ -114,6 +127,10 @@ function DaemonBootGate({ children }: { children: ReactNode }) {
     )
   }
 
+  if (askForKey && !useKey) {
+    return <SignInForm onSignedIn={() => void healthQuery.refetch()} onUseKey={() => setUseKey(true)} />
+  }
+
   if (askForKey) {
     return (
       <form
@@ -143,6 +160,9 @@ function DaemonBootGate({ children }: { children: ReactNode }) {
         />
         <button type="submit" className="btn-primary mt-4" disabled={!keyDraft.trim() || healthQuery.isFetching}>
           {t('boot.continue')}
+        </button>
+        <button type="button" className="mt-3 text-xs text-ink-muted hover:text-ink" onClick={() => setUseKey(false)}>
+          {t('boot.signInInstead')}
         </button>
       </form>
     )

@@ -1,7 +1,7 @@
 {
   "API_KEYS_LIST_FAILED": "{{detail}}",
   "API_KEY_IN_URL": "請在 Authorization 標頭中傳送 API 金鑰，不要放在網址裡。",
-  "API_KEY_REQUIRED": "允許其他電腦存取前，請先建立 API 金鑰。",
+  "API_KEY_REQUIRED": "允許其他裝置存取前，請先建立 API 金鑰或新增人員。",
   "APPROVE_FAILED": "{{detail}}",
   "AUTOMATION_INVALID": "{{detail}}",
   "BAD_REQUEST": "{{detail}}",

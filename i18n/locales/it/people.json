@@ -1,0 +1,73 @@
+{
+  "subtitle": "Chi usa questo Toskar e cosa può fare ciascuno.",
+  "adminsOnly": "Solo gli admin e il proprietario gestiscono le persone.",
+  "you": "(tu)",
+  "ownerNoSignIn": "Usa questo computer; ancora nessun accesso per altri dispositivi",
+  "notSignedIn": "Non ha ancora scelto un nome utente",
+  "disabled": "Disattivato",
+  "roleFor": "Ruolo di {{name}}",
+  "signInLink": "Link di accesso",
+  "newPasswordLink": "Link per nuova password",
+  "enable": "Attiva",
+  "disable": "Disattiva",
+  "everyone": "Tutti",
+  "private": "Chat, ricordi, file e automazioni di ciascuno sono privati, anche quelli del proprietario. Modelli, strumenti, conoscenza e profili sono condivisi.",
+  "roles": {
+    "owner": "Proprietario",
+    "admin": "Admin",
+    "member": "Membro",
+    "visitor": "Ospite"
+  },
+  "add": {
+    "title": "Aggiungi una persona",
+    "body": "Riceve un link monouso per scegliere nome utente e password.",
+    "name": "Nome",
+    "role": "Ruolo",
+    "submit": "Aggiungi",
+    "roleHint": {
+      "admin": "Gli admin gestiscono modelli, strumenti, computer e persone diverse dagli admin e dal proprietario.",
+      "member": "I membri usano Toskar: le proprie chat, ricordi, file e automazioni.",
+      "visitor": "Gli ospiti chattano e nient’altro."
+    }
+  },
+  "link": {
+    "invite": "Invia a {{name}} questo link per scegliere nome utente e password:",
+    "reset": "Invia a {{name}} questo link per scegliere una nuova password:",
+    "copy": "Copia link",
+    "copied": "Copiato",
+    "expires": "Funziona una volta, fino al {{date}}.",
+    "lanOff": "Solo questo computer può aprirlo finché l’accesso dalla rete locale è disattivato.",
+    "lanOffAction": "Attivalo in Accesso API",
+    "done": "Fatto"
+  },
+  "invite": {
+    "loading": "Apertura del link…",
+    "goneTitle": "Questo link non funziona più",
+    "goneBody": "È scaduto o è già stato usato. Chiedine uno nuovo a chi te l’ha inviato.",
+    "title": "Benvenuto, {{name}}",
+    "body": "Scegli un nome utente e una password per accedere a questo Toskar.",
+    "resetTitle": "Una nuova password per {{name}}",
+    "resetBody": "Scegli una nuova password. Gli altri dispositivi connessi al tuo account verranno disconnessi.",
+    "usernameHint": "Da 3 a 32 lettere, cifre, punti, trattini o trattini bassi.",
+    "password": "Password",
+    "passwordHint": "Almeno 10 caratteri.",
+    "again": "Ripeti la password",
+    "mismatch": "Le password non coincidono.",
+    "submit": "Accedi",
+    "resetSubmit": "Salva e accedi"
+  },
+  "signIn": {
+    "title": "Accedi a Toskar",
+    "body": "Questo Toskar è condiviso. Accedi con il nome utente e la password scelti dal tuo invito.",
+    "username": "Nome utente",
+    "password": "Password",
+    "submit": "Accedi",
+    "forgot": "Password dimenticata? Chiedi a un admin o al proprietario un link per una nuova password.",
+    "useKey": "Usa invece una chiave API"
+  },
+  "account": {
+    "label": "Il tuo account",
+    "signedInAs": "Accesso come {{name}} (@{{username}}), {{role}}.",
+    "signOut": "Esci"
+  }
+}
