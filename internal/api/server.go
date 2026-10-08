@@ -125,8 +125,12 @@ type Dependencies struct {
 	RotateAPIKey         func(ctx context.Context, id string) (auth.APIKeyRecord, string, error)
 	SetAPIKeyPermissions func(ctx context.Context, id string, p auth.APIKeyPermissions) (auth.APIKeyRecord, error)
 	VerifyAPIKey         func(ctx context.Context, secret string) (auth.APIKeyRecord, error)
-	// People are who use this Toskar and their roles (#206).
-	People *auth.People
+	// People are who use this Toskar and their roles; Sessions are signed-in
+	// browsers, and Invites the links people set up their sign-in with
+	// (#206).
+	People   *auth.People
+	Sessions *auth.Sessions
+	Invites  *auth.Invites
 	// Devices makes the codes a phone connects with (#216).
 	Devices *auth.DevicePairer
 	// PhoneAddress is where a phone reaches this computer, and whether it
@@ -311,7 +315,7 @@ func (s *Server) routes() {
 	s.memoryRoutes(api)
 	s.artifactRoutes(api)
 	s.deviceRoutes(api)
-	api.HandleFunc("/me", s.handleMe).Methods(http.MethodGet)
+	s.peopleRoutes(api)
 	api.HandleFunc("/tls", s.handleTLS).Methods(http.MethodGet)
 	s.notificationRoutes(api)
 	s.connectorRoutes(api)
@@ -511,65 +515,128 @@ func (s *Server) thisComputer(r *http.Request) *http.Request {
 	return r.WithContext(auth.WithPrincipal(r.Context(), owner))
 }
 
+// publicRoutes answer without a key or a session, each with its own proof:
+// a phone's pairing code (#216), a username and password, or an invite's
+// one-time link (#206).
+var publicRoutes = map[string]bool{
+	http.MethodPost + " /api/v1" + pairDeviceRoute: true,
+	http.MethodPost + " /api/v1/session":           true,
+	http.MethodGet + " /api/v1/invites/{token}":    true,
+	http.MethodPost + " /api/v1/invites/{token}":   true,
+}
+
+// unsafeMethod changes something, so a session's request must come from
+// Toskar's own pages.
+func unsafeMethod(m string) bool {
+	return m != http.MethodGet && m != http.MethodHead && m != http.MethodOptions
+}
+
 func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if s.deps.Config == nil || auth.FromThisComputer(r) {
+		if s.deps.Config == nil {
 			next.ServeHTTP(w, s.thisComputer(r))
 			return
 		}
-		if !config.ListensBeyondLoopback(s.deps.Config.Get().APIHost) {
+		local := auth.FromThisComputer(r)
+		beyond := config.ListensBeyondLoopback(s.deps.Config.Get().APIHost)
+		if !local && !beyond && !loopbackAddr(r.RemoteAddr) {
 			// Bound to loopback, so nothing needs a key, but a device's
 			// connection from before network access was turned off is
 			// refused; Rebind closes those too.
-			if !loopbackAddr(r.RemoteAddr) {
-				writeErr(w, http.StatusForbidden, "LAN_ACCESS_OFF", "local network access is off on this computer", nil)
-				return
-			}
-			next.ServeHTTP(w, s.thisComputer(r))
+			writeErr(w, http.StatusForbidden, "LAN_ACCESS_OFF", "local network access is off on this computer", nil)
 			return
 		}
 		route := routeTemplate(r)
-		// A phone connecting has no key yet; the code is its proof, and the
-		// handler answers only on the local network (#216).
-		if r.Method == http.MethodPost && route == "/api/v1"+pairDeviceRoute {
-			next.ServeHTTP(w, r)
-			return
-		}
-		token, err := auth.BearerToken(r)
-		if err != nil {
-			if errors.Is(err, auth.ErrAPIKeyInURL) {
-				writeErrFrom(w, http.StatusBadRequest, "API_KEY_IN_URL", err)
+		// Who the request is from (#206): a key's person, then a signed-in
+		// browser's, then this computer's Owner.
+		if token, err := auth.BearerToken(r); err == nil {
+			if principal, ok := s.keyPrincipal(w, r, token, route); ok {
+				next.ServeHTTP(w, r.WithContext(auth.WithPrincipal(r.Context(), principal)))
+				return
+			} else if !local {
 				return
 			}
-			writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "authorization required", nil)
+		} else if errors.Is(err, auth.ErrAPIKeyInURL) && !local {
+			writeErrFrom(w, http.StatusBadRequest, "API_KEY_IN_URL", err)
 			return
 		}
-		if s.deps.VerifyAPIKey == nil {
-			writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "authorization required", nil)
-			return
-		}
-		rec, err := s.deps.VerifyAPIKey(r.Context(), token)
-		if err != nil {
-			writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "invalid api key", nil)
-			return
-		}
-		// A phone's key reaches only what the phone uses.
-		if rec.Kind == auth.KindDevice && !auth.DeviceMayReach(r.Method, route) {
-			writeErr(w, http.StatusForbidden, "DEVICE_NOT_ALLOWED", "a phone's key can't do this; use a key from API Access", nil)
-			return
-		}
-		// The request is its person's, while they may still use Toskar.
-		principal := auth.Principal{Person: auth.Person{ID: rec.PersonID, Role: auth.RoleOwner}, Via: auth.ViaAPIKey, KeyID: rec.ID}
-		if s.deps.People != nil {
-			person, err := s.deps.People.Active(r.Context(), rec.PersonID)
-			if err != nil {
-				writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "this key's person can no longer use Toskar", nil)
+		if principal, ok := s.sessionPrincipal(r); ok {
+			// A signed-in browser's change must come from Toskar's own
+			// pages: browsers say so in Origin or Sec-Fetch-Site, and
+			// checkBrowser already refused a foreign origin.
+			if unsafeMethod(r.Method) && r.Header.Get("Origin") == "" && r.Header.Get("Sec-Fetch-Site") != "same-origin" {
+				writeErr(w, http.StatusForbidden, "CROSS_SITE", "a signed-in change must come from Toskar's own pages", nil)
 				return
 			}
-			principal.Person = person
+			next.ServeHTTP(w, r.WithContext(auth.WithPrincipal(r.Context(), principal)))
+			return
 		}
-		next.ServeHTTP(w, r.WithContext(auth.WithPrincipal(r.Context(), principal)))
+		if local || !beyond {
+			next.ServeHTTP(w, s.thisComputer(r))
+			return
+		}
+		if publicRoutes[r.Method+" "+route] {
+			next.ServeHTTP(w, r.WithContext(auth.WithPrincipal(r.Context(), auth.Anonymous())))
+			return
+		}
+		writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "authorization required", nil)
 	})
+}
+
+// keyPrincipal is a valid key's person. ok is false when the key isn't
+// good; from another computer, the refusal has been written.
+func (s *Server) keyPrincipal(w http.ResponseWriter, r *http.Request, token, route string) (auth.Principal, bool) {
+	local := auth.FromThisComputer(r)
+	if s.deps.VerifyAPIKey == nil {
+		if !local {
+			writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "authorization required", nil)
+		}
+		return auth.Principal{}, false
+	}
+	rec, err := s.deps.VerifyAPIKey(r.Context(), token)
+	if err != nil {
+		// On this computer a key is optional; a wrong one is ignored.
+		if !local {
+			writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "invalid api key", nil)
+		}
+		return auth.Principal{}, false
+	}
+	// A phone's key reaches only what the phone uses.
+	if rec.Kind == auth.KindDevice && !auth.DeviceMayReach(r.Method, route) {
+		writeErr(w, http.StatusForbidden, "DEVICE_NOT_ALLOWED", "a phone's key can't do this; use a key from API Access", nil)
+		return auth.Principal{}, false
+	}
+	principal := auth.Principal{Person: auth.Person{ID: rec.PersonID, Role: auth.RoleOwner}, Via: auth.ViaAPIKey, KeyID: rec.ID}
+	if s.deps.People != nil {
+		person, err := s.deps.People.Active(r.Context(), rec.PersonID)
+		if err != nil {
+			writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "this key's person can no longer use Toskar", nil)
+			return auth.Principal{}, false
+		}
+		principal.Person = person
+	}
+	return principal, true
+}
+
+// sessionPrincipal is a signed-in browser's person, while the session and
+// the person are good.
+func (s *Server) sessionPrincipal(r *http.Request) (auth.Principal, bool) {
+	if s.deps.Sessions == nil || s.deps.People == nil {
+		return auth.Principal{}, false
+	}
+	cookie, err := r.Cookie(auth.SessionCookie)
+	if err != nil {
+		return auth.Principal{}, false
+	}
+	id, err := s.deps.Sessions.Person(r.Context(), cookie.Value)
+	if err != nil {
+		return auth.Principal{}, false
+	}
+	person, err := s.deps.People.Active(r.Context(), id)
+	if err != nil {
+		return auth.Principal{}, false
+	}
+	return auth.Principal{Person: person, Via: auth.ViaSession}, true
 }
 
 // routeTemplate is the matched route's path template, such as

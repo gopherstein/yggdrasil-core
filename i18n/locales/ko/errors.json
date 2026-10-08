@@ -158,5 +158,17 @@
   "AUTOMATION_NOT_WEBHOOK": "이 자동화는 웹훅으로 시작되지 않습니다.",
   "AUTOMATION_PAUSED": "이 자동화는 일시 중지되었습니다.",
   "HOOK_TOO_SOON": "이 웹훅은 방금 호출되었습니다. 몇 초 후에 다시 시도하세요.",
-  "HOOK_TOO_LARGE": "요청 본문이 64KB보다 큽니다."
+  "HOOK_TOO_LARGE": "요청 본문이 64KB보다 큽니다.",
+  "SIGN_IN_FAILED": "사용자 이름과 비밀번호가 맞지 않아요.",
+  "SIGN_IN_THROTTLED": "시도가 너무 많아요. 15분 기다린 뒤 다시 시도하세요.",
+  "INVITE_INVALID": "이 링크는 만료되었거나 이미 사용되었어요. 새 링크를 요청하세요.",
+  "USERNAME_TAKEN": "이미 사용 중인 사용자 이름이에요.",
+  "USERNAME_INVALID": "사용자 이름은 3~32자의 영문자, 숫자, 마침표, 하이픈, 밑줄이에요.",
+  "PASSWORD_TOO_SHORT": "비밀번호는 10자 이상이어야 해요.",
+  "ROLE_INVALID": "그런 역할은 없어요.",
+  "OWNER_FIXED": "소유자의 역할은 바꿀 수 없고, 누구도 자신의 역할을 바꾸거나 자신을 비활성화할 수 없어요.",
+  "NAME_INVALID": "이름은 1~80자예요.",
+  "PERSON_NOT_FOUND": "그 사람은 여기 없어요.",
+  "ROLE_REQUIRED": "{{role}} 역할이 필요해요.",
+  "CROSS_SITE": "이 변경은 Toskar 페이지에서 온 것이 아니어서 거부되었어요."
 }

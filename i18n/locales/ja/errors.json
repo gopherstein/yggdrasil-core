@@ -158,5 +158,17 @@
   "AUTOMATION_NOT_WEBHOOK": "このオートメーションは Webhook では開始しません。",
   "AUTOMATION_PAUSED": "このオートメーションは一時停止中です。",
   "HOOK_TOO_SOON": "この Webhook はたった今呼び出されました。数秒後にもう一度お試しください。",
-  "HOOK_TOO_LARGE": "リクエストの本文が 64 KB を超えています。"
+  "HOOK_TOO_LARGE": "リクエストの本文が 64 KB を超えています。",
+  "SIGN_IN_FAILED": "ユーザー名とパスワードが一致しません。",
+  "SIGN_IN_THROTTLED": "試行回数が多すぎます。15分待ってからもう一度お試しください。",
+  "INVITE_INVALID": "このリンクは期限切れか、すでに使われています。新しいリンクを依頼してください。",
+  "USERNAME_TAKEN": "そのユーザー名はすでに使われています。",
+  "USERNAME_INVALID": "ユーザー名は3〜32文字の英字、数字、ピリオド、ハイフン、アンダースコアです。",
+  "PASSWORD_TOO_SHORT": "パスワードは10文字以上必要です。",
+  "ROLE_INVALID": "それは役割ではありません。",
+  "OWNER_FIXED": "オーナーの役割は変更できません。また、自分の役割を変えたり自分を無効にしたりすることはできません。",
+  "NAME_INVALID": "名前は1〜80文字です。",
+  "PERSON_NOT_FOUND": "その人はここにいません。",
+  "ROLE_REQUIRED": "これには{{role}}の役割が必要です。",
+  "CROSS_SITE": "この変更は Toskar のページから行われていないため、拒否されました。"
 }

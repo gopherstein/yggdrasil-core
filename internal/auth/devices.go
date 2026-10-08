@@ -70,6 +70,8 @@ type DevicePairer struct {
 	state   string
 	device  *APIKeyRecord
 	tries   map[string][]time.Time
+	// starter is who showed the code: the phone's key is theirs (#206).
+	starter Person
 }
 
 func (p *DevicePairer) now() time.Time {
@@ -81,6 +83,11 @@ func (p *DevicePairer) now() time.Time {
 
 // Start shows a new code, replacing any other.
 func (p *DevicePairer) Start() (DevicePairing, error) {
+	return p.StartFor(Person{ID: OwnerID, Name: "Owner", Role: RoleOwner})
+}
+
+// StartFor shows a new code for person, whose the phone's key will be.
+func (p *DevicePairer) StartFor(person Person) (DevicePairing, error) {
 	n, err := rand.Int(rand.Reader, big.NewInt(1_000_000))
 	if err != nil {
 		return DevicePairing{}, err
@@ -90,7 +97,7 @@ func (p *DevicePairer) Start() (DevicePairing, error) {
 	defer p.mu.Unlock()
 	p.hash = sha256.Sum256([]byte(code))
 	p.expires = p.now().Add(deviceCodeTTL)
-	p.misses, p.state, p.device = 0, "waiting", nil
+	p.misses, p.state, p.device, p.starter = 0, "waiting", nil, person
 	return DevicePairing{Code: code, ExpiresAt: p.expires, State: p.state}, nil
 }
 
@@ -154,9 +161,10 @@ func (p *DevicePairer) Pair(ctx context.Context, code, deviceName, address strin
 	}
 	// Single use: the code is spent before the key is made.
 	p.state = "connecting"
+	starter := p.starter
 	p.mu.Unlock()
 
-	rec, secret, err := p.CreateKey(ctx, name)
+	rec, secret, err := p.CreateKey(AsPerson(ctx, starter), name)
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if err != nil {

@@ -158,5 +158,17 @@
   "AUTOMATION_NOT_WEBHOOK": "This automation doesn't run from a webhook.",
   "AUTOMATION_PAUSED": "This automation is paused.",
   "HOOK_TOO_SOON": "This webhook was called a moment ago. Try again in a few seconds.",
-  "HOOK_TOO_LARGE": "The request body is larger than 64 KB."
+  "HOOK_TOO_LARGE": "The request body is larger than 64 KB.",
+  "SIGN_IN_FAILED": "That username and password don't match.",
+  "SIGN_IN_THROTTLED": "Too many tries. Wait 15 minutes and try again.",
+  "INVITE_INVALID": "This link has expired or was already used. Ask for a new one.",
+  "USERNAME_TAKEN": "That username is taken.",
+  "USERNAME_INVALID": "A username is 3 to 32 letters, digits, dots, dashes, or underscores.",
+  "PASSWORD_TOO_SHORT": "A password needs at least 10 characters.",
+  "ROLE_INVALID": "That isn't a role.",
+  "OWNER_FIXED": "The Owner's role can't change, and nobody changes their own role or disables themselves.",
+  "NAME_INVALID": "A name is 1 to 80 characters.",
+  "PERSON_NOT_FOUND": "That person isn't here.",
+  "ROLE_REQUIRED": "This needs the {{role}} role.",
+  "CROSS_SITE": "That change didn't come from Toskar's own pages, so it was refused."
 }
