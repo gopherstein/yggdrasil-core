@@ -83,7 +83,7 @@ func newFakeRelay(t *testing.T) *fakeRelay {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /v1/enroll", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != "Bearer "+f.secret {
-			http.Error(w, `{"error":{"code":"ENROLL_DENIED"}}`, 401)
+			http.Error(w, `{"error":{"code":"ENROLL_DENIED"}}`, http.StatusUnauthorized)
 			return
 		}
 		var body struct{ Route string }
@@ -97,7 +97,7 @@ func newFakeRelay(t *testing.T) *fakeRelay {
 	})
 	mux.HandleFunc("PUT /v1/routes/{route}/record", func(w http.ResponseWriter, r *http.Request) {
 		if !f.authorized(r) {
-			http.Error(w, `{"error":{"code":"TOKEN_EXPIRED"}}`, 401)
+			http.Error(w, `{"error":{"code":"TOKEN_EXPIRED"}}`, http.StatusUnauthorized)
 			return
 		}
 		b, _ := io.ReadAll(r.Body)
@@ -108,7 +108,7 @@ func newFakeRelay(t *testing.T) *fakeRelay {
 	})
 	mux.HandleFunc("GET /v1/tunnel", func(w http.ResponseWriter, r *http.Request) {
 		if !f.authorized(r) {
-			http.Error(w, `{"error":{"code":"TOKEN_EXPIRED"}}`, 401)
+			http.Error(w, `{"error":{"code":"TOKEN_EXPIRED"}}`, http.StatusUnauthorized)
 			return
 		}
 		fl := w.(http.Flusher)
@@ -126,7 +126,7 @@ func newFakeRelay(t *testing.T) *fakeRelay {
 	})
 	mux.HandleFunc("POST /v1/tunnel/streams/{id}", func(w http.ResponseWriter, r *http.Request) {
 		if !f.authorized(r) || r.Header.Get("Upgrade") != "toskar-stream" || r.PathValue("id") != "s1" {
-			http.Error(w, "no", 400)
+			http.Error(w, "no", http.StatusBadRequest)
 			return
 		}
 		conn, buf, err := http.NewResponseController(w).Hijack()
