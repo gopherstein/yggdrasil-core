@@ -26,8 +26,10 @@ import (
 	"github.com/yeixio/toskar-core/internal/rendezvous"
 )
 
-// DefaultRelay is Toskar's relay.
-const DefaultRelay = "relay.toskar.ai"
+// DefaultRelay is Toskar's relay. It's on port 4443 because it shares the
+// website's load balancer, whose 443 ends TLS for the website (toskar-relay's
+// deploy/README.md).
+const DefaultRelay = "relay.toskar.ai:4443"
 
 // Timing.
 const (

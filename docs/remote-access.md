@@ -37,7 +37,7 @@ For a subscriber it should be as easy as Plex: no ports, addresses, or accounts.
 Every path is the same TLS session, from the app to the computer's API listener, checked against the same pin:
 
 - **Direct:** the app pins `<public address>:<port>` to the fingerprint it already has.
-- **Relay:** the app connects to `relay.toskar.ai:443` with the server name `<route>.relay.toskar.ai` and pins `<route>.relay.toskar.ai:443` to the same fingerprint. The relay reads only the server name in the TLS ClientHello, picks the computer's tunnel by it, and passes the bytes through. It never terminates TLS, has no certificate for the computer, and can't read prompts, answers, files, or the device key inside.
+- **Relay:** the app connects to `<route>.relay.toskar.ai:4443` (the server name it sends) and pins that host and port to the same fingerprint. Port 4443, not 443, because Toskar's relay shares the website's load balancer, whose 443 ends TLS for the website. The relay reads only the server name in the TLS ClientHello, picks the computer's tunnel by it, and passes the bytes through. It never terminates TLS, has no certificate for the computer, and can't read prompts, answers, files, or the device key inside.
 
 A relay or rendezvous that lies, or is taken over, can at most drop or delay traffic: a connection it sends anywhere else fails the pin. The pin is never learned from the service; it only comes from pairing.
 
