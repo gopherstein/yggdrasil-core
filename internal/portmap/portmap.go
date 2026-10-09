@@ -204,15 +204,13 @@ func (k *Keeper) run(ctx context.Context, internal uint16, done chan struct{}) {
 		k.mu.Lock()
 		k.current, k.err = m, err
 		k.mu.Unlock()
-		wait := time.Minute
+		// Renew at half the granted lifetime, at most once a minute; after a
+		// failure, try again in five.
+		wait := 5 * time.Minute
 		if err == nil {
-			wait = m.Lifetime / 2
-			if wait < time.Minute {
-				wait = time.Minute
-			}
+			wait = max(m.Lifetime/2, time.Minute)
 		} else {
 			m = Mapping{}
-			wait = 5 * time.Minute
 		}
 		select {
 		case <-ctx.Done():
