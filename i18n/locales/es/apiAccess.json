@@ -155,7 +155,25 @@
       "ipv6": "Accesible desde cualquier lugar por IPv6 en [{{address}}]:{{port}}, si tu router lo permite.",
       "manual": "Accesible en {{address}}, la dirección que indicaste.",
       "carrierNat": "Aún no es accesible: tu proveedor comparte una dirección entre muchos hogares, así que un puerto del router no llega a esta computadora. El relé de Toskar se encargará de esto.",
-      "noPort": "Aún no es accesible: el router no abrió el puerto {{port}}. Redirígelo a esta computadora e indica la dirección, o usa Tailscale."
+      "noPort": "Aún no es accesible: el router no abrió el puerto {{port}}. Redirígelo a esta computadora e indica la dirección, o usa Tailscale.",
+      "relay": "Accesible desde cualquier lugar a través de {{relay}}."
+    },
+    "relay": {
+      "title": "Relé de tu organización",
+      "body": "Si tu organización tiene su propio relé de Toskar, escribe su nombre y el secreto de inscripción que te dio tu equipo de TI. Los dispositivos vinculados a esta computadora llegarán a ella a través de ese relé cuando no funcione nada más directo.",
+      "name": "Relé",
+      "nameExample": "relay.example.com",
+      "secret": "Secreto de inscripción",
+      "secretSaved": "Guardado. Pega uno nuevo para reemplazarlo.",
+      "secretPlaceholder": "Pega el secreto de inscripción",
+      "connect": "Conectar",
+      "remove": "Usar el relé de Toskar",
+      "state": {
+        "connected": "Conectado a {{relay}}.",
+        "connecting": "Conectando con {{relay}}…",
+        "noToken": "Escribe el secreto de inscripción del relé para conectarte.",
+        "error": "No se puede conectar con {{relay}} ({{code}}). Revisa el nombre y el secreto de inscripción."
+      }
     }
   }
 }

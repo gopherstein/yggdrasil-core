@@ -155,7 +155,25 @@
       "ipv6": "Reachable from anywhere over IPv6 at [{{address}}]:{{port}}, if your router lets it in.",
       "manual": "Reachable at {{address}}, the address you entered.",
       "carrierNat": "Not reachable yet: your internet provider shares one address among many homes, so a router port can't reach this computer. Toskar's relay will handle this.",
-      "noPort": "Not reachable yet: the router didn't open port {{port}}. Forward it to this computer and enter the address, or use Tailscale."
+      "noPort": "Not reachable yet: the router didn't open port {{port}}. Forward it to this computer and enter the address, or use Tailscale.",
+      "relay": "Reachable from anywhere through {{relay}}."
+    },
+    "relay": {
+      "title": "Your organization's relay",
+      "body": "If your organization runs its own Toskar relay, enter its name and the enrollment secret your IT team gave you. Devices paired with this computer then reach it through that relay when nothing more direct works.",
+      "name": "Relay",
+      "nameExample": "relay.example.com",
+      "secret": "Enrollment secret",
+      "secretSaved": "Saved. Paste a new one to replace it.",
+      "secretPlaceholder": "Paste the enrollment secret",
+      "connect": "Connect",
+      "remove": "Use Toskar's relay instead",
+      "state": {
+        "connected": "Connected to {{relay}}.",
+        "connecting": "Connecting to {{relay}}…",
+        "noToken": "Enter the relay's enrollment secret to connect.",
+        "error": "Can't connect to {{relay}} ({{code}}). Check the name and the enrollment secret."
+      }
     }
   }
 }

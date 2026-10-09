@@ -155,7 +155,25 @@
       "ipv6": "Acessível de qualquer lugar por IPv6 em [{{address}}]:{{port}}, se o roteador permitir.",
       "manual": "Acessível em {{address}}, o endereço que você informou.",
       "carrierNat": "Ainda não acessível: seu provedor compartilha um endereço entre muitas casas, então uma porta do roteador não chega a este computador. O relay do Toskar vai resolver isso.",
-      "noPort": "Ainda não acessível: o roteador não abriu a porta {{port}}. Redirecione-a para este computador e informe o endereço, ou use o Tailscale."
+      "noPort": "Ainda não acessível: o roteador não abriu a porta {{port}}. Redirecione-a para este computador e informe o endereço, ou use o Tailscale.",
+      "relay": "Acessível de qualquer lugar pelo {{relay}}."
+    },
+    "relay": {
+      "title": "Relay da sua organização",
+      "body": "Se a sua organização mantém o próprio relay do Toskar, digite o nome dele e o segredo de inscrição que a equipe de TI passou para você. Os dispositivos pareados com este computador vão chegar a ele por esse relay quando nada mais direto funcionar.",
+      "name": "Relay",
+      "nameExample": "relay.example.com",
+      "secret": "Segredo de inscrição",
+      "secretSaved": "Salvo. Cole um novo para substituir.",
+      "secretPlaceholder": "Cole o segredo de inscrição",
+      "connect": "Conectar",
+      "remove": "Usar o relay do Toskar",
+      "state": {
+        "connected": "Conectado a {{relay}}.",
+        "connecting": "Conectando a {{relay}}…",
+        "noToken": "Digite o segredo de inscrição do relay para conectar.",
+        "error": "Não foi possível conectar a {{relay}} ({{code}}). Confira o nome e o segredo de inscrição."
+      }
     }
   }
 }

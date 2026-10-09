@@ -963,14 +963,19 @@ type SettingsView struct {
 	RemoteAccessAddress string `json:"remote_access_address,omitempty"`
 	// RemoteAccessPortMapping is whether Toskar asks the router to open a
 	// port for it; on unless turned off.
-	RemoteAccessPortMapping bool   `json:"remote_access_port_mapping"`
-	WebUIEnabled            bool   `json:"web_ui_enabled"`
-	DiscoveryEnabled        bool   `json:"discovery_enabled"`
-	NodeName                string `json:"node_name"`
-	NodeID                  string `json:"node_id"`
-	AdvancedMode            bool   `json:"advanced_mode"`
-	ModelLifecycle          string `json:"model_lifecycle"`     // automatic | manual
-	IdleUnloadMinutes       int    `json:"idle_unload_minutes"` // 0 = never
+	RemoteAccessPortMapping bool `json:"remote_access_port_mapping"`
+	// RemoteAccessRelay is an organization's own relay, or "" for Toskar's;
+	// RemoteAccessRelayEnrolled is whether its enrollment secret is set
+	// (the secret itself is never shown).
+	RemoteAccessRelay         string `json:"remote_access_relay,omitempty"`
+	RemoteAccessRelayEnrolled bool   `json:"remote_access_relay_enrolled"`
+	WebUIEnabled              bool   `json:"web_ui_enabled"`
+	DiscoveryEnabled          bool   `json:"discovery_enabled"`
+	NodeName                  string `json:"node_name"`
+	NodeID                    string `json:"node_id"`
+	AdvancedMode              bool   `json:"advanced_mode"`
+	ModelLifecycle            string `json:"model_lifecycle"`     // automatic | manual
+	IdleUnloadMinutes         int    `json:"idle_unload_minutes"` // 0 = never
 	// KeepRunningInBackground keeps the local daemon (and desktop tray) alive
 	// when the main window is closed. Default false. A saved schedule turns it on,
 	// because the scheduler stops when the daemon stops.

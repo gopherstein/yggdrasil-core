@@ -155,7 +155,25 @@
       "ipv6": "Joignable de partout en IPv6 à [{{address}}]:{{port}}, si votre box le laisse passer.",
       "manual": "Joignable à {{address}}, l'adresse que vous avez saisie.",
       "carrierNat": "Pas encore joignable : votre fournisseur partage une adresse entre de nombreux foyers, donc un port de la box n'atteint pas cet ordinateur. Le relais de Toskar s'en chargera.",
-      "noPort": "Pas encore joignable : la box n'a pas ouvert le port {{port}}. Redirigez-le vers cet ordinateur et saisissez l'adresse, ou utilisez Tailscale."
+      "noPort": "Pas encore joignable : la box n'a pas ouvert le port {{port}}. Redirigez-le vers cet ordinateur et saisissez l'adresse, ou utilisez Tailscale.",
+      "relay": "Joignable de partout via {{relay}}."
+    },
+    "relay": {
+      "title": "Relais de votre organisation",
+      "body": "Si votre organisation exploite son propre relais Toskar, saisissez son nom et le secret d'inscription fourni par votre équipe informatique. Les appareils associés à cet ordinateur l'atteindront alors via ce relais quand aucun chemin plus direct ne fonctionne.",
+      "name": "Relais",
+      "nameExample": "relay.example.com",
+      "secret": "Secret d'inscription",
+      "secretSaved": "Enregistré. Collez-en un nouveau pour le remplacer.",
+      "secretPlaceholder": "Collez le secret d'inscription",
+      "connect": "Se connecter",
+      "remove": "Utiliser plutôt le relais de Toskar",
+      "state": {
+        "connected": "Connecté à {{relay}}.",
+        "connecting": "Connexion à {{relay}}…",
+        "noToken": "Saisissez le secret d'inscription du relais pour vous connecter.",
+        "error": "Impossible de se connecter à {{relay}} ({{code}}). Vérifiez le nom et le secret d'inscription."
+      }
     }
   }
 }

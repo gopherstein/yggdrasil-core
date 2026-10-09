@@ -2,8 +2,12 @@ package api
 
 import (
 	"context"
+	"crypto/sha256"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/json"
 	"errors"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -165,5 +169,98 @@ func TestRouteSecret(t *testing.T) {
 	res.Body.Close()
 	if res.StatusCode != http.StatusForbidden {
 		t.Fatalf("remote: %d", res.StatusCode)
+	}
+}
+
+// pipeConn is a device's connection as the relay client hands it over:
+// its address is the device's, not the relay's.
+type pipeConn struct {
+	net.Conn
+	remote net.Addr
+}
+
+func (c pipeConn) RemoteAddr() net.Addr { return c.remote }
+
+// A device through the relay meets the remote listener as a direct one
+// does: TLS with the API's certificate, paired devices' keys only, wrong
+// keys counted against the device's address (#456).
+func TestServeRelayed(t *testing.T) {
+	dir := t.TempDir()
+	mgr, err := config.NewManager(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cert, err := auth.APICertificate(auth.NewSecretStore(dir))
+	if err != nil {
+		t.Fatal(err)
+	}
+	srv := NewServer(Dependencies{
+		Config: mgr,
+		VerifyAPIKey: func(_ context.Context, secret string) (auth.APIKeyRecord, error) {
+			if secret == "phone-key" {
+				return auth.APIKeyRecord{ID: "d1", PersonID: auth.OwnerID, Kind: auth.KindDevice}, nil
+			}
+			return auth.APIKeyRecord{}, errors.New("invalid")
+		},
+	})
+	if srv.ServeRelayed(nil) {
+		t.Fatal("took a connection with the listener off")
+	}
+	srv.SetTLS(&tls.Config{Certificates: []tls.Certificate{cert}, MinVersion: tls.VersionTLS12}, APITLS{Enabled: true})
+	if err := srv.ServeRemote("127.0.0.1:0"); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(srv.StopRemote)
+	device := "203.0.113.50"
+	t.Cleanup(func() { remoteFailures.Forget(device) })
+	pin := sha256.Sum256(cert.Certificate[0])
+	client := &http.Client{Timeout: 5 * time.Second, Transport: &http.Transport{
+		DialContext: func(context.Context, string, string) (net.Conn, error) {
+			a, b := net.Pipe()
+			if !srv.ServeRelayed(pipeConn{Conn: b, remote: &net.TCPAddr{IP: net.ParseIP(device)}}) {
+				return nil, errors.New("not taken")
+			}
+			return a, nil
+		},
+		// The device trusts the pinned certificate, as through the relay.
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true, VerifyPeerCertificate: func(raw [][]byte, _ [][]*x509.Certificate) error {
+			if sha256.Sum256(raw[0]) != pin {
+				return errors.New("not the pinned certificate")
+			}
+			return nil
+		}},
+	}}
+	call := func(key string) (int, string) {
+		t.Helper()
+		req, _ := http.NewRequest(http.MethodGet, "https://relayed.invalid/api/v1/health", nil)
+		if key != "" {
+			req.Header.Set("Authorization", "Bearer "+key)
+		}
+		res, err := client.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer res.Body.Close()
+		var body struct {
+			Error struct{ Code string }
+		}
+		_ = json.NewDecoder(res.Body).Decode(&body)
+		return res.StatusCode, body.Error.Code
+	}
+	if status, _ := call("phone-key"); status != http.StatusOK {
+		t.Fatalf("phone key: %d", status)
+	}
+	if status, code := call(""); status != http.StatusUnauthorized {
+		t.Fatalf("no key: %d %s", status, code)
+	}
+	for range 20 {
+		call("wrong")
+	}
+	if status, code := call("phone-key"); status != http.StatusTooManyRequests || code != "REMOTE_THROTTLED" {
+		t.Fatalf("after wrong keys from the device's address: %d %s", status, code)
+	}
+	srv.StopRemote()
+	if srv.ServeRelayed(pipeConn{remote: &net.TCPAddr{}}) {
+		t.Fatal("took a connection after stopping")
 	}
 }

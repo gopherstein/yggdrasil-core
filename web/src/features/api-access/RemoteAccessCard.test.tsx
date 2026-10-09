@@ -27,4 +27,37 @@ describe('RemoteAccessCard (#456)', () => {
     fireEvent.click(screen.getByRole('switch', { name: 'Access from anywhere' }))
     await waitFor(() => expect(api.updateSettings).toHaveBeenCalledWith({ remote_access_enabled: false }))
   })
+
+  it("connects to an organization's relay, keeps the secret out of sight, and says how it's going", async () => {
+    vi.mocked(api.getSettings).mockResolvedValue({
+      remote_access_enabled: true,
+      remote_access_port: 7333,
+      remote_access_relay: 'relay.example.com',
+      remote_access_relay_enrolled: true,
+    } as never)
+    vi.mocked(api.getRemoteAccess).mockResolvedValue({
+      enabled: true,
+      port: 7333,
+      listening: '[::]:7333',
+      reachable: 'relay',
+      relay: { name: 'relay.example.com', state: 'connected' },
+    })
+    vi.mocked(api.updateSettings).mockClear().mockResolvedValue({} as never)
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <RemoteAccessCard />
+      </QueryClientProvider>,
+    )
+    expect(await screen.findByText('Reachable from anywhere through relay.example.com.')).toBeInTheDocument()
+    expect(screen.getByText('Connected to relay.example.com.')).toBeInTheDocument()
+    const secret = screen.getByLabelText('Enrollment secret')
+    expect(secret).toHaveValue('')
+    expect(secret).toHaveAttribute('placeholder', 'Saved. Paste a new one to replace it.')
+    fireEvent.change(secret, { target: { value: ' new-secret-0123456789abcdef ' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Connect' }))
+    await waitFor(() => expect(api.updateSettings).toHaveBeenCalledWith({ remote_access_relay_secret: 'new-secret-0123456789abcdef' }))
+    expect(secret).toHaveValue('')
+    fireEvent.click(screen.getByRole('button', { name: "Use Toskar's relay instead" }))
+    await waitFor(() => expect(api.updateSettings).toHaveBeenCalledWith({ remote_access_relay: '', remote_access_relay_secret: '' }))
+  })
 })

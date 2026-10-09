@@ -551,8 +551,9 @@ export const api = {
       mapped_by?: 'pcp' | 'nat-pmp' | 'upnp'
       map_error?: string
       ipv6?: string[]
-      reachable?: 'direct' | 'ipv6' | 'manual' | 'none'
+      reachable?: 'direct' | 'ipv6' | 'manual' | 'relay' | 'none'
       reason?: 'off' | 'not_listening' | 'carrier_nat' | 'no_port'
+      relay?: { name: string; state: 'no_token' | 'connecting' | 'connected' | 'error'; error?: string }
     }>('/api/v1/remote-access'),
 
   getApiTLS: () => request<APITLS>('/api/v1/tls'),

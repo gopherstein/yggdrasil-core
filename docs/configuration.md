@@ -79,6 +79,8 @@ Restart the daemon after editing the file by hand. A changed `api_host` or `inte
 | `TOSKAR_INTERNAL_PORT` | `internal_port` | |
 | `TOSKAR_DISCOVERY_ENABLED` | `discovery_enabled` | `1`, `true`, `yes`, or `on` turn it on; anything else turns it off. |
 | `TOSKAR_STATIC_PEERS` | `static_peers` | Comma-separated `host:port` list |
+| `TOSKAR_RELAY_URL` | | The relay access from anywhere uses when `remote_access.relay` is empty, instead of Toskar's, such as a developer's `relay.localhost:7472`. |
+| `TOSKAR_RELAY_CA` | | A PEM file of certificates to trust for the relay, besides the system's, for a relay whose certificate an organization's own CA issued. |
 | `TOSKAR_ADVERTISE_HOST` | `advertise_host` | |
 | `TOSKAR_NODE_ID` | `node_id` | For containers with a fixed identity |
 | `TOSKAR_NODE_NAME` | `node_name` | |

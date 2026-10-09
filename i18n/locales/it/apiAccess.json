@@ -155,7 +155,25 @@
       "ipv6": "Raggiungibile ovunque via IPv6 su [{{address}}]:{{port}}, se il router lo consente.",
       "manual": "Raggiungibile su {{address}}, l'indirizzo che hai inserito.",
       "carrierNat": "Non ancora raggiungibile: il tuo provider condivide un indirizzo tra molte case, quindi una porta del router non raggiunge questo computer. Ci penserà il relay di Toskar.",
-      "noPort": "Non ancora raggiungibile: il router non ha aperto la porta {{port}}. Inoltrala a questo computer e inserisci l'indirizzo, oppure usa Tailscale."
+      "noPort": "Non ancora raggiungibile: il router non ha aperto la porta {{port}}. Inoltrala a questo computer e inserisci l'indirizzo, oppure usa Tailscale.",
+      "relay": "Raggiungibile ovunque tramite {{relay}}."
+    },
+    "relay": {
+      "title": "Relay della tua organizzazione",
+      "body": "Se la tua organizzazione gestisce un proprio relay Toskar, inserisci il suo nome e il segreto di registrazione che ti ha dato il reparto IT. I dispositivi associati a questo computer lo raggiungeranno tramite quel relay quando nessun percorso più diretto funziona.",
+      "name": "Relay",
+      "nameExample": "relay.example.com",
+      "secret": "Segreto di registrazione",
+      "secretSaved": "Salvato. Incollane uno nuovo per sostituirlo.",
+      "secretPlaceholder": "Incolla il segreto di registrazione",
+      "connect": "Connetti",
+      "remove": "Usa invece il relay di Toskar",
+      "state": {
+        "connected": "Connesso a {{relay}}.",
+        "connecting": "Connessione a {{relay}}…",
+        "noToken": "Inserisci il segreto di registrazione del relay per connetterti.",
+        "error": "Impossibile connettersi a {{relay}} ({{code}}). Controlla il nome e il segreto di registrazione."
+      }
     }
   }
 }

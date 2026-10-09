@@ -1,6 +1,6 @@
 # Access from anywhere: design
 
-Status: in progress (#456). The remote listener, its setting, router port mapping, the route secret, and the address record have shipped; registration, the relay, and the apps are what the pieces build to.
+Status: in progress (#456). The remote listener, its setting, router port mapping, the route secret, the address record, and the computer's side of the relay (enrollment, registration, and the tunnel) have shipped in core; the rendezvous and relay are built in the private `yeixio/toskar-relay`. Receipt exchange, hosting Toskar's relay, and the apps are what's left.
 
 The phone, tablet, TV, and watch apps reach a person's own Toskar from anywhere, not only on the home network, with no port forwarding, VPN, or dynamic DNS to set up. Like Plex remote access, the connection is direct whenever it can be, and Toskar's service mostly introduces the two ends. Everything stays end-to-end encrypted to the computer the app already trusts.
 
@@ -49,7 +49,7 @@ When the person turns on **Settings → Access from anywhere** (off by default; 
 - **Port mapping:** it asks the router for a mapping to that port with PCP, then NAT-PMP, then UPnP-IGD, renews it before it lapses, and removes it when the setting is turned off or Toskar quits. A port the person forwarded by hand can be entered instead.
 - **Public addresses:** its global IPv6 addresses, and the router's external IPv4 address from the mapping protocol; with neither, it asks the rendezvous what address it saw.
 - **Registration:** every few minutes, and whenever an address changes, it sends the rendezvous an address record (below).
-- **Relay tunnel:** with the subscription active and no direct path working, it keeps one outbound connection to the relay, over TLS to the relay's own certificate, and accepts the streams the relay passes it as connections to the remote listener. No inbound port is needed.
+- **Relay tunnel:** whenever it has a route token, it keeps one outbound connection to the relay, over TLS to the relay's own certificate, and accepts the streams the relay passes it as connections to the remote listener, each with the device's address so the remote listener's limits count the device. No inbound port is needed. An idle tunnel costs only a ping every 25 seconds, and keeping it up means a device can switch to the relay the moment a direct path fails.
 - **Status in Settings:** "Reachable from anywhere: direct", "through IPv6", "through Toskar's relay", or "not reachable, and why" (no mapping, no subscription, the service unreachable), with the address and port it found.
 
 ## The rendezvous
@@ -67,7 +67,7 @@ A small stateless service with a key-value store. It holds no traffic.
 
 ## The relay
 
-- **Routing by server name:** the first label of `<route>.relay.toskar.ai` is a short form of the route ID. The computer's tunnel registers under it, authenticated by the route token the app obtained (below), so only the computer the subscription was bought for can take the route.
+- **Routing by server name:** the first label of `<route>.relay.toskar.ai` is the route ID (32 characters, one DNS label). The computer's tunnel registers under it, authenticated by the route token the app obtained (below), so only the computer the subscription was bought for can take the route.
 - **Pass-through:** the relay copies bytes between the app's TCP connection and a stream in the computer's tunnel, nothing more.
 - **Limits:** a fair-use cap on relayed bytes per route a month, connection-rate limits per route and per client address, and an idle timeout. Over the cap, the app says so and keeps the home network and on-device answers.
 - **Counting** is by bytes and connections; the relay can't count messages, because it can't read them. That's one reason for flat pricing (below).
@@ -92,6 +92,8 @@ Testers go through the real subscription flow without paying; nothing in the app
 ## Enterprise: your own tunnel, at scale
 
 Organizations run their own way in instead of the subscription, and it has to work for hundreds of people. A separate guide (`docs/remote-access-enterprise.md`) covers it; this is what it needs and what core and the apps must do for it.
+
+**Or their own relay.** An organization that would rather keep its Toskar servers off the internet entirely runs the relay itself, licensed from Toskar, on its own hardware and name (toskar-relay's `docs/self-hosting.md`). Each Toskar server gets the relay's name and an enrollment secret under API Access → Your organization's relay, enrolls itself for a token, registers, and keeps its tunnel there; paired devices then find and reach it through that relay as they would through Toskar's. The enrollment secret is only ever sent to an organization's relay, never to Toskar's. `TOSKAR_RELAY_CA` adds a private CA for the relay's certificate.
 
 **The shape:** Toskar runs on a server; people reach it at a hostname the organization controls, such as `toskar.example.com`, through its own tunnel or reverse proxy, with sign-in through its identity provider.
 

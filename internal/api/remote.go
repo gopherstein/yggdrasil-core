@@ -44,7 +44,9 @@ type RemoteStatus struct {
 type remoteListener struct {
 	mu     sync.Mutex
 	server *http.Server
-	status RemoteStatus
+	// relayed takes devices' connections from the relay tunnel (#456).
+	relayed *mergedListener
+	status  RemoteStatus
 }
 
 // remoteHandler marks every request as remote, keeps it to the API, and
@@ -106,12 +108,14 @@ func (s *Server) ServeRemote(addr string) error {
 		ReadHeaderTimeout: 10 * time.Second,
 		IdleTimeout:       2 * time.Minute,
 	}
+	merged := newMergedListener(ln)
 	s.remote.mu.Lock()
 	s.remote.server = srv
+	s.remote.relayed = merged
 	s.remote.status = RemoteStatus{Listening: ln.Addr().String()}
 	s.remote.mu.Unlock()
 	go func() {
-		if err := srv.Serve(tls.NewListener(ln, cfg)); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := srv.Serve(tls.NewListener(merged, cfg)); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			s.remote.set(RemoteStatus{Error: err.Error()})
 		}
 	}()
@@ -122,12 +126,86 @@ func (s *Server) ServeRemote(addr string) error {
 func (s *Server) StopRemote() {
 	s.remote.mu.Lock()
 	srv := s.remote.server
-	s.remote.server = nil
+	s.remote.server, s.remote.relayed = nil, nil
 	s.remote.status = RemoteStatus{}
 	s.remote.mu.Unlock()
 	if srv != nil {
 		_ = srv.Close()
 	}
+}
+
+// ServeRelayed answers a device's connection that came through the relay
+// as the remote listener answers its own: TLS with the API's certificate,
+// paired devices' keys only. It reports false when the listener is off.
+func (s *Server) ServeRelayed(conn net.Conn) bool {
+	s.remote.mu.Lock()
+	merged := s.remote.relayed
+	s.remote.mu.Unlock()
+	return merged != nil && merged.push(conn)
+}
+
+// TLSCertificate is the API's certificate, which signs the address record
+// devices find this computer by.
+func (s *Server) TLSCertificate() (tls.Certificate, bool) {
+	s.listenMu.Lock()
+	defer s.listenMu.Unlock()
+	if s.tlsConfig == nil || len(s.tlsConfig.Certificates) == 0 {
+		return tls.Certificate{}, false
+	}
+	return s.tlsConfig.Certificates[0], true
+}
+
+// mergedListener accepts from a TCP listener and from connections pushed
+// to it, so relayed devices get the same server as direct ones.
+type mergedListener struct {
+	net.Listener
+	conns chan net.Conn
+	errs  chan error
+	done  chan struct{}
+	once  sync.Once
+}
+
+func newMergedListener(ln net.Listener) *mergedListener {
+	m := &mergedListener{Listener: ln, conns: make(chan net.Conn), errs: make(chan error, 1), done: make(chan struct{})}
+	go func() {
+		for {
+			c, err := ln.Accept()
+			if err != nil {
+				m.errs <- err
+				return
+			}
+			if !m.push(c) {
+				c.Close()
+				return
+			}
+		}
+	}()
+	return m
+}
+
+func (m *mergedListener) push(c net.Conn) bool {
+	select {
+	case m.conns <- c:
+		return true
+	case <-m.done:
+		return false
+	}
+}
+
+func (m *mergedListener) Accept() (net.Conn, error) {
+	select {
+	case c := <-m.conns:
+		return c, nil
+	case err := <-m.errs:
+		return nil, err
+	case <-m.done:
+		return nil, net.ErrClosed
+	}
+}
+
+func (m *mergedListener) Close() error {
+	m.once.Do(func() { close(m.done) })
+	return m.Listener.Close()
 }
 
 // RemoteListening is what the remote listener is doing.
@@ -171,6 +249,13 @@ func (s *Server) handleRemoteAccess(w http.ResponseWriter, r *http.Request) {
 		if reach.Reason != "" {
 			out["reason"] = reach.Reason
 		}
+		if reach.Relay != "" {
+			relay := map[string]any{"name": reach.Relay, "state": reach.RelayState}
+			if reach.RelayError != "" {
+				relay["error"] = reach.RelayError
+			}
+			out["relay"] = relay
+		}
 	}
 	st := s.RemoteListening()
 	if st.Listening != "" {
@@ -193,9 +278,12 @@ type RemoteReach struct {
 	MapError       string
 	IPv6           []string
 	// Reachable is direct (a router port at a public address), ipv6,
-	// manual (a port forwarded by hand), or none, with Reason: off,
+	// manual (a port forwarded by hand), relay, or none, with Reason: off,
 	// not_listening, carrier_nat, or no_port.
 	Reachable, Reason string
+	// Relay is the relay used, and RelayState how it's doing: no_token,
+	// connecting, connected, or error, with RelayError its code.
+	Relay, RelayState, RelayError string
 }
 
 // handleRouteSecret gives a paired device the route secret, on the home

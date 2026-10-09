@@ -7,9 +7,9 @@ import { Toggle } from './Toggle'
 /**
  * Access from anywhere (#456, docs/remote-access.md): a listener for the
  * devices paired with this computer when they're away from home. It serves
- * only what a phone uses, over HTTPS, to their keys. For now it's reached
- * through a port the person forwards (or Tailscale); automatic setup comes
- * next.
+ * only what a phone uses, over HTTPS, to their keys. The router opens a
+ * port for it, or the person forwards one; otherwise a relay carries the
+ * connection: Toskar's, or the organization's own.
  */
 export function RemoteAccessCard() {
   const { t } = useTranslation('apiAccess')
@@ -90,8 +90,131 @@ export function RemoteAccessCard() {
       </form>
       {error ? <p className="text-sm text-danger">{error}</p> : null}
       <p className="text-xs text-ink-faint">{t('remote.notes', { port: current })}</p>
+      <RelaySettings
+        relay={settings.data?.remote_access_relay ?? ''}
+        enrolled={settings.data?.remote_access_relay_enrolled ?? false}
+        status={enabled ? st?.relay : undefined}
+        saving={save.isPending}
+        onSave={(patch) => save.mutate(patch)}
+      />
     </section>
   )
+}
+
+type RelayStatus = NonNullable<Awaited<ReturnType<typeof api.getRemoteAccess>>>['relay']
+
+/**
+ * An organization's own relay (toskar-relay's self-hosting guide): its name
+ * and the enrollment secret this computer trades for its own token. The
+ * secret is never shown again; the field only says one is saved.
+ */
+function RelaySettings({
+  relay,
+  enrolled,
+  status,
+  saving,
+  onSave,
+}: {
+  relay: string
+  enrolled: boolean
+  status: RelayStatus
+  saving: boolean
+  onSave: (patch: { remote_access_relay?: string; remote_access_relay_secret?: string }) => void
+}) {
+  const { t } = useTranslation('apiAccess')
+  const [name, setName] = useState(relay)
+  const [secret, setSecret] = useState('')
+  useEffect(() => setName(relay), [relay])
+  const own = relay !== ''
+  // The secret is only ever for an organization's relay, never Toskar's.
+  const changed = name.trim() !== '' && (name.trim() !== relay || secret.trim() !== '')
+  return (
+    <details className="rounded-lg border border-line p-3" open={own || undefined}>
+      <summary className="cursor-pointer text-sm font-medium">{t('remote.relay.title')}</summary>
+      <div className="mt-3 space-y-3">
+        <p className="text-sm text-ink-muted">{t('remote.relay.body')}</p>
+        {own && status ? <RelayLine status={status} /> : null}
+        <form
+          className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
+          onSubmit={(e) => {
+            e.preventDefault()
+            const patch: { remote_access_relay?: string; remote_access_relay_secret?: string } = {}
+            if (name.trim() !== relay) patch.remote_access_relay = name.trim()
+            if (secret.trim() !== '') patch.remote_access_relay_secret = secret.trim()
+            onSave(patch)
+            setSecret('')
+          }}
+        >
+          <label className="block space-y-1 text-sm">
+            <span className="text-ink-muted">{t('remote.relay.name')}</span>
+            <input
+              className="field w-full"
+              placeholder={t('remote.relay.nameExample')}
+              autoComplete="off"
+              spellCheck={false}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </label>
+          <label className="block space-y-1 text-sm">
+            <span className="text-ink-muted">{t('remote.relay.secret')}</span>
+            <input
+              className="field w-full"
+              type="password"
+              autoComplete="off"
+              placeholder={enrolled ? t('remote.relay.secretSaved') : t('remote.relay.secretPlaceholder')}
+              value={secret}
+              onChange={(e) => setSecret(e.target.value)}
+            />
+          </label>
+          <button type="submit" className="btn-secondary" disabled={!changed || saving}>
+            {t('remote.relay.connect')}
+          </button>
+        </form>
+        {own ? (
+          <button
+            type="button"
+            className="btn-ghost text-sm"
+            disabled={saving}
+            onClick={() => onSave({ remote_access_relay: '', remote_access_relay_secret: '' })}
+          >
+            {t('remote.relay.remove')}
+          </button>
+        ) : null}
+      </div>
+    </details>
+  )
+}
+
+/** How the connection to the organization's relay is doing. */
+function RelayLine({ status }: { status: NonNullable<RelayStatus> }) {
+  const { t } = useTranslation('apiAccess')
+  switch (status.state) {
+    case 'connected':
+      return (
+        <p className="text-sm text-success" role="status">
+          {t('remote.relay.state.connected', { relay: status.name })}
+        </p>
+      )
+    case 'no_token':
+      return (
+        <p className="text-sm text-warning" role="status">
+          {t('remote.relay.state.noToken')}
+        </p>
+      )
+    case 'error':
+      return (
+        <p className="text-sm text-danger" role="status">
+          {t('remote.relay.state.error', { relay: status.name, code: status.error ?? '' })}
+        </p>
+      )
+    default:
+      return (
+        <p className="text-sm text-ink-muted" role="status">
+          {t('remote.relay.state.connecting', { relay: status.name })}
+        </p>
+      )
+  }
 }
 
 type Status = NonNullable<Awaited<ReturnType<typeof api.getRemoteAccess>>>
@@ -118,6 +241,9 @@ function ReachLine({ status }: { status: Status }) {
       break
     case 'manual':
       line = t('remote.reach.manual', { address: status.address })
+      break
+    case 'relay':
+      line = t('remote.reach.relay', { relay: status.relay?.name ?? '' })
       break
     default:
       ok = false

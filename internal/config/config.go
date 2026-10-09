@@ -118,6 +118,10 @@ type RemoteAccess struct {
 	// default it does, while access from anywhere is on and no forwarded
 	// address is set.
 	NoPortMapping bool `json:"no_port_mapping,omitempty"`
+	// Relay is the relay's name, with a port when it isn't 443, for an
+	// organization's own relay; empty is Toskar's. Its enrollment secret
+	// is kept with the secrets, not here.
+	Relay string `json:"relay,omitempty"`
 }
 
 // RemotePort is the remote listener's port.

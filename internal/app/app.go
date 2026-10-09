@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/fs"
 	"log/slog"
@@ -54,6 +55,7 @@ import (
 	"github.com/yeixio/toskar-core/internal/profiles"
 	"github.com/yeixio/toskar-core/internal/pyenv"
 	"github.com/yeixio/toskar-core/internal/ratings"
+	"github.com/yeixio/toskar-core/internal/relayclient"
 	"github.com/yeixio/toskar-core/internal/remotetools"
 	"github.com/yeixio/toskar-core/internal/replylang"
 	"github.com/yeixio/toskar-core/internal/runlog"
@@ -114,6 +116,10 @@ type App struct {
 	Muninn           *muninn.Store
 	// portKeeper keeps the router port access from anywhere uses (#456).
 	portKeeper portmap.Keeper
+	// relay is the relay client while access from anywhere is on (#456).
+	relayMu   sync.Mutex
+	relay     *relayclient.Client
+	relayStop context.CancelFunc
 	// TopicLog keeps off-topic attempts (#345).
 	TopicLog *topiclog.Store
 	// Notifications is Gjallarhorn's notification center and delivery.
@@ -1245,6 +1251,7 @@ func (a *App) Shutdown(ctx context.Context) error {
 	shutdownCtx, cancel := context.WithTimeout(ctx, 4*time.Second)
 	defer cancel()
 	// The router port goes when Toskar does.
+	a.stopRelay()
 	a.portKeeper.Stop()
 	a.API.StopRemote()
 	_ = a.API.Shutdown(shutdownCtx)
@@ -1300,7 +1307,8 @@ func (a *App) settingsView(ctx context.Context) (contracts.SettingsView, error) 
 		LANAPIEnabled: cfg.LANAPIEnabled, WebUIEnabled: cfg.WebUIEnabled,
 		RemoteAccessEnabled: cfg.RemoteAccess.Enabled, RemoteAccessPort: cfg.RemotePort(), RemoteAccessAddress: cfg.RemoteAccess.Address,
 		RemoteAccessPortMapping: !cfg.RemoteAccess.NoPortMapping,
-		DiscoveryEnabled:        cfg.DiscoveryEnabled, NodeName: cfg.NodeName, NodeID: cfg.NodeID,
+		RemoteAccessRelay:       cfg.RemoteAccess.Relay, RemoteAccessRelayEnrolled: a.relayEnrolled(cfg),
+		DiscoveryEnabled: cfg.DiscoveryEnabled, NodeName: cfg.NodeName, NodeID: cfg.NodeID,
 		AdvancedMode: advanced, ModelLifecycle: lifecycle, IdleUnloadMinutes: idleMins,
 		KeepRunningInBackground: keepBackground,
 		DefaultProfileID:        defaultProfile,
@@ -1510,6 +1518,21 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 		}
 		remote.Address, remoteTouched = addr, true
 	}
+	if v, ok := patch["remote_access_relay"].(string); ok {
+		name, err := cleanRelayName(v)
+		if err != nil {
+			return err
+		}
+		remote.Relay, remoteTouched = name, true
+	}
+	relaySecret, relaySecretTouched := patch["remote_access_relay_secret"].(string)
+	if relaySecretTouched && strings.TrimSpace(relaySecret) != "" {
+		clean, err := cleanRelaySecret(relaySecret)
+		if err != nil {
+			return err
+		}
+		relaySecret = clean
+	}
 	err := a.Config.Update(func(c *config.Config) {
 		if remoteTouched {
 			c.RemoteAccess = remote
@@ -1543,6 +1566,23 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 	if err != nil {
 		return err
 	}
+	// A new relay or enrollment secret needs a new token (#456).
+	relayChanged := remote.Relay != remoteBefore.Relay || relaySecretTouched
+	if relayChanged {
+		secrets := auth.NewSecretStore(a.Config.Get().DataDir)
+		if relaySecretTouched {
+			if relaySecret == "" {
+				if err := secrets.Delete(relaySecretName); err != nil && !errors.Is(err, os.ErrNotExist) {
+					return err
+				}
+			} else if err := secrets.Write(relaySecretName, relaySecret); err != nil {
+				return err
+			}
+		}
+		if err := secrets.Delete(relayclient.TokenName); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
+	}
 	// Network access applies now: the API moves to its new address, without
 	// a restart (#216). If it can't, the setting goes back.
 	if lanTouched && a.API != nil && a.API.Addr() != "" {
@@ -1566,6 +1606,8 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 			_ = a.applyRemoteAccess()
 			return contracts.NewError("REMOTE_LISTEN_FAILED", map[string]any{"port": port}, fmt.Errorf("access from anywhere can't listen on port %d: %w", port, err))
 		}
+	} else if relayChanged {
+		a.applyRelay()
 	}
 	if v, ok := patch["node_name"].(string); ok && v != "" {
 		if discoveryTouched && a.Nodes != nil {
