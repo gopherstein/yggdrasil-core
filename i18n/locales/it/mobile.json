@@ -26,6 +26,7 @@
     "enterAddress": "Inserisci l'indirizzo del computer su cui è in esecuzione Toskar.",
     "couldNotReach": "Impossibile raggiungere Toskar.",
     "unreachable": "Toskar su quel computer non è raggiungibile. Usa la stessa rete Wi-Fi e scegli Collega un dispositivo su quel computer.",
+    "unreachableAway": "Impossibile raggiungere il computer fuori casa. Potrebbe essere spento o in stop, oppure l'accesso ovunque è disattivato.",
     "keyRejected": "Quella chiave API è stata rifiutata. Collegati invece con un codice dal computer, oppure crea una chiave in Accesso API.",
     "dropped": "La connessione a Toskar si è interrotta.",
     "chatFailed": "Chat non riuscita.",
@@ -172,6 +173,11 @@
     "computer": "Computer",
     "connectedComputer": "Computer collegato",
     "encrypted": "Cifrato · certificato {{code}}",
+    "path": {
+      "home": "A casa",
+      "direct": "Fuori casa, direttamente",
+      "relay": "Fuori casa, tramite {{relay}}"
+    },
     "notEncrypted": "Non cifrato. Aggiornare Toskar sul computer cifra le chat con esso.",
     "certificateChanged": "Il certificato di questo computer è cambiato, quindi questo dispositivo non si connette. Se Toskar è stato reinstallato lì, dimenticalo qui sotto e connettiti di nuovo.",
     "notConnected": "Non collegato",
