@@ -192,5 +192,7 @@
   "NAME_INVALID": "名前は1〜80文字です。",
   "PERSON_NOT_FOUND": "その人はここにいません。",
   "ROLE_REQUIRED": "これには{{role}}の役割が必要です。",
-  "CROSS_SITE": "この変更は Toskar のページから行われていないため、拒否されました。"
+  "CROSS_SITE": "この変更は Toskar のページから行われていないため、拒否されました。",
+  "MESSAGE_NOT_FOUND": "そのメッセージはこのチャットにもうありません。チャットを再読み込みして、もう一度お試しください。",
+  "INVALID_BRANCH": "parent_id、retry_of、edit_of のどれか1つを、チャットの conversation_id と一緒に送ってください。"
 }

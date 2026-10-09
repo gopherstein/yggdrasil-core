@@ -192,5 +192,7 @@
   "NAME_INVALID": "Um nome tem de 1 a 80 caracteres.",
   "PERSON_NOT_FOUND": "Essa pessoa não está aqui.",
   "ROLE_REQUIRED": "Isso exige a função {{role}}.",
-  "CROSS_SITE": "Essa alteração não veio das páginas do Toskar, então foi recusada."
+  "CROSS_SITE": "Essa alteração não veio das páginas do Toskar, então foi recusada.",
+  "MESSAGE_NOT_FOUND": "Essa mensagem não está mais nesta conversa. Recarregue a conversa e tente de novo.",
+  "INVALID_BRANCH": "Envie só um entre parent_id, retry_of ou edit_of, com o conversation_id da conversa."
 }

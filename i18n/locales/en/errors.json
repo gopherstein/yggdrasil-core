@@ -192,5 +192,7 @@
   "NAME_INVALID": "A name is 1 to 80 characters.",
   "PERSON_NOT_FOUND": "That person isn't here.",
   "ROLE_REQUIRED": "This needs the {{role}} role.",
-  "CROSS_SITE": "That change didn't come from Toskar's own pages, so it was refused."
+  "CROSS_SITE": "That change didn't come from Toskar's own pages, so it was refused.",
+  "MESSAGE_NOT_FOUND": "That message isn't in this chat anymore. Reload the chat and try again.",
+  "INVALID_BRANCH": "Send one of parent_id, retry_of, or edit_of, with the chat's conversation_id."
 }

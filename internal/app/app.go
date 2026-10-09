@@ -494,6 +494,7 @@ func New(opts Options) (*App, error) {
 		ListMessages: func(ctx context.Context, id string) ([]contracts.Message, error) {
 			return convRepo.ListMessages(ctx, id)
 		},
+		ShowVersion: convRepo.ShowVersion,
 		GetSettings: func(ctx context.Context) (contracts.SettingsView, error) {
 			return a.settingsView(ctx)
 		},

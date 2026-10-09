@@ -2935,6 +2935,15 @@ paths:
                 time_zone:
                   type: string
                   description: "The person's IANA time zone, such as America/Juneau, for the date and time the answer uses; this computer's when empty or unknown"
+                parent_id:
+                  type: string
+                  description: Answer from this message in the chat, as a new version of the point after it (#447)
+                retry_of:
+                  type: string
+                  description: Ask this answer's question again, as a new version of the answer; message may be empty
+                edit_of:
+                  type: string
+                  description: Send message in place of this one, as a new version of it
                 attachments:
                   type: array
                   items:
@@ -2992,6 +3001,26 @@ paths:
                 properties:
                   stopped:
                     type: boolean
+  /api/v1/conversations/{id}/messages/{mid}/shown:
+    put:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: mid
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Show a version of its point in the chat, with what followed it (#447)
+      operationId: showMessageVersion
+      responses:
+        "200":
+          description: The chat as shown
+        "404":
+          description: MESSAGE_NOT_FOUND
   /api/v1/conversations/{id}/messages:
     get:
       summary: Messages of a conversation, with sources, steps, and files

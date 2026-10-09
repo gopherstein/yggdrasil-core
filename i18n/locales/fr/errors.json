@@ -192,5 +192,7 @@
   "NAME_INVALID": "Un nom compte 1 à 80 caractères.",
   "PERSON_NOT_FOUND": "Cette personne n’est pas ici.",
   "ROLE_REQUIRED": "Il faut le rôle {{role}}.",
-  "CROSS_SITE": "Cette modification ne venait pas des pages de Toskar, elle a donc été refusée."
+  "CROSS_SITE": "Cette modification ne venait pas des pages de Toskar, elle a donc été refusée.",
+  "MESSAGE_NOT_FOUND": "Ce message n'est plus dans cette discussion. Rechargez la discussion et réessayez.",
+  "INVALID_BRANCH": "Envoyez un seul parmi parent_id, retry_of ou edit_of, avec le conversation_id de la discussion."
 }

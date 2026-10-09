@@ -313,9 +313,22 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 		Effort string `json:"effort"`
 		// TimeZone is the person's IANA time zone, from their browser.
 		TimeZone string `json:"time_zone"`
+		// ParentID answers from that point in the chat; RetryOf asks an
+		// answer's question again; EditOf sends message in place of an
+		// earlier one. Each is a new version of its point (#447).
+		ParentID string `json:"parent_id"`
+		RetryOf  string `json:"retry_of"`
+		EditOf   string `json:"edit_of"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "invalid body", nil)
+		return
+	}
+	if n := btoi(body.ParentID != "") + btoi(body.RetryOf != "") + btoi(body.EditOf != ""); n > 1 {
+		writeErr(w, http.StatusBadRequest, "INVALID_BRANCH", "send one of parent_id, retry_of, and edit_of", nil)
+		return
+	} else if n == 1 && body.ConversationID == "" {
+		writeErr(w, http.StatusBadRequest, "INVALID_BRANCH", "parent_id, retry_of, and edit_of need a conversation_id", nil)
 		return
 	}
 	ctx := huginn.WithEffort(artifacts.WithAttachments(r.Context(), body.Attachments), huginn.ParseEffort(body.Effort))
@@ -363,6 +376,7 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 		body.ModelID = ""
 		ctx = turnopts.With(ctx, &turnopts.Options{Memory: true, Knowledge: true, FixedProfile: true})
 	}
+	ctx = turnopts.WithBranch(ctx, turnopts.Branch{ParentID: body.ParentID, RetryOf: body.RetryOf, EditOf: body.EditOf})
 	r = r.WithContext(locale.WithTimeZone(ctx, body.TimeZone))
 	if err := s.deps.Chat(w, r, body.ConversationID, body.ProfileID, body.ModelID, body.Message, body.Stream, body.Execution); err != nil {
 		writeErrFrom(w, http.StatusInternalServerError, "CHAT_FAILED", err)
@@ -740,4 +754,27 @@ func (s *Server) handleRuntimeHistory(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, s.deps.RuntimeHistory())
+}
+
+func btoi(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+// handleShowVersion shows a version of its point in a chat, with what
+// followed it, and answers with the chat as shown (#447).
+func (s *Server) handleShowVersion(w http.ResponseWriter, r *http.Request) {
+	if s.deps.ShowVersion == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Versions aren't available.", nil)
+		return
+	}
+	vars := mux.Vars(r)
+	msgs, err := s.deps.ShowVersion(r.Context(), vars["id"], vars["mid"])
+	if err != nil {
+		writeErr(w, http.StatusNotFound, "MESSAGE_NOT_FOUND", err.Error(), nil)
+		return
+	}
+	writeJSON(w, http.StatusOK, msgs)
 }

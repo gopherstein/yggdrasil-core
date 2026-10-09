@@ -94,7 +94,10 @@ type Dependencies struct {
 	UpdateConversation    func(ctx context.Context, id string, title, profileID, modelID *string, memoryOff *bool) (contracts.Conversation, error)
 	DeleteConversation    func(ctx context.Context, id string) error
 	ListMessages          func(ctx context.Context, conversationID string) ([]contracts.Message, error)
-	Chat                  func(w http.ResponseWriter, r *http.Request, conversationID, profileID, modelID, message string, stream bool, execution string) error
+	// ShowVersion shows a version of its point in a chat and returns the
+	// chat as shown (#447).
+	ShowVersion func(ctx context.Context, conversationID, messageID string) ([]contracts.Message, error)
+	Chat        func(w http.ResponseWriter, r *http.Request, conversationID, profileID, modelID, message string, stream bool, execution string) error
 	// StopChat stops a conversation's running turn and reports whether one was running.
 	StopChat           func(conversationID string) bool
 	ListTasks          func(ctx context.Context) ([]contracts.Task, error)
@@ -270,6 +273,7 @@ func (s *Server) routes() {
 	api.HandleFunc("/chat", s.handleChat).Methods(http.MethodPost)
 	api.HandleFunc("/chat/stop", s.handleStopChat).Methods(http.MethodPost)
 	api.HandleFunc("/conversations/{id}/messages", s.handleConversationMessages).Methods(http.MethodGet, http.MethodOptions)
+	api.HandleFunc("/conversations/{id}/messages/{mid}/shown", s.handleShowVersion).Methods(http.MethodPut)
 	api.HandleFunc("/tasks", s.handleListTasks).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/tasks", s.handleCreateTask).Methods(http.MethodPost)
 	api.HandleFunc("/tasks/{id}", s.handleGetTask).Methods(http.MethodGet, http.MethodOptions)

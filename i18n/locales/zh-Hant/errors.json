@@ -192,5 +192,7 @@
   "NAME_INVALID": "名稱為 1 到 80 個字元。",
   "PERSON_NOT_FOUND": "此人不在這裡。",
   "ROLE_REQUIRED": "這需要 {{role}} 角色。",
-  "CROSS_SITE": "此變更不是來自 Toskar 自己的頁面，因此被拒絕。"
+  "CROSS_SITE": "此變更不是來自 Toskar 自己的頁面，因此被拒絕。",
+  "MESSAGE_NOT_FOUND": "這則訊息已不在此聊天中。請重新載入聊天後再試。",
+  "INVALID_BRANCH": "請只傳送 parent_id、retry_of 或 edit_of 其中一個，並附上聊天的 conversation_id。"
 }

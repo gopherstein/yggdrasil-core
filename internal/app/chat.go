@@ -51,6 +51,32 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			}
 		}
 	}
+	// A retry asks its answer's question again (#447).
+	branch := turnopts.BranchFrom(ctx)
+	if conversationID == "" {
+		branch = turnopts.Branch{}
+	}
+	var retried contracts.Message
+	if branch.RetryOf != "" {
+		replaced, err := a.Conversations.Message(ctx, conversationID, branch.RetryOf)
+		if err != nil || replaced.Role != "assistant" {
+			return nil, contracts.Errorf("MESSAGE_NOT_FOUND", nil, "there's no answer %q to retry in this chat", branch.RetryOf)
+		}
+		if retried, err = a.Conversations.Message(ctx, conversationID, replaced.ParentID); err != nil || retried.Role != "user" {
+			return nil, contracts.Errorf("MESSAGE_NOT_FOUND", nil, "the answer %q has no question to ask again", branch.RetryOf)
+		}
+		message = retried.Content
+	}
+	if branch.EditOf != "" {
+		if edited, err := a.Conversations.Message(ctx, conversationID, branch.EditOf); err != nil || edited.Role != "user" {
+			return nil, contracts.Errorf("MESSAGE_NOT_FOUND", nil, "there's no message %q to edit in this chat", branch.EditOf)
+		}
+	}
+	if branch.ParentID != "" {
+		if _, err := a.Conversations.Message(ctx, conversationID, branch.ParentID); err != nil {
+			return nil, contracts.Errorf("MESSAGE_NOT_FOUND", nil, "there's no message %q to answer from in this chat", branch.ParentID)
+		}
+	}
 	// Memory requests are answered by Yggdrasil, not the model.
 	opts := turnopts.From(ctx)
 	if profileID == "" {
@@ -82,7 +108,9 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 	if a.attachesPictures(ctx) {
 		_, picturesAsked = a.seeingModel(ctx)
 	}
-	if len(structured.SchemaFrom(ctx)) == 0 && !picturesAsked && !topical {
+	// Toskar's own replies go at the end of the chat, so a retry or an edit
+	// always gets a model's answer at its point (#447).
+	if len(structured.SchemaFrom(ctx)) == 0 && !picturesAsked && !topical && !branch.Any() {
 		if ch, ok := a.answerCapabilityQuestion(ctx, conversationID, message); ok {
 			return ch, nil
 		}
@@ -92,7 +120,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		}
 	}
 	// An API caller changes memories only when it opted into memory (§62).
-	if (opts != nil && !opts.Memory) || topical {
+	if (opts != nil && !opts.Memory) || topical || branch.Any() {
 		// Fall through: "Remember …" is an ordinary message for this caller.
 	} else if ch, ok := a.handleMemoryCommand(ctx, conversationID, message); ok {
 		return ch, nil
@@ -113,7 +141,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 	}
 	// A request for something that is not installed but can be, such as an
 	// image before image generation is set up, is offered the setup (§29).
-	if !topical {
+	if !topical && !branch.Any() {
 		if ch, ok := a.offerSetup(ctx, profile, conversationID, message); ok {
 			return ch, nil
 		}
@@ -256,12 +284,32 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		return nil, err
 	}
 
+	// The person's message, at its point in the chat (#447): the end, after
+	// the message it answers from, or beside the one it edits. A retry asks
+	// the saved question again. turnMessageID is the question the answer
+	// goes under.
+	turnMessageID := ""
 	if conversationID != "" {
 		if save, _ := a.Settings.GetBool(ctx, "save_chat_history", true); save {
+			var meta *contracts.MessageMeta
 			if len(attached) > 0 {
-				_, _ = a.Conversations.AddMessageWithMeta(ctx, conversationID, "user", message, &contracts.MessageMeta{Files: fileRefs(attached)})
-			} else {
-				_, _ = a.Conversations.AddMessage(ctx, conversationID, "user", message)
+				meta = &contracts.MessageMeta{Files: fileRefs(attached)}
+			}
+			var saved contracts.Message
+			var err error
+			switch {
+			case branch.RetryOf != "":
+				saved = retried
+			case branch.EditOf != "":
+				edited, _ := a.Conversations.Message(ctx, conversationID, branch.EditOf)
+				saved, err = a.Conversations.AddReply(ctx, conversationID, edited.ParentID, "user", message, meta)
+			case branch.ParentID != "":
+				saved, err = a.Conversations.AddReply(ctx, conversationID, branch.ParentID, "user", message, meta)
+			default:
+				saved, err = a.Conversations.AddMessageWithMeta(ctx, conversationID, "user", message, meta)
+			}
+			if err == nil {
+				turnMessageID = saved.ID
 			}
 		}
 	}
@@ -361,6 +409,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			taskID:         task.ID,
 			turnPrompt:     message,
 			trace:          &turnTrace{runID: task.ID, notice: routeNotice, lang: appLang},
+			turnMessageID:  turnMessageID,
 			startedAt:      turnStart,
 			attachments:    attached,
 			pictures:       shown,
@@ -496,7 +545,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 					if _, healthFailure := modelhealth.Parse(evt.Error); healthFailure && full != "" {
 						if conversationID != "" {
 							if saveChat, _ := a.Settings.GetBool(ctx, "save_chat_history", true); saveChat {
-								_, _ = a.Conversations.AddMessage(ctx, conversationID, "assistant", full)
+								_, _ = env.saveAnswer(ctx, conversationID, full, nil)
 							}
 						}
 					}
@@ -589,7 +638,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			saveChat, _ := a.Settings.GetBool(ctx, "save_chat_history", true)
 			msgID := ""
 			if saveChat {
-				msg, _ := a.Conversations.AddMessageWithMeta(ctx, conversationID, "assistant", full, answerMeta)
+				msg, _ := env.saveAnswer(ctx, conversationID, full, answerMeta)
 				msgID = msg.ID
 			}
 			a.recordGeneration(ctx, profile, conversationID, convTitle, msgID, env.modelID(), metrics, roleSteps)
@@ -1048,6 +1097,9 @@ type chatExecEnv struct {
 	firstGenerate time.Time
 
 	mu sync.Mutex
+	// turnMessageID is the saved question this turn answers (#447): the
+	// answer goes under it, and the model is sent the chat up to it.
+	turnMessageID string
 	// checkModelNoted is set once the run trace says which model checked
 	// the topic (#457).
 	checkModelNoted bool
@@ -1101,7 +1153,15 @@ func (e *chatExecEnv) PriorMessages(ctx context.Context) []pluginapi.ChatMessage
 	if e.conversationID == "" || e.app == nil || e.app.Conversations == nil {
 		return nil
 	}
-	stored, err := e.app.Conversations.ListMessages(ctx, e.conversationID)
+	// The chat up to this turn's question, whichever versions are shown
+	// elsewhere (#447).
+	var stored []contracts.Message
+	var err error
+	if e.turnMessageID != "" {
+		stored, err = e.app.Conversations.PathTo(ctx, e.conversationID, e.turnMessageID)
+	} else {
+		stored, err = e.app.Conversations.ListMessages(ctx, e.conversationID)
+	}
 	if err != nil {
 		return nil
 	}
@@ -1599,7 +1659,7 @@ func (a *App) keepStopped(ctx context.Context, env *chatExecEnv, conversationID,
 	}
 	if conversationID != "" {
 		if save, _ := a.Settings.GetBool(ctx, "save_chat_history", true); save {
-			_, _ = a.Conversations.AddMessageWithMeta(ctx, conversationID, "assistant", content, env.trace.meta())
+			_, _ = env.saveAnswer(ctx, conversationID, content, env.trace.meta())
 		}
 	}
 	a.publish(ctx, events.New(events.ChatStopped, map[string]any{
@@ -1641,4 +1701,13 @@ func (e *chatExecEnv) noteTraining(nodeID string) {
 func (e *chatExecEnv) TurnImages() []string {
 	e.look(e.ctx)
 	return e.images
+}
+
+// saveAnswer saves the turn's answer under its question (#447), or at the
+// end of the chat when the question wasn't saved.
+func (e *chatExecEnv) saveAnswer(ctx context.Context, conversationID, content string, meta *contracts.MessageMeta) (contracts.Message, error) {
+	if e.turnMessageID != "" {
+		return e.app.Conversations.AddReply(ctx, conversationID, e.turnMessageID, "assistant", content, meta)
+	}
+	return e.app.Conversations.AddMessageWithMeta(ctx, conversationID, "assistant", content, meta)
 }
