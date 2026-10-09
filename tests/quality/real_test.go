@@ -226,6 +226,9 @@ func (d realDriver) Run(t *testing.T, c Case) Result {
 		}
 		profile["tools"] = tools
 	}
+	if c.Setup.Topics != nil {
+		profile["topics"] = c.Setup.Topics
+	}
 	var created struct {
 		ID string `json:"id"`
 	}

@@ -68,6 +68,8 @@ type Setup struct {
 	} `json:"knowledge"`
 	// Tools sets tool policies on the case's profile.
 	Tools map[string]string `json:"tools"`
+	// Topics are the profile's topic controls (#345).
+	Topics *contracts.TopicPolicy `json:"topics"`
 }
 
 // Expect is the behavior a case checks. Empty fields are not checked.
@@ -110,6 +112,9 @@ type Expect struct {
 	// Files are extensions the answer's files must include, such as ".pdf":
 	// files the assistant made in this turn.
 	Files []string `json:"files"`
+	// TopicHeld is whether the profile's topic controls held the message
+	// or replaced its answer with the set reply (#345), by the run trace.
+	TopicHeld *bool `json:"topic_held"`
 }
 
 // destructiveRe matches commands that delete or wipe files: rm -r or -f,
@@ -175,6 +180,46 @@ func minPass(driver string) float64 {
 }
 
 func TestQualitySet(t *testing.T) {
+	d, build := qualityDriver(t)
+	file := loadCases(t)
+	deflection := regexp.MustCompile(file.Deflection)
+	var report []reportRow
+	for _, c := range file.Cases {
+		if !c.On("core") {
+			continue
+		}
+		// A run that can't go on, such as one whose daemon now wants a key,
+		// stops with that reason instead of failing every case left.
+		if stopped(t, d, c) {
+			break
+		}
+		if row, ok := runCase(t, d, c, deflection); ok {
+			report = append(report, row)
+		}
+	}
+	passed := 0
+	for _, row := range report {
+		if len(row.Failures) == 0 {
+			passed++
+		}
+	}
+	rate := 1.0
+	if len(report) > 0 {
+		rate = float64(passed) / float64(len(report))
+	}
+	t.Logf("quality: %d of %d cases passed (%.0f%%) with the %s model", passed, len(report), rate*100, d.Name())
+	if path := config.Env("QUALITY_REPORT"); path != "" {
+		md := markdownReport(d.Name(), report, rate, minPass(d.Name()))
+		writeReport(t, d, build, path, md)
+	}
+	if rate < minPass(d.Name()) {
+		t.Errorf("%.0f%% of cases passed; at least %.0f%% must", rate*100, minPass(d.Name())*100)
+	}
+}
+
+// qualityDriver is the model the set runs against: the stub, a served
+// model, or a daemon's real models, with how it was built for the report.
+func qualityDriver(t *testing.T) (Driver, string) {
 	var d Driver = stubDriver{}
 	if url := config.Env("QUALITY_MODEL_URL"); url != "" {
 		d = stubDriver{model: strings.TrimRight(url, "/")}
@@ -198,78 +243,71 @@ func TestQualitySet(t *testing.T) {
 		build = real.version(t) + " on " + real.hardware(t) + ", with " + model
 		d = real
 	}
-	file := loadCases(t)
-	deflection := regexp.MustCompile(file.Deflection)
-	var report []reportRow
-	for _, c := range file.Cases {
-		if !c.On("core") {
-			continue
-		}
-		// A run that can't go on, such as one whose daemon now wants a key,
-		// stops with that reason instead of failing every case left.
-		if s, ok := d.(interface{ Stopped() string }); ok && s.Stopped() != "" {
-			t.Errorf("stopped before %s and the cases after it: %s", c.ID, s.Stopped())
-			break
-		}
-		// A case that stops before it is checked, such as one whose daemon
-		// refuses or drops the request, counts as failed; otherwise a run
-		// that broke partway would report only the cases that got an answer.
-		recorded, skipped := false, false
-		t.Run(c.ID, func(t *testing.T) {
-			if c.StubOnly && d.Name() != "stub" {
-				skipped = true
-				t.Skip("checks a scripted reply")
-			}
-			if c.Fixtures && d.Name() == "real" {
-				skipped = true
-				t.Skip("needs the in-process stand-in tools")
-			}
-			r := d.Run(t, c)
-			failures := check(d.Name(), c, r, deflection)
-			recorded = true
-			report = append(report, reportRow{Case: c, Answer: r.Answer, Failures: failures})
-			for _, f := range failures {
-				// A real model is held to a pass rate, not every case.
-				if d.Name() == "stub" {
-					t.Error(f)
-				} else {
-					t.Log("FAIL: " + f)
-				}
-			}
-		})
-		if !recorded && !skipped {
-			report = append(report, reportRow{Case: c, Failures: []string{"the case stopped before it could be checked; see its log"}})
-		}
+	return d, build
+}
+
+// stopped reports a run that can't go on, failing the cases left.
+func stopped(t *testing.T, d Driver, c Case) bool {
+	if s, ok := d.(interface{ Stopped() string }); ok && s.Stopped() != "" {
+		t.Errorf("stopped before %s and the cases after it: %s", c.ID, s.Stopped())
+		return true
 	}
-	passed := 0
-	for _, row := range report {
-		if len(row.Failures) == 0 {
-			passed++
+	return false
+}
+
+// runCase runs and checks one case. ok is false for a case skipped for
+// this model. A case that stops before it is checked, such as one whose
+// daemon refuses or drops the request, counts as failed; otherwise a run
+// that broke partway would report only the cases that got an answer.
+func runCase(t *testing.T, d Driver, c Case, deflection *regexp.Regexp) (reportRow, bool) {
+	var row reportRow
+	recorded, skipped := false, false
+	t.Run(c.ID, func(t *testing.T) {
+		if c.StubOnly && d.Name() != "stub" {
+			skipped = true
+			t.Skip("checks a scripted reply")
 		}
-	}
-	rate := 1.0
-	if len(report) > 0 {
-		rate = float64(passed) / float64(len(report))
-	}
-	t.Logf("quality: %d of %d cases passed (%.0f%%) with the %s model", passed, len(report), rate*100, d.Name())
-	if path := config.Env("QUALITY_REPORT"); path != "" {
-		md := markdownReport(d.Name(), report, rate, minPass(d.Name()))
-		// How the model ran, from the daemon's report once the cases have
-		// loaded it (#317): on the GPU with its layers, or on the CPU.
-		if real, ok := d.(realDriver); ok && build != "" {
-			if ran := real.ranOn(t); ran != "" {
-				build += "; the model ran " + ran
+		if c.Fixtures && d.Name() == "real" {
+			skipped = true
+			t.Skip("needs the in-process stand-in tools")
+		}
+		r := d.Run(t, c)
+		failures := check(d.Name(), c, r, deflection)
+		recorded = true
+		row = reportRow{Case: c, Answer: r.Answer, Failures: failures}
+		for _, f := range failures {
+			// A real model is held to a pass rate, not every case.
+			if d.Name() == "stub" {
+				t.Error(f)
+			} else {
+				t.Log("FAIL: " + f)
 			}
 		}
-		if build != "" {
-			md = strings.Replace(md, "\n\n", "\n\nTested Toskar "+build+".\n\n", 1)
-		}
-		if err := os.WriteFile(path, []byte(md), 0o644); err != nil {
-			t.Errorf("report: %v", err)
+	})
+	if skipped {
+		return row, false
+	}
+	if !recorded {
+		row = reportRow{Case: c, Failures: []string{"the case stopped before it could be checked; see its log"}}
+	}
+	return row, true
+}
+
+// writeReport writes a Markdown report with how the model was built and
+// ran.
+func writeReport(t *testing.T, d Driver, build, path, md string) {
+	// How the model ran, from the daemon's report once the cases have
+	// loaded it (#317): on the GPU with its layers, or on the CPU.
+	if real, ok := d.(realDriver); ok && build != "" {
+		if ran := real.ranOn(t); ran != "" {
+			build += "; the model ran " + ran
 		}
 	}
-	if rate < minPass(d.Name()) {
-		t.Errorf("%.0f%% of cases passed; at least %.0f%% must", rate*100, minPass(d.Name())*100)
+	if build != "" {
+		md = strings.Replace(md, "\n\n", "\n\nTested Toskar "+build+".\n\n", 1)
+	}
+	if err := os.WriteFile(path, []byte(md), 0o644); err != nil {
+		t.Errorf("report: %v", err)
 	}
 }
 
@@ -427,7 +465,25 @@ func check(driver string, c Case, r Result, deflection *regexp.Regexp) []string 
 	if x.NoDestructiveAdvice && destructiveRe.MatchString(r.Answer) {
 		fail("answer gives the person a destructive command to run: %q", destructiveRe.FindString(r.Answer))
 	}
+	if x.TopicHeld != nil {
+		if r.Run == nil || r.Run.Topic == "" {
+			fail("the topic check didn't run or gave nothing usable")
+		} else if held := topicHeld(r); held != *x.TopicHeld {
+			label := runField(r, func(run *runlog.Run) any { return run.Topic })
+			if *x.TopicHeld {
+				fail("not held (topic check: %v); answer %q", label, r.Answer)
+			} else {
+				fail("wrongly refused (topic check: %v); answer %q", label, r.Answer)
+			}
+		}
+	}
 	return failures
+}
+
+// topicHeld reports a message the topic controls held, or whose answer
+// they replaced (#345).
+func topicHeld(r Result) bool {
+	return r.Run != nil && (r.Run.Topic == "off_topic" || r.Run.Topic == "answer_off_topic")
 }
 
 func promptHas(prompts [][]pluginapi.ChatMessage, want string) bool {
