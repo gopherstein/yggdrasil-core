@@ -143,6 +143,7 @@ func TestRouteSecret(t *testing.T) {
 			return auth.APIKeyRecord{}, errors.New("invalid")
 		},
 		RouteSecret: func() (string, string, error) { return "c2VjcmV0", "routeid", nil },
+		RelayName:   func() string { return "relay.example.com" },
 	})
 	srv.SetTLS(&tls.Config{Certificates: []tls.Certificate{cert}, MinVersion: tls.VersionTLS12}, APITLS{Enabled: true})
 
@@ -152,7 +153,7 @@ func TestRouteSecret(t *testing.T) {
 	r.Header.Set("Authorization", "Bearer phone-key")
 	rec := httptest.NewRecorder()
 	srv.Handler().ServeHTTP(rec, r)
-	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"route_secret":"c2VjcmV0"`) {
+	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"route_secret":"c2VjcmV0"`) || !strings.Contains(rec.Body.String(), `"relay":"relay.example.com"`) {
 		t.Fatalf("home network: %d %s", rec.Code, rec.Body)
 	}
 

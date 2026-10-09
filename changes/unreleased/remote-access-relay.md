@@ -6,4 +6,5 @@
   organization's relay; the computer then enrolls, keeps its sealed
   address current there, and holds a tunnel open, so paired devices reach
   it from anywhere with no open port. Traffic stays encrypted from the
-  device to the computer. API Access shows whether the relay is connected.
+  device to the computer. API Access shows whether the relay is connected, and paired devices
+  learn which relay to find the computer through.

@@ -100,6 +100,9 @@ type Dependencies struct {
 	// RouteSecret is this computer's route secret for paired devices, and
 	// the route ID it makes (#456).
 	RouteSecret func() (secret, route string, err error)
+	// RelayName is the relay this computer uses away from home: Toskar's or
+	// an organization's, given to devices with the route secret.
+	RelayName   func() string
 	RemoteReach func() RemoteReach
 	// SetRelayToken keeps a route token the app got for this computer from
 	// a store subscription, and with enable turns access from anywhere on.

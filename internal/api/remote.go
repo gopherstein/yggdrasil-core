@@ -338,5 +338,9 @@ func (s *Server) handleRouteSecret(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusInternalServerError, "ROUTE_FAILED", err.Error(), nil)
 		return
 	}
-	writeJSON(w, http.StatusOK, map[string]any{"route_secret": secret, "route_id": route})
+	out := map[string]any{"route_secret": secret, "route_id": route}
+	if s.deps.RelayName != nil {
+		out["relay"] = s.deps.RelayName()
+	}
+	writeJSON(w, http.StatusOK, out)
 }
