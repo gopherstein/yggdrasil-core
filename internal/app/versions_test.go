@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/yeixio/toskar-core/internal/turnopts"
+	"github.com/yeixio/toskar-core/pkg/contracts"
 	"github.com/yeixio/toskar-core/pkg/pluginapi"
 )
 
@@ -113,5 +114,35 @@ func TestRetryAndEditInAPastChat(t *testing.T) {
 	// Retrying something that isn't an answer in this chat is refused.
 	if _, err := a.RunChat(turnopts.WithBranch(ctx, turnopts.Branch{RetryOf: msgs[0].ID}), "general-assistant", conv.ID, "", false, "auto", ""); err == nil {
 		t.Fatal("retried a question")
+	}
+}
+
+// A retry of an answer that acted says that what it did isn't undone
+// (#447).
+func TestRetrySaysActionsStay(t *testing.T) {
+	t.Setenv("TOSKAR_STUB_INFERENCE", "1")
+	t.Setenv("TOSKAR_DISCOVERY_ENABLED", "false")
+	a, err := New(Options{DataDir: t.TempDir(), Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.DB.Close() })
+	ctx := context.Background()
+	a.StubReply = func(string, []pluginapi.ChatMessage) string { return "Done again." }
+	conv, _ := a.Conversations.Create(ctx, "t", "general-assistant", "auto")
+	q, _ := a.Conversations.AddMessage(ctx, conv.ID, "user", "Make me a packing list file.")
+	made, _ := a.Conversations.AddMessageWithMeta(ctx, conv.ID, "assistant", "I made packing.md.",
+		&contracts.MessageMeta{Steps: []contracts.ActivityStep{{Kind: "create", Text: "Made packing.md"}}})
+
+	stream, err := a.RunChat(turnopts.WithBranch(ctx, turnopts.Branch{RetryOf: made.ID}), "general-assistant", conv.ID, "", false, "auto", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for range stream {
+	}
+	msgs, _ := a.Conversations.ListMessages(ctx, conv.ID)
+	last := msgs[len(msgs)-1]
+	if last.ParentID != q.ID || last.Meta == nil || !strings.Contains(last.Meta.Notice, "aren't undone") {
+		t.Fatalf("retried answer: %+v", last.Meta)
 	}
 }

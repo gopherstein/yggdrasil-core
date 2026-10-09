@@ -479,7 +479,8 @@
     "smallModelFilesInstall": "{{model}}은(는) 작은 모델이라 내 파일의 수치와 세부 내용을 혼동할 수 있어요. 소스와 대조해 확인하세요. 모델 페이지에서 더 큰 모델을 받으면 더 믿을 수 있어요.",
     "smallModelKnowledge": "{{model}}은(는) 작은 모델이라 내 지식의 수치와 세부 내용을 혼동할 수 있어요. 소스와 대조해 확인하세요.",
     "smallModelKnowledgeChoose": "{{model}}은(는) 작은 모델이라 내 지식의 수치와 세부 내용을 혼동할 수 있어요. 소스와 대조해 확인하세요. 이런 질문에는 모델에서 {{larger}} 또는 자동을 선택하세요.",
-    "smallModelKnowledgeInstall": "{{model}}은(는) 작은 모델이라 내 지식의 수치와 세부 내용을 혼동할 수 있어요. 소스와 대조해 확인하세요. 모델 페이지에서 더 큰 모델을 받으면 더 믿을 수 있어요."
+    "smallModelKnowledgeInstall": "{{model}}은(는) 작은 모델이라 내 지식의 수치와 세부 내용을 혼동할 수 있어요. 소스와 대조해 확인하세요. 모델 페이지에서 더 큰 모델을 받으면 더 믿을 수 있어요.",
+    "actionsStay": "이전 답이 한 일(만든 파일이나 실행한 명령 등)은 되돌려지지 않아요."
   },
   "steps": {
     "autoChose": "자동이 {{kind}}에 맞춰 {{model}}을(를) 선택했어요",
@@ -568,5 +569,18 @@
   },
   "topics": {
     "offTopic": "여기서는 그 일을 도와드릴 수 없어요. 다른 무엇을 도와드릴까요?"
+  },
+  "versions": {
+    "label": "버전",
+    "previous": "이전 버전",
+    "next": "다음 버전",
+    "position": "{{index}} / {{count}}",
+    "tryAgain": "다시 시도",
+    "tryAgainWith": "다른 모델로 다시 시도",
+    "withAnother": "다른 모델…",
+    "auto": "자동",
+    "edit": "수정",
+    "editing": "메시지를 수정하고 있어요. 보내면 새 버전이 되고 이전 버전은 남아요.",
+    "cancelEdit": "취소"
   }
 }

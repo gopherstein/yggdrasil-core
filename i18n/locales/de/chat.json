@@ -493,7 +493,8 @@
     "smallModelFilesInstall": "{{model}} ist ein kleines Modell und kann Zahlen und Details aus deinen Dateien verwechseln. Prüfe sie anhand der Quelle. Ein größeres Modell unter „Modelle“ ist zuverlässiger.",
     "smallModelKnowledge": "{{model}} ist ein kleines Modell und kann Zahlen und Details aus deinem Wissen verwechseln. Prüfe sie anhand der Quelle.",
     "smallModelKnowledgeChoose": "{{model}} ist ein kleines Modell und kann Zahlen und Details aus deinem Wissen verwechseln. Prüfe sie anhand der Quelle. Wähle für Fragen wie diese {{larger}} oder „Automatisch“ unter „Modell“.",
-    "smallModelKnowledgeInstall": "{{model}} ist ein kleines Modell und kann Zahlen und Details aus deinem Wissen verwechseln. Prüfe sie anhand der Quelle. Ein größeres Modell unter „Modelle“ ist zuverlässiger."
+    "smallModelKnowledgeInstall": "{{model}} ist ein kleines Modell und kann Zahlen und Details aus deinem Wissen verwechseln. Prüfe sie anhand der Quelle. Ein größeres Modell unter „Modelle“ ist zuverlässiger.",
+    "actionsStay": "Was die frühere Antwort getan hat, etwa erstellte Dateien oder ausgeführte Befehle, wird nicht rückgängig gemacht."
   },
   "steps": {
     "autoChose": "„Automatisch“ hat {{model}} gewählt – für {{kind}}",
@@ -594,5 +595,18 @@
   },
   "topics": {
     "offTopic": "Dabei kann ich hier nicht helfen. Wobei kann ich dir sonst helfen?"
+  },
+  "versions": {
+    "label": "Versionen",
+    "previous": "Vorherige Version",
+    "next": "Nächste Version",
+    "position": "{{index}} / {{count}}",
+    "tryAgain": "Noch einmal",
+    "tryAgainWith": "Mit einem anderen Modell noch einmal",
+    "withAnother": "Anderes Modell…",
+    "auto": "Automatisch",
+    "edit": "Bearbeiten",
+    "editing": "Du bearbeitest deine Nachricht. Senden erstellt eine neue Version; die frühere bleibt.",
+    "cancelEdit": "Abbrechen"
   }
 }

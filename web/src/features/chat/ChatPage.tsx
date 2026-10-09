@@ -30,6 +30,7 @@ import { ChatHistoryDrawer, useCanPinChatHistory } from './ChatHistoryDrawer'
 import { AnswerDetails } from './AnswerDetails'
 import { FileChip, PendingFileChip, type PendingFile } from './FileChips'
 import { MemoryToggle } from './MemoryToggle'
+import { AnswerActions, EditAction, VersionSwitch } from './MessageActions'
 import { ReadAloudButton, SystemReadAloudButton } from './ReadAloud'
 import { hasSystemSpeech } from './speakableText'
 import { SetupOfferCard } from './SetupOffer'
@@ -293,6 +294,9 @@ export function ChatPage() {
   }, [selectedId])
   const abortRef = useRef<AbortController | null>(null)
   const lastUserMessageRef = useRef('')
+  // The sent message being edited (#447): its text is in the box, and
+  // sending makes a new version of it.
+  const [editing, setEditing] = useState<string | null>(null)
   const [toolFailure, setToolFailure] = useState<string | null>(null)
   const [contextUsage, setContextUsage] = useState<ContextUsage | null>(null)
   const streamingConvRef = useRef<string | null>(null)
@@ -520,6 +524,8 @@ export function ChatPage() {
 
   useEffect(() => {
     composerRef.current?.focus()
+    // An edit belongs to the chat it started in.
+    setEditing(null)
   }, [selectedId])
 
   const deleteConversation = useMutation({
@@ -862,6 +868,11 @@ export function ChatPage() {
               completedConvRef.current = null
             }
             handleChatComplete(conversationId)
+            // The answer is saved by now; the stream's end can come first,
+            // and a fetch then would show the version it replaced (#447).
+            if (conversationId === selectedId) {
+              queryClient.invalidateQueries({ queryKey: ['messages', conversationId] })
+            }
           }
         }
         if (event.type === 'knowledge.retrieved') {
@@ -990,7 +1001,22 @@ export function ChatPage() {
   })
   const continueAfterSetup = useCallback((text: string) => sendRef.current(text), [])
 
-  const sendMessage = async (overrideText?: string) => {
+  /**
+   * Sends a message, or with branch, answers from a point in the chat as a
+   * new version there (#447): retryOf asks an answer's question again,
+   * editOf sends the text in place of a sent message, and modelId answers
+   * with another model.
+   */
+  const sendMessage = async (overrideText?: string, branch?: { retryOf?: string; editOf?: string; modelId?: string }) => {
+    if (!branch && editing && overrideText == null) branch = { editOf: editing }
+    const current = queryClient.getQueryData<Message[]>(['messages', selectedId]) ?? []
+    const branchAt = branch?.retryOf ?? branch?.editOf
+    const branchIndex = branchAt ? current.findIndex((m) => m.id === branchAt) : -1
+    if (branch?.retryOf) {
+      const question = branchIndex > 0 ? current[branchIndex - 1] : undefined
+      if (!question || question.role !== 'user') return
+      overrideText = question.content
+    }
     const readyFiles = overrideText == null ? pendingFiles.filter((f) => f.status === 'ready' && f.file) : []
     if (overrideText == null && pendingFiles.some((f) => f.status === 'uploading')) {
       setSendError(t('send.waitForFiles'))
@@ -1006,7 +1032,7 @@ export function ChatPage() {
       return
     }
 
-    let modelId: string | undefined = modelIdForChat
+    let modelId: string | undefined = branch?.modelId ?? modelIdForChat
     if (!modelId) {
       try {
         modelId = (await ensureModelReady()) ?? undefined
@@ -1027,7 +1053,10 @@ export function ChatPage() {
 
     lastUserMessageRef.current = message
     followLatest()
-    setDraft('')
+    if (!branch?.retryOf) {
+      setDraft('')
+      setEditing(null)
+    }
     const attachments = readyFiles.map((f) => f.file!)
     if (overrideText == null) setPendingFiles([])
     setIsSending(true)
@@ -1079,6 +1108,10 @@ export function ChatPage() {
       await queryClient.cancelQueries({ queryKey: ['messages', conversationId] })
 
       queryClient.setQueryData<Message[]>(['messages', conversationId], (current) => {
+        // A retry or an edit ends the chat at its point until the answer
+        // comes; the earlier version stays on the server.
+        if (branchIndex >= 0) current = (current ?? []).slice(0, branchIndex)
+        if (branch?.retryOf) return current ?? []
         const optimistic: Message = {
           id: `optimistic-${Date.now()}`,
           conversation_id: conversationId!,
@@ -1100,6 +1133,8 @@ export function ChatPage() {
           execution: effectiveRunMode,
           effort,
           attachments: attachments.length > 0 ? attachments.map((f) => f.id) : undefined,
+          retry_of: branch?.retryOf,
+          edit_of: branch?.editOf,
         },
         signal: controller.signal,
         onToken: (content) => {
@@ -1245,6 +1280,26 @@ export function ChatPage() {
   }, [chatHistoryPinned, canPinHistory])
 
   const messages = messagesQuery.data ?? []
+
+  // Retry and edit (#447).
+  const startEdit = (message: Message) => {
+    setEditing(message.id)
+    setDraft(message.content)
+    composerRef.current?.focus()
+  }
+  const cancelEdit = () => {
+    setEditing(null)
+    setDraft('')
+  }
+  const showVersion = async (id: string) => {
+    if (!selectedId) return
+    const shown = await api.showMessageVersion(selectedId, id)
+    if (shown) queryClient.setQueryData(['messages', selectedId], shown)
+  }
+  const retryModels = [
+    { id: AUTO_MODEL_ID, name: t('versions.auto') },
+    ...installedModels.map((m) => ({ id: m.id, name: m.display_name || m.id })),
+  ]
   const streamingText = streamingContent == null ? '' : displayChatText(streamingContent)
   const replyInProgress = isSending && streamingText.length === 0
   // Ratatoskr: thinking while a reply is written, delivering when it runs
@@ -1351,6 +1406,14 @@ export function ChatPage() {
           event.target.value = ''
         }}
       />
+      {editing ? (
+        <div className="flex items-center justify-between gap-2 px-3 pt-2 text-xs text-ink-muted">
+          <span>{t('versions.editing')}</span>
+          <button type="button" className="text-primary hover:underline" onClick={cancelEdit}>
+            {t('versions.cancelEdit')}
+          </button>
+        </div>
+      ) : null}
       <textarea
         ref={composerRef}
         // What is typed takes its own direction; the empty box follows the page.
@@ -1368,6 +1431,18 @@ export function ChatPage() {
           if (event.key === 'Enter' && !event.shiftKey) {
             event.preventDefault()
             void sendMessage()
+          }
+          // ↑ in an empty box edits the last message sent (#447).
+          if (event.key === 'ArrowUp' && !draft && !editing) {
+            const last = [...messages].reverse().find((m) => m.role === 'user' && !m.id.startsWith('optimistic-'))
+            if (last) {
+              event.preventDefault()
+              startEdit(last)
+            }
+          }
+          if (event.key === 'Escape' && editing) {
+            event.preventDefault()
+            cancelEdit()
           }
         }}
         placeholder={t('composer.placeholder')}
@@ -1738,7 +1813,7 @@ export function ChatPage() {
                   return (
                   <div
                     key={message.id}
-                    className={message.role === 'user' ? 'chat-user-turn' : 'chat-reply'}
+                    className={`group ${message.role === 'user' ? 'chat-user-turn' : 'chat-reply'}${editing === message.id ? ' ring-2 ring-primary/40' : ''}`}
                   >
                     {message.role === 'assistant' ? (
                       <>
@@ -1746,21 +1821,28 @@ export function ChatPage() {
                         {message.meta?.automation_run ? <AutomationRunNote run={message.meta.automation_run} /> : null}
                         <ChatMarkdown text={text} />
                         <AnswerDetails meta={message.meta} runs={admin} />
+
                         {message.meta?.setup && admin ? (
                           <SetupOfferCard offer={message.meta.setup} onContinue={continueAfterSetup} />
                         ) : null}
                         {message.meta?.automation && member ? (
                           <AutomationDraftCard draft={message.meta.automation} conversationId={message.conversation_id} />
                         ) : null}
-                        {canReadAloud ? (
-                          <div className="mt-2">
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                          <VersionSwitch message={message} disabled={isSending} onShow={(id) => void showVersion(id)} />
+                          {canReadAloud ? (
                             <ReadAloudButton text={text} conversationId={message.conversation_id} />
-                          </div>
-                        ) : systemReadAloud ? (
-                          <div className="mt-2">
+                          ) : systemReadAloud ? (
                             <SystemReadAloudButton text={text} />
-                          </div>
-                        ) : null}
+                          ) : null}
+                          {!message.id.startsWith('optimistic-') ? (
+                            <AnswerActions
+                              disabled={isSending}
+                              models={retryModels}
+                              onRetry={(modelId) => void sendMessage(undefined, { retryOf: message.id, modelId })}
+                            />
+                          ) : null}
+                        </div>
                       </>
                     ) : (
                       <>
@@ -1770,6 +1852,12 @@ export function ChatPage() {
                             {message.meta.files.map((file) => (
                               <FileChip key={file.id} file={file} />
                             ))}
+                          </span>
+                        ) : null}
+                        {!message.id.startsWith('optimistic-') ? (
+                          <span className="mt-1 flex flex-wrap items-center justify-end gap-2">
+                            <VersionSwitch message={message} disabled={isSending} onShow={(id) => void showVersion(id)} />
+                            <EditAction disabled={isSending} onEdit={() => startEdit(message)} />
                           </span>
                         ) : null}
                       </>

@@ -388,7 +388,9 @@ const screenshotMessages = `[
     "conversation_id": "conv-local",
     "role": "assistant",
     "content": "Take the ridge above the reservoir. It is about 6 miles, stays in the trees for the first hour, and the viewpoint is usually quiet by late morning. Pack water; there is no faucet after the trailhead.",
-    "created_at": "2026-09-24T15:01:20Z"
+    "created_at": "2026-09-24T15:01:20Z",
+    "parent_id": "m1",
+    "versions": {"index": 2, "count": 2, "ids": ["m2-old", "m2"]}
   },
   {
     "id": "m3",

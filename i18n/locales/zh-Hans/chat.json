@@ -479,7 +479,8 @@
     "smallModelFilesInstall": "{{model}} 是小模型，可能会弄混你文件中的数字和细节。请对照来源核对。从“模型”页面获取更大的模型会更可靠。",
     "smallModelKnowledge": "{{model}} 是小模型，可能会弄混你知识库中的数字和细节。请对照来源核对。",
     "smallModelKnowledgeChoose": "{{model}} 是小模型，可能会弄混你知识库中的数字和细节。请对照来源核对。对于这类问题，请在“模型”中选择 {{larger}} 或“自动”。",
-    "smallModelKnowledgeInstall": "{{model}} 是小模型，可能会弄混你知识库中的数字和细节。请对照来源核对。从“模型”页面获取更大的模型会更可靠。"
+    "smallModelKnowledgeInstall": "{{model}} 是小模型，可能会弄混你知识库中的数字和细节。请对照来源核对。从“模型”页面获取更大的模型会更可靠。",
+    "actionsStay": "上一个回答做过的事（例如创建的文件或运行的命令）不会被撤销。"
   },
   "steps": {
     "autoChose": "“自动”为{{kind}}选择了 {{model}}",
@@ -568,5 +569,18 @@
   },
   "topics": {
     "offTopic": "这里帮不了这个忙。还有什么可以帮你的吗？"
+  },
+  "versions": {
+    "label": "版本",
+    "previous": "上一个版本",
+    "next": "下一个版本",
+    "position": "{{index}} / {{count}}",
+    "tryAgain": "重试",
+    "tryAgainWith": "换个模型重试",
+    "withAnother": "其他模型…",
+    "auto": "自动",
+    "edit": "编辑",
+    "editing": "正在编辑你的消息。发送后会生成新版本，旧版本会保留。",
+    "cancelEdit": "取消"
   }
 }
