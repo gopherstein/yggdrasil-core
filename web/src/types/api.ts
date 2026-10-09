@@ -343,6 +343,17 @@ export interface AIProfile {
   topics?: TopicPolicy
 }
 
+/** What a profile's topic controls do with one message: the Try it panel (#345). */
+export interface TopicTrial {
+  /** on_topic, small_talk, off_topic, or "" when the check gave nothing usable. */
+  label: '' | 'on_topic' | 'small_talk' | 'off_topic'
+  /** Enforce answered with the set reply, without the full answer. */
+  held: boolean
+  /** The answer went off topic and was replaced with the set reply. */
+  replaced: boolean
+  reply: string
+}
+
 /** A profile's topic controls (#345). */
 export interface TopicPolicy {
   stays_on: string

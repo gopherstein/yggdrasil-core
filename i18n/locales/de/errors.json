@@ -148,6 +148,8 @@
   "PROFILE_PINNED": "Dieser Schlüssel antwortet nur mit seinem eigenen Profil. Lass Profil und Modell weg oder nenne dieses Profil.",
   "PIN_INVALID": "Diese Zuordnung kann nicht gespeichert werden. Nur Mitglieder und Gäste werden zugeordnet, und nur zu vorhandenen Profilen.",
   "PINS_FAILED": "Die Profilzuordnungen konnten nicht gelesen werden.",
+  "PROFILE_NOT_FOUND": "Dieses Profil gibt es nicht.",
+  "TRIAL_FAILED": "Die Nachricht konnte nicht ausprobiert werden. Prüfe die Themenregeln und ob ein Modell bereit ist.",
   "PORTAL_MEMBERS": "Dieser Chat ist für die Menschen, die sich bei diesem Toskar anmelden.",
   "PORTAL_INVITE": "Dieser Chat ist nur auf Einladung. Öffne den Link, den du bekommen hast, oder bitte um einen neuen.",
   "PORTAL_INVALID": "Diese Portaleinstellung kann nicht verwendet werden.",

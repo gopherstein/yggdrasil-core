@@ -329,3 +329,66 @@ func TestPinnedPeopleChat(t *testing.T) {
 		t.Fatalf("gone: %v", err)
 	}
 }
+
+// Try it runs a message past draft topic controls without saving anything:
+// Guide shows the label and the answer, Enforce holds or replaces (#345).
+func TestTryTopics(t *testing.T) {
+	t.Setenv("TOSKAR_STUB_INFERENCE", "1")
+	t.Setenv("TOSKAR_DISCOVERY_ENABLED", "false")
+	a, err := New(Options{DataDir: t.TempDir(), Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.DB.Close() })
+	ctx := context.Background()
+	a.StubReply = func(_ string, msgs []pluginapi.ChatMessage) string {
+		sys, last := msgs[0].Content, msgs[len(msgs)-1].Content
+		switch {
+		case strings.HasPrefix(sys, "You check each message"):
+			if strings.Contains(last, "poem") {
+				return "off_topic\nI only help with tires."
+			}
+			return "on_topic"
+		case strings.HasPrefix(sys, "You check each answer"):
+			if strings.Contains(last, "Roses") {
+				return "off_topic"
+			}
+			return "on_topic"
+		}
+		if strings.Contains(last, "rhyme") {
+			return "Roses are red."
+		}
+		if !strings.Contains(sys, "only for: Tires") {
+			return "no topic rules"
+		}
+		return "Winter tires grip better."
+	}
+	draft := &contracts.TopicPolicy{StaysOn: "Tires", OffTopicReply: "Tires only!"}
+	got, err := a.TryTopics(ctx, "general-assistant", draft, "Write a poem")
+	if err != nil || got.Label != topicOff || got.Held || got.Reply == "Tires only!" {
+		t.Fatalf("guide, off topic: %+v %v", got, err)
+	}
+	draft.Strictness = contracts.TopicsEnforce
+	if got, _ := a.TryTopics(ctx, "general-assistant", draft, "Write a poem"); !got.Held || got.Reply != "Tires only!" {
+		t.Fatalf("enforce, held: %+v", got)
+	}
+	if got, _ := a.TryTopics(ctx, "general-assistant", draft, "Snow tires?"); got.Label != topicOn || got.Reply != "Winter tires grip better." {
+		t.Fatalf("on topic: %+v", got)
+	}
+	if got, _ := a.TryTopics(ctx, "general-assistant", draft, "Tires, in rhyme"); !got.Replaced || got.Reply != "Tires only!" {
+		t.Fatalf("replaced: %+v", got)
+	}
+	if _, err := a.TryTopics(ctx, "general-assistant", nil, "hi"); err == nil {
+		t.Fatal("no topics to try")
+	}
+	if _, err := a.TryTopics(ctx, "general-assistant", draft, " "); !errors.Is(err, ErrTrialMessage) {
+		t.Fatalf("empty: %v", err)
+	}
+	// Nothing saved: no conversations or runs.
+	if convs, _ := a.Conversations.List(ctx); len(convs) != 0 {
+		t.Fatalf("conversations: %d", len(convs))
+	}
+	if p, _ := a.Profiles.Get(ctx, "general-assistant"); p.Topics != nil {
+		t.Fatal("the draft was saved")
+	}
+}

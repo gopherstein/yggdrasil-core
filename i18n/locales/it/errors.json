@@ -148,6 +148,8 @@
   "PROFILE_PINNED": "Questa chiave risponde solo con il proprio profilo. Ometti profilo e modello, oppure indica quel profilo.",
   "PIN_INVALID": "Impossibile salvare questa assegnazione. Si assegnano solo Membri e Ospiti, e solo a profili esistenti.",
   "PINS_FAILED": "Impossibile leggere a quali profili sono assegnate le persone.",
+  "PROFILE_NOT_FOUND": "Questo profilo non esiste.",
+  "TRIAL_FAILED": "Impossibile provare questo messaggio. Controlla i controlli sugli argomenti e che un modello sia pronto.",
   "PORTAL_MEMBERS": "Questa chat è per le persone che accedono a questo Toskar.",
   "PORTAL_INVITE": "Questa chat è su invito. Apri il link che hai ricevuto o chiedine uno nuovo.",
   "PORTAL_INVALID": "Questa impostazione del portale non può essere usata.",

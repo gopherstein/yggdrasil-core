@@ -109,6 +109,8 @@ import type {
   Person,
   PersonLink,
   ProfilePins,
+  TopicPolicy,
+  TopicTrial,
   InviteView,
   Role,
   PortalPageView,
@@ -721,6 +723,13 @@ export const api = {
     request<AIProfile>('/api/v1/profiles', {
       method: 'POST',
       body: JSON.stringify(profile),
+    }),
+
+  /** Try one message against a profile's topic controls, or draft ones, without saving (#345). */
+  tryTopics: (id: string, message: string, topics?: TopicPolicy) =>
+    request<TopicTrial>(`/api/v1/profiles/${encodeURIComponent(id)}/try-topics`, {
+      method: 'POST',
+      body: JSON.stringify({ message, topics }),
     }),
 
   updateProfile: (id: string, profile: Partial<AIProfile> & { roles?: AIProfile['roles'] }) =>

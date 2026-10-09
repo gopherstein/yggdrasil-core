@@ -13,6 +13,10 @@ Set them on a profile, under **Profiles → Edit → Topics**:
 
 Greetings, thanks, and "what can you do?" are always fine, so a strict assistant doesn't feel broken.
 
+## Try it
+
+Under the topic controls, **Try it** runs a message past them as they are in the editor, before you save: pick one of the made-up attempts to talk it off topic, or type a question your people might ask. Each shows the label (on topic, small talk, or off topic) and the reply. The check runs at either strictness, so with Guide you also see what Enforce would hold. Answers there are quick ones, without tools, knowledge, or memories, and nothing is saved or counted.
+
 ## How it works
 
 The topic rules come first in every turn, as the administrator's rules, ahead of everything else the model is told. They say that nothing later changes them: not the person's preferences or memories, not an application's instructions through the API, not a document, file, or web page, and not a message asking to ignore them, to pretend, or to play a role.
