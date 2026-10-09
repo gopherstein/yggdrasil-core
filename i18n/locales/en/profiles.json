@@ -423,6 +423,25 @@
         "hello": "Hi!",
         "whatCanYouDo": "What can you help me with?"
       }
+    },
+    "attempts": {
+      "title": "Off-topic attempts",
+      "total_one": "{{count}} in the last {{days}} days",
+      "total_other": "{{count}} in the last {{days}} days",
+      "none": "Nothing held in the last 30 days. Only Enforce holds messages, so with Guide this stays empty.",
+      "chartLabel_one": "{{count}} off-topic attempt in the last {{days}} days, by day",
+      "chartLabel_other": "{{count}} off-topic attempts in the last {{days}} days, by day",
+      "dayTip_one": "{{date}}: {{count}} attempt",
+      "dayTip_other": "{{date}}: {{count}} attempts",
+      "where": {
+        "portal": "Portal {{name}}",
+        "key": "API key {{name}}",
+        "person": "{{name}} in the app",
+        "automation": "Automations"
+      },
+      "replaced": "answer replaced",
+      "markOnTopic": "Mark as on topic",
+      "privacy": "Only Admins see these. They're kept and deleted with run records (Settings → What left this computer). Marking one as on topic adds it to the example questions."
     }
   }
 }

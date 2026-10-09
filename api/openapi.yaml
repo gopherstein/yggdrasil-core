@@ -290,6 +290,49 @@ paths:
           description: TRIAL_FAILED
         "404":
           description: PROFILE_NOT_FOUND
+  /api/v1/profiles/{id}/topic-attempts:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: days
+          in: query
+          schema:
+            type: integer
+      summary: A profile's off-topic attempts (#345)
+      description: What an Enforce profile held, or whose answer it replaced, over the last days (30 by default, up to 365), kept as run records are.
+      operationId: getTopicAttempts
+      responses:
+        "200":
+          description: "days, total, by_day ({day, count}), by_where ({kind: portal, key, person, or automation; id; name; count}), and attempts, the latest 100 with their where"
+        "404":
+          description: PROFILE_NOT_FOUND
+  /api/v1/profiles/{id}/topic-attempts/{aid}/on-topic:
+    post:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: aid
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Mark an off-topic attempt as on topic (#345)
+      description: Adds its message to the profile's example questions and forgets the attempts with that message.
+      operationId: markOnTopic
+      responses:
+        "204":
+          description: Added
+        "404":
+          description: ATTEMPT_NOT_FOUND
+        "409":
+          description: EXAMPLES_FULL
   /api/v1/profile-pins:
     get:
       summary: The profiles each pinnable role is kept to (#345)

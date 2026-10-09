@@ -422,6 +422,22 @@
         "hello": "你好！",
         "whatCanYouDo": "你能帮我做什么？"
       }
+    },
+    "attempts": {
+      "title": "离题尝试",
+      "total_other": "最近 {{days}} 天共 {{count}} 次",
+      "none": "最近 30 天没有拦下消息。只有强制模式会拦下消息，所以引导模式下这里为空。",
+      "chartLabel_other": "最近 {{days}} 天的离题尝试共 {{count}} 次（按天）",
+      "dayTip_other": "{{date}}：{{count}} 次",
+      "where": {
+        "portal": "门户 {{name}}",
+        "key": "API 密钥 {{name}}",
+        "person": "应用中的 {{name}}",
+        "automation": "自动化"
+      },
+      "replaced": "回答已替换",
+      "markOnTopic": "标记为在主题内",
+      "privacy": "只有管理员能看到。它们随运行记录一起保存和删除（设置 → 离开这台电脑的内容）。标记为在主题内会将其加入示例问题。"
     }
   }
 }

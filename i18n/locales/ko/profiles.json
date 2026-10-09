@@ -422,6 +422,22 @@
         "hello": "안녕하세요!",
         "whatCanYouDo": "뭘 도와줄 수 있어?"
       }
+    },
+    "attempts": {
+      "title": "주제를 벗어난 시도",
+      "total_other": "최근 {{days}}일 동안 {{count}}건",
+      "none": "최근 30일 동안 막은 메시지가 없어요. 메시지를 막는 건 강제일 때뿐이라 안내에서는 비어 있어요.",
+      "chartLabel_other": "최근 {{days}}일 동안 주제를 벗어난 시도 {{count}}건(일별)",
+      "dayTip_other": "{{date}}: {{count}}건",
+      "where": {
+        "portal": "포털 {{name}}",
+        "key": "API 키 {{name}}",
+        "person": "앱의 {{name}}",
+        "automation": "자동화"
+      },
+      "replaced": "답을 바꿈",
+      "markOnTopic": "주제 안으로 표시",
+      "privacy": "관리자만 볼 수 있어요. 실행 기록과 함께 보관되고 삭제돼요(설정 → 이 컴퓨터 밖으로 나간 데이터). 주제 안으로 표시하면 예시 질문에 추가돼요."
     }
   }
 }

@@ -8,10 +8,12 @@ import (
 	"unicode/utf8"
 
 	"github.com/yeixio/toskar-core/internal/auth"
+	"github.com/yeixio/toskar-core/internal/egress"
 	"github.com/yeixio/toskar-core/internal/locale"
 	"github.com/yeixio/toskar-core/internal/orchestrator/builtin/simple"
 	"github.com/yeixio/toskar-core/internal/runlog"
 	"github.com/yeixio/toskar-core/internal/tools"
+	"github.com/yeixio/toskar-core/internal/topiclog"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 	"github.com/yeixio/toskar-core/pkg/pluginapi"
 )
@@ -236,6 +238,7 @@ func (e *chatExecEnv) holdOffTopic(ctx context.Context, message string) (string,
 		return "", false
 	}
 	run.Note("topicHeld", nil)
+	e.recordAttempt(ctx, topiclog.Held)
 	return e.offTopicReply(ctx, v), true
 }
 
@@ -254,6 +257,7 @@ func (e *chatExecEnv) CheckAnswer(ctx context.Context, role, prompt, answer stri
 	}
 	run.Topic(topicAnswerOff)
 	run.Note("topicReplaced", nil)
+	e.recordAttempt(ctx, topiclog.Replaced)
 	return e.offTopicReply(ctx, v)
 }
 
@@ -303,4 +307,24 @@ func (a *App) pinnedProfile(ctx context.Context, profileID string) (string, bool
 		return profileID, true, nil
 	}
 	return allowed[0], true, nil
+}
+
+// recordAttempt keeps an off-topic message for the profile's Admins, with
+// where it came from (#345). A Try it trial has no task and isn't kept.
+func (e *chatExecEnv) recordAttempt(ctx context.Context, label string) {
+	if e.app == nil || e.app.TopicLog == nil || e.taskID == "" {
+		return
+	}
+	run := egress.RunFrom(ctx)
+	who := auth.PrincipalFrom(ctx)
+	a := topiclog.Attempt{
+		ProfileID: e.profile.ID, Label: label, Source: run.Source,
+		KeyID: who.KeyID, PersonID: who.Person.ID, ConversationID: e.conversationID, Message: e.turnPrompt,
+	}
+	if e.opts != nil {
+		a.PortalID = e.opts.Portal
+	}
+	if err := e.app.TopicLog.Add(context.WithoutCancel(ctx), a); err != nil && e.app.Logger != nil {
+		e.app.Logger.Warn("keep off-topic attempt", "error", err)
+	}
 }

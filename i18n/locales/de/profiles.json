@@ -423,6 +423,25 @@
         "hello": "Hallo!",
         "whatCanYouDo": "Wobei kannst du mir helfen?"
       }
+    },
+    "attempts": {
+      "title": "Versuche außerhalb des Themas",
+      "total_one": "{{count}} in den letzten {{days}} Tagen",
+      "total_other": "{{count}} in den letzten {{days}} Tagen",
+      "none": "In den letzten 30 Tagen wurde nichts zurückgehalten. Nur Durchsetzen hält Nachrichten zurück, mit Leiten bleibt dies leer.",
+      "chartLabel_one": "{{count}} Versuch außerhalb des Themas in den letzten {{days}} Tagen, nach Tag",
+      "chartLabel_other": "{{count}} Versuche außerhalb des Themas in den letzten {{days}} Tagen, nach Tag",
+      "dayTip_one": "{{date}}: {{count}} Versuch",
+      "dayTip_other": "{{date}}: {{count}} Versuche",
+      "where": {
+        "portal": "Portal {{name}}",
+        "key": "API-Schlüssel {{name}}",
+        "person": "{{name}} in der App",
+        "automation": "Automationen"
+      },
+      "replaced": "Antwort ersetzt",
+      "markOnTopic": "Als zum Thema markieren",
+      "privacy": "Nur Admins sehen diese. Sie werden mit den Durchlaufprotokollen aufbewahrt und gelöscht (Einstellungen → Was diesen Computer verlassen hat). Als zum Thema markiert, kommt eine Nachricht zu den Beispielfragen."
     }
   }
 }

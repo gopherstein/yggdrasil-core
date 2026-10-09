@@ -425,6 +425,28 @@
         "hello": "¡Hola!",
         "whatCanYouDo": "¿En qué me puedes ayudar?"
       }
+    },
+    "attempts": {
+      "title": "Intentos fuera de tema",
+      "total_one": "{{count}} en los últimos {{days}} días",
+      "total_other": "{{count}} en los últimos {{days}} días",
+      "total_many": "{{count}} en los últimos {{days}} días",
+      "none": "Nada retenido en los últimos 30 días. Solo Imponer retiene mensajes, así que con Guiar esto queda vacío.",
+      "chartLabel_one": "{{count}} intento fuera de tema en los últimos {{days}} días, por día",
+      "chartLabel_other": "{{count}} intentos fuera de tema en los últimos {{days}} días, por día",
+      "chartLabel_many": "{{count}} intentos fuera de tema en los últimos {{days}} días, por día",
+      "dayTip_one": "{{date}}: {{count}} intento",
+      "dayTip_other": "{{date}}: {{count}} intentos",
+      "dayTip_many": "{{date}}: {{count}} intentos",
+      "where": {
+        "portal": "Portal {{name}}",
+        "key": "Clave de API {{name}}",
+        "person": "{{name}} en la app",
+        "automation": "Automatizaciones"
+      },
+      "replaced": "respuesta reemplazada",
+      "markOnTopic": "Marcar como en el tema",
+      "privacy": "Solo los Administradores ven esto. Se conservan y se borran con los registros de ejecución (Configuración → Lo que salió de esta computadora). Marcar uno como en el tema lo añade a las preguntas de ejemplo."
     }
   }
 }

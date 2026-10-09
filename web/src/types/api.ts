@@ -354,6 +354,29 @@ export interface TopicTrial {
   reply: string
 }
 
+/** Where off-topic attempts came from (#345). */
+export interface TopicWhere {
+  kind: 'portal' | 'key' | 'person' | 'automation'
+  id?: string
+  name?: string
+}
+
+/** A profile's off-topic attempts over some days (#345). */
+export interface TopicActivity {
+  days: number
+  total: number
+  by_day: { day: string; count: number }[]
+  by_where: (TopicWhere & { count: number })[]
+  /** The latest, newest first. */
+  attempts: {
+    id: string
+    at: string
+    label: 'off_topic' | 'answer_off_topic'
+    message: string
+    where: TopicWhere
+  }[]
+}
+
 /** A profile's topic controls (#345). */
 export interface TopicPolicy {
   stays_on: string

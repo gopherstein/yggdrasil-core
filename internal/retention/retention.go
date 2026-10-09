@@ -20,6 +20,8 @@ type Counts struct {
 	AutomationRuns int64 `json:"automation_runs"`
 	Egress         int64 `json:"egress"`
 	ToolRuns       int64 `json:"tool_runs"`
+	// TopicAttempts are off-topic messages an Enforce profile held (#345).
+	TopicAttempts int64 `json:"topic_attempts"`
 }
 
 // Before removes run records older than cutoff. Each automation keeps its
@@ -75,6 +77,9 @@ func remove(ctx context.Context, db *sql.DB, cutoff string) (Counts, error) {
 		return c, err
 	}
 	if err := exec(&c.ToolRuns, `DELETE FROM tool_runs WHERE at < ?`, cutoff); err != nil {
+		return c, err
+	}
+	if err := exec(&c.TopicAttempts, `DELETE FROM topic_attempts WHERE at < ?`, cutoff); err != nil {
 		return c, err
 	}
 	return c, tx.Commit()

@@ -41,12 +41,13 @@ func TestRetention(t *testing.T) {
 		('r2', 'a1', '2026-08-02T08:00:00Z', 'failed', ?),
 		('r3', 'a1', '2026-08-03T08:00:00Z', 'succeeded', ?)`, old, old, old)
 	mustExec(`INSERT INTO egress (id, at, kind, destination) VALUES ('e1', ?, 'web_search', 'duckduckgo.com'), ('e2', ?, 'web_page', 'example.com')`, old, recent)
+	mustExec(`INSERT INTO topic_attempts (id, at, profile_id, label, message) VALUES ('t1', ?, 'p', 'off_topic', 'a poem'), ('t2', ?, 'p', 'off_topic', 'a joke')`, old, recent)
 
 	c, err := Before(ctx, db.SQL, time.Now().Add(-30*24*time.Hour))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if c.Tasks != 1 || c.AutomationRuns != 2 || c.Egress != 1 {
+	if c.Tasks != 1 || c.AutomationRuns != 2 || c.Egress != 1 || c.TopicAttempts != 1 {
 		t.Fatalf("counts = %+v", c)
 	}
 	if count(t, db, `SELECT COUNT(*) FROM task_steps`) != 0 {

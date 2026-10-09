@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -390,5 +391,78 @@ func TestTryTopics(t *testing.T) {
 	}
 	if p, _ := a.Profiles.Get(ctx, "general-assistant"); p.Topics != nil {
 		t.Fatal("the draft was saved")
+	}
+}
+
+// What an Enforce profile holds is kept for its Admins, with where it came
+// from; marking one as on topic adds it to the examples and forgets it.
+// Try it is never kept (#345).
+func TestTopicAttempts(t *testing.T) {
+	t.Setenv("TOSKAR_STUB_INFERENCE", "1")
+	t.Setenv("TOSKAR_DISCOVERY_ENABLED", "false")
+	a, err := New(Options{DataDir: t.TempDir(), Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.DB.Close() })
+	ctx := context.Background()
+	a.StubReply = func(_ string, msgs []pluginapi.ChatMessage) string {
+		if strings.HasPrefix(msgs[0].Content, "You check each message") {
+			if strings.Contains(msgs[len(msgs)-1].Content, "rotation") && strings.Contains(msgs[0].Content, "Tire rotation?") {
+				return "on_topic"
+			}
+			return "off_topic\nTires only."
+		}
+		return "ok"
+	}
+	p, _ := a.Profiles.Get(ctx, "general-assistant")
+	p.Topics = &contracts.TopicPolicy{StaysOn: "Tires", Strictness: contracts.TopicsEnforce}
+	if err := a.Profiles.Update(ctx, p); err != nil {
+		t.Fatal(err)
+	}
+	chat := func(message string) {
+		t.Helper()
+		conv, _ := a.Conversations.Create(ctx, "t", "general-assistant", "auto")
+		stream, err := a.RunChat(ctx, "general-assistant", conv.ID, message, false, "auto", "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		for range stream {
+		}
+	}
+	chat("Write a poem")
+	chat("Tire rotation?")
+	if _, err := a.TryTopics(ctx, "general-assistant", nil, "Tell me a joke"); err != nil {
+		t.Fatal(err)
+	}
+	got, err := a.TopicAttempts(ctx, "general-assistant", 30)
+	if err != nil || got.Total != 2 || len(got.Attempts) != 2 || len(got.ByDay) != 1 || got.ByDay[0].Count != 2 {
+		t.Fatalf("activity: %+v %v", got, err)
+	}
+	if w := got.ByWhere; len(w) != 1 || w[0].Kind != "person" || w[0].ID != auth.OwnerID || w[0].Count != 2 {
+		t.Fatalf("where: %+v", w)
+	}
+	var rotation string
+	for _, at := range got.Attempts {
+		if at.Message == "Tire rotation?" {
+			rotation = at.ID
+		}
+	}
+	if err := a.MarkOnTopic(ctx, "research", rotation); !errors.Is(err, ErrNoAttempt) {
+		t.Fatalf("another profile's attempt: %v", err)
+	}
+	if err := a.MarkOnTopic(ctx, "general-assistant", rotation); err != nil {
+		t.Fatal(err)
+	}
+	if p, _ := a.Profiles.Get(ctx, "general-assistant"); !slices.Equal(p.Topics.Examples, []string{"Tire rotation?"}) {
+		t.Fatalf("examples: %+v", p.Topics)
+	}
+	if got, _ := a.TopicAttempts(ctx, "general-assistant", 30); got.Total != 1 || got.Attempts[0].Message != "Write a poem" {
+		t.Fatalf("after marking: %+v", got)
+	}
+	// Now an example, the check counts it as on topic.
+	chat("Tire rotation?")
+	if got, _ := a.TopicAttempts(ctx, "general-assistant", 30); got.Total != 1 {
+		t.Fatalf("an example held again: %+v", got)
 	}
 }

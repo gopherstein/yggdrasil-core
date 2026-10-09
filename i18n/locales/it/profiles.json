@@ -425,6 +425,28 @@
         "hello": "Ciao!",
         "whatCanYouDo": "Con cosa puoi aiutarmi?"
       }
+    },
+    "attempts": {
+      "title": "Tentativi fuori tema",
+      "total_one": "{{count}} negli ultimi {{days}} giorni",
+      "total_other": "{{count}} negli ultimi {{days}} giorni",
+      "total_many": "{{count}} negli ultimi {{days}} giorni",
+      "none": "Niente trattenuto negli ultimi 30 giorni. Solo Imponi trattiene i messaggi, quindi con Guida resta vuoto.",
+      "chartLabel_one": "{{count}} tentativo fuori tema negli ultimi {{days}} giorni, per giorno",
+      "chartLabel_other": "{{count}} tentativi fuori tema negli ultimi {{days}} giorni, per giorno",
+      "chartLabel_many": "{{count}} tentativi fuori tema negli ultimi {{days}} giorni, per giorno",
+      "dayTip_one": "{{date}}: {{count}} tentativo",
+      "dayTip_other": "{{date}}: {{count}} tentativi",
+      "dayTip_many": "{{date}}: {{count}} tentativi",
+      "where": {
+        "portal": "Portale {{name}}",
+        "key": "Chiave API {{name}}",
+        "person": "{{name}} nell'app",
+        "automation": "Automazioni"
+      },
+      "replaced": "risposta sostituita",
+      "markOnTopic": "Segna come in tema",
+      "privacy": "Solo gli Admin li vedono. Vengono conservati ed eliminati con i registri delle esecuzioni (Impostazioni → Cosa è uscito da questo computer). Segnarne uno come in tema lo aggiunge alle domande di esempio."
     }
   }
 }

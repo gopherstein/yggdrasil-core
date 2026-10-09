@@ -73,7 +73,11 @@ type Dependencies struct {
 	UpdateProfile  func(ctx context.Context, p contracts.AIProfile) (contracts.AIProfile, error)
 	// TryTopics runs one message past a profile's topic controls, or draft
 	// ones, for the editor's Try it panel (#345).
-	TryTopics             func(ctx context.Context, profileID string, draft *contracts.TopicPolicy, message string) (any, error)
+	TryTopics func(ctx context.Context, profileID string, draft *contracts.TopicPolicy, message string) (any, error)
+	// TopicAttempts and MarkOnTopic are a profile's off-topic attempts,
+	// and adding one to its examples (#345).
+	TopicAttempts         func(ctx context.Context, profileID string, days int) (any, error)
+	MarkOnTopic           func(ctx context.Context, profileID, attemptID string) error
 	DeleteProfile         func(ctx context.Context, id string) error
 	ResetProfile          func(ctx context.Context, id string) (contracts.AIProfile, error)
 	ListNodes             func(ctx context.Context) ([]contracts.Node, error)
@@ -261,6 +265,8 @@ func (s *Server) routes() {
 	api.HandleFunc("/profiles/{id}", s.handleDeleteProfile).Methods(http.MethodDelete)
 	api.HandleFunc("/profiles/{id}/reset", s.handleResetProfile).Methods(http.MethodPost)
 	api.HandleFunc("/profiles/{id}/try-topics", s.handleTryTopics).Methods(http.MethodPost)
+	api.HandleFunc("/profiles/{id}/topic-attempts", s.handleTopicAttempts).Methods(http.MethodGet)
+	api.HandleFunc("/profiles/{id}/topic-attempts/{aid}/on-topic", s.handleMarkOnTopic).Methods(http.MethodPost)
 	api.HandleFunc("/chat", s.handleChat).Methods(http.MethodPost)
 	api.HandleFunc("/chat/stop", s.handleStopChat).Methods(http.MethodPost)
 	api.HandleFunc("/conversations/{id}/messages", s.handleConversationMessages).Methods(http.MethodGet, http.MethodOptions)

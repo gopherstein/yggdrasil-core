@@ -36,6 +36,7 @@ import {
 } from './profilePresentation'
 import { OrchestrationControls, cleanOrchestration } from './OrchestrationControls'
 import { TopicsEditor } from './TopicsEditor'
+import { TopicsAttempts } from './TopicsAttempts'
 import { TopicsTry } from './TopicsTry'
 import { topicsDraft, topicsFrom } from './topicsDraft'
 import { EXECUTION_KEYS, MEMORY_KEYS, ORCHESTRATION_KEYS } from './orchestrationKeys'
@@ -928,6 +929,7 @@ function AdvancedEditor({
           <div className="space-y-6">
             <TopicsEditor value={topics} onChange={setTopics} disabled={saving} />
             <TopicsTry profileId={profile.id} topics={topicsFrom(topics)} examples={topicsFrom(topics)?.examples ?? []} />
+            {profile.topics ? <TopicsAttempts profileId={profile.id} /> : null}
           </div>
         </section>
       )}

@@ -67,6 +67,7 @@ import (
 	"github.com/yeixio/toskar-core/internal/tasks"
 	"github.com/yeixio/toskar-core/internal/telemetry"
 	"github.com/yeixio/toskar-core/internal/tools"
+	"github.com/yeixio/toskar-core/internal/topiclog"
 	"github.com/yeixio/toskar-core/internal/training"
 	"github.com/yeixio/toskar-core/internal/updates"
 	"github.com/yeixio/toskar-core/internal/version"
@@ -110,6 +111,8 @@ type App struct {
 	Health           *modelhealth.Monitor
 	Mimir            *mimir.Store
 	Muninn           *muninn.Store
+	// TopicLog keeps off-topic attempts (#345).
+	TopicLog *topiclog.Store
 	// Notifications is Gjallarhorn's notification center and delivery.
 	Notifications *gjallarhorn.Hub
 	// Share admits chat, automations, benchmarks, and training by priority (§60).
@@ -585,6 +588,10 @@ func New(opts Options) (*App, error) {
 		TryTopics: func(ctx context.Context, profileID string, draft *contracts.TopicPolicy, message string) (any, error) {
 			return a.TryTopics(ctx, profileID, draft, message)
 		},
+		TopicAttempts: func(ctx context.Context, profileID string, days int) (any, error) {
+			return a.TopicAttempts(ctx, profileID, days)
+		},
+		MarkOnTopic: a.MarkOnTopic,
 		UpdateProfile: func(ctx context.Context, p contracts.AIProfile) (contracts.AIProfile, error) {
 			if err := profileMgr.Update(ctx, p); err != nil {
 				return contracts.AIProfile{}, err
@@ -808,6 +815,7 @@ func New(opts Options) (*App, error) {
 	knowledgeModels := newKnowledgeModels(a)
 	a.Mimir.SetModels(knowledgeModels)
 	a.Muninn = muninn.NewStore(db.SQL)
+	a.TopicLog = topiclog.New(db.SQL)
 	// Memories are found by meaning too, in any language, with the same
 	// embedding model as knowledge (multilingual spec §18).
 	a.Muninn.SetEmbedder(func(ctx context.Context) (muninn.Embedder, error) {

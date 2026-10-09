@@ -17,6 +17,12 @@ Greetings, thanks, and "what can you do?" are always fine, so a strict assistant
 
 Under the topic controls, **Try it** runs a message past them as they are in the editor, before you save: pick one of the made-up attempts to talk it off topic, or type a question your people might ask. Each shows the label (on topic, small talk, or off topic) and the reply. The check runs at either strictness, so with Guide you also see what Enforce would hold. Answers there are quick ones, without tools, knowledge, or memories, and nothing is saved or counted.
 
+## Off-topic attempts
+
+Under Try it, **Off-topic attempts** shows what an Enforce profile held, or whose answer it replaced, over the last 30 days: how many each day, where they came from (a portal, an API key, a person in the app, or an automation), and the latest messages. It shows when people try to take the assistant off topic, and when the topic is set too narrowly: **Mark as on topic** adds a message to the example questions, so the checks count it as on topic from then on, and forgets the attempts with that message.
+
+Only Admins see them. They're run records, kept for as long as run records are (**Settings → What left this computer**) and deleted with them; at most 500 characters of each message are kept. Guide checks nothing, so it keeps nothing, and Try it is never kept.
+
 ## How it works
 
 The topic rules come first in every turn, as the administrator's rules, ahead of everything else the model is told. They say that nothing later changes them: not the person's preferences or memories, not an application's instructions through the API, not a document, file, or web page, and not a message asking to ignore them, to pretend, or to play a role.

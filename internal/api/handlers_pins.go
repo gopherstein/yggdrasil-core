@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/yeixio/toskar-core/internal/auth"
@@ -165,4 +166,41 @@ func (s *Server) handleTryTopics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, out)
+}
+
+// handleTopicAttempts is a profile's off-topic attempts over ?days= (30 by
+// default), for its Admins (#345).
+func (s *Server) handleTopicAttempts(w http.ResponseWriter, r *http.Request) {
+	if s.deps.TopicAttempts == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Off-topic attempts aren't available.", nil)
+		return
+	}
+	days, _ := strconv.Atoi(r.URL.Query().Get("days"))
+	out, err := s.deps.TopicAttempts(r.Context(), mux.Vars(r)["id"], days)
+	if err != nil {
+		writeErr(w, http.StatusNotFound, "PROFILE_NOT_FOUND", err.Error(), nil)
+		return
+	}
+	writeJSON(w, http.StatusOK, out)
+}
+
+// handleMarkOnTopic adds an attempt's message to the profile's example
+// questions (#345).
+func (s *Server) handleMarkOnTopic(w http.ResponseWriter, r *http.Request) {
+	if s.deps.MarkOnTopic == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Off-topic attempts aren't available.", nil)
+		return
+	}
+	if err := s.deps.MarkOnTopic(r.Context(), mux.Vars(r)["id"], mux.Vars(r)["aid"]); err != nil {
+		switch code, _ := contracts.ErrorCode(err); code {
+		case "ATTEMPT_NOT_FOUND":
+			writeErrFrom(w, http.StatusNotFound, code, err)
+		case "EXAMPLES_FULL":
+			writeErrFrom(w, http.StatusConflict, code, err)
+		default:
+			writeErr(w, http.StatusBadRequest, "MARK_FAILED", err.Error(), nil)
+		}
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 }
