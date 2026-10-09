@@ -199,5 +199,7 @@
   "REMOTE_DEVICES_ONLY": "From outside the home network, only paired devices can connect.",
   "REMOTE_PORT_INVALID": "The port is 1024 to 65535, and not the one the app or the computers use.",
   "REMOTE_ADDRESS_INVALID": "Enter a host name or IP, with a port when it differs, such as home.example.com or 203.0.113.7:7333.",
-  "REMOTE_LISTEN_FAILED": "Access from anywhere can't listen on port {{port}}. Another program may be using it."
+  "REMOTE_LISTEN_FAILED": "Access from anywhere can't listen on port {{port}}. Another program may be using it.",
+  "ROUTE_NOT_LOCAL": "Connect at home once to set up access from anywhere on this device.",
+  "ROUTE_FAILED": "Couldn't set up access from anywhere on this computer."
 }

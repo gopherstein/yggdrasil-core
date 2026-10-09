@@ -8,8 +8,10 @@ import (
 	"strings"
 
 	"github.com/yeixio/toskar-core/internal/api"
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/config"
 	"github.com/yeixio/toskar-core/internal/portmap"
+	"github.com/yeixio/toskar-core/internal/rendezvous"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
@@ -142,4 +144,14 @@ func validHostName(h string) bool {
 		}
 	}
 	return true
+}
+
+// routeSecret is this computer's route secret for paired devices, made the
+// first time, and its route ID.
+func (a *App) routeSecret() (string, string, error) {
+	secret, err := rendezvous.RouteSecret(auth.NewSecretStore(a.Config.Get().DataDir))
+	if err != nil {
+		return "", "", err
+	}
+	return rendezvous.EncodeSecret(secret), rendezvous.RouteID(secret), nil
 }

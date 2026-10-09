@@ -199,5 +199,7 @@
   "REMOTE_DEVICES_ONLY": "De fora da rede de casa, só dispositivos pareados podem se conectar.",
   "REMOTE_PORT_INVALID": "A porta vai de 1024 a 65535 e não é a usada pelo app ou pelos computadores.",
   "REMOTE_ADDRESS_INVALID": "Informe um nome de host ou IP, com a porta se for diferente, como home.example.com ou 203.0.113.7:7333.",
-  "REMOTE_LISTEN_FAILED": "O acesso de qualquer lugar não consegue escutar na porta {{port}}. Outro programa pode estar usando."
+  "REMOTE_LISTEN_FAILED": "O acesso de qualquer lugar não consegue escutar na porta {{port}}. Outro programa pode estar usando.",
+  "ROUTE_NOT_LOCAL": "Conecte-se uma vez em casa para configurar o acesso de qualquer lugar neste dispositivo.",
+  "ROUTE_FAILED": "Não foi possível configurar o acesso de qualquer lugar neste computador."
 }

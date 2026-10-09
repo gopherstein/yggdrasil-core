@@ -267,6 +267,7 @@ var cgnat = netip.MustParsePrefix("100.64.0.0/10")
 // reads. Everything else, such as API keys, settings changes, models,
 // computers, and files on disk, needs a key made in API Access.
 var deviceRoutes = map[string]bool{
+	"GET /api/v1/remote-access/route":         true,
 	"GET /api/v1/health":                      true,
 	"GET /api/v1/version":                     true,
 	"GET /api/v1/settings":                    true,

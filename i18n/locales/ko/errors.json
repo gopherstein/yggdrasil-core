@@ -199,5 +199,7 @@
   "REMOTE_DEVICES_ONLY": "집 네트워크 밖에서는 페어링한 기기만 연결할 수 있어요.",
   "REMOTE_PORT_INVALID": "포트는 1024~65535이며 앱이나 컴퓨터가 쓰는 포트가 아니어야 해요.",
   "REMOTE_ADDRESS_INVALID": "호스트 이름이나 IP를 입력하세요. 포트가 다르면 함께 적어요. 예: home.example.com, 203.0.113.7:7333.",
-  "REMOTE_LISTEN_FAILED": "어디서나 접속이 포트 {{port}}에서 대기할 수 없어요. 다른 프로그램이 쓰고 있을 수 있어요."
+  "REMOTE_LISTEN_FAILED": "어디서나 접속이 포트 {{port}}에서 대기할 수 없어요. 다른 프로그램이 쓰고 있을 수 있어요.",
+  "ROUTE_NOT_LOCAL": "이 기기에서 어디서나 접속을 설정하려면 집에서 한 번 연결하세요.",
+  "ROUTE_FAILED": "이 컴퓨터에서 어디서나 접속을 설정하지 못했어요."
 }

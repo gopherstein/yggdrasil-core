@@ -144,8 +144,15 @@ func (s *Server) handlePairDevice(w http.ResponseWriter, r *http.Request) {
 	// now on (#213); over plain HTTP the phone checks it on its next HTTPS
 	// connection.
 	tlsInfo := s.TLS()
-	writeJSON(w, http.StatusCreated, map[string]any{"api_key": secret, "key": rec,
-		"tls_fingerprint": tlsInfo.Fingerprint, "tls_short": tlsInfo.Short})
+	out := map[string]any{"api_key": secret, "key": rec,
+		"tls_fingerprint": tlsInfo.Fingerprint, "tls_short": tlsInfo.Short}
+	// The route secret, for finding this computer away from home (#456).
+	if s.deps.RouteSecret != nil {
+		if route, id, err := s.deps.RouteSecret(); err == nil {
+			out["route_secret"], out["route_id"] = route, id
+		}
+	}
+	writeJSON(w, http.StatusCreated, out)
 }
 
 // myDevices are the request's person's connected devices (#206).
