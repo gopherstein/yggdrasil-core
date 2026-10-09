@@ -156,17 +156,39 @@ jobs:
             -e TOSKAR_QUALITY_REPORT=/src/.quality/report.md \
             golang:1.26-bookworm \
             go test ./tests/quality -run TestQualitySet -count=1 -v -timeout 280m
+      # Topic controls (#345): the share of off-topic cases held and of
+      # on-topic ones wrongly refused, with the same models.
+      - name: Topic controls
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p .quality
+          docker run --rm --network "$NAME" \
+            --cap-drop ALL --security-opt no-new-privileges \
+            --memory 4g --memory-swap 4g --cpus 2 \
+            -v "$PWD:/src" -w /src \
+            -v toskar-quality-go:/go \
+            -e TOSKAR_QUALITY_URL="http://$NAME:7331" \
+            -e TOSKAR_QUALITY_KEY="$QUALITY_KEY" \
+            -e TOSKAR_QUALITY_INSTALL=recommended \
+            -e TOSKAR_QUALITY_MODEL="${{ matrix.model }}" \
+            -e TOSKAR_QUALITY_TOPIC_REPORT=/src/.quality/topics.md \
+            golang:1.26-bookworm \
+            go test ./tests/quality -run TestTopicQuality -count=1 -v -timeout 60m
       - name: Report
         if: always()
         run: |
-          if [ -f .quality/report.md ]; then
-            head -c 60000 .quality/report.md >> "$GITHUB_STEP_SUMMARY"
-          fi
+          for f in .quality/report.md .quality/topics.md; do
+            if [ -f "$f" ]; then
+              head -c 60000 "$f" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: quality-report-real-models-${{ matrix.model }}
-          path: .quality/report.md
+          path: |
+            .quality/report.md
+            .quality/topics.md
           if-no-files-found: ignore
       - name: Daemon log
         if: failure()

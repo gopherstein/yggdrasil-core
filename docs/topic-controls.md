@@ -56,6 +56,10 @@ What an assistant can reach is part of staying on topic:
 - **Tools:** a profile uses only the tools turned on in its **Tools** tab. Give a public assistant only the ones its topic needs: a tire shop's needs web search, maybe maps, and not files or code.
 - **Knowledge:** a turn searches only the profile's own knowledge sources, from its **Knowledge** tab.
 
+## How well it holds
+
+`tests/quality/topics.json` is a tire shop with Enforce: on-topic questions and small talk it must answer, and off-topic ones it must hold, with jailbreaks in several forms and languages. Each run reports the share held and the share wrongly refused, so tightening the controls can't quietly start refusing real customers; the weekly run on real models includes it. With Gemma 3 4B, two runs held 12 and 13 of 13 off-topic cases and wrongly refused none of 9 on-topic ones; the one it let through was another shop's prices, a subject that looks like the topic.
+
 ## Be honest about the limits
 
 No language model can promise it never goes off topic. Guide makes it the model's clear instruction; Enforce makes going off topic hard and visible, not impossible. A small model can label a message wrongly either way, so try a profile's real questions before publishing it.

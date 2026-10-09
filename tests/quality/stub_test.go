@@ -229,6 +229,7 @@ func setupProfile(t *testing.T, ctx context.Context, a *app.App, s Setup) string
 			p.Tools = append(p.Tools, contracts.ToolPolicy{ToolID: id, Policy: policy})
 		}
 	}
+	p.Topics = s.Topics
 	created, err := a.Profiles.Create(ctx, p)
 	if err != nil {
 		t.Fatal(err)
