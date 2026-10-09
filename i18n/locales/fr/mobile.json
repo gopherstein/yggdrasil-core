@@ -470,5 +470,21 @@
     "tryAgain": "Réessayer",
     "askAnother": "Autre question",
     "complicationDescription": "Posez une question à Toskar depuis le cadran."
+  },
+  "anywhere": {
+    "title": "Utiliser Toskar hors de la maison",
+    "body": "Joignez votre ordinateur de partout, sans rien régler sur votre box. Tout reste chiffré de cet appareil jusqu'à votre ordinateur.",
+    "month": "{{price}} par mois",
+    "year": "{{price}} par an",
+    "restore": "Restaurer l'achat",
+    "ready": "Prêt hors de la maison",
+    "readyBody": "Hors de la maison, cet appareil joint votre ordinateur via le relais de Toskar.",
+    "pending": "En attente de l'approbation de l'achat.",
+    "notAdmin": "Abonné. Demandez à un administrateur de votre ordinateur d'activer l'accès de partout dans Accès API.",
+    "inUse": "Cet abonnement est déjà utilisé pour un autre ordinateur.",
+    "failed": "Impossible de terminer : {{detail}}",
+    "renews": "Se renouvelle automatiquement jusqu'à ce que vous le résiliiez dans les réglages d'abonnement de votre compte.",
+    "terms": "Conditions",
+    "privacy": "Confidentialité"
   }
 }

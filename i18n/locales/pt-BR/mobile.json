@@ -470,5 +470,21 @@
     "tryAgain": "Tentar de novo",
     "askAnother": "Perguntar outra coisa",
     "complicationDescription": "Pergunte ao Toskar pelo mostrador do relógio."
+  },
+  "anywhere": {
+    "title": "Use o Toskar fora de casa",
+    "body": "Acesse seu computador de qualquer lugar, sem configurar o roteador. Tudo fica criptografado deste dispositivo até o seu computador.",
+    "month": "{{price}} por mês",
+    "year": "{{price}} por ano",
+    "restore": "Restaurar compra",
+    "ready": "Pronto para fora de casa",
+    "readyBody": "Fora de casa, este dispositivo acessa seu computador pelo relay do Toskar.",
+    "pending": "Aguardando a aprovação da compra.",
+    "notAdmin": "Assinatura feita. Peça a um administrador do computador para ativar o acesso de qualquer lugar em Acesso à API.",
+    "inUse": "Esta assinatura já é usada para outro computador.",
+    "failed": "Não foi possível concluir: {{detail}}",
+    "renews": "Renova automaticamente até você cancelar nas configurações de assinaturas da sua conta.",
+    "terms": "Termos",
+    "privacy": "Privacidade"
   }
 }

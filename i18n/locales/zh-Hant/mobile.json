@@ -462,5 +462,21 @@
     "tryAgain": "再試一次",
     "askAnother": "再問一個",
     "complicationDescription": "從錶面直接問 Toskar。"
+  },
+  "anywhere": {
+    "title": "在外使用 Toskar",
+    "body": "無需設定路由器，隨處連線你的電腦。從此裝置到你的電腦，一切都保持加密。",
+    "month": "每月 {{price}}",
+    "year": "每年 {{price}}",
+    "restore": "回復購買",
+    "ready": "已可在外使用",
+    "readyBody": "在外時，此裝置透過 Toskar 的中繼連線你的電腦。",
+    "pending": "正在等待購買獲准。",
+    "notAdmin": "已訂閱。請電腦上的管理員在 API 存取中開啟隨處存取。",
+    "inUse": "此訂閱已用於另一台電腦。",
+    "failed": "無法完成：{{detail}}",
+    "renews": "會自動續訂，直到你在帳戶的訂閱設定中取消。",
+    "terms": "條款",
+    "privacy": "隱私"
   }
 }
