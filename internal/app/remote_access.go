@@ -7,7 +7,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/yeixio/toskar-core/internal/api"
 	"github.com/yeixio/toskar-core/internal/config"
+	"github.com/yeixio/toskar-core/internal/portmap"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
@@ -22,10 +24,67 @@ func (a *App) applyRemoteAccess() error {
 	}
 	cfg := a.Config.Get()
 	if !cfg.RemoteAccess.Enabled {
+		a.portKeeper.Stop()
 		a.API.StopRemote()
 		return nil
 	}
-	return a.API.ServeRemote(fmt.Sprintf(":%d", cfg.RemotePort()))
+	if err := a.API.ServeRemote(fmt.Sprintf(":%d", cfg.RemotePort())); err != nil {
+		a.portKeeper.Stop()
+		return err
+	}
+	// The router opens a port for it, unless the person forwarded one or
+	// turned that off (docs/remote-access.md).
+	if mapsPort(cfg) {
+		a.portKeeper.Start(uint16(cfg.RemotePort()))
+	} else {
+		a.portKeeper.Stop()
+	}
+	return nil
+}
+
+// mapsPort reports whether Toskar asks the router for a port.
+func mapsPort(cfg config.Config) bool {
+	return cfg.RemoteAccess.Enabled && !cfg.RemoteAccess.NoPortMapping && cfg.RemoteAccess.Address == ""
+}
+
+// remoteReach is how the internet reaches the remote listener, for its
+// status in Settings.
+func (a *App) remoteReach() api.RemoteReach {
+	cfg := a.Config.Get()
+	out := api.RemoteReach{PortMapping: mapsPort(cfg)}
+	for _, ip := range portmap.PublicIPv6() {
+		out.IPv6 = append(out.IPv6, ip.String())
+	}
+	m, err := a.portKeeper.Status()
+	if m.Method != "" {
+		out.Mapped, out.Method = m.External.String(), m.Method
+	}
+	if err != nil {
+		out.MapError = err.Error()
+	}
+	listening := a.API != nil && a.API.RemoteListening().Listening != ""
+	out.Reachable, out.Reason = reachOf(cfg, listening, m, len(out.IPv6) > 0)
+	return out
+}
+
+// reachOf says in a word how the internet reaches the listener, and why
+// not when it doesn't.
+func reachOf(cfg config.Config, listening bool, m portmap.Mapping, ipv6 bool) (reachable, reason string) {
+	switch {
+	case !cfg.RemoteAccess.Enabled:
+		return "none", "off"
+	case !listening:
+		return "none", "not_listening"
+	case cfg.RemoteAccess.Address != "":
+		return "manual", ""
+	case m.Method != "" && portmap.Public(m.External.Addr()):
+		return "direct", ""
+	case ipv6:
+		return "ipv6", ""
+	case m.Method != "" && portmap.CarrierNAT(m.External.Addr()):
+		return "none", "carrier_nat"
+	}
+	return "none", "no_port"
 }
 
 // Errors from the remote access settings.

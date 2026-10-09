@@ -640,6 +640,7 @@ export interface SettingsView {
   remote_access_enabled?: boolean
   remote_access_port?: number
   remote_access_address?: string
+  remote_access_port_mapping?: boolean
   web_ui_enabled: boolean
   discovery_enabled: boolean
   node_name: string
@@ -946,6 +947,7 @@ export interface SettingsPatch {
   remote_access_enabled?: boolean
   remote_access_port?: number
   remote_access_address?: string
+  remote_access_port_mapping?: boolean
   discovery_enabled?: boolean
   web_ui_enabled?: boolean
   advanced_mode?: boolean

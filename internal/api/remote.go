@@ -155,6 +155,23 @@ func (s *Server) handleRemoteAccess(w http.ResponseWriter, r *http.Request) {
 			out["address"] = cfg.RemoteAccess.Address
 		}
 	}
+	if s.deps.RemoteReach != nil {
+		reach := s.deps.RemoteReach()
+		out["port_mapping"] = reach.PortMapping
+		if reach.Mapped != "" {
+			out["mapped"], out["mapped_by"] = reach.Mapped, reach.Method
+		}
+		if reach.MapError != "" {
+			out["map_error"] = reach.MapError
+		}
+		if len(reach.IPv6) > 0 {
+			out["ipv6"] = reach.IPv6
+		}
+		out["reachable"] = reach.Reachable
+		if reach.Reason != "" {
+			out["reason"] = reach.Reason
+		}
+	}
 	st := s.RemoteListening()
 	if st.Listening != "" {
 		out["listening"] = st.Listening
@@ -163,4 +180,20 @@ func (s *Server) handleRemoteAccess(w http.ResponseWriter, r *http.Request) {
 		out["error"] = st.Error
 	}
 	writeJSON(w, http.StatusOK, out)
+}
+
+// RemoteReach is how the internet reaches the remote listener (#456): the
+// router port it opened, its IPv6 addresses, and in one word, how.
+type RemoteReach struct {
+	// PortMapping is whether Toskar asks the router to open a port.
+	PortMapping bool
+	// Mapped is the router's outside address and port, and Method how it
+	// was opened: pcp, nat-pmp, or upnp.
+	Mapped, Method string
+	MapError       string
+	IPv6           []string
+	// Reachable is direct (a router port at a public address), ipv6,
+	// manual (a port forwarded by hand), or none, with Reason: off,
+	// not_listening, carrier_nat, or no_port.
+	Reachable, Reason string
 }

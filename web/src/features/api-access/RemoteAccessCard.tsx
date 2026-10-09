@@ -54,15 +54,16 @@ export function RemoteAccessCard() {
           onChange={() => save.mutate({ remote_access_enabled: !enabled })}
         />
       </div>
-      {enabled ? (
-        <p className="text-sm" role="status">
-          {st?.listening ? (
-            <span className="text-success">{t('remote.listening', { port: st.port })}</span>
-          ) : st?.error ? (
-            <span className="text-danger">{t('remote.notListening', { port: st.port, error: st.error })}</span>
-          ) : null}
-        </p>
-      ) : null}
+      {enabled && st ? <ReachLine status={st} /> : null}
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={settings.data?.remote_access_port_mapping ?? true}
+          disabled={save.isPending || !settings.data}
+          onChange={(e) => save.mutate({ remote_access_port_mapping: e.target.checked })}
+        />
+        <span>{t('remote.portMapping')}</span>
+      </label>
       <form
         className="grid gap-3 sm:grid-cols-[8rem_1fr_auto] sm:items-end"
         onSubmit={(e) => {
@@ -90,5 +91,41 @@ export function RemoteAccessCard() {
       {error ? <p className="text-sm text-danger">{error}</p> : null}
       <p className="text-xs text-ink-faint">{t('remote.notes', { port: current })}</p>
     </section>
+  )
+}
+
+type Status = NonNullable<Awaited<ReturnType<typeof api.getRemoteAccess>>>
+
+/** How the internet reaches this computer, in a line. */
+function ReachLine({ status }: { status: Status }) {
+  const { t } = useTranslation('apiAccess')
+  if (!status.listening) {
+    return (
+      <p className="text-sm text-danger" role="status">
+        {t('remote.notListening', { port: status.port, error: status.error ?? '' })}
+      </p>
+    )
+  }
+  const by = status.mapped_by ? t(`remote.method.${status.mapped_by}`) : ''
+  let line: string
+  let ok = true
+  switch (status.reachable) {
+    case 'direct':
+      line = t('remote.reach.direct', { address: status.mapped, method: by })
+      break
+    case 'ipv6':
+      line = t('remote.reach.ipv6', { address: status.ipv6?.[0] ?? '', port: status.port })
+      break
+    case 'manual':
+      line = t('remote.reach.manual', { address: status.address })
+      break
+    default:
+      ok = false
+      line = status.reason === 'carrier_nat' ? t('remote.reach.carrierNat') : t('remote.reach.noPort', { port: status.port })
+  }
+  return (
+    <p className={`text-sm ${ok ? 'text-success' : 'text-warning'}`} role="status">
+      {line}
+    </p>
   )
 }

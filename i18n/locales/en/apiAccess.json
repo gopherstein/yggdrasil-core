@@ -138,12 +138,24 @@
   "remote": {
     "title": "Access from anywhere",
     "body": "Devices paired with this computer can reach it away from home. It answers only what they use, over HTTPS, to their keys.",
-    "listening": "Listening on port {{port}}.",
     "notListening": "Not listening on port {{port}}: {{error}}",
     "port": "Port",
     "address": "Forwarded address (optional)",
     "addressExample": "home.example.com or 203.0.113.7:7333",
     "save": "Save",
-    "notes": "For now, forward port {{port}} on your router to this computer and enter the address it's reached at, or use Tailscale. Setting this up automatically comes next."
+    "notes": "Toskar asks your router to open port {{port}} while this is on, and closes it when it's off. If the router can't, forward the port to this computer and enter the address it's reached at, or use Tailscale.",
+    "portMapping": "Open a port on the router automatically",
+    "method": {
+      "pcp": "PCP",
+      "nat-pmp": "NAT-PMP",
+      "upnp": "UPnP"
+    },
+    "reach": {
+      "direct": "Reachable from anywhere at {{address}}. Your router opened the port ({{method}}).",
+      "ipv6": "Reachable from anywhere over IPv6 at [{{address}}]:{{port}}, if your router lets it in.",
+      "manual": "Reachable at {{address}}, the address you entered.",
+      "carrierNat": "Not reachable yet: your internet provider shares one address among many homes, so a router port can't reach this computer. Toskar's relay will handle this.",
+      "noPort": "Not reachable yet: the router didn't open port {{port}}. Forward it to this computer and enter the address, or use Tailscale."
+    }
   }
 }

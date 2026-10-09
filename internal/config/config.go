@@ -114,6 +114,10 @@ type RemoteAccess struct {
 	// Address is where it's reached from outside, when the person forwarded
 	// a port by hand: a host name or IP, with a port when it differs.
 	Address string `json:"address,omitempty"`
+	// NoPortMapping stops Toskar asking the router to open a port; by
+	// default it does, while access from anywhere is on and no forwarded
+	// address is set.
+	NoPortMapping bool `json:"no_port_mapping,omitempty"`
 }
 
 // RemotePort is the remote listener's port.

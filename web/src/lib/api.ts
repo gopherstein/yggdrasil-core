@@ -540,7 +540,20 @@ export const api = {
   /** How the API speaks HTTPS on the local network (#213). */
   /** Access from anywhere's setting and what its listener is doing (#456). */
   getRemoteAccess: () =>
-    request<{ enabled: boolean; port?: number; address?: string; listening?: string; error?: string }>('/api/v1/remote-access'),
+    request<{
+      enabled: boolean
+      port?: number
+      address?: string
+      listening?: string
+      error?: string
+      port_mapping?: boolean
+      mapped?: string
+      mapped_by?: 'pcp' | 'nat-pmp' | 'upnp'
+      map_error?: string
+      ipv6?: string[]
+      reachable?: 'direct' | 'ipv6' | 'manual' | 'none'
+      reason?: 'off' | 'not_listening' | 'carrier_nat' | 'no_port'
+    }>('/api/v1/remote-access'),
 
   getApiTLS: () => request<APITLS>('/api/v1/tls'),
 

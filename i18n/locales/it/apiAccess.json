@@ -138,12 +138,24 @@
   "remote": {
     "title": "Accesso ovunque",
     "body": "I dispositivi associati a questo computer possono raggiungerlo fuori casa. Risponde solo a ciò che usano, via HTTPS, con le loro chiavi.",
-    "listening": "In ascolto sulla porta {{port}}.",
     "notListening": "Non in ascolto sulla porta {{port}}: {{error}}",
     "port": "Porta",
     "address": "Indirizzo inoltrato (facoltativo)",
     "addressExample": "home.example.com o 203.0.113.7:7333",
     "save": "Salva",
-    "notes": "Per ora inoltra la porta {{port}} del router a questo computer e inserisci l'indirizzo con cui si raggiunge, oppure usa Tailscale. La configurazione automatica arriverà dopo."
+    "notes": "Toskar chiede al router di aprire la porta {{port}} finché questa opzione è attiva, e la chiude quando la disattivi. Se il router non può, inoltra la porta a questo computer e inserisci l'indirizzo, oppure usa Tailscale.",
+    "portMapping": "Apri automaticamente una porta sul router",
+    "method": {
+      "pcp": "PCP",
+      "nat-pmp": "NAT-PMP",
+      "upnp": "UPnP"
+    },
+    "reach": {
+      "direct": "Raggiungibile ovunque su {{address}}. Il router ha aperto la porta ({{method}}).",
+      "ipv6": "Raggiungibile ovunque via IPv6 su [{{address}}]:{{port}}, se il router lo consente.",
+      "manual": "Raggiungibile su {{address}}, l'indirizzo che hai inserito.",
+      "carrierNat": "Non ancora raggiungibile: il tuo provider condivide un indirizzo tra molte case, quindi una porta del router non raggiunge questo computer. Ci penserà il relay di Toskar.",
+      "noPort": "Non ancora raggiungibile: il router non ha aperto la porta {{port}}. Inoltrala a questo computer e inserisci l'indirizzo, oppure usa Tailscale."
+    }
   }
 }

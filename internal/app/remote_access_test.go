@@ -5,8 +5,11 @@ import (
 	"errors"
 	"io"
 	"log/slog"
+	"net/netip"
 	"testing"
 
+	"github.com/yeixio/toskar-core/internal/config"
+	"github.com/yeixio/toskar-core/internal/portmap"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
@@ -58,5 +61,43 @@ func TestRemoteAccessSettings(t *testing.T) {
 	}
 	if view, _ := a.settingsView(ctx); view.RemoteAccessPort != 7333 {
 		t.Fatalf("default port: %d", view.RemoteAccessPort)
+	}
+}
+
+// How the internet reaches the listener, in a word (#456).
+func TestReachOf(t *testing.T) {
+	on := config.Config{RemoteAccess: config.RemoteAccess{Enabled: true}}
+	upnp := func(addr string) portmap.Mapping {
+		return portmap.Mapping{Method: portmap.MethodUPnP, External: netip.MustParseAddrPort(addr)}
+	}
+	manual := on
+	manual.RemoteAccess.Address = "home.example.com"
+	for name, c := range map[string]struct {
+		cfg       config.Config
+		listening bool
+		m         portmap.Mapping
+		ipv6      bool
+		reach     string
+		reason    string
+	}{
+		"off":           {config.Config{}, false, portmap.Mapping{}, false, "none", "off"},
+		"not listening": {on, false, portmap.Mapping{}, false, "none", "not_listening"},
+		"manual":        {manual, true, portmap.Mapping{}, false, "manual", ""},
+		"direct":        {on, true, upnp("203.0.113.9:7333"), false, "direct", ""},
+		"ipv6":          {on, true, portmap.Mapping{}, true, "ipv6", ""},
+		"carrier NAT":   {on, true, upnp("100.70.1.2:7333"), false, "none", "carrier_nat"},
+		"no port":       {on, true, portmap.Mapping{}, false, "none", "no_port"},
+	} {
+		if reach, reason := reachOf(c.cfg, c.listening, c.m, c.ipv6); reach != c.reach || reason != c.reason {
+			t.Errorf("%s: %s %s", name, reach, reason)
+		}
+	}
+	if !mapsPort(on) || mapsPort(manual) {
+		t.Fatal("maps a port")
+	}
+	noMap := on
+	noMap.RemoteAccess.NoPortMapping = true
+	if mapsPort(noMap) {
+		t.Fatal("mapped with mapping off")
 	}
 }

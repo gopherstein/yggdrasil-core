@@ -138,12 +138,24 @@
   "remote": {
     "title": "隨處存取",
     "body": "與這台電腦配對的裝置在外也能存取它。它只透過 HTTPS、對這些裝置的金鑰，回應它們用到的功能。",
-    "listening": "正在連接埠 {{port}} 上監聽。",
     "notListening": "未在連接埠 {{port}} 上監聽：{{error}}",
     "port": "連接埠",
     "address": "轉送位址（選填）",
     "addressExample": "home.example.com 或 203.0.113.7:7333",
     "save": "儲存",
-    "notes": "目前，請在路由器上把連接埠 {{port}} 轉送到這台電腦並填寫存取位址，或使用 Tailscale。自動設定將在下一步提供。"
+    "notes": "開啟期間，Toskar 會請路由器開啟連接埠 {{port}}，關閉後會將其關閉。如果路由器不支援，請把連接埠轉送到這台電腦並填寫位址，或使用 Tailscale。",
+    "portMapping": "自動在路由器上開啟連接埠",
+    "method": {
+      "pcp": "PCP",
+      "nat-pmp": "NAT-PMP",
+      "upnp": "UPnP"
+    },
+    "reach": {
+      "direct": "可在 {{address}} 隨處存取。路由器已開啟連接埠（{{method}}）。",
+      "ipv6": "如果路由器允許，可透過 IPv6 在 [{{address}}]:{{port}} 隨處存取。",
+      "manual": "可透過你填寫的位址 {{address}} 存取。",
+      "carrierNat": "暫時無法存取：你的網路服務商讓許多家庭共用一個位址，路由器連接埠無法到達這台電腦。Toskar 的中繼將解決這個問題。",
+      "noPort": "暫時無法存取：路由器沒有開啟連接埠 {{port}}。請把它轉送到這台電腦並填寫位址，或使用 Tailscale。"
+    }
   }
 }
