@@ -81,11 +81,27 @@ type assistantOptions struct {
 
 // HandleModels lists profiles as OpenAI models.
 func (h *Handler) HandleModels(w http.ResponseWriter, r *http.Request) {
-	if h.Auth != nil {
+	perms := auth.DefaultAPIKeyPermissions()
+	switch {
+	case h.Permissions != nil:
+		p, _, err := h.Permissions(r)
+		if err != nil {
+			writeError(w, http.StatusUnauthorized, "UNAUTHORIZED", err.Error())
+			return
+		}
+		perms = p
+	case h.Auth != nil:
 		if err := h.Auth(r); err != nil {
 			writeError(w, http.StatusUnauthorized, "UNAUTHORIZED", err.Error())
 			return
 		}
+	}
+	// A key pinned to a profile sees only it (#345).
+	if perms.Profile != "" {
+		writeJSON(w, map[string]any{"object": "list", "data": []map[string]any{
+			{"id": "profile:" + perms.Profile, "object": "model", "owned_by": "yggdrasil"},
+		}})
+		return
 	}
 	items, err := h.Profiles.List(r.Context())
 	if err != nil {
@@ -171,6 +187,20 @@ func (h *Handler) HandleChatCompletions(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// A key pinned to a profile answers with it alone (#345).
+	if perms.Profile != "" {
+		requested := ""
+		if strings.HasPrefix(req.Model, "profile:") {
+			requested = profileID
+		}
+		pinned, err := perms.Pinned(requested, modelID)
+		if err != nil {
+			writeError(w, http.StatusForbidden, "PROFILE_PINNED", "this key answers only with profile:"+perms.Profile+`; use model "profile:`+perms.Profile+`" or "auto"`)
+			return
+		}
+		profileID, modelID = pinned, ""
+		opts.FixedProfile = true
+	}
 	// Prefer profile when the id matches a known profile; otherwise use as model override.
 	if modelID != "" && profileID == modelID {
 		if _, err := h.Profiles.Get(r.Context(), profileID); err != nil {

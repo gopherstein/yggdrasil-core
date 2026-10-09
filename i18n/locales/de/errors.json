@@ -145,6 +145,7 @@
   "PORTAL_TOO_LONG": "Eine Nachricht kann hier höchstens {{max}} Zeichen lang sein.",
   "PORTAL_BUSY": "Dieser Chat ist gerade ausgelastet. Versuche es gleich noch einmal.",
   "PORTAL_RATE": "Du hast viele Nachrichten gesendet. Versuche es später erneut.",
+  "PROFILE_PINNED": "Dieser Schlüssel antwortet nur mit seinem eigenen Profil. Lass Profil und Modell weg oder nenne dieses Profil.",
   "PORTAL_MEMBERS": "Dieser Chat ist für die Menschen, die sich bei diesem Toskar anmelden.",
   "PORTAL_INVITE": "Dieser Chat ist nur auf Einladung. Öffne den Link, den du bekommen hast, oder bitte um einen neuen.",
   "PORTAL_INVALID": "Diese Portaleinstellung kann nicht verwendet werden.",

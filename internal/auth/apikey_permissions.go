@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 )
 
@@ -33,6 +34,27 @@ type APIKeyPermissions struct {
 	Tools string `json:"tools"`
 	// Placement lets a request choose where it runs.
 	Placement bool `json:"placement"`
+	// Profile pins the key to one profile (#345): every request answers
+	// with it and its topic controls, and can't name another profile or a
+	// model. Empty lets each request choose.
+	Profile string `json:"profile,omitempty"`
+}
+
+// ErrProfilePinned is a request naming another profile, or a model, with a
+// key pinned to a profile.
+var ErrProfilePinned = errors.New("this key answers only with its own profile")
+
+// Pinned returns the profile a request uses: the key's pinned profile,
+// when it has one, or the one requested. With a pin, a request may name
+// only that profile, or "auto" or nothing for the model.
+func (p APIKeyPermissions) Pinned(profileID, modelID string) (string, error) {
+	if p.Profile == "" {
+		return profileID, nil
+	}
+	if (profileID != "" && profileID != p.Profile) || (modelID != "" && modelID != "auto" && modelID != p.Profile) {
+		return "", ErrProfilePinned
+	}
+	return p.Profile, nil
 }
 
 // DefaultAPIKeyPermissions is what a key has until it is changed, and what

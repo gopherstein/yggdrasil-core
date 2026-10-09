@@ -145,6 +145,7 @@
   "PORTAL_TOO_LONG": "此处的消息最多 {{max}} 个字符。",
   "PORTAL_BUSY": "此聊天正忙。请稍后再试。",
   "PORTAL_RATE": "你发送的消息太多了。请稍后再试。",
+  "PROFILE_PINNED": "此密钥只使用它自己的配置回答。请省略配置和模型，或指定该配置。",
   "PORTAL_MEMBERS": "此聊天供登录这个 Toskar 的人使用。",
   "PORTAL_INVITE": "此聊天仅限受邀者。请打开你收到的链接，或索取新的链接。",
   "PORTAL_INVALID": "无法使用该门户设置。",

@@ -4,7 +4,12 @@ import { describe, expect, it, vi } from 'vitest'
 import { api } from '@/lib/api'
 import { KeyPermissions } from './KeyPermissions'
 
-vi.mock('@/lib/api', () => ({ api: { setApiKeyPermissions: vi.fn() } }))
+vi.mock('@/lib/api', () => ({
+  api: {
+    setApiKeyPermissions: vi.fn(),
+    getProfiles: vi.fn().mockResolvedValue([{ id: 'tires', name: 'Tire Shop' }]),
+  },
+}))
 
 describe('KeyPermissions', () => {
   it('changes one permission and keeps the rest', async () => {
@@ -24,6 +29,28 @@ describe('KeyPermissions', () => {
         knowledge: 'always',
         tools: 'read_only',
         placement: true,
+      }),
+    )
+  })
+
+  it('pins the key to a profile', async () => {
+    vi.mocked(api.setApiKeyPermissions).mockResolvedValue(null)
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <KeyPermissions
+          apiKey={{ id: 'k2', name: 'site', prefix: 'ygg_def', created_at: '2026-10-01T00:00:00Z', revoked: false }}
+        />
+      </QueryClientProvider>,
+    )
+    await screen.findByRole('option', { name: 'Tire Shop' })
+    fireEvent.change(screen.getByLabelText('Answers with'), { target: { value: 'tires' } })
+    await waitFor(() =>
+      expect(api.setApiKeyPermissions).toHaveBeenCalledWith('k2', {
+        memory: 'on_request',
+        knowledge: 'always',
+        tools: 'profile',
+        placement: true,
+        profile: 'tires',
       }),
     )
   })

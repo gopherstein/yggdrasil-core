@@ -103,7 +103,10 @@
     },
     "placement": "May choose where requests run",
     "note": "Requests can ask for less, never more. Over the network these limits always apply; on this computer they apply when the app sends this key.",
-    "saveFailed": "Could not save."
+    "saveFailed": "Could not save.",
+    "profile": "Answers with",
+    "anyProfile": "The profile each request names",
+    "pinnedHint": "Every request answers with this profile and its topic controls, and can't name another profile or a model."
   },
   "share": {
     "title": "Use Toskar in other AI apps",

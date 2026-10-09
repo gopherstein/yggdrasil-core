@@ -2,12 +2,14 @@ package app
 
 import (
 	"context"
+	"errors"
 	"io"
 	"log/slog"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/muninn"
 	"github.com/yeixio/toskar-core/internal/personal"
 	"github.com/yeixio/toskar-core/internal/runlog"
@@ -155,5 +157,112 @@ func TestParseTopicVerdict(t *testing.T) {
 		if got := parseTopicVerdict(in); got != want {
 			t.Errorf("%q: %+v, want %+v", in, got, want)
 		}
+	}
+}
+
+// A profile with topic controls answers everything by its own rules:
+// Toskar's own replies about itself, its memory, or what to install are
+// not given in its place (#345).
+func TestTopicsSkipToskarsOwnReplies(t *testing.T) {
+	t.Setenv("TOSKAR_STUB_INFERENCE", "1")
+	t.Setenv("TOSKAR_DISCOVERY_ENABLED", "false")
+	a, err := New(Options{DataDir: t.TempDir(), Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.DB.Close() })
+	ctx := context.Background()
+	a.StubReply = func(string, []pluginapi.ChatMessage) string { return "From the tire shop." }
+	ask := func(message string) string {
+		t.Helper()
+		conv, err := a.Conversations.Create(ctx, "t", "general-assistant", "auto")
+		if err != nil {
+			t.Fatal(err)
+		}
+		stream, err := a.RunChat(ctx, "general-assistant", conv.ID, message, false, "auto", "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		var b strings.Builder
+		for c := range stream {
+			b.WriteString(c.Content)
+		}
+		return b.String()
+	}
+	questions := []string{"How do I install MCP?", "Remember that my car is a Subaru."}
+	for _, q := range questions {
+		if got := ask(q); got == "From the tire shop." {
+			t.Fatalf("without topics, %q went to the model", q)
+		}
+	}
+	p, _ := a.Profiles.Get(ctx, "general-assistant")
+	p.Topics = &contracts.TopicPolicy{StaysOn: "Tires"}
+	if err := a.Profiles.Update(ctx, p); err != nil {
+		t.Fatal(err)
+	}
+	before, _ := a.Muninn.List(ctx)
+	for _, q := range questions {
+		if got := ask(q); got != "From the tire shop." {
+			t.Errorf("%q: %q", q, got)
+		}
+	}
+	if after, _ := a.Muninn.List(ctx); len(after) != len(before) {
+		t.Fatal("a topic profile stored a memory")
+	}
+}
+
+// A key is pinned only to a profile that exists (#345).
+func TestPinKeyToAProfile(t *testing.T) {
+	t.Setenv("TOSKAR_DISCOVERY_ENABLED", "false")
+	a, err := New(Options{DataDir: t.TempDir(), Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.DB.Close() })
+	ctx := context.Background()
+	key, _, err := a.APIKeys.Create(ctx, "site")
+	if err != nil {
+		t.Fatal(err)
+	}
+	perms := auth.DefaultAPIKeyPermissions()
+	perms.Profile = "no-such-profile"
+	if _, err := a.setAPIKeyPermissions(ctx, key.ID, perms); err == nil {
+		t.Fatal("pinned to a missing profile")
+	}
+	perms.Profile = "general-assistant"
+	rec, err := a.setAPIKeyPermissions(ctx, key.ID, perms)
+	if err != nil || rec.Permissions.Profile != "general-assistant" {
+		t.Fatalf("%+v %v", rec, err)
+	}
+}
+
+// An MCP call with a pinned key answers with its profile, and can't name
+// a model (#345).
+func TestPinnedKeyOverMCP(t *testing.T) {
+	t.Setenv("TOSKAR_STUB_INFERENCE", "1")
+	t.Setenv("TOSKAR_DISCOVERY_ENABLED", "false")
+	a, err := New(Options{DataDir: t.TempDir(), Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.DB.Close() })
+	var asked string
+	a.StubReply = func(_ string, msgs []pluginapi.ChatMessage) string {
+		asked = msgs[0].Content
+		return "ok"
+	}
+	p, _ := a.Profiles.Get(context.Background(), "research")
+	p.Topics = &contracts.TopicPolicy{StaysOn: "Tires"}
+	if err := a.Profiles.Update(context.Background(), p); err != nil {
+		t.Fatal(err)
+	}
+	perms := auth.DefaultAPIKeyPermissions()
+	perms.Profile = "research"
+	ctx := context.WithValue(context.Background(), mcpPermsKey{}, perms)
+	if _, err := a.mcpAsk(ctx, "hi", "qwen3-8b"); !errors.Is(err, auth.ErrProfilePinned) {
+		t.Fatalf("naming a model: %v", err)
+	}
+	if got, err := a.mcpAsk(ctx, "Which tires for snow?", ""); err != nil || got != "ok" || !strings.Contains(asked, "only for: Tires") {
+		t.Fatalf("%q %v; system: %.120s", got, err, asked)
 	}
 }

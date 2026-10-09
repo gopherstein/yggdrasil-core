@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { api } from '@/lib/api'
@@ -11,7 +11,8 @@ const USE_OPTIONS: APIKeyPermissions['memory'][] = ['never', 'on_request', 'alwa
 
 /**
  * What an API key may ask of the assistant (spec §62): memory, connected
- * knowledge, tools, and placement. Requests can narrow it, never widen it.
+ * knowledge, tools, and placement, and the profile it answers with (#345).
+ * Requests can narrow it, never widen it.
  */
 export function KeyPermissions({ apiKey }: { apiKey: APIKeyRecord }) {
   const { t } = useTranslation('apiAccess')
@@ -27,11 +28,29 @@ export function KeyPermissions({ apiKey }: { apiKey: APIKeyRecord }) {
     onError: (err) => setError(err instanceof Error ? err.message : t('permissions.saveFailed')),
   })
   const change = (patch: Partial<APIKeyPermissions>) => save.mutate({ ...current, ...patch })
+  const profiles = useQuery({ queryKey: ['profiles'], queryFn: () => api.getProfiles(), retry: false })
 
   return (
     <details className="w-full text-xs">
       <summary className="cursor-pointer text-ink-muted">{t('permissions.summary')}</summary>
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        <label className="block sm:col-span-2">
+          <span className="text-ink-muted">{t('permissions.profile')}</span>
+          <select
+            className="field mt-1 w-full"
+            value={current.profile ?? ''}
+            disabled={save.isPending}
+            onChange={(e) => change({ profile: e.target.value || undefined })}
+          >
+            <option value="">{t('permissions.anyProfile')}</option>
+            {(profiles.data ?? []).map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+          {current.profile ? <span className="mt-1 block text-ink-faint">{t('permissions.pinnedHint')}</span> : null}
+        </label>
         <label className="block">
           <span className="text-ink-muted">{t('permissions.memories')}</span>
           <select

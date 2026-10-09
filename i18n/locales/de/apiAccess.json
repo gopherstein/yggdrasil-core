@@ -103,7 +103,10 @@
     },
     "placement": "Darf wählen, wo Anfragen laufen",
     "note": "Anfragen können weniger verlangen, nie mehr. Über das Netzwerk gelten diese Grenzen immer; auf diesem Computer gelten sie, wenn die App diesen Schlüssel sendet.",
-    "saveFailed": "Konnte nicht gespeichert werden."
+    "saveFailed": "Konnte nicht gespeichert werden.",
+    "profile": "Antwortet mit",
+    "anyProfile": "Dem Profil, das die Anfrage nennt",
+    "pinnedHint": "Jede Anfrage antwortet mit diesem Profil und seinen Themenregeln und kann kein anderes Profil und kein Modell nennen."
   },
   "share": {
     "title": "Toskar in anderen KI-Apps nutzen",

@@ -169,3 +169,37 @@ func TestToskarAndYggdrasilExtension(t *testing.T) {
 		t.Fatalf("stream lacks the extension under both names:\n%s", body)
 	}
 }
+
+// A key pinned to a profile answers with it alone, and lists only it
+// (#345).
+func TestPinnedKey(t *testing.T) {
+	h := testHandler(t)
+	chat := &scriptChat{chunks: []pluginapi.ChatChunk{{Content: "ok", Done: true}}}
+	h.Chat = chat
+	perms := auth.DefaultAPIKeyPermissions()
+	perms.Profile = "tires"
+	h.Permissions = func(r *http.Request) (auth.APIKeyPermissions, context.Context, error) { return perms, r.Context(), nil }
+
+	for _, model := range []string{"auto", "profile:tires", "tires", ""} {
+		rec := post(h, `{"model":"`+model+`","messages":[{"role":"user","content":"hi"}]}`)
+		if rec.Code != http.StatusOK || chat.profileID != "tires" || chat.modelID != "" || !chat.opts.FixedProfile {
+			t.Errorf("%q: %d %s profile=%q model=%q", model, rec.Code, rec.Body, chat.profileID, chat.modelID)
+		}
+	}
+	for _, model := range []string{"profile:general", "qwen3-8b"} {
+		if rec := post(h, `{"model":"`+model+`","messages":[{"role":"user","content":"hi"}]}`); rec.Code != http.StatusForbidden || !strings.Contains(rec.Body.String(), "PROFILE_PINNED") {
+			t.Errorf("%q: %d %s", model, rec.Code, rec.Body)
+		}
+	}
+
+	rec := httptest.NewRecorder()
+	h.HandleModels(rec, httptest.NewRequest(http.MethodGet, "/v1/models", nil))
+	var list struct {
+		Data []struct {
+			ID string `json:"id"`
+		} `json:"data"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &list); err != nil || len(list.Data) != 1 || list.Data[0].ID != "profile:tires" {
+		t.Fatalf("models: %s", rec.Body)
+	}
+}

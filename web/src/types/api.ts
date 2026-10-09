@@ -810,6 +810,8 @@ export interface APIKeyPermissions {
   knowledge: 'never' | 'on_request' | 'always'
   tools: 'profile' | 'read_only' | 'none'
   placement: boolean
+  /** The profile every request answers with (#345); empty lets each request choose. */
+  profile?: string
 }
 
 export interface CreateAPIKeyResponse {
