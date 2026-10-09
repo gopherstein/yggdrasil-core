@@ -277,7 +277,20 @@
       "allowOnce": "允许一次"
     },
     "ranOnGPU": "GPU",
-    "ranOnCPU": "CPU"
+    "ranOnCPU": "CPU",
+    "versions": {
+      "tryAgain": "重试",
+      "tryAgainHint": "再问一次这个问题。长按可选择其他模型。",
+      "tryAnother": "换个模型试试",
+      "pickModel": "重试所用模型",
+      "edit": "编辑",
+      "editing": "正在编辑你的消息。发送后会生成新版本，旧版本会保留。",
+      "cancelEdit": "取消",
+      "previous": "上一个版本",
+      "next": "下一个版本",
+      "position": "{{index}} / {{count}}",
+      "positionLabel": "第 {{index}} 个版本，共 {{count}} 个"
+    }
   },
   "effort": {
     "title": "投入程度",
@@ -396,7 +409,8 @@
       "homework": "给十岁的孩子解释光合作用。",
       "trip": "为四口之家规划朱诺一个下雨的星期六。",
       "movie": "推荐一个家庭电影之夜，选三部相互呼应的电影。"
-    }
+    },
+    "tryAgain": "重试"
   },
   "setup": {
     "title": "在电脑上设置",
