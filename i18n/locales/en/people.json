@@ -80,5 +80,22 @@
     "signOut": "Sign out",
     "signedInWith": "Signed in as {{name}} ({{external}}), {{role}}.",
     "signedInByProxy": "Signed in as {{name}} by your sign-in service, {{role}}. Sign out there."
+  },
+  "pins": {
+    "title": "Profiles they use",
+    "body": "Keep Members or Visitors to one or more profiles, such as an assistant with topic controls. They can't pick another. Admins and the Owner always have every profile.",
+    "members": "Members",
+    "visitors": "Visitors",
+    "any": "Any profile",
+    "noneTicked": "With none ticked, they use any profile.",
+    "profiles": "Profiles",
+    "for": "Profiles for {{name}}",
+    "sameAsRole": "Same as their role",
+    "mode": {
+      "role": "Same as their role",
+      "any": "Any profile",
+      "only": "Only these"
+    },
+    "pickOne": "Tick at least one."
   }
 }

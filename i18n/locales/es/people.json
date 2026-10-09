@@ -80,5 +80,22 @@
     "signOut": "Cerrar sesión",
     "signedInWith": "Sesión iniciada como {{name}} ({{external}}), {{role}}.",
     "signedInByProxy": "Sesión iniciada como {{name}} mediante tu servicio de inicio de sesión, {{role}}. Cierra la sesión allí."
+  },
+  "pins": {
+    "title": "Perfiles que usan",
+    "body": "Limita a los Miembros o Visitantes a uno o más perfiles, como un asistente con controles de tema. No pueden elegir otro. Los Administradores y el Propietario siempre tienen todos los perfiles.",
+    "members": "Miembros",
+    "visitors": "Visitantes",
+    "any": "Cualquier perfil",
+    "noneTicked": "Si no marcas ninguno, usan cualquier perfil.",
+    "profiles": "Perfiles",
+    "for": "Perfiles de {{name}}",
+    "sameAsRole": "Igual que su rol",
+    "mode": {
+      "role": "Igual que su rol",
+      "any": "Cualquier perfil",
+      "only": "Solo estos"
+    },
+    "pickOne": "Marca al menos uno."
   }
 }

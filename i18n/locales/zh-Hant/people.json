@@ -80,5 +80,22 @@
     "signOut": "登出",
     "signedInWith": "已登入為 {{name}}（{{external}}），{{role}}。",
     "signedInByProxy": "已透過你的登入服務以 {{name}}（{{role}}）登入。請在那裡登出。"
+  },
+  "pins": {
+    "title": "可用的設定檔",
+    "body": "將成員或訪客限制在一個或多個設定檔中，例如帶有主題控制的助手。他們不能選擇其他設定檔。管理員和擁有者始終可以使用所有設定檔。",
+    "members": "成員",
+    "visitors": "訪客",
+    "any": "任意設定檔",
+    "noneTicked": "都不勾選時，他們可以使用任意設定檔。",
+    "profiles": "設定檔",
+    "for": "{{name}} 的設定檔",
+    "sameAsRole": "與其角色相同",
+    "mode": {
+      "role": "與其角色相同",
+      "any": "任意設定檔",
+      "only": "僅限這些"
+    },
+    "pickOne": "請至少勾選一個。"
   }
 }

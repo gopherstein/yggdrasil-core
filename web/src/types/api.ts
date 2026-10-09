@@ -752,6 +752,13 @@ export interface Person {
   sign_in: boolean
   /** The name a trusted proxy signs them in as (#206). */
   external?: string
+  /** The profiles they're pinned to in place of their role's (#345); [] is any profile. */
+  profiles?: string[]
+}
+
+/** The profiles each pinnable role is kept to (#345); empty is any profile. */
+export interface ProfilePins {
+  roles: { member: string[]; visitor: string[] }
 }
 
 /** Who a request is from: GET /api/v1/me. */
@@ -760,6 +767,8 @@ export interface Principal {
   /** this_computer, api_key, or session. */
   via: 'this_computer' | 'api_key' | 'session' | 'proxy' | 'system' | 'none' | string
   key_id?: string
+  /** The profiles they may chat with, when they're pinned to some (#345). */
+  profiles?: string[]
 }
 
 /** A one-time link to give a person: its page's path on this Toskar. */

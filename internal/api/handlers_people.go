@@ -36,6 +36,7 @@ func (s *Server) peopleRoutes(api *mux.Router) {
 	api.HandleFunc("/people", s.atLeast(auth.RoleAdmin, s.handleAddPerson)).Methods(http.MethodPost)
 	api.HandleFunc("/people/{id}", s.atLeast(auth.RoleAdmin, s.handleChangePerson)).Methods(http.MethodPatch)
 	api.HandleFunc("/people/{id}/link", s.atLeast(auth.RoleAdmin, s.handlePersonLink)).Methods(http.MethodPost)
+	s.pinRoutes(api)
 }
 
 // atLeast refuses a request whose person's role is below min.
@@ -100,7 +101,12 @@ func (s *Server) signInReady(w http.ResponseWriter) bool {
 // handleMe is who the request is from (#206): their person, role, and how
 // Toskar knows, so a client can show what that person may do.
 func (s *Server) handleMe(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, http.StatusOK, auth.PrincipalFrom(r.Context()))
+	writeJSON(w, http.StatusOK, struct {
+		auth.Principal
+		// Profiles are the profiles they may chat with, when they're
+		// pinned to some (#345).
+		Profiles []string `json:"profiles,omitempty"`
+	}{auth.PrincipalFrom(r.Context()), s.myProfiles(r)})
 }
 
 // setSession signs the browser in as person.

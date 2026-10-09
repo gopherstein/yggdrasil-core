@@ -58,6 +58,12 @@ func screenshotGET(path string) (string, bool) {
 		return `{"status":"ok","product":"Yggdrasil","version":"0.1.0","acceleration":"gpu"}`, true
 	case path == "/api/v1/me":
 		return `{"person":{"id":"owner","name":"Owner","role":"owner","created_at":"2026-09-24T00:00:00Z","sign_in":false},"via":"this_computer"}`, true
+	case path == "/api/v1/people":
+		return `[{"id":"owner","name":"Owner","role":"owner","created_at":"2026-09-24T00:00:00Z","sign_in":false},` +
+			`{"id":"p-dana","name":"Dana","username":"dana","role":"member","created_at":"2026-09-25T00:00:00Z","sign_in":true,"profiles":["research"]},` +
+			`{"id":"p-sam","name":"Sam","role":"visitor","created_at":"2026-09-26T00:00:00Z","sign_in":false}]`, true
+	case path == "/api/v1/profile-pins":
+		return `{"roles":{"member":[],"visitor":["general-assistant"]}}`, true
 	case path == "/api/v1/version":
 		return `{"version":"0.1.0","commit":"screenshot","build_date":"2026-09-24T00:00:00Z","product":"Yggdrasil"}`, true
 	case path == "/api/v1/hardware":

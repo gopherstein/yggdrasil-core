@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"regexp"
 	"strings"
@@ -60,6 +61,9 @@ type Person struct {
 	// PortalID is the chat portal a guest belongs to (#205); a guest
 	// reaches only that portal's chat.
 	PortalID string `json:"portal_id,omitempty"`
+	// Profiles pins them to these profiles (#345), in place of their
+	// role's: nil is their role's, empty is any profile.
+	Profiles *[]string `json:"profiles,omitempty"`
 }
 
 // ErrNoPerson is an unknown or disabled person.
@@ -73,14 +77,20 @@ type People struct {
 // NewPeople reads people from db.
 func NewPeople(db *sql.DB) *People { return &People{db: db} }
 
-const personColumns = `id, name, COALESCE(username, ''), role, created_at, disabled_at, password_hash IS NOT NULL, COALESCE(external_label, external_id, ''), COALESCE(portal_id, '')`
+const personColumns = `id, name, COALESCE(username, ''), role, created_at, disabled_at, password_hash IS NOT NULL, COALESCE(external_label, external_id, ''), COALESCE(portal_id, ''), profiles_json`
 
 func scanPerson(row interface{ Scan(...any) error }) (Person, error) {
 	var p Person
 	var created string
-	var disabled sql.NullString
-	if err := row.Scan(&p.ID, &p.Name, &p.Username, &p.Role, &created, &disabled, &p.SignIn, &p.External, &p.PortalID); err != nil {
+	var disabled, profiles sql.NullString
+	if err := row.Scan(&p.ID, &p.Name, &p.Username, &p.Role, &created, &disabled, &p.SignIn, &p.External, &p.PortalID, &profiles); err != nil {
 		return Person{}, err
+	}
+	if profiles.Valid {
+		list := []string{}
+		if json.Unmarshal([]byte(profiles.String), &list) == nil {
+			p.Profiles = &list
+		}
 	}
 	p.CreatedAt = parseTime(created)
 	if disabled.Valid {

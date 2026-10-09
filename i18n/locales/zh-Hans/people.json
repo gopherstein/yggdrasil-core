@@ -80,5 +80,22 @@
     "signOut": "退出登录",
     "signedInWith": "已登录为 {{name}}（{{external}}），{{role}}。",
     "signedInByProxy": "已通过你的登录服务以 {{name}}（{{role}}）登录。请在那里退出登录。"
+  },
+  "pins": {
+    "title": "可用的配置",
+    "body": "将成员或访客限制在一个或多个配置中，例如带主题控制的助手。他们不能选择其他配置。管理员和所有者始终可以使用所有配置。",
+    "members": "成员",
+    "visitors": "访客",
+    "any": "任意配置",
+    "noneTicked": "都不勾选时，他们可以使用任意配置。",
+    "profiles": "配置",
+    "for": "{{name}} 的配置",
+    "sameAsRole": "与其角色相同",
+    "mode": {
+      "role": "与其角色相同",
+      "any": "任意配置",
+      "only": "仅限这些"
+    },
+    "pickOne": "请至少勾选一个。"
   }
 }

@@ -417,10 +417,14 @@ export function ChatPage() {
   )
   // Deployed specialized AIs answer through their base model, on this computer.
   const specializedModels = (specializedQuery.data ?? []).filter((m) => m.installed)
-  const sortedProfiles = useMemo(
-    () => sortProfiles(profilesQuery.data ?? []),
-    [profilesQuery.data],
-  )
+  // A person pinned to profiles chats with only those (#345).
+  const meQuery = useQuery({ queryKey: ['me'], queryFn: () => api.getMe(), staleTime: 60_000, retry: false })
+  const allowedProfiles = meQuery.data?.profiles
+  const sortedProfiles = useMemo(() => {
+    const all = sortProfiles(profilesQuery.data ?? [])
+    return allowedProfiles ? all.filter((p) => allowedProfiles.includes(p.id)) : all
+  }, [profilesQuery.data, allowedProfiles])
+  const mayUse = (id?: string | null) => (id && (!allowedProfiles || allowedProfiles.includes(id)) ? id : null)
 
   const hasCluster = useMemo(() => {
     const nodes = nodesQuery.data ?? []
@@ -435,7 +439,7 @@ export function ChatPage() {
     : false
 
   const defaultProfileId =
-    activeProfileId ||
+    mayUse(activeProfileId) ||
     (preferredExists ? preferredProfileId : null) ||
     (hasCluster
       ? sortedProfiles.find((p) => isTeamProfile(p))?.id ||
@@ -448,8 +452,8 @@ export function ChatPage() {
     null
 
   const profileIdForChat =
-    selectedConversation?.profile_id ||
-    draftProfileId ||
+    mayUse(selectedConversation?.profile_id) ||
+    mayUse(draftProfileId) ||
     defaultProfileId ||
     undefined
 

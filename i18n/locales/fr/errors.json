@@ -146,6 +146,8 @@
   "PORTAL_BUSY": "Cette discussion est occupée. Réessayez dans un instant.",
   "PORTAL_RATE": "Vous avez envoyé beaucoup de messages. Réessayez plus tard.",
   "PROFILE_PINNED": "Cette clé ne répond qu'avec son propre profil. Omettez le profil et le modèle, ou indiquez ce profil.",
+  "PIN_INVALID": "Impossible d'enregistrer cette attribution. Seuls les Membres et les Visiteurs sont attribués, et seulement à des profils existants.",
+  "PINS_FAILED": "Impossible de lire les profils attribués aux personnes.",
   "PORTAL_MEMBERS": "Cette discussion est réservée aux personnes qui se connectent à ce Toskar.",
   "PORTAL_INVITE": "Cette discussion est sur invitation. Ouvrez le lien reçu ou demandez-en un nouveau.",
   "PORTAL_INVALID": "Ce réglage du portail ne peut pas être utilisé.",

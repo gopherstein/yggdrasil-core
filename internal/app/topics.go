@@ -2,9 +2,12 @@ package app
 
 import (
 	"context"
+	"errors"
+	"slices"
 	"strings"
 	"unicode/utf8"
 
+	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/locale"
 	"github.com/yeixio/toskar-core/internal/orchestrator/builtin/simple"
 	"github.com/yeixio/toskar-core/internal/runlog"
@@ -252,4 +255,52 @@ func (e *chatExecEnv) CheckAnswer(ctx context.Context, role, prompt, answer stri
 	run.Topic(topicAnswerOff)
 	run.Note("topicReplaced", nil)
 	return e.offTopicReply(ctx, v)
+}
+
+// errNoAllowedProfile is a pinned person none of whose profiles exist.
+var errNoAllowedProfile = errors.New("none of the profiles you may use exist anymore; ask an Admin")
+
+// allowedProfiles are the profiles the turn's person may chat with, of
+// those that exist, and whether they're pinned at all (#345). The Owner,
+// Admins, and a portal's guests aren't pinned.
+func (a *App) allowedProfiles(ctx context.Context) ([]string, bool, error) {
+	if a.People == nil {
+		return nil, false, nil
+	}
+	who := auth.PrincipalFrom(ctx).Person
+	if !who.Role.Pinnable() {
+		return nil, false, nil
+	}
+	// Read them again: the context may carry an older copy.
+	person, err := a.People.Get(ctx, who.ID)
+	if err != nil {
+		return nil, false, nil
+	}
+	pinned, err := a.People.AllowedProfiles(ctx, person)
+	if err != nil || pinned == nil {
+		return nil, false, err
+	}
+	var out []string
+	for _, id := range pinned {
+		if _, err := a.Profiles.Get(ctx, id); err == nil {
+			out = append(out, id)
+		}
+	}
+	return out, true, nil
+}
+
+// pinnedProfile is the profile a pinned person's turn uses: the one asked
+// for when they may use it, else the first they may (#345).
+func (a *App) pinnedProfile(ctx context.Context, profileID string) (string, bool, error) {
+	allowed, pinned, err := a.allowedProfiles(ctx)
+	if err != nil || !pinned {
+		return profileID, false, err
+	}
+	if len(allowed) == 0 {
+		return "", true, errNoAllowedProfile
+	}
+	if slices.Contains(allowed, profileID) {
+		return profileID, true, nil
+	}
+	return allowed[0], true, nil
 }

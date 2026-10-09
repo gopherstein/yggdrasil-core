@@ -266,3 +266,66 @@ func TestPinnedKeyOverMCP(t *testing.T) {
 		t.Fatalf("%q %v; system: %.120s", got, err, asked)
 	}
 }
+
+// A person pinned to profiles chats with one of them, whatever the chat
+// asks for; the Owner isn't pinned (#345).
+func TestPinnedPeopleChat(t *testing.T) {
+	t.Setenv("TOSKAR_STUB_INFERENCE", "1")
+	t.Setenv("TOSKAR_DISCOVERY_ENABLED", "false")
+	a, err := New(Options{DataDir: t.TempDir(), Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.DB.Close() })
+	a.StubReply = func(string, []pluginapi.ChatMessage) string { return "ok" }
+	bg := context.Background()
+	sam, err := a.People.Create(bg, "Sam", auth.RoleMember)
+	if err != nil {
+		t.Fatal(err)
+	}
+	profileOf := func(ctx context.Context, asked string) (string, error) {
+		t.Helper()
+		conv, err := a.Conversations.Create(ctx, "t", asked, "auto")
+		if err != nil {
+			t.Fatal(err)
+		}
+		stream, err := a.RunChat(ctx, asked, conv.ID, "Which tires for snow?", false, "auto", "")
+		if err != nil {
+			return "", err
+		}
+		for range stream {
+		}
+		var runs []runlog.Run
+		for i := 0; i < 50 && len(runs) == 0; i++ {
+			runs, _ = a.RunLog.List(ctx, conv.ID, 1)
+			time.Sleep(10 * time.Millisecond)
+		}
+		if len(runs) != 1 {
+			t.Fatalf("runs: %+v", runs)
+		}
+		return runs[0].ProfileID, nil
+	}
+	asSam := auth.AsPerson(bg, sam)
+	if got, _ := profileOf(asSam, "general-assistant"); got != "general-assistant" {
+		t.Fatalf("unpinned: %q", got)
+	}
+	if err := a.People.SetRoleProfiles(bg, auth.RoleMember, []string{"research", "programming"}); err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := profileOf(asSam, "general-assistant"); got != "research" {
+		t.Fatalf("another profile: %q", got)
+	}
+	if got, _ := profileOf(asSam, "programming"); got != "programming" {
+		t.Fatalf("one they may use: %q", got)
+	}
+	if got, _ := profileOf(bg, "general-assistant"); got != "general-assistant" {
+		t.Fatalf("the Owner: %q", got)
+	}
+	// Pinned only to profiles that are gone: no chat, rather than any.
+	if _, err := a.People.SetProfiles(bg, sam.ID, &[]string{"gone"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := profileOf(asSam, "general-assistant"); !errors.Is(err, errNoAllowedProfile) {
+		t.Fatalf("gone: %v", err)
+	}
+}
