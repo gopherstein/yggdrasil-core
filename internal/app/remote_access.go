@@ -26,11 +26,13 @@ func (a *App) applyRemoteAccess() error {
 	}
 	cfg := a.Config.Get()
 	if !cfg.RemoteAccess.Enabled {
+		a.stopRelay()
 		a.portKeeper.Stop()
 		a.API.StopRemote()
 		return nil
 	}
 	if err := a.API.ServeRemote(fmt.Sprintf(":%d", cfg.RemotePort())); err != nil {
+		a.stopRelay()
 		a.portKeeper.Stop()
 		return err
 	}
@@ -41,6 +43,8 @@ func (a *App) applyRemoteAccess() error {
 	} else {
 		a.portKeeper.Stop()
 	}
+	// The relay tunnel hands devices to the listener just started.
+	a.applyRelay()
 	return nil
 }
 
@@ -65,13 +69,18 @@ func (a *App) remoteReach() api.RemoteReach {
 		out.MapError = err.Error()
 	}
 	listening := a.API != nil && a.API.RemoteListening().Listening != ""
-	out.Reachable, out.Reason = reachOf(cfg, listening, m, len(out.IPv6) > 0)
+	relayed := false
+	if name, st := a.relayStatus(); st != nil {
+		out.Relay, out.RelayState, out.RelayError = name, st.State, st.Error
+		relayed = st.State == "connected"
+	}
+	out.Reachable, out.Reason = reachOf(cfg, listening, m, len(out.IPv6) > 0, relayed)
 	return out
 }
 
 // reachOf says in a word how the internet reaches the listener, and why
-// not when it doesn't.
-func reachOf(cfg config.Config, listening bool, m portmap.Mapping, ipv6 bool) (reachable, reason string) {
+// not when it doesn't. The relay counts only when nothing direct does.
+func reachOf(cfg config.Config, listening bool, m portmap.Mapping, ipv6, relayed bool) (reachable, reason string) {
 	switch {
 	case !cfg.RemoteAccess.Enabled:
 		return "none", "off"
@@ -83,6 +92,8 @@ func reachOf(cfg config.Config, listening bool, m portmap.Mapping, ipv6 bool) (r
 		return "direct", ""
 	case ipv6:
 		return "ipv6", ""
+	case relayed:
+		return "relay", ""
 	case m.Method != "" && portmap.CarrierNAT(m.External.Addr()):
 		return "none", "carrier_nat"
 	}

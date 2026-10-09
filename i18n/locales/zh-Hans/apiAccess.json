@@ -155,7 +155,25 @@
       "ipv6": "如果路由器允许，可通过 IPv6 在 [{{address}}]:{{port}} 随处访问。",
       "manual": "可通过你填写的地址 {{address}} 访问。",
       "carrierNat": "暂时无法访问：你的网络服务商让许多家庭共用一个地址，路由器端口无法到达这台电脑。Toskar 的中继将解决这个问题。",
-      "noPort": "暂时无法访问：路由器没有打开端口 {{port}}。请把它转发到这台电脑并填写地址，或使用 Tailscale。"
+      "noPort": "暂时无法访问：路由器没有打开端口 {{port}}。请把它转发到这台电脑并填写地址，或使用 Tailscale。",
+      "relay": "可通过 {{relay}} 随处访问。"
+    },
+    "relay": {
+      "title": "你所在组织的中继",
+      "body": "如果你的组织运行着自己的 Toskar 中继，请输入它的名称和 IT 团队给你的注册密钥。当没有更直接的方式可用时，与这台电脑配对的设备会通过该中继连接它。",
+      "name": "中继",
+      "nameExample": "relay.example.com",
+      "secret": "注册密钥",
+      "secretSaved": "已保存。粘贴新的密钥即可替换。",
+      "secretPlaceholder": "粘贴注册密钥",
+      "connect": "连接",
+      "remove": "改用 Toskar 的中继",
+      "state": {
+        "connected": "已连接到 {{relay}}。",
+        "connecting": "正在连接 {{relay}}…",
+        "noToken": "输入中继的注册密钥以连接。",
+        "error": "无法连接到 {{relay}}（{{code}}）。请检查名称和注册密钥。"
+      }
     }
   }
 }

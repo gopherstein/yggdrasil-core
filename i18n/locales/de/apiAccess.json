@@ -155,7 +155,25 @@
       "ipv6": "Von überall über IPv6 erreichbar unter [{{address}}]:{{port}}, wenn dein Router das zulässt.",
       "manual": "Erreichbar unter {{address}}, der Adresse, die du eingegeben hast.",
       "carrierNat": "Noch nicht erreichbar: Dein Anbieter teilt eine Adresse unter vielen Haushalten, daher erreicht ein Router-Port diesen Computer nicht. Toskars Relay übernimmt das.",
-      "noPort": "Noch nicht erreichbar: Der Router hat Port {{port}} nicht geöffnet. Leite ihn auf diesen Computer weiter und gib die Adresse ein, oder nutze Tailscale."
+      "noPort": "Noch nicht erreichbar: Der Router hat Port {{port}} nicht geöffnet. Leite ihn auf diesen Computer weiter und gib die Adresse ein, oder nutze Tailscale.",
+      "relay": "Von überall über {{relay}} erreichbar."
+    },
+    "relay": {
+      "title": "Relay deiner Organisation",
+      "body": "Wenn deine Organisation ein eigenes Toskar-Relay betreibt, gib seinen Namen und den Registrierungsschlüssel ein, den dir die IT gegeben hat. Mit diesem Computer gekoppelte Geräte erreichen ihn dann über dieses Relay, wenn kein direkterer Weg funktioniert.",
+      "name": "Relay",
+      "nameExample": "relay.example.com",
+      "secret": "Registrierungsschlüssel",
+      "secretSaved": "Gespeichert. Füge einen neuen ein, um ihn zu ersetzen.",
+      "secretPlaceholder": "Registrierungsschlüssel einfügen",
+      "connect": "Verbinden",
+      "remove": "Stattdessen das Relay von Toskar nutzen",
+      "state": {
+        "connected": "Mit {{relay}} verbunden.",
+        "connecting": "Verbindung mit {{relay}} wird hergestellt …",
+        "noToken": "Gib den Registrierungsschlüssel des Relays ein, um dich zu verbinden.",
+        "error": "Keine Verbindung zu {{relay}} ({{code}}). Prüfe den Namen und den Registrierungsschlüssel."
+      }
     }
   }
 }

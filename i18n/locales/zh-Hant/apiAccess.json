@@ -155,7 +155,25 @@
       "ipv6": "如果路由器允許，可透過 IPv6 在 [{{address}}]:{{port}} 隨處存取。",
       "manual": "可透過你填寫的位址 {{address}} 存取。",
       "carrierNat": "暫時無法存取：你的網路服務商讓許多家庭共用一個位址，路由器連接埠無法到達這台電腦。Toskar 的中繼將解決這個問題。",
-      "noPort": "暫時無法存取：路由器沒有開啟連接埠 {{port}}。請把它轉送到這台電腦並填寫位址，或使用 Tailscale。"
+      "noPort": "暫時無法存取：路由器沒有開啟連接埠 {{port}}。請把它轉送到這台電腦並填寫位址，或使用 Tailscale。",
+      "relay": "可透過 {{relay}} 隨處存取。"
+    },
+    "relay": {
+      "title": "你所屬組織的中繼",
+      "body": "如果你的組織執行著自己的 Toskar 中繼，請輸入它的名稱和 IT 團隊給你的註冊密鑰。當沒有更直接的方式可用時，與這台電腦配對的裝置會透過該中繼連線。",
+      "name": "中繼",
+      "nameExample": "relay.example.com",
+      "secret": "註冊密鑰",
+      "secretSaved": "已儲存。貼上新的密鑰即可取代。",
+      "secretPlaceholder": "貼上註冊密鑰",
+      "connect": "連線",
+      "remove": "改用 Toskar 的中繼",
+      "state": {
+        "connected": "已連線到 {{relay}}。",
+        "connecting": "正在連線 {{relay}}…",
+        "noToken": "輸入中繼的註冊密鑰以連線。",
+        "error": "無法連線到 {{relay}}（{{code}}）。請檢查名稱和註冊密鑰。"
+      }
     }
   }
 }
