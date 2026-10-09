@@ -470,5 +470,21 @@
     "tryAgain": "Riprova",
     "askAnother": "Chiedi altro",
     "complicationDescription": "Chiedi a Toskar dal quadrante."
+  },
+  "anywhere": {
+    "title": "Usa Toskar fuori casa",
+    "body": "Raggiungi il tuo computer ovunque, senza configurare il router. Tutto resta cifrato da questo dispositivo al tuo computer.",
+    "month": "{{price}} al mese",
+    "year": "{{price}} all'anno",
+    "restore": "Ripristina acquisto",
+    "ready": "Pronto fuori casa",
+    "readyBody": "Fuori casa, questo dispositivo raggiunge il tuo computer tramite il relay di Toskar.",
+    "pending": "In attesa dell'approvazione dell'acquisto.",
+    "notAdmin": "Abbonato. Chiedi a un amministratore del computer di attivare l'accesso ovunque in Accesso API.",
+    "inUse": "Questo abbonamento è già usato per un altro computer.",
+    "failed": "Impossibile completare: {{detail}}",
+    "renews": "Si rinnova automaticamente finché non lo annulli nelle impostazioni degli abbonamenti del tuo account.",
+    "terms": "Termini",
+    "privacy": "Privacy"
   }
 }

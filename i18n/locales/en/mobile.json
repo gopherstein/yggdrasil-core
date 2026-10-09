@@ -542,5 +542,21 @@
     "tryAgain": "Try again",
     "askAnother": "Ask another",
     "complicationDescription": "Ask Toskar from your watch face."
+  },
+  "anywhere": {
+    "title": "Use Toskar away from home",
+    "body": "Reach your computer from anywhere, with no setup on your router. Everything stays encrypted from this device to your computer.",
+    "month": "{{price}} a month",
+    "year": "{{price}} a year",
+    "restore": "Restore purchase",
+    "ready": "Ready away from home",
+    "readyBody": "This device reaches your computer through Toskar's relay when it's away from home.",
+    "pending": "Waiting for the purchase to be approved.",
+    "notAdmin": "Subscribed. Ask an Admin on your computer to turn on Access from anywhere in API Access.",
+    "inUse": "This subscription is already used for another computer.",
+    "failed": "Couldn't finish: {{detail}}",
+    "renews": "Renews automatically until you cancel it in your account's subscription settings.",
+    "terms": "Terms",
+    "privacy": "Privacy"
   }
 }

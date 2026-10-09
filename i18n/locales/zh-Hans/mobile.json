@@ -462,5 +462,21 @@
     "tryAgain": "重试",
     "askAnother": "再问一个",
     "complicationDescription": "从表盘直接问 Toskar。"
+  },
+  "anywhere": {
+    "title": "在外使用 Toskar",
+    "body": "无需设置路由器，随处连接你的电脑。从此设备到你的电脑，一切都保持加密。",
+    "month": "每月 {{price}}",
+    "year": "每年 {{price}}",
+    "restore": "恢复购买",
+    "ready": "已可在外使用",
+    "readyBody": "在外时，此设备通过 Toskar 的中继连接你的电脑。",
+    "pending": "正在等待购买获批。",
+    "notAdmin": "已订阅。请让电脑上的管理员在 API 访问中打开随处访问。",
+    "inUse": "此订阅已用于另一台电脑。",
+    "failed": "无法完成：{{detail}}",
+    "renews": "会自动续订，直到你在账户的订阅设置中取消。",
+    "terms": "条款",
+    "privacy": "隐私"
   }
 }

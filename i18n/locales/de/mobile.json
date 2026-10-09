@@ -466,5 +466,21 @@
     "tryAgain": "Erneut versuchen",
     "askAnother": "Noch etwas fragen",
     "complicationDescription": "Frag Toskar direkt vom Zifferblatt."
+  },
+  "anywhere": {
+    "title": "Toskar unterwegs nutzen",
+    "body": "Erreiche deinen Computer von überall, ohne Einstellungen am Router. Alles bleibt von diesem Gerät bis zu deinem Computer verschlüsselt.",
+    "month": "{{price}} pro Monat",
+    "year": "{{price}} pro Jahr",
+    "restore": "Kauf wiederherstellen",
+    "ready": "Bereit für unterwegs",
+    "readyBody": "Unterwegs erreicht dieses Gerät deinen Computer über das Relay von Toskar.",
+    "pending": "Der Kauf wartet auf Freigabe.",
+    "notAdmin": "Abonniert. Bitte einen Admin auf deinem Computer, unter API-Zugriff den Zugriff von überall einzuschalten.",
+    "inUse": "Dieses Abo wird bereits für einen anderen Computer verwendet.",
+    "failed": "Konnte nicht abgeschlossen werden: {{detail}}",
+    "renews": "Verlängert sich automatisch, bis du es in den Abo-Einstellungen deines Kontos kündigst.",
+    "terms": "Bedingungen",
+    "privacy": "Datenschutz"
   }
 }

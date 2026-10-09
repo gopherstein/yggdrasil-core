@@ -470,5 +470,21 @@
     "tryAgain": "Reintentar",
     "askAnother": "Preguntar otra cosa",
     "complicationDescription": "Pregunta a Toskar desde la esfera del reloj."
+  },
+  "anywhere": {
+    "title": "Usa Toskar fuera de casa",
+    "body": "Llega a tu computadora desde cualquier lugar, sin configurar el router. Todo va cifrado desde este dispositivo hasta tu computadora.",
+    "month": "{{price}} al mes",
+    "year": "{{price}} al año",
+    "restore": "Restaurar compra",
+    "ready": "Listo fuera de casa",
+    "readyBody": "Fuera de casa, este dispositivo llega a tu computadora a través del relé de Toskar.",
+    "pending": "Esperando a que se apruebe la compra.",
+    "notAdmin": "Suscrito. Pide a un administrador de tu computadora que active el acceso desde cualquier lugar en Acceso a la API.",
+    "inUse": "Esta suscripción ya se usa para otra computadora.",
+    "failed": "No se pudo terminar: {{detail}}",
+    "renews": "Se renueva automáticamente hasta que la canceles en los ajustes de suscripciones de tu cuenta.",
+    "terms": "Términos",
+    "privacy": "Privacidad"
   }
 }
