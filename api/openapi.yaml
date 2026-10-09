@@ -233,6 +233,68 @@ paths:
       responses:
         "201":
           description: path (/invite/<token>), kind (invite or reset), and expires_at (a week for an invite, a day for a reset)
+  /api/v1/people/{id}/profiles:
+    put:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Pin a Member or Visitor to profiles (#345)
+      description: "profiles: a list replaces their role's pin, [] is any profile, and null is their role's again. The Owner and Admins can't be pinned."
+      operationId: setPersonProfiles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profiles:
+                  type: array
+                  nullable: true
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: The person, with profiles
+        "400":
+          description: PIN_INVALID
+  /api/v1/profile-pins:
+    get:
+      summary: The profiles each pinnable role is kept to (#345)
+      operationId: getProfilePins
+      responses:
+        "200":
+          description: "roles: member and visitor, each a list of profile ids; empty is any profile"
+  /api/v1/profile-pins/{role}:
+    put:
+      parameters:
+        - name: role
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [member, visitor]
+      summary: Pin a role to profiles (#345)
+      operationId: setRoleProfiles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profiles:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: The pins of every role
+        "400":
+          description: PIN_INVALID
   /api/v1/me:
     get:
       summary: Who the request is from (#206)

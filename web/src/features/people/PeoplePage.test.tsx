@@ -19,6 +19,10 @@ vi.mock('@/lib/api', async () => {
       getSettings: vi.fn(),
       getNodes: vi.fn(),
       getApiTLS: vi.fn(),
+      getProfiles: vi.fn(),
+      getProfilePins: vi.fn(),
+      setRoleProfiles: vi.fn(),
+      setPersonProfiles: vi.fn(),
     },
   }
 })
@@ -43,6 +47,31 @@ describe('PeoplePage', () => {
     vi.mocked(api.getNodes).mockResolvedValue([{ id: 'local', is_local: true, address: '192.168.1.20:7332' }] as never)
     vi.mocked(api.getApiTLS).mockResolvedValue({ enabled: true } as never)
     vi.mocked(api.listPeople).mockResolvedValue([owner, admin, kid])
+    vi.mocked(api.getProfiles).mockResolvedValue([
+      { id: 'tires', name: 'Tire Shop' },
+      { id: 'general-assistant', name: 'General Assistant' },
+    ] as never)
+    vi.mocked(api.getProfilePins).mockResolvedValue({ roles: { member: [], visitor: [] } })
+  })
+
+  it('pins Visitors and one person to profiles (#345)', async () => {
+    vi.mocked(api.getMe).mockResolvedValue({ person: owner, via: 'local' })
+    vi.mocked(api.setRoleProfiles).mockResolvedValue({ roles: { member: [], visitor: ['tires'] } })
+    vi.mocked(api.setPersonProfiles).mockResolvedValue({ ...kid, profiles: ['tires'] })
+    renderIt()
+    const visitors = (await screen.findByText('Visitors')).closest('details') as HTMLElement
+    fireEvent.click(within(visitors).getByText('Visitors'))
+    fireEvent.click(await within(visitors).findByLabelText('Tire Shop'))
+    await waitFor(() => expect(api.setRoleProfiles).toHaveBeenCalledWith('visitor', ['tires']))
+    expect(await within(visitors).findByText('Tire Shop', { selector: 'span.ms-2' })).toBeInTheDocument()
+
+    const row = screen.getByText('Sam').closest('li') as HTMLElement
+    expect(within(row).getByText('Same as their role', { selector: 'span' })).toBeInTheDocument()
+    fireEvent.click(within(row).getByLabelText('Only these'))
+    fireEvent.click(within(row).getByLabelText('Tire Shop'))
+    await waitFor(() => expect(api.setPersonProfiles).toHaveBeenCalledWith('p-kid', ['tires']))
+    fireEvent.click(within(row).getByLabelText('Any profile'))
+    await waitFor(() => expect(api.setPersonProfiles).toHaveBeenCalledWith('p-kid', []))
   })
 
   it('adds a person and shows the link to give them', async () => {

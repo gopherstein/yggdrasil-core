@@ -146,6 +146,8 @@
   "PORTAL_BUSY": "Este chat está ocupado. Tente de novo em instantes.",
   "PORTAL_RATE": "Você enviou muitas mensagens. Tente mais tarde.",
   "PROFILE_PINNED": "Esta chave responde só com o próprio perfil. Omita o perfil e o modelo, ou indique esse perfil.",
+  "PIN_INVALID": "Não foi possível salvar essa atribuição. Só Membros e Visitantes são atribuídos, e só a perfis que existem.",
+  "PINS_FAILED": "Não foi possível ler a quais perfis as pessoas estão atribuídas.",
   "PORTAL_MEMBERS": "Este chat é para as pessoas que entram neste Toskar.",
   "PORTAL_INVITE": "Este chat é só para convidados. Abra o link que você recebeu ou peça um novo.",
   "PORTAL_INVALID": "Essa configuração do portal não pode ser usada.",

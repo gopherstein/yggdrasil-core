@@ -108,6 +108,7 @@ import type {
   Principal,
   Person,
   PersonLink,
+  ProfilePins,
   InviteView,
   Role,
   PortalPageView,
@@ -624,6 +625,17 @@ export const api = {
   /** Rename, change the role of, disable, or enable a person. */
   changePerson: (id: string, change: { name?: string; role?: Role; disabled?: boolean }) =>
     request<Person>(`/api/v1/people/${encodeURIComponent(id)}`, { method: 'PATCH', body: JSON.stringify(change) }),
+
+  /** Pin a person to profiles (#345): a list replaces their role's, [] is any, null is their role's again. */
+  setPersonProfiles: (id: string, profiles: string[] | null) =>
+    request<Person>(`/api/v1/people/${encodeURIComponent(id)}/profiles`, { method: 'PUT', body: JSON.stringify({ profiles }) }),
+
+  /** The profiles Members and Visitors are kept to (#345). */
+  getProfilePins: () => request<ProfilePins>('/api/v1/profile-pins'),
+
+  /** Pin a role to profiles (#345); [] is any profile. */
+  setRoleProfiles: (role: 'member' | 'visitor', profiles: string[]) =>
+    request<ProfilePins>(`/api/v1/profile-pins/${role}`, { method: 'PUT', body: JSON.stringify({ profiles }) }),
 
   /** A new one-time link for a person: an invite, or a reset once they have a sign-in. */
   personLink: (id: string) => request<PersonLink>(`/api/v1/people/${encodeURIComponent(id)}/link`, { method: 'POST' }),

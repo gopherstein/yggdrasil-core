@@ -80,5 +80,22 @@
     "signOut": "Abmelden",
     "signedInWith": "Angemeldet als {{name}} ({{external}}), {{role}}.",
     "signedInByProxy": "Über deinen Anmeldedienst angemeldet als {{name}}, {{role}}. Melde dich dort ab."
+  },
+  "pins": {
+    "title": "Profile, die sie nutzen",
+    "body": "Beschränke Mitglieder oder Gäste auf ein oder mehrere Profile, etwa einen Assistenten mit Themenregeln. Sie können kein anderes wählen. Admins und der Eigentümer haben immer alle Profile.",
+    "members": "Mitglieder",
+    "visitors": "Gäste",
+    "any": "Jedes Profil",
+    "noneTicked": "Ist nichts angehakt, nutzen sie jedes Profil.",
+    "profiles": "Profile",
+    "for": "Profile für {{name}}",
+    "sameAsRole": "Wie ihre Rolle",
+    "mode": {
+      "role": "Wie ihre Rolle",
+      "any": "Jedes Profil",
+      "only": "Nur diese"
+    },
+    "pickOne": "Hake mindestens eines an."
   }
 }

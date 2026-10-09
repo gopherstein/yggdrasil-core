@@ -6,6 +6,7 @@ import { RealmKicker } from '@/components/ui/Realm'
 import { formatDate } from '@/i18n/format'
 import { api, ApiError } from '@/lib/api'
 import type { Person, PersonLink, Role } from '@/types/api'
+import { PersonPins, RolePins } from './ProfilePins'
 import { useShareBase } from './shareBase'
 
 const ROLES: Role[] = ['admin', 'member', 'visitor']
@@ -93,6 +94,11 @@ function PersonRow({ person, me, onLink }: { person: Person; me?: Person; onLink
           {disabled ? <span className="status-chip ms-2 bg-danger/15 text-danger">{t('disabled')}</span> : null}
         </p>
         {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
+        {canManage && !disabled && (person.role === 'member' || person.role === 'visitor') ? (
+          <div className="mt-1">
+            <PersonPins person={person} />
+          </div>
+        ) : null}
       </div>
       {/* A proxied person's role follows their groups there. */}
       {canManage && !disabled && !person.external ? (
@@ -209,6 +215,8 @@ export function PeoplePage() {
           </section>
 
           {shown ? <LinkPanel name={shown.name} link={shown.link} onDone={() => setShown(null)} /> : null}
+
+          <RolePins />
 
           <section className="card" aria-labelledby="everyone">
             <h2 id="everyone" className="section-title">

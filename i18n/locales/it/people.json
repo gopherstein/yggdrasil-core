@@ -80,5 +80,22 @@
     "signOut": "Esci",
     "signedInWith": "Accesso come {{name}} ({{external}}), {{role}}.",
     "signedInByProxy": "Accesso come {{name}} tramite il tuo servizio di accesso, {{role}}. Esci da lì."
+  },
+  "pins": {
+    "title": "Profili che usano",
+    "body": "Limita Membri o Ospiti a uno o più profili, come un assistente con controlli sugli argomenti. Non possono sceglierne un altro. Gli Admin e il Proprietario hanno sempre tutti i profili.",
+    "members": "Membri",
+    "visitors": "Ospiti",
+    "any": "Qualsiasi profilo",
+    "noneTicked": "Se non ne selezioni nessuno, usano qualsiasi profilo.",
+    "profiles": "Profili",
+    "for": "Profili di {{name}}",
+    "sameAsRole": "Come il loro ruolo",
+    "mode": {
+      "role": "Come il loro ruolo",
+      "any": "Qualsiasi profilo",
+      "only": "Solo questi"
+    },
+    "pickOne": "Selezionane almeno uno."
   }
 }

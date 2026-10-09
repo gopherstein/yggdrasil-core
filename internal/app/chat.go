@@ -56,6 +56,17 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 	if profileID == "" {
 		profileID = a.defaultProfileID(ctx)
 	}
+	// A person pinned to profiles chats with one of them (#345); a portal's
+	// profile is the portal's.
+	if opts == nil || opts.Portal == "" {
+		pinned, isPinned, err := a.pinnedProfile(ctx, profileID)
+		if err != nil {
+			return nil, err
+		}
+		if isPinned && pinned != profileID {
+			profileID, modelID = pinned, ""
+		}
+	}
 	// A profile with topic controls answers only by its own rules, so none
 	// of Toskar's own replies below, about itself, its memory, or what to
 	// install, are given in its place (#345).

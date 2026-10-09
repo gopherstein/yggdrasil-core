@@ -80,5 +80,22 @@
     "signOut": "Se déconnecter",
     "signedInWith": "Connecté en tant que {{name}} ({{external}}), {{role}}.",
     "signedInByProxy": "Connecté en tant que {{name}} par votre service de connexion, {{role}}. Déconnectez-vous depuis celui-ci."
+  },
+  "pins": {
+    "title": "Profils qu'ils utilisent",
+    "body": "Limitez les Membres ou les Visiteurs à un ou plusieurs profils, comme un assistant avec des contrôles de sujet. Ils ne peuvent pas en choisir un autre. Les Admins et le Propriétaire ont toujours tous les profils.",
+    "members": "Membres",
+    "visitors": "Visiteurs",
+    "any": "N'importe quel profil",
+    "noneTicked": "Si rien n'est coché, ils utilisent n'importe quel profil.",
+    "profiles": "Profils",
+    "for": "Profils de {{name}}",
+    "sameAsRole": "Comme leur rôle",
+    "mode": {
+      "role": "Comme leur rôle",
+      "any": "N'importe quel profil",
+      "only": "Seulement ceux-ci"
+    },
+    "pickOne": "Cochez-en au moins un."
   }
 }

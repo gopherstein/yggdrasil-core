@@ -80,5 +80,22 @@
     "signOut": "Sair",
     "signedInWith": "Conectado como {{name}} ({{external}}), {{role}}.",
     "signedInByProxy": "Conectado como {{name}} pelo seu serviço de login, {{role}}. Saia por lá."
+  },
+  "pins": {
+    "title": "Perfis que usam",
+    "body": "Limite Membros ou Visitantes a um ou mais perfis, como um assistente com controles de tema. Eles não podem escolher outro. Administradores e o Proprietário sempre têm todos os perfis.",
+    "members": "Membros",
+    "visitors": "Visitantes",
+    "any": "Qualquer perfil",
+    "noneTicked": "Sem nenhum marcado, eles usam qualquer perfil.",
+    "profiles": "Perfis",
+    "for": "Perfis de {{name}}",
+    "sameAsRole": "Igual à função",
+    "mode": {
+      "role": "Igual à função",
+      "any": "Qualquer perfil",
+      "only": "Só estes"
+    },
+    "pickOne": "Marque pelo menos um."
   }
 }
