@@ -91,7 +91,7 @@ Testers go through the real subscription flow without paying; nothing in the app
 
 ## Enterprise: your own tunnel, at scale
 
-Organizations run their own way in instead of the subscription, and it has to work for hundreds of people. A separate guide (`docs/remote-access-enterprise.md`) covers it; this is what it needs and what core and the apps must do for it.
+Organizations run their own way in instead of the subscription, and it has to work for hundreds of people. A separate guide ([remote-access-enterprise.md](remote-access-enterprise.md)) covers it; this is what it needs and what core and the apps must do for it.
 
 **Or their own relay.** An organization that would rather keep its Toskar servers off the internet entirely runs the relay itself, licensed from Toskar, on its own hardware and name (toskar-relay's `docs/self-hosting.md`). Each Toskar server gets the relay's name and an enrollment secret under API Access → Your organization's relay, enrolls itself for a token, registers, and keeps its tunnel there; paired devices then find and reach it through that relay as they would through Toskar's. The enrollment secret is only ever sent to an organization's relay, never to Toskar's. `TOSKAR_RELAY_CA` adds a private CA for the relay's certificate.
 
