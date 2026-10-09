@@ -422,6 +422,22 @@
         "hello": "你好！",
         "whatCanYouDo": "你能幫我做什麼？"
       }
+    },
+    "attempts": {
+      "title": "離題嘗試",
+      "total_other": "最近 {{days}} 天共 {{count}} 次",
+      "none": "最近 30 天沒有攔下訊息。只有強制模式會攔下訊息，所以引導模式下這裡為空。",
+      "chartLabel_other": "最近 {{days}} 天的離題嘗試共 {{count}} 次（按天）",
+      "dayTip_other": "{{date}}：{{count}} 次",
+      "where": {
+        "portal": "入口網站 {{name}}",
+        "key": "API 金鑰 {{name}}",
+        "person": "應用程式中的 {{name}}",
+        "automation": "自動化"
+      },
+      "replaced": "回答已取代",
+      "markOnTopic": "標記為在主題內",
+      "privacy": "只有管理員能看到。它們隨執行紀錄一起保存和刪除（設定 → 離開這台電腦的資料）。標記為在主題內會將其加入範例問題。"
     }
   }
 }

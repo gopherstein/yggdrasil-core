@@ -425,6 +425,28 @@
         "hello": "Oi!",
         "whatCanYouDo": "Em que você pode me ajudar?"
       }
+    },
+    "attempts": {
+      "title": "Tentativas fora do tema",
+      "total_one": "{{count}} nos últimos {{days}} dias",
+      "total_other": "{{count}} nos últimos {{days}} dias",
+      "total_many": "{{count}} nos últimos {{days}} dias",
+      "none": "Nada retido nos últimos 30 dias. Só Impor retém mensagens, então com Orientar isto fica vazio.",
+      "chartLabel_one": "{{count}} tentativa fora do tema nos últimos {{days}} dias, por dia",
+      "chartLabel_other": "{{count}} tentativas fora do tema nos últimos {{days}} dias, por dia",
+      "chartLabel_many": "{{count}} tentativas fora do tema nos últimos {{days}} dias, por dia",
+      "dayTip_one": "{{date}}: {{count}} tentativa",
+      "dayTip_other": "{{date}}: {{count}} tentativas",
+      "dayTip_many": "{{date}}: {{count}} tentativas",
+      "where": {
+        "portal": "Portal {{name}}",
+        "key": "Chave de API {{name}}",
+        "person": "{{name}} no app",
+        "automation": "Automações"
+      },
+      "replaced": "resposta substituída",
+      "markOnTopic": "Marcar como no tema",
+      "privacy": "Só Administradores veem isto. Ficam guardadas e são apagadas com os registros de execução (Configurações → O que saiu deste computador). Marcar uma como no tema a adiciona às perguntas de exemplo."
     }
   }
 }

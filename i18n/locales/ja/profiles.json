@@ -422,6 +422,22 @@
         "hello": "こんにちは！",
         "whatCanYouDo": "何を手伝ってくれるの？"
       }
+    },
+    "attempts": {
+      "title": "話題外の試み",
+      "total_other": "過去{{days}}日間で{{count}}件",
+      "none": "過去30日間に止めたメッセージはありません。止めるのは強制のときだけなので、ガイドでは空のままです。",
+      "chartLabel_other": "過去{{days}}日間の話題外の試み{{count}}件（日別）",
+      "dayTip_other": "{{date}}：{{count}}件",
+      "where": {
+        "portal": "ポータル {{name}}",
+        "key": "APIキー {{name}}",
+        "person": "アプリの {{name}}",
+        "automation": "自動化"
+      },
+      "replaced": "回答を置き換え",
+      "markOnTopic": "話題内にする",
+      "privacy": "管理者だけが見られます。実行記録と一緒に保存・削除されます（設定 → このコンピュータから送信されたもの）。話題内にすると質問の例に追加されます。"
     }
   }
 }

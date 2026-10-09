@@ -425,6 +425,28 @@
         "hello": "Bonjour !",
         "whatCanYouDo": "En quoi peux-tu m'aider ?"
       }
+    },
+    "attempts": {
+      "title": "Tentatives hors sujet",
+      "total_one": "{{count}} sur les {{days}} derniers jours",
+      "total_other": "{{count}} sur les {{days}} derniers jours",
+      "total_many": "{{count}} sur les {{days}} derniers jours",
+      "none": "Rien de retenu ces 30 derniers jours. Seul Imposer retient des messages, donc avec Guider cette liste reste vide.",
+      "chartLabel_one": "{{count}} tentative hors sujet sur les {{days}} derniers jours, par jour",
+      "chartLabel_other": "{{count}} tentatives hors sujet sur les {{days}} derniers jours, par jour",
+      "chartLabel_many": "{{count}} tentatives hors sujet sur les {{days}} derniers jours, par jour",
+      "dayTip_one": "{{date}} : {{count}} tentative",
+      "dayTip_other": "{{date}} : {{count}} tentatives",
+      "dayTip_many": "{{date}} : {{count}} tentatives",
+      "where": {
+        "portal": "Portail {{name}}",
+        "key": "Clé d'API {{name}}",
+        "person": "{{name}} dans l'app",
+        "automation": "Automatisations"
+      },
+      "replaced": "réponse remplacée",
+      "markOnTopic": "Marquer comme dans le sujet",
+      "privacy": "Seuls les Admins les voient. Elles sont conservées et supprimées avec l'historique des exécutions (Paramètres → Ce qui a quitté cet ordinateur). En marquer une comme dans le sujet l'ajoute aux questions d'exemple."
     }
   }
 }

@@ -109,6 +109,7 @@ import type {
   Person,
   PersonLink,
   ProfilePins,
+  TopicActivity,
   TopicPolicy,
   TopicTrial,
   InviteView,
@@ -730,6 +731,16 @@ export const api = {
     request<TopicTrial>(`/api/v1/profiles/${encodeURIComponent(id)}/try-topics`, {
       method: 'POST',
       body: JSON.stringify({ message, topics }),
+    }),
+
+  /** A profile's off-topic attempts over the last days (#345). */
+  getTopicAttempts: (id: string, days = 30) =>
+    request<TopicActivity>(`/api/v1/profiles/${encodeURIComponent(id)}/topic-attempts?days=${days}`),
+
+  /** Add an off-topic attempt's message to the profile's example questions (#345). */
+  markOnTopic: (id: string, attemptId: string) =>
+    request<void>(`/api/v1/profiles/${encodeURIComponent(id)}/topic-attempts/${encodeURIComponent(attemptId)}/on-topic`, {
+      method: 'POST',
     }),
 
   updateProfile: (id: string, profile: Partial<AIProfile> & { roles?: AIProfile['roles'] }) =>
