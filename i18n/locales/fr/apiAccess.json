@@ -134,5 +134,16 @@
     "meta": "Connecté {{connected}} · Dernière utilisation {{lastUsed}}",
     "confirmDisconnect": "Déconnecter {{name}} ? Il lui faudra un nouveau code pour se reconnecter.",
     "disconnect": "Déconnecter"
+  },
+  "remote": {
+    "title": "Accès de partout",
+    "body": "Les appareils associés à cet ordinateur peuvent l'atteindre hors de chez vous. Il ne répond qu'à ce qu'ils utilisent, en HTTPS, avec leurs clés.",
+    "listening": "À l'écoute sur le port {{port}}.",
+    "notListening": "Pas à l'écoute sur le port {{port}} : {{error}}",
+    "port": "Port",
+    "address": "Adresse redirigée (facultatif)",
+    "addressExample": "home.example.com ou 203.0.113.7:7333",
+    "save": "Enregistrer",
+    "notes": "Pour l'instant, redirigez le port {{port}} de votre box vers cet ordinateur et saisissez l'adresse à laquelle on le joint, ou utilisez Tailscale. La configuration automatique arrive ensuite."
   }
 }

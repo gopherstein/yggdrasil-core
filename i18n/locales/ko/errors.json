@@ -194,5 +194,10 @@
   "ROLE_REQUIRED": "{{role}} 역할이 필요해요.",
   "CROSS_SITE": "이 변경은 Toskar 페이지에서 온 것이 아니어서 거부되었어요.",
   "MESSAGE_NOT_FOUND": "그 메시지는 이 채팅에 더 이상 없어요. 채팅을 다시 불러온 뒤 다시 시도하세요.",
-  "INVALID_BRANCH": "parent_id, retry_of, edit_of 중 하나만 채팅의 conversation_id와 함께 보내세요."
+  "INVALID_BRANCH": "parent_id, retry_of, edit_of 중 하나만 채팅의 conversation_id와 함께 보내세요.",
+  "REMOTE_THROTTLED": "이 주소에서 잘못된 키가 너무 많이 왔어요. 나중에 다시 시도하세요.",
+  "REMOTE_DEVICES_ONLY": "집 네트워크 밖에서는 페어링한 기기만 연결할 수 있어요.",
+  "REMOTE_PORT_INVALID": "포트는 1024~65535이며 앱이나 컴퓨터가 쓰는 포트가 아니어야 해요.",
+  "REMOTE_ADDRESS_INVALID": "호스트 이름이나 IP를 입력하세요. 포트가 다르면 함께 적어요. 예: home.example.com, 203.0.113.7:7333.",
+  "REMOTE_LISTEN_FAILED": "어디서나 접속이 포트 {{port}}에서 대기할 수 없어요. 다른 프로그램이 쓰고 있을 수 있어요."
 }

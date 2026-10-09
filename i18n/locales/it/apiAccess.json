@@ -134,5 +134,16 @@
     "meta": "Collegato {{connected}} · Ultimo uso {{lastUsed}}",
     "confirmDisconnect": "Scollegare {{name}}? Servirà un nuovo codice per ricollegarlo.",
     "disconnect": "Scollega"
+  },
+  "remote": {
+    "title": "Accesso ovunque",
+    "body": "I dispositivi associati a questo computer possono raggiungerlo fuori casa. Risponde solo a ciò che usano, via HTTPS, con le loro chiavi.",
+    "listening": "In ascolto sulla porta {{port}}.",
+    "notListening": "Non in ascolto sulla porta {{port}}: {{error}}",
+    "port": "Porta",
+    "address": "Indirizzo inoltrato (facoltativo)",
+    "addressExample": "home.example.com o 203.0.113.7:7333",
+    "save": "Salva",
+    "notes": "Per ora inoltra la porta {{port}} del router a questo computer e inserisci l'indirizzo con cui si raggiunge, oppure usa Tailscale. La configurazione automatica arriverà dopo."
   }
 }

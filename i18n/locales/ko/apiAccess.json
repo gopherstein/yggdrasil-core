@@ -134,5 +134,16 @@
     "meta": "연결: {{connected}} · 마지막 사용: {{lastUsed}}",
     "confirmDisconnect": "{{name}}의 연결을 해제할까요? 다시 연결하려면 새 코드가 필요해요.",
     "disconnect": "연결 해제"
+  },
+  "remote": {
+    "title": "어디서나 접속",
+    "body": "이 컴퓨터와 페어링한 기기가 집 밖에서도 접속할 수 있어요. HTTPS로, 각 기기의 키에만, 쓰는 기능만 응답해요.",
+    "listening": "포트 {{port}}에서 대기 중이에요.",
+    "notListening": "포트 {{port}}에서 대기하지 않아요: {{error}}",
+    "port": "포트",
+    "address": "포워딩한 주소(선택)",
+    "addressExample": "home.example.com 또는 203.0.113.7:7333",
+    "save": "저장",
+    "notes": "지금은 공유기의 포트 {{port}}를 이 컴퓨터로 포워딩하고 접속 주소를 입력하거나, Tailscale을 사용하세요. 자동 설정은 다음 단계에서 제공돼요."
   }
 }

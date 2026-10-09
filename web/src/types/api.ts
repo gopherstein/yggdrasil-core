@@ -636,6 +636,10 @@ export interface SettingsView {
   api_host: string
   api_port: number
   lan_api_enabled: boolean
+  /** Access from anywhere (#456): the listener for paired devices away from home. */
+  remote_access_enabled?: boolean
+  remote_access_port?: number
+  remote_access_address?: string
   web_ui_enabled: boolean
   discovery_enabled: boolean
   node_name: string
@@ -939,6 +943,9 @@ export interface SettingsPatch {
   memory_enabled?: boolean
   node_name?: string
   lan_api_enabled?: boolean
+  remote_access_enabled?: boolean
+  remote_access_port?: number
+  remote_access_address?: string
   discovery_enabled?: boolean
   web_ui_enabled?: boolean
   advanced_mode?: boolean

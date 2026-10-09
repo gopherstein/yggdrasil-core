@@ -538,6 +538,10 @@ function mediaSetupPath(kind: MediaKind, nodeId?: string): string {
 
 export const api = {
   /** How the API speaks HTTPS on the local network (#213). */
+  /** Access from anywhere's setting and what its listener is doing (#456). */
+  getRemoteAccess: () =>
+    request<{ enabled: boolean; port?: number; address?: string; listening?: string; error?: string }>('/api/v1/remote-access'),
+
   getApiTLS: () => request<APITLS>('/api/v1/tls'),
 
   /** Who this browser is (#206). */

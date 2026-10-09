@@ -134,5 +134,16 @@
     "meta": "Conectado {{connected}} · Último uso {{lastUsed}}",
     "confirmDisconnect": "¿Desconectar {{name}}? Necesitará un código nuevo para volver a conectarse.",
     "disconnect": "Desconectar"
+  },
+  "remote": {
+    "title": "Acceso desde cualquier lugar",
+    "body": "Los dispositivos vinculados con esta computadora pueden usarla fuera de casa. Solo responde lo que usan, por HTTPS y con sus claves.",
+    "listening": "Escuchando en el puerto {{port}}.",
+    "notListening": "No escucha en el puerto {{port}}: {{error}}",
+    "port": "Puerto",
+    "address": "Dirección redirigida (opcional)",
+    "addressExample": "home.example.com o 203.0.113.7:7333",
+    "save": "Guardar",
+    "notes": "Por ahora, redirige el puerto {{port}} de tu router a esta computadora e indica la dirección con la que se llega a ella, o usa Tailscale. La configuración automática llegará después."
   }
 }

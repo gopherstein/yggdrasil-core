@@ -794,6 +794,14 @@ paths:
                 $ref: "#/components/schemas/SettingsView"
         "400":
           description: A setting that isn't the person's own, or an invalid value
+  /api/v1/remote-access:
+    get:
+      summary: Access from anywhere's setting and its listener (#456)
+      description: "enabled, port, address (a forwarded address, when set), and listening (the address it listens on) or error. Turn it on and set the port and address with PATCH /api/v1/settings: remote_access_enabled, remote_access_port, remote_access_address."
+      operationId: getRemoteAccess
+      responses:
+        "200":
+          description: The setting and what the listener is doing
   /api/v1/tls:
     get:
       summary: How the API speaks HTTPS on the local network (#213)

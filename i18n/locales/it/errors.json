@@ -194,5 +194,10 @@
   "ROLE_REQUIRED": "Serve il ruolo {{role}}.",
   "CROSS_SITE": "Questa modifica non veniva dalle pagine di Toskar, quindi è stata rifiutata.",
   "MESSAGE_NOT_FOUND": "Questo messaggio non è più in questa chat. Ricarica la chat e riprova.",
-  "INVALID_BRANCH": "Invia solo uno tra parent_id, retry_of o edit_of, con il conversation_id della chat."
+  "INVALID_BRANCH": "Invia solo uno tra parent_id, retry_of o edit_of, con il conversation_id della chat.",
+  "REMOTE_THROTTLED": "Da questo indirizzo sono arrivate troppe chiavi sbagliate. Riprova più tardi.",
+  "REMOTE_DEVICES_ONLY": "Da fuori della rete di casa possono connettersi solo i dispositivi associati.",
+  "REMOTE_PORT_INVALID": "La porta va da 1024 a 65535 e non è quella dell'app o dei computer.",
+  "REMOTE_ADDRESS_INVALID": "Inserisci un nome host o un IP, con la porta se diversa, come home.example.com o 203.0.113.7:7333.",
+  "REMOTE_LISTEN_FAILED": "L'accesso ovunque non può restare in ascolto sulla porta {{port}}. Forse la usa un altro programma."
 }

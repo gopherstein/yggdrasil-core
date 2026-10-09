@@ -194,5 +194,10 @@
   "ROLE_REQUIRED": "これには{{role}}の役割が必要です。",
   "CROSS_SITE": "この変更は Toskar のページから行われていないため、拒否されました。",
   "MESSAGE_NOT_FOUND": "そのメッセージはこのチャットにもうありません。チャットを再読み込みして、もう一度お試しください。",
-  "INVALID_BRANCH": "parent_id、retry_of、edit_of のどれか1つを、チャットの conversation_id と一緒に送ってください。"
+  "INVALID_BRANCH": "parent_id、retry_of、edit_of のどれか1つを、チャットの conversation_id と一緒に送ってください。",
+  "REMOTE_THROTTLED": "このアドレスから誤ったキーが多すぎます。しばらくしてからお試しください。",
+  "REMOTE_DEVICES_ONLY": "自宅のネットワークの外からは、ペアリングしたデバイスだけが接続できます。",
+  "REMOTE_PORT_INVALID": "ポートは 1024〜65535 で、アプリやコンピュータが使うポート以外です。",
+  "REMOTE_ADDRESS_INVALID": "ホスト名または IP を入力してください（ポートが異なる場合は付けて）。例：home.example.com、203.0.113.7:7333。",
+  "REMOTE_LISTEN_FAILED": "どこからでもアクセスはポート {{port}} で待ち受けできません。別のプログラムが使っている可能性があります。"
 }

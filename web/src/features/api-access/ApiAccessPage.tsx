@@ -13,6 +13,8 @@ import { RealmKicker } from '@/components/ui/Realm'
 import { ShareWithApps } from './ShareWithApps'
 import { ConnectPhone } from '@/features/nodes/ConnectPhone'
 import { formatDate } from '@/i18n/format'
+import { RemoteAccessCard } from './RemoteAccessCard'
+import { Toggle } from './Toggle'
 
 type ProbeState = 'checking' | 'ok' | 'fail'
 
@@ -420,6 +422,8 @@ export function ApiAccessPage() {
         )}
       </section>
 
+      <RemoteAccessCard />
+
       {phoneOpen ? <ConnectPhone onClose={() => setPhoneOpen(false)} /> : null}
 
       <section className="card space-y-4">
@@ -717,39 +721,5 @@ function CopyField({
         {copied ? t('service.copied') : t('service.copyUrl')}
       </button>
     </div>
-  )
-}
-
-function Toggle({
-  label,
-  checked,
-  disabled,
-  onChange,
-}: {
-  label: string
-  checked: boolean
-  disabled?: boolean
-  onChange: () => void
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      disabled={disabled}
-      onClick={onChange}
-      className={[
-        'relative inline-flex h-7 w-12 shrink-0 rounded-full transition disabled:opacity-50',
-        checked ? 'bg-primary' : 'bg-raised',
-      ].join(' ')}
-    >
-      <span
-        className={[
-          'absolute top-0.5 h-6 w-6 rounded-full bg-[#EEF2F6] shadow transition',
-          checked ? 'start-[22px]' : 'start-0.5',
-        ].join(' ')}
-      />
-    </button>
   )
 }

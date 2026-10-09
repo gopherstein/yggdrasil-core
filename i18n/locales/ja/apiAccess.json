@@ -134,5 +134,16 @@
     "meta": "接続：{{connected}} · 最終使用：{{lastUsed}}",
     "confirmDisconnect": "{{name}} の接続を解除しますか？もう一度接続するには新しいコードが必要です。",
     "disconnect": "接続を解除"
+  },
+  "remote": {
+    "title": "どこからでもアクセス",
+    "body": "このコンピュータとペアリングしたデバイスが外出先からも使えます。HTTPS で、各デバイスのキーに対して、使う機能だけに応答します。",
+    "listening": "ポート {{port}} で待ち受け中。",
+    "notListening": "ポート {{port}} で待ち受けていません：{{error}}",
+    "port": "ポート",
+    "address": "転送したアドレス（任意）",
+    "addressExample": "home.example.com または 203.0.113.7:7333",
+    "save": "保存",
+    "notes": "当面は、ルーターのポート {{port}} をこのコンピュータに転送して届くアドレスを入力するか、Tailscale を使ってください。自動設定は次の段階で対応します。"
   }
 }
