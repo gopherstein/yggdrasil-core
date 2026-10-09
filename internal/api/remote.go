@@ -60,7 +60,11 @@ func (s *Server) remoteHandler() http.Handler {
 			return
 		}
 		ip := remoteIP(r)
-		if remoteFailures.Blocked(ip) {
+		// A device through a relay that hides client addresses has none:
+		// counting those together would let one stranger lock out every
+		// relayed device, and a device key can't be guessed anyway.
+		counted := ip != "0.0.0.0"
+		if counted && remoteFailures.Blocked(ip) {
 			writeErr(w, http.StatusTooManyRequests, "REMOTE_THROTTLED", "too many wrong keys from this address; try again later", nil)
 			return
 		}
@@ -68,13 +72,17 @@ func (s *Server) remoteHandler() http.Handler {
 		// anything else reads the request, so every wrong one counts.
 		token, err := auth.BearerToken(r)
 		if err != nil || token == "" || s.deps.VerifyAPIKey == nil {
-			remoteFailures.Fail(ip)
+			if counted {
+				remoteFailures.Fail(ip)
+			}
 			writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "a paired device's key is required", nil)
 			return
 		}
 		rec, err := s.deps.VerifyAPIKey(r.Context(), token)
 		if err != nil {
-			remoteFailures.Fail(ip)
+			if counted {
+				remoteFailures.Fail(ip)
+			}
 			writeErr(w, http.StatusUnauthorized, "UNAUTHORIZED", "invalid api key", nil)
 			return
 		}

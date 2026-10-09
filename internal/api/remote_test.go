@@ -262,6 +262,17 @@ func TestServeRelayed(t *testing.T) {
 	if status, code := call("phone-key"); status != http.StatusTooManyRequests || code != "REMOTE_THROTTLED" {
 		t.Fatalf("after wrong keys from the device's address: %d %s", status, code)
 	}
+
+	// Through a relay that hides client addresses, devices have none:
+	// wrong keys there aren't pooled into one limit for everyone.
+	device = "0.0.0.0"
+	client.CloseIdleConnections()
+	for range 25 {
+		call("wrong")
+	}
+	if status, code := call("phone-key"); status != http.StatusOK {
+		t.Fatalf("a relayed device with no address after others' wrong keys: %d %s", status, code)
+	}
 	srv.StopRemote()
 	if srv.ServeRelayed(pipeConn{remote: &net.TCPAddr{}}) {
 		t.Fatal("took a connection after stopping")
