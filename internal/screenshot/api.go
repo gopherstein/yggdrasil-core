@@ -24,6 +24,11 @@ func serveScreenshotAPI(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusOK, screenshotParsedAutomation)
 		return
 	}
+	// Try it in the profile editor shows a held attempt (#345).
+	if r.Method == http.MethodPost && strings.HasSuffix(path, "/try-topics") {
+		writeJSON(w, http.StatusOK, `{"label":"off_topic","held":true,"replaced":false,"reply":"I can help with tires, wheels, and bookings at Dana's. What do you need?"}`)
+		return
+	}
 	if r.Method != http.MethodGet {
 		writeJSON(w, http.StatusOK, `{}`)
 		return

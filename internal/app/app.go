@@ -582,6 +582,9 @@ func New(opts Options) (*App, error) {
 			return profileMgr.Create(ctx, p)
 		},
 		GetProfile: profileMgr.Get,
+		TryTopics: func(ctx context.Context, profileID string, draft *contracts.TopicPolicy, message string) (any, error) {
+			return a.TryTopics(ctx, profileID, draft, message)
+		},
 		UpdateProfile: func(ctx context.Context, p contracts.AIProfile) (contracts.AIProfile, error) {
 			if err := profileMgr.Update(ctx, p); err != nil {
 				return contracts.AIProfile{}, err

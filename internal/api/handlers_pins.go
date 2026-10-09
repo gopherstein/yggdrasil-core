@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/yeixio/toskar-core/internal/auth"
+	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
 // Pinning profiles to roles and people (#345), for Admins.
@@ -131,4 +132,37 @@ func (s *Server) myProfiles(r *http.Request) []string {
 		}
 	}
 	return out
+}
+
+// handleTryTopics runs one message past a profile's topic controls, or the
+// draft ones the editor sends, without saving anything (#345).
+func (s *Server) handleTryTopics(w http.ResponseWriter, r *http.Request) {
+	if s.deps.TryTopics == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Trying topics isn't available.", nil)
+		return
+	}
+	var body struct {
+		Message string                 `json:"message"`
+		Topics  *contracts.TopicPolicy `json:"topics"`
+	}
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 64<<10)).Decode(&body); err != nil {
+		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "invalid body", nil)
+		return
+	}
+	id := mux.Vars(r)["id"]
+	if s.deps.GetProfile != nil {
+		if _, err := s.deps.GetProfile(r.Context(), id); err != nil {
+			writeErr(w, http.StatusNotFound, "PROFILE_NOT_FOUND", "there's no profile "+id, nil)
+			return
+		}
+	}
+	out, err := s.deps.TryTopics(r.Context(), id, body.Topics, body.Message)
+	if err != nil {
+		if r.Context().Err() != nil {
+			return
+		}
+		writeErr(w, http.StatusBadRequest, "TRIAL_FAILED", err.Error(), nil)
+		return
+	}
+	writeJSON(w, http.StatusOK, out)
 }

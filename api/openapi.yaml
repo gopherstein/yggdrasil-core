@@ -261,6 +261,35 @@ paths:
           description: The person, with profiles
         "400":
           description: PIN_INVALID
+  /api/v1/profiles/{id}/try-topics:
+    post:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      summary: Try one message against a profile's topic controls (#345)
+      description: "message (up to 2000 characters), and optional topics: draft topic controls used in place of the saved ones. Nothing is saved. The answer is a quick one, without tools, knowledge, or memories."
+      operationId: tryTopics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                topics:
+                  type: object
+      responses:
+        "200":
+          description: "label (on_topic, small_talk, off_topic, or empty), held, replaced, and reply"
+        "400":
+          description: TRIAL_FAILED
+        "404":
+          description: PROFILE_NOT_FOUND
   /api/v1/profile-pins:
     get:
       summary: The profiles each pinnable role is kept to (#345)
