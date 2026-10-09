@@ -194,5 +194,10 @@
   "ROLE_REQUIRED": "This needs the {{role}} role.",
   "CROSS_SITE": "That change didn't come from Toskar's own pages, so it was refused.",
   "MESSAGE_NOT_FOUND": "That message isn't in this chat anymore. Reload the chat and try again.",
-  "INVALID_BRANCH": "Send one of parent_id, retry_of, or edit_of, with the chat's conversation_id."
+  "INVALID_BRANCH": "Send one of parent_id, retry_of, or edit_of, with the chat's conversation_id.",
+  "REMOTE_THROTTLED": "Too many wrong keys came from this address. Try again later.",
+  "REMOTE_DEVICES_ONLY": "From outside the home network, only paired devices can connect.",
+  "REMOTE_PORT_INVALID": "The port is 1024 to 65535, and not the one the app or the computers use.",
+  "REMOTE_ADDRESS_INVALID": "Enter a host name or IP, with a port when it differs, such as home.example.com or 203.0.113.7:7333.",
+  "REMOTE_LISTEN_FAILED": "Access from anywhere can't listen on port {{port}}. Another program may be using it."
 }

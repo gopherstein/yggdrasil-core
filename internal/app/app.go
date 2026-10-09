@@ -1194,6 +1194,11 @@ func (a *App) Start(ctx context.Context) error {
 	go func() {
 		defer a.wg.Done()
 		a.setAPITLS()
+		// Access from anywhere listens beside the API when it's on (#456);
+		// a port in use is reported in Settings, not fatal.
+		if err := a.applyRemoteAccess(); err != nil && a.Logger != nil {
+			a.Logger.Warn("access from anywhere could not listen", "port", cfg.RemotePort(), "error", err)
+		}
 		if err := a.API.ListenAndServe(cfg.APIAddr()); err != nil && ctx.Err() == nil {
 			errCh <- err
 		}
@@ -1234,6 +1239,7 @@ func (a *App) Shutdown(ctx context.Context) error {
 
 	shutdownCtx, cancel := context.WithTimeout(ctx, 4*time.Second)
 	defer cancel()
+	a.API.StopRemote()
 	_ = a.API.Shutdown(shutdownCtx)
 	_ = a.internal.Shutdown(shutdownCtx)
 	a.wg.Wait()
@@ -1285,6 +1291,7 @@ func (a *App) settingsView(ctx context.Context) (contracts.SettingsView, error) 
 		DataDir: cfg.DataDir, ModelsDir: cfg.ModelsDir, RuntimesDir: cfg.RuntimesDir,
 		LogsDir: cfg.LogsDir, APIHost: cfg.APIHost, APIPort: cfg.APIPort,
 		LANAPIEnabled: cfg.LANAPIEnabled, WebUIEnabled: cfg.WebUIEnabled,
+		RemoteAccessEnabled: cfg.RemoteAccess.Enabled, RemoteAccessPort: cfg.RemotePort(), RemoteAccessAddress: cfg.RemoteAccess.Address,
 		DiscoveryEnabled: cfg.DiscoveryEnabled, NodeName: cfg.NodeName, NodeID: cfg.NodeID,
 		AdvancedMode: advanced, ModelLifecycle: lifecycle, IdleUnloadMinutes: idleMins,
 		KeepRunningInBackground: keepBackground,
@@ -1471,7 +1478,31 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 			return auth.ErrAPIKeyRequired
 		}
 	}
+	// Access from anywhere (#456): checked before anything is saved.
+	remoteBefore := lanBefore.RemoteAccess
+	remote := remoteBefore
+	remoteTouched := false
+	if v, ok := patch["remote_access_enabled"].(bool); ok {
+		remote.Enabled, remoteTouched = v, true
+	}
+	if v, ok := patch["remote_access_port"].(float64); ok {
+		port := int(v)
+		if float64(port) != v || (port != 0 && !validRemotePort(lanBefore, port)) {
+			return errRemotePort
+		}
+		remote.Port, remoteTouched = port, true
+	}
+	if v, ok := patch["remote_access_address"].(string); ok {
+		addr, err := cleanRemoteAddress(v)
+		if err != nil {
+			return err
+		}
+		remote.Address, remoteTouched = addr, true
+	}
 	err := a.Config.Update(func(c *config.Config) {
+		if remoteTouched {
+			c.RemoteAccess = remote
+		}
 		if v, ok := patch["node_name"].(string); ok && v != "" {
 			c.NodeName = v
 		}
@@ -1513,6 +1544,16 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 		if !discoveryTouched {
 			// The discovery record says whether the API answers on the network.
 			a.restartAdvertiser()
+		}
+	}
+	// The remote listener follows its setting now; one that can't listen
+	// puts the setting back and says why.
+	if remoteTouched && remote != remoteBefore && a.API != nil && a.API.Addr() != "" {
+		if err := a.applyRemoteAccess(); err != nil {
+			port := a.Config.Get().RemotePort()
+			_ = a.Config.Update(func(c *config.Config) { c.RemoteAccess = remoteBefore })
+			_ = a.applyRemoteAccess()
+			return contracts.NewError("REMOTE_LISTEN_FAILED", map[string]any{"port": port}, fmt.Errorf("access from anywhere can't listen on port %d: %w", port, err))
 		}
 	}
 	if v, ok := patch["node_name"].(string); ok && v != "" {

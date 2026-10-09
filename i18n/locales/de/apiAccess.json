@@ -134,5 +134,16 @@
     "meta": "Verbunden {{connected}} · Zuletzt genutzt {{lastUsed}}",
     "confirmDisconnect": "{{name}} trennen? Zum erneuten Verbinden braucht es einen neuen Code.",
     "disconnect": "Trennen"
+  },
+  "remote": {
+    "title": "Zugriff von überall",
+    "body": "Mit diesem Computer gekoppelte Geräte erreichen ihn auch unterwegs. Er beantwortet nur, was sie nutzen, über HTTPS und mit ihren Schlüsseln.",
+    "listening": "Wartet auf Port {{port}}.",
+    "notListening": "Wartet nicht auf Port {{port}}: {{error}}",
+    "port": "Port",
+    "address": "Weitergeleitete Adresse (optional)",
+    "addressExample": "home.example.com oder 203.0.113.7:7333",
+    "save": "Speichern",
+    "notes": "Leite vorerst Port {{port}} an deinem Router auf diesen Computer weiter und gib die Adresse ein, unter der er erreichbar ist, oder nutze Tailscale. Die automatische Einrichtung folgt."
   }
 }

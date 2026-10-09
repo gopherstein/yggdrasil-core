@@ -194,5 +194,10 @@
   "ROLE_REQUIRED": "這需要 {{role}} 角色。",
   "CROSS_SITE": "此變更不是來自 Toskar 自己的頁面，因此被拒絕。",
   "MESSAGE_NOT_FOUND": "這則訊息已不在此聊天中。請重新載入聊天後再試。",
-  "INVALID_BRANCH": "請只傳送 parent_id、retry_of 或 edit_of 其中一個，並附上聊天的 conversation_id。"
+  "INVALID_BRANCH": "請只傳送 parent_id、retry_of 或 edit_of 其中一個，並附上聊天的 conversation_id。",
+  "REMOTE_THROTTLED": "來自此位址的錯誤金鑰過多。請稍後再試。",
+  "REMOTE_DEVICES_ONLY": "在家庭網路之外，只有已配對的裝置可以連線。",
+  "REMOTE_PORT_INVALID": "連接埠範圍為 1024 到 65535，且不能是應用程式或電腦使用的連接埠。",
+  "REMOTE_ADDRESS_INVALID": "請輸入主機名稱或 IP，連接埠不同時一併填寫，例如 home.example.com 或 203.0.113.7:7333。",
+  "REMOTE_LISTEN_FAILED": "隨處存取無法在連接埠 {{port}} 上監聽。可能有其他程式正在使用它。"
 }

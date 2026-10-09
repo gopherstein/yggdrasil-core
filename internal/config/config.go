@@ -24,6 +24,9 @@ type Config struct {
 	InternalHost  string `json:"internal_host"`
 	InternalPort  int    `json:"internal_port"`
 	LANAPIEnabled bool   `json:"lan_api_enabled"`
+	// RemoteAccess is access from anywhere (#456): a listener for phones
+	// outside the home network.
+	RemoteAccess RemoteAccess `json:"remote_access,omitempty"`
 	// APITLSCert and APITLSKey are the person's own certificate and key, in
 	// PEM files, for HTTPS on the API (#213). Empty uses the certificate
 	// Toskar makes.
@@ -99,6 +102,26 @@ type ProxyAuth struct {
 	DefaultRole string `json:"default_role,omitempty"`
 	// OwnerUser is the proxy's name for the Owner.
 	OwnerUser string `json:"owner_user,omitempty"`
+}
+
+// RemoteAccess is the listener for paired devices outside the home network
+// (#456, docs/remote-access.md). It serves only the routes a phone uses,
+// over TLS, to phone keys.
+type RemoteAccess struct {
+	Enabled bool `json:"enabled,omitempty"`
+	// Port is the listener's port; 0 is DefaultRemotePort.
+	Port int `json:"port,omitempty"`
+	// Address is where it's reached from outside, when the person forwarded
+	// a port by hand: a host name or IP, with a port when it differs.
+	Address string `json:"address,omitempty"`
+}
+
+// RemotePort is the remote listener's port.
+func (c Config) RemotePort() int {
+	if c.RemoteAccess.Port > 0 {
+		return c.RemoteAccess.Port
+	}
+	return DefaultRemotePort
 }
 
 // Manager loads and persists configuration.

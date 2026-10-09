@@ -192,6 +192,8 @@ type Server struct {
 	replaced  map[net.Listener]bool
 	conns     map[net.Conn]bool
 	closed    chan struct{}
+	// remote is the listener for access from anywhere (#456).
+	remote remoteListener
 
 	knowledge     KnowledgeService
 	memory        *muninn.Store
@@ -340,6 +342,7 @@ func (s *Server) routes() {
 	s.oidcRoutes(api)
 	s.portalRoutes(api)
 	api.HandleFunc("/tls", s.handleTLS).Methods(http.MethodGet)
+	api.HandleFunc("/remote-access", s.handleRemoteAccess).Methods(http.MethodGet)
 	s.notificationRoutes(api)
 	s.connectorRoutes(api)
 	s.mcpRoutes(api)
@@ -562,6 +565,15 @@ func unsafeMethod(m string) bool {
 
 func (s *Server) controlAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// From outside the home network (#456): a phone's key, and nothing
+		// else; never this computer's or a signed-in browser's.
+		if remoteRequest(r) {
+			route := routeTemplate(r)
+			if principal, ok := s.keyPrincipal(w, r, remoteToken(r), route); ok {
+				s.serveAs(w, r, principal, route, next)
+			}
+			return
+		}
 		if s.deps.Config == nil {
 			next.ServeHTTP(w, s.thisComputer(r))
 			return

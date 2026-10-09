@@ -10,6 +10,8 @@ import (
 const (
 	DefaultAPIPort      = 7331
 	DefaultInternalPort = 7332
+	// DefaultRemotePort is access from anywhere's listener (#456).
+	DefaultRemotePort   = 7333
 	DefaultBindLoopback = "127.0.0.1"
 	ServiceType         = "_localai._tcp"
 	ServiceDomain       = "local."

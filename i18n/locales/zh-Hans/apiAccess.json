@@ -134,5 +134,16 @@
     "meta": "连接于 {{connected}} · 上次使用 {{lastUsed}}",
     "confirmDisconnect": "断开 {{name}}？再次连接需要新的代码。",
     "disconnect": "断开"
+  },
+  "remote": {
+    "title": "随处访问",
+    "body": "与这台电脑配对的设备在外也能访问它。它只通过 HTTPS、对这些设备的密钥，响应它们用到的功能。",
+    "listening": "正在端口 {{port}} 上监听。",
+    "notListening": "未在端口 {{port}} 上监听：{{error}}",
+    "port": "端口",
+    "address": "转发地址（可选）",
+    "addressExample": "home.example.com 或 203.0.113.7:7333",
+    "save": "保存",
+    "notes": "目前，请在路由器上把端口 {{port}} 转发到这台电脑并填写访问地址，或使用 Tailscale。自动设置将在下一步提供。"
   }
 }

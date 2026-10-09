@@ -194,5 +194,10 @@
   "ROLE_REQUIRED": "Il faut le rôle {{role}}.",
   "CROSS_SITE": "Cette modification ne venait pas des pages de Toskar, elle a donc été refusée.",
   "MESSAGE_NOT_FOUND": "Ce message n'est plus dans cette discussion. Rechargez la discussion et réessayez.",
-  "INVALID_BRANCH": "Envoyez un seul parmi parent_id, retry_of ou edit_of, avec le conversation_id de la discussion."
+  "INVALID_BRANCH": "Envoyez un seul parmi parent_id, retry_of ou edit_of, avec le conversation_id de la discussion.",
+  "REMOTE_THROTTLED": "Trop de clés incorrectes sont venues de cette adresse. Réessayez plus tard.",
+  "REMOTE_DEVICES_ONLY": "Depuis l'extérieur du réseau domestique, seuls les appareils associés peuvent se connecter.",
+  "REMOTE_PORT_INVALID": "Le port va de 1024 à 65535 et n'est pas celui de l'app ou des ordinateurs.",
+  "REMOTE_ADDRESS_INVALID": "Saisissez un nom d'hôte ou une IP, avec le port s'il diffère, comme home.example.com ou 203.0.113.7:7333.",
+  "REMOTE_LISTEN_FAILED": "L'accès de partout ne peut pas écouter sur le port {{port}}. Un autre programme l'utilise peut-être."
 }

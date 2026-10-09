@@ -947,20 +947,27 @@ type Task struct {
 
 // SettingsView is the user-visible settings payload.
 type SettingsView struct {
-	DataDir           string `json:"data_dir"`
-	ModelsDir         string `json:"models_dir"`
-	RuntimesDir       string `json:"runtimes_dir"`
-	LogsDir           string `json:"logs_dir"`
-	APIHost           string `json:"api_host"`
-	APIPort           int    `json:"api_port"`
-	LANAPIEnabled     bool   `json:"lan_api_enabled"`
-	WebUIEnabled      bool   `json:"web_ui_enabled"`
-	DiscoveryEnabled  bool   `json:"discovery_enabled"`
-	NodeName          string `json:"node_name"`
-	NodeID            string `json:"node_id"`
-	AdvancedMode      bool   `json:"advanced_mode"`
-	ModelLifecycle    string `json:"model_lifecycle"`     // automatic | manual
-	IdleUnloadMinutes int    `json:"idle_unload_minutes"` // 0 = never
+	DataDir       string `json:"data_dir"`
+	ModelsDir     string `json:"models_dir"`
+	RuntimesDir   string `json:"runtimes_dir"`
+	LogsDir       string `json:"logs_dir"`
+	APIHost       string `json:"api_host"`
+	APIPort       int    `json:"api_port"`
+	LANAPIEnabled bool   `json:"lan_api_enabled"`
+	// RemoteAccessEnabled, RemoteAccessPort, and RemoteAccessAddress are
+	// access from anywhere (#456): the listener for paired devices outside
+	// the home network, its port, and the address a forwarded port is
+	// reached at.
+	RemoteAccessEnabled bool   `json:"remote_access_enabled"`
+	RemoteAccessPort    int    `json:"remote_access_port"`
+	RemoteAccessAddress string `json:"remote_access_address,omitempty"`
+	WebUIEnabled        bool   `json:"web_ui_enabled"`
+	DiscoveryEnabled    bool   `json:"discovery_enabled"`
+	NodeName            string `json:"node_name"`
+	NodeID              string `json:"node_id"`
+	AdvancedMode        bool   `json:"advanced_mode"`
+	ModelLifecycle      string `json:"model_lifecycle"`     // automatic | manual
+	IdleUnloadMinutes   int    `json:"idle_unload_minutes"` // 0 = never
 	// KeepRunningInBackground keeps the local daemon (and desktop tray) alive
 	// when the main window is closed. Default false. A saved schedule turns it on,
 	// because the scheduler stops when the daemon stops.

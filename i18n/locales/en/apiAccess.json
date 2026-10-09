@@ -134,5 +134,16 @@
     "meta": "Connected {{connected}} · Last used {{lastUsed}}",
     "confirmDisconnect": "Disconnect {{name}}? It will need a new code to connect again.",
     "disconnect": "Disconnect"
+  },
+  "remote": {
+    "title": "Access from anywhere",
+    "body": "Devices paired with this computer can reach it away from home. It answers only what they use, over HTTPS, to their keys.",
+    "listening": "Listening on port {{port}}.",
+    "notListening": "Not listening on port {{port}}: {{error}}",
+    "port": "Port",
+    "address": "Forwarded address (optional)",
+    "addressExample": "home.example.com or 203.0.113.7:7333",
+    "save": "Save",
+    "notes": "For now, forward port {{port}} on your router to this computer and enter the address it's reached at, or use Tailscale. Setting this up automatically comes next."
   }
 }
