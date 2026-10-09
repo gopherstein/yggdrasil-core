@@ -67,9 +67,23 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		}
 		message = retried.Content
 	}
+	// What a retry or an edit replaces may have acted: a file made, a
+	// command run. That stays done, and the new answer says so.
+	replacedActed := false
+	if branch.RetryOf != "" {
+		replaced, _ := a.Conversations.Message(ctx, conversationID, branch.RetryOf)
+		replacedActed = acted(replaced.Meta)
+	}
 	if branch.EditOf != "" {
 		if edited, err := a.Conversations.Message(ctx, conversationID, branch.EditOf); err != nil || edited.Role != "user" {
 			return nil, contracts.Errorf("MESSAGE_NOT_FOUND", nil, "there's no message %q to edit in this chat", branch.EditOf)
+		}
+		if shown, err := a.Conversations.ListMessages(ctx, conversationID); err == nil {
+			for i, m := range shown {
+				if m.ID == branch.EditOf && i+1 < len(shown) && shown[i+1].Role == "assistant" {
+					replacedActed = acted(shown[i+1].Meta)
+				}
+			}
 		}
 	}
 	if branch.ParentID != "" {
@@ -416,6 +430,9 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		}
 		if routeReason != "" {
 			env.trace.routed(routeReason)
+		}
+		if replacedActed {
+			env.trace.notice = env.trace.noticeText("actionsStay", nil)
 		}
 		env.opts = opts
 		if opts != nil && opts.Language != "" {
@@ -1710,4 +1727,19 @@ func (e *chatExecEnv) saveAnswer(ctx context.Context, conversationID, content st
 		return e.app.Conversations.AddReply(ctx, conversationID, e.turnMessageID, "assistant", content, meta)
 	}
 	return e.app.Conversations.AddMessageWithMeta(ctx, conversationID, "assistant", content, meta)
+}
+
+// acted reports an answer whose steps changed something: wrote or made a
+// file, ran a command, or used Git. Retrying it doesn't undo them (#447).
+func acted(meta *contracts.MessageMeta) bool {
+	if meta == nil {
+		return false
+	}
+	for _, s := range meta.Steps {
+		switch s.Kind {
+		case "write", "create", "command", "git":
+			return true
+		}
+	}
+	return false
 }

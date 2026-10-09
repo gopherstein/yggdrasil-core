@@ -335,7 +335,7 @@ Retrying an answer or editing a message adds a **version** of that point in the 
 - `edit_of`: a sent message's ID. `message` is sent in its place, as a version beside it, and answered.
 - `parent_id`: any message's ID, to answer from that point.
 
-The model is sent only the chat up to that point. `PUT /conversations/{id}/messages/{mid}/shown` shows another version, and the conversation that followed it. Errors: `MESSAGE_NOT_FOUND`, and `INVALID_BRANCH` for more than one of the three or no `conversation_id`.
+The model is sent only the chat up to that point. When the answer a retry or an edit replaces had acted (wrote or made a file, ran a command, used Git), the new answer's `meta.notice` says that isn't undone. `PUT /conversations/{id}/messages/{mid}/shown` shows another version, and the conversation that followed it. Errors: `MESSAGE_NOT_FOUND`, and `INVALID_BRANCH` for more than one of the three or no `conversation_id`.
 
 Assistant messages from `GET /conversations/{id}/messages` carry `meta`: the `sources` an answer drew on (`web`, `knowledge`, or `file`, with title, URL or source name, and a snippet) and plain-language `steps` describing what was done. The same `meta` is on the `chat.complete` event.
 

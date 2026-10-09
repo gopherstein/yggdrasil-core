@@ -507,7 +507,8 @@
     "smallModelFilesInstall": "{{model}} é um modelo pequeno e pode confundir números e detalhes dos seus arquivos. Confira-os na fonte. Um modelo maior da página Modelos será mais confiável.",
     "smallModelKnowledge": "{{model}} é um modelo pequeno e pode confundir números e detalhes do seu conhecimento. Confira-os na fonte.",
     "smallModelKnowledgeChoose": "{{model}} é um modelo pequeno e pode confundir números e detalhes do seu conhecimento. Confira-os na fonte. Para perguntas como esta, escolha {{larger}} ou Automático em Modelo.",
-    "smallModelKnowledgeInstall": "{{model}} é um modelo pequeno e pode confundir números e detalhes do seu conhecimento. Confira-os na fonte. Um modelo maior da página Modelos será mais confiável."
+    "smallModelKnowledgeInstall": "{{model}} é um modelo pequeno e pode confundir números e detalhes do seu conhecimento. Confira-os na fonte. Um modelo maior da página Modelos será mais confiável.",
+    "actionsStay": "O que a resposta anterior fez, como arquivos criados ou comandos executados, não é desfeito."
   },
   "steps": {
     "autoChose": "Automático escolheu {{model}} para {{kind}}",
@@ -620,5 +621,18 @@
   },
   "topics": {
     "offTopic": "Não posso ajudar com isso aqui. Em que mais posso ajudar?"
+  },
+  "versions": {
+    "label": "Versões",
+    "previous": "Versão anterior",
+    "next": "Próxima versão",
+    "position": "{{index}} / {{count}}",
+    "tryAgain": "Tentar de novo",
+    "tryAgainWith": "Tentar de novo com outro modelo",
+    "withAnother": "Outro modelo…",
+    "auto": "Automático",
+    "edit": "Editar",
+    "editing": "Você está editando sua mensagem. Enviar cria uma nova versão; a anterior continua.",
+    "cancelEdit": "Cancelar"
   }
 }

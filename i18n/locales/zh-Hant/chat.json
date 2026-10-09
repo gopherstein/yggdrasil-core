@@ -479,7 +479,8 @@
     "smallModelFilesInstall": "{{model}} 是小型模型，可能會弄混你檔案中的數字和細節。請對照來源檢查。從「模型」頁面取得較大的模型會更可靠。",
     "smallModelKnowledge": "{{model}} 是小型模型，可能會弄混你知識中的數字和細節。請對照來源檢查。",
     "smallModelKnowledgeChoose": "{{model}} 是小型模型，可能會弄混你知識中的數字和細節。請對照來源檢查。對於這類問題，請在「模型」中選擇 {{larger}} 或「自動」。",
-    "smallModelKnowledgeInstall": "{{model}} 是小型模型，可能會弄混你知識中的數字和細節。請對照來源檢查。從「模型」頁面取得較大的模型會更可靠。"
+    "smallModelKnowledgeInstall": "{{model}} 是小型模型，可能會弄混你知識中的數字和細節。請對照來源檢查。從「模型」頁面取得較大的模型會更可靠。",
+    "actionsStay": "上一個回答做過的事（例如建立的檔案或執行的指令）不會被復原。"
   },
   "steps": {
     "autoChose": "「自動」為{{kind}}選擇了 {{model}}",
@@ -568,5 +569,18 @@
   },
   "topics": {
     "offTopic": "這裡幫不了這個忙。還有什麼可以幫你的嗎？"
+  },
+  "versions": {
+    "label": "版本",
+    "previous": "上一個版本",
+    "next": "下一個版本",
+    "position": "{{index}} / {{count}}",
+    "tryAgain": "重試",
+    "tryAgainWith": "換個模型重試",
+    "withAnother": "其他模型…",
+    "auto": "自動",
+    "edit": "編輯",
+    "editing": "正在編輯你的訊息。傳送後會產生新版本，舊版本會保留。",
+    "cancelEdit": "取消"
   }
 }

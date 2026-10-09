@@ -493,7 +493,8 @@
     "smallModelFilesInstall": "{{model}} is a small model and can mix up numbers and details from your files. Check them against the source. A larger model from the Models page will be more reliable.",
     "smallModelKnowledge": "{{model}} is a small model and can mix up numbers and details from your knowledge. Check them against the source.",
     "smallModelKnowledgeChoose": "{{model}} is a small model and can mix up numbers and details from your knowledge. Check them against the source. For questions like this, choose {{larger}} or Auto in Model.",
-    "smallModelKnowledgeInstall": "{{model}} is a small model and can mix up numbers and details from your knowledge. Check them against the source. A larger model from the Models page will be more reliable."
+    "smallModelKnowledgeInstall": "{{model}} is a small model and can mix up numbers and details from your knowledge. Check them against the source. A larger model from the Models page will be more reliable.",
+    "actionsStay": "The earlier answer's actions, such as files made or commands run, aren't undone."
   },
   "steps": {
     "autoChose": "Auto chose {{model}} for {{kind}}",
@@ -594,5 +595,18 @@
   },
   "topics": {
     "offTopic": "I can't help with that here. What else can I help you with?"
+  },
+  "versions": {
+    "label": "Versions",
+    "previous": "Previous version",
+    "next": "Next version",
+    "position": "{{index}} / {{count}}",
+    "tryAgain": "Try again",
+    "tryAgainWith": "Try again with another model",
+    "withAnother": "Another model…",
+    "auto": "Auto",
+    "edit": "Edit",
+    "editing": "Editing your message. Sending makes a new version; the earlier one stays.",
+    "cancelEdit": "Cancel"
   }
 }
