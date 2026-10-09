@@ -202,6 +202,9 @@
   "REMOTE_LISTEN_FAILED": "L'accès de partout ne peut pas écouter sur le port {{port}}. Un autre programme l'utilise peut-être.",
   "RELAY_INVALID": "Saisissez le nom du relais, comme relay.example.com, avec un port seulement s'il ne s'agit pas du 443.",
   "RELAY_SECRET_INVALID": "Ce n'est pas un secret d'inscription. Copiez-le depuis le fichier enroll.secret du relais.",
+  "RELAY_TOKEN_INVALID": "Ce jeton de relais n'est pas pour cet ordinateur ou il a expiré. Abonnez-vous à nouveau depuis cet appareil.",
+  "RELAY_TOKEN_NOT_NEEDED": "Cet ordinateur utilise le relais de votre organisation : il n'a pas besoin d'abonnement.",
+  "RELAY_TOKEN_FAILED": "Impossible d'enregistrer le jeton de relais sur cet ordinateur.",
   "ROUTE_NOT_LOCAL": "Connectez-vous une fois à la maison pour configurer l'accès de partout sur cet appareil.",
   "ROUTE_FAILED": "Impossible de configurer l'accès de partout sur cet ordinateur."
 }

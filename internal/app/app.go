@@ -503,9 +503,10 @@ func New(opts Options) (*App, error) {
 		ListMessages: func(ctx context.Context, id string) ([]contracts.Message, error) {
 			return convRepo.ListMessages(ctx, id)
 		},
-		ShowVersion: convRepo.ShowVersion,
-		RemoteReach: a.remoteReach,
-		RouteSecret: a.routeSecret,
+		ShowVersion:   convRepo.ShowVersion,
+		RemoteReach:   a.remoteReach,
+		RouteSecret:   a.routeSecret,
+		SetRelayToken: a.setRelayToken,
 		GetSettings: func(ctx context.Context) (contracts.SettingsView, error) {
 			return a.settingsView(ctx)
 		},

@@ -101,6 +101,9 @@ type Dependencies struct {
 	// the route ID it makes (#456).
 	RouteSecret func() (secret, route string, err error)
 	RemoteReach func() RemoteReach
+	// SetRelayToken keeps a route token the app got for this computer from
+	// a store subscription, and with enable turns access from anywhere on.
+	SetRelayToken func(ctx context.Context, token string, enable bool) (state string, err error)
 	ShowVersion func(ctx context.Context, conversationID, messageID string) ([]contracts.Message, error)
 	Chat        func(w http.ResponseWriter, r *http.Request, conversationID, profileID, modelID, message string, stream bool, execution string) error
 	// StopChat stops a conversation's running turn and reports whether one was running.
@@ -349,6 +352,7 @@ func (s *Server) routes() {
 	api.HandleFunc("/tls", s.handleTLS).Methods(http.MethodGet)
 	api.HandleFunc("/remote-access", s.handleRemoteAccess).Methods(http.MethodGet)
 	api.HandleFunc("/remote-access/route", s.handleRouteSecret).Methods(http.MethodGet)
+	api.HandleFunc("/remote-access/relay-token", s.handleRelayToken).Methods(http.MethodPut)
 	s.notificationRoutes(api)
 	s.connectorRoutes(api)
 	s.mcpRoutes(api)

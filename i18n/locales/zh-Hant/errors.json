@@ -202,6 +202,9 @@
   "REMOTE_LISTEN_FAILED": "隨處存取無法在連接埠 {{port}} 上監聽。可能有其他程式正在使用它。",
   "RELAY_INVALID": "請輸入中繼的名稱，例如 relay.example.com；連接埠不是 443 時才需要加上。",
   "RELAY_SECRET_INVALID": "這不是註冊密鑰。請從中繼的 enroll.secret 檔案中複製。",
+  "RELAY_TOKEN_INVALID": "這個中繼權杖不屬於這台電腦，或已過期。請在此裝置上重新訂閱。",
+  "RELAY_TOKEN_NOT_NEEDED": "這台電腦使用你所屬組織的中繼，因此不需要訂閱。",
+  "RELAY_TOKEN_FAILED": "無法在這台電腦上儲存中繼權杖。",
   "ROUTE_NOT_LOCAL": "請先在家裡連線一次，以在此裝置上設定隨處存取。",
   "ROUTE_FAILED": "無法在這台電腦上設定隨處存取。"
 }

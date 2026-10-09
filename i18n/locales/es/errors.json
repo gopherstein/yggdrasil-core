@@ -202,6 +202,9 @@
   "REMOTE_LISTEN_FAILED": "El acceso desde cualquier lugar no puede escuchar en el puerto {{port}}. Puede que otro programa lo esté usando.",
   "RELAY_INVALID": "Escribe el nombre del relé, como relay.example.com, con un puerto solo si no es el 443.",
   "RELAY_SECRET_INVALID": "Eso no es un secreto de inscripción. Cópialo del archivo enroll.secret del relé.",
+  "RELAY_TOKEN_INVALID": "Ese token del relé no es para esta computadora o ya caducó. Vuelve a suscribirte desde este dispositivo.",
+  "RELAY_TOKEN_NOT_NEEDED": "Esta computadora usa el relé de tu organización, así que no necesita una suscripción.",
+  "RELAY_TOKEN_FAILED": "No se pudo guardar el token del relé en esta computadora.",
   "ROUTE_NOT_LOCAL": "Conéctate una vez en casa para configurar el acceso desde cualquier lugar en este dispositivo.",
   "ROUTE_FAILED": "No se pudo configurar el acceso desde cualquier lugar en esta computadora."
 }

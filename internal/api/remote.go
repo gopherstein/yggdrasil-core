@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"net"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"github.com/yeixio/toskar-core/internal/auth"
+	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
 // Access from anywhere (#456, docs/remote-access.md): a second listener for
@@ -284,6 +286,39 @@ type RemoteReach struct {
 	// Relay is the relay used, and RelayState how it's doing: no_token,
 	// connecting, connected, or error, with RelayError its code.
 	Relay, RelayState, RelayError string
+}
+
+// handleRelayToken takes the route token the app got from a store
+// subscription for this computer (#456): the computer then registers and
+// keeps its tunnel on Toskar's relay. A paired device may hand it over from
+// anywhere; turning access from anywhere on with it needs an Admin.
+func (s *Server) handleRelayToken(w http.ResponseWriter, r *http.Request) {
+	var body struct {
+		Token  string `json:"token"`
+		Enable bool   `json:"enable"`
+	}
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 8<<10)).Decode(&body); err != nil {
+		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "invalid JSON", nil)
+		return
+	}
+	if body.Enable && !auth.PrincipalFrom(r.Context()).Person.Role.AtLeast(auth.RoleAdmin) {
+		writeErr(w, http.StatusForbidden, "ROLE_REQUIRED", "turning on access from anywhere needs the admin role", map[string]any{"role": string(auth.RoleAdmin)})
+		return
+	}
+	if s.deps.SetRelayToken == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Access from anywhere isn't available.", nil)
+		return
+	}
+	state, err := s.deps.SetRelayToken(r.Context(), body.Token, body.Enable)
+	if err != nil {
+		if code, _ := contracts.ErrorCode(err); code != "" {
+			writeErrFrom(w, http.StatusBadRequest, code, err)
+			return
+		}
+		writeErr(w, http.StatusInternalServerError, "RELAY_TOKEN_FAILED", "Couldn't keep the relay token.", map[string]any{"cause": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"state": state})
 }
 
 // handleRouteSecret gives a paired device the route secret, on the home

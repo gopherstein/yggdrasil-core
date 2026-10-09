@@ -202,6 +202,9 @@
   "REMOTE_LISTEN_FAILED": "어디서나 접속이 포트 {{port}}에서 대기할 수 없어요. 다른 프로그램이 쓰고 있을 수 있어요.",
   "RELAY_INVALID": "relay.example.com처럼 릴레이 이름을 입력하세요. 포트는 443이 아닐 때만 붙이세요.",
   "RELAY_SECRET_INVALID": "등록 비밀이 아니에요. 릴레이의 enroll.secret 파일에서 복사하세요.",
+  "RELAY_TOKEN_INVALID": "이 릴레이 토큰은 이 컴퓨터용이 아니거나 만료되었어요. 이 기기에서 다시 구독하세요.",
+  "RELAY_TOKEN_NOT_NEEDED": "이 컴퓨터는 조직의 릴레이를 사용하므로 구독이 필요 없어요.",
+  "RELAY_TOKEN_FAILED": "이 컴퓨터에 릴레이 토큰을 저장하지 못했어요.",
   "ROUTE_NOT_LOCAL": "이 기기에서 어디서나 접속을 설정하려면 집에서 한 번 연결하세요.",
   "ROUTE_FAILED": "이 컴퓨터에서 어디서나 접속을 설정하지 못했어요."
 }

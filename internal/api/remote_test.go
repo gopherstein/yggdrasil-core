@@ -7,6 +7,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -16,6 +17,7 @@ import (
 
 	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/config"
+	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
 // The remote listener serves paired devices' keys on phone routes, over
@@ -262,5 +264,53 @@ func TestServeRelayed(t *testing.T) {
 	srv.StopRemote()
 	if srv.ServeRelayed(pipeConn{remote: &net.TCPAddr{}}) {
 		t.Fatal("took a connection after stopping")
+	}
+}
+
+// The app hands over a subscription's relay token; turning access from
+// anywhere on with it needs an Admin (#456).
+func TestRelayToken(t *testing.T) {
+	var got []string
+	srv := NewServer(Dependencies{
+		SetRelayToken: func(_ context.Context, tok string, enable bool) (string, error) {
+			if tok == "bad" {
+				return "", contracts.NewError("RELAY_TOKEN_INVALID", nil, errors.New("not for this computer"))
+			}
+			got = append(got, fmt.Sprintf("%s %v", tok, enable))
+			return "connecting", nil
+		},
+	})
+	call := func(role auth.Role, body string) (int, string) {
+		r := httptest.NewRequest(http.MethodPut, "/api/v1/remote-access/relay-token", strings.NewReader(body))
+		r = r.WithContext(auth.WithPrincipal(r.Context(), auth.Principal{Person: auth.Person{ID: "p", Role: role}}))
+		w := httptest.NewRecorder()
+		srv.handleRelayToken(w, r)
+		var out struct {
+			State string
+			Error struct{ Code string }
+		}
+		_ = json.Unmarshal(w.Body.Bytes(), &out)
+		return w.Code, out.State + out.Error.Code
+	}
+	if status, code := call(auth.RoleMember, `{"token":"rt1.x.y","enable":true}`); status != http.StatusForbidden || code != "ROLE_REQUIRED" {
+		t.Fatalf("member enabling: %d %s", status, code)
+	}
+	if status, state := call(auth.RoleMember, `{"token":"rt1.x.y"}`); status != http.StatusOK || state != "connecting" {
+		t.Fatalf("member handing over: %d %s", status, state)
+	}
+	if status, _ := call(auth.RoleAdmin, `{"token":"rt1.x.y","enable":true}`); status != http.StatusOK {
+		t.Fatalf("admin enabling: %d", status)
+	}
+	if status, code := call(auth.RoleAdmin, `{"token":"bad"}`); status != http.StatusBadRequest || code != "RELAY_TOKEN_INVALID" {
+		t.Fatalf("bad token: %d %s", status, code)
+	}
+	if status, code := call(auth.RoleAdmin, `nope`); status != http.StatusBadRequest || code != "INVALID_JSON" {
+		t.Fatalf("bad JSON: %d %s", status, code)
+	}
+	if len(got) != 2 || got[0] != "rt1.x.y false" || got[1] != "rt1.x.y true" {
+		t.Fatalf("handed over: %v", got)
+	}
+	if !auth.DeviceMayReach(http.MethodPut, "/api/v1/remote-access/relay-token") {
+		t.Fatal("a paired device can't hand over a token")
 	}
 }
