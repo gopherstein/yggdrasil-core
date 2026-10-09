@@ -277,7 +277,20 @@
       "allowOnce": "Permitir uma vez"
     },
     "ranOnGPU": "GPU",
-    "ranOnCPU": "CPU"
+    "ranOnCPU": "CPU",
+    "versions": {
+      "tryAgain": "Tentar de novo",
+      "tryAgainHint": "Fazer esta pergunta de novo. Toque e segure para escolher outro modelo.",
+      "tryAnother": "Tentar com outro modelo",
+      "pickModel": "Tentar de novo com",
+      "edit": "Editar",
+      "editing": "Você está editando sua mensagem. Enviar cria uma nova versão; a anterior continua.",
+      "cancelEdit": "Cancelar",
+      "previous": "Versão anterior",
+      "next": "Próxima versão",
+      "position": "{{index}} / {{count}}",
+      "positionLabel": "Versão {{index}} de {{count}}"
+    }
   },
   "effort": {
     "title": "Esforço",
@@ -404,7 +417,8 @@
       "homework": "Explique a fotossíntese para uma criança de dez anos.",
       "trip": "Planeje um sábado chuvoso em Juneau para uma família de quatro pessoas.",
       "movie": "Sugira uma noite de cinema em família com três filmes que combinem."
-    }
+    },
+    "tryAgain": "Tentar de novo"
   },
   "setup": {
     "title": "Configure no seu computador",

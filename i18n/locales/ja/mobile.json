@@ -277,7 +277,20 @@
       "allowOnce": "1回だけ許可"
     },
     "ranOnGPU": "GPU",
-    "ranOnCPU": "CPU"
+    "ranOnCPU": "CPU",
+    "versions": {
+      "tryAgain": "もう一度",
+      "tryAgainHint": "この質問をもう一度します。長押しで別のモデルを選べます。",
+      "tryAnother": "別のモデルで試す",
+      "pickModel": "もう一度（モデルを選択）",
+      "edit": "編集",
+      "editing": "メッセージを編集中です。送信すると新しいバージョンになり、前のものは残ります。",
+      "cancelEdit": "キャンセル",
+      "previous": "前のバージョン",
+      "next": "次のバージョン",
+      "position": "{{index}} / {{count}}",
+      "positionLabel": "バージョン {{index}}/{{count}}"
+    }
   },
   "effort": {
     "title": "処理の深さ",
@@ -396,7 +409,8 @@
       "homework": "10歳の子どもに光合成を説明して。",
       "trip": "4人家族でジュノーの雨の土曜日を過ごす計画を立てて。",
       "movie": "テーマがつながる3本の映画で、家族の映画の夜を提案して。"
-    }
+    },
+    "tryAgain": "もう一度"
   },
   "setup": {
     "title": "コンピュータで設定する",

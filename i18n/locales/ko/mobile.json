@@ -277,7 +277,20 @@
       "allowOnce": "한 번 허용"
     },
     "ranOnGPU": "GPU",
-    "ranOnCPU": "CPU"
+    "ranOnCPU": "CPU",
+    "versions": {
+      "tryAgain": "다시 시도",
+      "tryAgainHint": "이 질문을 다시 해요. 길게 눌러 다른 모델을 고를 수 있어요.",
+      "tryAnother": "다른 모델로 시도",
+      "pickModel": "다시 시도할 모델",
+      "edit": "수정",
+      "editing": "메시지를 수정하고 있어요. 보내면 새 버전이 되고 이전 버전은 남아요.",
+      "cancelEdit": "취소",
+      "previous": "이전 버전",
+      "next": "다음 버전",
+      "position": "{{index}} / {{count}}",
+      "positionLabel": "버전 {{index}}/{{count}}"
+    }
   },
   "effort": {
     "title": "노력 수준",
@@ -396,7 +409,8 @@
       "homework": "열 살 아이에게 광합성을 설명해 줘.",
       "trip": "4인 가족을 위해 비 오는 토요일 주노 일정을 짜 줘.",
       "movie": "잘 어울리는 영화 세 편으로 가족 영화의 밤을 추천해 줘."
-    }
+    },
+    "tryAgain": "다시 시도"
   },
   "setup": {
     "title": "컴퓨터에서 설정하기",
