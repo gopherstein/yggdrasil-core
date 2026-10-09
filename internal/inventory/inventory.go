@@ -14,13 +14,15 @@ import (
 
 // Model is an installed model.
 type Model struct {
-	ID           string   `json:"id"`
-	Name         string   `json:"name"`
-	Running      bool     `json:"running"`
-	ToolCalling  bool     `json:"tool_calling"`
-	Vision       bool     `json:"vision"`
-	Coding       bool     `json:"coding"`
-	SupportRole  string   `json:"support_role,omitempty"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Running     bool   `json:"running"`
+	ToolCalling bool   `json:"tool_calling"`
+	Vision      bool   `json:"vision"`
+	Coding      bool   `json:"coding"`
+	SupportRole string `json:"support_role,omitempty"`
+	// TopicCheck is a model verified to hold topic controls (#457).
+	TopicCheck   bool     `json:"topic_check,omitempty"`
 	MemoryNeeded uint64   `json:"memory_needed_bytes,omitempty"`
 	On           []string `json:"on"`
 }
@@ -332,6 +334,14 @@ var rules = []rule{
 				return true, v, ""
 			}
 			return false, nil, "No paired computer is online."
+		}},
+	{"topic_checks", "Keep an assistant on its topic", regexp.MustCompile(`(?i)\b(off[- ]topic|on topic|topic controls?|stay on (its|the|a) (topic|subject))\b`),
+		func(s Snapshot) (bool, []string, string) {
+			v := modelsWhere(s, func(m Model) bool { return m.TopicCheck })
+			if len(v) > 0 {
+				return true, v, "A profile's Enforce checks run on the smallest of these that fits beside the model answering."
+			}
+			return false, nil, "No installed model is verified to check topics, so Enforce checks with each profile's own model, which may let more through. Gemma 3 4B is verified."
 		}},
 }
 

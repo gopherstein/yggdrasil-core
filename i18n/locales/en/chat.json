@@ -469,7 +469,8 @@
       "lookedUp": "Looked up the web first",
       "topicHeld": "Off topic: sent the set reply without answering",
       "topicReplaced": "The answer went off topic, so the set reply was sent instead",
-      "topicUnchecked": "The topic check gave no answer, so the rules alone applied"
+      "topicUnchecked": "The topic check gave no answer, so the rules alone applied",
+      "topicCheckModel": "Checked the topic with {{model}}"
     }
   },
   "notices": {

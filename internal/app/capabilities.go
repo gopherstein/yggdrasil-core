@@ -46,7 +46,7 @@ func (a *App) buildCapabilities(ctx context.Context) inventory.Snapshot {
 			ToolCalling: toolCallSupport(m.Capabilities) != "unsupported",
 			// A vision model sees pictures here only with its projector.
 			Vision: m.Capabilities.Vision && (!m.Installed || a.seesImages(m.ID)), Coding: m.Capabilities.Coding, SupportRole: contracts.SupportRoleOf(m),
-			MemoryNeeded: m.MemoryNeeded, On: []string{}}
+			MemoryNeeded: m.MemoryNeeded, TopicCheck: m.Installed && a.verifiedForTopics(m.ID), On: []string{}}
 		if m.Installed && local != "" {
 			im.On = append(im.On, local)
 		}

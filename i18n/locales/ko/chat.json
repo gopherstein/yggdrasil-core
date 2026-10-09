@@ -456,7 +456,8 @@
       "lookedUp": "먼저 웹에서 찾아봄",
       "topicHeld": "주제 벗어남: 답하지 않고 정해 둔 답을 보냄",
       "topicReplaced": "답이 주제를 벗어나 정해 둔 답을 대신 보냄",
-      "topicUnchecked": "주제 확인 결과가 없어 규칙만 적용됨"
+      "topicUnchecked": "주제 확인 결과가 없어 규칙만 적용됨",
+      "topicCheckModel": "{{model}}(으)로 주제 확인"
     }
   },
   "notices": {

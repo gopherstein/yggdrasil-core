@@ -482,7 +482,8 @@
       "lookedUp": "Primero se buscó en la web",
       "topicHeld": "Fuera de tema: se envió la respuesta fijada sin responder",
       "topicReplaced": "La respuesta se salió del tema, así que se envió la respuesta fijada",
-      "topicUnchecked": "La revisión del tema no dio resultado, así que solo se aplicaron las reglas"
+      "topicUnchecked": "La revisión del tema no dio resultado, así que solo se aplicaron las reglas",
+      "topicCheckModel": "Tema revisado con {{model}}"
     }
   },
   "notices": {

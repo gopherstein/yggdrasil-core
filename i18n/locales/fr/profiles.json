@@ -447,6 +447,8 @@
       "replaced": "réponse remplacée",
       "markOnTopic": "Marquer comme dans le sujet",
       "privacy": "Seuls les Admins les voient. Elles sont conservées et supprimées avec l'historique des exécutions (Paramètres → Ce qui a quitté cet ordinateur). En marquer une comme dans le sujet l'ajoute aux questions d'exemple."
-    }
+    },
+    "noVerifiedModel": "Aucun modèle installé n'est vérifié pour contrôler les sujets, donc Imposer contrôle avec le modèle de ce profil, qui peut en laisser passer davantage. Gemma 3 4B est vérifié.",
+    "installVerified": "L'installer"
   }
 }

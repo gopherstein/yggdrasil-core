@@ -469,7 +469,8 @@
       "lookedUp": "Zuerst im Web nachgeschlagen",
       "topicHeld": "Außerhalb des Themas: festgelegte Antwort ohne Beantwortung gesendet",
       "topicReplaced": "Die Antwort wich vom Thema ab, daher wurde stattdessen die festgelegte Antwort gesendet",
-      "topicUnchecked": "Die Themenprüfung ergab nichts, daher galten nur die Regeln"
+      "topicUnchecked": "Die Themenprüfung ergab nichts, daher galten nur die Regeln",
+      "topicCheckModel": "Thema mit {{model}} geprüft"
     }
   },
   "notices": {

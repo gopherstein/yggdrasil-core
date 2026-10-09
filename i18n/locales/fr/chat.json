@@ -482,7 +482,8 @@
       "lookedUp": "Recherche sur le web d'abord",
       "topicHeld": "Hors sujet : réponse prévue envoyée sans répondre",
       "topicReplaced": "La réponse s'est écartée du sujet, la réponse prévue a donc été envoyée",
-      "topicUnchecked": "La vérification du sujet n'a rien donné, seules les règles se sont appliquées"
+      "topicUnchecked": "La vérification du sujet n'a rien donné, seules les règles se sont appliquées",
+      "topicCheckModel": "Sujet vérifié avec {{model}}"
     }
   },
   "notices": {

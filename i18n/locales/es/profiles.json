@@ -447,6 +447,8 @@
       "replaced": "respuesta reemplazada",
       "markOnTopic": "Marcar como en el tema",
       "privacy": "Solo los Administradores ven esto. Se conservan y se borran con los registros de ejecución (Configuración → Lo que salió de esta computadora). Marcar uno como en el tema lo añade a las preguntas de ejemplo."
-    }
+    },
+    "noVerifiedModel": "Ningún modelo instalado está verificado para revisar temas, así que Imponer revisa con el modelo de este perfil, que puede dejar pasar más. Gemma 3 4B está verificado.",
+    "installVerified": "Instalarlo"
   }
 }

@@ -36,7 +36,7 @@ The topic rules come first in every turn, as the administrator's rules, ahead of
 
   The set reply is the one under **When asked something else**, word for word. Without one, the check writes one short sentence in the person's language saying what the assistant can help with, and when it can't, Toskar sends "I can't help with that here. What else can I help you with?" in the person's language.
 
-  The checks use the model that answers, which is already loaded, so each adds one short call. If a check gives nothing usable, the turn goes on as Guide, and the run trace says so.
+  The checks run on a small model that holds them well (#457): the model catalog marks the models that pass the topic quality cases (Gemma 3 4B so far), and the smallest one installed on this computer checks when it is the model answering, already running, or fits in memory beside it, with a quarter of memory to spare. Otherwise the model that answers checks too. Each check is one short call, and the run trace says which model checked. Diagnostics, under what Toskar can do, says when no verified model is installed, and so does the Topics tab under Enforce. If a check gives nothing usable, the turn goes on as Guide, and the run trace says so.
 
 The run trace (`GET /api/v1/runs`, and the run details under an answer) notes a held message or a replaced answer, and its `topic` says what the check found.
 
