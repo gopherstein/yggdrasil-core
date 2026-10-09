@@ -201,7 +201,7 @@ func (e *chatExecEnv) topicCheck(ctx context.Context, role, what, label, text st
 		{Role: "system", Content: topicCheckSystem(t, what)},
 		{Role: "user", Content: topicCheckAsk(e.PriorMessages(ctx), label, text)},
 	}
-	out, err := collectText(ctx, e, role, ask)
+	out, err := e.checkText(ctx, role, ask)
 	if err != nil {
 		return topicVerdict{}
 	}

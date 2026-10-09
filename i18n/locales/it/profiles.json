@@ -447,6 +447,8 @@
       "replaced": "risposta sostituita",
       "markOnTopic": "Segna come in tema",
       "privacy": "Solo gli Admin li vedono. Vengono conservati ed eliminati con i registri delle esecuzioni (Impostazioni → Cosa è uscito da questo computer). Segnarne uno come in tema lo aggiunge alle domande di esempio."
-    }
+    },
+    "noVerifiedModel": "Nessun modello installato è verificato per controllare gli argomenti, quindi Imponi controlla con il modello di questo profilo, che può lasciar passare di più. Gemma 3 4B è verificato.",
+    "installVerified": "Installalo"
   }
 }

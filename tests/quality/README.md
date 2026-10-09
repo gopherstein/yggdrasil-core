@@ -66,7 +66,7 @@ the phone has no topic controls, so its copies don't include them.
 ones wrongly refused; the stub must get every case right, and a real model
 must hold at least 80% (`TOSKAR_QUALITY_TOPIC_MIN_HELD`) and wrongly refuse
 at most 15% (`TOSKAR_QUALITY_TOPIC_MAX_REFUSED`). `TOSKAR_QUALITY_TOPIC_REPORT`
-writes its report. The weekly real-model run includes it.
+writes its report. The weekly real-model run includes it. A model that passes is tagged `topic-check` in `manifests/models/catalog.json`, which makes it a candidate to run the topic checks (#457).
 
 ## Running it
 

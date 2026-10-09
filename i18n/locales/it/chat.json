@@ -482,7 +482,8 @@
       "lookedUp": "Prima cercato sul web",
       "topicHeld": "Fuori tema: inviata la risposta stabilita senza rispondere",
       "topicReplaced": "La risposta è andata fuori tema, quindi è stata inviata la risposta stabilita",
-      "topicUnchecked": "Il controllo dell'argomento non ha dato esito, quindi sono valse solo le regole"
+      "topicUnchecked": "Il controllo dell'argomento non ha dato esito, quindi sono valse solo le regole",
+      "topicCheckModel": "Argomento controllato con {{model}}"
     }
   },
   "notices": {

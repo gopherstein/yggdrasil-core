@@ -1047,11 +1047,14 @@ type chatExecEnv struct {
 	startedAt     time.Time
 	firstGenerate time.Time
 
-	mu         sync.Mutex
-	lastModel  string
-	roleNodes  map[string]string
-	roleModels map[string]string
-	usedNodes  []string
+	mu sync.Mutex
+	// checkModelNoted is set once the run trace says which model checked
+	// the topic (#457).
+	checkModelNoted bool
+	lastModel       string
+	roleNodes       map[string]string
+	roleModels      map[string]string
+	usedNodes       []string
 }
 
 func (e *chatExecEnv) modelID() string {

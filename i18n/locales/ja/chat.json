@@ -456,7 +456,8 @@
       "lookedUp": "先にWebで調査",
       "topicHeld": "話題外：回答せずに設定した返答を送信",
       "topicReplaced": "回答が話題から外れたため、代わりに設定した返答を送信",
-      "topicUnchecked": "話題の確認で結果が得られなかったため、ルールのみを適用"
+      "topicUnchecked": "話題の確認で結果が得られなかったため、ルールのみを適用",
+      "topicCheckModel": "{{model}} で話題を確認"
     }
   },
   "notices": {

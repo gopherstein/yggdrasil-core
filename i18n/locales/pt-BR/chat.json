@@ -482,7 +482,8 @@
       "lookedUp": "Pesquisou na web primeiro",
       "topicHeld": "Fora do tema: enviada a resposta definida sem responder",
       "topicReplaced": "A resposta saiu do tema, então a resposta definida foi enviada no lugar",
-      "topicUnchecked": "A verificação do tema não deu resultado, então só as regras se aplicaram"
+      "topicUnchecked": "A verificação do tema não deu resultado, então só as regras se aplicaram",
+      "topicCheckModel": "Tema verificado com {{model}}"
     }
   },
   "notices": {

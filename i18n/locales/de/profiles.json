@@ -442,6 +442,8 @@
       "replaced": "Antwort ersetzt",
       "markOnTopic": "Als zum Thema markieren",
       "privacy": "Nur Admins sehen diese. Sie werden mit den Durchlaufprotokollen aufbewahrt und gelöscht (Einstellungen → Was diesen Computer verlassen hat). Als zum Thema markiert, kommt eine Nachricht zu den Beispielfragen."
-    }
+    },
+    "noVerifiedModel": "Kein installiertes Modell ist für Themenprüfungen bestätigt, daher prüft Durchsetzen mit dem eigenen Modell dieses Profils, das mehr durchlassen kann. Gemma 3 4B ist bestätigt.",
+    "installVerified": "Installieren"
   }
 }

@@ -456,7 +456,8 @@
       "lookedUp": "先在網路上查詢",
       "topicHeld": "離題：未回答，已傳送設定的回覆",
       "topicReplaced": "回答偏離了主題，已改為傳送設定的回覆",
-      "topicUnchecked": "主題檢查沒有結果，因此只套用了規則"
+      "topicUnchecked": "主題檢查沒有結果，因此只套用了規則",
+      "topicCheckModel": "用 {{model}} 檢查了主題"
     }
   },
   "notices": {

@@ -442,6 +442,8 @@
       "replaced": "answer replaced",
       "markOnTopic": "Mark as on topic",
       "privacy": "Only Admins see these. They're kept and deleted with run records (Settings → What left this computer). Marking one as on topic adds it to the example questions."
-    }
+    },
+    "noVerifiedModel": "No installed model is verified to check topics, so Enforce checks with this profile's own model, which may let more through. Gemma 3 4B is verified.",
+    "installVerified": "Install it"
   }
 }

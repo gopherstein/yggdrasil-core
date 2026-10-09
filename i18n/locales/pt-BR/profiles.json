@@ -447,6 +447,8 @@
       "replaced": "resposta substituída",
       "markOnTopic": "Marcar como no tema",
       "privacy": "Só Administradores veem isto. Ficam guardadas e são apagadas com os registros de execução (Configurações → O que saiu deste computador). Marcar uma como no tema a adiciona às perguntas de exemplo."
-    }
+    },
+    "noVerifiedModel": "Nenhum modelo instalado é verificado para checar temas, então Impor checa com o modelo deste perfil, que pode deixar passar mais. O Gemma 3 4B é verificado.",
+    "installVerified": "Instalar"
   }
 }
