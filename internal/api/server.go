@@ -62,18 +62,18 @@ type Dependencies struct {
 	ListRunningModels   func(ctx context.Context) ([]contracts.RunningModelView, error)
 	// Acceleration sums up where this computer's loaded models run, for
 	// health (#317).
-	Acceleration          func(ctx context.Context) string
-	StartModel            func(ctx context.Context, id string, nodeID string) (contracts.RunningModelView, error)
-	StopModel             func(ctx context.Context, instanceID string, nodeID string) error
-	ListRuntimes          func(ctx context.Context) ([]runtimes.RuntimeInfo, error)
-	InstallRuntime        func(ctx context.Context, id string) error
-	ListProfiles          func(ctx context.Context) ([]contracts.AIProfile, error)
-	CreateProfile         func(ctx context.Context, p contracts.AIProfile) (contracts.AIProfile, error)
-	GetProfile            func(ctx context.Context, id string) (contracts.AIProfile, error)
-	UpdateProfile         func(ctx context.Context, p contracts.AIProfile) (contracts.AIProfile, error)
+	Acceleration   func(ctx context.Context) string
+	StartModel     func(ctx context.Context, id string, nodeID string) (contracts.RunningModelView, error)
+	StopModel      func(ctx context.Context, instanceID string, nodeID string) error
+	ListRuntimes   func(ctx context.Context) ([]runtimes.RuntimeInfo, error)
+	InstallRuntime func(ctx context.Context, id string) error
+	ListProfiles   func(ctx context.Context) ([]contracts.AIProfile, error)
+	CreateProfile  func(ctx context.Context, p contracts.AIProfile) (contracts.AIProfile, error)
+	GetProfile     func(ctx context.Context, id string) (contracts.AIProfile, error)
+	UpdateProfile  func(ctx context.Context, p contracts.AIProfile) (contracts.AIProfile, error)
 	// TryTopics runs one message past a profile's topic controls, or draft
 	// ones, for the editor's Try it panel (#345).
-	TryTopics func(ctx context.Context, profileID string, draft *contracts.TopicPolicy, message string) (any, error)
+	TryTopics             func(ctx context.Context, profileID string, draft *contracts.TopicPolicy, message string) (any, error)
 	DeleteProfile         func(ctx context.Context, id string) error
 	ResetProfile          func(ctx context.Context, id string) (contracts.AIProfile, error)
 	ListNodes             func(ctx context.Context) ([]contracts.Node, error)
