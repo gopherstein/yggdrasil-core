@@ -104,8 +104,8 @@ type Dependencies struct {
 	// SetRelayToken keeps a route token the app got for this computer from
 	// a store subscription, and with enable turns access from anywhere on.
 	SetRelayToken func(ctx context.Context, token string, enable bool) (state string, err error)
-	ShowVersion func(ctx context.Context, conversationID, messageID string) ([]contracts.Message, error)
-	Chat        func(w http.ResponseWriter, r *http.Request, conversationID, profileID, modelID, message string, stream bool, execution string) error
+	ShowVersion   func(ctx context.Context, conversationID, messageID string) ([]contracts.Message, error)
+	Chat          func(w http.ResponseWriter, r *http.Request, conversationID, profileID, modelID, message string, stream bool, execution string) error
 	// StopChat stops a conversation's running turn and reports whether one was running.
 	StopChat           func(conversationID string) bool
 	ListTasks          func(ctx context.Context) ([]contracts.Task, error)
