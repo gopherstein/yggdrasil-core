@@ -22,6 +22,16 @@ The app tries them at once where it can, and keeps the first that answers with t
 
 **Hole punching is left out of the first version.** The apps talk HTTPS through the platform's own stack (URLSession, OkHttp), which can't do TCP simultaneous open or a UDP transport such as QUIC over a punched hole without a native networking layer of its own. With direct and relayed paths both end to end, hole punching is an optimization for relay cost, which is small for chat (see Cost). Revisit it if relayed traffic turns out large.
 
+## Setting it up: one switch, one subscribe
+
+For a subscriber it should be as easy as Plex: no ports, addresses, or accounts.
+
+- **In the app,** once it's paired at home, a card offers **Use Toskar away from home**. Tapping it shows the store's subscription sheet, and that's all. The app hands the subscription to the computer over its existing connection, and the computer turns access from anywhere on and finds its own way out: a router port, IPv6, or the relay. The card turns into "Ready away from home".
+- **Turning it on from the app** takes an Admin or the Owner, since it changes what the computer serves. Anyone else is told who can turn it on.
+- **On the computer,** Settings → Access from anywhere is one switch with a status line. Nothing to type unless the person wants a port they forwarded by hand.
+- **Away from home** there's nothing to do: the app tries its paths and keeps the first that works, switching between Wi-Fi and mobile data on its own.
+- **When something's wrong,** the app and Settings say what in plain words, and what to do: "Your computer is offline or asleep", "Your router didn't open a port, so Toskar's relay is in use", "The subscription ended".
+
 ## End-to-end encryption on every path
 
 Every path is the same TLS session, from the app to the computer's API listener, checked against the same pin:
@@ -70,6 +80,32 @@ A small stateless service with a key-value store. It holds no traffic.
 - **Pricing:** with direct paths first, most people cost almost nothing, so a flat monthly price with a fair-use cap on relayed traffic is simpler than metering messages. A household covers the devices on one computer. Final prices wait for the cost test.
 - **Desktop to desktop** (Toskar Pro away from home reaching the home computer) can't use mobile store billing; it's a later option with billing on toskar.ai.
 
+## Testing and free access
+
+Testers go through the real subscription flow without paying; nothing in the app or core gives a free pass that a client could claim.
+
+- **Beta builds** (TestFlight, Play testing tracks): purchases use the stores' test environments, so testers subscribe for free, and App Review can try the feature. The rendezvous checks receipts with the production endpoints first, then the sandbox, and marks a test purchase's route token `sandbox`: it lasts as long as the store's test subscription (test renewals are sped up, which tests renewal and expiry too), has its own relay cap, and is left out of billing and cost figures. Only builds handed out for testing produce test purchases.
+- **Specific people on the store build** (friends, press, early supporters): App Store offer codes, and Play promo codes or trials, give a real subscription for a while with no special code of ours.
+- **Development without a store:** core and the apps take `TOSKAR_RELAY_URL`, so a developer runs the relay service locally with its own signing key, which production never trusts. A command on the service mints a route token for a route ID and an expiry, for testers who can't use a store build (such as Toskar Pro on a laptop); every grant is logged and can be revoked.
+- **The free paths** (home network, a port forwarded by hand, Tailscale) need no subscription, so most of the feature can be tried without the service.
+
+## Enterprise: your own tunnel, at scale
+
+Organizations run their own way in instead of the subscription, and it has to work for hundreds of people. A separate guide (`docs/remote-access-enterprise.md`) covers it; this is what it needs and what core and the apps must do for it.
+
+**The shape:** Toskar runs on a server; people reach it at a hostname the organization controls, such as `toskar.example.com`, through its own tunnel or reverse proxy, with sign-in through its identity provider.
+
+- **The way in,** any of:
+  - a reverse proxy or load balancer on the organization's network or edge, such as nginx, Caddy, Traefik, or a cloud load balancer;
+  - Cloudflare Tunnel with Cloudflare Access;
+  - Tailscale or another mesh VPN with access rules, for phones enrolled in it;
+  - the company VPN.
+- **Sign-in:** OpenID Connect (`oidc`) for the web app, or a proxy that signs people in (`trusted_proxies`, `proxy_auth`), with groups mapped to Admin, Member, and Visitor. Profiles can be pinned to roles (#345), and portals (#205) serve people outside the company.
+- **Phones, at scale:** each person pairs their own phone from their account in the web app (Connect a device), so an Admin doesn't pair hundreds by hand; removing a person or a device revokes its key. Phone requests carry that key in `Authorization`, so the proxy must let requests with a bearer token through to Toskar without its own login page (a bypass rule for the API, or service authentication), while browsers still sign in.
+- **Certificates:** a certificate the phones already trust, from a public CA on the hostname, or the company's CA installed by MDM. *Needed in the apps:* when a server's certificate is trusted by the phone's system for its hostname, the app trusts it the usual way instead of pinning it, so renewals (every 90 days with Let's Encrypt) don't ask every phone to accept a changed certificate. Pinning stays for self-signed certificates, as now.
+- **Capacity:** many people chatting at once need models on enough computers: pair GPU computers into the cluster (`docs/clustering.md`) and set placement, effort, and limits per profile. The guide gives sizing rules of thumb.
+- **Operations:** the guide covers health checks for the load balancer (`GET /api/v1/health`), keeping the data directory on durable storage with backups, logs and the run-record retention, and updating Toskar.
+
 ## Threat model
 
 | Threat | What stops it |
@@ -83,6 +119,7 @@ A small stateless service with a key-value store. It holds no traffic.
 | Someone takes over another person's relay route | Registering a route needs that route's token, which only its subscription produced. |
 | The service goes away | Home network and do-it-yourself routes keep working; nothing depends on the service to work at home. |
 | A router port left open | The mapping lapses on its own (it's renewed, not permanent) and is removed when the setting is turned off. |
+| A free relay through a faked tester flag | There's no flag: only store-verified receipts, sandbox ones marked and capped, and grants the service signs. |
 
 ## Privacy
 
@@ -101,5 +138,5 @@ A small stateless service with a key-value store. It holds no traffic.
 2. **Core:** the setting, the remote listener, port mapping (PCP, NAT-PMP, UPnP-IGD) written in Go without new dependencies, address discovery, and the status in Settings. Useful on its own, with a manual port forward.
 3. **Core:** the route secret at pairing and on the LAN for paired devices, the signed and encrypted address record, registration, and the relay tunnel.
 4. **`yeixio/toskar-relay`:** the rendezvous, receipt checks and route tokens, and the relay, with deployment on its own instance.
-5. **Apps:** subscription screens (StoreKit 2, Play Billing), the receipt exchange, path selection (home, direct, relay) with the pin on each, the path shown, and the offline and over-the-cap messages.
-6. **Store setup, privacy listings, docs** for the free routes beside the subscription, then the cost test and final prices.
+5. **Apps:** subscription screens (StoreKit 2, Play Billing), the receipt exchange, the "Use Toskar away from home" card, turning the setting on for an Admin, path selection (home, direct, relay) with the pin on each, the path shown, the offline and over-the-cap messages, and system trust for publicly trusted certificates.
+6. **Store setup, privacy listings, docs:** the free routes, and the enterprise guide, beside the subscription; then the cost test and final prices.
