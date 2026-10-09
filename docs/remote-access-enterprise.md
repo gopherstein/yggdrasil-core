@@ -11,7 +11,7 @@ way in that keeps their encryption end to end. The design is in
 |---|---|---|---|
 | **Your own Toskar relay** | No | Yes, end to end | A small server with a public name, and a relay license from Toskar |
 | **A VPN** (Tailscale, WireGuard, your corporate VPN) | Yes | Yes, end to end | Everyone on the VPN |
-| **A reverse proxy or tunnel** (nginx, Caddy, Traefik, a cloud load balancer, Cloudflare Tunnel) | Yes, with your sign-in | Not yet (below) | A public name and certificate |
+| **A reverse proxy or tunnel** (nginx, Caddy, Traefik, a cloud load balancer, Cloudflare Tunnel) | Yes, with your sign-in | Yes, paired by name (below); the proxy can read the traffic | A public name and certificate |
 | **A forwarded port** | No | Yes, end to end | A public address for each Toskar server |
 
 Most organizations pair two of them: a reverse proxy or tunnel for the web
@@ -19,11 +19,13 @@ app, where people sign in with your identity provider, and the relay or a
 VPN for devices.
 
 **Why devices differ:** a paired device trusts its Toskar server by the
-server's own certificate, saved when it was paired, not by a name. A reverse
-proxy or Cloudflare Tunnel shows its own certificate instead, so a device
-refuses it. Accepting a certificate the device's system trusts for the
-server's name, as browsers do, is coming to the apps; until then, use the
-relay or a VPN for devices.
+server's own certificate, saved when it was paired. Through the relay, a VPN,
+or a forwarded port, that certificate reaches the device unchanged, so the
+encryption runs from the device to the server. A reverse proxy or Cloudflare
+Tunnel shows its own certificate and ends TLS itself, so it can read the
+traffic. Devices accept it only for the name they were paired with, when the
+device's system trusts the certificate for that name, as a browser would
+(below).
 
 ## Your own relay
 
@@ -82,6 +84,27 @@ Put Toskar behind your proxy at a name you control, such as
   the tunnel at `http://localhost:7331` on the Toskar server.
 
 The user guide's *Run without a desktop* section has the details.
+
+### Devices through your proxy
+
+A device can use the same name, so it reaches the server through your proxy
+when it's away:
+
+- **Pair by name.** On the office network, have people connect their
+  device to the server's name, such as `toskar.example.com`, rather than its
+  address. Inside, your DNS answers with the server's own address (pairing
+  only works on the office network); outside, it answers with the proxy's.
+- **The certificate** the proxy serves must be one the devices' systems
+  trust for that name: from a public CA, or your own CA installed on them
+  by your device management. Renewals need nothing from anyone. The device
+  never extends this to an IP address, or to a relay's names, which stay
+  pinned to the server's own certificate.
+- **Let device requests through.** Devices send their key as
+  `Authorization: Bearer …` to `/api/v1/…`. The proxy must pass those
+  requests to Toskar without its own login page: a bypass rule for the API
+  with a bearer token, or service authentication. Browsers still sign in.
+- **The proxy sees the traffic,** since it ends TLS. If that matters, use
+  the relay or a VPN for devices instead.
 
 ## Hundreds of people
 
