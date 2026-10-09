@@ -38,7 +38,7 @@ func TestRouteSecret(t *testing.T) {
 		t.Fatalf("route id: %q", id)
 	}
 	for _, c := range id {
-		if !(c >= 'a' && c <= 'z' || c >= '2' && c <= '7') {
+		if (c < 'a' || c > 'z') && (c < '2' || c > '7') {
 			t.Fatalf("not a DNS label: %q", id)
 		}
 	}
