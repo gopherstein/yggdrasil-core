@@ -506,6 +506,7 @@ func New(opts Options) (*App, error) {
 		ShowVersion:   convRepo.ShowVersion,
 		RemoteReach:   a.remoteReach,
 		RouteSecret:   a.routeSecret,
+		RelayName:     func() string { return relayName(a.Config.Get()) },
 		SetRelayToken: a.setRelayToken,
 		GetSettings: func(ctx context.Context) (contracts.SettingsView, error) {
 			return a.settingsView(ctx)

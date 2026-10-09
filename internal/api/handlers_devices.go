@@ -150,6 +150,9 @@ func (s *Server) handlePairDevice(w http.ResponseWriter, r *http.Request) {
 	if s.deps.RouteSecret != nil {
 		if route, id, err := s.deps.RouteSecret(); err == nil {
 			out["route_secret"], out["route_id"] = route, id
+			if s.deps.RelayName != nil {
+				out["relay"] = s.deps.RelayName()
+			}
 		}
 	}
 	writeJSON(w, http.StatusCreated, out)

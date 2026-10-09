@@ -805,7 +805,7 @@ paths:
   /api/v1/remote-access/route:
     get:
       summary: The route secret, for a paired device on the home network (#456)
-      description: "route_secret (base64url, 32 bytes) and route_id. Given only on the home network, never through the remote listener; pairing (POST /api/v1/devices/pair) returns them too."
+      description: "route_secret (base64url, 32 bytes), route_id, and relay (the relay this computer uses away from home). Given only on the home network, never through the remote listener; pairing (POST /api/v1/devices/pair) returns them too."
       operationId: getRouteSecret
       responses:
         "200":
