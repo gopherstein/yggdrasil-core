@@ -499,6 +499,7 @@ func New(opts Options) (*App, error) {
 		},
 		ShowVersion: convRepo.ShowVersion,
 		RemoteReach: a.remoteReach,
+		RouteSecret: a.routeSecret,
 		GetSettings: func(ctx context.Context) (contracts.SettingsView, error) {
 			return a.settingsView(ctx)
 		},

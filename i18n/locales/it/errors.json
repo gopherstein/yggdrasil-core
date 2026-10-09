@@ -199,5 +199,7 @@
   "REMOTE_DEVICES_ONLY": "Da fuori della rete di casa possono connettersi solo i dispositivi associati.",
   "REMOTE_PORT_INVALID": "La porta va da 1024 a 65535 e non è quella dell'app o dei computer.",
   "REMOTE_ADDRESS_INVALID": "Inserisci un nome host o un IP, con la porta se diversa, come home.example.com o 203.0.113.7:7333.",
-  "REMOTE_LISTEN_FAILED": "L'accesso ovunque non può restare in ascolto sulla porta {{port}}. Forse la usa un altro programma."
+  "REMOTE_LISTEN_FAILED": "L'accesso ovunque non può restare in ascolto sulla porta {{port}}. Forse la usa un altro programma.",
+  "ROUTE_NOT_LOCAL": "Connettiti una volta a casa per configurare l'accesso ovunque su questo dispositivo.",
+  "ROUTE_FAILED": "Impossibile configurare l'accesso ovunque su questo computer."
 }

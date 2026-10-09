@@ -13,6 +13,7 @@ import "strings"
 
 // visitorRoutes are what everyone signed in may reach.
 var visitorRoutes = map[string]bool{
+	"GET /api/v1/remote-access/route":                     true,
 	"GET /api/v1/health":                                  true,
 	"GET /api/v1/version":                                 true,
 	"GET /api/v1/me":                                      true,

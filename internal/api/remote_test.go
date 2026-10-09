@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
@@ -109,5 +110,60 @@ func TestRemoteListenerNeedsTLS(t *testing.T) {
 	srv := NewServer(Dependencies{})
 	if err := srv.ServeRemote("127.0.0.1:0"); err == nil || srv.RemoteListening().Error == "" {
 		t.Fatalf("listened without a certificate: %v", err)
+	}
+}
+
+// The route secret comes only on the home network, never through the
+// remote listener, and with pairing (#456).
+func TestRouteSecret(t *testing.T) {
+	dir := t.TempDir()
+	mgr, err := config.NewManager(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := mgr.Update(func(c *config.Config) { c.APIHost, c.LANAPIEnabled = "0.0.0.0", true }); err != nil {
+		t.Fatal(err)
+	}
+	cert, err := auth.APICertificate(auth.NewSecretStore(dir))
+	if err != nil {
+		t.Fatal(err)
+	}
+	srv := NewServer(Dependencies{
+		Config: mgr,
+		VerifyAPIKey: func(_ context.Context, secret string) (auth.APIKeyRecord, error) {
+			if secret == "phone-key" {
+				return auth.APIKeyRecord{ID: "d1", PersonID: auth.OwnerID, Kind: auth.KindDevice}, nil
+			}
+			return auth.APIKeyRecord{}, errors.New("invalid")
+		},
+		RouteSecret: func() (string, string, error) { return "c2VjcmV0", "routeid", nil },
+	})
+	srv.SetTLS(&tls.Config{Certificates: []tls.Certificate{cert}, MinVersion: tls.VersionTLS12}, APITLS{Enabled: true})
+
+	// On the home network, with a phone's key.
+	r := httptest.NewRequest(http.MethodGet, "/api/v1/remote-access/route", nil)
+	r.RemoteAddr, r.Host = "192.168.1.20:50000", "192.168.1.5:7331"
+	r.Header.Set("Authorization", "Bearer phone-key")
+	rec := httptest.NewRecorder()
+	srv.Handler().ServeHTTP(rec, r)
+	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"route_secret":"c2VjcmV0"`) {
+		t.Fatalf("home network: %d %s", rec.Code, rec.Body)
+	}
+
+	// Through the remote listener: refused, though the key is good.
+	if err := srv.ServeRemote("127.0.0.1:0"); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(srv.StopRemote)
+	client := &http.Client{Timeout: 5 * time.Second, Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
+	req, _ := http.NewRequest(http.MethodGet, "https://"+srv.RemoteListening().Listening+"/api/v1/remote-access/route", nil)
+	req.Header.Set("Authorization", "Bearer phone-key")
+	res, err := client.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	res.Body.Close()
+	if res.StatusCode != http.StatusForbidden {
+		t.Fatalf("remote: %d", res.StatusCode)
 	}
 }

@@ -199,5 +199,7 @@
   "REMOTE_DEVICES_ONLY": "在家庭网络之外，只有已配对的设备可以连接。",
   "REMOTE_PORT_INVALID": "端口范围为 1024 到 65535，且不能是应用或电脑使用的端口。",
   "REMOTE_ADDRESS_INVALID": "请输入主机名或 IP，端口不同时一并填写，例如 home.example.com 或 203.0.113.7:7333。",
-  "REMOTE_LISTEN_FAILED": "随处访问无法在端口 {{port}} 上监听。可能有其他程序正在使用它。"
+  "REMOTE_LISTEN_FAILED": "随处访问无法在端口 {{port}} 上监听。可能有其他程序正在使用它。",
+  "ROUTE_NOT_LOCAL": "请先在家里连接一次，以在此设备上设置随处访问。",
+  "ROUTE_FAILED": "无法在这台电脑上设置随处访问。"
 }

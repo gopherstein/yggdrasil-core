@@ -197,3 +197,23 @@ type RemoteReach struct {
 	// not_listening, carrier_nat, or no_port.
 	Reachable, Reason string
 }
+
+// handleRouteSecret gives a paired device the route secret, on the home
+// network only, never through the remote listener: devices paired before
+// access from anywhere get it here the first time they connect at home.
+func (s *Server) handleRouteSecret(w http.ResponseWriter, r *http.Request) {
+	if remoteRequest(r) || !auth.FromLocalNetwork(r) {
+		writeErr(w, http.StatusForbidden, "ROUTE_NOT_LOCAL", "the route secret is given only on the home network", nil)
+		return
+	}
+	if s.deps.RouteSecret == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Access from anywhere isn't available.", nil)
+		return
+	}
+	secret, route, err := s.deps.RouteSecret()
+	if err != nil {
+		writeErr(w, http.StatusInternalServerError, "ROUTE_FAILED", err.Error(), nil)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"route_secret": secret, "route_id": route})
+}

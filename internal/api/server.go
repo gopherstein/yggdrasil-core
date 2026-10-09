@@ -97,6 +97,9 @@ type Dependencies struct {
 	// ShowVersion shows a version of its point in a chat and returns the
 	// chat as shown (#447).
 	// RemoteReach is how the internet reaches access from anywhere (#456).
+	// RouteSecret is this computer's route secret for paired devices, and
+	// the route ID it makes (#456).
+	RouteSecret func() (secret, route string, err error)
 	RemoteReach func() RemoteReach
 	ShowVersion func(ctx context.Context, conversationID, messageID string) ([]contracts.Message, error)
 	Chat        func(w http.ResponseWriter, r *http.Request, conversationID, profileID, modelID, message string, stream bool, execution string) error
@@ -345,6 +348,7 @@ func (s *Server) routes() {
 	s.portalRoutes(api)
 	api.HandleFunc("/tls", s.handleTLS).Methods(http.MethodGet)
 	api.HandleFunc("/remote-access", s.handleRemoteAccess).Methods(http.MethodGet)
+	api.HandleFunc("/remote-access/route", s.handleRouteSecret).Methods(http.MethodGet)
 	s.notificationRoutes(api)
 	s.connectorRoutes(api)
 	s.mcpRoutes(api)
