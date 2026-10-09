@@ -1,6 +1,6 @@
 # Access from anywhere: design
 
-Status: in progress (#456). The remote listener and its setting have shipped; the rest is what the pieces build to.
+Status: in progress (#456). The remote listener, its setting, and router port mapping have shipped; the rest is what the pieces build to.
 
 The phone, tablet, TV, and watch apps reach a person's own Toskar from anywhere, not only on the home network, with no port forwarding, VPN, or dynamic DNS to set up. Like Plex remote access, the connection is direct whenever it can be, and Toskar's service mostly introduces the two ends. Everything stays end-to-end encrypted to the computer the app already trusts.
 

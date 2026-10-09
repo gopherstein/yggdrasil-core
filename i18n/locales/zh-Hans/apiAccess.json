@@ -138,12 +138,24 @@
   "remote": {
     "title": "随处访问",
     "body": "与这台电脑配对的设备在外也能访问它。它只通过 HTTPS、对这些设备的密钥，响应它们用到的功能。",
-    "listening": "正在端口 {{port}} 上监听。",
     "notListening": "未在端口 {{port}} 上监听：{{error}}",
     "port": "端口",
     "address": "转发地址（可选）",
     "addressExample": "home.example.com 或 203.0.113.7:7333",
     "save": "保存",
-    "notes": "目前，请在路由器上把端口 {{port}} 转发到这台电脑并填写访问地址，或使用 Tailscale。自动设置将在下一步提供。"
+    "notes": "开启期间，Toskar 会请路由器打开端口 {{port}}，关闭后会将其关闭。如果路由器不支持，请把端口转发到这台电脑并填写地址，或使用 Tailscale。",
+    "portMapping": "自动在路由器上打开端口",
+    "method": {
+      "pcp": "PCP",
+      "nat-pmp": "NAT-PMP",
+      "upnp": "UPnP"
+    },
+    "reach": {
+      "direct": "可在 {{address}} 随处访问。路由器已打开端口（{{method}}）。",
+      "ipv6": "如果路由器允许，可通过 IPv6 在 [{{address}}]:{{port}} 随处访问。",
+      "manual": "可通过你填写的地址 {{address}} 访问。",
+      "carrierNat": "暂时无法访问：你的网络服务商让许多家庭共用一个地址，路由器端口无法到达这台电脑。Toskar 的中继将解决这个问题。",
+      "noPort": "暂时无法访问：路由器没有打开端口 {{port}}。请把它转发到这台电脑并填写地址，或使用 Tailscale。"
+    }
   }
 }

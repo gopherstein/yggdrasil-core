@@ -138,12 +138,24 @@
   "remote": {
     "title": "Acesso de qualquer lugar",
     "body": "Dispositivos pareados com este computador podem acessá-lo fora de casa. Ele responde só ao que eles usam, por HTTPS, com as chaves deles.",
-    "listening": "Escutando na porta {{port}}.",
     "notListening": "Não está escutando na porta {{port}}: {{error}}",
     "port": "Porta",
     "address": "Endereço redirecionado (opcional)",
     "addressExample": "home.example.com ou 203.0.113.7:7333",
     "save": "Salvar",
-    "notes": "Por enquanto, redirecione a porta {{port}} do roteador para este computador e informe o endereço em que ele é acessado, ou use o Tailscale. A configuração automática vem depois."
+    "notes": "O Toskar pede ao roteador para abrir a porta {{port}} enquanto isto estiver ligado, e a fecha quando desligado. Se o roteador não conseguir, redirecione a porta para este computador e informe o endereço, ou use o Tailscale.",
+    "portMapping": "Abrir uma porta no roteador automaticamente",
+    "method": {
+      "pcp": "PCP",
+      "nat-pmp": "NAT-PMP",
+      "upnp": "UPnP"
+    },
+    "reach": {
+      "direct": "Acessível de qualquer lugar em {{address}}. O roteador abriu a porta ({{method}}).",
+      "ipv6": "Acessível de qualquer lugar por IPv6 em [{{address}}]:{{port}}, se o roteador permitir.",
+      "manual": "Acessível em {{address}}, o endereço que você informou.",
+      "carrierNat": "Ainda não acessível: seu provedor compartilha um endereço entre muitas casas, então uma porta do roteador não chega a este computador. O relay do Toskar vai resolver isso.",
+      "noPort": "Ainda não acessível: o roteador não abriu a porta {{port}}. Redirecione-a para este computador e informe o endereço, ou use o Tailscale."
+    }
   }
 }

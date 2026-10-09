@@ -50,6 +50,7 @@ import (
 	"github.com/yeixio/toskar-core/internal/orchestrator"
 	"github.com/yeixio/toskar-core/internal/orchestrator/builtin/simple"
 	"github.com/yeixio/toskar-core/internal/portals"
+	"github.com/yeixio/toskar-core/internal/portmap"
 	"github.com/yeixio/toskar-core/internal/profiles"
 	"github.com/yeixio/toskar-core/internal/pyenv"
 	"github.com/yeixio/toskar-core/internal/ratings"
@@ -111,6 +112,8 @@ type App struct {
 	Health           *modelhealth.Monitor
 	Mimir            *mimir.Store
 	Muninn           *muninn.Store
+	// portKeeper keeps the router port access from anywhere uses (#456).
+	portKeeper portmap.Keeper
 	// TopicLog keeps off-topic attempts (#345).
 	TopicLog *topiclog.Store
 	// Notifications is Gjallarhorn's notification center and delivery.
@@ -495,6 +498,7 @@ func New(opts Options) (*App, error) {
 			return convRepo.ListMessages(ctx, id)
 		},
 		ShowVersion: convRepo.ShowVersion,
+		RemoteReach: a.remoteReach,
 		GetSettings: func(ctx context.Context) (contracts.SettingsView, error) {
 			return a.settingsView(ctx)
 		},
@@ -1239,6 +1243,8 @@ func (a *App) Shutdown(ctx context.Context) error {
 
 	shutdownCtx, cancel := context.WithTimeout(ctx, 4*time.Second)
 	defer cancel()
+	// The router port goes when Toskar does.
+	a.portKeeper.Stop()
 	a.API.StopRemote()
 	_ = a.API.Shutdown(shutdownCtx)
 	_ = a.internal.Shutdown(shutdownCtx)
@@ -1292,7 +1298,8 @@ func (a *App) settingsView(ctx context.Context) (contracts.SettingsView, error) 
 		LogsDir: cfg.LogsDir, APIHost: cfg.APIHost, APIPort: cfg.APIPort,
 		LANAPIEnabled: cfg.LANAPIEnabled, WebUIEnabled: cfg.WebUIEnabled,
 		RemoteAccessEnabled: cfg.RemoteAccess.Enabled, RemoteAccessPort: cfg.RemotePort(), RemoteAccessAddress: cfg.RemoteAccess.Address,
-		DiscoveryEnabled: cfg.DiscoveryEnabled, NodeName: cfg.NodeName, NodeID: cfg.NodeID,
+		RemoteAccessPortMapping: !cfg.RemoteAccess.NoPortMapping,
+		DiscoveryEnabled:        cfg.DiscoveryEnabled, NodeName: cfg.NodeName, NodeID: cfg.NodeID,
 		AdvancedMode: advanced, ModelLifecycle: lifecycle, IdleUnloadMinutes: idleMins,
 		KeepRunningInBackground: keepBackground,
 		DefaultProfileID:        defaultProfile,
@@ -1491,6 +1498,9 @@ func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) erro
 			return errRemotePort
 		}
 		remote.Port, remoteTouched = port, true
+	}
+	if v, ok := patch["remote_access_port_mapping"].(bool); ok {
+		remote.NoPortMapping, remoteTouched = !v, true
 	}
 	if v, ok := patch["remote_access_address"].(string); ok {
 		addr, err := cleanRemoteAddress(v)

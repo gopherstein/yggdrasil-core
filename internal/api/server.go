@@ -96,6 +96,8 @@ type Dependencies struct {
 	ListMessages          func(ctx context.Context, conversationID string) ([]contracts.Message, error)
 	// ShowVersion shows a version of its point in a chat and returns the
 	// chat as shown (#447).
+	// RemoteReach is how the internet reaches access from anywhere (#456).
+	RemoteReach func() RemoteReach
 	ShowVersion func(ctx context.Context, conversationID, messageID string) ([]contracts.Message, error)
 	Chat        func(w http.ResponseWriter, r *http.Request, conversationID, profileID, modelID, message string, stream bool, execution string) error
 	// StopChat stops a conversation's running turn and reports whether one was running.

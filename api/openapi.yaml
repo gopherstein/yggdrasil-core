@@ -797,7 +797,7 @@ paths:
   /api/v1/remote-access:
     get:
       summary: Access from anywhere's setting and its listener (#456)
-      description: "enabled, port, address (a forwarded address, when set), and listening (the address it listens on) or error. Turn it on and set the port and address with PATCH /api/v1/settings: remote_access_enabled, remote_access_port, remote_access_address."
+      description: "enabled, port, address (a forwarded address, when set), listening (the address it listens on) or error, port_mapping, mapped and mapped_by (pcp, nat-pmp, or upnp) for the router port it opened, map_error, ipv6, and reachable (direct, ipv6, manual, or none) with reason (off, not_listening, carrier_nat, or no_port). Set it with PATCH /api/v1/settings: remote_access_enabled, remote_access_port, remote_access_address, remote_access_port_mapping."
       operationId: getRemoteAccess
       responses:
         "200":

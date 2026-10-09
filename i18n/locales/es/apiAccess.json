@@ -138,12 +138,24 @@
   "remote": {
     "title": "Acceso desde cualquier lugar",
     "body": "Los dispositivos vinculados con esta computadora pueden usarla fuera de casa. Solo responde lo que usan, por HTTPS y con sus claves.",
-    "listening": "Escuchando en el puerto {{port}}.",
     "notListening": "No escucha en el puerto {{port}}: {{error}}",
     "port": "Puerto",
     "address": "Dirección redirigida (opcional)",
     "addressExample": "home.example.com o 203.0.113.7:7333",
     "save": "Guardar",
-    "notes": "Por ahora, redirige el puerto {{port}} de tu router a esta computadora e indica la dirección con la que se llega a ella, o usa Tailscale. La configuración automática llegará después."
+    "notes": "Toskar pide a tu router que abra el puerto {{port}} mientras esto está activado, y lo cierra al desactivarlo. Si el router no puede, redirige el puerto a esta computadora e indica la dirección, o usa Tailscale.",
+    "portMapping": "Abrir un puerto en el router automáticamente",
+    "method": {
+      "pcp": "PCP",
+      "nat-pmp": "NAT-PMP",
+      "upnp": "UPnP"
+    },
+    "reach": {
+      "direct": "Accesible desde cualquier lugar en {{address}}. Tu router abrió el puerto ({{method}}).",
+      "ipv6": "Accesible desde cualquier lugar por IPv6 en [{{address}}]:{{port}}, si tu router lo permite.",
+      "manual": "Accesible en {{address}}, la dirección que indicaste.",
+      "carrierNat": "Aún no es accesible: tu proveedor comparte una dirección entre muchos hogares, así que un puerto del router no llega a esta computadora. El relé de Toskar se encargará de esto.",
+      "noPort": "Aún no es accesible: el router no abrió el puerto {{port}}. Redirígelo a esta computadora e indica la dirección, o usa Tailscale."
+    }
   }
 }

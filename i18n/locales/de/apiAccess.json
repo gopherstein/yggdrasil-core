@@ -138,12 +138,24 @@
   "remote": {
     "title": "Zugriff von überall",
     "body": "Mit diesem Computer gekoppelte Geräte erreichen ihn auch unterwegs. Er beantwortet nur, was sie nutzen, über HTTPS und mit ihren Schlüsseln.",
-    "listening": "Wartet auf Port {{port}}.",
     "notListening": "Wartet nicht auf Port {{port}}: {{error}}",
     "port": "Port",
     "address": "Weitergeleitete Adresse (optional)",
     "addressExample": "home.example.com oder 203.0.113.7:7333",
     "save": "Speichern",
-    "notes": "Leite vorerst Port {{port}} an deinem Router auf diesen Computer weiter und gib die Adresse ein, unter der er erreichbar ist, oder nutze Tailscale. Die automatische Einrichtung folgt."
+    "notes": "Toskar bittet deinen Router, Port {{port}} zu öffnen, solange dies an ist, und schließt ihn, wenn es aus ist. Kann der Router das nicht, leite den Port auf diesen Computer weiter und gib die Adresse ein, oder nutze Tailscale.",
+    "portMapping": "Automatisch einen Port am Router öffnen",
+    "method": {
+      "pcp": "PCP",
+      "nat-pmp": "NAT-PMP",
+      "upnp": "UPnP"
+    },
+    "reach": {
+      "direct": "Von überall erreichbar unter {{address}}. Dein Router hat den Port geöffnet ({{method}}).",
+      "ipv6": "Von überall über IPv6 erreichbar unter [{{address}}]:{{port}}, wenn dein Router das zulässt.",
+      "manual": "Erreichbar unter {{address}}, der Adresse, die du eingegeben hast.",
+      "carrierNat": "Noch nicht erreichbar: Dein Anbieter teilt eine Adresse unter vielen Haushalten, daher erreicht ein Router-Port diesen Computer nicht. Toskars Relay übernimmt das.",
+      "noPort": "Noch nicht erreichbar: Der Router hat Port {{port}} nicht geöffnet. Leite ihn auf diesen Computer weiter und gib die Adresse ein, oder nutze Tailscale."
+    }
   }
 }

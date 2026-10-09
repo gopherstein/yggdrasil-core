@@ -138,12 +138,24 @@
   "remote": {
     "title": "Accès de partout",
     "body": "Les appareils associés à cet ordinateur peuvent l'atteindre hors de chez vous. Il ne répond qu'à ce qu'ils utilisent, en HTTPS, avec leurs clés.",
-    "listening": "À l'écoute sur le port {{port}}.",
     "notListening": "Pas à l'écoute sur le port {{port}} : {{error}}",
     "port": "Port",
     "address": "Adresse redirigée (facultatif)",
     "addressExample": "home.example.com ou 203.0.113.7:7333",
     "save": "Enregistrer",
-    "notes": "Pour l'instant, redirigez le port {{port}} de votre box vers cet ordinateur et saisissez l'adresse à laquelle on le joint, ou utilisez Tailscale. La configuration automatique arrive ensuite."
+    "notes": "Toskar demande à votre box d'ouvrir le port {{port}} tant que ceci est activé, et le ferme quand c'est désactivé. Si la box ne peut pas, redirigez le port vers cet ordinateur et saisissez l'adresse, ou utilisez Tailscale.",
+    "portMapping": "Ouvrir un port sur la box automatiquement",
+    "method": {
+      "pcp": "PCP",
+      "nat-pmp": "NAT-PMP",
+      "upnp": "UPnP"
+    },
+    "reach": {
+      "direct": "Joignable de partout à {{address}}. Votre box a ouvert le port ({{method}}).",
+      "ipv6": "Joignable de partout en IPv6 à [{{address}}]:{{port}}, si votre box le laisse passer.",
+      "manual": "Joignable à {{address}}, l'adresse que vous avez saisie.",
+      "carrierNat": "Pas encore joignable : votre fournisseur partage une adresse entre de nombreux foyers, donc un port de la box n'atteint pas cet ordinateur. Le relais de Toskar s'en chargera.",
+      "noPort": "Pas encore joignable : la box n'a pas ouvert le port {{port}}. Redirigez-le vers cet ordinateur et saisissez l'adresse, ou utilisez Tailscale."
+    }
   }
 }
