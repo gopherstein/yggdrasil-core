@@ -812,6 +812,18 @@ paths:
           description: route_secret and route_id
         "403":
           description: ROUTE_NOT_LOCAL
+  /api/v1/remote-access/relay-token:
+    put:
+      summary: Hand over a subscription's relay token (#456)
+      description: "Body {token, enable}. token is the route token the app got for this computer by exchanging a store receipt with Toskar's relay; the computer keeps it and registers and keeps its tunnel there. A paired device may send it, from home or through the remote listener. enable also turns access from anywhere on, and needs an Admin (403 ROLE_REQUIRED). Answers state: the relay client's state, or off. 400 RELAY_TOKEN_INVALID for a token that isn't for this computer's route or has expired, RELAY_TOKEN_NOT_NEEDED when an organization's relay is set."
+      operationId: putRelayToken
+      responses:
+        "200":
+          description: The token is kept; state
+        "400":
+          description: RELAY_TOKEN_INVALID or RELAY_TOKEN_NOT_NEEDED
+        "403":
+          description: ROLE_REQUIRED, turning access from anywhere on without the admin role
   /api/v1/tls:
     get:
       summary: How the API speaks HTTPS on the local network (#213)

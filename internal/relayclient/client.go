@@ -102,7 +102,12 @@ type Status struct {
 func (c *Client) Status() Status {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return c.status
+	st := c.status
+	if st.State == "" {
+		// Started, and not yet heard from.
+		st.State = "connecting"
+	}
+	return st
 }
 
 func (c *Client) setState(state, errText string) {
@@ -190,22 +195,34 @@ func (c *Client) token(ctx context.Context, renew bool) (string, error) {
 // tokenExpiry reads a token's expiry without checking it; only the relay
 // can check its own signature.
 func tokenExpiry(tok string) time.Time {
-	rest, ok := strings.CutPrefix(tok, "rt1.")
-	if !ok {
-		return time.Time{}
+	_, exp, _ := ParseToken(tok)
+	return exp
+}
+
+// ParseToken reads a route token's route and expiry, without checking its
+// signature: only the relay that signed it can. ok is false for anything
+// that isn't a route token.
+func ParseToken(tok string) (route string, exp time.Time, ok bool) {
+	rest, found := strings.CutPrefix(strings.TrimSpace(tok), "rt1.")
+	if !found {
+		return "", time.Time{}, false
 	}
-	payload, _, _ := strings.Cut(rest, ".")
+	payload, sig, found := strings.Cut(rest, ".")
+	if !found || sig == "" {
+		return "", time.Time{}, false
+	}
 	raw, err := base64.RawURLEncoding.DecodeString(payload)
 	if err != nil {
-		return time.Time{}
+		return "", time.Time{}, false
 	}
 	var c struct {
-		Exp int64 `json:"exp"`
+		Route string `json:"route"`
+		Exp   int64  `json:"exp"`
 	}
-	if json.Unmarshal(raw, &c) != nil || c.Exp == 0 {
-		return time.Time{}
+	if json.Unmarshal(raw, &c) != nil || c.Exp == 0 || c.Route == "" {
+		return "", time.Time{}, false
 	}
-	return time.Unix(c.Exp, 0)
+	return c.Route, time.Unix(c.Exp, 0), true
 }
 
 func (c *Client) enroll(ctx context.Context) (string, error) {

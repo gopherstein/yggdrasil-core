@@ -202,6 +202,9 @@
   "REMOTE_LISTEN_FAILED": "O acesso de qualquer lugar não consegue escutar na porta {{port}}. Outro programa pode estar usando.",
   "RELAY_INVALID": "Digite o nome do relay, como relay.example.com, com uma porta só se não for a 443.",
   "RELAY_SECRET_INVALID": "Isso não é um segredo de inscrição. Copie-o do arquivo enroll.secret do relay.",
+  "RELAY_TOKEN_INVALID": "Esse token do relay não é deste computador ou já expirou. Assine de novo neste dispositivo.",
+  "RELAY_TOKEN_NOT_NEEDED": "Este computador usa o relay da sua organização, então não precisa de assinatura.",
+  "RELAY_TOKEN_FAILED": "Não foi possível salvar o token do relay neste computador.",
   "ROUTE_NOT_LOCAL": "Conecte-se uma vez em casa para configurar o acesso de qualquer lugar neste dispositivo.",
   "ROUTE_FAILED": "Não foi possível configurar o acesso de qualquer lugar neste computador."
 }

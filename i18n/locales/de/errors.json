@@ -202,6 +202,9 @@
   "REMOTE_LISTEN_FAILED": "Zugriff von überall kann nicht auf Port {{port}} warten. Vielleicht nutzt ihn ein anderes Programm.",
   "RELAY_INVALID": "Gib den Namen des Relays ein, etwa relay.example.com, mit Port nur, wenn er nicht 443 ist.",
   "RELAY_SECRET_INVALID": "Das ist kein Registrierungsschlüssel. Kopiere ihn aus der Datei enroll.secret des Relays.",
+  "RELAY_TOKEN_INVALID": "Dieses Relay-Token gilt nicht für diesen Computer oder ist abgelaufen. Schließe das Abo auf diesem Gerät erneut ab.",
+  "RELAY_TOKEN_NOT_NEEDED": "Dieser Computer nutzt das Relay deiner Organisation und braucht daher kein Abo.",
+  "RELAY_TOKEN_FAILED": "Das Relay-Token konnte auf diesem Computer nicht gespeichert werden.",
   "ROUTE_NOT_LOCAL": "Verbinde dich einmal zu Hause, um den Zugriff von überall auf diesem Gerät einzurichten.",
   "ROUTE_FAILED": "Der Zugriff von überall konnte auf diesem Computer nicht eingerichtet werden."
 }

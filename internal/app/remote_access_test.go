@@ -2,16 +2,20 @@ package app
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"io"
 	"log/slog"
 	"net/netip"
 	"testing"
+	"time"
 
 	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/config"
 	"github.com/yeixio/toskar-core/internal/portmap"
 	"github.com/yeixio/toskar-core/internal/relayclient"
+	"github.com/yeixio/toskar-core/internal/rendezvous"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
@@ -180,5 +184,54 @@ func TestRelaySettings(t *testing.T) {
 	t.Setenv("TOSKAR_RELAY_URL", "https://relay.localhost:7472/")
 	if got := relayName(a.Config.Get()); got != "relay.localhost:7472" {
 		t.Fatalf("from the environment: %s", got)
+	}
+}
+
+// A subscription's token from the app: only a current one for this
+// computer's route, never with an organization's relay, and kept for the
+// relay client (#456).
+func TestSetRelayToken(t *testing.T) {
+	t.Setenv("TOSKAR_DISCOVERY_ENABLED", "false")
+	dir := t.TempDir()
+	a, err := New(Options{DataDir: dir, Logger: slog.New(slog.NewTextHandler(io.Discard, nil))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = a.DB.Close() })
+	ctx := context.Background()
+	secrets := auth.NewSecretStore(dir)
+	routeSecret, err := rendezvous.RouteSecret(secrets)
+	if err != nil {
+		t.Fatal(err)
+	}
+	route := rendezvous.RouteID(routeSecret)
+	mint := func(r string, exp time.Time) string {
+		payload, _ := json.Marshal(map[string]any{"v": 1, "route": r, "exp": exp.Unix()})
+		return "rt1." + base64.RawURLEncoding.EncodeToString(payload) + ".sig"
+	}
+	for name, tok := range map[string]string{
+		"another route": mint("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", time.Now().Add(time.Hour)),
+		"expired":       mint(route, time.Now().Add(-time.Minute)),
+		"not a token":   "hello",
+	} {
+		if _, err := a.setRelayToken(ctx, tok, false); !errors.Is(err, errRelayToken) {
+			t.Errorf("%s: %v", name, err)
+		}
+	}
+	good := mint(route, time.Now().Add(30*24*time.Hour))
+	if state, err := a.setRelayToken(ctx, good, false); err != nil || state != "off" {
+		t.Fatalf("kept while off: %q %v", state, err)
+	}
+	if kept, _ := secrets.Read(relayclient.TokenName); kept != good {
+		t.Fatal("token not kept")
+	}
+	if _, err := a.setRelayToken(ctx, good, true); err != nil || !a.Config.Get().RemoteAccess.Enabled {
+		t.Fatalf("enable: %v", err)
+	}
+	if err := a.applySettingsPatch(ctx, map[string]any{"remote_access_relay": "relay.example.com"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := a.setRelayToken(ctx, good, false); !errors.Is(err, errRelayTokenOwn) {
+		t.Fatalf("with the organization's relay: %v", err)
 	}
 }

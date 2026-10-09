@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/yeixio/toskar-core/internal/auth"
 	"github.com/yeixio/toskar-core/internal/config"
@@ -25,8 +26,10 @@ import (
 const relaySecretName = "relay-enroll-secret"
 
 var (
-	errRelayName   = contracts.NewError("RELAY_INVALID", nil, errors.New("the relay is a host name, with a port when it isn't 443, such as relay.example.com"))
-	errRelaySecret = contracts.NewError("RELAY_SECRET_INVALID", nil, errors.New("that isn't an enrollment secret; copy it from the relay's enroll.secret file"))
+	errRelayToken    = contracts.NewError("RELAY_TOKEN_INVALID", nil, errors.New("that isn't a current relay token for this computer"))
+	errRelayTokenOwn = contracts.NewError("RELAY_TOKEN_NOT_NEEDED", nil, errors.New("this computer uses its organization's relay, which gives it its own token"))
+	errRelayName     = contracts.NewError("RELAY_INVALID", nil, errors.New("the relay is a host name, with a port when it isn't 443, such as relay.example.com"))
+	errRelaySecret   = contracts.NewError("RELAY_SECRET_INVALID", nil, errors.New("that isn't an enrollment secret; copy it from the relay's enroll.secret file"))
 )
 
 // relayName is the relay this computer uses: its setting, then
@@ -189,4 +192,37 @@ func (a *App) directAddresses() []string {
 		out = append(out, net.JoinHostPort(ip.String(), port))
 	}
 	return out
+}
+
+// setRelayToken keeps the route token the app got for this computer from a
+// store subscription (#456), for Toskar's relay, and starts using it; with
+// enable it turns access from anywhere on too (the caller is an Admin).
+func (a *App) setRelayToken(ctx context.Context, tok string, enable bool) (string, error) {
+	cfg := a.Config.Get()
+	if cfg.RemoteAccess.Relay != "" {
+		return "", errRelayTokenOwn
+	}
+	secrets := auth.NewSecretStore(cfg.DataDir)
+	routeSecret, err := rendezvous.RouteSecret(secrets)
+	if err != nil {
+		return "", err
+	}
+	route, exp, ok := relayclient.ParseToken(tok)
+	if !ok || route != rendezvous.RouteID(routeSecret) || !time.Now().Before(exp) {
+		return "", errRelayToken
+	}
+	if err := secrets.Write(relayclient.TokenName, strings.TrimSpace(tok)); err != nil {
+		return "", err
+	}
+	if enable && !cfg.RemoteAccess.Enabled {
+		if err := a.applySettingsPatch(ctx, map[string]any{"remote_access_enabled": true}); err != nil {
+			return "", err
+		}
+	} else {
+		a.applyRelay()
+	}
+	if _, st := a.relayStatus(); st != nil {
+		return st.State, nil
+	}
+	return "off", nil
 }

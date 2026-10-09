@@ -324,6 +324,12 @@ func TestNoToken(t *testing.T) {
 	}
 }
 
+func TestStatusBeforeRun(t *testing.T) {
+	if st := (&Client{}).Status(); st.State != "connecting" {
+		t.Fatalf("before running: %q", st.State)
+	}
+}
+
 func TestRouteAddress(t *testing.T) {
 	c := &Client{Relay: "relay.example.com", Secret: make([]byte, 32)}
 	if got := c.RouteAddress(); got != c.Route()+".relay.example.com:443" {
@@ -332,5 +338,18 @@ func TestRouteAddress(t *testing.T) {
 	c.Relay = "relay.localhost:7472"
 	if got := c.RouteAddress(); got != c.Route()+".relay.localhost:7472" {
 		t.Fatal(got)
+	}
+}
+
+func TestParseToken(t *testing.T) {
+	exp := time.Unix(1_800_000_000, 0)
+	route, got, ok := ParseToken(" " + fakeToken("abc", exp) + "\n")
+	if !ok || route != "abc" || !got.Equal(exp) {
+		t.Fatalf("parse: %q %v %v", route, got, ok)
+	}
+	for _, bad := range []string{"", "rt1.", "rt1.e30", "rt1.e30.sig", "rt2." + strings.TrimPrefix(fakeToken("abc", exp), "rt1."), fakeToken("", exp)} {
+		if _, _, ok := ParseToken(bad); ok {
+			t.Errorf("parsed %q", bad)
+		}
 	}
 }
