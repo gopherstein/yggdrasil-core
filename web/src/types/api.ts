@@ -622,6 +622,10 @@ export interface Message {
   created_at: string
   /** What an assistant answer drew on and did. */
   meta?: MessageMeta
+  /** The message this one follows (#447). */
+  parent_id?: string
+  /** The versions of this point, when a retry or an edit made more than one. */
+  versions?: { index: number; count: number; ids: string[] }
 }
 
 export interface SettingsView {
@@ -700,6 +704,12 @@ export interface ChatRequest {
   effort?: 'auto' | 'fast' | 'balanced' | 'thorough'
   /** The person's IANA time zone, for the date and time the answer uses; set by the api client. */
   time_zone?: string
+  /** Answer from this message, as a new version of the point after it (#447). */
+  parent_id?: string
+  /** Ask this answer's question again, as a new version of the answer. */
+  retry_of?: string
+  /** Send message in place of this one, as a new version of it. */
+  edit_of?: string
 }
 
 export interface StopChatResponse {

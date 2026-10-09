@@ -748,6 +748,21 @@ type Message struct {
 	Content        string       `json:"content"`
 	CreatedAt      time.Time    `json:"created_at"`
 	Meta           *MessageMeta `json:"meta,omitempty"`
+	// ParentID is the message this one follows (#447), or "" for the
+	// chat's first.
+	ParentID string `json:"parent_id,omitempty"`
+	// Versions are the versions of this point in the chat, when a retry or
+	// an edit made more than one.
+	Versions *MessageVersions `json:"versions,omitempty"`
+}
+
+// MessageVersions are the versions of one point in a chat (#447): the
+// messages with the same parent, oldest first, and which one this is.
+type MessageVersions struct {
+	// Index is this one's place, from 1.
+	Index int      `json:"index"`
+	Count int      `json:"count"`
+	IDs   []string `json:"ids"`
 }
 
 // GenerationMetrics is per-turn inference performance.

@@ -55,3 +55,28 @@ func From(ctx context.Context) *Options {
 	o, _ := ctx.Value(key{}).(*Options)
 	return o
 }
+
+// Branch is where in a chat a turn answers from (#447): after ParentID, as
+// a retry of the answer RetryOf, or with the edited message EditOf, each a
+// new version of that point. The zero Branch goes on at the end.
+type Branch struct {
+	ParentID string
+	RetryOf  string
+	EditOf   string
+}
+
+// Any reports a turn that answers from a point other than the end.
+func (b Branch) Any() bool { return b.ParentID != "" || b.RetryOf != "" || b.EditOf != "" }
+
+type branchKey struct{}
+
+// WithBranch carries where a turn answers from.
+func WithBranch(ctx context.Context, b Branch) context.Context {
+	return context.WithValue(ctx, branchKey{}, b)
+}
+
+// BranchFrom is where a turn answers from; the zero Branch is the end.
+func BranchFrom(ctx context.Context) Branch {
+	b, _ := ctx.Value(branchKey{}).(Branch)
+	return b
+}

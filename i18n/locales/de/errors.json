@@ -192,5 +192,7 @@
   "NAME_INVALID": "Ein Name hat 1 bis 80 Zeichen.",
   "PERSON_NOT_FOUND": "Diese Person gibt es hier nicht.",
   "ROLE_REQUIRED": "Dafür ist die Rolle {{role}} nötig.",
-  "CROSS_SITE": "Diese Änderung kam nicht von Toskars eigenen Seiten und wurde abgelehnt."
+  "CROSS_SITE": "Diese Änderung kam nicht von Toskars eigenen Seiten und wurde abgelehnt.",
+  "MESSAGE_NOT_FOUND": "Diese Nachricht ist nicht mehr in diesem Chat. Lade den Chat neu und versuche es noch einmal.",
+  "INVALID_BRANCH": "Sende genau eines von parent_id, retry_of oder edit_of, mit der conversation_id des Chats."
 }

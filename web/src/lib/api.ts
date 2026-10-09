@@ -892,6 +892,12 @@ export const api = {
   getMessages: (conversationId: string) =>
     request<Message[]>(`/api/v1/conversations/${conversationId}/messages`),
 
+  /** Show a version of its point in a chat, with what followed it; returns the chat as shown (#447). */
+  showMessageVersion: (conversationId: string, messageId: string) =>
+    request<Message[]>(`/api/v1/conversations/${conversationId}/messages/${encodeURIComponent(messageId)}/shown`, {
+      method: 'PUT',
+    }),
+
   sendChat: (body: ChatRequest) =>
     request<ChatResponse>('/api/v1/chat', {
       method: 'POST',

@@ -1,5 +1,5 @@
 {
-  "version": "1.18",
+  "version": "1.19",
   "types": {
     "ActivityStep": [
       "kind",
@@ -101,7 +101,9 @@
       "created_at",
       "id",
       "meta",
-      "role"
+      "parent_id",
+      "role",
+      "versions"
     ],
     "MessageMeta": [
       "automation",
