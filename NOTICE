@@ -18,4 +18,7 @@ Source for this program is the toskar-core repository. A running daemon offers i
 Third-party components remain under their own licenses, including the
 Go module dependencies in go.mod, the web UI dependencies in
 web/package.json, and llama.cpp builds that the daemon downloads when
-a user installs that runtime.
+a user installs that runtime. The Noto Sans fonts built into made PDFs
+(internal/artifacts/fonts), and the Noto Sans Chinese, Japanese, and
+Korean fonts downloaded when a PDF first needs one, are under the SIL
+Open Font License 1.1 (internal/artifacts/fonts/OFL.txt).

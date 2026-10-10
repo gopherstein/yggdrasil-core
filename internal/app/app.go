@@ -846,7 +846,7 @@ func New(opts Options) (*App, error) {
 	})
 	a.summarizer = &muninn.Summarizer{Store: a.Muninn}
 	a.API.BindMemory(a.Muninn)
-	a.Tools.Register(&artifacts.CreateTool{Store: a.Artifacts})
+	a.Tools.Register(&artifacts.CreateTool{Store: a.Artifacts, Fonts: &artifacts.Fonts{Dir: filepath.Join(cfg.DataDir, "fonts")}})
 	a.Tools.Register(&artifacts.AnalyzeTool{Store: a.Artifacts})
 	a.Tools.Register(&scheduleTool{app: a})
 	a.API.BindArtifacts(a.Artifacts)

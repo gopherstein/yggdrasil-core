@@ -39,6 +39,9 @@ func conversationFrom(ctx context.Context) string {
 // computer changes.
 type CreateTool struct {
 	Store *Store
+	// Fonts has the fonts Chinese, Japanese, and Korean PDFs need; without
+	// it those characters are shown as "?".
+	Fonts *Fonts
 }
 
 func (t *CreateTool) ID() string          { return "files.create" }
@@ -82,7 +85,7 @@ func (t *CreateTool) Execute(ctx context.Context, args map[string]any) (map[stri
 	case ".docx":
 		data, err = MarkdownToDOCX(content)
 	case ".pdf":
-		data, err = MarkdownToPDF(content)
+		data, err = t.Fonts.MarkdownToPDF(ctx, content)
 	}
 	if err != nil {
 		return nil, err

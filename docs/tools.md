@@ -31,7 +31,7 @@ When a question needs current information and the profile allows web search with
 | Asked for | Written from | Notes |
 | --- | --- | --- |
 | Word document (`.docx`) | Markdown | Headings, bold, italic, code, lists, tables, code blocks, quotes, and rules |
-| PDF (`.pdf`) | Markdown | A4, the same elements, page numbers on longer documents. It uses the PDF standard fonts, so characters outside Western European text show as `?` |
+| PDF (`.pdf`) | Markdown | A4, the same elements, page numbers on longer documents. Text is in Noto Sans, embedded with only the characters used, so accents, Greek, and Cyrillic show. The first PDF with Chinese, Japanese, or Korean text downloads that font (6–11 MB) into the data folder's `fonts`; later ones use it. Characters no font has, such as some math symbols, show as `?` |
 | Spreadsheet (`.xlsx`) | CSV text | A line `## Sheet: Name` starts another sheet; a cell starting with `=` is a formula, such as `=SUM(B2:B9)`; numbers are stored as numbers |
 | Markdown, text, HTML, JSON, CSV, code | Itself | |
 
