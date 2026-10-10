@@ -1,6 +1,6 @@
 # Deliberate: design
 
-Status: in progress (#459). In: the reasoning cases and their report; per-call temperatures and token caps; the `drafter` and `judge` roles; drafts with the short-answer vote, and cross-examination and the judge for drafts that disagree, behind `deliberate: always`; and the web app's setting and drafts view. Next: the measurements, Auto, and the phone.
+Status: in progress (#459). In: the reasoning cases and their report; per-call temperatures and token caps; the `drafter` and `judge` roles; drafts with the short-answer vote, and cross-examination and the judge for drafts that disagree, behind `deliberate: always`; the setting and drafts view in the web app, and the drafts view on the phone; and the user guide's section. Next: the measurements, the `Reasoning` kind, and Auto.
 
 Several models answer the same question independently, check each other's reasoning, and a judge writes the final answer, saying so where they still disagree. For a short answer, such as a number or one fact, the cheaper path is a vote. It's opt-in, and it's measured before Auto ever turns it on.
 
