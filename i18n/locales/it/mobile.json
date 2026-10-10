@@ -296,6 +296,21 @@
       "next": "Versione successiva",
       "position": "{{index}} / {{count}}",
       "positionLabel": "Versione {{index}} di {{count}}"
+    },
+    "select": {
+      "start": "Seleziona",
+      "selected_one": "{{count}} selezionata",
+      "selected_other": "{{count}} selezionate",
+      "selected_many": "{{count}} selezionate",
+      "all": "Seleziona tutto",
+      "none": "Deseleziona tutto",
+      "delete_one": "Elimina {{count}}",
+      "delete_other": "Elimina {{count}}",
+      "delete_many": "Elimina {{count}}",
+      "confirm_one": "Eliminare {{count}} chat?",
+      "confirm_other": "Eliminare {{count}} chat?",
+      "confirm_many": "Eliminare {{count}} chat?",
+      "confirmBody": "I loro messaggi, allegati e file generati vengono rimossi. Le chat sul tuo computer vengono rimosse anche lì."
     }
   },
   "effort": {

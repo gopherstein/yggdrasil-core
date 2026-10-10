@@ -296,6 +296,21 @@
       "next": "Version suivante",
       "position": "{{index}} / {{count}}",
       "positionLabel": "Version {{index}} sur {{count}}"
+    },
+    "select": {
+      "start": "Sélectionner",
+      "selected_one": "{{count}} sélectionnée",
+      "selected_other": "{{count}} sélectionnées",
+      "selected_many": "{{count}} sélectionnées",
+      "all": "Tout sélectionner",
+      "none": "Ne rien sélectionner",
+      "delete_one": "Supprimer {{count}}",
+      "delete_other": "Supprimer {{count}}",
+      "delete_many": "Supprimer {{count}}",
+      "confirm_one": "Supprimer {{count}} discussion ?",
+      "confirm_other": "Supprimer {{count}} discussions ?",
+      "confirm_many": "Supprimer {{count}} discussions ?",
+      "confirmBody": "Leurs messages, pièces jointes et fichiers générés sont supprimés. Les discussions de votre ordinateur y sont aussi supprimées."
     }
   },
   "effort": {

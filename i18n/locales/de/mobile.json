@@ -296,6 +296,18 @@
       "next": "Nächste Version",
       "position": "{{index}} / {{count}}",
       "positionLabel": "Version {{index}} von {{count}}"
+    },
+    "select": {
+      "start": "Auswählen",
+      "selected_one": "{{count}} ausgewählt",
+      "selected_other": "{{count}} ausgewählt",
+      "all": "Alle auswählen",
+      "none": "Keine auswählen",
+      "delete_one": "{{count}} löschen",
+      "delete_other": "{{count}} löschen",
+      "confirm_one": "{{count}} Chat löschen?",
+      "confirm_other": "{{count}} Chats löschen?",
+      "confirmBody": "Ihre Nachrichten, Anhänge und erzeugten Dateien werden entfernt. Chats auf deinem Computer werden auch dort entfernt."
     }
   },
   "effort": {

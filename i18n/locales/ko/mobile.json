@@ -296,6 +296,15 @@
       "next": "다음 버전",
       "position": "{{index}} / {{count}}",
       "positionLabel": "버전 {{index}}/{{count}}"
+    },
+    "select": {
+      "start": "선택",
+      "selected_other": "{{count}}개 선택됨",
+      "all": "모두 선택",
+      "none": "선택 해제",
+      "delete_other": "{{count}}개 삭제",
+      "confirm_other": "채팅 {{count}}개를 삭제할까요?",
+      "confirmBody": "메시지, 첨부 파일, 생성된 파일도 삭제됩니다. 컴퓨터에 있는 채팅은 컴퓨터에서도 삭제됩니다."
     }
   },
   "effort": {
