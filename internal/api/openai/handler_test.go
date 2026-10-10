@@ -145,6 +145,7 @@ type scriptChat struct {
 	execution string
 	effort    huginn.Effort
 	opts      *turnopts.Options
+	sampling  pluginapi.GenerateOptions
 	// emit runs during the turn, as the orchestrator would.
 	emit func(o *turnopts.Options)
 }
@@ -157,6 +158,7 @@ func (s *scriptChat) RunChat(ctx context.Context, profileID, conversationID, mes
 	s.execution = execution
 	s.effort = huginn.EffortFrom(ctx)
 	s.opts = turnopts.From(ctx)
+	s.sampling = pluginapi.AnswerOptionsFrom(ctx)
 	if s.err != nil {
 		return nil, s.err
 	}
@@ -180,6 +182,36 @@ func sawEvent(ch <-chan events.Event, eventType string) bool {
 			}
 		default:
 			return false
+		}
+	}
+}
+
+// temperature and max_tokens reach the turn as the answer's options (#70);
+// unset, the model's defaults stand; 0 is greedy, and out of range is refused.
+func TestChatCompletionsSampling(t *testing.T) {
+	h := testHandler(t)
+	chat := &scriptChat{chunks: []pluginapi.ChatChunk{{Content: "ok", Done: true}}}
+	h.Chat = chat
+	call := func(extra string) int {
+		rec := httptest.NewRecorder()
+		body := `{"model":"profile:general","messages":[{"role":"user","content":"hi"}]` + extra + `}`
+		h.HandleChatCompletions(rec, httptest.NewRequest(http.MethodPost, "/v1/chat/completions", strings.NewReader(body)))
+		return rec.Code
+	}
+	for extra, want := range map[string]pluginapi.GenerateOptions{
+		``:                                   {},
+		`,"temperature":0.7,"max_tokens":64`: {Temperature: 0.7, MaxTokens: 64},
+		`,"temperature":0`:                   {Temperature: pluginapi.GreedyTemperature},
+		`,"max_completion_tokens":32`:        {MaxTokens: 32},
+	} {
+		chat.sampling = pluginapi.GenerateOptions{Temperature: 99}
+		if code := call(extra); code != http.StatusOK || chat.sampling != want {
+			t.Errorf("%q: %d, options %+v, want %+v", extra, code, chat.sampling, want)
+		}
+	}
+	for _, bad := range []string{`,"temperature":2.5`, `,"temperature":-1`, `,"max_tokens":-5`} {
+		if code := call(bad); code != http.StatusBadRequest {
+			t.Errorf("%q: %d, want 400", bad, code)
 		}
 	}
 }

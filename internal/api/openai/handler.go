@@ -3,6 +3,7 @@ package openai
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -41,11 +42,15 @@ type Handler struct {
 }
 
 type chatCompletionRequest struct {
-	Model       string                  `json:"model"`
-	Messages    []pluginapi.ChatMessage `json:"messages"`
-	Stream      bool                    `json:"stream"`
-	Temperature float64                 `json:"temperature"`
-	MaxTokens   int                     `json:"max_tokens"`
+	Model    string                  `json:"model"`
+	Messages []pluginapi.ChatMessage `json:"messages"`
+	Stream   bool                    `json:"stream"`
+	// Temperature (0 to 2) and MaxTokens apply to the calls that write the
+	// answer (#70); unset, the model's defaults stand. MaxCompletionTokens
+	// is OpenAI's newer name for MaxTokens.
+	Temperature         *float64 `json:"temperature"`
+	MaxTokens           int      `json:"max_tokens"`
+	MaxCompletionTokens int      `json:"max_completion_tokens"`
 	// ReasoningEffort is OpenAI's low, medium, or high.
 	ReasoningEffort string `json:"reasoning_effort"`
 	// Toskar holds the assistant's own controls (§62). Yggdrasil is its name
@@ -130,6 +135,29 @@ func (h *Handler) HandleModels(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, map[string]any{"object": "list", "data": data})
 }
 
+// sampling is the request's temperature and token cap for the answer, as
+// GenerateOptions: temperature 0 is greedy, which the zero value can't say.
+func (req chatCompletionRequest) sampling() (pluginapi.GenerateOptions, error) {
+	var o pluginapi.GenerateOptions
+	if t := req.Temperature; t != nil {
+		if *t < 0 || *t > 2 {
+			return o, errors.New("temperature must be between 0 and 2")
+		}
+		o.Temperature = *t
+		if *t == 0 {
+			o.Temperature = pluginapi.GreedyTemperature
+		}
+	}
+	o.MaxTokens = req.MaxTokens
+	if req.MaxCompletionTokens > 0 {
+		o.MaxTokens = req.MaxCompletionTokens
+	}
+	if o.MaxTokens < 0 || req.MaxCompletionTokens < 0 {
+		return o, errors.New("max_tokens must be positive")
+	}
+	return o, nil
+}
+
 // HandleChatCompletions routes profile:ID to orchestrator chat.
 func (h *Handler) HandleChatCompletions(w http.ResponseWriter, r *http.Request) {
 	perms := auth.DefaultAPIKeyPermissions()
@@ -151,6 +179,11 @@ func (h *Handler) HandleChatCompletions(w http.ResponseWriter, r *http.Request) 
 	var req chatCompletionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, http.StatusBadRequest, "INVALID_JSON", "invalid request body")
+		return
+	}
+	sampling, err := req.sampling()
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "INVALID_REQUEST", err.Error())
 		return
 	}
 	profileID := ""
@@ -229,6 +262,9 @@ func (h *Handler) HandleChatCompletions(w http.ResponseWriter, r *http.Request) 
 		}
 	}
 	ctx := turnopts.With(r.Context(), opts)
+	if sampling != (pluginapi.GenerateOptions{}) {
+		ctx = pluginapi.WithAnswerOptions(ctx, sampling)
+	}
 	if effort != "" {
 		ctx = huginn.WithEffort(ctx, huginn.ParseEffort(effort))
 	}

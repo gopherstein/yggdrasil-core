@@ -33,8 +33,8 @@ func (c *Client) Chat(ctx context.Context, req pluginapi.ChatRequest) (<-chan pl
 		"messages": req.Messages,
 		"stream":   req.Stream,
 	}
-	if req.Temperature > 0 {
-		body["temperature"] = req.Temperature
+	if t, ok := pluginapi.SamplingTemperature(req.Temperature); ok {
+		body["temperature"] = t
 	}
 	if req.MaxTokens > 0 {
 		body["max_tokens"] = req.MaxTokens

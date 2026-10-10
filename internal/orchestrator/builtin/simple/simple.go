@@ -234,9 +234,15 @@ func (o *Orchestrator) Run(
 		// reference, and no tool loop.
 		toolsOn := len(tools.Enabled(profile, nil)) > 0 && !profile.ModelCallsNoTools
 		nodeID, _ := env.NodeForRole(role)
+		// The calls that write the answer take the caller's temperature
+		// and token cap, when it sent them (#70).
+		answerCtx := ctx
+		if o := pluginapi.AnswerOptionsFrom(ctx); o != (pluginapi.GenerateOptions{}) {
+			answerCtx = pluginapi.WithGenerateOptions(ctx, o)
+		}
 
 		if jsonOnly {
-			content, m, err := generateText(ctx, env, role, messages)
+			content, m, err := generateText(answerCtx, env, role, messages)
 			if err != nil {
 				ch <- pluginapi.OrchestrationEvent{Type: "agent.error", Role: role, Error: err.Error(), Done: true}
 				return
@@ -278,7 +284,7 @@ func (o *Orchestrator) Run(
 		triedMedia := false
 
 		for {
-			content, m, err := generateText(ctx, env, role, messages)
+			content, m, err := generateText(answerCtx, env, role, messages)
 			if err != nil {
 				if content != "" {
 					ch <- pluginapi.OrchestrationEvent{Type: "agent.message", Role: role, NodeID: nodeID, Content: content}
