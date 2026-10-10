@@ -93,7 +93,9 @@ type Dependencies struct {
 	CreateConversation    func(ctx context.Context, title, profileID, modelID string) (contracts.Conversation, error)
 	UpdateConversation    func(ctx context.Context, id string, title, profileID, modelID *string, memoryOff *bool) (contracts.Conversation, error)
 	DeleteConversation    func(ctx context.Context, id string) error
-	ListMessages          func(ctx context.Context, conversationID string) ([]contracts.Message, error)
+	// DeleteConversations deletes several of the caller's chats at once (#452).
+	DeleteConversations func(ctx context.Context, ids []string) (contracts.ConversationsDeleted, error)
+	ListMessages        func(ctx context.Context, conversationID string) ([]contracts.Message, error)
 	// ShowVersion shows a version of its point in a chat and returns the
 	// chat as shown (#447).
 	// RemoteReach is how the internet reaches access from anywhere (#456).
@@ -342,6 +344,7 @@ func (s *Server) routes() {
 	api.HandleFunc("/logs/{name}", s.handleGetLog).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/conversations", s.handleListConversations).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/conversations", s.handleCreateConversation).Methods(http.MethodPost)
+	api.HandleFunc("/conversations/delete", s.handleDeleteConversations).Methods(http.MethodPost)
 	api.HandleFunc("/conversations/{id}", s.handleUpdateConversation).Methods(http.MethodPatch)
 	api.HandleFunc("/conversations/{id}", s.handleDeleteConversation).Methods(http.MethodDelete)
 	api.HandleFunc("/events", s.handleSSE).Methods(http.MethodGet, http.MethodOptions)
@@ -1149,6 +1152,42 @@ func (s *Server) handleDeleteConversation(w http.ResponseWriter, r *http.Request
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// maxBulkDelete is the most chats one bulk delete takes.
+const maxBulkDelete = 1000
+
+// handleDeleteConversations deletes several of the caller's chats in one
+// request (#452), with the ownership checks a single delete has: another
+// person's chat is skipped as not found.
+func (s *Server) handleDeleteConversations(w http.ResponseWriter, r *http.Request) {
+	if s.deps.DeleteConversations == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Conversations are not available yet.", nil)
+		return
+	}
+	var req contracts.ConversationsDeleteRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "Request body must be valid JSON.", nil)
+		return
+	}
+	ids := make([]string, 0, len(req.IDs))
+	seen := map[string]bool{}
+	for _, id := range req.IDs {
+		if id = strings.TrimSpace(id); id != "" && !seen[id] {
+			seen[id] = true
+			ids = append(ids, id)
+		}
+	}
+	if len(ids) == 0 || len(ids) > maxBulkDelete {
+		writeErr(w, http.StatusBadRequest, "INVALID_CONVERSATION_IDS", fmt.Sprintf("Name 1 to %d chats to delete.", maxBulkDelete), map[string]any{"max": maxBulkDelete})
+		return
+	}
+	out, err := s.deps.DeleteConversations(r.Context(), ids)
+	if err != nil {
+		writeErrFrom(w, http.StatusInternalServerError, "CONVERSATION_DELETE_FAILED", err)
+		return
+	}
+	writeJSON(w, http.StatusOK, out)
 }
 
 func (s *Server) handleSSE(w http.ResponseWriter, r *http.Request) {

@@ -23,6 +23,7 @@
   "CONVERSATIONS_LIST_FAILED": "Impossible d'afficher vos discussions.",
   "CONVERSATION_CREATE_FAILED": "Impossible de démarrer une nouvelle discussion.",
   "CONVERSATION_DELETE_FAILED": "{{detail}}",
+  "INVALID_CONVERSATION_IDS": "Indiquez de 1 à {{max}} discussions à supprimer.",
   "CONVERSATION_UPDATE_FAILED": "{{detail}}",
   "CREATE_FAILED": "{{detail}}",
   "DECIDE_FAILED": "{{detail}}",

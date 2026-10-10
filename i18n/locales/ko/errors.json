@@ -23,6 +23,7 @@
   "CONVERSATIONS_LIST_FAILED": "채팅 목록을 불러올 수 없어요.",
   "CONVERSATION_CREATE_FAILED": "새 채팅을 시작할 수 없어요.",
   "CONVERSATION_DELETE_FAILED": "{{detail}}",
+  "INVALID_CONVERSATION_IDS": "삭제할 채팅을 1~{{max}}개 지정하세요.",
   "CONVERSATION_UPDATE_FAILED": "{{detail}}",
   "CREATE_FAILED": "{{detail}}",
   "DECIDE_FAILED": "{{detail}}",

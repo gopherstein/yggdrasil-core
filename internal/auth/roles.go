@@ -49,6 +49,7 @@ var visitorRoutes = map[string]bool{
 	"POST /api/v1/conversations":                          true,
 	"PATCH /api/v1/conversations/{id}":                    true,
 	"DELETE /api/v1/conversations/{id}":                   true,
+	"POST /api/v1/conversations/delete":                   true,
 	"GET /api/v1/conversations/{id}/messages":             true,
 	"PUT /api/v1/conversations/{id}/messages/{mid}/shown": true,
 	"GET /api/v1/conversations/{id}/artifacts":            true,

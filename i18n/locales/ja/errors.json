@@ -23,6 +23,7 @@
   "CONVERSATIONS_LIST_FAILED": "チャットの一覧を取得できませんでした。",
   "CONVERSATION_CREATE_FAILED": "新しいチャットを開始できませんでした。",
   "CONVERSATION_DELETE_FAILED": "{{detail}}",
+  "INVALID_CONVERSATION_IDS": "削除するチャットを 1〜{{max}} 件指定してください。",
   "CONVERSATION_UPDATE_FAILED": "{{detail}}",
   "CREATE_FAILED": "{{detail}}",
   "DECIDE_FAILED": "{{detail}}",
