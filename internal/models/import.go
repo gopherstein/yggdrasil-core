@@ -38,6 +38,9 @@ type Imported struct {
 	// Copying is set while the file is copied in the background; its
 	// progress comes as model.download events, as a download's does.
 	Copying bool
+	// Projector is a vision projector found beside the file, to offer as
+	// its image support (see SetProjector).
+	Projector string
 }
 
 // ImportFile adds a GGUF file on this computer as a model: checked first,
@@ -97,6 +100,9 @@ func (m *Manager) importChecked(ctx context.Context, req ImportRequest, path str
 	entry := importEntry(req, details, filepath.Base(path), uint64(st.Size()))
 	entry.ID = m.freeID(ctx, entry.ID, path)
 	out := Imported{ID: entry.ID, Details: details}
+	if !uploaded {
+		out.Projector = projectorNear(path)
+	}
 
 	m.catalog.Upsert(entry)
 	if err := m.storage.UpsertCatalogEntry(ctx, entry); err != nil {
@@ -360,4 +366,136 @@ func fileSHA256(path string) (string, error) {
 		return "", err
 	}
 	return hex.EncodeToString(h.Sum(nil)), nil
+}
+
+// editableTags are the tags a person can give a model they added: Auto
+// sends coding requests to one tagged coding (#467). Vision comes with a
+// projector, not a tag.
+var editableTags = map[string]bool{"general": true, "coding": true, "reasoning": true, "writing": true}
+
+// UpdateAdded renames or retags a model added from a file or a link; a
+// catalog model keeps its own.
+func (m *Manager) UpdateAdded(ctx context.Context, id string, displayName *string, tags []string) (CatalogEntry, error) {
+	entry, ok := m.catalog.Get(id)
+	if !ok {
+		return CatalogEntry{}, contracts.Errorf("MODEL_NOT_FOUND", map[string]any{"model_id": id}, "no model %q", id)
+	}
+	if !entry.Dynamic {
+		return CatalogEntry{}, contracts.Errorf("MODEL_NOT_EDITABLE", nil, "only a model you added can be renamed")
+	}
+	if displayName != nil {
+		name := strings.TrimSpace(*displayName)
+		if name == "" || len(name) > 120 {
+			return CatalogEntry{}, contracts.Errorf("MODEL_NAME_INVALID", nil, "give the model a name of 1 to 120 characters")
+		}
+		entry.DisplayName = name
+	}
+	if tags != nil {
+		kept := []string{}
+		for _, t := range tags {
+			if t = strings.ToLower(strings.TrimSpace(t)); editableTags[t] && !contains(kept, t) {
+				kept = append(kept, t)
+			}
+		}
+		if contains(entry.Tags, "vision") {
+			kept = append(kept, "vision")
+		}
+		if len(kept) == 0 {
+			kept = []string{"general"}
+		}
+		entry.Tags = kept
+	}
+	m.catalog.Upsert(entry)
+	return entry, m.storage.UpsertCatalogEntry(ctx, entry)
+}
+
+// SetProjector gives a model its vision projector (llama.cpp's mmproj), a
+// GGUF file on this computer, so it can see pictures (#467). The file is
+// copied beside the model.
+func (m *Manager) SetProjector(ctx context.Context, id, path string) error {
+	entry, ok := m.catalog.Get(id)
+	if !ok {
+		return contracts.Errorf("MODEL_NOT_FOUND", map[string]any{"model_id": id}, "no model %q", id)
+	}
+	if installed, _, err := m.storage.IsInstalled(ctx, id); err != nil || !installed {
+		return contracts.Errorf("MODEL_NOT_INSTALLED", map[string]any{"model_id": id}, "model %q not installed", id)
+	}
+	p := filepath.Clean(strings.TrimSpace(path))
+	if !filepath.IsAbs(p) {
+		return contracts.Errorf("MODEL_FILE_INVALID", map[string]any{"detail": "the path must be absolute"}, "give the file's full path")
+	}
+	if !strings.EqualFold(filepath.Ext(p), ".gguf") && !m.foundProjector(ctx, p) {
+		return contracts.Errorf("MODEL_FILE_INVALID", map[string]any{"detail": "only .gguf files"}, "only .gguf files can be added")
+	}
+	d, err := gguf.Inspect(p)
+	if err != nil {
+		return contracts.Errorf("MODEL_FILE_INVALID", map[string]any{"detail": err.Error()}, "this isn't a file Toskar can use: %v", err)
+	}
+	if !d.Projector() {
+		return contracts.Errorf("MODEL_FILE_NOT_PROJECTOR", nil, "this is a model, not a vision projector")
+	}
+	temp := m.storage.ProjectorTempPath(id)
+	if err := os.MkdirAll(filepath.Dir(temp), 0o755); err != nil {
+		return err
+	}
+	if err := copyPlain(p, temp); err != nil {
+		_ = os.Remove(temp)
+		return err
+	}
+	if err := os.Rename(temp, m.storage.ProjectorPath(id)); err != nil {
+		return err
+	}
+	st, _ := os.Stat(m.storage.ProjectorPath(id))
+	size := uint64(0)
+	if st != nil {
+		size = uint64(st.Size())
+	}
+	entry.Projector = &ModelFile{SizeBytes: size}
+	entry.Capabilities.Vision = true
+	if !contains(entry.Tags, "vision") {
+		entry.Tags = append(entry.Tags, "vision")
+	}
+	m.catalog.Upsert(entry)
+	return m.storage.UpsertCatalogEntry(ctx, entry)
+}
+
+// projectorNear is a vision projector in the same folder as a model file,
+// the way LM Studio and Hugging Face keep them, or "".
+func projectorNear(model string) string {
+	matches, _ := filepath.Glob(filepath.Join(filepath.Dir(model), "*.gguf"))
+	for _, p := range matches {
+		if p == model || !strings.Contains(strings.ToLower(filepath.Base(p)), "mmproj") {
+			continue
+		}
+		if d, err := gguf.Inspect(p); err == nil && d.Projector() {
+			return p
+		}
+	}
+	return ""
+}
+
+func copyPlain(src, dst string) error {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+	out, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	if _, err := io.Copy(out, in); err != nil {
+		out.Close()
+		return err
+	}
+	return out.Close()
+}
+
+func contains(list []string, s string) bool {
+	for _, v := range list {
+		if v == s {
+			return true
+		}
+	}
+	return false
 }

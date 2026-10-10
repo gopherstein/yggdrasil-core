@@ -347,6 +347,22 @@
       "works": "可以使用",
       "speed": "每秒 {{speed}} 個 token",
       "failed": "沒有回答：{{error}}"
+    },
+    "details": {
+      "name": "名稱",
+      "tags": "擅長",
+      "tag": {
+        "general": "日常問題",
+        "coding": "程式設計",
+        "reasoning": "推理",
+        "writing": "寫作"
+      },
+      "tagsHint": "聊天設為「自動」時，程式設計請求會交給擅長程式設計的模型。",
+      "save": "儲存",
+      "saved": "已儲存",
+      "visionOffer": "在它旁邊找到了圖片支援檔案，加入後它就能看圖片：",
+      "visionAdd": "加入圖片支援",
+      "visionOn": "已加入圖片支援：它可以看圖片了。"
     }
   }
 }

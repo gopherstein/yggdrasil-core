@@ -588,6 +588,8 @@ func New(opts Options) (*App, error) {
 		ModelUploadPath:       a.Models.UploadPath,
 		AdoptModelUpload:      a.Models.AdoptUpload,
 		FindModelsInOtherApps: a.Models.FindOtherApps,
+		UpdateAddedModel:      a.Models.UpdateAdded,
+		SetModelProjector:     a.Models.SetProjector,
 		ListRunningModels:     a.listRunningAll,
 		Acceleration:          a.healthAcceleration,
 		StartModel: func(ctx context.Context, id, nodeID string) (contracts.RunningModelView, error) {

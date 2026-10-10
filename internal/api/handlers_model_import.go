@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/yeixio/toskar-core/internal/models"
 )
 
@@ -53,8 +54,9 @@ func (s *Server) handleImportModel(w http.ResponseWriter, r *http.Request) {
 	}
 	d := got.Details
 	writeJSON(w, http.StatusOK, map[string]any{
-		"model_id": got.ID,
-		"status":   map[bool]string{true: "copying", false: "installed"}[got.Copying],
+		"model_id":  got.ID,
+		"projector": got.Projector,
+		"status":    map[bool]string{true: "copying", false: "installed"}[got.Copying],
 		"details": map[string]any{
 			"name":           d.Name,
 			"architecture":   d.Architecture,
@@ -66,6 +68,50 @@ func (s *Server) handleImportModel(w http.ResponseWriter, r *http.Request) {
 			"license":        d.License,
 		},
 	})
+}
+
+// handleUpdateAddedModel renames or retags a model added from a file or a
+// link (#467).
+func (s *Server) handleUpdateAddedModel(w http.ResponseWriter, r *http.Request) {
+	if s.deps.UpdateAddedModel == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Editing a model is not available.", nil)
+		return
+	}
+	var body struct {
+		DisplayName *string  `json:"display_name"`
+		Tags        []string `json:"tags"`
+	}
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 16<<10)).Decode(&body); err != nil {
+		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "Request body must be valid JSON.", nil)
+		return
+	}
+	entry, err := s.deps.UpdateAddedModel(r.Context(), mux.Vars(r)["id"], body.DisplayName, body.Tags)
+	if err != nil {
+		writeErrFrom(w, http.StatusBadRequest, "MODEL_UPDATE_FAILED", err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"model_id": entry.ID, "display_name": entry.DisplayName, "tags": entry.Tags})
+}
+
+// handleSetModelProjector gives a model its vision projector, a GGUF file on
+// this computer (#467).
+func (s *Server) handleSetModelProjector(w http.ResponseWriter, r *http.Request) {
+	if s.deps.SetModelProjector == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Adding a projector is not available.", nil)
+		return
+	}
+	var body struct {
+		Path string `json:"path"`
+	}
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 16<<10)).Decode(&body); err != nil {
+		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "Request body must be valid JSON.", nil)
+		return
+	}
+	if err := s.deps.SetModelProjector(r.Context(), mux.Vars(r)["id"], body.Path); err != nil {
+		writeErrFrom(w, http.StatusBadRequest, "MODEL_UPDATE_FAILED", err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"model_id": mux.Vars(r)["id"], "vision": true})
 }
 
 // handleFoundModels lists models other local AI apps keep on this computer,

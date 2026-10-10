@@ -29,6 +29,8 @@ type FoundModel struct {
 	Quantization string `json:"quantization,omitempty"`
 	// ModelID is set when the file is already a model here.
 	ModelID string `json:"model_id,omitempty"`
+	// Projector is its vision projector, when the app keeps one with it.
+	Projector string `json:"projector,omitempty"`
 }
 
 // appDir is a folder where an app keeps its models.
@@ -96,7 +98,7 @@ func (m *Manager) FindOtherApps(ctx context.Context) []FoundModel {
 	}
 	var out []FoundModel
 	seen := map[string]bool{}
-	add := func(app, path, name string) {
+	add := func(app, path, name, projector string) {
 		key := canonical(path)
 		if seen[key] || ctx.Err() != nil {
 			return
@@ -123,13 +125,13 @@ func (m *Manager) FindOtherApps(ctx context.Context) []FoundModel {
 		out = append(out, FoundModel{
 			App: app, Path: path, Name: name, SizeBytes: uint64(st.Size()),
 			Architecture: d.Architecture, Parameters: params, Quantization: d.Quantization,
-			ModelID: byPath[key],
+			ModelID: byPath[key], Projector: projector,
 		})
 	}
 	for _, dir := range otherAppDirs(home, runtime.GOOS, os.Getenv) {
 		if dir.ollama {
 			for _, o := range ollamaModels(dir.dir) {
-				add(dir.app, o.path, o.name)
+				add(dir.app, o.path, o.name, o.projector)
 			}
 			continue
 		}
@@ -144,7 +146,7 @@ func (m *Manager) FindOtherApps(ctx context.Context) []FoundModel {
 				return fs.SkipDir
 			}
 			if !e.IsDir() && strings.EqualFold(filepath.Ext(path), ".gguf") && !strings.Contains(strings.ToLower(e.Name()), "mmproj") {
-				add(dir.app, path, "")
+				add(dir.app, path, "", projectorNear(path))
 			}
 			return nil
 		})
@@ -156,6 +158,18 @@ func (m *Manager) FindOtherApps(ctx context.Context) []FoundModel {
 		return strings.ToLower(out[i].Name) < strings.ToLower(out[j].Name)
 	})
 	return out
+}
+
+// foundProjector reports a projector FindOtherApps lists, such as an
+// Ollama blob, which has no .gguf name.
+func (m *Manager) foundProjector(ctx context.Context, path string) bool {
+	want := canonical(path)
+	for _, f := range m.FindOtherApps(ctx) {
+		if f.Projector != "" && canonical(f.Projector) == want {
+			return true
+		}
+	}
+	return false
 }
 
 // foundPath reports a path FindOtherApps lists, so a file without a .gguf
@@ -170,7 +184,7 @@ func (m *Manager) foundPath(ctx context.Context, path string) bool {
 	return false
 }
 
-type ollamaModel struct{ name, path string }
+type ollamaModel struct{ name, path, projector string }
 
 // ollamaModels reads Ollama's manifests: each model:tag names its weights
 // as a blob by digest.
@@ -197,12 +211,23 @@ func ollamaModels(dir string) []ollamaModel {
 		if json.Unmarshal(raw, &manifest) != nil {
 			return nil
 		}
+		var model ollamaModel
 		for _, l := range manifest.Layers {
 			hex, ok := strings.CutPrefix(l.Digest, "sha256:")
-			if l.MediaType != "application/vnd.ollama.image.model" || !ok || strings.ContainsAny(hex, `/\.`) {
+			if !ok || strings.ContainsAny(hex, `/\.`) {
 				continue
 			}
-			out = append(out, ollamaModel{name: ollamaName(root, path), path: filepath.Join(dir, "blobs", "sha256-"+hex)})
+			blob := filepath.Join(dir, "blobs", "sha256-"+hex)
+			switch l.MediaType {
+			case "application/vnd.ollama.image.model":
+				model.path = blob
+			case "application/vnd.ollama.image.projector":
+				model.projector = blob
+			}
+		}
+		if model.path != "" {
+			model.name = ollamaName(root, path)
+			out = append(out, model)
 		}
 		return nil
 	})

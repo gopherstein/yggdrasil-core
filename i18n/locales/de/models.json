@@ -354,6 +354,22 @@
       "works": "Funktioniert",
       "speed": "{{speed}} Tokens pro Sekunde",
       "failed": "Es hat nicht geantwortet: {{error}}"
+    },
+    "details": {
+      "name": "Name",
+      "tags": "Gut bei",
+      "tag": {
+        "general": "Alltagsfragen",
+        "coding": "Programmieren",
+        "reasoning": "Logisches Denken",
+        "writing": "Schreiben"
+      },
+      "tagsHint": "Steht ein Chat auf Auto, gehen Programmieranfragen an ein Modell, das gut programmieren kann.",
+      "save": "Speichern",
+      "saved": "Gespeichert",
+      "visionOffer": "Dazu wurde Bildunterstützung gefunden, damit es Bilder sehen kann:",
+      "visionAdd": "Bildunterstützung hinzufügen",
+      "visionOn": "Bildunterstützung hinzugefügt: Es kann Bilder sehen."
     }
   }
 }

@@ -361,6 +361,22 @@
       "works": "Fonctionne",
       "speed": "{{speed}} jetons par seconde",
       "failed": "Il n'a pas répondu : {{error}}"
+    },
+    "details": {
+      "name": "Nom",
+      "tags": "Doué pour",
+      "tag": {
+        "general": "Questions du quotidien",
+        "coding": "Programmation",
+        "reasoning": "Raisonnement",
+        "writing": "Rédaction"
+      },
+      "tagsHint": "Quand une discussion est sur Auto, les demandes de programmation vont à un modèle doué pour la programmation.",
+      "save": "Enregistrer",
+      "saved": "Enregistré",
+      "visionOffer": "Une prise en charge des images a été trouvée avec lui, pour qu'il puisse voir les images :",
+      "visionAdd": "Ajouter la prise en charge des images",
+      "visionOn": "Prise en charge des images ajoutée : il peut voir les images."
     }
   }
 }

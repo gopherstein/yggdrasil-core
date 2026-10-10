@@ -26,12 +26,13 @@ export function AddModelPanel({ onClose, onAdded }: { onClose: () => void; onAdd
   const { t } = useTranslation('models')
   const [way, setWay] = useState<Way>('file')
   const [done, setDone] = useState<string | null>(null)
-  const [lastAdded, setLastAdded] = useState<string | null>(null)
-  const added = (result: ModelImportResult | null, fallbackName?: string) => {
+  // The model just added: its name, and a vision projector to offer.
+  const [lastAdded, setLastAdded] = useState<{ id: string; name: string; projector?: string } | null>(null)
+  const added = (result: ModelImportResult | null, fallbackName?: string, projector?: string) => {
     if (!result) return
-    setLastAdded(result.model_id)
     // The name it was saved with: the one asked for, else its header's.
     const name = fallbackName || result.details?.name || result.model_id
+    setLastAdded({ id: result.model_id, name, projector: projector || result.projector || undefined })
     setDone(result.status === 'copying' ? t('add.copying', { name }) : t('add.added', { name }))
     onAdded(result.model_id)
   }
@@ -79,8 +80,108 @@ export function AddModelPanel({ onClose, onAdded }: { onClose: () => void; onAdd
           {done}
         </p>
       ) : null}
-      {lastAdded ? <QuickCheck key={lastAdded} modelId={lastAdded} /> : null}
+      {lastAdded ? (
+        <div key={lastAdded.id} className="space-y-3">
+          <AddedDetails modelId={lastAdded.id} name={lastAdded.name} projector={lastAdded.projector} onSaved={() => onAdded(lastAdded.id)} />
+          <QuickCheck modelId={lastAdded.id} />
+        </div>
+      ) : null}
     </section>
+  )
+}
+
+// The tags a person can give a model they added; vision comes with a projector.
+const TAGS = ['general', 'coding', 'reasoning', 'writing'] as const
+
+/**
+ * Names and tags a model just added, and gives it the vision projector
+ * found with it (#467). Auto sends coding requests to a model tagged coding.
+ */
+function AddedDetails({ modelId, name, projector, onSaved }: { modelId: string; name: string; projector?: string; onSaved: () => void }) {
+  const { t } = useTranslation('models')
+  const [value, setValue] = useState(name)
+  const [tags, setTags] = useState<string[]>(['general'])
+  const [saved, setSaved] = useState(false)
+  const save = useMutation({
+    mutationFn: () => api.updateAddedModel(modelId, { display_name: value.trim(), tags }),
+    onSuccess: () => {
+      setSaved(true)
+      onSaved()
+    },
+  })
+  const pair = useMutation({
+    mutationFn: () => api.setModelProjector(modelId, projector!),
+    onSuccess: () => onSaved(),
+  })
+  return (
+    <div className="space-y-3 rounded-lg border border-line/70 px-3 py-3 text-sm">
+      <form
+        className="space-y-2"
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (value.trim()) save.mutate()
+        }}
+      >
+        <label className="block text-ink-muted">
+          {t('add.details.name')}
+          <input
+            className="field mt-1 w-full"
+            value={value}
+            maxLength={120}
+            onChange={(e) => {
+              setValue(e.target.value)
+              setSaved(false)
+            }}
+          />
+        </label>
+        <fieldset>
+          <legend className="text-ink-muted">{t('add.details.tags')}</legend>
+          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+            {TAGS.map((tag) => (
+              <label key={tag} className="flex items-center gap-1.5 text-ink">
+                <input
+                  type="checkbox"
+                  checked={tags.includes(tag)}
+                  onChange={(e) => {
+                    setTags((current) => (e.target.checked ? [...current, tag] : current.filter((x) => x !== tag)))
+                    setSaved(false)
+                  }}
+                />
+                {t(`add.details.tag.${tag}`)}
+              </label>
+            ))}
+          </div>
+          <p className="mt-1 text-xs text-ink-faint">{t('add.details.tagsHint')}</p>
+        </fieldset>
+        <div className="flex items-center gap-3">
+          <button type="submit" className="btn-secondary btn-sm" disabled={!value.trim() || save.isPending}>
+            {t('add.details.save')}
+          </button>
+          {saved ? <span className="text-xs text-ink-faint">{t('add.details.saved')}</span> : null}
+        </div>
+        {save.isError ? <p className="text-danger">{errorText(save.error, t('add.failed'))}</p> : null}
+      </form>
+      {projector ? (
+        <div className="flex flex-wrap items-center gap-3 border-t border-line/50 pt-3">
+          {pair.isSuccess ? (
+            <p className="text-ink">{t('add.details.visionOn')}</p>
+          ) : (
+            <>
+              <p className="min-w-0 flex-1 text-ink-muted">
+                {t('add.details.visionOffer')}
+                <span className="block truncate font-mono text-xs text-ink-faint" title={projector}>
+                  {projector.split(/[\\/]/).pop()}
+                </span>
+              </p>
+              <button type="button" className="btn-secondary btn-sm" disabled={pair.isPending} onClick={() => pair.mutate()}>
+                {t('add.details.visionAdd')}
+              </button>
+            </>
+          )}
+          {pair.isError ? <p className="w-full text-danger">{errorText(pair.error, t('add.failed'))}</p> : null}
+        </div>
+      ) : null}
+    </div>
   )
 }
 
@@ -149,7 +250,7 @@ function QuickCheck({ modelId }: { modelId: string }) {
   )
 }
 
-function FromFile({ onAdded }: { onAdded: (r: ModelImportResult | null, name?: string) => void }) {
+function FromFile({ onAdded }: { onAdded: (r: ModelImportResult | null, name?: string, projector?: string) => void }) {
   const { t } = useTranslation('models')
   const input = useRef<HTMLInputElement>(null)
   const [dragging, setDragging] = useState(false)
@@ -260,13 +361,13 @@ function FromFile({ onAdded }: { onAdded: (r: ModelImportResult | null, name?: s
   )
 }
 
-function FromApps({ onAdded }: { onAdded: (r: ModelImportResult | null, name?: string) => void }) {
+function FromApps({ onAdded }: { onAdded: (r: ModelImportResult | null, name?: string, projector?: string) => void }) {
   const { t } = useTranslation('models')
   const found = useQuery({ queryKey: ['models-found'], queryFn: () => api.findModelsInOtherApps(), retry: false })
   const add = useMutation({
     mutationFn: (m: FoundModel) => api.importModelPath({ path: m.path, in_place: true, display_name: m.name }),
     onSuccess: (r, m) => {
-      onAdded(r, m.name)
+      onAdded(r, m.name, m.projector)
       void found.refetch()
     },
   })

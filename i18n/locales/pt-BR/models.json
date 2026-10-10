@@ -361,6 +361,22 @@
       "works": "Funciona",
       "speed": "{{speed}} tokens por segundo",
       "failed": "Ele não respondeu: {{error}}"
+    },
+    "details": {
+      "name": "Nome",
+      "tags": "Bom em",
+      "tag": {
+        "general": "Perguntas do dia a dia",
+        "coding": "Programação",
+        "reasoning": "Raciocínio",
+        "writing": "Escrita"
+      },
+      "tagsHint": "Quando uma conversa está no Automático, pedidos de programação vão para um modelo bom em programação.",
+      "save": "Salvar",
+      "saved": "Salvo",
+      "visionOffer": "Foi encontrado suporte a imagens junto com ele, para que veja imagens:",
+      "visionAdd": "Adicionar suporte a imagens",
+      "visionOn": "Suporte a imagens adicionado: ele pode ver imagens."
     }
   }
 }

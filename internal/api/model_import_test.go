@@ -35,9 +35,14 @@ func TestImportModelRoute(t *testing.T) {
 	}
 	mgr.Home = filepath.Join(dir, "home")
 	t.Setenv("OLLAMA_MODELS", "")
-	srv := NewServer(Dependencies{Config: cfg, ImportModel: mgr.ImportFile, ModelUploadPath: mgr.UploadPath, AdoptModelUpload: mgr.AdoptUpload, FindModelsInOtherApps: mgr.FindOtherApps})
+	srv := NewServer(Dependencies{Config: cfg, ImportModel: mgr.ImportFile, ModelUploadPath: mgr.UploadPath, AdoptModelUpload: mgr.AdoptUpload,
+		FindModelsInOtherApps: mgr.FindOtherApps, UpdateAddedModel: mgr.UpdateAdded, SetModelProjector: mgr.SetProjector})
 	call := func(path, contentType string, body []byte) (int, map[string]any) {
-		r := httptest.NewRequest(http.MethodPost, path, bytes.NewReader(body))
+		method := http.MethodPost
+		if m, p, ok := strings.Cut(path, " "); ok {
+			method, path = m, p
+		}
+		r := httptest.NewRequest(method, path, bytes.NewReader(body))
 		r.Header.Set("Content-Type", contentType)
 		r.RemoteAddr, r.Host = "127.0.0.1:50000", "127.0.0.1:7331"
 		rec := httptest.NewRecorder()
@@ -48,11 +53,19 @@ func TestImportModelRoute(t *testing.T) {
 	}
 
 	src := gguftest.Write(t, filepath.Join(dir, "lmstudio"), "Small-Q4_K_M.gguf", gguftest.Options{Name: "Small", FileType: 15, Context: 2048})
+	proj := gguftest.Write(t, filepath.Join(dir, "lmstudio"), "mmproj-Small-F16.gguf", gguftest.Options{Architecture: "clip", Type: "mmproj"})
 	body, _ := json.Marshal(map[string]any{"path": src, "in_place": true})
 	code, out := call("/api/v1/models/import", "application/json", body)
 	details, _ := out["details"].(map[string]any)
-	if code != http.StatusOK || out["model_id"] != "small-q4-k-m" || out["status"] != "installed" || details["quantization"] != "Q4_K_M" {
+	if code != http.StatusOK || out["model_id"] != "small-q4-k-m" || out["status"] != "installed" || details["quantization"] != "Q4_K_M" || out["projector"] != proj {
 		t.Fatalf("path import: %d %v", code, out)
+	}
+	if code, out := call("PATCH /api/v1/models/small-q4-k-m", "application/json", []byte(`{"display_name":"Tiny","tags":["coding"]}`)); code != http.StatusOK || out["display_name"] != "Tiny" {
+		t.Errorf("rename: %d %v", code, out)
+	}
+	body, _ = json.Marshal(map[string]any{"path": proj})
+	if code, out := call("PUT /api/v1/models/small-q4-k-m/projector", "application/json", body); code != http.StatusOK || out["vision"] != true || !mgr.SeesImages("small-q4-k-m") {
+		t.Errorf("projector: %d %v", code, out)
 	}
 
 	code, out = call("/api/v1/models/import?filename=phone.gguf&display_name=From+the+phone", "application/octet-stream", gguftest.Bytes(gguftest.Options{Name: "Sent"}))

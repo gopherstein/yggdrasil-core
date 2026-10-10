@@ -150,3 +150,55 @@ func TestAdoptUpload(t *testing.T) {
 		t.Error("adopted a file outside the models folder")
 	}
 }
+
+// A model added from a file can be renamed and tagged, and given the
+// vision projector found beside it, so it sees pictures (#467).
+func TestAddedModelDetails(t *testing.T) {
+	m, storage, dir := importManager(t)
+	ctx := context.Background()
+	folder := filepath.Join(dir, "lmstudio", "gemma")
+	src := gguftest.Write(t, folder, "gemma-Q4_K_M.gguf", gguftest.Options{Name: "Gemma"})
+	proj := gguftest.Write(t, folder, "mmproj-gemma-F16.gguf", gguftest.Options{Architecture: "clip", Type: "mmproj"})
+	got, err := m.ImportFile(ctx, ImportRequest{Path: src, InPlace: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Projector != proj {
+		t.Fatalf("projector offered = %q, want %q", got.Projector, proj)
+	}
+	name := "My Gemma"
+	entry, err := m.UpdateAdded(ctx, got.ID, &name, []string{"Coding", "coding", "vision", "nonsense"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry.DisplayName != "My Gemma" || len(entry.Tags) != 1 || entry.Tags[0] != "coding" {
+		t.Errorf("entry = %+v", entry)
+	}
+
+	// A model isn't a projector, and a projector needs an installed model.
+	if err := m.SetProjector(ctx, got.ID, src); err == nil {
+		t.Error("a model was taken as a projector")
+	}
+	if err := m.SetProjector(ctx, "nope", proj); err == nil {
+		t.Error("a projector was set for a model that isn't here")
+	}
+	if err := m.SetProjector(ctx, got.ID, proj); err != nil {
+		t.Fatal(err)
+	}
+	if !m.SeesImages(got.ID) || m.ProjectorPath(got.ID) != storage.ProjectorPath(got.ID) {
+		t.Errorf("sees images = %v, projector at %q", m.SeesImages(got.ID), m.ProjectorPath(got.ID))
+	}
+	if e, _ := m.catalog.Get(got.ID); !contains(e.Tags, "vision") || !contains(e.Tags, "coding") {
+		t.Errorf("tags after the projector = %v", e.Tags)
+	}
+	// Retagging keeps vision, which comes with the projector.
+	if e, _ := m.UpdateAdded(ctx, got.ID, nil, []string{"general"}); !contains(e.Tags, "vision") || !contains(e.Tags, "general") {
+		t.Errorf("tags after retagging = %v", e.Tags)
+	}
+
+	// A catalog model keeps its own name.
+	m.catalog.Upsert(CatalogEntry{ID: "catalog-model", DisplayName: "Catalog"})
+	if _, err := m.UpdateAdded(ctx, "catalog-model", &name, nil); err == nil {
+		t.Error("renamed a catalog model")
+	}
+}

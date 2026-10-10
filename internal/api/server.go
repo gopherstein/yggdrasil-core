@@ -66,8 +66,12 @@ type Dependencies struct {
 	// FindModelsInOtherApps lists models LM Studio, Ollama, llama.cpp, and
 	// GPT4All keep on this computer.
 	FindModelsInOtherApps func(ctx context.Context) []models.FoundModel
-	DeleteModel           func(ctx context.Context, id string, nodeID string) error
-	ListRunningModels     func(ctx context.Context) ([]contracts.RunningModelView, error)
+	// UpdateAddedModel renames or retags a model added from a file or a
+	// link; SetModelProjector gives it a vision projector (#467).
+	UpdateAddedModel  func(ctx context.Context, id string, displayName *string, tags []string) (models.CatalogEntry, error)
+	SetModelProjector func(ctx context.Context, id, path string) error
+	DeleteModel       func(ctx context.Context, id string, nodeID string) error
+	ListRunningModels func(ctx context.Context) ([]contracts.RunningModelView, error)
 	// Acceleration sums up where this computer's loaded models run, for
 	// health (#317).
 	Acceleration func(ctx context.Context) string
@@ -288,6 +292,8 @@ func (s *Server) routes() {
 	api.HandleFunc("/models/{id}/start", s.handleStartModel).Methods(http.MethodPost)
 	api.HandleFunc("/models/{id}/stop", s.handleStopModel).Methods(http.MethodPost)
 	api.HandleFunc("/models/{id}", s.handleDeleteModel).Methods(http.MethodDelete)
+	api.HandleFunc("/models/{id}", s.handleUpdateAddedModel).Methods(http.MethodPatch)
+	api.HandleFunc("/models/{id}/projector", s.handleSetModelProjector).Methods(http.MethodPut)
 	api.HandleFunc("/runtimes", s.handleListRuntimes).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/runtimes/{id}/install", s.handleInstallRuntime).Methods(http.MethodPost)
 	api.HandleFunc("/profiles", s.handleProfiles).Methods(http.MethodGet, http.MethodOptions)

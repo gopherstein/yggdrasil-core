@@ -6,7 +6,7 @@ import { api } from '@/lib/api'
 import { AddModelPanel } from './AddModelPanel'
 
 vi.mock('@/lib/api', () => ({
-  api: { importModelPath: vi.fn(), findModelsInOtherApps: vi.fn(), installModelFromURL: vi.fn(), getModels: vi.fn(), startBenchmark: vi.fn(), getBenchmark: vi.fn() },
+  api: { importModelPath: vi.fn(), findModelsInOtherApps: vi.fn(), installModelFromURL: vi.fn(), getModels: vi.fn(), startBenchmark: vi.fn(), getBenchmark: vi.fn(), updateAddedModel: vi.fn(), setModelProjector: vi.fn() },
   uploadModel: vi.fn(),
 }))
 
@@ -68,5 +68,25 @@ describe('AddModelPanel (#467)', () => {
     fireEvent.click(check)
     expect(await screen.findByText(/42 tokens a second/)).toBeInTheDocument()
     expect(api.startBenchmark).toHaveBeenCalledWith({ model_ids: ['qwen'], workload_ids: ['quick'], runs: 1 })
+  })
+
+  it('names and tags what it added, and adds the image support found with it', async () => {
+    vi.mocked(api.importModelPath).mockResolvedValue({ model_id: 'gemma', status: 'installed', details: { name: 'Gemma' }, projector: '/m/mmproj-gemma.gguf' })
+    vi.mocked(api.updateAddedModel).mockResolvedValue({ model_id: 'gemma', display_name: 'My Gemma', tags: ['coding'] })
+    vi.mocked(api.setModelProjector).mockResolvedValue({ model_id: 'gemma', vision: true })
+    renderIt()
+    fireEvent.change(screen.getByLabelText('Or the location of a file on this computer'), { target: { value: '/m/gemma.gguf' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
+    const name = await screen.findByLabelText('Name')
+    fireEvent.change(name, { target: { value: 'My Gemma' } })
+    fireEvent.click(screen.getByLabelText('Everyday questions'))
+    fireEvent.click(screen.getByLabelText('Coding'))
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    expect(await screen.findByText('Saved')).toBeInTheDocument()
+    expect(api.updateAddedModel).toHaveBeenCalledWith('gemma', { display_name: 'My Gemma', tags: ['coding'] })
+    expect(screen.getByText('mmproj-gemma.gguf')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Add image support' }))
+    expect(await screen.findByText(/Image support added/)).toBeInTheDocument()
+    expect(api.setModelProjector).toHaveBeenCalledWith('gemma', '/m/mmproj-gemma.gguf')
   })
 })
