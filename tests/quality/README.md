@@ -66,7 +66,7 @@ the phone has no topic controls, so its copies don't include them.
 ones wrongly refused; the stub must get every case right, and a real model
 must hold at least 80% (`TOSKAR_QUALITY_TOPIC_MIN_HELD`) and wrongly refuse
 at most 15% (`TOSKAR_QUALITY_TOPIC_MAX_REFUSED`). `TOSKAR_QUALITY_TOPIC_REPORT`
-writes its report. The weekly real-model run includes it. A model that passes is tagged `topic-check` in `manifests/models/catalog.json`, which makes it a candidate to run the topic checks (#457).
+writes its report. The weekly real-model run includes it. A model that passes is tagged `topic-check` in `manifests/models/catalog.json`, which makes it a candidate to run the topic checks (#457). Against a daemon with a tagged model installed, the rates are a gate, since that model runs the checks. With none installed, the answering model checks itself: the rates are measured and reported, which is how a model earns the tag, but don't fail the run. gemma-2-9b, qwen2.5-14b, and qwen2.5-32b earned it in #510's runs; qwen2.5-7b, which wrongly refused 2 or 3 of 9, didn't.
 
 `reasoning.json` holds questions with one right answer (#459,
 [deliberate.md](../../docs/deliberate.md)): math word problems, logic

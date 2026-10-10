@@ -36,8 +36,13 @@ func TestSameLanguage(t *testing.T) {
 	if !sameLanguage(spanish, "es-419") || !sameLanguage("I can help with tires, wheels, and bookings at the shop.", "en") {
 		t.Error("a sentence in the reply's language was refused")
 	}
-	if !sameLanguage("OK!", "de") {
-		t.Error("a sentence too short to tell was refused")
+	// One the detector can't place isn't trusted: Toskar's own sentence is.
+	if sameLanguage("OK!", "de") {
+		t.Error("a sentence too short to tell was trusted")
+	}
+	// The quality run's Spanish refusal, which the detector once couldn't place.
+	if sameLanguage("Por favor, pregúnteme sobre neumáticos para temporadas frías o si necesita reservar una rotación de neumáticos.", "en") {
+		t.Error("the Spanish refusal counted as English")
 	}
 }
 

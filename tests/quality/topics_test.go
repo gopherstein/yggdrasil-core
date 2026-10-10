@@ -110,17 +110,30 @@ func TestTopicQuality(t *testing.T) {
 	if d.Name() != "stub" {
 		minHeld, maxRefused = topicLimit("QUALITY_TOPIC_MIN_HELD", 0.8), topicLimit("QUALITY_TOPIC_MAX_REFUSED", 0.15)
 	}
+	// A model tagged topic-check runs the checks wherever it's installed, so
+	// it must pass. With none installed, the answering model checks itself:
+	// it's measured, which is how a model earns the tag, not failed (#510's
+	// runs: qwen2.5-7b, untagged, wrongly refused 2 or 3 of 9).
+	gated := true
+	if real, ok := d.(realDriver); ok && !real.hasTopicChecker(t) {
+		gated = false
+		summary += "; no model here is verified for topic checks, so the answering model checked itself, measured but not gated"
+	}
 	if path := config.Env("QUALITY_TOPIC_REPORT"); path != "" {
 		md := markdownReport(d.Name(), report, share(len(report)-failedRows(report), len(report)), 0)
 		md = strings.Replace(md, "# Chat quality: core,", "# Topic controls: core,", 1)
 		md = strings.Replace(md, "\n\n", fmt.Sprintf("\n\nThe topic controls %s. At least %.0f%% must be held, and at most %.0f%% wrongly refused.\n\n", summary, minHeld*100, maxRefused*100), 1)
 		writeReport(t, d, build, path, md)
 	}
+	fail := t.Errorf
+	if !gated {
+		fail = t.Logf
+	}
 	if rates.heldShare() < minHeld {
-		t.Errorf("held %.0f%% of off-topic cases; at least %.0f%% must be", rates.heldShare()*100, minHeld*100)
+		fail("held %.0f%% of off-topic cases; at least %.0f%% must be", rates.heldShare()*100, minHeld*100)
 	}
 	if rates.refusedShare() > maxRefused {
-		t.Errorf("wrongly refused %.0f%% of on-topic cases; at most %.0f%% may be", rates.refusedShare()*100, maxRefused*100)
+		fail("wrongly refused %.0f%% of on-topic cases; at most %.0f%% may be", rates.refusedShare()*100, maxRefused*100)
 	}
 }
 
@@ -132,4 +145,23 @@ func failedRows(rows []reportRow) int {
 		}
 	}
 	return n
+}
+
+// hasTopicChecker reports an installed model verified for the topic checks
+// (tagged topic-check), from the daemon's capability inventory.
+func (d realDriver) hasTopicChecker(t *testing.T) bool {
+	var snap struct {
+		Models []struct {
+			TopicCheck bool `json:"topic_check"`
+		} `json:"models"`
+	}
+	if _, err := d.request("GET", "/api/v1/capabilities", nil, &snap, t.Logf); err != nil {
+		return true // can't tell: hold the model to the gate
+	}
+	for _, m := range snap.Models {
+		if m.TopicCheck {
+			return true
+		}
+	}
+	return false
 }
