@@ -8,6 +8,10 @@
   delete them with one confirmation. Deleted chats, one or several, can be
   brought back with Undo for 10 seconds. Clearing history in Settings
   deletes in a few requests instead of one per chat.
+- Settings → History can delete chats last used more than 30, 90, or 365
+  days ago, keeping pinned chats, and says how many before you confirm.
+  Clearing all history is confirmed in the page, which also works in the
+  desktop app.
 
 ### Security
 
