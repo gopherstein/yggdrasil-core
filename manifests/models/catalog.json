@@ -276,7 +276,7 @@
         "format": "gguf"
       },
       "purpose": ["assistant", "general"],
-      "tags": ["general", "large"],
+      "tags": ["general", "large", "topic-check"],
       "runtime": ["llamacpp"],
       "recommended_roles": ["assistant"],
       "languages": [
@@ -392,7 +392,7 @@
         "format": "gguf"
       },
       "purpose": ["assistant", "general", "research"],
-      "tags": ["general", "large", "reasoning"],
+      "tags": ["general", "large", "reasoning", "topic-check"],
       "runtime": ["llamacpp"],
       "recommended_roles": ["assistant", "coordinator"],
       "training": {
@@ -617,7 +617,7 @@
         "format": "gguf"
       },
       "purpose": ["assistant", "general", "research"],
-      "tags": ["general", "large", "reasoning"],
+      "tags": ["general", "large", "reasoning", "topic-check"],
       "runtime": ["llamacpp"],
       "recommended_roles": ["assistant"],
       "training": {

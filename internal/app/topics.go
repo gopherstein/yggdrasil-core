@@ -228,13 +228,18 @@ func (e *chatExecEnv) offTopicReply(ctx context.Context, v topicVerdict) string 
 	return locale.T(lang, "chat:topics.offTopic", nil)
 }
 
-// sameLanguage reports a check's sentence in the language the reply should
-// be in, or one too short to tell: a small model can write it in another
-// language than the person's.
+// sameLanguage reports a check's sentence surely in the language the reply
+// should be in: a small model can write it in another language than the
+// person's, and one the detector can't place isn't trusted.
 func sameLanguage(text, want string) bool {
-	got, ok := replylang.Detect(text)
-	if !ok || want == "" {
+	if want == "" {
 		return true
+	}
+	// Only a sentence surely in the reply's language is used; Toskar's own
+	// translated sentence is the safe choice otherwise.
+	got, ok := replylang.Detect(text)
+	if !ok {
+		return false
 	}
 	base := func(tag string) string { b, _, _ := strings.Cut(strings.ToLower(tag), "-"); return b }
 	return base(got) == base(want)
