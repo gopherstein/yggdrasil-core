@@ -179,6 +179,24 @@ jobs:
             -e TOSKAR_QUALITY_TOPIC_REPORT=/src/.quality/topics.md \
             golang:1.26-bookworm \
             go test ./tests/quality -run TestTopicQuality -count=1 -v -timeout 60m
+      # Files (#510): every type Toskar reads, attached and asked about,
+      # and every type it makes, asked for and then opened.
+      - name: Files
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p .quality
+          docker run --rm --network "$NAME" \
+            --cap-drop ALL --security-opt no-new-privileges \
+            --memory 4g --memory-swap 4g --cpus 2 \
+            -v "$PWD:/src" -w /src \
+            -v toskar-quality-go:/go \
+            -e TOSKAR_QUALITY_URL="http://$NAME:7331" \
+            -e TOSKAR_QUALITY_KEY="$QUALITY_KEY" \
+            -e TOSKAR_QUALITY_INSTALL=recommended \
+            -e TOSKAR_QUALITY_MODEL="${{ matrix.model }}" \
+            -e TOSKAR_QUALITY_FILES_REPORT=/src/.quality/files.md \
+            golang:1.26-bookworm \
+            go test ./tests/quality -run 'TestFiles' -count=1 -v -timeout 60m
       # Reasoning (#459): how often the model gets questions with one right
       # answer right, by kind, and the time and tokens it takes. Measured,
       # not gated: the baseline Deliberate is compared against.
@@ -203,7 +221,7 @@ jobs:
       - name: Report
         if: always()
         run: |
-          for f in .quality/report.md .quality/topics.md .quality/reasoning.md; do
+          for f in .quality/report.md .quality/topics.md .quality/files.md .quality/reasoning.md; do
             if [ -f "$f" ]; then
               head -c 60000 "$f" >> "$GITHUB_STEP_SUMMARY"
             fi
@@ -215,6 +233,7 @@ jobs:
           path: |
             .quality/report.md
             .quality/topics.md
+            .quality/files.md
             .quality/reasoning.md
             .quality/reasoning.json
           if-no-files-found: ignore

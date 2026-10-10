@@ -21,7 +21,7 @@ var (
 	fileAsRe = regexp.MustCompile(`(?i)\b(as|into|in) an? (spreadsheet|excel file|xlsx|csv|pdf|docx|word document|word file|markdown file|json file)\b`)
 	// fileNamedRe matches a request to make a document with a name given,
 	// such as "save it as recipes.pdf".
-	fileNamedRe = regexp.MustCompile(`(?i)\b(create|make|generate|export|build|produce|write|save|put|give me|turn)\b[^.?!\n]{0,60}?\b[\w][\w-]*\.(pdf|docx|xlsx|csv|tsv|md|txt)\b`)
+	fileNamedRe = regexp.MustCompile(`(?i)\b(create|make|generate|export|build|produce|write|save|put|give me|turn)\b[^.?!\n]{0,60}?\b[\w][\w-]*\.(pdf|docx|xlsx|csv|tsv|md|txt|json|html|py|js|ts|go|sql|yaml|yml)\b`)
 	// howToRe matches a question about how to do it, which isn't a request.
 	howToRe = regexp.MustCompile(`(?i)^\s*(how|what|why|where|when)\b`)
 	// fileNameRe finds a file name the user gave.

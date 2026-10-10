@@ -1,0 +1,414 @@
+{
+  "note": "The files quality set (#510): every type Toskar reads, attached and asked about, and every type it makes, asked for and then opened. Attachments are built by make (pdf, docx, pptx from Markdown; xlsx from CSV) or are content as it is.",
+  "cases": [
+    {
+      "id": "read_pdf",
+      "what": "A PDF's text is read: the total on an invoice.",
+      "attach": [
+        {
+          "name": "invoice.pdf",
+          "make": "pdf",
+          "content": "# Invoice 4471\n\nCustomer: Lake Road Garage\n\n- Winter tires, set of four: $1,040.00\n- Alignment: $189.50\n- Disposal fee: $55.00\n\nTotal due: $1,284.50\n\nDue by November 14."
+        }
+      ],
+      "message": "What's the total due on this invoice, and by when?",
+      "stub": [
+        "The total due is $1,284.50, by November 14."
+      ],
+      "expect": {
+        "prompt_contains": [
+          "1,284.50"
+        ],
+        "answer_matches": "1,?284\\.50"
+      }
+    },
+    {
+      "id": "read_xlsx",
+      "what": "A spreadsheet's rows are read: which store made more.",
+      "attach": [
+        {
+          "name": "sales.xlsx",
+          "make": "xlsx",
+          "content": "Month,Store,Revenue\nJanuary,North,1200\nJanuary,South,950\nFebruary,North,1340\nFebruary,South,1010"
+        }
+      ],
+      "message": "Which store made more in February, and how much?",
+      "stub": [
+        "North made more in February: 1,340."
+      ],
+      "expect": {
+        "prompt_contains": [
+          "1340"
+        ],
+        "answer_matches": "(?is)north.*1,?340|1,?340.*north"
+      }
+    },
+    {
+      "id": "read_csv",
+      "what": "A CSV file's rows are read: who joined first.",
+      "attach": [
+        {
+          "name": "members.csv",
+          "make": "",
+          "content": "Name,Joined,Plan\nAvery,2021-03-04,Gold\nBlake,2023-11-20,Silver\nCasey,2019-07-15,Gold"
+        }
+      ],
+      "message": "Who has been a member the longest?",
+      "stub": [
+        "Casey, since July 15, 2019."
+      ],
+      "expect": {
+        "prompt_contains": [
+          "Casey"
+        ],
+        "answer_matches": "(?i)casey"
+      }
+    },
+    {
+      "id": "read_tsv",
+      "what": "A tab-separated file is read: what's running low.",
+      "attach": [
+        {
+          "name": "inventory.tsv",
+          "make": "",
+          "content": "SKU\tItem\tCount\nT-100\tWinter tire 205/55R16\t14\nT-200\tAll-season tire 215/60R16\t3\nT-300\tRim 16-inch\t22"
+        }
+      ],
+      "message": "Which item is running low?",
+      "stub": [
+        "The all-season tire 215/60R16 (T-200): only 3 left."
+      ],
+      "expect": {
+        "prompt_contains": [
+          "T-200"
+        ],
+        "answer_matches": "(?i)all-season|T-200|215/60"
+      }
+    },
+    {
+      "id": "read_json",
+      "what": "A JSON file is read: settings from a config.",
+      "attach": [
+        {
+          "name": "config.json",
+          "make": "",
+          "content": "{\n  \"service\": \"tire-booking\",\n  \"retries\": 3,\n  \"timeout_seconds\": 45,\n  \"regions\": [\n    \"us-west\",\n    \"eu-central\"\n  ]\n}"
+        }
+      ],
+      "message": "What's the timeout, and which regions does it run in?",
+      "stub": [
+        "The timeout is 45 seconds, in us-west and eu-central."
+      ],
+      "expect": {
+        "prompt_contains": [
+          "eu-central"
+        ],
+        "answer_matches": "(?is)45.*eu-central|eu-central.*45"
+      }
+    },
+    {
+      "id": "read_html",
+      "what": "An HTML page's text is read, not its tags.",
+      "attach": [
+        {
+          "name": "hours.html",
+          "make": "",
+          "content": "<!doctype html><html><head><title>Hours</title></head><body><h1>Spring hours</h1><p>From April 1 we open at <b>7:30</b> on weekdays and at 9 on Saturdays.</p></body></html>"
+        }
+      ],
+      "message": "From April, when do they open on weekdays?",
+      "stub": [
+        "At 7:30 on weekdays."
+      ],
+      "expect": {
+        "prompt_contains": [
+          "7:30"
+        ],
+        "answer_matches": "7:30"
+      }
+    },
+    {
+      "id": "read_txt",
+      "what": "A plain text file is read: a decision in meeting notes.",
+      "attach": [
+        {
+          "name": "notes.txt",
+          "make": "",
+          "content": "Product meeting, October 2\n\nAttendees: Priya, Sam, Jo\n\nDiscussed the beta feedback and the support load.\nDecision: move the launch to March 9.\nOwner: Priya."
+        }
+      ],
+      "message": "What did we decide about the launch?",
+      "stub": [
+        "The launch moves to March 9, with Priya as owner."
+      ],
+      "expect": {
+        "prompt_contains": [
+          "March 9"
+        ],
+        "answer_matches": "(?i)march 9"
+      }
+    },
+    {
+      "id": "read_md",
+      "what": "A Markdown file is read: a port in a README.",
+      "attach": [
+        {
+          "name": "README.md",
+          "make": "",
+          "content": "# Setup\n\n1. Install Go 1.26\n2. Run `make dev`\n\nThe API listens on port 7331, and the web app on 5173."
+        }
+      ],
+      "message": "What port does the API listen on?",
+      "stub": [
+        "Port 7331."
+      ],
+      "expect": {
+        "prompt_contains": [
+          "7331"
+        ],
+        "answer_matches": "7331"
+      }
+    },
+    {
+      "id": "read_code",
+      "what": "A code file is read: the bug in a function.",
+      "attach": [
+        {
+          "name": "stats.py",
+          "make": "",
+          "content": "def average(xs):\n    \"\"\"The mean of a list of numbers.\"\"\"\n    return sum(xs) / (len(xs) - 1)\n\nprint(average([2, 4, 6]))"
+        }
+      ],
+      "message": "What's wrong with this function?",
+      "stub": [
+        "It divides by len(xs) - 1 instead of len(xs), so the average is too high (6 instead of 4)."
+      ],
+      "expect": {
+        "prompt_contains": [
+          "len(xs) - 1"
+        ],
+        "answer_matches": "(?i)len\\(xs\\) ?- ?1|n ?- ?1|off by one|divid"
+      }
+    },
+    {
+      "id": "read_docx",
+      "what": "A Word document is read (#510): a returns window.",
+      "attach": [
+        {
+          "name": "returns-policy.docx",
+          "make": "docx",
+          "content": "# Returns policy\n\nTires can be returned within **30 days** with the receipt.\n\nMounted tires can't be returned."
+        }
+      ],
+      "message": "How long do I have to return tires?",
+      "stub": [
+        "Within 30 days, with the receipt; mounted tires can't be returned."
+      ],
+      "expect": {
+        "prompt_contains": [
+          "30 days"
+        ],
+        "answer_matches": "(?i)30 days|thirty days"
+      }
+    },
+    {
+      "id": "read_pptx",
+      "what": "A PowerPoint deck is read slide by slide (#510): a date on the last slide.",
+      "attach": [
+        {
+          "name": "q3-review.pptx",
+          "make": "pptx",
+          "content": "Q3 review\nDana's Tire Shop\n---\nRevenue up 18% year over year\nWinter tire sales led\n---\nNext steps\nOpen the Eastside shop in May"
+        }
+      ],
+      "message": "When does the Eastside shop open?",
+      "stub": [
+        "In May."
+      ],
+      "expect": {
+        "prompt_contains": [
+          "Eastside"
+        ],
+        "answer_matches": "(?i)\\bmay\\b"
+      }
+    },
+    {
+      "id": "make_pdf",
+      "what": "A PDF is made and holds what was asked.",
+      "setup": {
+        "tools": {
+          "files.create": "allow"
+        }
+      },
+      "message": "Make a PDF of a packing list for a weekend camping trip: tent, sleeping bag, stove, and water filter.",
+      "stub": [
+        "# Weekend camping packing list\n\n- Tent\n- Sleeping bag\n- Stove\n- Water filter"
+      ],
+      "expect": {
+        "file_text": {
+          ".pdf": [
+            "tent",
+            "sleeping bag",
+            "stove",
+            "water filter"
+          ]
+        }
+      }
+    },
+    {
+      "id": "make_docx",
+      "what": "A Word document is made and holds what was asked.",
+      "setup": {
+        "tools": {
+          "files.create": "allow"
+        }
+      },
+      "message": "Write a Word document with a short welcome letter for new members of the hiking club.",
+      "stub": [
+        "# Welcome to the hiking club\n\nDear new member,\n\nWelcome aboard! Our first hike is Saturday at 8 at the trailhead.\n\nSee you on the trail,\nThe hiking club"
+      ],
+      "expect": {
+        "file_text": {
+          ".docx": [
+            "welcome",
+            "hiking club"
+          ]
+        }
+      }
+    },
+    {
+      "id": "make_xlsx",
+      "what": "A spreadsheet is made with the rows asked for.",
+      "setup": {
+        "tools": {
+          "files.create": "allow"
+        }
+      },
+      "message": "Make a spreadsheet of my monthly budget: rent 1200, groceries 450, transport 120, and a total row.",
+      "stub": [
+        "Item,Amount\nRent,1200\nGroceries,450\nTransport,120\nTotal,=SUM(B2:B4)"
+      ],
+      "expect": {
+        "file_text": {
+          ".xlsx": [
+            "rent",
+            "1200",
+            "groceries",
+            "450",
+            "transport",
+            "total"
+          ]
+        }
+      }
+    },
+    {
+      "id": "make_csv",
+      "what": "A CSV file is made with the rows asked for.",
+      "setup": {
+        "tools": {
+          "files.create": "allow"
+        }
+      },
+      "message": "Make a CSV of the first four planets in order from the sun.",
+      "stub": [
+        "Order,Planet\n1,Mercury\n2,Venus\n3,Earth\n4,Mars"
+      ],
+      "expect": {
+        "file_text": {
+          ".csv": [
+            "mercury",
+            "venus",
+            "earth",
+            "mars"
+          ]
+        }
+      }
+    },
+    {
+      "id": "make_md",
+      "what": "A Markdown file is made.",
+      "setup": {
+        "tools": {
+          "files.create": "allow"
+        }
+      },
+      "message": "Write a markdown file with a checklist for changing a flat tire.",
+      "stub": [
+        "# Changing a flat tire\n\n- [ ] Loosen the lug nuts\n- [ ] Jack up the car\n- [ ] Swap in the spare\n- [ ] Tighten the lug nuts"
+      ],
+      "expect": {
+        "file_text": {
+          ".md": [
+            "lug nuts",
+            "jack"
+          ]
+        }
+      }
+    },
+    {
+      "id": "make_html",
+      "what": "A web page is made when one is named.",
+      "setup": {
+        "tools": {
+          "files.create": "allow"
+        }
+      },
+      "message": "Save a simple web page as hours.html that lists our opening hours: Monday to Friday 8 to 6, Saturday 9 to 4.",
+      "stub": [
+        "<!doctype html>\n<html><body>\n<h1>Opening hours</h1>\n<p>Monday to Friday: 8 to 6</p>\n<p>Saturday: 9 to 4</p>\n</body></html>"
+      ],
+      "expect": {
+        "file_text": {
+          ".html": [
+            "monday to friday",
+            "saturday"
+          ]
+        }
+      }
+    },
+    {
+      "id": "make_json",
+      "what": "A JSON file is made with the data asked for.",
+      "setup": {
+        "tools": {
+          "files.create": "allow"
+        }
+      },
+      "message": "Make a JSON file with three tire sizes and their prices: 205/55R16 for $120, 215/60R16 for $135, and 225/45R17 for $160.",
+      "stub": [
+        "[\n  {\"size\": \"205/55R16\", \"price\": 120},\n  {\"size\": \"215/60R16\", \"price\": 135},\n  {\"size\": \"225/45R17\", \"price\": 160}\n]"
+      ],
+      "expect": {
+        "file_text": {
+          ".json": [
+            "205/55R16",
+            "215/60R16",
+            "225/45R17",
+            "135"
+          ]
+        }
+      }
+    },
+    {
+      "id": "make_code",
+      "what": "A code file is made when one is named.",
+      "setup": {
+        "tools": {
+          "files.create": "allow"
+        }
+      },
+      "message": "Write a Python script saved as convert.py that converts Celsius to Fahrenheit.",
+      "stub": [
+        "def c_to_f(c):\n    return c * 9 / 5 + 32\n\n\nif __name__ == \"__main__\":\n    print(c_to_f(100))"
+      ],
+      "expect": {
+        "file_text": {
+          ".py": [
+            "9 ?/ ?5|1\\.8",
+            "32"
+          ]
+        }
+      }
+    }
+  ]
+}

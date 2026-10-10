@@ -114,6 +114,8 @@ func MimeType(name string) string {
 		return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 	case ".docx":
 		return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+	case ".pptx":
+		return "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 	case ".wav":
 		return "audio/wav"
 	case ".mp3":
@@ -158,7 +160,7 @@ func kindOf(name string) string {
 		return "audio"
 	case ".webm", ".mp4", ".mov", ".m4v", ".mkv":
 		return "video"
-	case ".txt", ".md", ".markdown", ".html", ".htm", ".json", ".jsonl", ".log", ".docx":
+	case ".txt", ".md", ".markdown", ".html", ".htm", ".json", ".jsonl", ".log", ".docx", ".pptx":
 		return "document"
 	case ".py", ".js", ".ts", ".tsx", ".jsx", ".go", ".rs", ".java", ".kt", ".c", ".h", ".cpp", ".hpp", ".cs",
 		".rb", ".php", ".swift", ".sh", ".sql", ".yaml", ".yml", ".toml", ".xml", ".css", ".ini":

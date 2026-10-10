@@ -54,6 +54,10 @@ func FilePassages(name string, raw []byte) ([]Passage, error) {
 			// recognition; a knowledge source recognizes the pages once.
 			err = fmt.Errorf("%s is a scanned PDF with no text to read. Connect it on the Knowledge page, which reads scanned pages with text recognition", filepath.Base(name))
 		}
+	case ".docx":
+		docs, err = parseDOCX(name, raw)
+	case ".pptx":
+		docs, err = parsePPTX(name, raw)
 	default:
 		var d document
 		d, err = parseDocument(name, raw)
