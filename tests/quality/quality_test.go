@@ -38,8 +38,10 @@ type Case struct {
 	What    string                  `json:"what"`
 	Setup   Setup                   `json:"setup"`
 	History []pluginapi.ChatMessage `json:"history"`
-	Message string                  `json:"message"`
-	Stub    []string                `json:"stub"`
+	// Attach are files sent with the message (#510).
+	Attach  []Attachment `json:"attach"`
+	Message string       `json:"message"`
+	Stub    []string     `json:"stub"`
 	// StubQuery is what the stub writes when asked for a follow-up's web
 	// search; without it, the message itself.
 	StubQuery string `json:"stub_query"`
@@ -115,6 +117,10 @@ type Expect struct {
 	// Files are extensions the answer's files must include, such as ".pdf":
 	// files the assistant made in this turn.
 	Files []string `json:"files"`
+	// FileText, by extension, are texts a file the assistant made must hold,
+	// read the way Toskar reads an attachment (#510): the file is opened,
+	// not only named.
+	FileText map[string][]string `json:"file_text"`
 	// TopicHeld is whether the profile's topic controls held the message
 	// or replaced its answer with the set reply (#345), by the run trace.
 	TopicHeld *bool `json:"topic_held"`
@@ -142,6 +148,8 @@ type Result struct {
 	Events []Event
 	// Prompts are what the model was sent (stub only).
 	Prompts [][]pluginapi.ChatMessage
+	// Files are the files the assistant made in the turn, by name.
+	Files map[string][]byte
 }
 
 // Event is one event during a request.
@@ -403,6 +411,9 @@ func check(driver string, c Case, r Result, deflection *regexp.Regexp) []string 
 		}) {
 			fail("no %s file in the answer: %+v", ext, metaFiles(r))
 		}
+	}
+	for _, f := range madeFileFailures(x.FileText, r.Files) {
+		fail("%s", f)
 	}
 	if x.Verified && !r.has("verify.done") && (r.Run == nil || r.Run.VerificationPasses == 0) {
 		fail("answer was not checked")

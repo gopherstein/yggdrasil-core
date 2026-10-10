@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -124,6 +125,10 @@ func (d realDriver) request(method, path string, body, out any, logf func(string
 			}
 			return resp.StatusCode, fmt.Errorf("%s %s: %d %s", method, path, resp.StatusCode, raw)
 		}
+		if rb, ok := out.(*rawBody); ok {
+			*rb = raw
+			return resp.StatusCode, nil
+		}
 		if out != nil && len(raw) > 0 {
 			if err := json.Unmarshal(raw, out); err != nil {
 				return resp.StatusCode, fmt.Errorf("%s %s: %v in %s", method, path, err, raw)
@@ -132,6 +137,9 @@ func (d realDriver) request(method, path string, body, out any, logf func(string
 		return resp.StatusCode, nil
 	}
 }
+
+// rawBody takes a reply as it is, such as a file's content.
+type rawBody []byte
 
 // unreached reports a request that never got to the daemon: refused or
 // reset before a response, so sending it again can't repeat anything.
@@ -247,10 +255,26 @@ func (d realDriver) Run(t *testing.T, c Case) Result {
 		ID string `json:"id"`
 	}
 	d.do(t, http.MethodPost, "/api/v1/conversations", map[string]any{"title": "Quality " + c.ID, "profile_id": created.ID, "model_id": d.modelID()}, &conv)
-	chat := func(message string) {
+	chat := func(message string, attachments ...string) {
 		d.do(t, http.MethodPost, "/api/v1/chat", map[string]any{
 			"conversation_id": conv.ID, "profile_id": created.ID, "model_id": d.modelID(), "message": message, "stream": false,
+			"attachments": attachments,
 		}, nil)
+	}
+	// Attachments are uploaded as the apps upload them (#510).
+	var attached []string
+	for _, f := range c.Attach {
+		data, err := f.Bytes()
+		if err != nil {
+			t.Fatal(err)
+		}
+		var saved struct {
+			ID string `json:"id"`
+		}
+		d.do(t, http.MethodPost, "/api/v1/artifacts", map[string]any{
+			"name": f.Name, "content_base64": base64.StdEncoding.EncodeToString(data), "conversation_id": conv.ID,
+		}, &saved)
+		attached = append(attached, saved.ID)
 	}
 	// The real model answers the earlier turns itself.
 	for _, m := range c.History {
@@ -261,7 +285,7 @@ func (d realDriver) Run(t *testing.T, c Case) Result {
 
 	ctx, cancel := context.WithCancel(context.Background())
 	events := d.watch(t, ctx, conv.ID)
-	chat(c.Message)
+	chat(c.Message, attached...)
 	r := Result{Events: events()}
 	cancel()
 
@@ -279,6 +303,18 @@ func (d realDriver) Run(t *testing.T, c Case) Result {
 		if msgs[i].Role == "assistant" {
 			r.Answer, r.Meta = msgs[i].Content, msgs[i].Meta
 			break
+		}
+	}
+	if r.Meta != nil {
+		r.Files = map[string][]byte{}
+		for _, f := range r.Meta.Files {
+			if f.Producer != "assistant" {
+				continue
+			}
+			var data rawBody
+			if _, err := d.request(http.MethodGet, "/api/v1/artifacts/"+f.ID+"/content", nil, &data, t.Logf); err == nil {
+				r.Files[f.Name] = data
+			}
 		}
 	}
 	if r.Meta != nil && r.Meta.RunID != "" {

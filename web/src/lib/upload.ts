@@ -1,5 +1,5 @@
 /** File types knowledge and training material accept. */
-export const UPLOAD_ACCEPT = '.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm,.xlsx,.pdf'
+export const UPLOAD_ACCEPT = '.txt,.md,.markdown,.csv,.tsv,.json,.jsonl,.html,.htm,.xlsx,.pdf,.docx,.pptx'
 
 /** Audio chat can play and transcribe. */
 export const AUDIO_ACCEPT = '.wav,.mp3,.m4a,.aac,.ogg,.flac,.webm'
@@ -10,7 +10,7 @@ export const IMAGE_ACCEPT = '.png,.jpg,.jpeg'
 /** Videos chat can show to a model that sees, as frames. (.webm is with audio.) */
 export const VIDEO_ACCEPT = '.mp4,.mov,.m4v,.mkv'
 
-const BINARY = ['.xlsx', '.pdf', ...AUDIO_ACCEPT.split(','), ...IMAGE_ACCEPT.split(','), ...VIDEO_ACCEPT.split(',')]
+const BINARY = ['.xlsx', '.pdf', '.docx', '.pptx', ...AUDIO_ACCEPT.split(','), ...IMAGE_ACCEPT.split(','), ...VIDEO_ACCEPT.split(',')]
 
 export const MAX_UPLOAD_BYTES = 20 * 1024 * 1024
 

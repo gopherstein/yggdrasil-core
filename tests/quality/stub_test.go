@@ -14,7 +14,9 @@ import (
 	"time"
 
 	"github.com/yeixio/toskar-core/internal/app"
+	"github.com/yeixio/toskar-core/internal/artifacts"
 	"github.com/yeixio/toskar-core/internal/events"
+	"github.com/yeixio/toskar-core/internal/imagegen"
 	"github.com/yeixio/toskar-core/internal/mimir"
 	"github.com/yeixio/toskar-core/internal/webfixtures"
 	"github.com/yeixio/toskar-core/pkg/contracts"
@@ -161,7 +163,26 @@ func (d stubDriver) Run(t *testing.T, c Case) Result {
 		}
 	}()
 
-	stream, err := a.RunChat(ctx, profileID, conv.ID, c.Message, false, "auto", "")
+	// Attachments are saved as an upload is, after the same check, and
+	// sent with the message (#510).
+	var attached []string
+	for _, f := range c.Attach {
+		data, err := f.Bytes()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !artifacts.IsAudio(f.Name) && !artifacts.IsVideo(f.Name) && !imagegen.IsEditable(f.Name) {
+			if _, err := mimir.FilePassages(f.Name, data); err != nil {
+				t.Fatalf("the upload of %s would be refused: %v", f.Name, err)
+			}
+		}
+		saved, err := a.Artifacts.Save(ctx, artifacts.Input{ConversationID: conv.ID, Name: f.Name, Producer: artifacts.ProducerUser, Data: data})
+		if err != nil {
+			t.Fatal(err)
+		}
+		attached = append(attached, saved.ID)
+	}
+	stream, err := a.RunChat(artifacts.WithAttachments(ctx, attached), profileID, conv.ID, c.Message, false, "auto", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -191,6 +212,17 @@ func (d stubDriver) Run(t *testing.T, c Case) Result {
 					r.Answer = msgs[i].Content
 				}
 				break
+			}
+		}
+	}
+	if r.Meta != nil {
+		r.Files = map[string][]byte{}
+		for _, f := range r.Meta.Files {
+			if f.Producer != artifacts.ProducerAssistant {
+				continue
+			}
+			if _, data, err := a.Artifacts.Read(ctx, f.ID); err == nil {
+				r.Files[f.Name] = data
 			}
 		}
 	}

@@ -88,6 +88,22 @@ models only; the stub measures `single`). The Quality workflow's
 report, and `TOSKAR_QUALITY_REASONING_JSON` the results. The weekly
 real-model run includes it.
 
+`files.json` is the files set (#510): every type Toskar reads, attached to
+a message and asked about, and every type it makes, asked for and then
+opened. A case's `attach` lists files sent with its message: `make` builds
+one with Toskar's own writers (`pdf`, `docx`, and `pptx` from Markdown, a
+deck's slides split by lines of `---`; `xlsx` from CSV), or `content` is the
+file as it is. It's uploaded the way the apps upload, after the same check.
+`file_text` names, by extension, what a file the assistant made must hold:
+the file is opened the way Toskar reads an attachment, not only named.
+`TestFileCasesCover` checks that every attachment builds and reads, and that
+every readable and writable type has a case. `TestFilesQuality` runs the set:
+the stub must pass every case (the file reached the model, and a made file
+holds what was asked), and a real model the same share as the chat set.
+`TOSKAR_QUALITY_FILES_REPORT` writes its report, and the weekly real-model
+run includes it. Images, video, and audio join it next, judged by a model
+that can see or hear.
+
 ## Running it
 
 - **Stub model:** `make quality`, also part of `go test ./...` in CI. It runs

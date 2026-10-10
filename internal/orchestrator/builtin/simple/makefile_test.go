@@ -21,6 +21,9 @@ func TestAskedForFile(t *testing.T) {
 		"Can I have that recipe as a PDF?":           {Name: "document.pdf"},
 		"Turn it into a Word document":               {Name: "document.docx"},
 		"Save the recipe as 10_Loaf_Pan_Recipes.pdf": {Name: "10_Loaf_Pan_Recipes.pdf"},
+		// #510: a web page or a script, asked for by its name.
+		"Save a simple web page as hours.html that lists our opening hours": {Name: "hours.html"},
+		"Write a Python script saved as convert.py that converts Celsius":   {Name: "convert.py"},
 	}
 	for msg, want := range cases {
 		got, ok := askedForFile(msg)
