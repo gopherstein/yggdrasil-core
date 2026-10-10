@@ -128,6 +128,19 @@
       "qwen2-5-7b-q4": "Asistente general sólido para el trabajo diario.",
       "qwen2-5-coder-7b-q4": "Modelo de programación sólido y versátil, con uso de herramientas.",
       "deepseek-r1-distill-7b-q4": "Razonamiento más sólido para análisis y problemas de varios pasos."
+    },
+    "import": {
+      "button": "Añadir un archivo de modelo",
+      "hint": "Un modelo GGUF de tus archivos o de otra app. Se comprueba primero y debe caber en este dispositivo.",
+      "checking": "Comprobando el archivo…",
+      "added": "Se añadió {{name}}.",
+      "heading": "Añadidos desde archivos",
+      "notGGUF": "Elige un archivo de modelo .gguf.",
+      "incomplete": "El archivo está incompleto. Vuelve a copiarlo e inténtalo otra vez.",
+      "notModel": "Este archivo no es un modelo que este dispositivo pueda usar.",
+      "projector": "Es un proyector de visión, que ayuda a un modelo a ver imágenes. Elige el modelo en sí.",
+      "tooLarge": "Este modelo es demasiado grande para este dispositivo.",
+      "failed": "No se pudo añadir el modelo."
     }
   },
   "onboarding": {
