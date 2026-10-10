@@ -345,6 +345,15 @@
       "description": "A direct link to a .gguf file. A Hugging Face link is checked against the file's checksum, and a vision model's image support comes with it.",
       "url": "Link",
       "name": "Name (optional)"
+    },
+    "check": {
+      "prompt": "Check that it loads and answers.",
+      "waiting": "The check is ready when the copy finishes.",
+      "button": "Check it works",
+      "running": "Loading it and asking one question…",
+      "works": "Works",
+      "speed": "{{speed}} tokens a second",
+      "failed": "It didn't answer: {{error}}"
     }
   }
 }

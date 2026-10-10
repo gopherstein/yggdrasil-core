@@ -5,7 +5,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { api, uploadModel } from '@/lib/api'
 import { formatBytes } from '@/lib/format'
 import { rovingKeyDown } from '@/lib/roving'
-import type { FoundModel, ModelImportResult } from '@/types/api'
+import type { BenchmarkJob, FoundModel, ModelImportResult } from '@/types/api'
 
 type Way = 'file' | 'apps' | 'link'
 
@@ -26,8 +26,10 @@ export function AddModelPanel({ onClose, onAdded }: { onClose: () => void; onAdd
   const { t } = useTranslation('models')
   const [way, setWay] = useState<Way>('file')
   const [done, setDone] = useState<string | null>(null)
+  const [lastAdded, setLastAdded] = useState<string | null>(null)
   const added = (result: ModelImportResult | null, fallbackName?: string) => {
     if (!result) return
+    setLastAdded(result.model_id)
     // The name it was saved with: the one asked for, else its header's.
     const name = fallbackName || result.details?.name || result.model_id
     setDone(result.status === 'copying' ? t('add.copying', { name }) : t('add.added', { name }))
@@ -60,6 +62,7 @@ export function AddModelPanel({ onClose, onAdded }: { onClose: () => void; onAdd
             onClick={() => {
               setWay(id)
               setDone(null)
+              setLastAdded(null)
             }}
           >
             {t(`add.ways.${id}`)}
@@ -76,7 +79,73 @@ export function AddModelPanel({ onClose, onAdded }: { onClose: () => void; onAdd
           {done}
         </p>
       ) : null}
+      {lastAdded ? <QuickCheck key={lastAdded} modelId={lastAdded} /> : null}
     </section>
+  )
+}
+
+/** What a quick check found: the speed, or why it didn't answer. */
+function checkResult(job: BenchmarkJob): { ok: boolean; speed?: number; error?: string } {
+  const measured = job.samples.filter((s) => !s.warmup)
+  const failed = job.samples.find((s) => s.error)
+  if (job.status === 'failed' || (failed && measured.every((s) => s.error))) {
+    return { ok: false, error: job.error || failed?.error }
+  }
+  const speeds = (measured.length ? measured : job.samples).map((s) => s.eval_tok_per_sec).filter((v) => v > 0)
+  return { ok: true, speed: speeds.length ? speeds.reduce((a, b) => a + b, 0) / speeds.length : undefined }
+}
+
+/**
+ * Loads a model just added and asks it one short question (#467): Works,
+ * with its speed, or the error. Asked for, not automatic, since loading a
+ * large model takes memory from what's running.
+ */
+function QuickCheck({ modelId }: { modelId: string }) {
+  const { t } = useTranslation('models')
+  // A copy is installed when it finishes; until then the check waits.
+  const models = useQuery({
+    queryKey: ['models'],
+    queryFn: () => api.getModels(),
+    retry: false,
+    refetchInterval: (q) => ((q.state.data ?? []).find((x) => x.id === modelId)?.installed ? false : 2000),
+  })
+  const installed = Boolean((models.data ?? []).find((m) => m.id === modelId)?.installed)
+  const [jobId, setJobId] = useState<string | null>(null)
+  const start = useMutation({
+    mutationFn: () => api.startBenchmark({ model_ids: [modelId], workload_ids: ['quick'], runs: 1 }),
+    onSuccess: (job) => job && setJobId(job.id),
+  })
+  const job = useQuery({
+    queryKey: ['benchmark', jobId],
+    queryFn: () => api.getBenchmark(jobId!),
+    enabled: Boolean(jobId),
+    refetchInterval: (q) => (q.state.data && ['completed', 'failed', 'cancelled'].includes(q.state.data.status) ? false : 1000),
+  })
+  const finished = job.data && ['completed', 'failed', 'cancelled'].includes(job.data.status)
+  const result = finished && job.data ? checkResult(job.data) : null
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-lg border border-line/70 px-3 py-2 text-sm">
+      {result ? (
+        result.ok ? (
+          <p className="text-ink">
+            <span className="font-medium text-success">{t('add.check.works')}</span>
+            {result.speed ? ` · ${t('add.check.speed', { speed: Math.round(result.speed) })}` : ''}
+          </p>
+        ) : (
+          <p className="text-danger">{t('add.check.failed', { error: result.error || t('add.failed') })}</p>
+        )
+      ) : jobId || start.isPending ? (
+        <LoadingSpinner label={t('add.check.running')} />
+      ) : (
+        <>
+          <span className="text-ink-muted">{installed ? t('add.check.prompt') : t('add.check.waiting')}</span>
+          <button type="button" className="btn-secondary btn-sm" disabled={!installed} onClick={() => start.mutate()}>
+            {t('add.check.button')}
+          </button>
+        </>
+      )}
+      {start.isError ? <p className="text-danger">{errorText(start.error, t('add.failed'))}</p> : null}
+    </div>
   )
 }
 

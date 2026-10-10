@@ -345,6 +345,15 @@
       "description": "Ein direkter Link zu einer .gguf-Datei. Ein Hugging-Face-Link wird mit der Prüfsumme der Datei abgeglichen, und die Bildunterstützung eines Bildmodells kommt mit.",
       "url": "Link",
       "name": "Name (optional)"
+    },
+    "check": {
+      "prompt": "Prüfe, ob es lädt und antwortet.",
+      "waiting": "Die Prüfung ist bereit, wenn die Kopie fertig ist.",
+      "button": "Prüfen, ob es funktioniert",
+      "running": "Wird geladen und bekommt eine Frage…",
+      "works": "Funktioniert",
+      "speed": "{{speed}} Tokens pro Sekunde",
+      "failed": "Es hat nicht geantwortet: {{error}}"
     }
   }
 }

@@ -352,6 +352,15 @@
       "description": "Un lien direct vers un fichier .gguf. Un lien Hugging Face est vérifié avec la somme de contrôle du fichier, et la prise en charge des images d'un modèle de vision est incluse.",
       "url": "Lien",
       "name": "Nom (facultatif)"
+    },
+    "check": {
+      "prompt": "Vérifiez qu'il se charge et répond.",
+      "waiting": "La vérification sera prête à la fin de la copie.",
+      "button": "Vérifier qu'il fonctionne",
+      "running": "Chargement et une question…",
+      "works": "Fonctionne",
+      "speed": "{{speed}} jetons par seconde",
+      "failed": "Il n'a pas répondu : {{error}}"
     }
   }
 }

@@ -338,6 +338,15 @@
       "description": "指向 .gguf 檔案的直接連結。Hugging Face 連結會以檔案檢查碼核對，視覺模型的圖片支援也會一併加入。",
       "url": "連結",
       "name": "名稱（選填）"
+    },
+    "check": {
+      "prompt": "檢查它能否載入並回答。",
+      "waiting": "複製完成後即可檢查。",
+      "button": "檢查能否使用",
+      "running": "正在載入並提出一個問題…",
+      "works": "可以使用",
+      "speed": "每秒 {{speed}} 個 token",
+      "failed": "沒有回答：{{error}}"
     }
   }
 }
