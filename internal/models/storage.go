@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/yeixio/toskar-core/pkg/contracts"
@@ -139,11 +140,26 @@ func (s *Storage) DeleteInstalled(ctx context.Context, modelID string) error {
 	if err != nil {
 		return err
 	}
-	if path != "" {
+	// A model used in place (#467) is another app's file, or the person's:
+	// only files in the models folder are Toskar's to delete.
+	if path != "" && s.owns(path) {
 		_ = os.Remove(path)
 	}
 	_ = os.Remove(s.ProjectorPath(modelID))
 	_, err = s.db.ExecContext(ctx, `DELETE FROM installed_models WHERE model_id = ?`, modelID)
+	return err
+}
+
+// owns reports a path inside the models folder.
+func (s *Storage) owns(path string) bool {
+	rel, err := filepath.Rel(s.modelsDir, path)
+	return err == nil && rel != "." && !strings.HasPrefix(rel, "..") && !filepath.IsAbs(rel)
+}
+
+// SetSHA256 records an installed model's checksum, worked out after it was
+// added.
+func (s *Storage) SetSHA256(ctx context.Context, modelID, sum string) error {
+	_, err := s.db.ExecContext(ctx, `UPDATE installed_models SET sha256 = ? WHERE model_id = ?`, sum, modelID)
 	return err
 }
 

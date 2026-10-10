@@ -2395,6 +2395,88 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RunningModelView"
+  /api/v1/models/import:
+    post:
+      summary: Add a model from a GGUF file
+      description: >-
+        A path on this computer as JSON, copied into the models folder (the default; progress comes as
+        model.download events) or used in place with in_place, or the file itself as an
+        application/octet-stream body with filename in the query. The header and tensor bounds are
+        checked first (#467).
+      operationId: importModel
+      parameters:
+        - name: filename
+          in: query
+          description: For an upload, the file's name, ending in .gguf
+          schema:
+            type: string
+        - name: display_name
+          in: query
+          schema:
+            type: string
+        - name: id
+          in: query
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path:
+                  type: string
+                  description: An absolute path to a .gguf file on this computer
+                in_place:
+                  type: boolean
+                id:
+                  type: string
+                display_name:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: Added; status is copying or installed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                  status:
+                    type: string
+                    enum: [copying, installed]
+                  details:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      architecture:
+                        type: string
+                      parameters:
+                        type: integer
+                      size_label:
+                        type: string
+                      context_length:
+                        type: integer
+                      quantization:
+                        type: string
+                      chat_template:
+                        type: boolean
+                      license:
+                        type: string
+        "400":
+          description: MODEL_FILE_NOT_FOUND, MODEL_FILE_INVALID (not GGUF, incomplete, or damaged), or MODEL_FILE_PROJECTOR
   /api/v1/models/install-from-url:
     post:
       summary: Download a GGUF from a URL
