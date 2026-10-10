@@ -2477,6 +2477,45 @@ paths:
                         type: string
         "400":
           description: MODEL_FILE_NOT_FOUND, MODEL_FILE_INVALID (not GGUF, incomplete, or damaged), or MODEL_FILE_PROJECTOR
+  /api/v1/models/import/found:
+    get:
+      summary: Models other local AI apps keep on this computer
+      description: >-
+        GGUF models LM Studio, Ollama (through its manifests), llama.cpp, and GPT4All already
+        downloaded, to add with POST /api/v1/models/import without downloading them again. Only
+        headers and Ollama's manifests are read; incomplete files and vision projectors are left out (#467).
+      operationId: findModelsInOtherApps
+      responses:
+        "200":
+          description: The models found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  models:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        app:
+                          type: string
+                          enum: [lmstudio, ollama, llamacpp, gpt4all]
+                        path:
+                          type: string
+                        name:
+                          type: string
+                        size_bytes:
+                          type: integer
+                        architecture:
+                          type: string
+                        parameters:
+                          type: string
+                        quantization:
+                          type: string
+                        model_id:
+                          type: string
+                          description: Set when the file is already a model here
   /api/v1/models/install-from-url:
     post:
       summary: Download a GGUF from a URL

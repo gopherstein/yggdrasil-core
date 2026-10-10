@@ -68,6 +68,18 @@ func (s *Server) handleImportModel(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// handleFoundModels lists models other local AI apps keep on this computer,
+// to add without downloading them again (#467).
+func (s *Server) handleFoundModels(w http.ResponseWriter, r *http.Request) {
+	found := []models.FoundModel{}
+	if s.deps.FindModelsInOtherApps != nil {
+		if list := s.deps.FindModelsInOtherApps(r.Context()); list != nil {
+			found = list
+		}
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"models": found})
+}
+
 // importUpload writes the body to the models folder, then adds it.
 // filename, display_name, and id come in the query.
 func (s *Server) importUpload(r *http.Request) (models.Imported, error) {

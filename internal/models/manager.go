@@ -29,6 +29,8 @@ type Manager struct {
 	// the model file's size and SHA-256, and a vision model's projector, or
 	// nil (#191). An error leaves the install as it was asked for.
 	Resolve func(ctx context.Context, sourceURL string) (ModelFile, *ModelFile, error)
+	// Home is the folder FindOtherApps looks in; empty is the user's.
+	Home string
 
 	mu          sync.Mutex
 	downloading map[string]struct{}

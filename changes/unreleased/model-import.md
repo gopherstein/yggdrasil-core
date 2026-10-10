@@ -6,6 +6,9 @@
   checked first, so an incomplete copy or a file that isn't a model is
   refused, and the model's name, size, quantization, and context length come
   from the file. The web app and the phone app will use it next.
+- Toskar finds models LM Studio, Ollama, llama.cpp, and GPT4All already
+  downloaded on this computer (`GET /api/v1/models/import/found`), so they
+  can be added in place without downloading them again.
 
 ### Fixed
 

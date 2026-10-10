@@ -33,7 +33,9 @@ func TestImportModelRoute(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv := NewServer(Dependencies{Config: cfg, ImportModel: mgr.ImportFile, ModelUploadPath: mgr.UploadPath, AdoptModelUpload: mgr.AdoptUpload})
+	mgr.Home = filepath.Join(dir, "home")
+	t.Setenv("OLLAMA_MODELS", "")
+	srv := NewServer(Dependencies{Config: cfg, ImportModel: mgr.ImportFile, ModelUploadPath: mgr.UploadPath, AdoptModelUpload: mgr.AdoptUpload, FindModelsInOtherApps: mgr.FindOtherApps})
 	call := func(path, contentType string, body []byte) (int, map[string]any) {
 		r := httptest.NewRequest(http.MethodPost, path, bytes.NewReader(body))
 		r.Header.Set("Content-Type", contentType)
@@ -70,5 +72,14 @@ func TestImportModelRoute(t *testing.T) {
 	}
 	if _, err := os.Stat(src); err != nil {
 		t.Errorf("the original file: %v", err)
+	}
+
+	gguftest.Write(t, filepath.Join(dir, "home", ".lmstudio", "models", "x"), "Found-Q8_0.gguf", gguftest.Options{Name: "Found"})
+	r := httptest.NewRequest(http.MethodGet, "/api/v1/models/import/found", nil)
+	r.RemoteAddr, r.Host = "127.0.0.1:50000", "127.0.0.1:7331"
+	rec := httptest.NewRecorder()
+	srv.Handler().ServeHTTP(rec, r)
+	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), `"app":"lmstudio"`) || !strings.Contains(rec.Body.String(), `"name":"Found"`) {
+		t.Errorf("found: %d %s", rec.Code, rec.Body.String())
 	}
 }

@@ -46,7 +46,13 @@ type Imported struct {
 func (m *Manager) ImportFile(ctx context.Context, req ImportRequest) (Imported, error) {
 	path, err := importPath(req.Path)
 	if err != nil {
-		return Imported{}, err
+		// A model another app keeps, such as an Ollama blob, has no .gguf
+		// name; it's added when FindOtherApps lists it.
+		p := filepath.Clean(strings.TrimSpace(req.Path))
+		if !filepath.IsAbs(p) || !m.foundPath(ctx, p) {
+			return Imported{}, err
+		}
+		path = p
 	}
 	return m.importChecked(ctx, req, path, false)
 }
