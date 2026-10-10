@@ -2,22 +2,35 @@ package artifacts
 
 import (
 	"bytes"
+	"compress/zlib"
+	"encoding/hex"
 	"fmt"
+	"hash/fnv"
+	"math"
+	"sort"
 	"strings"
 	"unicode"
+	"unicode/utf16"
 
 	"golang.org/x/text/encoding/charmap"
 )
 
-// MarkdownToPDF makes an A4 PDF from Markdown (Gungnir §21). It uses the
-// PDF standard fonts (Helvetica and Courier), so nothing is embedded; text
-// outside Western European characters (Windows-1252) is shown as "?".
+// MarkdownToPDF makes an A4 PDF from Markdown (Gungnir §21), in Noto Sans
+// for text and Courier for code. Chinese, Japanese, and Korean need
+// (*Fonts).MarkdownToPDF; here they're shown as "?".
 func MarkdownToPDF(text string) ([]byte, error) {
-	p := newPDFLayout()
+	return markdownToPDF(text, nil)
+}
+
+func markdownToPDF(text string, extra []*ttfFont) ([]byte, error) {
+	p, err := newPDFLayout(extra)
+	if err != nil {
+		return nil, err
+	}
 	for _, b := range parseMarkdown(text) {
 		p.block(b)
 	}
-	return p.finish(), nil
+	return p.finish()
 }
 
 const (
@@ -37,58 +50,82 @@ const (
 	fontMono
 )
 
-var fontNames = []string{"Helvetica", "Helvetica-Bold", "Helvetica-Oblique", "Courier"}
+// A face is one font in the PDF: an embedded TrueType font, of which only
+// the glyphs used are kept, or Courier, a standard font nothing is
+// embedded for.
+type face struct {
+	ttf     *ttfFont
+	res     int      // its resource name is /F<res>
+	scale   float64  // font units to thousandths of the font size
+	gids    []uint16 // the font's glyph for each glyph in the PDF
+	cid     map[uint16]uint16
+	text    map[uint16]rune // the character each glyph in the PDF shows
+	used    bool
+	hasBold bool // false when bold text in it is drawn thicker
+}
 
-// Character widths, in thousandths of the font size, for ASCII 32–126
-// (Adobe's Helvetica and Helvetica-Bold metrics). Other characters use 556.
-var helvetica = []int{278, 278, 355, 556, 556, 889, 667, 191, 333, 333, 389, 584, 278, 333, 278, 278, 556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 278, 278, 584, 584, 584, 556, 1015, 667, 667, 722, 722, 667, 611, 778, 722, 278, 500, 667, 556, 833, 722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 278, 278, 278, 469, 556, 333, 556, 556, 500, 556, 556, 278, 556, 556, 222, 222, 500, 222, 833, 556, 556, 556, 556, 333, 500, 278, 556, 500, 722, 500, 500, 500, 334, 260, 334, 584}
-var helveticaBold = []int{278, 333, 474, 556, 556, 889, 722, 238, 333, 333, 389, 584, 278, 333, 278, 278, 556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 333, 333, 584, 584, 584, 611, 975, 722, 722, 722, 722, 667, 611, 778, 722, 278, 556, 722, 611, 833, 722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 333, 278, 333, 584, 556, 333, 556, 611, 556, 611, 556, 333, 611, 611, 278, 278, 556, 278, 889, 611, 611, 611, 611, 389, 556, 333, 611, 556, 778, 556, 556, 500, 389, 280, 389, 584}
+func newFace(f *ttfFont, res int, hasBold bool) *face {
+	fc := &face{ttf: f, res: res, hasBold: hasBold}
+	if f != nil {
+		fc.scale = 1000 / float64(f.unitsPerEm)
+		fc.gids = []uint16{0}
+		fc.cid = map[uint16]uint16{0: 0}
+		fc.text = map[uint16]rune{}
+	}
+	return fc
+}
 
-func charWidth(f pdfFont, b byte) float64 {
-	if f == fontMono {
+func (fc *face) has(r rune) bool {
+	if fc.ttf == nil {
+		_, ok := charmap.Windows1252.EncodeRune(r)
+		return ok
+	}
+	_, ok := fc.ttf.cmap[r]
+	return ok
+}
+
+// width is a character's width in thousandths of the font size.
+func (fc *face) width(r rune) float64 {
+	if fc.ttf == nil {
 		return 600
 	}
-	table := helvetica
-	if f == fontBold {
-		table = helveticaBold
-	}
-	if b >= 32 && b <= 126 {
-		return float64(table[b-32])
-	}
-	return 556
+	return math.Round(float64(fc.ttf.advance(fc.ttf.cmap[r])) * fc.scale)
 }
 
-// winAnsi encodes text in the standard fonts' encoding.
-func winAnsi(s string) []byte {
-	enc := charmap.Windows1252.NewEncoder()
-	out := make([]byte, 0, len(s))
+// encode adds a character to s as the font's code for it.
+func (fc *face) encode(s []byte, r rune) []byte {
+	fc.used = true
+	if fc.ttf == nil {
+		b, _ := charmap.Windows1252.EncodeRune(r)
+		return append(s, b)
+	}
+	g := fc.ttf.cmap[r]
+	c, ok := fc.cid[g]
+	if !ok {
+		c = uint16(len(fc.gids))
+		fc.cid[g] = c
+		fc.gids = append(fc.gids, g)
+		fc.text[c] = r
+	}
+	return append(s, byte(c>>8), byte(c))
+}
+
+// clean is text as the PDF shows it: tabs as four spaces, no-break spaces
+// as spaces, and no control characters.
+func clean(s string) string {
+	var b strings.Builder
 	for _, r := range s {
-		switch r {
-		case '\t':
-			out = append(out, ' ', ' ', ' ', ' ')
-			continue
-		case ' ':
-			r = ' '
+		switch {
+		case r == '\t':
+			b.WriteString("    ")
+		case r == '\u00a0':
+			b.WriteByte(' ')
+		case unicode.IsControl(r):
+		default:
+			b.WriteRune(r)
 		}
-		if unicode.IsControl(r) {
-			continue
-		}
-		b, err := enc.Bytes([]byte(string(r)))
-		if err != nil || len(b) != 1 {
-			out = append(out, '?')
-			continue
-		}
-		out = append(out, b[0])
 	}
-	return out
-}
-
-func textWidth(f pdfFont, size float64, b []byte) float64 {
-	w := 0.0
-	for _, c := range b {
-		w += charWidth(f, c)
-	}
-	return w * size / 1000
+	return b.String()
 }
 
 func spanFont(s span) pdfFont {
@@ -104,15 +141,51 @@ func spanFont(s span) pdfFont {
 }
 
 type pdfLayout struct {
-	pages []*bytes.Buffer
-	cur   *bytes.Buffer
-	y     float64
+	pages  []*bytes.Buffer
+	cur    *bytes.Buffer
+	y      float64
+	faces  []*face
+	chains [4][]*face // the faces tried for each style, in order
 }
 
-func newPDFLayout() *pdfLayout {
-	p := &pdfLayout{}
+func newPDFLayout(extra []*ttfFont) (*pdfLayout, error) {
+	builtin, err := builtinFonts()
+	if err != nil {
+		return nil, err
+	}
+	regular, bold, mono := newFace(builtin[0], 1, true), newFace(builtin[1], 2, true), newFace(nil, 3, true)
+	p := &pdfLayout{faces: []*face{regular, bold, mono}}
+	var more []*face
+	for _, f := range extra {
+		fc := newFace(f, len(p.faces)+1, false)
+		p.faces = append(p.faces, fc)
+		more = append(more, fc)
+	}
+	chain := func(fs ...*face) []*face { return append(fs, more...) }
+	p.chains = [4][]*face{
+		fontRegular: chain(regular),
+		fontBold:    chain(bold),
+		fontItalic:  chain(regular),
+		fontMono:    chain(mono, regular),
+	}
 	p.newPage()
-	return p
+	return p, nil
+}
+
+// scratch is a layout that shares p's fonts, to measure text on.
+func (p *pdfLayout) scratch() *pdfLayout {
+	return &pdfLayout{cur: &bytes.Buffer{}, y: 1e6, faces: p.faces, chains: p.chains}
+}
+
+// faceFor is the first face in a style that has r, and the character it
+// shows: "?" when none has it.
+func (p *pdfLayout) faceFor(f pdfFont, r rune) (*face, rune) {
+	for _, fc := range p.chains[f] {
+		if fc.has(r) {
+			return fc, r
+		}
+	}
+	return p.chains[f][0], '?'
 }
 
 func (p *pdfLayout) newPage() {
@@ -128,7 +201,28 @@ func (p *pdfLayout) room(h float64) {
 	}
 }
 
-func pdfString(b []byte) string {
+func (p *pdfLayout) textWidth(f pdfFont, size float64, s string) float64 {
+	w := 0.0
+	for _, r := range s {
+		fc, r := p.faceFor(f, r)
+		w += fc.width(r)
+	}
+	return w * size / 1000
+}
+
+// fit cuts s until it is no wider than width.
+func (p *pdfLayout) fit(f pdfFont, size float64, s string, width float64) string {
+	rs := []rune(s)
+	for len(rs) > 1 && p.textWidth(f, size, string(rs)) > width {
+		rs = rs[:len(rs)-1]
+	}
+	return string(rs)
+}
+
+func pdfString(b []byte, literal bool) string {
+	if !literal {
+		return "<" + hex.EncodeToString(b) + ">"
+	}
 	var s strings.Builder
 	s.WriteByte('(')
 	for _, c := range b {
@@ -141,12 +235,49 @@ func pdfString(b []byte) string {
 	return s.String()
 }
 
-func (p *pdfLayout) text(x, y float64, f pdfFont, size float64, b []byte) {
-	fmt.Fprintf(p.cur, "BT /F%d %.1f Tf %.2f %.2f Td %s Tj ET\n", int(f)+1, size, x, y, pdfString(b))
+// text writes s at x, y, each character in the first of the style's faces
+// that has it. Italic is slanted; bold in a face without a bold weight is
+// drawn with an outline.
+func (p *pdfLayout) text(x, y float64, f pdfFont, size float64, s string) {
+	p.write(p.cur, x, y, f, size, s)
+}
+
+func (p *pdfLayout) write(w *bytes.Buffer, x, y float64, f pdfFont, size float64, s string) {
+	if f == fontItalic {
+		fmt.Fprintf(w, "BT 1 0 0.2 1 %.2f %.2f Tm", x, y)
+	} else {
+		fmt.Fprintf(w, "BT %.2f %.2f Td", x, y)
+	}
+	var run []byte
+	var cur *face
+	flush := func() {
+		if cur == nil || len(run) == 0 {
+			return
+		}
+		fake := f == fontBold && !cur.hasBold
+		if fake {
+			fmt.Fprintf(w, " 2 Tr %.2f w", size*0.03)
+		}
+		fmt.Fprintf(w, " /F%d %.1f Tf %s Tj", cur.res, size, pdfString(run, cur.ttf == nil))
+		if fake {
+			w.WriteString(" 0 Tr")
+		}
+		run = run[:0]
+	}
+	for _, r := range s {
+		fc, r := p.faceFor(f, r)
+		if fc != cur {
+			flush()
+			cur = fc
+		}
+		run = fc.encode(run, r)
+	}
+	flush()
+	w.WriteString(" ET\n")
 }
 
 type word struct {
-	b     []byte
+	s     string
 	font  pdfFont
 	space bool // a space comes before it
 }
@@ -160,13 +291,13 @@ func words(spans []span, base pdfFont) []word {
 		if f == fontRegular {
 			f = base
 		}
-		for _, part := range strings.SplitAfter(s.Text, " ") {
+		for _, part := range strings.SplitAfter(clean(s.Text), " ") {
 			if part == "" {
 				continue
 			}
 			trimmed := strings.TrimRight(part, " ")
 			if trimmed != "" {
-				out = append(out, word{b: winAnsi(trimmed), font: f, space: space})
+				out = append(out, word{s: trimmed, font: f, space: space})
 			}
 			space = strings.HasSuffix(part, " ")
 		}
@@ -181,9 +312,9 @@ func (p *pdfLayout) flow(spans []span, base pdfFont, size, lead, x, width float6
 		lineW := 0.0
 		n := 0
 		for n < len(ws) {
-			w := textWidth(ws[n].font, size, ws[n].b)
+			w := p.textWidth(ws[n].font, size, ws[n].s)
 			if n > 0 && ws[n].space {
-				w += textWidth(ws[n].font, size, []byte{' '})
+				w += p.textWidth(ws[n].font, size, " ")
 			}
 			if n > 0 && lineW+w > width {
 				break
@@ -196,28 +327,26 @@ func (p *pdfLayout) flow(spans []span, base pdfFont, size, lead, x, width float6
 		// Words in the same font go out as one string with their spaces,
 		// so the text can be copied and searched.
 		cx := x
-		var run []byte
+		var run strings.Builder
 		runFont, runX := ws[0].font, x
 		for i, w := range ws[:n] {
-			b := w.b
 			// A single word wider than the line is cut to fit.
-			for textWidth(w.font, size, b) > width && len(b) > 1 {
-				b = b[:len(b)-1]
-			}
+			s := p.fit(w.font, size, w.s, width)
 			if i > 0 && w.space {
 				// The space goes with the words before it, in their font.
-				run = append(run, ' ')
-				cx += textWidth(runFont, size, []byte{' '})
+				run.WriteByte(' ')
+				cx += p.textWidth(runFont, size, " ")
 			}
 			if i > 0 && w.font != runFont {
-				p.text(runX, p.y, runFont, size, run)
-				run, runFont, runX = nil, w.font, cx
+				p.text(runX, p.y, runFont, size, run.String())
+				run.Reset()
+				runFont, runX = w.font, cx
 			}
-			run = append(run, b...)
-			cx += textWidth(w.font, size, b)
+			run.WriteString(s)
+			cx += p.textWidth(w.font, size, s)
 		}
-		if len(run) > 0 {
-			p.text(runX, p.y, runFont, size, run)
+		if run.Len() > 0 {
+			p.text(runX, p.y, runFont, size, run.String())
 		}
 		ws = ws[n:]
 	}
@@ -241,7 +370,7 @@ func (p *pdfLayout) block(b block) {
 		p.y -= 6
 	case blockBullet, blockNumbered:
 		indent := 18 + 18*float64(b.Level)
-		marker := "\x95"
+		marker := "•"
 		if b.Kind == blockNumbered {
 			marker = fmt.Sprintf("%d.", b.Number)
 		}
@@ -249,18 +378,14 @@ func (p *pdfLayout) block(b block) {
 		top := p.y
 		p.flow(b.Spans, fontRegular, 11, 15, marginX+indent, contentW-indent)
 		if top > p.y { // marker on the item's first line
-			p.text(marginX+indent-14, top-15, fontRegular, 11, []byte(marker))
+			p.text(marginX+indent-14, top-15, fontRegular, 11, marker)
 		}
 		p.y -= 2
 	case blockCode:
 		for _, line := range b.Lines {
 			p.room(12)
 			p.y -= 12
-			bs := winAnsi(line)
-			for textWidth(fontMono, 9.5, bs) > contentW && len(bs) > 1 {
-				bs = bs[:len(bs)-1]
-			}
-			p.text(marginX+8, p.y, fontMono, 9.5, bs)
+			p.text(marginX+8, p.y, fontMono, 9.5, p.fit(fontMono, 9.5, clean(line), contentW))
 		}
 		p.y -= 8
 	case blockRule:
@@ -285,14 +410,14 @@ func (p *pdfLayout) table(rows [][][]span) {
 	const size, lead, pad = 9.5, 12.5, 4.0
 	p.y -= 8
 	for i, row := range rows {
+		base := fontRegular
+		if i == 0 {
+			base = fontBold
+		}
 		// Lay the row out on a scratch page to learn its height.
 		heights := make([]float64, cols)
 		for c := 0; c < cols && c < len(row); c++ {
-			scratch := &pdfLayout{cur: &bytes.Buffer{}, y: 1e6}
-			base := fontRegular
-			if i == 0 {
-				base = fontBold
-			}
+			scratch := p.scratch()
 			scratch.flow(row[c], base, size, lead, 0, colW-2*pad)
 			heights[c] = 1e6 - scratch.y
 		}
@@ -307,10 +432,6 @@ func (p *pdfLayout) table(rows [][][]span) {
 			x := marginX + float64(c)*colW
 			fmt.Fprintf(p.cur, "0.7 G 0.5 w %.2f %.2f %.2f %.2f re S 0 G\n", x, top-h, colW, h)
 			if c < len(row) {
-				base := fontRegular
-				if i == 0 {
-					base = fontBold
-				}
 				p.y = top - pad + 2
 				p.flow(row[c], base, size, lead, x+pad, colW-2*pad)
 			}
@@ -320,43 +441,142 @@ func (p *pdfLayout) table(rows [][][]span) {
 	p.y -= 10
 }
 
-// finish writes the PDF file: catalog, page tree, fonts, and each page.
-func (p *pdfLayout) finish() []byte {
+func deflate(b []byte) []byte {
 	var out bytes.Buffer
-	var offsets []int
-	obj := func(body string) {
-		offsets = append(offsets, out.Len())
-		fmt.Fprintf(&out, "%d 0 obj\n%s\nendobj\n", len(offsets), body)
-	}
-	out.WriteString("%PDF-1.4\n%\xe2\xe3\xcf\xd3\n")
-	nFonts := len(fontNames)
-	firstPage := 3 + nFonts
-	var kids strings.Builder
-	for i := range p.pages {
-		fmt.Fprintf(&kids, "%d 0 R ", firstPage+2*i)
-	}
-	obj("<< /Type /Catalog /Pages 2 0 R >>")
-	obj(fmt.Sprintf("<< /Type /Pages /Kids [%s] /Count %d >>", strings.TrimSpace(kids.String()), len(p.pages)))
-	var fonts strings.Builder
-	for i, name := range fontNames {
-		obj(fmt.Sprintf("<< /Type /Font /Subtype /Type1 /BaseFont /%s /Encoding /WinAnsiEncoding >>", name))
-		fmt.Fprintf(&fonts, "/F%d %d 0 R ", i+1, 3+i)
-	}
-	for i, page := range p.pages {
-		// Page number at the foot of each page, when there is more than one.
-		if len(p.pages) > 1 {
-			num := winAnsi(fmt.Sprintf("%d / %d", i+1, len(p.pages)))
-			fmt.Fprintf(page, "0.5 g BT /F1 8.0 Tf %.2f %.2f Td %s Tj ET 0 g\n", pageW/2-textWidth(fontRegular, 8, num)/2, marginBottom/2, pdfString(num))
+	z := zlib.NewWriter(&out)
+	_, _ = z.Write(b)
+	_ = z.Close()
+	return out.Bytes()
+}
+
+// finish writes the PDF file: catalog, page tree, fonts, and each page.
+func (p *pdfLayout) finish() ([]byte, error) {
+	// Page number at the foot of each page, when there is more than one.
+	if len(p.pages) > 1 {
+		for i, page := range p.pages {
+			num := fmt.Sprintf("%d / %d", i+1, len(p.pages))
+			page.WriteString("0.5 g ")
+			p.write(page, pageW/2-p.textWidth(fontRegular, 8, num)/2, marginBottom/2, fontRegular, 8, num)
+			page.WriteString("0 g\n")
 		}
-		obj(fmt.Sprintf("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 %.0f %.0f] /Resources << /Font << %s>> >> /Contents %d 0 R >>",
-			pageW, pageH, fonts.String(), firstPage+2*i+1))
-		obj(fmt.Sprintf("<< /Length %d >>\nstream\n%sendstream", page.Len(), page.String()))
+	}
+	var objs []string
+	add := func(body string) int {
+		objs = append(objs, body)
+		return len(objs)
+	}
+	stream := func(dict string, data []byte) int {
+		z := deflate(data)
+		return add(fmt.Sprintf("<< %s /Filter /FlateDecode /Length %d >>\nstream\n%s\nendstream", dict, len(z), z))
+	}
+	add("<< /Type /Catalog /Pages 2 0 R >>")
+	pagesAt := add("") // written once the pages are
+	var fonts strings.Builder
+	for _, fc := range p.faces {
+		if !fc.used {
+			continue
+		}
+		var ref int
+		if fc.ttf == nil {
+			ref = add("<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>")
+		} else {
+			var err error
+			if ref, err = p.embed(fc, add, stream); err != nil {
+				return nil, err
+			}
+		}
+		fmt.Fprintf(&fonts, "/F%d %d 0 R ", fc.res, ref)
+	}
+	var kids []string
+	for _, page := range p.pages {
+		contents := stream("", page.Bytes())
+		kids = append(kids, fmt.Sprintf("%d 0 R", add(fmt.Sprintf("<< /Type /Page /Parent %d 0 R /MediaBox [0 0 %.0f %.0f] /Resources << /Font << %s>> >> /Contents %d 0 R >>",
+			pagesAt, pageW, pageH, fonts.String(), contents))))
+	}
+	objs[pagesAt-1] = fmt.Sprintf("<< /Type /Pages /Kids [%s] /Count %d >>", strings.Join(kids, " "), len(p.pages))
+
+	var out bytes.Buffer
+	out.WriteString("%PDF-1.4\n%\xe2\xe3\xcf\xd3\n")
+	offsets := make([]int, len(objs))
+	for i, body := range objs {
+		offsets[i] = out.Len()
+		fmt.Fprintf(&out, "%d 0 obj\n%s\nendobj\n", i+1, body)
 	}
 	xref := out.Len()
-	fmt.Fprintf(&out, "xref\n0 %d\n0000000000 65535 f \n", len(offsets)+1)
+	fmt.Fprintf(&out, "xref\n0 %d\n0000000000 65535 f \n", len(objs)+1)
 	for _, o := range offsets {
 		fmt.Fprintf(&out, "%010d 00000 n \n", o)
 	}
-	fmt.Fprintf(&out, "trailer\n<< /Size %d /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF\n", len(offsets)+1, xref)
-	return out.Bytes()
+	fmt.Fprintf(&out, "trailer\n<< /Size %d /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF\n", len(objs)+1, xref)
+	return out.Bytes(), nil
+}
+
+// embed writes a TrueType face as a composite font of the glyphs used,
+// numbered in the order they were first used, with each glyph's width and
+// the character it shows, so its text can be copied. It returns the
+// font's object.
+func (p *pdfLayout) embed(fc *face, add func(string) int, stream func(string, []byte) int) (int, error) {
+	f := fc.ttf
+	file, _, err := f.subset(fc.gids)
+	if err != nil {
+		return 0, err
+	}
+	// A subset's name starts with six capital letters of its own.
+	h := fnv.New32a()
+	for _, g := range fc.gids {
+		_, _ = h.Write([]byte{byte(g >> 8), byte(g)})
+	}
+	sum := h.Sum32()
+	tag := make([]byte, 6)
+	for i := range tag {
+		tag[i] = 'A' + byte(sum%26)
+		sum /= 26
+	}
+	name := string(tag) + "+" + f.name
+	s := func(v int) int { return int(math.Round(float64(v) * fc.scale)) }
+
+	fileRef := stream(fmt.Sprintf("/Length1 %d", len(file)), file)
+	descriptor := add(fmt.Sprintf("<< /Type /FontDescriptor /FontName /%s /Flags 4 /FontBBox [%d %d %d %d] /ItalicAngle 0 /Ascent %d /Descent %d /CapHeight %d /StemV 80 /FontFile2 %d 0 R >>",
+		name, s(f.bbox[0]), s(f.bbox[1]), s(f.bbox[2]), s(f.bbox[3]), s(f.ascent), s(f.descent), s(f.capHeight), fileRef))
+	var widths strings.Builder
+	for i, g := range fc.gids {
+		if i > 0 {
+			widths.WriteByte(' ')
+		}
+		fmt.Fprintf(&widths, "%d", s(f.advance(g)))
+	}
+	cid := add(fmt.Sprintf("<< /Type /Font /Subtype /CIDFontType2 /BaseFont /%s /CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) /Supplement 0 >> /FontDescriptor %d 0 R /DW 0 /W [0 [%s]] /CIDToGIDMap /Identity >>",
+		name, descriptor, widths.String()))
+	toUnicode := stream("", toUnicodeCMap(fc.text))
+	return add(fmt.Sprintf("<< /Type /Font /Subtype /Type0 /BaseFont /%s /Encoding /Identity-H /DescendantFonts [%d 0 R] /ToUnicode %d 0 R >>",
+		name, cid, toUnicode)), nil
+}
+
+// toUnicodeCMap maps each glyph in the PDF back to its character.
+func toUnicodeCMap(text map[uint16]rune) []byte {
+	cids := make([]int, 0, len(text))
+	for c := range text {
+		cids = append(cids, int(c))
+	}
+	sort.Ints(cids)
+	var b bytes.Buffer
+	b.WriteString("/CIDInit /ProcSet findresource begin\n12 dict begin\nbegincmap\n" +
+		"/CIDSystemInfo << /Registry (Adobe) /Ordering (UCS) /Supplement 0 >> def\n" +
+		"/CMapName /Adobe-Identity-UCS def\n/CMapType 2 def\n" +
+		"1 begincodespacerange\n<0000> <FFFF>\nendcodespacerange\n")
+	for len(cids) > 0 {
+		n := min(len(cids), 100)
+		fmt.Fprintf(&b, "%d beginbfchar\n", n)
+		for _, c := range cids[:n] {
+			fmt.Fprintf(&b, "<%04X> <", c)
+			for _, u := range utf16.Encode([]rune{text[uint16(c)]}) {
+				fmt.Fprintf(&b, "%04X", u)
+			}
+			b.WriteString(">\n")
+		}
+		b.WriteString("endbfchar\n")
+		cids = cids[n:]
+	}
+	b.WriteString("endcmap\nCMapName currentdict /CMap defineresource pop\nend\nend\n")
+	return b.Bytes()
 }
