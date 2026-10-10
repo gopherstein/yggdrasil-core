@@ -49,3 +49,14 @@ func TestTopicCheckLeansOnTopic(t *testing.T) {
 		t.Errorf("system = %s", s)
 	}
 }
+
+// The second look counts care and use of what the subject names, and never
+// a request to write something else or to drop the rules.
+func TestAboutSubjectSystem(t *testing.T) {
+	s := aboutSubjectSystem(&contracts.TopicPolicy{StaysOn: "Tires", NeverDiscuss: []string{"other shops' prices"}})
+	for _, want := range []string{"caring for", "other shops' prices", "a poem or a story", "yes or no"} {
+		if !strings.Contains(s, want) {
+			t.Errorf("missing %q in %s", want, s)
+		}
+	}
+}
