@@ -2163,7 +2163,7 @@ paths:
     post:
       summary: OpenAI-compatible chat completions
       description: >-
-        temperature and max_tokens are accepted and ignored. The toskar object asks for
+        temperature and max_tokens apply to the calls that write the answer (#70). The toskar object asks for
         memory, knowledge, tools, effort, and placement, within what the API key allows.
         yggdrasil, its name from before the rename, works too; toskar wins when both are
         sent. Responses carry the answer's extension fields under both names.
@@ -2192,8 +2192,17 @@ paths:
                   type: boolean
                 temperature:
                   type: number
+                  minimum: 0
+                  maximum: 2
+                  description: For the answer; 0 gives the same most likely answer every time. Left out, the model's default.
                 max_tokens:
                   type: integer
+                  minimum: 1
+                  description: The most tokens each answer-writing call may use. Left out, the model's default.
+                max_completion_tokens:
+                  type: integer
+                  minimum: 1
+                  description: OpenAI's newer name for max_tokens; wins when both are sent.
                 reasoning_effort:
                   type: string
                   enum: [low, medium, high]

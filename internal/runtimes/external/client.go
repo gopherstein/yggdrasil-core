@@ -133,8 +133,8 @@ func (r *Runtime) ListModels(ctx context.Context) ([]string, error) {
 // /v1/chat/completions with stream).
 func (r *Runtime) Chat(ctx context.Context, model string, req pluginapi.ChatRequest) (<-chan pluginapi.ChatChunk, error) {
 	body := map[string]any{"model": model, "messages": req.Messages, "stream": true}
-	if req.Temperature > 0 {
-		body["temperature"] = req.Temperature
+	if t, ok := pluginapi.SamplingTemperature(req.Temperature); ok {
+		body["temperature"] = t
 	}
 	if req.MaxTokens > 0 {
 		body["max_tokens"] = req.MaxTokens

@@ -789,6 +789,7 @@ Built-in profile ids include `general-assistant`, `programming`, and `research`.
 The API gets the same assistant as chat: planning, web look-ups, connected services, answer checks, personalization, and specialized AIs.
 - **Messages:** the whole `messages` array is used. The last `user` message is the turn, and earlier `user` and `assistant` messages are its history. `system` (and `developer`) messages are the calling app's instructions. They cannot change what tools may do.
 - **Effort:** `reasoning_effort` maps to effort. `minimal` and `low` give Fast, `medium` gives Balanced, and `high` gives Thorough.
+- **Sampling:** `temperature` (0 to 2; 0 gives the same most likely answer every time) and `max_tokens` (or `max_completion_tokens`) apply to the model calls that write the answer, on this computer, a paired one, or an external server. Planning, look-ups, and answer checks keep their own settings, so a small `max_tokens` doesn't cut them short. Left out, the model's defaults stand. Out of range is `400 INVALID_REQUEST`.
 
 The optional `toskar` object holds the assistant's own controls. Its name from before the rename, `yggdrasil`, works too; when a request sends both, `toskar` wins.
 
@@ -840,7 +841,6 @@ Asking for something a key does not allow returns 403 and says what was refused.
 
 ### Known differences
 
-- `temperature` and `max_tokens` are accepted and ignored.
 - `tool` messages and assistant `tool_calls` in the history are skipped.
 - Tool definitions in the OpenAI request are not passed through. Tool use is controlled by the Toskar profile.
 - The non-streaming `id` is the fixed string `chatcmpl-ygg`.
