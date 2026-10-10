@@ -81,7 +81,13 @@ func (s *Server) handleUploadArtifact(w http.ResponseWriter, r *http.Request) {
 	// Check the file can be read now, so a broken file is reported when it
 	// is attached rather than when the question is asked.
 	if !kept {
-		if _, err := mimir.FilePassages(body.Name, data); err != nil {
+		_, err := mimir.FilePassages(body.Name, data)
+		// A scanned PDF is read with text recognition where it's set up,
+		// starting now, so the question finds its text (#510).
+		if errors.Is(err, mimir.ErrScanned) && s.deps.RecognizeUpload != nil && s.deps.RecognizeUpload(body.Name, data) {
+			err = nil
+		}
+		if err != nil {
 			writeErr(w, http.StatusBadRequest, "UNREADABLE_FILE", fmt.Sprintf("Toskar can't read %s: %s", artifacts.CleanName(body.Name), err.Error()),
 				map[string]any{"name": artifacts.CleanName(body.Name), "cause": err.Error()})
 			return

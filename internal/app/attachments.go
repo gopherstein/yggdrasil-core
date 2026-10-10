@@ -62,6 +62,23 @@ func fileRefs(list []artifacts.Artifact) []contracts.FileRef {
 // attached or made earlier in the chat, as reference material, so "add a
 // column to that spreadsheet" works on a file the assistant produced. It
 // returns "" when the chat has no files.
+// recognizeUpload starts recognizing a scanned PDF as it's attached, so
+// the turn that asks about it finds the text remembered (#510). It reports
+// false where text recognition isn't set up, and the upload is refused as
+// before.
+func (a *App) recognizeUpload(name string, data []byte) bool {
+	if a.Mimir == nil || !a.Mimir.CanRecognize() {
+		return false
+	}
+	raw := append([]byte(nil), data...)
+	go func() {
+		if err := a.Mimir.Recognize(context.Background(), name, raw); err != nil && a.Logger != nil {
+			a.Logger.Warn("recognizing an attached PDF", "name", name, "err", err)
+		}
+	}()
+	return true
+}
+
 // AudioToolID is the tool an audio attachment's note points to.
 const AudioToolID = "speech.transcribe"
 
@@ -170,7 +187,7 @@ func (e *chatExecEnv) attachmentBlock(ctx context.Context, prompt string) string
 				b.WriteString("\n")
 				continue
 			}
-			passages, err := mimir.FilePassages(art.Name, data)
+			passages, err := e.app.Mimir.ChatPassages(ctx, art.Name, data)
 			if err != nil {
 				fmt.Fprintf(&b, "\nA file %s, %s, could not be read: %s\n", label, art.Name, err.Error())
 				continue

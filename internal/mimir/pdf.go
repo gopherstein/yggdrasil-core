@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/ledongthuc/pdf"
 
@@ -154,7 +155,20 @@ func (s *Store) readPDF(ctx context.Context) pdfReader {
 // whenever one of its files changes.
 func (s *Store) recognize(ctx context.Context, raw []byte, pages []int) (map[int]string, error) {
 	sum := sha256.Sum256(raw)
-	cache := filepath.Join(s.dir, "ocr-cache", hex.EncodeToString(sum[:])+".json")
+	key := hex.EncodeToString(sum[:])
+	s.recognizingMu.Lock()
+	if s.recognizing == nil {
+		s.recognizing = map[string]*sync.Mutex{}
+	}
+	one := s.recognizing[key]
+	if one == nil {
+		one = &sync.Mutex{}
+		s.recognizing[key] = one
+	}
+	s.recognizingMu.Unlock()
+	one.Lock()
+	defer one.Unlock()
+	cache := filepath.Join(s.dir, "ocr-cache", key+".json")
 	if b, err := os.ReadFile(cache); err == nil {
 		var texts map[int]string
 		if json.Unmarshal(b, &texts) == nil && hasPages(texts, pages) {

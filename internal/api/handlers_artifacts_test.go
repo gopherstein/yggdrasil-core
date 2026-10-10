@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -66,5 +67,37 @@ func TestArtifactRoutes(t *testing.T) {
 	}
 	if rec = do(http.MethodGet, "/api/v1/artifacts/"+a.ID, ""); rec.Code != http.StatusNotFound {
 		t.Fatalf("after delete: %d", rec.Code)
+	}
+}
+
+// A scanned PDF is attached when text recognition can read it (#510), and
+// refused with a clear message where it can't.
+func TestScannedPDFUpload(t *testing.T) {
+	raw, err := os.ReadFile("../mimir/testdata/scanned.pdf")
+	if err != nil {
+		t.Fatal(err)
+	}
+	body := `{"name":"hours.pdf","content_base64":"` + base64.StdEncoding.EncodeToString(raw) + `"}`
+	for _, can := range []bool{false, true} {
+		var started string
+		srv := NewServer(Dependencies{RecognizeUpload: func(name string, _ []byte) bool { started = name; return can }})
+		db, err := store.Open(filepath.Join(t.TempDir(), "test.db"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		srv.BindArtifacts(artifacts.NewStore(db.SQL, t.TempDir()))
+		rec := httptest.NewRecorder()
+		srv.Handler().ServeHTTP(rec, localRequest(http.MethodPost, "/api/v1/artifacts", strings.NewReader(body)))
+		db.Close()
+		want := http.StatusBadRequest
+		if can {
+			want = http.StatusOK
+		}
+		if rec.Code != want || started != "hours.pdf" {
+			t.Errorf("recognition available %v: %d %s, started %q", can, rec.Code, rec.Body, started)
+		}
+		if !can && !strings.Contains(rec.Body.String(), "scanned PDF") {
+			t.Errorf("the refusal doesn't say why: %s", rec.Body)
+		}
 	}
 }

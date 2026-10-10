@@ -108,6 +108,9 @@ type Dependencies struct {
 	CreateConversation    func(ctx context.Context, title, profileID, modelID string) (contracts.Conversation, error)
 	UpdateConversation    func(ctx context.Context, id string, title, profileID, modelID *string, memoryOff *bool) (contracts.Conversation, error)
 	DeleteConversation    func(ctx context.Context, id string) error
+	// RecognizeUpload starts text recognition on a scanned PDF being
+	// attached, and reports whether it can (#510).
+	RecognizeUpload func(name string, data []byte) bool
 	// DeleteConversations deletes several of the caller's chats at once (#452).
 	DeleteConversations func(ctx context.Context, ids []string) (contracts.ConversationsDeleted, error)
 	ListMessages        func(ctx context.Context, conversationID string) ([]contracts.Message, error)

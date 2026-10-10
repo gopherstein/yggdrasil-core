@@ -149,3 +149,36 @@ func TestScannedAttachmentPointsToKnowledge(t *testing.T) {
 		t.Fatalf("got %v", err)
 	}
 }
+
+// A scanned PDF attached to a chat is read with text recognition where it's
+// set up (#510), once: attached and asked about at the same time, the
+// pages are recognized one time, and the next turn finds the text kept.
+func TestScannedAttachmentIsRecognized(t *testing.T) {
+	ctx := context.Background()
+	s := newTestStore(t)
+	raw := testPDF(t, "scanned.pdf")
+	if _, err := s.ChatPassages(ctx, "hours.pdf", raw); !errors.Is(err, ErrScanned) {
+		t.Fatalf("without recognition: %v", err)
+	}
+	rec := &fakeRecognizer{}
+	s.SetRecognizer(rec)
+	var wg sync.WaitGroup
+	for range 3 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			_ = s.Recognize(ctx, "hours.pdf", raw)
+		}()
+	}
+	wg.Wait()
+	passages, err := s.ChatPassages(ctx, "hours.pdf", raw)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(passages[0].Body, "Monday to Friday: 8 am to 6 pm") {
+		t.Errorf("passages = %+v", passages)
+	}
+	if rec.count() != 1 {
+		t.Errorf("recognized %d times; once is enough", rec.count())
+	}
+}

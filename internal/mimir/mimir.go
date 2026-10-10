@@ -133,6 +133,10 @@ type Store struct {
 	fetching sync.Map
 	// recognizer reads scanned PDF pages, when text recognition is set up.
 	recognizer Recognizer
+	// recognizing holds a lock for each file being recognized, by content,
+	// so a PDF attached and asked about at once is recognized once (#510).
+	recognizingMu sync.Mutex
+	recognizing   map[string]*sync.Mutex
 }
 
 // MaxTextBytes limits pasted or uploaded content.
