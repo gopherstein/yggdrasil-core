@@ -484,6 +484,19 @@ export interface Deliberation {
   outcome: 'agreed' | 'majority' | 'disagreed' | 'long'
   final?: string
   drafts: DeliberationDraft[]
+  /** Each draft checked by another drafter, when they disagreed (contract 1.24). */
+  critiques?: DeliberationCritique[]
+  /** The model that wrote the answer from the drafts, when one did (contract 1.24). */
+  judge?: { role: string; model_id?: string; node_id?: string; node_name?: string }
+}
+
+export interface DeliberationCritique {
+  draft: number
+  critic: string
+  claims?: string[]
+  disagreements?: string[]
+  likely_errors?: string[]
+  failed?: boolean
 }
 
 export interface DeliberationDraft {

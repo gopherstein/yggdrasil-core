@@ -573,16 +573,34 @@ func (t *turnTrace) draft(d contracts.DeliberationDraft) {
 	t.deliberation.Drafts = append(t.deliberation.Drafts, d)
 }
 
-// deliberated records the drafts' outcome as a step: "3 drafts · they
-// agreed", "· 2 of 3 agreed", or that they disagreed.
-func (t *turnTrace) deliberated(outcome, final string, drafts, agreeing int) {
+// critique records a draft checked by another drafter (#459).
+func (t *turnTrace) critique(c contracts.DeliberationCritique) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 	if t.deliberation == nil {
 		t.deliberation = &contracts.Deliberation{}
 	}
-	t.deliberation.Outcome, t.deliberation.Final = outcome, final
+	t.deliberation.Critiques = append(t.deliberation.Critiques, c)
+}
+
+// deliberated records the drafts' outcome as a step: "3 drafts · they
+// agreed", "· 2 of 3 agreed", or that they disagreed.
+func (t *turnTrace) deliberated(outcome, final string, drafts, agreeing int, judge *contracts.DeliberationJudge) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if t.deliberation == nil {
+		t.deliberation = &contracts.Deliberation{}
+	}
+	t.deliberation.Outcome, t.deliberation.Final, t.deliberation.Judge = outcome, final, judge
 	params := map[string]any{"count": drafts, "agreeing": agreeing}
+	switch {
+	case judge != nil && outcome == "disagreed":
+		t.step("deliberate", "deliberateJudged", params)
+		return
+	case judge != nil:
+		t.step("deliberate", "deliberateCombined", params)
+		return
+	}
 	switch outcome {
 	case "agreed":
 		t.step("deliberate", "deliberateAgreed", params)

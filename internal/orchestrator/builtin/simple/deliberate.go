@@ -9,21 +9,25 @@ import (
 	"unicode/utf8"
 
 	"github.com/yeixio/toskar-core/internal/profiles"
+	"github.com/yeixio/toskar-core/internal/structured"
 	"github.com/yeixio/toskar-core/internal/tools"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 	"github.com/yeixio/toskar-core/pkg/pluginapi"
 )
 
 // Deliberate (#459, docs/deliberate.md): independent drafts of the same
-// answer, compared. This is the short-answer path: when most drafts give the
-// same short final answer (a number, a date, a name, yes or no), that
-// answer is kept. Cross-examination and a judge for the rest come next;
-// until then a turn whose drafts disagree keeps its own answer and says so.
+// answer, compared. The short-answer path comes first: when most drafts give
+// the same short final answer (a number, a date, a name, yes or no), that
+// answer is kept. Otherwise each draft is critiqued by another drafter, and
+// a judge writes the answer from the drafts and critiques, saying where
+// they still disagree. Anything that fails keeps the turn's own answer.
 
 const (
 	// EventDeliberateDraft is one draft, started or finished.
 	EventDeliberateDraft = "deliberate.draft"
-	// EventDeliberateDone is the vote's outcome.
+	// EventDeliberateCritique is one draft's critique by another drafter.
+	EventDeliberateCritique = "deliberate.critique"
+	// EventDeliberateDone is the outcome.
 	EventDeliberateDone = "deliberate.done"
 )
 
@@ -64,6 +68,25 @@ const draftGuidance = "When the question has a short answer, such as a number, a
 
 // draftTextRunes caps how much of a draft is kept for the person to read.
 const draftTextRunes = 6000
+
+// Caps for cross-examination and the judge.
+const (
+	critiqueTokens = 700
+	judgeTokens    = 2048
+	// promptDraftRunes caps each draft as quoted to a critic or the judge.
+	promptDraftRunes = 4000
+)
+
+const critiqueInstructions = "You check another assistant's draft answer against independent drafts of the same question. " +
+	"Reply with only a JSON object: {\"claims\": [the draft's key claims], \"disagreements\": [where it disagrees with the other drafts, and which is right if you can tell], \"likely_errors\": [mistakes in the draft: wrong steps, figures, or facts]}. " +
+	"Keep each item to one sentence. Use empty lists when there's nothing to say."
+
+// critiqueSchema constrains a critique where the runtime can.
+var critiqueSchema = []byte(`{"type":"object","properties":{"claims":{"type":"array","items":{"type":"string"}},"disagreements":{"type":"array","items":{"type":"string"}},"likely_errors":{"type":"array","items":{"type":"string"}}},"required":["claims","disagreements","likely_errors"]}`)
+
+const judgeGuidance = "You are the judge. Several independent drafts answered the person's question, and each was checked against the others. " +
+	"Write the final answer for the person from them: keep what's right, fix what the checks show is wrong, and don't mention the drafts or the checks. " +
+	"Where they disagree and you can't settle it, say so plainly and give both answers with the reason for each, instead of picking one silently."
 
 // deliberating reports whether a profile deliberates. Auto behaves like
 // never until the quality run shows where it helps (docs/deliberate.md).
@@ -122,6 +145,136 @@ type draft struct {
 	failed     bool
 }
 
+// critique is one draft checked by another drafter.
+type critique struct {
+	draft         int
+	critic        string
+	claims        []string
+	disagreements []string
+	likelyErrors  []string
+	failed        bool
+}
+
+func clip(s string, runes int) string {
+	if utf8.RuneCountInString(s) > runes {
+		return string([]rune(s)[:runes]) + "…"
+	}
+	return s
+}
+
+// draftLetter names a draft for the critics and the judge: A, B, C.
+func draftLetter(i int) string { return string(rune('A' + i)) }
+
+// parseCritique reads a critic's JSON, loosely: a model the runtime
+// couldn't constrain may wrap it in text.
+func parseCritique(content string) (claims, disagreements, likely []string, ok bool) {
+	found, found2 := structured.Extract(tools.VisibleText(content))
+	if !found2 {
+		return nil, nil, nil, false
+	}
+	obj, isObj := found.Value.(map[string]any)
+	if !isObj {
+		return nil, nil, nil, false
+	}
+	list := func(key string) []string {
+		var out []string
+		items, _ := obj[key].([]any)
+		for _, it := range items {
+			if s, _ := it.(string); strings.TrimSpace(s) != "" {
+				out = append(out, clip(strings.TrimSpace(s), 300))
+			}
+			if len(out) == 6 {
+				break
+			}
+		}
+		return out
+	}
+	return list("claims"), list("disagreements"), list("likely_errors"), true
+}
+
+// crossExamine has each draft that answered checked by the next drafter
+// that did, at the same time.
+func crossExamine(ctx context.Context, env pluginapi.ExecutionEnvironment, prompt string, drafts []draft) []critique {
+	var answered []int
+	for i, d := range drafts {
+		if !d.failed {
+			answered = append(answered, i)
+		}
+	}
+	if len(answered) < 2 {
+		return nil
+	}
+	critiques := make([]critique, len(answered))
+	var wg sync.WaitGroup
+	for k, i := range answered {
+		critic := drafts[answered[(k+1)%len(answered)]].role
+		critiques[k] = critique{draft: i, critic: critic}
+		wg.Add(1)
+		go func(k, i int, critic string) {
+			defer wg.Done()
+			var b strings.Builder
+			fmt.Fprintf(&b, "The question:\n%s\n\nThe draft to check (draft %s):\n%s\n", prompt, draftLetter(i), clip(drafts[i].text, promptDraftRunes))
+			for _, j := range answered {
+				if j != i {
+					fmt.Fprintf(&b, "\nIndependent draft %s:\n%s\n", draftLetter(j), clip(drafts[j].text, promptDraftRunes))
+				}
+			}
+			ask := []pluginapi.ChatMessage{{Role: "system", Content: critiqueInstructions}, {Role: "user", Content: b.String()}}
+			cctx := structured.WithSchema(pluginapi.WithGenerateOptions(ctx, pluginapi.GenerateOptions{MaxTokens: critiqueTokens}), critiqueSchema)
+			text, _, err := generateText(cctx, env, critic, ask)
+			c := &critiques[k]
+			if err != nil {
+				c.failed = true
+				return
+			}
+			var ok bool
+			c.claims, c.disagreements, c.likelyErrors, ok = parseCritique(text)
+			c.failed = !ok
+		}(k, i, critic)
+	}
+	wg.Wait()
+	return critiques
+}
+
+// judgeRoleFor is the judge: the profile's judge model, else its reviewer,
+// else the turn's own.
+func judgeRoleFor(profile contracts.AIProfile, own string) string {
+	if profiles.HasRole(profile, profiles.RoleJudge) {
+		return profiles.RoleJudge
+	}
+	return reviewerRole(profile, own)
+}
+
+// judge writes the answer from the drafts and their critiques.
+func judge(ctx context.Context, env pluginapi.ExecutionEnvironment, role, prompt, plainSys string, drafts []draft, critiques []critique) (string, error) {
+	var b strings.Builder
+	fmt.Fprintf(&b, "The person's question:\n%s\n", prompt)
+	for i, d := range drafts {
+		if !d.failed {
+			fmt.Fprintf(&b, "\nDraft %s:\n%s\n", draftLetter(i), clip(d.text, promptDraftRunes))
+		}
+	}
+	for _, c := range critiques {
+		if c.failed || len(c.disagreements)+len(c.likelyErrors) == 0 {
+			continue
+		}
+		fmt.Fprintf(&b, "\nChecks of draft %s:\n", draftLetter(c.draft))
+		for _, s := range c.disagreements {
+			fmt.Fprintf(&b, "- Disagrees: %s\n", s)
+		}
+		for _, s := range c.likelyErrors {
+			fmt.Fprintf(&b, "- Likely error: %s\n", s)
+		}
+	}
+	ask := []pluginapi.ChatMessage{{Role: "system", Content: plainSys + "\n" + judgeGuidance}, {Role: "user", Content: b.String()}}
+	text, _, err := generateText(pluginapi.WithGenerateOptions(ctx, pluginapi.GenerateOptions{MaxTokens: judgeTokens}), env, role, ask)
+	text = strings.TrimSpace(tools.VisibleText(text))
+	if err == nil && text == "" {
+		err = fmt.Errorf("the judge wrote nothing")
+	}
+	return text, err
+}
+
 // vote finds the short final answer most drafts gave. It returns the
 // outcome, the winning normalized answer, and the index of the draft kept:
 // the turn's own when it agrees, else the first that does.
@@ -168,7 +321,7 @@ func vote(drafts []draft) (outcome, winner string, kept int) {
 // messages are what it was written from, and plainSys the system prompt
 // without tools: drafts answer, they don't call tools.
 func deliberateAnswer(ctx context.Context, env pluginapi.ExecutionEnvironment, ch chan<- pluginapi.OrchestrationEvent,
-	messages []pluginapi.ChatMessage, plainSys, own, role, node string) string {
+	profile contracts.AIProfile, prompt string, messages []pluginapi.ChatMessage, plainSys, own, role, node string) string {
 	drafts := make([]draft, deliberateDrafts)
 	drafts[0] = draft{role: role, node: node, text: own, final: draftFinal(own)}
 	// plainSys already carries draftGuidance.
@@ -203,6 +356,28 @@ func deliberateAnswer(ctx context.Context, env pluginapi.ExecutionEnvironment, c
 		return own
 	}
 	outcome, winner, kept := vote(drafts)
+	// Drafts that disagree, or answers too long to compare, are checked
+	// against each other and judged.
+	var critiques []critique
+	judged, judgeRole, judgeNode := "", "", ""
+	if outcome == OutcomeDisagreed || outcome == OutcomeLong {
+		critiques = crossExamine(ctx, env, prompt, drafts)
+		if ctx.Err() == nil && len(critiques) > 0 {
+			judgeRole = judgeRoleFor(profile, role)
+			judgeNode, _ = env.NodeForRole(judgeRole)
+			announceRole(env, judgeRole)
+			if text, err := judge(ctx, env, judgeRole, prompt, plainSys, drafts, critiques); err == nil && ctx.Err() == nil {
+				judged = text
+			}
+		}
+		if ctx.Err() != nil {
+			return own
+		}
+	}
+	for _, c := range critiques {
+		env.Emit(EventDeliberateCritique, map[string]any{"draft": c.draft, "critic": c.critic, "failed": c.failed,
+			"claims": c.claims, "disagreements": c.disagreements, "likely_errors": c.likelyErrors})
+	}
 	for i, d := range drafts {
 		status := "done"
 		if d.failed {
@@ -213,13 +388,18 @@ func deliberateAnswer(ctx context.Context, env pluginapi.ExecutionEnvironment, c
 			text = string([]rune(text)[:draftTextRunes]) + "…"
 		}
 		env.Emit(EventDeliberateDraft, map[string]any{"index": i, "role": d.role, "node_id": d.node, "status": status,
-			"final": d.final, "text": text, "chosen": i == kept})
+			"final": d.final, "text": text, "chosen": judged == "" && i == kept})
 	}
 	agreeing := 0
 	for _, d := range drafts {
 		if !d.failed && d.final != "" && winner != "" && normalizeFinal(d.final) == winner {
 			agreeing++
 		}
+	}
+	if judged != "" {
+		env.Emit(EventDeliberateDone, map[string]any{"drafts": len(drafts), "agreeing": agreeing, "outcome": outcome,
+			"final": draftFinal(judged), "judged": true, "judge_role": judgeRole, "judge_node": judgeNode})
+		return judged
 	}
 	env.Emit(EventDeliberateDone, map[string]any{"drafts": len(drafts), "agreeing": agreeing, "outcome": outcome,
 		"final": drafts[kept].final, "chosen": kept})

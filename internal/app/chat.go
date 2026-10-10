@@ -1383,12 +1383,30 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 				e.trace.draft(contracts.DeliberationDraft{Role: role, ModelID: e.modelForRole(role), NodeID: node, NodeName: name,
 					Final: final, Text: text, Chosen: chosen, Failed: status == "failed"})
 			}
+		case simple.EventDeliberateCritique:
+			draft, _ := payload["draft"].(int)
+			critic, _ := payload["critic"].(string)
+			failed, _ := payload["failed"].(bool)
+			claims, _ := payload["claims"].([]string)
+			disagreements, _ := payload["disagreements"].([]string)
+			likely, _ := payload["likely_errors"].([]string)
+			e.trace.critique(contracts.DeliberationCritique{Draft: draft, Critic: critic, Failed: failed,
+				Claims: claims, Disagreements: disagreements, LikelyErrors: likely})
 		case simple.EventDeliberateDone:
 			outcome, _ := payload["outcome"].(string)
 			final, _ := payload["final"].(string)
 			drafts, _ := payload["drafts"].(int)
 			agreeing, _ := payload["agreeing"].(int)
-			e.trace.deliberated(outcome, final, drafts, agreeing)
+			var judge *contracts.DeliberationJudge
+			if judged, _ := payload["judged"].(bool); judged {
+				role, _ := payload["judge_role"].(string)
+				node, _ := payload["judge_node"].(string)
+				judge = &contracts.DeliberationJudge{Role: role, ModelID: e.modelForRole(role), NodeID: node}
+				if node != "" {
+					judge.NodeName = e.app.nodeDisplayName(node)
+				}
+			}
+			e.trace.deliberated(outcome, final, drafts, agreeing, judge)
 		case simple.EventConsistency:
 			found, _ := payload["found"].(int)
 			fixed, _ := payload["fixed"].(int)

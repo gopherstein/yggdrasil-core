@@ -11,10 +11,13 @@ import (
 )
 
 // roleEnv answers by role, and records each role's options, computer, and
-// prompt, and the events.
+// prompt, and the events. A role's later calls (a drafter's critique, the
+// assistant's judging) get its next replies, from sequences.
 type roleEnv struct {
 	mu       sync.Mutex
 	replies  map[string]string
+	sequence map[string][]string
+	prompts  map[string][]string
 	opts     map[string]pluginapi.GenerateOptions
 	systems  map[string]string
 	calls    map[string]int
@@ -23,20 +26,32 @@ type roleEnv struct {
 }
 
 func newRoleEnv(replies map[string]string) *roleEnv {
-	return &roleEnv{replies: replies, opts: map[string]pluginapi.GenerateOptions{}, systems: map[string]string{}, calls: map[string]int{}}
+	return &roleEnv{replies: replies, sequence: map[string][]string{}, prompts: map[string][]string{},
+		opts: map[string]pluginapi.GenerateOptions{}, systems: map[string]string{}, calls: map[string]int{}}
 }
 
 func (e *roleEnv) Generate(ctx context.Context, role string, messages []pluginapi.ChatMessage) (<-chan pluginapi.ChatChunk, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	n := e.calls[role]
 	e.calls[role]++
-	e.opts[role] = pluginapi.GenerateOptionsFrom(ctx)
+	if n == 0 {
+		e.opts[role] = pluginapi.GenerateOptionsFrom(ctx)
+		if len(messages) > 0 {
+			e.systems[role] = messages[0].Content
+		}
+	}
 	if len(messages) > 0 {
-		e.systems[role] = messages[0].Content
+		e.prompts[role] = append(e.prompts[role], messages[len(messages)-1].Content)
 	}
 	content, ok := e.replies[role]
 	if !ok {
 		content = "done"
+	}
+	if n > 0 {
+		if seq := e.sequence[role]; n-1 < len(seq) {
+			content = seq[n-1]
+		}
 	}
 	ch := make(chan pluginapi.ChatChunk, 1)
 	ch <- pluginapi.ChatChunk{Content: content, Done: true}
@@ -263,5 +278,113 @@ func TestVoteSkipsFailedDrafts(t *testing.T) {
 	}
 	if outcome, _, _ := vote([]draft{{final: "26"}, {failed: true}, {failed: true}}); outcome != OutcomeLong {
 		t.Fatalf("one answer: %s", outcome)
+	}
+}
+
+// Drafts that disagree are checked against each other and judged: each
+// draft by the next drafter, then the judge writes the answer from the
+// drafts and what the checks found.
+func TestDeliberateJudge(t *testing.T) {
+	env := newRoleEnv(map[string]string{"assistant": "Final answer: $26", "drafter:2": "Final answer: $30", "drafter:3": "Final answer: $28"})
+	env.sequence["drafter:2"] = []string{`{"claims":["$26"],"disagreements":["Draft A says $26 where draft B says $30"],"likely_errors":[]}`}
+	env.sequence["drafter:3"] = []string{`Here you go: {"claims":[],"disagreements":[],"likely_errors":["Draft B ignored the 4-for-$10 deal"]} done.`}
+	// The assistant checks draft C (and answers with no JSON), then judges.
+	env.sequence["assistant"] = []string{"no JSON here", "Two packs of 4 and 2 singles.\nFinal answer: $26"}
+	text := runDeliberate(t, env, muffins, always)
+	if !strings.Contains(text, "Two packs of 4") {
+		t.Fatalf("kept %q, want the judge's answer", text)
+	}
+	done := env.last(EventDeliberateDone)
+	if done["outcome"] != OutcomeDisagreed || done["judged"] != true || done["judge_role"] != "assistant" || done["final"] != "$26" {
+		t.Fatalf("done: %+v", done)
+	}
+	if n := env.count(EventDeliberateCritique); n != 3 {
+		t.Fatalf("critiques: %d", n)
+	}
+	failed := 0
+	for i, ev := range env.events {
+		if ev == EventDeliberateCritique && env.payloads[i]["failed"] == true {
+			failed++
+			if env.payloads[i]["critic"] != "assistant" || env.payloads[i]["draft"] != 2 {
+				t.Fatalf("the failed critique: %+v", env.payloads[i])
+			}
+		}
+	}
+	if failed != 1 {
+		t.Fatalf("failed critiques: %d", failed)
+	}
+	judgePrompt := env.prompts["assistant"][len(env.prompts["assistant"])-1]
+	for _, want := range []string{"Draft A:", "Draft C:", "Disagrees: Draft A says $26", "Likely error: Draft B ignored the 4-for-$10 deal"} {
+		if !strings.Contains(judgePrompt, want) {
+			t.Errorf("the judge wasn't told %q:\n%s", want, judgePrompt)
+		}
+	}
+	critiquePrompt := env.prompts["drafter:2"][1]
+	if !strings.Contains(critiquePrompt, "draft A") || !strings.Contains(critiquePrompt, "Independent draft B") {
+		t.Errorf("drafter:2's critique prompt:\n%s", critiquePrompt)
+	}
+	// No draft is marked kept when the judge wrote the answer.
+	for i, ev := range env.events {
+		if ev == EventDeliberateDraft && env.payloads[i]["chosen"] == true {
+			t.Fatalf("a draft marked kept: %+v", env.payloads[i])
+		}
+	}
+}
+
+// A profile's judge model judges; long answers are judged too; a judge
+// that writes nothing leaves the turn's own answer.
+func TestDeliberateJudgeRoleAndFallback(t *testing.T) {
+	long := map[string]string{"assistant": "A long explanation without a final line.", "drafter:2": "Another long take.", "drafter:3": "A third.", "judge": "The combined answer."}
+	env := newRoleEnv(long)
+	events, err := New().Run(context.Background(), contracts.Task{Prompt: "Explain why the sky is blue"}, contracts.AIProfile{
+		Roles:         []contracts.ModelRole{{Role: "assistant", ModelID: "m"}, {Role: "judge", ModelID: "big"}},
+		Orchestration: always,
+	}, env)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var text string
+	for evt := range events {
+		if evt.Type == "agent.message" {
+			text += evt.Content
+		}
+	}
+	if !strings.Contains(text, "The combined answer.") || env.calls["judge"] != 1 {
+		t.Fatalf("kept %q, judge calls %d", text, env.calls["judge"])
+	}
+	if done := env.last(EventDeliberateDone); done["outcome"] != OutcomeLong || done["judge_role"] != "judge" {
+		t.Fatalf("done: %+v", done)
+	}
+	if o := env.opts["judge"]; o.MaxTokens != judgeTokens {
+		t.Fatalf("judge options: %+v", o)
+	}
+
+	// The judge writes nothing: the turn's own answer stands.
+	empty := newRoleEnv(map[string]string{"assistant": "Final answer: $26", "drafter:2": "Final answer: $30", "drafter:3": "Final answer: $28"})
+	empty.sequence["assistant"] = []string{"{}", "   "}
+	if text := runDeliberate(t, empty, muffins, always); !strings.Contains(text, "Final answer: $26") {
+		t.Fatalf("kept %q", text)
+	}
+	if done := empty.last(EventDeliberateDone); done["judged"] == true || done["outcome"] != OutcomeDisagreed {
+		t.Fatalf("done: %+v", done)
+	}
+}
+
+// Drafts that agree aren't checked or judged.
+func TestDeliberateAgreedSkipsTheJudge(t *testing.T) {
+	env := newRoleEnv(map[string]string{"assistant": "Final answer: $26", "drafter:2": "Final answer: 26", "drafter:3": "Final answer: $26.00"})
+	runDeliberate(t, env, muffins, always)
+	if env.calls["drafter:2"] != 1 || env.calls["assistant"] != 1 || env.count(EventDeliberateCritique) != 0 {
+		t.Fatalf("calls %v, critiques %d", env.calls, env.count(EventDeliberateCritique))
+	}
+}
+
+func TestParseCritique(t *testing.T) {
+	claims, dis, likely, ok := parseCritique("Sure! ```json\n{\"claims\":[\"x\"],\"disagreements\":[\"y\"],\"likely_errors\":[\"\",\"z\"]}\n```")
+	if !ok || len(claims) != 1 || len(dis) != 1 || len(likely) != 1 || likely[0] != "z" {
+		t.Fatalf("%v %v %v %v", claims, dis, likely, ok)
+	}
+	if _, _, _, ok := parseCritique("no json"); ok {
+		t.Fatal("parsed nothing")
 	}
 }
