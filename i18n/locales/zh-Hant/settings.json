@@ -159,9 +159,19 @@
     "description": "控制 Toskar 在這台電腦上保留哪些內容。",
     "saveChats": "儲存聊天紀錄",
     "saveTasks": "儲存工作紀錄",
-    "confirmClear": "要刪除這台電腦上的所有聊天紀錄嗎？這個動作無法復原。",
+    "confirmAll_other": "刪除這台電腦上你的全部 {{count}} 個聊天？",
     "clear": "清除聊天紀錄",
-    "clearing": "正在清除…"
+    "clearing": "正在清除…",
+    "olderThan": "刪除早於以下時間的聊天",
+    "days_other": "{{count}} 天",
+    "noneOlder": "沒有這麼舊的聊天",
+    "deleteCount_other": "刪除 {{count}} 個聊天",
+    "confirmOlder_other": "刪除 {{count}} 個超過 {{days}} 天未使用的聊天？",
+    "confirmDetail": "它們的訊息、附件和產生的檔案都會被刪除，且無法復原。",
+    "pinnedKept": "已釘選的聊天會保留。",
+    "cancel": "取消",
+    "deleted_other": "已刪除 {{count}} 個聊天。",
+    "deleteFailed": "無法刪除這些聊天。"
   },
   "ratings": {
     "title": "社群評分",

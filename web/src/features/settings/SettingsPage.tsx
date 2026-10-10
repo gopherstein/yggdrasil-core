@@ -18,6 +18,7 @@ import { NotificationDestinations } from './NotificationDestinations'
 import { UpdateCheckSetting, UpdateNotice } from './Updates'
 import { WhatLeft } from './WhatLeft'
 import { YourData } from './YourData'
+import { ChatCleanup } from './ChatCleanup'
 import { YourAccount } from '@/features/people/YourAccount'
 import { YourDevices } from './YourDevices'
 import { useRole } from '@/lib/role'
@@ -219,20 +220,6 @@ export function SettingsPage() {
           ? error.message
           : t('reset.failed'),
       )
-    },
-  })
-
-  const clearHistoryMutation = useMutation({
-    mutationFn: async () => {
-      const ids = ((await api.getConversations()) ?? []).map((c) => c.id)
-      // In requests of up to 1,000, the most one bulk delete takes (#452).
-      for (let i = 0; i < ids.length; i += 1000) {
-        await api.deleteConversations(ids.slice(i, i + 1000))
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
-      queryClient.invalidateQueries({ queryKey: ['performance'] })
     },
   })
 
@@ -538,18 +525,7 @@ export function SettingsPage() {
                   }
                 />
               </div>
-              <button
-                type="button"
-                className="btn-secondary px-3 py-1.5 text-xs"
-                disabled={clearHistoryMutation.isPending}
-                onClick={() => {
-                  if (window.confirm(t('history.confirmClear'))) {
-                    clearHistoryMutation.mutate()
-                  }
-                }}
-              >
-                {clearHistoryMutation.isPending ? t('history.clearing') : t('history.clear')}
-              </button>
+              <ChatCleanup />
             </section>
 
             <section className="card space-y-4">
