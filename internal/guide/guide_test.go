@@ -23,6 +23,8 @@ func TestAboutYggdrasil(t *testing.T) {
 		"how to turn on notifications by email?":  "Notifications",
 		"what does the Team profile do?":          "Run a Team profile",
 		"How do I reach Toskar away from home?":   "Reach Toskar away from home",
+		"How do I compare independent drafts?":    "Compare independent drafts",
+		"what does the Judge role do?":            "Compare independent drafts",
 		// The product's name, and the one from before the rename (#237).
 		"Can Toskar train its own AI?":         "Train your own AI",
 		"How do I use an API key with Toskar?": "Connect another app through the API",

@@ -731,6 +731,7 @@ A chat that fails while streaming sends `event: error_code` with the same `code`
 | `memory.saved`, `memory.deleted` | A memory is saved or forgotten from a chat |
 | `orchestration.role` | A planner, worker, or reviewer starts, with the computer it runs on |
 | `plan.planner`, `answer.reviewed` | The planner split a request (`parts`); the reviewer checked an answer (`changed`) |
+| `deliberate.draft`, `deliberate.critique`, `deliberate.done` | Deliberate (#459): a draft starts (`status: running`) and finishes (`done` or `failed`, with `final`, `text`, and `chosen`), with `index`, `role`, and `node_id`; a draft is checked (`draft`, `critic`, `claims`, `disagreements`, `likely_errors`, `failed`); the drafts are settled (`drafts`, `agreeing`, `outcome`, `final`, and either `chosen` or `judged` with `judge_role` and `judge_node`) |
 | `task.created`, `task.started`, `task.completed`, `task.failed` | An orchestration task changes state |
 | `scheduler.placement` | Norn places work on a computer |
 | `work.waiting` | Work waits for higher-priority work, with `class`, `label`, and `reason` |

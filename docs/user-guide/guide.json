@@ -195,6 +195,21 @@
       ]
     },
     {
+      "id": "deliberate",
+      "title": "Compare independent drafts",
+      "paragraphs": [
+        "A profile can have its answers drafted three times, independently, and compared before you see one. Small models make reasoning slips, such as a wrong step in a word problem, and a second and third draft that don't see the first often catch them. The extra drafts run on paired computers when there are any, at different settings, so they don't simply repeat each other.",
+        "When the drafts' final answers are short, such as a number, a date, or a name, they are compared: when most agree, that answer is kept and nothing more runs. When they disagree, or the answers are too long to compare, each draft is checked against the others, and a judge writes the answer from the drafts and the checks, saying where they still disagree. If anything fails along the way, the answer you would have had without drafts stands.",
+        "It's off by default. It makes answers slower and uses more of your computers, and it helps most with math, logic, and questions that take several steps. Team profiles have their own reviewer and don't compare drafts. Small talk, pictures, and answers that must be in a fixed format are answered once."
+      ],
+      "steps": [
+        "Open Profiles & Orchestration, edit a profile, and open Strategy and computers.",
+        "Set Compare independent drafts to Always, and save.",
+        "To choose the models, open Models, choose Show all roles, and set Drafter and Judge. Without them, the drafts use the profile's model and the judge uses its Reviewer, or its model.",
+        "Under an answer, the drafts line, such as 3 drafts · they agreed, opens to each draft's model, computer, and final answer, the checks, and the judge. The steps say how it went. The phone app shows the same."
+      ]
+    },
+    {
       "id": "api",
       "title": "Connect another app through the API",
       "paragraphs": [
