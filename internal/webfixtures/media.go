@@ -1,8 +1,12 @@
 package webfixtures
 
 import (
+	"bytes"
 	"context"
+	"encoding/binary"
 	"fmt"
+	"image"
+	"image/png"
 
 	"github.com/yeixio/toskar-core/internal/artifacts"
 	"github.com/yeixio/toskar-core/internal/tools"
@@ -31,7 +35,10 @@ func RegisterMedia(r *tools.Registry, store *artifacts.Store) {
 		return save(ctx, "changed.png", tinyPNG)
 	}})
 	r.Register(mediaTool{id: "video.generate", run: func(ctx context.Context, _ map[string]any) (map[string]any, error) {
-		return save(ctx, "clip.mp4", tinyMP4)
+		return save(ctx, "clip.webm", tinyWebM)
+	}})
+	r.Register(mediaTool{id: "speech.synthesize", run: func(ctx context.Context, _ map[string]any) (map[string]any, error) {
+		return save(ctx, "speech.wav", silentWAV)
 	}})
 }
 
@@ -47,8 +54,42 @@ func (t mediaTool) Execute(ctx context.Context, args map[string]any) (map[string
 	return t.run(ctx, args)
 }
 
-// tinyPNG is a 1×1 picture, and tinyMP4 the start of an MP4 file.
+// tinyPNG is a whole 64×64 picture that decodes (#510: the old 1×1 one
+// was cut short), tinyWebM the start of a WebM file, as the real tool
+// makes, and silentWAV a second of silence, 16-bit mono at 22050 Hz, as
+// Piper writes.
 var (
-	tinyPNG = []byte("\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\rIDATx\x9cc\xf8\x0f\x00\x00\x01\x01\x00\x05\x18\xd8N\x00\x00\x00\x00IEND\xaeB`\x82")
-	tinyMP4 = []byte("\x00\x00\x00\x18ftypmp42\x00\x00\x00\x00mp42isom")
+	tinyPNG   = solidPNG(64, 64)
+	tinyWebM  = []byte("\x1a\x45\xdf\xa3\x9f\x42\x86\x81\x01\x42\xf7\x81\x01\x42\xf2\x81\x04\x42\xf3\x81\x08\x42\x82\x84webm")
+	silentWAV = silence(22050, 22050)
 )
+
+func solidPNG(w, h int) []byte {
+	img := image.NewRGBA(image.Rect(0, 0, w, h))
+	for i := range img.Pix {
+		img.Pix[i] = 0xc0
+	}
+	var b bytes.Buffer
+	_ = png.Encode(&b, img)
+	return b.Bytes()
+}
+
+func silence(rate, samples int) []byte {
+	data := samples * 2
+	var b bytes.Buffer
+	w := func(v any) { _ = binary.Write(&b, binary.LittleEndian, v) }
+	b.WriteString("RIFF")
+	w(uint32(36 + data))
+	b.WriteString("WAVEfmt ")
+	w(uint32(16))
+	w(uint16(1))
+	w(uint16(1))
+	w(uint32(rate))
+	w(uint32(rate * 2))
+	w(uint16(2))
+	w(uint16(16))
+	b.WriteString("data")
+	w(uint32(data))
+	b.Write(make([]byte, data))
+	return b.Bytes()
+}

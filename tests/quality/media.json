@@ -1,0 +1,160 @@
+{
+  "note": "The media set (#510): pictures, edits, video, and speech Toskar makes, judged for what they show or say, and pictures it reads. judge checks a made file: it decodes, and a model that sees (or a transcription) confirms it. Attachments with make png are drawn from their description.",
+  "cases": [
+    {
+      "id": "make_image_apple",
+      "what": "A picture is made that shows what was asked.",
+      "message": "Draw a red apple sitting on a white table.",
+      "stub": [
+        "A shiny red apple on a white wooden table, soft daylight.",
+        "Here it is, attached below."
+      ],
+      "expect": {
+        "tools_run": [
+          "image.generate"
+        ],
+        "answer_lacks": "(?i)(can'?t|cannot|unable to|not able to) (draw|create|make|generate|produce|edit)|as an ai|text-based|language model"
+      },
+      "judge": {
+        "kind": "image",
+        "ext": ".png",
+        "shows": "a red apple",
+        "min_side": 512
+      }
+    },
+    {
+      "id": "make_image_dog_beach",
+      "what": "A scene with two things in it shows both.",
+      "message": "Make a picture of a dog running on a sandy beach.",
+      "stub": [
+        "A happy dog running along a sandy beach, waves behind it.",
+        "It's attached below."
+      ],
+      "expect": {
+        "tools_run": [
+          "image.generate"
+        ],
+        "answer_lacks": "(?i)(can'?t|cannot|unable to|not able to) (draw|create|make|generate|produce|edit)|as an ai|text-based|language model"
+      },
+      "judge": {
+        "kind": "image",
+        "ext": ".png",
+        "shows": "a dog on a beach",
+        "min_side": 512
+      }
+    },
+    {
+      "id": "edit_image_background",
+      "what": "An attached picture is edited as asked, and keeps what wasn't asked to change.",
+      "message": "Change the background of this picture to blue, and keep the red circle.",
+      "attach": [
+        {
+          "name": "circle.png",
+          "make": "png",
+          "content": "size=512 bg=white shape=circle color=red count=1"
+        }
+      ],
+      "stub": [
+        "Here's the picture with a blue background."
+      ],
+      "expect": {
+        "tools_run": [
+          "image.edit"
+        ]
+      },
+      "judge": {
+        "kind": "image",
+        "ext": ".png",
+        "shows": "a red circle on a blue background",
+        "min_side": 256
+      }
+    },
+    {
+      "id": "make_video_waves",
+      "what": "A short video is made, and its frames show what was asked.",
+      "message": "Make a short video of waves rolling onto a beach.",
+      "stub": [
+        "Gentle waves rolling onto a sandy beach, slow pan.",
+        "The clip is attached below."
+      ],
+      "expect": {
+        "tools_run": [
+          "video.generate"
+        ],
+        "answer_lacks": "(?i)(can'?t|cannot|unable to|not able to) (draw|create|make|generate|produce|edit)|as an ai|text-based|language model"
+      },
+      "judge": {
+        "kind": "video",
+        "ext": ".webm",
+        "shows": "waves or the sea at a beach"
+      }
+    },
+    {
+      "id": "read_aloud",
+      "what": "Asked to read something aloud, Toskar makes a recording that says it.",
+      "message": "Read this aloud: The quick brown fox jumps over the lazy dog by the river.",
+      "real_only": true,
+      "expect": {
+        "tools_run": [
+          "speech.synthesize"
+        ]
+      },
+      "judge": {
+        "kind": "audio",
+        "ext": ".wav",
+        "says": "The quick brown fox jumps over the lazy dog by the river."
+      }
+    },
+    {
+      "id": "transcribe_recording",
+      "what": "An attached recording is transcribed.",
+      "message": "What does this recording say? Give me the words.",
+      "real_only": true,
+      "recording": "Please book a tire rotation for Saturday at nine in the morning.",
+      "expect": {
+        "tools_run": [
+          "speech.transcribe"
+        ],
+        "answer_matches": "(?is)rotation.*saturday|saturday.*rotation"
+      }
+    },
+    {
+      "id": "read_image_count",
+      "what": "A picture is read: how many shapes, and their color (#449).",
+      "message": "How many squares are in this picture, and what color are they?",
+      "attach": [
+        {
+          "name": "squares.png",
+          "make": "png",
+          "content": "size=512 bg=white shape=square color=blue count=3"
+        }
+      ],
+      "stub": [
+        "There are three blue squares."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?is)(three|3).*blue|blue.*(three|3)"
+      }
+    },
+    {
+      "id": "read_image_shape",
+      "what": "A picture is read: the shape and its color (#449).",
+      "message": "What shape is in this picture, and what color is it?",
+      "attach": [
+        {
+          "name": "shape.png",
+          "make": "png",
+          "content": "size=512 bg=white shape=circle color=green count=1"
+        }
+      ],
+      "stub": [
+        "A green circle."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?is)green.*(circle|round)|(circle|round).*green"
+      }
+    }
+  ]
+}

@@ -18,9 +18,11 @@ import (
 	"github.com/yeixio/toskar-core/internal/events"
 	"github.com/yeixio/toskar-core/internal/imagegen"
 	"github.com/yeixio/toskar-core/internal/mimir"
+	"github.com/yeixio/toskar-core/internal/models"
 	"github.com/yeixio/toskar-core/internal/webfixtures"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 	"github.com/yeixio/toskar-core/pkg/pluginapi"
+	"os"
 )
 
 // stubDriver runs a case in-process with the web replaced by the pages in
@@ -101,6 +103,14 @@ func (d stubDriver) Run(t *testing.T, c Case) Result {
 	webfixtures.Register(a.Tools, web)
 	webfixtures.RegisterMedia(a.Tools, a.Artifacts)
 	ctx := context.Background()
+	// A picture attached needs a model that sees: the stub, with a
+	// projector, so the picture is sent with the message (#510).
+	for _, f := range c.Attach {
+		if imagegen.IsEditable(f.Name) {
+			installSeeingStub(t, ctx, a)
+			break
+		}
+	}
 
 	// The script: each model call gets the next reply; the rest say "done".
 	var mu sync.Mutex
@@ -236,6 +246,30 @@ func (d stubDriver) Run(t *testing.T, c Case) Result {
 
 // setupProfile copies the general assistant with the case's knowledge and
 // tool policies.
+// installSeeingStub installs a stand-in model that sees pictures, with a
+// projector file, as the app's vision tests do.
+func installSeeingStub(t *testing.T, ctx context.Context, a *app.App) {
+	t.Helper()
+	e := models.CatalogEntry{ID: "stub-vision", DisplayName: "Stub Vision", MemoryNeededBytes: 1,
+		Capabilities: contracts.ModelCapabilities{ToolCalling: true, ToolCallSupport: "compatible", Vision: true},
+		Tags:         []string{"vision", "general"}, Purpose: []string{"general"}, Runtime: []string{"llamacpp"},
+		Projector: &models.ModelFile{URL: "http://unused/mmproj.gguf"}, Dynamic: true}
+	a.Models.Catalog().Upsert(e)
+	st := a.Models.Storage()
+	if err := st.UpsertCatalogEntry(ctx, e); err != nil {
+		t.Fatal(err)
+	}
+	_ = st.EnsureDirs()
+	for path, data := range map[string]string{st.ModelPath(e.ID): "gguf", st.ProjectorPath(e.ID): "mmproj"} {
+		if err := os.WriteFile(path, []byte(data), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := st.MarkInstalled(ctx, e.ID, st.ModelPath(e.ID), "", 4); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func setupProfile(t *testing.T, ctx context.Context, a *app.App, s Setup) string {
 	t.Helper()
 	p, err := a.Profiles.Get(ctx, "general-assistant")
