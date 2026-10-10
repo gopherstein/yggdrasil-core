@@ -1888,7 +1888,11 @@ export function ChatPage() {
                   return (
                   <div
                     key={message.id}
-                    className={`group ${message.role === 'user' ? 'chat-user-turn' : 'chat-reply'}${editing === message.id ? ' ring-2 ring-primary/40' : ''}`}
+                    className={
+                      message.role === 'user'
+                        ? 'group relative ms-auto flex w-fit max-w-[85%] flex-col items-end'
+                        : `group chat-reply${editing === message.id ? ' ring-2 ring-primary/40' : ''}`
+                    }
                   >
                     {message.role === 'assistant' ? (
                       <>
@@ -1921,16 +1925,21 @@ export function ChatPage() {
                       </>
                     ) : (
                       <>
-                        <span dir="auto" className="whitespace-pre-wrap">{text}</span>
-                        {message.meta?.files?.length ? (
-                          <span className="mt-2 flex flex-wrap justify-end gap-1.5">
-                            {message.meta.files.map((file) => (
-                              <FileChip key={file.id} file={file} />
-                            ))}
-                          </span>
-                        ) : null}
+                        <div className={`chat-user-turn max-w-full${editing === message.id ? ' ring-2 ring-primary/40' : ''}`}>
+                          <span dir="auto" className="whitespace-pre-wrap">{text}</span>
+                          {message.meta?.files?.length ? (
+                            <span className="mt-2 flex flex-wrap justify-end gap-1.5">
+                              {message.meta.files.map((file) => (
+                                <FileChip key={file.id} file={file} />
+                              ))}
+                            </span>
+                          ) : null}
+                        </div>
+                        {/* Under the bubble, not inside it: with a mouse they show on
+                            hover in the gap below, so a hidden Edit leaves no empty
+                            band in the bubble; on touch they stay in view. */}
                         {!message.id.startsWith('optimistic-') ? (
-                          <span className="mt-1 flex flex-wrap items-center justify-end gap-2">
+                          <span className="mt-1 flex flex-wrap items-center justify-end gap-2 [@media(hover:hover)]:absolute [@media(hover:hover)]:end-0 [@media(hover:hover)]:top-full">
                             <VersionSwitch message={message} disabled={isSending} onShow={(id) => void showVersion(id)} />
                             <EditAction disabled={isSending} onEdit={() => startEdit(message)} />
                           </span>
