@@ -33,6 +33,8 @@ var (
 	passages []indexed
 	idf      map[string]float64
 	avgLen   float64
+	// maxIDF is the rarest word's weight (see coverage).
+	maxIDF float64
 )
 
 func load() {
@@ -79,6 +81,7 @@ func load() {
 	idf = map[string]float64{}
 	for t, d := range df {
 		idf[t] = math.Log(1 + (float64(len(passages))-float64(d)+0.5)/(float64(d)+0.5))
+		maxIDF = max(maxIDF, idf[t])
 	}
 	if len(passages) > 0 {
 		avgLen = float64(total) / float64(len(passages))
@@ -122,18 +125,16 @@ func tokens(s string) []string {
 	return out
 }
 
-// Search returns up to max passages for a question, best first, that score
-// at least min (see About).
-func Search(question string, max int, min float64) []Passage {
+// scored is a passage and how well it matches a question.
+type scored struct {
+	p     indexed
+	score float64
+}
+
+// rank scores every passage for a question's words (BM25), best first,
+// keeping those that score at least min.
+func rank(q map[string]bool, min float64) []scored {
 	loadOnce.Do(load)
-	q := map[string]bool{}
-	for _, t := range tokens(question) {
-		q[t] = true
-	}
-	type scored struct {
-		p     indexed
-		score float64
-	}
 	var all []scored
 	const k1, b = 1.2, 0.75
 	for _, p := range passages {
@@ -150,6 +151,21 @@ func Search(question string, max int, min float64) []Passage {
 		}
 	}
 	sort.SliceStable(all, func(i, j int) bool { return all[i].score > all[j].score })
+	return all
+}
+
+func termSet(question string) map[string]bool {
+	q := map[string]bool{}
+	for _, t := range tokens(question) {
+		q[t] = true
+	}
+	return q
+}
+
+// Search returns up to max passages for a question, best first, that score
+// at least min (see About).
+func Search(question string, max int, min float64) []Passage {
+	all := rank(termSet(question), min)
 	out := make([]Passage, 0, max)
 	for i := 0; i < len(all) && i < max; i++ {
 		out = append(out, all[i].p.Passage)
@@ -157,12 +173,35 @@ func Search(question string, max int, min float64) []Passage {
 	return out
 }
 
+// coverage is the share of a question's words, weighted by how rare they
+// are, that a passage has. A word the guide never uses counts as the rarest:
+// "17 sheep", "Maya", and "muffins" say a question isn't about Toskar,
+// however many common words it shares with a passage.
+func coverage(q map[string]bool, p indexed) float64 {
+	loadOnce.Do(load)
+	total, matched := 0.0, 0.0
+	for t := range q {
+		w, ok := idf[t]
+		if !ok {
+			w = maxIDF
+		}
+		total += w
+		if p.terms[t] > 0 {
+			matched += w
+		}
+	}
+	if total == 0 {
+		return 0
+	}
+	return matched / total
+}
+
 var (
 	// questionRe is a message asking something.
 	questionRe = regexp.MustCompile(`(?i)\?|^\s*(how|what|where|why|when|which|can|could|does|do|is|are|will|explain|tell me|show me|help)\b`)
 	// selfRe is a message about Toskar itself, under its name or the one
 	// from before the rename (#237).
-	selfRe = regexp.MustCompile(`(?i)\b(toskar|yggdrasil|this app|the app|your (own )?(features?|docs?|documentation|settings|capabilit\w*|guide)|you (support|offer|have|do)|in the (app|ui|settings)|what left this computer|this computer only|tool sources?|connected services?|specialized ais?|join (token|command)s?|paired computers?|team profile` +
+	selfRe = regexp.MustCompile(`(?i)\b(toskar|yggdrasil|this app|the app|your (own )?(features?|docs?|documentation|settings|capabilit\w*|guide)|(do|does|can|will|would|what) you (support|offer|have|do)|in the (app|ui|settings)|what left this computer|this computer only|tool sources?|connected services?|specialized ais?|join (token|command)s?|paired computers?|team profile` +
 		// Privacy questions are about this app: "are my chats private?",
 		// "who can see my data?", "do I need encryption?".
 		`|my (data|chats?|conversations?|files|memories|messages|information) (is |are )?(private|encrypted|safe|secure|stored)` +
@@ -170,11 +209,16 @@ var (
 )
 
 // Thresholds: a question naming Yggdrasil needs a modest match; one that
-// doesn't, a strong match on the guide's own words.
+// doesn't, a strong match on the guide's own words, with most of its words
+// in the best passage (minCoverage). A long question that shares a few
+// common words with the guide ("take one every half hour", "how many
+// months") scores high on BM25 alone; coverage tells it from "How do I
+// schedule an automation?".
 const (
-	minNamed  = 2.0
-	minStrong = 6.0
-	maxChars  = 3000
+	minNamed    = 2.0
+	minStrong   = 6.0
+	minCoverage = 0.6
+	maxChars    = 3000
 )
 
 // About returns the guide passages for a question about Yggdrasil, or
@@ -184,11 +228,20 @@ func About(message string) []Passage {
 	if !questionRe.MatchString(m) || len(strings.Fields(m)) > 60 {
 		return nil
 	}
+	q := termSet(m)
+	named := selfRe.MatchString(m)
 	min := minStrong
-	if selfRe.MatchString(m) {
+	if named {
 		min = minNamed
 	}
-	found := Search(m, 4, min)
+	ranked := rank(q, min)
+	if len(ranked) == 0 || (!named && coverage(q, ranked[0].p) < minCoverage) {
+		return nil
+	}
+	var found []Passage
+	for i := 0; i < len(ranked) && i < 4; i++ {
+		found = append(found, ranked[i].p.Passage)
+	}
 	var out []Passage
 	size := 0
 	for _, p := range found {
