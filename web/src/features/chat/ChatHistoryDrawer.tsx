@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type MouseEvent } from 'react'
+import { useEffect, useMemo, useState, type KeyboardEvent, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDialog } from '@/lib/useDialog'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
@@ -88,6 +88,8 @@ type ChatHistoryDrawerProps = {
   onRename: (conversation: Conversation) => void
   onTogglePin: (id: string) => void
   onDelete: (conversation: Conversation, event: MouseEvent) => void
+  /** Delete the chats chosen in select mode, after one confirmation (#452). */
+  onDeleteMany: (conversations: Conversation[]) => void
   onToggleDrawerPinned: () => void
   drawerPinned: boolean
   canPinDrawer: boolean
@@ -112,6 +114,7 @@ export function ChatHistoryDrawer({
   onRename,
   onTogglePin,
   onDelete,
+  onDeleteMany,
   onToggleDrawerPinned,
   drawerPinned,
   canPinDrawer,
@@ -128,7 +131,18 @@ export function ChatHistoryDrawer({
   // As an overlay it is a modal dialog: focus moves in and stays, and Escape
   // closes it. Pinned, it is a side panel the page works alongside.
   const overlay = mode === 'overlay'
-  const panelRef = useDialog<HTMLElement>(open && overlay, onClose)
+  // Select mode (#452): chats show checkboxes and the header and footer
+  // turn into an action bar. anchor is where a Shift-click range starts.
+  const [selecting, setSelecting] = useState(false)
+  const [chosen, setChosen] = useState<Set<string>>(() => new Set())
+  const [anchor, setAnchor] = useState<string | null>(null)
+  const leaveSelect = () => {
+    setSelecting(false)
+    setChosen(new Set())
+    setAnchor(null)
+  }
+  // Escape leaves select mode first, then closes the drawer.
+  const panelRef = useDialog<HTMLElement>(open && overlay, () => (selecting ? leaveSelect() : onClose()))
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -140,6 +154,54 @@ export function ChatHistoryDrawer({
     () => groupConversations(filtered, pinnedIds),
     [filtered, pinnedIds],
   )
+  // The chats in the order shown, for ranges and Select all.
+  const shown = useMemo(() => grouped.flatMap((g) => g.items), [grouped])
+
+  // Deleted chats drop out of the selection; when the chosen chats are
+  // deleted, select mode ends. A cancelled confirmation keeps it.
+  useEffect(() => {
+    const ids = new Set(conversations.map((c) => c.id))
+    const kept = [...chosen].filter((id) => ids.has(id))
+    if (kept.length === chosen.size) return
+    setChosen(new Set(kept))
+    if (kept.length === 0) setSelecting(false)
+    // Only the list changing prunes; choosing doesn't.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversations])
+
+  const toggle = (id: string) => {
+    setChosen((current) => {
+      const next = new Set(current)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+    setAnchor(id)
+  }
+  const selectRange = (from: string, to: string) => {
+    const a = shown.findIndex((c) => c.id === from)
+    const b = shown.findIndex((c) => c.id === to)
+    if (a < 0 || b < 0) return toggle(to)
+    const [lo, hi] = a < b ? [a, b] : [b, a]
+    setChosen((current) => new Set([...current, ...shown.slice(lo, hi + 1).map((c) => c.id)]))
+  }
+  // A click in select mode chooses; outside it, Cmd/Ctrl-click and
+  // Shift-click start choosing (Shift from the open chat).
+  const clickChat = (id: string, event: MouseEvent) => {
+    const range = event.shiftKey
+    const one = event.metaKey || event.ctrlKey
+    if (!selecting && !range && !one) {
+      onSelect(id)
+      return
+    }
+    event.preventDefault()
+    setSelecting(true)
+    const from = anchor ?? (selecting ? null : selectedId)
+    if (range && from) selectRange(from, id)
+    else toggle(id)
+  }
+  const allShown = shown.length > 0 && shown.every((c) => chosen.has(c.id))
+  const chosenChats = conversations.filter((c) => chosen.has(c.id))
 
   useEffect(() => {
     if (!menuOpenId) return
@@ -163,10 +225,37 @@ export function ChatHistoryDrawer({
       role={overlay ? 'dialog' : undefined}
       aria-modal={overlay ? true : undefined}
       aria-label={t('history.label')}
+      onKeyDown={(e: KeyboardEvent) => {
+        // Pinned, there's no dialog to catch Escape.
+        if (!overlay && selecting && e.key === 'Escape') {
+          e.stopPropagation()
+          leaveSelect()
+        }
+      }}
     >
       {/* The same height and border as the chat's header, so the two line up. */}
+      {selecting ? (
+        <div className="chat-header ps-4">
+          <h2 className="flex-1 font-display text-[15px] font-semibold text-ink" aria-live="polite">
+            {t('history.selected', { count: chosen.size })}
+          </h2>
+          <button type="button" className="chat-header-button text-sm" onClick={leaveSelect}>
+            {t('history.cancelSelect')}
+          </button>
+        </div>
+      ) : (
       <div className="chat-header ps-4">
         <h2 className="flex-1 font-display text-[15px] font-semibold text-ink">{t('history.title')}</h2>
+        {conversations.length > 0 && (
+          <button
+            type="button"
+            className="chat-header-button text-sm"
+            title={t('history.selectHint')}
+            onClick={() => setSelecting(true)}
+          >
+            {t('history.select')}
+          </button>
+        )}
         {canPinDrawer && (
           <button
             type="button"
@@ -196,6 +285,7 @@ export function ChatHistoryDrawer({
           </svg>
         </button>
       </div>
+      )}
 
       <div className="shrink-0 px-3 pt-3">
         <label className="relative block">
@@ -245,6 +335,7 @@ export function ChatHistoryDrawer({
               {group.items.map((conversation) => {
                 const isSelected = selectedId === conversation.id
                 const isPinned = pinnedIds.includes(conversation.id)
+                const isChosen = chosen.has(conversation.id)
                 return (
                   <li key={conversation.id} className="group relative">
                     {renamingId === conversation.id ? (
@@ -264,16 +355,36 @@ export function ChatHistoryDrawer({
                         <button
                           type="button"
                           title={conversation.title}
-                          onClick={() => onSelect(conversation.id)}
+                          role={selecting ? 'checkbox' : undefined}
+                          aria-checked={selecting ? isChosen : undefined}
+                          onClick={(e) => clickChat(conversation.id, e)}
                           className={[
-                            'w-full rounded-lg py-2 ps-2.5 pe-9 text-start text-sm transition',
-                            isSelected
-                              ? 'bg-primary-soft font-medium text-primary-active'
-                              : 'text-ink-muted hover:bg-raised/80 hover:text-ink',
+                            'w-full rounded-lg py-2 ps-2.5 text-start text-sm transition',
+                            selecting ? 'pe-2.5' : 'pe-9',
+                            selecting && isChosen
+                              ? 'bg-primary-soft text-ink'
+                              : isSelected && !selecting
+                                ? 'bg-primary-soft font-medium text-primary-active'
+                                : 'text-ink-muted hover:bg-raised/80 hover:text-ink',
                             isPinned && !isSelected ? 'text-ink' : '',
                           ].join(' ')}
                         >
                           <span className="flex min-w-0 items-center gap-1.5">
+                            {selecting ? (
+                              <span
+                                className={[
+                                  'inline-flex h-4 w-4 shrink-0 items-center justify-center rounded border',
+                                  isChosen ? 'border-primary bg-primary text-white' : 'border-line bg-surface',
+                                ].join(' ')}
+                                aria-hidden
+                              >
+                                {isChosen ? (
+                                  <svg viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="m3.5 8.5 3 3 6-7" />
+                                  </svg>
+                                ) : null}
+                              </span>
+                            ) : null}
                             {isPinned ? (
                               <span
                                 className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent"
@@ -286,7 +397,7 @@ export function ChatHistoryDrawer({
                             </span>
                           </span>
                         </button>
-                        <div className="absolute end-1 top-1/2 -translate-y-1/2">
+                        <div className={['absolute end-1 top-1/2 -translate-y-1/2', selecting ? 'hidden' : ''].join(' ')}>
                           <button
                             type="button"
                             className={[
@@ -365,6 +476,37 @@ export function ChatHistoryDrawer({
           </div>
         ))}
       </div>
+      {selecting ? (
+        <div className="flex shrink-0 items-center justify-between gap-2 border-t border-line/50 px-3 py-2.5">
+          <button
+            type="button"
+            className="btn-secondary px-3 py-1.5 text-xs"
+            disabled={shown.length === 0}
+            onClick={() =>
+              setChosen((current) => {
+                const next = new Set(current)
+                for (const c of shown) {
+                  if (allShown) next.delete(c.id)
+                  else next.add(c.id)
+                }
+                return next
+              })
+            }
+          >
+            {allShown ? t('history.selectNone') : t('history.selectAll')}
+          </button>
+          <button
+            type="button"
+            className="btn-danger px-3 py-1.5 text-xs"
+            disabled={chosenChats.length === 0}
+            onClick={() => {
+              onDeleteMany(chosenChats)
+            }}
+          >
+            {t('history.deleteSelected', { count: chosenChats.length })}
+          </button>
+        </div>
+      ) : null}
     </aside>
   )
 

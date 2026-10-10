@@ -252,7 +252,12 @@
     "untitled": "제목 없음",
     "cancel": "취소",
     "delete": "삭제",
-    "deleting": "삭제하는 중…"
+    "titleMany_other": "채팅 {{count}}개를 삭제할까요?",
+    "bodyMany": "메시지, 첨부 파일, 생성된 파일도 삭제됩니다.",
+    "includesOpen": "지금 열려 있는 채팅도 포함되어 있습니다.",
+    "deleteMany_other": "{{count}}개 삭제",
+    "deleted_other": "채팅 {{count}}개를 삭제했습니다",
+    "undo": "실행 취소"
   },
   "history": {
     "label": "채팅 기록",
@@ -274,6 +279,13 @@
     "rename": "이름 변경",
     "unpin": "고정 해제",
     "delete": "삭제",
+    "select": "선택",
+    "selectHint": "여러 채팅을 선택합니다. Shift-클릭으로 범위를, Cmd 또는 Ctrl-클릭으로 하나씩 추가합니다.",
+    "selected_other": "{{count}}개 선택됨",
+    "cancelSelect": "취소",
+    "selectAll": "모두 선택",
+    "selectNone": "선택 해제",
+    "deleteSelected_other": "{{count}}개 삭제",
     "groups": {
       "pinned": "고정됨",
       "today": "오늘",

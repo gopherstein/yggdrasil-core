@@ -224,9 +224,10 @@ export function SettingsPage() {
 
   const clearHistoryMutation = useMutation({
     mutationFn: async () => {
-      const conversations = (await api.getConversations()) ?? []
-      for (const c of conversations) {
-        await api.deleteConversation(c.id)
+      const ids = ((await api.getConversations()) ?? []).map((c) => c.id)
+      // In requests of up to 1,000, the most one bulk delete takes (#452).
+      for (let i = 0; i < ids.length; i += 1000) {
+        await api.deleteConversations(ids.slice(i, i + 1000))
       }
     },
     onSuccess: () => {

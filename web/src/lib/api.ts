@@ -8,6 +8,7 @@ import type {
   ChatRequest,
   ChatResponse,
   Conversation,
+  ConversationsDeleted,
   CreateAPIKeyResponse,
   CreateConversationRequest,
   DiagnosticsExportResult,
@@ -905,6 +906,17 @@ export const api = {
   deleteConversation: (id: string) =>
     request<null>(`/api/v1/conversations/${id}`, {
       method: 'DELETE',
+    }),
+
+  /**
+   * Deletes several chats at once (#452). keepalive lets it finish while
+   * the page closes, for a delete still waiting on its Undo.
+   */
+  deleteConversations: (ids: string[], opts?: { keepalive?: boolean }) =>
+    request<ConversationsDeleted>('/api/v1/conversations/delete', {
+      method: 'POST',
+      body: JSON.stringify({ ids }),
+      keepalive: opts?.keepalive,
     }),
 
   getMessages: (conversationId: string) =>
