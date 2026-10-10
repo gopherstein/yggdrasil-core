@@ -101,8 +101,25 @@ every readable and writable type has a case. `TestFilesQuality` runs the set:
 the stub must pass every case (the file reached the model, and a made file
 holds what was asked), and a real model the same share as the chat set.
 `TOSKAR_QUALITY_FILES_REPORT` writes its report, and the weekly real-model
-run includes it. Images, video, and audio join it next, judged by a model
-that can see or hear.
+run includes it.
+
+`media.json` is the media set (#510): pictures, edits, video, and speech
+Toskar makes, and pictures it reads. A case's `judge` checks the file the
+turn made: a picture must decode, with each side at least `min_side` on a
+real daemon; a WAV must be whole and at least half a second long. Against a
+real daemon, a model that sees (`TOSKAR_QUALITY_JUDGE_MODEL`, gemma-3-4b by
+default) is then asked whether the picture, or the clip's sampled frames,
+shows `shows`, and speech is transcribed back and compared with `says` by
+word error rate (`max_wer`, 25% by default). `make: png` draws an
+attachment from a description, such as `size=512 bg=white shape=square
+color=blue count=3`, for edits and for the reading cases, whose
+`image_sent` checks (stub only) that the picture reached the model.
+`real_only` cases need tools the stub has no stand-in for, and `recording`
+attaches text read by Toskar's own voice. The stub must pass every case it
+runs; a real daemon at least 75% (`TOSKAR_QUALITY_MEDIA_MIN_PASS`), since
+another model does the judging. `TOSKAR_QUALITY_MEDIA_INSTALL` sets up
+picture and video making, the judge, and speech first. The weekly run
+includes it once, with the recommended models.
 
 ## Running it
 

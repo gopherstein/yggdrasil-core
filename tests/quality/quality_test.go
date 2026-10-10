@@ -121,6 +121,9 @@ type Expect struct {
 	// read the way Toskar reads an attachment (#510): the file is opened,
 	// not only named.
 	FileText map[string][]string `json:"file_text"`
+	// ImageSent requires an attached picture to reach the model with the
+	// message (stub only: the request it got is checked).
+	ImageSent bool `json:"image_sent"`
 	// TopicHeld is whether the profile's topic controls held the message
 	// or replaced its answer with the set reply (#345), by the run trace.
 	TopicHeld *bool `json:"topic_held"`
@@ -411,6 +414,11 @@ func check(driver string, c Case, r Result, deflection *regexp.Regexp) []string 
 		}) {
 			fail("no %s file in the answer: %+v", ext, metaFiles(r))
 		}
+	}
+	if x.ImageSent && driver == "stub" && !slices.ContainsFunc(r.Prompts, func(p []pluginapi.ChatMessage) bool {
+		return slices.ContainsFunc(p, func(m pluginapi.ChatMessage) bool { return len(m.Images) > 0 })
+	}) {
+		fail("the picture never reached the model")
 	}
 	for _, f := range madeFileFailures(x.FileText, r.Files) {
 		fail("%s", f)

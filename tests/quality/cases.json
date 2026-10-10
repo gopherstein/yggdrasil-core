@@ -379,7 +379,7 @@
           "video.generate"
         ],
         "files": [
-          ".mp4"
+          ".webm"
         ],
         "answer_lacks": "(?i)(can'?t|cannot|unable to|not able to) (draw|create|make|generate|produce)|as an ai|text-based|language model"
       }

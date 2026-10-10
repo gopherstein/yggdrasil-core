@@ -86,7 +86,7 @@ jobs:
   real-models:
     if: vars.QUALITY_RUNNER == 'docker'
     runs-on: [self-hosted, toskar-models]
-    timeout-minutes: 300
+    timeout-minutes: 480
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -197,6 +197,28 @@ jobs:
             -e TOSKAR_QUALITY_FILES_REPORT=/src/.quality/files.md \
             golang:1.26-bookworm \
             go test ./tests/quality -run 'TestFiles' -count=1 -v -timeout 60m
+      # Media (#510): pictures, edits, video, and speech Toskar makes,
+      # judged by a model that sees (gemma-3-4b) or by transcription, and
+      # pictures it reads. Once a week, with the recommended models: it
+      # sets up picture and video making first (about 14 GB the first time,
+      # kept in the models volume), so the other models don't repeat it.
+      - name: Media
+        if: ${{ !cancelled() && matrix.model == 'recommended' }}
+        run: |
+          mkdir -p .quality
+          docker run --rm --network "$NAME" \
+            --cap-drop ALL --security-opt no-new-privileges \
+            --memory 4g --memory-swap 4g --cpus 2 \
+            -v "$PWD:/src" -w /src \
+            -v toskar-quality-go:/go \
+            -e TOSKAR_QUALITY_URL="http://$NAME:7331" \
+            -e TOSKAR_QUALITY_KEY="$QUALITY_KEY" \
+            -e TOSKAR_QUALITY_INSTALL=recommended \
+            -e TOSKAR_QUALITY_MODEL="${{ matrix.model }}" \
+            -e TOSKAR_QUALITY_MEDIA_INSTALL=1 \
+            -e TOSKAR_QUALITY_MEDIA_REPORT=/src/.quality/media.md \
+            golang:1.26-bookworm \
+            go test ./tests/quality -run 'TestMedia' -count=1 -v -timeout 180m
       # Reasoning (#459): how often the model gets questions with one right
       # answer right, by kind, and the time and tokens it takes. Measured,
       # not gated: the baseline Deliberate is compared against.
@@ -221,7 +243,7 @@ jobs:
       - name: Report
         if: always()
         run: |
-          for f in .quality/report.md .quality/topics.md .quality/files.md .quality/reasoning.md; do
+          for f in .quality/report.md .quality/topics.md .quality/files.md .quality/media.md .quality/reasoning.md; do
             if [ -f "$f" ]; then
               head -c 60000 "$f" >> "$GITHUB_STEP_SUMMARY"
             fi
@@ -234,6 +256,7 @@ jobs:
             .quality/report.md
             .quality/topics.md
             .quality/files.md
+            .quality/media.md
             .quality/reasoning.md
             .quality/reasoning.json
           if-no-files-found: ignore

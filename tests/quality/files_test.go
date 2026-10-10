@@ -6,10 +6,15 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"image"
+	"image/color"
+	"image/draw"
+	"image/png"
 	"os"
 	"path/filepath"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -43,6 +48,8 @@ func (a Attachment) Bytes() ([]byte, error) {
 		return artifacts.CSVToXLSX("Sheet1", a.Content)
 	case "pptx":
 		return pptx(strings.Split(a.Content, "\n---\n"))
+	case "png":
+		return shapesPNG(a.Content)
 	case "":
 		return []byte(a.Content), nil
 	}
@@ -68,6 +75,50 @@ func pptx(slides []string) ([]byte, error) {
 		_, _ = w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?><p:sld xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><p:cSld><p:spTree><p:sp><p:txBody>` + paras.String() + `</p:txBody></p:sp></p:spTree></p:cSld></p:sld>`))
 	}
 	if err := z.Close(); err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
+}
+
+// shapesPNG draws a picture from a description such as
+// "size=512 bg=white shape=square color=blue count=3": count shapes of one
+// color in a row on a plain background, for the cases that ask what a
+// picture shows and for the image edits.
+func shapesPNG(spec string) ([]byte, error) {
+	opt := map[string]string{"size": "512", "bg": "white", "shape": "circle", "color": "red", "count": "1"}
+	for _, f := range strings.Fields(spec) {
+		if k, v, ok := strings.Cut(f, "="); ok {
+			opt[k] = v
+		}
+	}
+	colors := map[string]color.RGBA{
+		"white": {255, 255, 255, 255}, "black": {0, 0, 0, 255}, "red": {220, 30, 30, 255},
+		"blue": {30, 70, 220, 255}, "green": {30, 160, 60, 255}, "yellow": {240, 200, 20, 255},
+	}
+	bg, ok1 := colors[opt["bg"]]
+	fg, ok2 := colors[opt["color"]]
+	size, err1 := strconv.Atoi(opt["size"])
+	count, err2 := strconv.Atoi(opt["count"])
+	if !ok1 || !ok2 || err1 != nil || err2 != nil || size < 32 || count < 1 || count > 6 {
+		return nil, fmt.Errorf("bad picture %q", spec)
+	}
+	img := image.NewRGBA(image.Rect(0, 0, size, size))
+	draw.Draw(img, img.Bounds(), &image.Uniform{bg}, image.Point{}, draw.Src)
+	cell := size / count
+	r := cell * 3 / 10
+	for i := range count {
+		cx, cy := cell*i+cell/2, size/2
+		for y := cy - r; y <= cy+r; y++ {
+			for x := cx - r; x <= cx+r; x++ {
+				dx, dy := x-cx, y-cy
+				if opt["shape"] == "square" || dx*dx+dy*dy <= r*r {
+					img.Set(x, y, fg)
+				}
+			}
+		}
+	}
+	var b bytes.Buffer
+	if err := png.Encode(&b, img); err != nil {
 		return nil, err
 	}
 	return b.Bytes(), nil
