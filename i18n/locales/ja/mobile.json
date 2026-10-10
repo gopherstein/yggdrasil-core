@@ -296,6 +296,15 @@
       "next": "次のバージョン",
       "position": "{{index}} / {{count}}",
       "positionLabel": "バージョン {{index}}/{{count}}"
+    },
+    "select": {
+      "start": "選択",
+      "selected_other": "{{count}} 件選択",
+      "all": "すべて選択",
+      "none": "選択を解除",
+      "delete_other": "{{count}} 件を削除",
+      "confirm_other": "{{count}} 件のチャットを削除しますか？",
+      "confirmBody": "メッセージ、添付ファイル、生成されたファイルも削除されます。コンピュータ上のチャットはコンピュータからも削除されます。"
     }
   },
   "effort": {

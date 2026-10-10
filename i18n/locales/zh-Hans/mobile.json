@@ -296,6 +296,15 @@
       "next": "下一个版本",
       "position": "{{index}} / {{count}}",
       "positionLabel": "第 {{index}} 个版本，共 {{count}} 个"
+    },
+    "select": {
+      "start": "选择",
+      "selected_other": "已选择 {{count}} 个",
+      "all": "全选",
+      "none": "全不选",
+      "delete_other": "删除 {{count}} 个",
+      "confirm_other": "删除 {{count}} 个聊天？",
+      "confirmBody": "它们的消息、附件和生成的文件都会被删除。电脑上的聊天也会从电脑上删除。"
     }
   },
   "effort": {

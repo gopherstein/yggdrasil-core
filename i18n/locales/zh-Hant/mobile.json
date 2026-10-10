@@ -296,6 +296,15 @@
       "next": "下一個版本",
       "position": "{{index}} / {{count}}",
       "positionLabel": "第 {{index}} 個版本，共 {{count}} 個"
+    },
+    "select": {
+      "start": "選取",
+      "selected_other": "已選取 {{count}} 個",
+      "all": "全選",
+      "none": "全不選",
+      "delete_other": "刪除 {{count}} 個",
+      "confirm_other": "刪除 {{count}} 個聊天？",
+      "confirmBody": "它們的訊息、附件和產生的檔案都會被刪除。電腦上的聊天也會從電腦上刪除。"
     }
   },
   "effort": {

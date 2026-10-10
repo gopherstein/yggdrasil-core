@@ -307,6 +307,18 @@
       "next": "Next version",
       "position": "{{index}} / {{count}}",
       "positionLabel": "Version {{index}} of {{count}}"
+    },
+    "select": {
+      "start": "Select",
+      "selected_one": "{{count}} selected",
+      "selected_other": "{{count}} selected",
+      "all": "Select all",
+      "none": "Select none",
+      "delete_one": "Delete {{count}}",
+      "delete_other": "Delete {{count}}",
+      "confirm_one": "Delete {{count}} chat?",
+      "confirm_other": "Delete {{count}} chats?",
+      "confirmBody": "Their messages, attachments, and generated files are removed. Chats on your computer are removed there too."
     }
   },
   "effort": {

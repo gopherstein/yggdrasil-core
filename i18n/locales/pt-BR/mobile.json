@@ -296,6 +296,21 @@
       "next": "Próxima versão",
       "position": "{{index}} / {{count}}",
       "positionLabel": "Versão {{index}} de {{count}}"
+    },
+    "select": {
+      "start": "Selecionar",
+      "selected_one": "{{count}} selecionada",
+      "selected_other": "{{count}} selecionadas",
+      "selected_many": "{{count}} selecionadas",
+      "all": "Selecionar tudo",
+      "none": "Desmarcar tudo",
+      "delete_one": "Excluir {{count}}",
+      "delete_other": "Excluir {{count}}",
+      "delete_many": "Excluir {{count}}",
+      "confirm_one": "Excluir {{count}} conversa?",
+      "confirm_other": "Excluir {{count}} conversas?",
+      "confirm_many": "Excluir {{count}} conversas?",
+      "confirmBody": "As mensagens, anexos e arquivos gerados delas são removidos. Conversas no seu computador também são removidas de lá."
     }
   },
   "effort": {
