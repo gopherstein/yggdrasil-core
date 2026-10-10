@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"encoding/xml"
+	"errors"
 	"fmt"
 	"image"
 	"image/color"
@@ -50,6 +51,9 @@ func (a Attachment) Bytes() ([]byte, error) {
 		return pptx(strings.Split(a.Content, "\n---\n"))
 	case "png":
 		return shapesPNG(a.Content)
+	case "file":
+		// A file kept in the repository, by its path from tests/quality.
+		return os.ReadFile(filepath.FromSlash(a.Content))
 	case "":
 		return []byte(a.Content), nil
 	}
@@ -207,7 +211,7 @@ func TestFileCasesCover(t *testing.T) {
 				t.Errorf("%s: %v", c.ID, err)
 				continue
 			}
-			if _, err := fileText(a.Name, data); err != nil {
+			if _, err := fileText(a.Name, data); err != nil && (!c.RealOnly || !errors.Is(err, mimir.ErrScanned)) {
 				t.Errorf("%s: %s doesn't read: %v", c.ID, a.Name, err)
 			}
 			read[strings.ToLower(filepath.Ext(a.Name))] = true

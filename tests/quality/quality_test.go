@@ -46,6 +46,9 @@ type Case struct {
 	// search; without it, the message itself.
 	StubQuery string `json:"stub_query"`
 	StubOnly  bool   `json:"stub_only"`
+	// RealOnly cases need real tools the stub has no stand-in for, such as
+	// text recognition or transcription.
+	RealOnly bool `json:"real_only"`
 	// Fixtures needs the in-process run's stand-in tools, such as an image
 	// tool that saves a tiny picture; a daemon has its real ones.
 	Fixtures bool   `json:"fixtures"`
@@ -280,6 +283,10 @@ func runCase(t *testing.T, d Driver, c Case, deflection *regexp.Regexp) (reportR
 		if c.StubOnly && d.Name() != "stub" {
 			skipped = true
 			t.Skip("checks a scripted reply")
+		}
+		if c.RealOnly && d.Name() != "real" {
+			skipped = true
+			t.Skip("needs the real tools")
 		}
 		if c.Fixtures && d.Name() == "real" {
 			skipped = true

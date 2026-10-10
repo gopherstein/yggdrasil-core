@@ -496,6 +496,7 @@ func New(opts Options) (*App, error) {
 				MemoryOff: memoryOff,
 			})
 		},
+		RecognizeUpload:     a.recognizeUpload,
 		DeleteConversation:  a.deleteConversation,
 		DeleteConversations: a.deleteConversations,
 		ListMessages: func(ctx context.Context, id string) ([]contracts.Message, error) {

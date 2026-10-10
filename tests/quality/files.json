@@ -23,6 +23,22 @@
       }
     },
     {
+      "id": "read_scanned_pdf",
+      "what": "A scanned PDF, with no text layer, is read with text recognition (#510).",
+      "real_only": true,
+      "attach": [
+        {
+          "name": "store-hours.pdf",
+          "make": "file",
+          "content": "../../internal/mimir/testdata/scanned.pdf"
+        }
+      ],
+      "message": "Is the store open on Sunday?",
+      "expect": {
+        "answer_matches": "(?i)closed|\\bno\\b|not open"
+      }
+    },
+    {
       "id": "read_xlsx",
       "what": "A spreadsheet's rows are read: which store made more.",
       "attach": [

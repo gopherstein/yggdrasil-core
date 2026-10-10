@@ -49,9 +49,6 @@ type mediaCase struct {
 	// Judge is how the file the turn makes is judged; nil for a case that
 	// reads a file instead, judged by its answer.
 	Judge *Judge `json:"judge"`
-	// RealOnly cases need the real tools, such as transcription, which the
-	// stub has no stand-in for.
-	RealOnly bool `json:"real_only"`
 	// Recording is text Toskar's own voice reads into a WAV that's attached
 	// to the message (real only), for a transcription case.
 	Recording string `json:"recording"`

@@ -1,6 +1,7 @@
 package mimir
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"path/filepath"
@@ -50,9 +51,9 @@ func FilePassages(name string, raw []byte) ([]Passage, error) {
 	case ".pdf":
 		docs, err = parsePDF(name, raw)
 		if errors.Is(err, ErrNoText) {
-			// Chat rereads attachments every turn, which is too slow for text
-			// recognition; a knowledge source recognizes the pages once.
-			err = fmt.Errorf("%s is a scanned PDF with no text to read. Connect it on the Knowledge page, which reads scanned pages with text recognition", filepath.Base(name))
+			// Recognizing scanned pages takes a while; Store.ChatPassages
+			// does it once, and remembers the text (#510).
+			err = scannedError{name: filepath.Base(name)}
 		}
 	case ".docx":
 		docs, err = parseDOCX(name, raw)
@@ -72,6 +73,49 @@ func FilePassages(name string, raw []byte) ([]Passage, error) {
 		out[i] = Passage(c)
 	}
 	return out, nil
+}
+
+// ErrScanned is a PDF with no text layer, whose pages need text
+// recognition before they can be read.
+var ErrScanned = errors.New("a scanned PDF")
+
+type scannedError struct{ name string }
+
+func (e scannedError) Error() string {
+	return e.name + " is a scanned PDF with no text to read, and text recognition isn't available here. Connect it on the Knowledge page"
+}
+
+func (e scannedError) Unwrap() error { return ErrScanned }
+
+// CanRecognize reports text recognition for scanned PDFs being set up.
+func (s *Store) CanRecognize() bool { return s != nil && s.recognizer != nil }
+
+// ChatPassages reads a file attached to a chat as FilePassages does, and
+// recognizes a scanned PDF's pages with text recognition when it's set up
+// (#510). The text is remembered by the file's content, so the next turn,
+// or Recognize run when the file was attached, makes it immediate.
+func (s *Store) ChatPassages(ctx context.Context, name string, raw []byte) ([]Passage, error) {
+	passages, err := FilePassages(name, raw)
+	if !errors.Is(err, ErrScanned) || !s.CanRecognize() {
+		return passages, err
+	}
+	docs, err := s.readPDF(ctx)(name, raw)
+	if err != nil {
+		return nil, err
+	}
+	chunks := chunkDocuments(docs)
+	out := make([]Passage, len(chunks))
+	for i, c := range chunks {
+		out[i] = Passage(c)
+	}
+	return out, nil
+}
+
+// Recognize recognizes a scanned PDF's pages ahead of the turn that reads
+// it, such as when it's attached, so the turn finds the text remembered.
+func (s *Store) Recognize(ctx context.Context, name string, raw []byte) error {
+	_, err := s.ChatPassages(ctx, name, raw)
+	return err
 }
 
 // SelectPassages keeps passages within budget runes. When everything fits, it
