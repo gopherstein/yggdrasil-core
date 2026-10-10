@@ -301,5 +301,43 @@
   "external": {
     "title": "外部服务器",
     "description": "兼容 OpenAI 的服务器，例如 OpenAI，或其他机器上的 vLLM、Ollama。可在聊天中选择它的模型；“自动”从不选择它们。"
+  },
+  "add": {
+    "open": "添加模型",
+    "title": "添加模型",
+    "description": "添加你已有的 GGUF 模型，或通过链接添加。模型会添加到这台电脑。",
+    "ways": {
+      "file": "从文件",
+      "apps": "从其他应用",
+      "link": "从链接"
+    },
+    "copying": "正在添加 {{name}}：正在复制。进度显示在“已安装”标签页。",
+    "added": "已添加 {{name}}，在“已安装”标签页中。",
+    "add": "添加",
+    "adding": "正在添加…",
+    "failed": "无法添加该模型。",
+    "file": {
+      "drop": "把 .gguf 文件拖到这里，即可发送到这台电脑。",
+      "choose": "选择文件",
+      "sending": "已发送 {{sent}}，共 {{total}}…",
+      "pathLabel": "或者这台电脑上文件的位置",
+      "pathPlaceholder": "/Users/you/Models/model-Q4_K_M.gguf",
+      "how": "添加方式",
+      "copy": "复制到 Toskar",
+      "copyHint": "会占用更多空间；原文件可以删除。",
+      "inPlace": "在原位置使用",
+      "inPlaceHint": "不复制。请保留文件位置，否则模型将无法使用。"
+    },
+    "apps": {
+      "looking": "正在查找模型…",
+      "description": "LM Studio、Ollama、llama.cpp 和 GPT4All 已下载的模型。它们在原位置使用，不额外占用空间。",
+      "none": "这台电脑上没有来自 LM Studio、Ollama、llama.cpp 或 GPT4All 的模型。",
+      "already": "已添加"
+    },
+    "link": {
+      "description": "指向 .gguf 文件的直接链接。Hugging Face 链接会用文件校验和核对，视觉模型的图片支持也会一并添加。",
+      "url": "链接",
+      "name": "名称（可选）"
+    }
   }
 }

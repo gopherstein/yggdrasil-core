@@ -315,5 +315,43 @@
   "external": {
     "title": "Server esterno",
     "description": "Un server compatibile con OpenAI, come OpenAI, vLLM o Ollama su un'altra macchina. I suoi modelli si possono scegliere per una chat; Auto non li sceglie mai."
+  },
+  "add": {
+    "open": "Aggiungi un modello",
+    "title": "Aggiungi un modello",
+    "description": "Aggiungi un modello GGUF che hai già, o uno da un link. Viene aggiunto a questo computer.",
+    "ways": {
+      "file": "Da un file",
+      "apps": "Da un'altra app",
+      "link": "Da un link"
+    },
+    "copying": "Aggiunta di {{name}}: copia in corso. L'avanzamento è nella scheda Installati.",
+    "added": "{{name}} aggiunto. È nella scheda Installati.",
+    "add": "Aggiungi",
+    "adding": "Aggiunta…",
+    "failed": "Impossibile aggiungere il modello.",
+    "file": {
+      "drop": "Trascina qui un file .gguf per inviarlo a questo computer.",
+      "choose": "Scegli un file",
+      "sending": "Invio di {{sent}} su {{total}}…",
+      "pathLabel": "Oppure la posizione di un file su questo computer",
+      "pathPlaceholder": "/Users/tu/Modelli/modello-Q4_K_M.gguf",
+      "how": "Come aggiungerlo",
+      "copy": "Copialo in Toskar",
+      "copyHint": "Occupa più spazio; puoi eliminare l'originale.",
+      "inPlace": "Usalo dove si trova",
+      "inPlaceHint": "Nessuna copia. Lascia il file lì, altrimenti il modello smette di funzionare."
+    },
+    "apps": {
+      "looking": "Ricerca dei modelli…",
+      "description": "Modelli già scaricati da LM Studio, Ollama, llama.cpp e GPT4All. Vengono usati dove si trovano, senza occupare altro spazio.",
+      "none": "Nessun modello di LM Studio, Ollama, llama.cpp o GPT4All su questo computer.",
+      "already": "Aggiunto"
+    },
+    "link": {
+      "description": "Un link diretto a un file .gguf. Un link di Hugging Face viene verificato con il checksum del file, e il supporto alle immagini di un modello visivo arriva insieme.",
+      "url": "Link",
+      "name": "Nome (facoltativo)"
+    }
   }
 }

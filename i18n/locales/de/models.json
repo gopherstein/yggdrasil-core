@@ -308,5 +308,43 @@
   "external": {
     "title": "Externer Server",
     "description": "Ein OpenAI-kompatibler Server, etwa OpenAI, vLLM oder Ollama auf einem anderen Rechner. Seine Modelle lassen sich für einen Chat wählen; „Auto“ wählt sie nie."
+  },
+  "add": {
+    "open": "Modell hinzufügen",
+    "title": "Modell hinzufügen",
+    "description": "Füge ein GGUF-Modell hinzu, das du schon hast, oder eines über einen Link. Es wird diesem Computer hinzugefügt.",
+    "ways": {
+      "file": "Aus einer Datei",
+      "apps": "Aus einer anderen App",
+      "link": "Über einen Link"
+    },
+    "copying": "{{name}} wird hinzugefügt und hineinkopiert. Den Fortschritt zeigt der Tab „Installiert“.",
+    "added": "{{name}} hinzugefügt. Es steht im Tab „Installiert“.",
+    "add": "Hinzufügen",
+    "adding": "Wird hinzugefügt…",
+    "failed": "Das Modell konnte nicht hinzugefügt werden.",
+    "file": {
+      "drop": "Lege eine .gguf-Datei hier ab, um sie an diesen Computer zu senden.",
+      "choose": "Datei auswählen",
+      "sending": "{{sent}} von {{total}} gesendet…",
+      "pathLabel": "Oder der Speicherort einer Datei auf diesem Computer",
+      "pathPlaceholder": "/Users/du/Modelle/modell-Q4_K_M.gguf",
+      "how": "Wie es hinzugefügt wird",
+      "copy": "In Toskar kopieren",
+      "copyHint": "Braucht mehr Platz; das Original kannst du löschen.",
+      "inPlace": "Dort verwenden, wo es ist",
+      "inPlaceHint": "Keine Kopie. Lass die Datei dort, sonst funktioniert das Modell nicht mehr."
+    },
+    "apps": {
+      "looking": "Suche nach Modellen…",
+      "description": "Modelle, die LM Studio, Ollama, llama.cpp und GPT4All schon heruntergeladen haben. Sie werden dort verwendet, wo sie sind, und brauchen keinen weiteren Platz.",
+      "none": "Keine Modelle von LM Studio, Ollama, llama.cpp oder GPT4All auf diesem Computer.",
+      "already": "Hinzugefügt"
+    },
+    "link": {
+      "description": "Ein direkter Link zu einer .gguf-Datei. Ein Hugging-Face-Link wird mit der Prüfsumme der Datei abgeglichen, und die Bildunterstützung eines Bildmodells kommt mit.",
+      "url": "Link",
+      "name": "Name (optional)"
+    }
   }
 }

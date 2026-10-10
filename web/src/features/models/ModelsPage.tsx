@@ -5,7 +5,9 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { api } from '@/lib/api'
 import { subscribeEvents } from '@/lib/events'
 import { useUIStore } from '@/stores/uiStore'
+import { useRole } from '@/lib/role'
 import type { ModelDownloadProgressPayload, ModelFit, ModelsFitResponse, FitLabel } from '@/types/api'
+import { AddModelPanel } from './AddModelPanel'
 import { BrowseAllPanel } from './BrowseAllPanel'
 import { DiscoverTab } from './DiscoverTab'
 import { InstalledTab } from './InstalledTab'
@@ -55,6 +57,9 @@ export function ModelsPage() {
   })
   const [search, setSearch] = useState('')
   const [browseOpen, setBrowseOpen] = useState(false)
+  // Adding a model from a file, another app, or a link is an Admin's (#467).
+  const [addOpen, setAddOpen] = useState(false)
+  const canAdd = useRole().atLeast('admin')
   const [target, setTarget] = useState<ModelsTarget>('local')
   const [downloadProgress, setDownloadProgress] = useState<
     Record<string, ModelDownloadProgressPayload>
@@ -260,6 +265,11 @@ export function ModelsPage() {
           </button>
         ))}
         </div>
+        {canAdd ? (
+          <button type="button" className="btn-secondary btn-sm" aria-expanded={addOpen} onClick={() => setAddOpen((v) => !v)}>
+            {t('add.open')}
+          </button>
+        ) : null}
         {(tab === 'discover' || tab === 'installed') && (
           <label className="search-field w-full sm:ms-auto sm:w-auto sm:min-w-[200px] sm:max-w-xs sm:flex-1">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" aria-hidden>
@@ -301,6 +311,15 @@ export function ModelsPage() {
           description={t('page.emptyDescription')}
         />
       )}
+
+      {addOpen ? (
+        <AddModelPanel
+          onClose={() => setAddOpen(false)}
+          onAdded={() => {
+            queryClient.invalidateQueries({ queryKey: ['models'] })
+          }}
+        />
+      ) : null}
 
       {browseOpen && tab === 'discover' && (
         <BrowseAllPanel
