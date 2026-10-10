@@ -440,7 +440,7 @@ func (o *Orchestrator) Run(
 			}
 			answer := parsed.Text
 			if deliberate {
-				answer = deliberateAnswer(ctx, env, ch, messages, plainSys, answer, role, nodeID)
+				answer = deliberateAnswer(ctx, env, ch, profile, task.Prompt, messages, plainSys, answer, role, nodeID)
 			}
 			if budget.Verify {
 				answer = verifyAnswer(ctx, env, reviewerRole(profile, role), messages, parsed.Text, evidence, task.Prompt, budget.Corrections)

@@ -672,6 +672,31 @@ type Deliberation struct {
 	// Final is the final answer kept, when there was one.
 	Final  string              `json:"final,omitempty"`
 	Drafts []DeliberationDraft `json:"drafts"`
+	// Critiques are each draft checked by another drafter, when the drafts
+	// disagreed or were too long to compare (contract 1.24).
+	Critiques []DeliberationCritique `json:"critiques,omitempty"`
+	// Judge wrote the answer from the drafts and critiques, when it did
+	// (contract 1.24). Then no draft is chosen.
+	Judge *DeliberationJudge `json:"judge,omitempty"`
+}
+
+// DeliberationCritique is one draft checked against the others.
+type DeliberationCritique struct {
+	// Draft is the index of the draft checked; Critic the drafter's role.
+	Draft         int      `json:"draft"`
+	Critic        string   `json:"critic"`
+	Claims        []string `json:"claims,omitempty"`
+	Disagreements []string `json:"disagreements,omitempty"`
+	LikelyErrors  []string `json:"likely_errors,omitempty"`
+	Failed        bool     `json:"failed,omitempty"`
+}
+
+// DeliberationJudge is the model that reconciled the drafts.
+type DeliberationJudge struct {
+	Role     string `json:"role"`
+	ModelID  string `json:"model_id,omitempty"`
+	NodeID   string `json:"node_id,omitempty"`
+	NodeName string `json:"node_name,omitempty"`
 }
 
 // DeliberationDraft is one independent draft.

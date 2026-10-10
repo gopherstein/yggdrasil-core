@@ -627,7 +627,13 @@
     "deliberateDisagreed_many": "Comparei {{count}} rascunhos independentes: eles discordaram, então este é o primeiro",
     "deliberateLong_one": "Escrevi {{count}} rascunho independente; a resposta era longa demais para comparar",
     "deliberateLong_other": "Escrevi {{count}} rascunhos independentes; as respostas eram longas demais para comparar, então este é o primeiro",
-    "deliberateLong_many": "Escrevi {{count}} rascunhos independentes; as respostas eram longas demais para comparar, então este é o primeiro"
+    "deliberateLong_many": "Escrevi {{count}} rascunhos independentes; as respostas eram longas demais para comparar, então este é o primeiro",
+    "deliberateJudged_one": "Comparei {{count}} rascunho independente: eles discordaram, então um juiz os conciliou",
+    "deliberateJudged_other": "Comparei {{count}} rascunhos independentes: eles discordaram, então um juiz os conciliou",
+    "deliberateJudged_many": "Comparei {{count}} rascunhos independentes: eles discordaram, então um juiz os conciliou",
+    "deliberateCombined_one": "Escrevi {{count}} rascunho independente, conferi e um juiz os combinou em uma resposta",
+    "deliberateCombined_other": "Escrevi {{count}} rascunhos independentes, conferi uns com os outros e um juiz os combinou em uma resposta",
+    "deliberateCombined_many": "Escrevi {{count}} rascunhos independentes, conferi uns com os outros e um juiz os combinou em uma resposta"
   },
   "help": {
     "mcpTools": "Não há nada a instalar para o MCP: o Toskar já fala o protocolo. Para adicionar as ferramentas de um servidor MCP, abra **{{tools}} → {{addTools}}** e escolha uma de quatro formas:\n\n- **Galeria:** escolha um servidor, como pastas, um navegador, Notion, Linear ou GitHub, e responda no máximo uma ou duas perguntas. Serviços que pedem login abrem uma janela para isso.\n- **Colar:** cole o que as instruções do servidor disserem: JSON para Claude Desktop, Cursor ou VS Code, uma linha de comando, uma linha `claude mcp add` ou um endereço web.\n- **Dos seus outros apps:** adicione servidores que você já configurou no Claude Desktop, Claude Code, Cursor, VS Code, Windsurf, Gemini CLI ou LM Studio.\n- **Personalizado:** um comando para executar ou um endereço web.\n\nO Toskar se conecta e lista as ferramentas do servidor antes de salvá-lo. Servidores que rodam neste computador precisam de Node.js ou uv; o erro diz qual falta. Ferramentas que mudam algo perguntam antes.",
