@@ -12,7 +12,7 @@ Several models answer the same question independently, check each other's reason
 - **Stop** cancels the turn's context (`App.StopChat`), which every `Generate`, tool call, worker, and remote call shares; the partial answer is kept (`keepStopped`).
 - **Steps and events:** orchestrator events go through `chatExecEnv.Emit` to the run trace, the answer's steps (`turnTrace.meta()` → `MessageMeta.Steps`), the API's progress callback, and the bus.
 - **Gaps:**
-  - `pluginapi.ChatRequest.Temperature` and `nodes.RemoteChatRequest.Temperature` exist but `generateOnNode` sets neither.
+  - `pluginapi.ChatRequest.Temperature` and `nodes.RemoteChatRequest.Temperature` exist, and a paired computer passes a remote request's temperature on (`internalChatStream`), but `generateOnNode`, which sends every chat call, never sets one.
   - No chat call sets `MaxTokens`, so there's no per-turn token budget.
   - `huginn.Classify` knows Chat, Current, Coding, Research, and Local, but not math, reasoning, or a single factual question.
   - The quality set matches answers by regex and has no category field.
