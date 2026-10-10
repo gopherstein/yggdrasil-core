@@ -1,6 +1,8 @@
 package guide
 
 import (
+	"encoding/json"
+	"os"
 	"strings"
 	"testing"
 )
@@ -31,14 +33,45 @@ func TestAboutYggdrasil(t *testing.T) {
 			t.Errorf("About(%q) = %v, want %s first", q, ps, want)
 		}
 	}
+	// Asking what it can do counts as naming it; a question that merely
+	// contains "you have" ("until you have taken them all") doesn't.
+	if ps := About("which runtimes do you support?"); len(ps) == 0 {
+		t.Error("About(which runtimes do you support?) found nothing")
+	}
 	for _, q := range []string{
 		"How do I make pasta carbonara?", "Can you write a poem about the sea?", "What is the capital of France?",
 		"How do I fix a flat bike tire?", "Explain quantum computing", "How do I improve my resume?",
 		"what is memory in a computer?", "Summarize this: the meeting moved to Tuesday.",
 		"How does AES encryption work?", "Is end-to-end encryption safe?",
+		// Long questions sharing a few common words with a passage.
+		"A doctor gives you 3 pills and tells you to take one every half hour, starting now. How many minutes until you have taken them all?",
+		"A farmer has 17 sheep. All but 9 run away. How many sheep are left?",
+		"How many months of the year have 28 days?",
 	} {
 		if ps := About(q); len(ps) != 0 {
 			t.Errorf("About(%q) = %v, want nothing", q, ps)
+		}
+	}
+}
+
+// TestAboutReasoning: none of the quality set's reasoning questions is about
+// Toskar, asked plainly or with the set's "Final answer" request.
+func TestAboutReasoning(t *testing.T) {
+	raw, err := os.ReadFile("../../tests/quality/reasoning.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var file struct {
+		Cases []struct{ ID, Message string } `json:"cases"`
+	}
+	if err := json.Unmarshal(raw, &file); err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range file.Cases {
+		for _, q := range []string{c.Message, c.Message + "\n\nGive your final answer on the last line, as: Final answer: …"} {
+			if ps := About(q); len(ps) != 0 {
+				t.Errorf("%s: About = %s, want nothing", c.ID, ps[0].Section)
+			}
 		}
 	}
 }
