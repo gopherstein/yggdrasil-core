@@ -201,6 +201,7 @@ func (o *Orchestrator) Run(
 		if deliberate {
 			instructions += "\n" + draftGuidance
 		}
+		reference = transcribeFirst(ctx, env, profile, reference)
 		// evidence is what the answer may draw figures from, for the check.
 		evidence := reference
 		toolPrompt := tools.PromptFor(profile)
@@ -279,6 +280,9 @@ func (o *Orchestrator) Run(
 		// changed records that a tool that changes things ran.
 		changed := false
 		retriedPlain := false
+		// retriedEmpty records that a reply with only a call that couldn't
+		// run was asked for again in plain text.
+		retriedEmpty := false
 		retriedLookup := false
 		retriedFile := false
 		triedMedia := false
@@ -443,6 +447,17 @@ func (o *Orchestrator) Run(
 					messages = append(rewrite, pluginapi.ChatMessage{Role: "user", Content: withReference(task.Prompt, reference), Images: images})
 					continue
 				}
+			}
+			// A reply that is only a call that can't run here is not an
+			// answer; it's asked for once more in plain text, and never sent
+			// empty.
+			if strings.TrimSpace(parsed.Text) == "" && parsed.Call != nil && !retriedEmpty {
+				retriedEmpty = true
+				messages = append(messages,
+					pluginapi.ChatMessage{Role: "assistant", Content: content},
+					pluginapi.ChatMessage{Role: "user", Content: "That tool can't be used now. Answer in plain text from what you already have."},
+				)
+				continue
 			}
 			answer := parsed.Text
 			if deliberate {
