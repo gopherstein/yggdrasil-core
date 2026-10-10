@@ -6,6 +6,7 @@ import { downloadArtifact } from '@/lib/api'
 import { useUIStore } from '@/stores/uiStore'
 import { RunDetails } from './RunDetails'
 import { FileChip } from './FileChips'
+import { DeliberationDetails } from './DeliberationDetails'
 
 function hostOf(url: string): string {
   try {
@@ -140,7 +141,8 @@ export function AnswerDetails({ meta, runs = true }: { meta?: MessageMeta; runs?
   const files = (meta?.files ?? []).filter((f) => f.producer === 'assistant')
   const advancedMode = useUIStore((s) => s.advancedMode)
   const runId = advancedMode ? meta?.run_id : undefined
-  if (sources.length === 0 && steps.length === 0 && !notice && files.length === 0 && !runId) return null
+  const deliberation = meta?.deliberation
+  if (sources.length === 0 && steps.length === 0 && !notice && files.length === 0 && !runId && !deliberation) return null
   return (
     <div className="mt-3 space-y-2 border-t border-line/50 pt-2.5">
       {notice ? (
@@ -190,6 +192,7 @@ export function AnswerDetails({ meta, runs = true }: { meta?: MessageMeta; runs?
           ) : null}
         </div>
       ) : null}
+      {deliberation ? <DeliberationDetails deliberation={deliberation} /> : null}
       {runId && runs ? <RunDetails runId={runId} /> : null}
     </div>
   )

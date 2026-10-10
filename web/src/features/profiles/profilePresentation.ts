@@ -129,6 +129,8 @@ export const MODEL_ROLES: { role: string }[] = [
   { role: 'planner' },
   { role: 'worker' },
   { role: 'reviewer' },
+  { role: 'drafter' },
+  { role: 'judge' },
 ]
 
 export function roleHelp(role: string): string {

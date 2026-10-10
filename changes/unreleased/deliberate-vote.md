@@ -8,3 +8,7 @@
   judge writes the answer, saying where they still disagree. The answer's
   steps say how it went, and the drafts and checks are kept with the answer
   for the app to show. It's off by default while it's measured.
+- The web app's profile editor has the Deliberate setting, Compare
+  independent drafts, under Strategy, and Drafter and Judge models under
+  Show all roles. Under an answer, the drafts open to show each draft's
+  model, computer, and final answer, the checks, and the judge.

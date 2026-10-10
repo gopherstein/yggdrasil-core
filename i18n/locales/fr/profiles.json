@@ -134,6 +134,8 @@
     "planner": "Planificateur",
     "worker": "Exécutant",
     "reviewer": "Relecteur",
+    "drafter": "Brouillon",
+    "judge": "Arbitre",
     "numbered": "{{role}} {{n}}",
     "automaticModel": "Modèle automatique",
     "pinnedComputer": "Ordinateur épinglé",
@@ -146,7 +148,9 @@
       "planner": "Découpe une demande en parties.",
       "worker": "Traite une partie d'un plan. Les parties peuvent s'exécuter simultanément sur différents ordinateurs.",
       "reviewer": "Vérifie la réponse avant que vous la voyiez.",
-      "other": "Une étape nommée du déroulement de ce profil."
+      "other": "Une étape nommée du déroulement de ce profil.",
+      "drafter": "Rédige un brouillon indépendant quand ce profil compare des brouillons.",
+      "judge": "Concilie les brouillons qui divergent. Utilise le relecteur s'il n'est pas défini."
     }
   },
   "capabilities": {
@@ -374,6 +378,12 @@
     "context_share": {
       "label": "Budget de contexte",
       "help": "Part maximale de la fenêtre que les messages précédents peuvent occuper (0.1–0.9)."
+    },
+    "deliberate": {
+      "label": "Comparer des brouillons indépendants",
+      "help": "Deux brouillons de plus répondent séparément à chaque question ; si leurs réponses finales diffèrent, ils se vérifient mutuellement et un arbitre rédige la réponse. Plus lent, idéal pour les maths et le raisonnement.",
+      "default": "Désactivé",
+      "always": "Toujours"
     }
   },
   "topics": {

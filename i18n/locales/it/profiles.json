@@ -134,6 +134,8 @@
     "planner": "Pianificatore",
     "worker": "Esecutore",
     "reviewer": "Revisore",
+    "drafter": "Bozza",
+    "judge": "Giudice",
     "numbered": "{{role}} {{n}}",
     "automaticModel": "Modello automatico",
     "pinnedComputer": "Computer fisso",
@@ -146,7 +148,9 @@
       "planner": "Divide una richiesta in parti.",
       "worker": "Lavora su una parte di un piano. Le parti possono essere eseguite su computer diversi contemporaneamente.",
       "reviewer": "Controlla la risposta prima che tu la veda.",
-      "other": "Un passaggio con nome nel flusso di lavoro di questo profilo."
+      "other": "Un passaggio con nome nel flusso di lavoro di questo profilo.",
+      "drafter": "Scrive una bozza indipendente quando questo profilo confronta le bozze.",
+      "judge": "Concilia le bozze che non concordano. Se non è impostato, usa il revisore."
     }
   },
   "capabilities": {
@@ -374,6 +378,12 @@
     "context_share": {
       "label": "Budget di contesto",
       "help": "Quota massima della finestra che i messaggi precedenti possono usare (0.1–0.9)."
+    },
+    "deliberate": {
+      "label": "Confronta bozze indipendenti",
+      "help": "Altre due bozze rispondono separatamente a ogni domanda; se le risposte finali differiscono, si controllano a vicenda e un giudice scrive la risposta. Più lento, ideale per matematica e ragionamento.",
+      "default": "Disattivato",
+      "always": "Sempre"
     }
   },
   "topics": {

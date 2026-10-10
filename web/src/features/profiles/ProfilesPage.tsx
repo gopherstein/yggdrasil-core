@@ -957,6 +957,10 @@ function AdvancedEditor({
               </select>
             </label>
             <p className="text-xs leading-relaxed text-ink-muted">{orchHint}</p>
+            {/* Team keeps its own workers and reviewer (docs/deliberate.md). */}
+            {strategy !== 'team' && (
+              <OrchestrationControls value={orchestration} onChange={setOrchestration} disabled={saving} only={['deliberate']} />
+            )}
             {advancedMode && (
               <OrchestrationControls value={orchestration} onChange={setOrchestration} disabled={saving} only={ORCHESTRATION_KEYS} />
             )}

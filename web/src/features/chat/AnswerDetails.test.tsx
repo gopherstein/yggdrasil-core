@@ -11,6 +11,33 @@ vi.mock('@/lib/api', async (importOriginal) => ({
 }))
 
 describe('AnswerDetails', () => {
+  it('shows the drafts Deliberate compared, their checks, and the judge (#459)', () => {
+    render(
+      <AnswerDetails
+        meta={{
+          deliberation: {
+            outcome: 'disagreed',
+            drafts: [
+              { role: 'assistant', model_id: 'qwen3-8b', final: '24', text: 'Sam has 2x, so 3x = 36.\nFinal answer: 24' },
+              { role: 'drafter:2', model_id: 'llama-3.2-3b', node_name: 'Studio', final: '18' },
+              { role: 'drafter:3', failed: true },
+            ],
+            critiques: [{ draft: 1, critic: 'assistant', likely_errors: ['Halves 36 instead of thirds'] }],
+            judge: { role: 'reviewer', model_id: 'qwen3-14b' },
+          },
+        }}
+      />,
+    )
+    fireEvent.click(screen.getByRole('button', { name: /3 drafts · a judge reconciled them/ }))
+    expect(screen.getByText('Draft 2')).toBeInTheDocument()
+    expect(screen.getByText('llama-3.2-3b · Studio')).toBeInTheDocument()
+    expect(screen.getByText("This draft didn't finish.")).toBeInTheDocument()
+    expect(screen.getByText('Draft 2, checked by draft 1:')).toBeInTheDocument()
+    expect(screen.getByText('Halves 36 instead of thirds')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Show draft' }))
+    expect(screen.getByText(/3x = 36/)).toBeInTheDocument()
+  })
+
   it('saves a chat file named in the sources (#281)', () => {
     render(
       <AnswerDetails

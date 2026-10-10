@@ -133,6 +133,8 @@
     "planner": "Planner",
     "worker": "Worker",
     "reviewer": "Reviewer",
+    "drafter": "Drafter",
+    "judge": "Judge",
     "numbered": "{{role}} {{n}}",
     "automaticModel": "Automatic model",
     "pinnedComputer": "Pinned computer",
@@ -145,7 +147,9 @@
       "planner": "Splits a request into parts.",
       "worker": "Works on one part of a plan. Parts can run on different computers at once.",
       "reviewer": "Checks the answer before you see it.",
-      "other": "A named step in this profile’s workflow."
+      "other": "A named step in this profile’s workflow.",
+      "drafter": "Writes an independent draft when this profile compares drafts.",
+      "judge": "Reconciles drafts that disagree. Uses the reviewer when not set."
     }
   },
   "capabilities": {
@@ -372,6 +376,12 @@
     "context_share": {
       "label": "Context budget",
       "help": "Most of the window earlier messages may use (0.1–0.9)."
+    },
+    "deliberate": {
+      "label": "Compare independent drafts",
+      "help": "Two more drafts answer each question separately; when their final answers differ, they check each other and a judge writes the answer. Slower, and best for math and reasoning.",
+      "default": "Off",
+      "always": "Always"
     }
   },
   "topics": {

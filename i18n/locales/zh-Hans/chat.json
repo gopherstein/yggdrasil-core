@@ -590,5 +590,24 @@
     "edit": "编辑",
     "editing": "正在编辑你的消息。发送后会生成新版本，旧版本会保留。",
     "cancelEdit": "取消"
+  },
+  "deliberation": {
+    "summary": {
+      "agreed_other": "{{count}} 份草稿 · 结果一致",
+      "majority_other": "{{count}} 份草稿 · 多数一致",
+      "disagreed_other": "{{count}} 份草稿 · 结果不一致",
+      "long_other": "{{count}} 份草稿 · 太长，无法比较",
+      "judged_other": "{{count}} 份草稿 · 由评审模型协调"
+    },
+    "kept": "已采用",
+    "failed": "此草稿未完成。",
+    "final": "最终答案：",
+    "noFinal": "未给出",
+    "showDraft": "显示草稿",
+    "hideDraft": "隐藏草稿",
+    "critiques": "检查",
+    "critique": "草稿 {{draft}}，由草稿 {{critic}} 检查：",
+    "noIssues": "未发现问题。",
+    "judgeWrote": "根据草稿和检查写出了答案。"
   }
 }
