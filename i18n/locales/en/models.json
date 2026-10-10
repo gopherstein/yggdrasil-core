@@ -308,5 +308,43 @@
   "external": {
     "title": "External server",
     "description": "An OpenAI-compatible server, such as OpenAI, vLLM, or Ollama elsewhere. Its models can be chosen for a chat; Auto never picks them."
+  },
+  "add": {
+    "open": "Add a model",
+    "title": "Add a model",
+    "description": "Add a GGUF model you already have, or one from a link. It's added to this computer.",
+    "ways": {
+      "file": "From a file",
+      "apps": "From another app",
+      "link": "From a link"
+    },
+    "copying": "Adding {{name}}: copying it in. Its progress shows on the Installed tab.",
+    "added": "Added {{name}}. It's on the Installed tab.",
+    "add": "Add",
+    "adding": "Adding…",
+    "failed": "Couldn't add the model.",
+    "file": {
+      "drop": "Drop a .gguf file here to send it to this computer.",
+      "choose": "Choose a file",
+      "sending": "Sending {{sent}} of {{total}}…",
+      "pathLabel": "Or the location of a file on this computer",
+      "pathPlaceholder": "/Users/you/Models/model-Q4_K_M.gguf",
+      "how": "How to add it",
+      "copy": "Copy it into Toskar",
+      "copyHint": "Uses more space; you can delete the original.",
+      "inPlace": "Use it where it is",
+      "inPlaceHint": "No copy. Keep the file there, or the model stops working."
+    },
+    "apps": {
+      "looking": "Looking for models…",
+      "description": "Models LM Studio, Ollama, llama.cpp, and GPT4All already downloaded. They're used where they are, so they take no more space.",
+      "none": "No models from LM Studio, Ollama, llama.cpp, or GPT4All on this computer.",
+      "already": "Added"
+    },
+    "link": {
+      "description": "A direct link to a .gguf file. A Hugging Face link is checked against the file's checksum, and a vision model's image support comes with it.",
+      "url": "Link",
+      "name": "Name (optional)"
+    }
   }
 }

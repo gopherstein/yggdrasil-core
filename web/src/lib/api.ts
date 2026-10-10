@@ -9,6 +9,8 @@ import type {
   ChatResponse,
   Conversation,
   ConversationsDeleted,
+  FoundModel,
+  ModelImportResult,
   CreateAPIKeyResponse,
   CreateConversationRequest,
   DiagnosticsExportResult,
@@ -331,6 +333,40 @@ async function request<T>(path: string, init?: RequestInit): Promise<T | null> {
   }
 
   return parseJson<T>(response)
+}
+
+/**
+ * Sends a GGUF file to be added as a model (#467), reporting how much has
+ * gone; an XMLHttpRequest, since fetch can't report an upload's progress.
+ */
+export function uploadModel(
+  file: File,
+  onProgress: (sent: number, total: number) => void,
+  displayName?: string,
+): Promise<ModelImportResult> {
+  return new Promise((resolve, reject) => {
+    const query = new URLSearchParams({ filename: file.name })
+    if (displayName) query.set('display_name', displayName)
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', `${getApiBase()}/api/v1/models/import?${query}`)
+    xhr.setRequestHeader('Accept', 'application/json')
+    xhr.setRequestHeader('Content-Type', 'application/octet-stream')
+    xhr.setRequestHeader(CLIENT_CONTRACT_HEADER, CLIENT_CONTRACT)
+    for (const [k, v] of Object.entries(authHeaders())) xhr.setRequestHeader(k, v)
+    xhr.upload.onprogress = (e) => onProgress(e.loaded, e.lengthComputable ? e.total : file.size)
+    xhr.onerror = () => reject(new ApiError(0, 'Could not reach the local Toskar service.', 'SERVICE_UNREACHABLE', {}))
+    xhr.onload = () => {
+      let body: { error?: ServiceError } & Partial<ModelImportResult> = {}
+      try {
+        body = JSON.parse(xhr.responseText || '{}')
+      } catch {
+        // Not JSON: the status says what failed.
+      }
+      if (xhr.status >= 200 && xhr.status < 300) resolve(body as ModelImportResult)
+      else reject(new ApiError(xhr.status, body.error?.message ?? `HTTP ${xhr.status}`, body.error?.code, body.error?.details))
+    }
+    xhr.send(file)
+  })
 }
 
 export async function endpointExists(path: string): Promise<boolean> {
@@ -704,6 +740,13 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(body),
     }),
+
+  /** Adds a GGUF file on this computer as a model, copied or used in place (#467). */
+  importModelPath: (body: { path: string; in_place?: boolean; display_name?: string }) =>
+    request<ModelImportResult>('/api/v1/models/import', { method: 'POST', body: JSON.stringify(body) }),
+
+  /** Models other local AI apps already downloaded on this computer (#467). */
+  findModelsInOtherApps: () => request<{ models: FoundModel[] }>('/api/v1/models/import/found'),
 
   startModel: (id: string, nodeId?: string) =>
     request<RunningModelView>(`/api/v1/models/${id}/start`, {

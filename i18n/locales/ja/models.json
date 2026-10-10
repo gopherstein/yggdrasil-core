@@ -301,5 +301,43 @@
   "external": {
     "title": "外部サーバー",
     "description": "OpenAI互換のサーバー（OpenAI、別のマシンのvLLMやOllamaなど）です。チャットでそのモデルを選べます。「自動」が選ぶことはありません。"
+  },
+  "add": {
+    "open": "モデルを追加",
+    "title": "モデルを追加",
+    "description": "手元にある GGUF モデル、またはリンク先のモデルを追加します。このコンピュータに追加されます。",
+    "ways": {
+      "file": "ファイルから",
+      "apps": "他のアプリから",
+      "link": "リンクから"
+    },
+    "copying": "{{name}} を追加中：コピーしています。進行状況は「インストール済み」タブに表示されます。",
+    "added": "{{name}} を追加しました。「インストール済み」タブにあります。",
+    "add": "追加",
+    "adding": "追加中…",
+    "failed": "モデルを追加できませんでした。",
+    "file": {
+      "drop": ".gguf ファイルをここにドロップすると、このコンピュータに送信します。",
+      "choose": "ファイルを選択",
+      "sending": "{{total}} 中 {{sent}} を送信中…",
+      "pathLabel": "または、このコンピュータ上のファイルの場所",
+      "pathPlaceholder": "/Users/you/Models/model-Q4_K_M.gguf",
+      "how": "追加の方法",
+      "copy": "Toskar にコピー",
+      "copyHint": "容量が増えますが、元のファイルは削除できます。",
+      "inPlace": "今の場所のまま使う",
+      "inPlaceHint": "コピーしません。ファイルを移動するとモデルが使えなくなります。"
+    },
+    "apps": {
+      "looking": "モデルを探しています…",
+      "description": "LM Studio、Ollama、llama.cpp、GPT4All がすでにダウンロードしたモデルです。今の場所のまま使うので、容量は増えません。",
+      "none": "このコンピュータには LM Studio、Ollama、llama.cpp、GPT4All のモデルがありません。",
+      "already": "追加済み"
+    },
+    "link": {
+      "description": ".gguf ファイルへの直接リンクです。Hugging Face のリンクはファイルのチェックサムで確認され、ビジョンモデルの画像対応も一緒に追加されます。",
+      "url": "リンク",
+      "name": "名前（任意）"
+    }
   }
 }

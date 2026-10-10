@@ -315,5 +315,43 @@
   "external": {
     "title": "Serveur externe",
     "description": "Un serveur compatible OpenAI, comme OpenAI, vLLM ou Ollama sur une autre machine. Ses modèles peuvent être choisis pour une conversation ; Auto ne les choisit jamais."
+  },
+  "add": {
+    "open": "Ajouter un modèle",
+    "title": "Ajouter un modèle",
+    "description": "Ajoutez un modèle GGUF que vous avez déjà, ou un modèle depuis un lien. Il est ajouté à cet ordinateur.",
+    "ways": {
+      "file": "À partir d'un fichier",
+      "apps": "À partir d'une autre app",
+      "link": "À partir d'un lien"
+    },
+    "copying": "Ajout de {{name}} : copie en cours. La progression s'affiche dans l'onglet Installés.",
+    "added": "{{name}} est ajouté. Il se trouve dans l'onglet Installés.",
+    "add": "Ajouter",
+    "adding": "Ajout…",
+    "failed": "Impossible d'ajouter le modèle.",
+    "file": {
+      "drop": "Déposez ici un fichier .gguf pour l'envoyer à cet ordinateur.",
+      "choose": "Choisir un fichier",
+      "sending": "Envoi de {{sent}} sur {{total}}…",
+      "pathLabel": "Ou l'emplacement d'un fichier sur cet ordinateur",
+      "pathPlaceholder": "/Users/vous/Modeles/modele-Q4_K_M.gguf",
+      "how": "Comment l'ajouter",
+      "copy": "Le copier dans Toskar",
+      "copyHint": "Prend plus de place ; vous pouvez supprimer l'original.",
+      "inPlace": "L'utiliser là où il est",
+      "inPlaceHint": "Pas de copie. Laissez le fichier à sa place, sinon le modèle ne fonctionnera plus."
+    },
+    "apps": {
+      "looking": "Recherche de modèles…",
+      "description": "Modèles déjà téléchargés par LM Studio, Ollama, llama.cpp et GPT4All. Ils sont utilisés là où ils sont, sans prendre plus de place.",
+      "none": "Aucun modèle de LM Studio, Ollama, llama.cpp ou GPT4All sur cet ordinateur.",
+      "already": "Ajouté"
+    },
+    "link": {
+      "description": "Un lien direct vers un fichier .gguf. Un lien Hugging Face est vérifié avec la somme de contrôle du fichier, et la prise en charge des images d'un modèle de vision est incluse.",
+      "url": "Lien",
+      "name": "Nom (facultatif)"
+    }
   }
 }

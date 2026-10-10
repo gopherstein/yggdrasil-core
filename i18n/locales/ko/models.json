@@ -301,5 +301,43 @@
   "external": {
     "title": "외부 서버",
     "description": "OpenAI 호환 서버(OpenAI, 다른 컴퓨터의 vLLM 또는 Ollama 등)입니다. 채팅에서 이 서버의 모델을 고를 수 있으며, 자동은 이 모델을 고르지 않습니다."
+  },
+  "add": {
+    "open": "모델 추가",
+    "title": "모델 추가",
+    "description": "이미 가지고 있는 GGUF 모델이나 링크의 모델을 추가합니다. 이 컴퓨터에 추가됩니다.",
+    "ways": {
+      "file": "파일에서",
+      "apps": "다른 앱에서",
+      "link": "링크에서"
+    },
+    "copying": "{{name}} 추가 중: 복사하고 있습니다. 진행 상황은 설치됨 탭에 표시됩니다.",
+    "added": "{{name}}을(를) 추가했습니다. 설치됨 탭에 있습니다.",
+    "add": "추가",
+    "adding": "추가 중…",
+    "failed": "모델을 추가하지 못했습니다.",
+    "file": {
+      "drop": ".gguf 파일을 여기에 놓으면 이 컴퓨터로 보냅니다.",
+      "choose": "파일 선택",
+      "sending": "{{total}} 중 {{sent}} 보내는 중…",
+      "pathLabel": "또는 이 컴퓨터에 있는 파일의 위치",
+      "pathPlaceholder": "/Users/you/Models/model-Q4_K_M.gguf",
+      "how": "추가 방법",
+      "copy": "Toskar로 복사",
+      "copyHint": "공간을 더 쓰지만 원본은 삭제해도 됩니다.",
+      "inPlace": "있는 위치에서 사용",
+      "inPlaceHint": "복사하지 않습니다. 파일을 옮기면 모델이 작동하지 않습니다."
+    },
+    "apps": {
+      "looking": "모델을 찾는 중…",
+      "description": "LM Studio, Ollama, llama.cpp, GPT4All이 이미 다운로드한 모델입니다. 있는 위치에서 사용하므로 공간을 더 쓰지 않습니다.",
+      "none": "이 컴퓨터에 LM Studio, Ollama, llama.cpp, GPT4All 모델이 없습니다.",
+      "already": "추가됨"
+    },
+    "link": {
+      "description": ".gguf 파일로 바로 가는 링크입니다. Hugging Face 링크는 파일 체크섬으로 확인하며, 비전 모델의 이미지 지원도 함께 추가됩니다.",
+      "url": "링크",
+      "name": "이름(선택)"
+    }
   }
 }

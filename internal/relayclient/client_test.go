@@ -221,7 +221,11 @@ func TestClient(t *testing.T) {
 	if want := []string{"203.0.113.7:7333", c.Route() + ".example.com:443"}; !slices.Equal(opened.Addresses, want) {
 		t.Fatalf("addresses: %v", opened.Addresses)
 	}
-	waitFor(t, "connected", func() bool { return c.Status().State == "connected" })
+	// The tunnel and the record are separate, so either can come first.
+	waitFor(t, "connected and registered", func() bool {
+		st := c.Status()
+		return st.State == "connected" && !st.Registered.IsZero()
+	})
 	if st := c.Status(); st.Registered.IsZero() || time.Until(st.Expires) < 29*24*time.Hour {
 		t.Fatalf("status: %+v", st)
 	}

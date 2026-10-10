@@ -315,5 +315,43 @@
   "external": {
     "title": "Servidor externo",
     "description": "Um servidor compatível com OpenAI, como OpenAI, vLLM ou Ollama em outra máquina. Os modelos dele podem ser escolhidos em uma conversa; o Auto nunca os escolhe."
+  },
+  "add": {
+    "open": "Adicionar um modelo",
+    "title": "Adicionar um modelo",
+    "description": "Adicione um modelo GGUF que você já tem, ou um de um link. Ele é adicionado a este computador.",
+    "ways": {
+      "file": "De um arquivo",
+      "apps": "De outro app",
+      "link": "De um link"
+    },
+    "copying": "Adicionando {{name}}: copiando. O progresso aparece na aba Instalados.",
+    "added": "{{name}} adicionado. Está na aba Instalados.",
+    "add": "Adicionar",
+    "adding": "Adicionando…",
+    "failed": "Não foi possível adicionar o modelo.",
+    "file": {
+      "drop": "Solte aqui um arquivo .gguf para enviá-lo a este computador.",
+      "choose": "Escolher um arquivo",
+      "sending": "Enviando {{sent}} de {{total}}…",
+      "pathLabel": "Ou o local de um arquivo neste computador",
+      "pathPlaceholder": "/Users/voce/Modelos/modelo-Q4_K_M.gguf",
+      "how": "Como adicionar",
+      "copy": "Copiar para o Toskar",
+      "copyHint": "Ocupa mais espaço; você pode apagar o original.",
+      "inPlace": "Usar onde está",
+      "inPlaceHint": "Sem cópia. Mantenha o arquivo lá, ou o modelo para de funcionar."
+    },
+    "apps": {
+      "looking": "Procurando modelos…",
+      "description": "Modelos que o LM Studio, o Ollama, o llama.cpp e o GPT4All já baixaram. Eles são usados onde estão, sem ocupar mais espaço.",
+      "none": "Nenhum modelo do LM Studio, Ollama, llama.cpp ou GPT4All neste computador.",
+      "already": "Adicionado"
+    },
+    "link": {
+      "description": "Um link direto para um arquivo .gguf. Um link do Hugging Face é conferido com o checksum do arquivo, e o suporte a imagens de um modelo de visão vem junto.",
+      "url": "Link",
+      "name": "Nome (opcional)"
+    }
   }
 }

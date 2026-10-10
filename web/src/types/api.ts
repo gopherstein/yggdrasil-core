@@ -428,6 +428,36 @@ export interface Node {
   address?: string
 }
 
+/** A model added from a file (#467), with what its header says. */
+export interface ModelImportResult {
+  model_id: string
+  /** copying while the file is copied in, with model.download progress. */
+  status: 'copying' | 'installed'
+  details: {
+    name?: string
+    architecture?: string
+    parameters?: number
+    size_label?: string
+    context_length?: number
+    quantization?: string
+    chat_template?: boolean
+    license?: string
+  }
+}
+
+/** A model another local AI app keeps on this computer (#467). */
+export interface FoundModel {
+  app: 'lmstudio' | 'ollama' | 'llamacpp' | 'gpt4all' | string
+  path: string
+  name: string
+  size_bytes: number
+  architecture?: string
+  parameters?: string
+  quantization?: string
+  /** Set when it's already a model here. */
+  model_id?: string
+}
+
 /** What a bulk delete removed and skipped (#452, contract 1.25). */
 export interface ConversationsDeleted {
   deleted: string[]
