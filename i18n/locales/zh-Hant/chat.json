@@ -257,7 +257,9 @@
     "includesOpen": "其中包括目前開啟的聊天。",
     "deleteMany_other": "刪除 {{count}} 個聊天",
     "deleted_other": "已刪除 {{count}} 個聊天",
-    "undo": "復原"
+    "undo": "復原",
+    "automationOne": "有一個自動化會把結果發到這個聊天。它會繼續執行，結果保留在它的記錄中。",
+    "automationMany_other": "其中 {{count}} 個聊天會收到自動化的結果。這些自動化會繼續執行，結果保留在它們的記錄中。"
   },
   "history": {
     "label": "聊天紀錄",

@@ -273,7 +273,11 @@
     "deleted_one": "Chat eliminata",
     "deleted_other": "{{count}} chat eliminate",
     "deleted_many": "{{count}} chat eliminate",
-    "undo": "Annulla"
+    "undo": "Annulla",
+    "automationOne": "Un'automazione pubblica i suoi risultati in questa chat. Continua a funzionare e i risultati restano nella sua cronologia.",
+    "automationMany_one": "{{count}} di queste riceve i risultati di un'automazione. Le automazioni continuano a funzionare e i risultati restano nella loro cronologia.",
+    "automationMany_other": "{{count}} di queste ricevono i risultati di un'automazione. Le automazioni continuano a funzionare e i risultati restano nella loro cronologia.",
+    "automationMany_many": "{{count}} di queste ricevono i risultati di un'automazione. Le automazioni continuano a funzionare e i risultati restano nella loro cronologia."
   },
   "history": {
     "label": "Cronologia delle chat",

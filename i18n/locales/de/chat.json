@@ -265,7 +265,10 @@
     "deleteMany_other": "{{count}} Chats löschen",
     "deleted_one": "Chat gelöscht",
     "deleted_other": "{{count}} Chats gelöscht",
-    "undo": "Rückgängig"
+    "undo": "Rückgängig",
+    "automationOne": "Eine Automatisierung schreibt ihre Ergebnisse in diesen Chat. Sie läuft weiter, und ihre Ergebnisse bleiben in ihrem Verlauf.",
+    "automationMany_one": "{{count}} davon erhält die Ergebnisse einer Automatisierung. Die Automatisierungen laufen weiter, und ihre Ergebnisse bleiben in ihrem Verlauf.",
+    "automationMany_other": "{{count}} davon erhalten die Ergebnisse einer Automatisierung. Die Automatisierungen laufen weiter, und ihre Ergebnisse bleiben in ihrem Verlauf."
   },
   "history": {
     "label": "Chatverlauf",

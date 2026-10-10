@@ -265,7 +265,10 @@
     "deleteMany_other": "Delete {{count}} chats",
     "deleted_one": "Chat deleted",
     "deleted_other": "{{count}} chats deleted",
-    "undo": "Undo"
+    "undo": "Undo",
+    "automationOne": "An automation posts its results to this chat. It keeps running, and its results stay in its history.",
+    "automationMany_one": "{{count}} of them gets an automation's results. The automation keeps running, and its results stay in its history.",
+    "automationMany_other": "{{count}} of them get an automation's results. The automations keep running, and their results stay in their history."
   },
   "history": {
     "label": "Chat history",

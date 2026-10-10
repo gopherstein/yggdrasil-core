@@ -655,6 +655,17 @@ export function ChatPage() {
   // Both dialogs keep keyboard focus inside while open. Escape is the safe
   // choice: keep the chat, or deny the tool.
   const deleteDialogRef = useDialog(Boolean(pendingDelete), () => setPendingDelete(null))
+  // A chat an automation posts its results to: deleting it stops the posts,
+  // not the automation, which the confirmation says (#452).
+  const automationsQuery = useQuery({
+    queryKey: ['automations'],
+    queryFn: () => api.listAutomations(),
+    enabled: Boolean(pendingDelete),
+    retry: false,
+  })
+  const automationChats = (pendingDelete ?? []).filter((c) =>
+    (automationsQuery.data ?? []).some((a) => a.conversation_id === c.id),
+  ).length
   const toolDialogRef = useDialog(Boolean(pendingTool), () => {
     if (!toolDeciding) void decidePendingTool(false)
   })
@@ -2154,6 +2165,13 @@ export function ChatPage() {
               </p>
               {pendingDelete.length > 1 && selectedId && pendingDelete.some((c) => c.id === selectedId) ? (
                 <p className="mt-1 text-sm text-ink-muted">{t('deleteDialog.includesOpen')}</p>
+              ) : null}
+              {automationChats > 0 ? (
+                <p className="mt-1 text-sm text-ink-muted">
+                  {pendingDelete.length === 1
+                    ? t('deleteDialog.automationOne')
+                    : t('deleteDialog.automationMany', { count: automationChats })}
+                </p>
               ) : null}
             </div>
             <div className="flex flex-wrap justify-end gap-2">

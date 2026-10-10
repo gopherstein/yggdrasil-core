@@ -273,7 +273,11 @@
     "deleted_one": "Conversa excluída",
     "deleted_other": "{{count}} conversas excluídas",
     "deleted_many": "{{count}} conversas excluídas",
-    "undo": "Desfazer"
+    "undo": "Desfazer",
+    "automationOne": "Uma automação publica os resultados nesta conversa. Ela continua rodando, e os resultados ficam no histórico dela.",
+    "automationMany_one": "{{count}} delas recebe os resultados de uma automação. As automações continuam rodando, e os resultados ficam no histórico delas.",
+    "automationMany_other": "{{count}} delas recebem os resultados de uma automação. As automações continuam rodando, e os resultados ficam no histórico delas.",
+    "automationMany_many": "{{count}} delas recebem os resultados de uma automação. As automações continuam rodando, e os resultados ficam no histórico delas."
   },
   "history": {
     "label": "Histórico de chats",
