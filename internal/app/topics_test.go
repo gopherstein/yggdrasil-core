@@ -85,6 +85,9 @@ func TestTopicsEnforce(t *testing.T) {
 				return "off_topic\nI can help with tires and bookings at Dana's. What do you need?"
 			}
 			return "on_topic"
+		case strings.HasPrefix(sys, "You decide whether a message is about"):
+			// The second look agrees the poem is off the subject.
+			return "no"
 		case strings.HasPrefix(sys, "You check each answer"):
 			if strings.Contains(last, "Roses") {
 				return "**Off topic**"
