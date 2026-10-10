@@ -21,6 +21,11 @@ on:
       models:
         description: 'Models for the self-hosted run, as a JSON list, such as ["recommended","qwen2.5-32b-q4"]. Blank for QUALITY_MODELS.'
         default: ""
+      deliberate:
+        description: The Deliberate mode the reasoning set measures (#459). The weekly run measures single.
+        type: choice
+        options: [single, always]
+        default: single
 
 jobs:
   # The quality set with a real model on CPU (Llama 3.2 1B through
@@ -190,10 +195,11 @@ jobs:
             -e TOSKAR_QUALITY_KEY="$QUALITY_KEY" \
             -e TOSKAR_QUALITY_INSTALL=recommended \
             -e TOSKAR_QUALITY_MODEL="${{ matrix.model }}" \
+            -e TOSKAR_QUALITY_DELIBERATE="${{ inputs.deliberate || 'single' }}" \
             -e TOSKAR_QUALITY_REASONING_REPORT=/src/.quality/reasoning.md \
             -e TOSKAR_QUALITY_REASONING_JSON=/src/.quality/reasoning.json \
             golang:1.26-bookworm \
-            go test ./tests/quality -run 'TestReasoning' -count=1 -v -timeout 120m
+            go test ./tests/quality -run 'TestReasoning' -count=1 -v -timeout 240m
       - name: Report
         if: always()
         run: |

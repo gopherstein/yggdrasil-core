@@ -229,6 +229,14 @@ func (d realDriver) Run(t *testing.T, c Case) Result {
 	if c.Setup.Topics != nil {
 		profile["topics"] = c.Setup.Topics
 	}
+	if c.Setup.Deliberate != "" {
+		orch, _ := profile["orchestration"].(map[string]any)
+		if orch == nil {
+			orch = map[string]any{}
+		}
+		orch["deliberate"] = c.Setup.Deliberate
+		profile["orchestration"] = orch
+	}
 	var created struct {
 		ID string `json:"id"`
 	}
