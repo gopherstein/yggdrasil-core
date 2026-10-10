@@ -489,5 +489,36 @@
     "renews": "Se renueva automáticamente hasta que la canceles en los ajustes de suscripciones de tu cuenta.",
     "terms": "Términos",
     "privacy": "Privacidad"
+  },
+  "deliberation": {
+    "summary": {
+      "agreed_one": "{{count}} borrador · coincidieron",
+      "agreed_other": "{{count}} borradores · coincidieron",
+      "agreed_many": "{{count}} borradores · coincidieron",
+      "majority_one": "{{count}} borrador · la mayoría coincidió",
+      "majority_other": "{{count}} borradores · la mayoría coincidió",
+      "majority_many": "{{count}} borradores · la mayoría coincidió",
+      "disagreed_one": "{{count}} borrador · no coincidieron",
+      "disagreed_other": "{{count}} borradores · no coincidieron",
+      "disagreed_many": "{{count}} borradores · no coincidieron",
+      "long_one": "{{count}} borrador · demasiado largos para comparar",
+      "long_other": "{{count}} borradores · demasiado largos para comparar",
+      "long_many": "{{count}} borradores · demasiado largos para comparar",
+      "judged_one": "{{count}} borrador · un juez los reconcilió",
+      "judged_other": "{{count}} borradores · un juez los reconcilió",
+      "judged_many": "{{count}} borradores · un juez los reconcilió"
+    },
+    "draft": "Borrador {{n}}",
+    "judge": "Juez",
+    "kept": "Elegido",
+    "failed": "Este borrador no terminó.",
+    "final": "Respuesta final:",
+    "noFinal": "ninguna",
+    "showDraft": "Mostrar borrador",
+    "hideDraft": "Ocultar borrador",
+    "critiques": "Revisiones",
+    "critique": "Borrador {{draft}}, revisado por el borrador {{critic}}:",
+    "noIssues": "no se encontraron problemas.",
+    "judgeWrote": "escribió la respuesta a partir de los borradores y las revisiones."
   }
 }

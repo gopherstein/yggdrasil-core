@@ -561,5 +561,31 @@
     "renews": "Renews automatically until you cancel it in your account's subscription settings.",
     "terms": "Terms",
     "privacy": "Privacy"
+  },
+  "deliberation": {
+    "summary": {
+      "agreed_one": "{{count}} draft · they agreed",
+      "agreed_other": "{{count}} drafts · they agreed",
+      "majority_one": "{{count}} draft · most agreed",
+      "majority_other": "{{count}} drafts · most agreed",
+      "disagreed_one": "{{count}} draft · they disagreed",
+      "disagreed_other": "{{count}} drafts · they disagreed",
+      "long_one": "{{count}} draft · too long to compare",
+      "long_other": "{{count}} drafts · too long to compare",
+      "judged_one": "{{count}} draft · a judge reconciled them",
+      "judged_other": "{{count}} drafts · a judge reconciled them"
+    },
+    "draft": "Draft {{n}}",
+    "judge": "Judge",
+    "kept": "Kept",
+    "failed": "This draft didn't finish.",
+    "final": "Final answer:",
+    "noFinal": "none given",
+    "showDraft": "Show draft",
+    "hideDraft": "Hide draft",
+    "critiques": "Checks",
+    "critique": "Draft {{draft}}, checked by draft {{critic}}:",
+    "noIssues": "no problems found.",
+    "judgeWrote": "wrote the answer from the drafts and checks."
   }
 }

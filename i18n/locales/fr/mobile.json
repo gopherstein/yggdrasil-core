@@ -489,5 +489,36 @@
     "renews": "Se renouvelle automatiquement jusqu'à ce que vous le résiliiez dans les réglages d'abonnement de votre compte.",
     "terms": "Conditions",
     "privacy": "Confidentialité"
+  },
+  "deliberation": {
+    "summary": {
+      "agreed_one": "{{count}} brouillon · ils concordaient",
+      "agreed_other": "{{count}} brouillons · ils concordaient",
+      "agreed_many": "{{count}} brouillons · ils concordaient",
+      "majority_one": "{{count}} brouillon · la plupart concordaient",
+      "majority_other": "{{count}} brouillons · la plupart concordaient",
+      "majority_many": "{{count}} brouillons · la plupart concordaient",
+      "disagreed_one": "{{count}} brouillon · ils divergeaient",
+      "disagreed_other": "{{count}} brouillons · ils divergeaient",
+      "disagreed_many": "{{count}} brouillons · ils divergeaient",
+      "long_one": "{{count}} brouillon · trop longs pour être comparés",
+      "long_other": "{{count}} brouillons · trop longs pour être comparés",
+      "long_many": "{{count}} brouillons · trop longs pour être comparés",
+      "judged_one": "{{count}} brouillon · un arbitre les a conciliés",
+      "judged_other": "{{count}} brouillons · un arbitre les a conciliés",
+      "judged_many": "{{count}} brouillons · un arbitre les a conciliés"
+    },
+    "draft": "Brouillon {{n}}",
+    "judge": "Juge",
+    "kept": "Retenu",
+    "failed": "Ce brouillon n'a pas abouti.",
+    "final": "Réponse finale :",
+    "noFinal": "aucune",
+    "showDraft": "Afficher le brouillon",
+    "hideDraft": "Masquer le brouillon",
+    "critiques": "Vérifications",
+    "critique": "Brouillon {{draft}}, vérifié par le brouillon {{critic}} :",
+    "noIssues": "aucun problème trouvé.",
+    "judgeWrote": "a rédigé la réponse à partir des brouillons et des vérifications."
   }
 }

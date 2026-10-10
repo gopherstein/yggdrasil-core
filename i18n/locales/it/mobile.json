@@ -489,5 +489,36 @@
     "renews": "Si rinnova automaticamente finché non lo annulli nelle impostazioni degli abbonamenti del tuo account.",
     "terms": "Termini",
     "privacy": "Privacy"
+  },
+  "deliberation": {
+    "summary": {
+      "agreed_one": "{{count}} bozza · concordavano",
+      "agreed_other": "{{count}} bozze · concordavano",
+      "agreed_many": "{{count}} bozze · concordavano",
+      "majority_one": "{{count}} bozza · la maggior parte concordava",
+      "majority_other": "{{count}} bozze · la maggior parte concordava",
+      "majority_many": "{{count}} bozze · la maggior parte concordava",
+      "disagreed_one": "{{count}} bozza · non concordavano",
+      "disagreed_other": "{{count}} bozze · non concordavano",
+      "disagreed_many": "{{count}} bozze · non concordavano",
+      "long_one": "{{count}} bozza · troppo lunghe da confrontare",
+      "long_other": "{{count}} bozze · troppo lunghe da confrontare",
+      "long_many": "{{count}} bozze · troppo lunghe da confrontare",
+      "judged_one": "{{count}} bozza · un giudice le ha conciliate",
+      "judged_other": "{{count}} bozze · un giudice le ha conciliate",
+      "judged_many": "{{count}} bozze · un giudice le ha conciliate"
+    },
+    "draft": "Bozza {{n}}",
+    "judge": "Giudice",
+    "kept": "Scelta",
+    "failed": "Questa bozza non è stata completata.",
+    "final": "Risposta finale:",
+    "noFinal": "nessuna",
+    "showDraft": "Mostra bozza",
+    "hideDraft": "Nascondi bozza",
+    "critiques": "Controlli",
+    "critique": "Bozza {{draft}}, controllata dalla bozza {{critic}}:",
+    "noIssues": "nessun problema trovato.",
+    "judgeWrote": "ha scritto la risposta a partire dalle bozze e dai controlli."
   }
 }

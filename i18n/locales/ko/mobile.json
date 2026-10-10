@@ -481,5 +481,26 @@
     "renews": "계정의 구독 설정에서 취소할 때까지 자동으로 갱신돼요.",
     "terms": "약관",
     "privacy": "개인정보"
+  },
+  "deliberation": {
+    "summary": {
+      "agreed_other": "초안 {{count}}개 · 일치했습니다",
+      "majority_other": "초안 {{count}}개 · 대부분 일치했습니다",
+      "disagreed_other": "초안 {{count}}개 · 일치하지 않았습니다",
+      "long_other": "초안 {{count}}개 · 너무 길어 비교할 수 없습니다",
+      "judged_other": "초안 {{count}}개 · 심사 모델이 조정했습니다"
+    },
+    "draft": "초안 {{n}}",
+    "judge": "판정자",
+    "kept": "채택",
+    "failed": "이 초안은 완료되지 않았습니다.",
+    "final": "최종 답변:",
+    "noFinal": "없음",
+    "showDraft": "초안 보기",
+    "hideDraft": "초안 숨기기",
+    "critiques": "검토",
+    "critique": "초안 {{draft}}, 초안 {{critic}}이(가) 검토:",
+    "noIssues": "문제가 없습니다.",
+    "judgeWrote": "이(가) 초안과 검토를 바탕으로 답변을 작성했습니다."
   }
 }

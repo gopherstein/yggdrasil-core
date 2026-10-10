@@ -481,5 +481,26 @@
     "renews": "會自動續訂，直到你在帳戶的訂閱設定中取消。",
     "terms": "條款",
     "privacy": "隱私"
+  },
+  "deliberation": {
+    "summary": {
+      "agreed_other": "{{count}} 份草稿 · 結果一致",
+      "majority_other": "{{count}} 份草稿 · 多數一致",
+      "disagreed_other": "{{count}} 份草稿 · 結果不一致",
+      "long_other": "{{count}} 份草稿 · 太長，無法比較",
+      "judged_other": "{{count}} 份草稿 · 由評審模型協調"
+    },
+    "draft": "草稿 {{n}}",
+    "judge": "評判",
+    "kept": "已採用",
+    "failed": "此草稿未完成。",
+    "final": "最終答案：",
+    "noFinal": "未提供",
+    "showDraft": "顯示草稿",
+    "hideDraft": "隱藏草稿",
+    "critiques": "檢查",
+    "critique": "草稿 {{draft}}，由草稿 {{critic}} 檢查：",
+    "noIssues": "未發現問題。",
+    "judgeWrote": "根據草稿和檢查寫出了答案。"
   }
 }

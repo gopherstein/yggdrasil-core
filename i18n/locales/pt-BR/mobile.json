@@ -489,5 +489,36 @@
     "renews": "Renova automaticamente até você cancelar nas configurações de assinaturas da sua conta.",
     "terms": "Termos",
     "privacy": "Privacidade"
+  },
+  "deliberation": {
+    "summary": {
+      "agreed_one": "{{count}} rascunho · eles concordaram",
+      "agreed_other": "{{count}} rascunhos · eles concordaram",
+      "agreed_many": "{{count}} rascunhos · eles concordaram",
+      "majority_one": "{{count}} rascunho · a maioria concordou",
+      "majority_other": "{{count}} rascunhos · a maioria concordou",
+      "majority_many": "{{count}} rascunhos · a maioria concordou",
+      "disagreed_one": "{{count}} rascunho · eles discordaram",
+      "disagreed_other": "{{count}} rascunhos · eles discordaram",
+      "disagreed_many": "{{count}} rascunhos · eles discordaram",
+      "long_one": "{{count}} rascunho · longos demais para comparar",
+      "long_other": "{{count}} rascunhos · longos demais para comparar",
+      "long_many": "{{count}} rascunhos · longos demais para comparar",
+      "judged_one": "{{count}} rascunho · um juiz os conciliou",
+      "judged_other": "{{count}} rascunhos · um juiz os conciliou",
+      "judged_many": "{{count}} rascunhos · um juiz os conciliou"
+    },
+    "draft": "Rascunho {{n}}",
+    "judge": "Juiz",
+    "kept": "Escolhido",
+    "failed": "Este rascunho não terminou.",
+    "final": "Resposta final:",
+    "noFinal": "nenhuma",
+    "showDraft": "Mostrar rascunho",
+    "hideDraft": "Ocultar rascunho",
+    "critiques": "Verificações",
+    "critique": "Rascunho {{draft}}, verificado pelo rascunho {{critic}}:",
+    "noIssues": "nenhum problema encontrado.",
+    "judgeWrote": "escreveu a resposta a partir dos rascunhos e verificações."
   }
 }
