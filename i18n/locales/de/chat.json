@@ -247,7 +247,9 @@
     "answer": "Antwort",
     "planner": "Planer",
     "reviewer": "Prüfer",
-    "worker": "Helfer {{n}}"
+    "worker": "Helfer {{n}}",
+    "drafter": "Entwurf {{n}}",
+    "judge": "Richter"
   },
   "deleteDialog": {
     "title": "Diesen Chat löschen?",
@@ -587,7 +589,15 @@
     "placeDetails": "Details zu einem Ort nachgeschlagen",
     "route": "Den Weg von {{from}} nach {{to}} gefunden",
     "git": "Das Git-Repository geprüft ({{action}})",
-    "helpAnswered": "Aus der Toskar-Anleitung beantwortet"
+    "helpAnswered": "Aus der Toskar-Anleitung beantwortet",
+    "deliberateAgreed_one": "{{count}} unabhängigen Entwurf verglichen: Er stimmte überein",
+    "deliberateAgreed_other": "{{count}} unabhängige Entwürfe verglichen: Sie stimmten überein",
+    "deliberateMajority_one": "{{count}} unabhängigen Entwurf verglichen: {{agreeing}} stimmten überein, diese Antwort bleibt",
+    "deliberateMajority_other": "{{count}} unabhängige Entwürfe verglichen: {{agreeing}} stimmten überein, diese Antwort bleibt",
+    "deliberateDisagreed_one": "{{count}} unabhängigen Entwurf verglichen: Sie widersprachen sich, daher ist dies der erste",
+    "deliberateDisagreed_other": "{{count}} unabhängige Entwürfe verglichen: Sie widersprachen sich, daher ist dies der erste",
+    "deliberateLong_one": "{{count}} unabhängigen Entwurf geschrieben; die Antwort war zu lang zum Vergleichen",
+    "deliberateLong_other": "{{count}} unabhängige Entwürfe geschrieben; die Antworten waren zu lang zum Vergleichen, daher ist dies der erste"
   },
   "help": {
     "mcpTools": "Für MCP selbst musst du nichts installieren: Toskar beherrscht es bereits. Um die Werkzeuge eines MCP-Servers hinzuzufügen, öffne **{{tools}} → {{addTools}}** und wähle einen von vier Wegen:\n\n- **Galerie:** Wähle einen Server, etwa Ordner, einen Browser, Notion, Linear oder GitHub, und beantworte höchstens ein, zwei Fragen. Dienste mit Anmeldung öffnen eine.\n- **Einfügen:** Füge ein, was die Anleitung des Servers sagt: JSON für Claude Desktop, Cursor oder VS Code, eine Befehlszeile, eine `claude mcp add`-Zeile oder eine Webadresse.\n- **Aus deinen anderen Apps:** Übernimm Server, die du schon in Claude Desktop, Claude Code, Cursor, VS Code, Windsurf, Gemini CLI oder LM Studio eingerichtet hast.\n- **Eigener:** Ein Befehl zum Ausführen oder eine Webadresse.\n\nToskar verbindet sich und listet die Werkzeuge des Servers, bevor es ihn speichert. Server auf diesem Computer brauchen Node.js oder uv; die Fehlermeldung sagt, was fehlt. Werkzeuge, die etwas ändern, fragen dich vorher.",

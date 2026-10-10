@@ -1369,6 +1369,26 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 			fixed, _ := payload["fixed"].(int)
 			remaining, _ := payload["remaining"].([]string)
 			e.trace.linksChecked(issues, fixed, remaining)
+		case simple.EventDeliberateDraft:
+			if status, _ := payload["status"].(string); status != "running" {
+				role, _ := payload["role"].(string)
+				node, _ := payload["node_id"].(string)
+				final, _ := payload["final"].(string)
+				text, _ := payload["text"].(string)
+				chosen, _ := payload["chosen"].(bool)
+				name := ""
+				if node != "" {
+					name = e.app.nodeDisplayName(node)
+				}
+				e.trace.draft(contracts.DeliberationDraft{Role: role, ModelID: e.modelForRole(role), NodeID: node, NodeName: name,
+					Final: final, Text: text, Chosen: chosen, Failed: status == "failed"})
+			}
+		case simple.EventDeliberateDone:
+			outcome, _ := payload["outcome"].(string)
+			final, _ := payload["final"].(string)
+			drafts, _ := payload["drafts"].(int)
+			agreeing, _ := payload["agreeing"].(int)
+			e.trace.deliberated(outcome, final, drafts, agreeing)
 		case simple.EventConsistency:
 			found, _ := payload["found"].(int)
 			fixed, _ := payload["fixed"].(int)

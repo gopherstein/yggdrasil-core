@@ -118,6 +118,7 @@ func ValidateOrchestration(o contracts.OrchestrationPolicy) error {
 		choice("verification", o.Verification, "off", "check", "correct", "thorough"),
 		choice("memory", o.Memory, "off"),
 		choice("fallback", o.Fallback, "off"),
+		choice("deliberate", o.Deliberate, "never", "always", "auto"),
 		between("max_workers", o.MaxWorkers, 2, 8),
 		between("max_tool_calls", o.MaxToolCalls, 1, 50),
 		between("retries", o.Retries, 1, 3),

@@ -403,6 +403,8 @@ export interface OrchestrationPolicy {
   context_share?: number
   fallback?: '' | 'off'
   fallback_models?: string[]
+  /** Whether answers are drafted independently and compared (#459). */
+  deliberate?: '' | 'never' | 'always' | 'auto'
   retries?: number
   timeout_seconds?: number
 }
@@ -474,6 +476,25 @@ export interface MessageMeta {
   automation?: AutomationDraft
   /** A result an automation posted to the chat it was made from (#204, contract 1.11). */
   automation_run?: AutomationRunRef
+  /** The drafts Deliberate compared and its outcome (#459, contract 1.23). */
+  deliberation?: Deliberation
+}
+
+export interface Deliberation {
+  outcome: 'agreed' | 'majority' | 'disagreed' | 'long'
+  final?: string
+  drafts: DeliberationDraft[]
+}
+
+export interface DeliberationDraft {
+  role: string
+  model_id?: string
+  node_id?: string
+  node_name?: string
+  final?: string
+  text?: string
+  chosen?: boolean
+  failed?: boolean
 }
 
 export interface AutomationRunRef {

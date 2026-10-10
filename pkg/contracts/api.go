@@ -570,6 +570,11 @@ type OrchestrationPolicy struct {
 	// ContextShare is the most of the model's window earlier messages may
 	// use, from 0.1 to 0.9.
 	ContextShare float64 `json:"context_share,omitempty"`
+	// Deliberate is never, always, or auto: whether a turn's answer is
+	// drafted independently several times and compared (#459,
+	// docs/deliberate.md). Empty is never; auto behaves like never until
+	// the quality run shows where it helps.
+	Deliberate string `json:"deliberate,omitempty"`
 	// Fallback is off to show a failure instead of quietly answering on
 	// another model.
 	Fallback string `json:"fallback,omitempty"`
@@ -652,6 +657,37 @@ type MessageMeta struct {
 	// AutomationRun marks a message an automation posted to the chat it
 	// was made from: its result (#204, contract 1.11).
 	AutomationRun *AutomationRunRef `json:"automation_run,omitempty"`
+	// Deliberation is how the answer was reached when its profile
+	// deliberates: the drafts compared and the outcome (#459, contract
+	// 1.23).
+	Deliberation *Deliberation `json:"deliberation,omitempty"`
+}
+
+// Deliberation is Deliberate's record of one answer (#459).
+type Deliberation struct {
+	// Outcome is agreed (every draft gave the same short final answer),
+	// majority (most did), disagreed (no answer had a majority), or long
+	// (the answers weren't short, so there was nothing to compare).
+	Outcome string `json:"outcome"`
+	// Final is the final answer kept, when there was one.
+	Final  string              `json:"final,omitempty"`
+	Drafts []DeliberationDraft `json:"drafts"`
+}
+
+// DeliberationDraft is one independent draft.
+type DeliberationDraft struct {
+	// Role is the turn's own role for the first draft, then drafter:2…
+	Role    string `json:"role"`
+	ModelID string `json:"model_id,omitempty"`
+	NodeID  string `json:"node_id,omitempty"`
+	// NodeName is the computer it ran on, for people.
+	NodeName string `json:"node_name,omitempty"`
+	// Final is its short final answer, when it gave one.
+	Final string `json:"final,omitempty"`
+	// Text is the draft, cut to a few thousand characters.
+	Text   string `json:"text,omitempty"`
+	Chosen bool   `json:"chosen,omitempty"`
+	Failed bool   `json:"failed,omitempty"`
 }
 
 // AutomationRunRef is the automation run a chat message came from.

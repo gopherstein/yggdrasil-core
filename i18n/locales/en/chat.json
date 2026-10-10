@@ -247,7 +247,9 @@
     "answer": "Answer",
     "planner": "Planner",
     "reviewer": "Reviewer",
-    "worker": "Worker {{n}}"
+    "worker": "Worker {{n}}",
+    "drafter": "Draft {{n}}",
+    "judge": "Judge"
   },
   "deleteDialog": {
     "title": "Delete this chat?",
@@ -587,7 +589,15 @@
     "placeDetails": "Looked up a place's details",
     "route": "Found the way from {{from}} to {{to}}",
     "git": "Checked the Git repository ({{action}})",
-    "helpAnswered": "Answered from Toskar's guide"
+    "helpAnswered": "Answered from Toskar's guide",
+    "deliberateAgreed_one": "Compared {{count}} independent draft: it agreed",
+    "deliberateAgreed_other": "Compared {{count}} independent drafts: they agreed",
+    "deliberateMajority_one": "Compared {{count}} independent draft: {{agreeing}} agreed, and that answer is kept",
+    "deliberateMajority_other": "Compared {{count}} independent drafts: {{agreeing}} agreed, and that answer is kept",
+    "deliberateDisagreed_one": "Compared {{count}} independent draft: they disagreed, so this is the first",
+    "deliberateDisagreed_other": "Compared {{count}} independent drafts: they disagreed, so this is the first",
+    "deliberateLong_one": "Wrote {{count}} independent draft; its answer was too long to compare",
+    "deliberateLong_other": "Wrote {{count}} independent drafts; the answers were too long to compare, so this is the first"
   },
   "help": {
     "mcpTools": "There's nothing to install for MCP itself: Toskar already speaks it. To add an MCP server's tools, open **{{tools}} → {{addTools}}** and pick one of four ways:\n\n- **Gallery:** choose a server, such as folders, a browser, Notion, Linear, or GitHub, and answer at most a question or two. Services that need a sign-in open one.\n- **Paste:** paste whatever the server's instructions say: JSON for Claude Desktop, Cursor, or VS Code, a command line, a `claude mcp add` line, or a web address.\n- **From your other apps:** add servers you already set up in Claude Desktop, Claude Code, Cursor, VS Code, Windsurf, Gemini CLI, or LM Studio.\n- **Custom:** a command to run, or a web address.\n\nToskar connects and lists the server's tools before saving it. Servers that run on this computer need Node.js or uv, and the error says which if one is missing. Tools that change things ask you first.",
