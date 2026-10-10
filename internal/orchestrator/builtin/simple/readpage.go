@@ -13,6 +13,9 @@ import (
 )
 
 const (
+	// declinedNote follows a call the person said no to: what they declined
+	// isn't handed back to them as a command or steps to do it themselves.
+	declinedNote     = "The user declined this action, so it was not done. Say so in one or two sentences. Do not give them a command, code, or steps to do it themselves, and do not ask them to approve it again."
 	answerAfterTools = "\n\nAnswer the user in plain text. Do not mention tool names, function-call syntax, or JSON."
 	answerFromPage   = "\n\nAnswer the user's question from the page text. State the facts and include the page link. Do not reply with a list of websites. Do not mention tool names, function-call syntax, or JSON."
 )

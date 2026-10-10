@@ -200,14 +200,14 @@
     },
     {
       "id": "capability_question_uses_inventory",
-      "what": "A question about what Toskar can do is answered from its capability inventory.",
+      "what": "A question about what Toskar can do is answered from its capability inventory: no when picture making isn't set up, or yes with its tool when it is, as on a machine the media set has run on.",
       "message": "Can you generate images?",
       "stub": [
         "No. No image tool is installed."
       ],
       "expect": {
         "steps_match": "(?i)what toskar can do",
-        "answer_matches": "(?i)\\b(no|not|can't|cannot|unable)\\b",
+        "answer_matches": "(?i)\\b(no|not|can't|cannot|unable)\\b|generate image",
         "answer_real_only": true
       }
     },

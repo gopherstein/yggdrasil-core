@@ -355,6 +355,9 @@ func (o *Orchestrator) Run(
 				if err != nil {
 					payload, _ := json.Marshal(map[string]any{"ok": false, "error": publicToolError(err)})
 					resultNote = "The tool failed. Details for you, not for the user:\n" + string(payload)
+					if declinedByPerson(err) {
+						resultNote += "\n" + declinedNote
+					}
 				} else {
 					raw, _ := json.Marshal(map[string]any{"ok": true, "result": result})
 					resultNote = "Tool result for you, not for the user. " + untrustedNote + "\n" + string(raw)
@@ -640,4 +643,9 @@ func PickRole(roles []contracts.ModelRole) string {
 		return roles[0].Role
 	}
 	return "assistant"
+}
+
+// declinedByPerson reports a tool call the person declined when asked.
+func declinedByPerson(err error) bool {
+	return strings.Contains(err.Error(), "denied by user")
 }
