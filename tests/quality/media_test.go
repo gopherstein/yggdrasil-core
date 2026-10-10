@@ -344,7 +344,7 @@ func TestMediaQuality(t *testing.T) {
 	}
 	var report []reportRow
 	for _, mc := range loadMediaCases(t) {
-		if mc.Case.RealOnly && !isReal {
+		if mc.RealOnly && !isReal {
 			continue
 		}
 		if stopped(t, d, mc.Case) {

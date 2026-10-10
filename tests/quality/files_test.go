@@ -211,7 +211,7 @@ func TestFileCasesCover(t *testing.T) {
 				t.Errorf("%s: %v", c.ID, err)
 				continue
 			}
-			if _, err := fileText(a.Name, data); err != nil && !(c.RealOnly && errors.Is(err, mimir.ErrScanned)) {
+			if _, err := fileText(a.Name, data); err != nil && (!c.RealOnly || !errors.Is(err, mimir.ErrScanned)) {
 				t.Errorf("%s: %s doesn't read: %v", c.ID, a.Name, err)
 			}
 			read[strings.ToLower(filepath.Ext(a.Name))] = true
