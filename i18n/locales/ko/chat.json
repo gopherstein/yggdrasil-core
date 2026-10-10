@@ -257,7 +257,9 @@
     "includesOpen": "지금 열려 있는 채팅도 포함되어 있습니다.",
     "deleteMany_other": "{{count}}개 삭제",
     "deleted_other": "채팅 {{count}}개를 삭제했습니다",
-    "undo": "실행 취소"
+    "undo": "실행 취소",
+    "automationOne": "이 채팅에는 자동화 결과가 게시됩니다. 자동화는 계속 실행되며 결과는 자동화 기록에 남습니다.",
+    "automationMany_other": "그중 {{count}}개에는 자동화 결과가 게시됩니다. 자동화는 계속 실행되며 결과는 자동화 기록에 남습니다."
   },
   "history": {
     "label": "채팅 기록",

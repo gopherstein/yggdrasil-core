@@ -273,7 +273,11 @@
     "deleted_one": "Chat eliminado",
     "deleted_other": "{{count}} chats eliminados",
     "deleted_many": "{{count}} chats eliminados",
-    "undo": "Deshacer"
+    "undo": "Deshacer",
+    "automationOne": "Una automatización publica sus resultados en este chat. Seguirá ejecutándose y sus resultados quedarán en su historial.",
+    "automationMany_one": "{{count}} de ellos recibe los resultados de una automatización. Las automatizaciones siguen ejecutándose y sus resultados quedan en su historial.",
+    "automationMany_other": "{{count}} de ellos reciben los resultados de una automatización. Las automatizaciones siguen ejecutándose y sus resultados quedan en su historial.",
+    "automationMany_many": "{{count}} de ellos reciben los resultados de una automatización. Las automatizaciones siguen ejecutándose y sus resultados quedan en su historial."
   },
   "history": {
     "label": "Historial de chats",

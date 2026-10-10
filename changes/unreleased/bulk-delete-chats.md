@@ -12,6 +12,8 @@
   days ago, keeping pinned chats, and says how many before you confirm.
   Clearing all history is confirmed in the page, which also works in the
   desktop app.
+- Deleting a chat that an automation posts its results to says so: the
+  automation keeps running, and its results stay in its history.
 
 ### Security
 

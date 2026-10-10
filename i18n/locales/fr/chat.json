@@ -273,7 +273,11 @@
     "deleted_one": "Discussion supprimée",
     "deleted_other": "{{count}} discussions supprimées",
     "deleted_many": "{{count}} discussions supprimées",
-    "undo": "Annuler"
+    "undo": "Annuler",
+    "automationOne": "Une automatisation publie ses résultats dans cette discussion. Elle continue de s'exécuter, et ses résultats restent dans son historique.",
+    "automationMany_one": "{{count}} d'entre elles reçoit les résultats d'une automatisation. Les automatisations continuent, et leurs résultats restent dans leur historique.",
+    "automationMany_other": "{{count}} d'entre elles reçoivent les résultats d'une automatisation. Les automatisations continuent, et leurs résultats restent dans leur historique.",
+    "automationMany_many": "{{count}} d'entre elles reçoivent les résultats d'une automatisation. Les automatisations continuent, et leurs résultats restent dans leur historique."
   },
   "history": {
     "label": "Historique des discussions",

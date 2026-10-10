@@ -257,7 +257,9 @@
     "includesOpen": "その中には、いま開いているチャットも含まれます。",
     "deleteMany_other": "{{count}} 件を削除",
     "deleted_other": "{{count}} 件のチャットを削除しました",
-    "undo": "元に戻す"
+    "undo": "元に戻す",
+    "automationOne": "このチャットには自動化の結果が投稿されています。自動化は引き続き実行され、結果はその履歴に残ります。",
+    "automationMany_other": "そのうち {{count}} 件には自動化の結果が投稿されています。自動化は引き続き実行され、結果はその履歴に残ります。"
   },
   "history": {
     "label": "チャット履歴",
