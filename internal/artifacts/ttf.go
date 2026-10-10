@@ -108,7 +108,8 @@ func parseCmap(t []byte, numGlyphs int) (map[rune]uint16, error) {
 			return nil, errFont
 		}
 		platform, encoding, off := u16(t, 4+8*i), u16(t, 6+8*i), u32(t, 8+8*i)
-		if off+2 > len(t) || !(platform == 0 || (platform == 3 && (encoding == 1 || encoding == 10))) {
+		unicode := platform == 0 || (platform == 3 && (encoding == 1 || encoding == 10))
+		if off+2 > len(t) || !unicode {
 			continue
 		}
 		if format := u16(t, off); (format == 12 || format == 4) && format > bestFormat {
