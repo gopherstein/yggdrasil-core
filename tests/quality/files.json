@@ -272,6 +272,26 @@
       }
     },
     {
+      "id": "make_pdf_japanese",
+      "what": "A PDF in Japanese keeps its text: its font is downloaded on first use (#510).",
+      "real_only": true,
+      "setup": {
+        "tools": {
+          "files.create": "allow"
+        }
+      },
+      "message": "Make a PDF of a camping packing list written in Japanese, with these items: テント, 寝袋, ストーブ.",
+      "expect": {
+        "file_text": {
+          ".pdf": [
+            "テント",
+            "寝袋",
+            "ストーブ"
+          ]
+        }
+      }
+    },
+    {
       "id": "make_docx",
       "what": "A Word document is made and holds what was asked.",
       "setup": {
