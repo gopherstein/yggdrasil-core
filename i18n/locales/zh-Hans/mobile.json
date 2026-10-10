@@ -481,5 +481,26 @@
     "renews": "会自动续订，直到你在账户的订阅设置中取消。",
     "terms": "条款",
     "privacy": "隐私"
+  },
+  "deliberation": {
+    "summary": {
+      "agreed_other": "{{count}} 份草稿 · 结果一致",
+      "majority_other": "{{count}} 份草稿 · 多数一致",
+      "disagreed_other": "{{count}} 份草稿 · 结果不一致",
+      "long_other": "{{count}} 份草稿 · 太长，无法比较",
+      "judged_other": "{{count}} 份草稿 · 由评审模型协调"
+    },
+    "draft": "草稿 {{n}}",
+    "judge": "评判",
+    "kept": "已采用",
+    "failed": "此草稿未完成。",
+    "final": "最终答案：",
+    "noFinal": "未给出",
+    "showDraft": "显示草稿",
+    "hideDraft": "隐藏草稿",
+    "critiques": "检查",
+    "critique": "草稿 {{draft}}，由草稿 {{critic}} 检查：",
+    "noIssues": "未发现问题。",
+    "judgeWrote": "根据草稿和检查写出了答案。"
   }
 }
