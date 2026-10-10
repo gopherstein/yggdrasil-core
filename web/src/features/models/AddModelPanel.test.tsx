@@ -6,7 +6,7 @@ import { api } from '@/lib/api'
 import { AddModelPanel } from './AddModelPanel'
 
 vi.mock('@/lib/api', () => ({
-  api: { importModelPath: vi.fn(), findModelsInOtherApps: vi.fn(), installModelFromURL: vi.fn() },
+  api: { importModelPath: vi.fn(), findModelsInOtherApps: vi.fn(), installModelFromURL: vi.fn(), getModels: vi.fn(), startBenchmark: vi.fn(), getBenchmark: vi.fn() },
   uploadModel: vi.fn(),
 }))
 
@@ -23,6 +23,7 @@ function renderIt() {
 describe('AddModelPanel (#467)', () => {
   beforeEach(async () => {
     await applyLanguage('en')
+    vi.mocked(api.getModels).mockResolvedValue([{ id: 'qwen', installed: true } as never])
     vi.mocked(api.importModelPath).mockReset().mockResolvedValue({ model_id: 'qwen', status: 'installed', details: { name: 'Qwen3 8B' } })
     vi.mocked(api.findModelsInOtherApps).mockResolvedValue({
       models: [
@@ -51,5 +52,21 @@ describe('AddModelPanel (#467)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Add' }))
     await screen.findByText(/Added qwen3-coder:30b\./)
     expect(api.importModelPath).toHaveBeenCalledWith({ path: '/o/blobs/sha256-1', in_place: true, display_name: 'qwen3-coder:30b' })
+  })
+
+  it('checks a model it added: loads it, asks one question, and shows the speed', async () => {
+    vi.mocked(api.startBenchmark).mockResolvedValue({ id: 'b1' } as never)
+    vi.mocked(api.getBenchmark).mockResolvedValue({
+      id: 'b1', status: 'completed', error: '',
+      samples: [{ warmup: true, eval_tok_per_sec: 30 }, { warmup: false, eval_tok_per_sec: 41.6 }],
+    } as never)
+    renderIt()
+    fireEvent.change(screen.getByLabelText('Or the location of a file on this computer'), { target: { value: '/m/qwen.gguf' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
+    const check = await screen.findByRole('button', { name: 'Check it works' })
+    await vi.waitFor(() => expect(check).toBeEnabled())
+    fireEvent.click(check)
+    expect(await screen.findByText(/42 tokens a second/)).toBeInTheDocument()
+    expect(api.startBenchmark).toHaveBeenCalledWith({ model_ids: ['qwen'], workload_ids: ['quick'], runs: 1 })
   })
 })

@@ -352,6 +352,15 @@
       "description": "Un enlace directo a un archivo .gguf. Un enlace de Hugging Face se comprueba con la suma de verificación del archivo, y la compatibilidad con imágenes de un modelo de visión se incluye.",
       "url": "Enlace",
       "name": "Nombre (opcional)"
+    },
+    "check": {
+      "prompt": "Comprueba que carga y responde.",
+      "waiting": "La comprobación estará lista cuando termine la copia.",
+      "button": "Comprobar que funciona",
+      "running": "Cargándolo y haciéndole una pregunta…",
+      "works": "Funciona",
+      "speed": "{{speed}} tokens por segundo",
+      "failed": "No respondió: {{error}}"
     }
   }
 }

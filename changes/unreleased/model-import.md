@@ -12,6 +12,9 @@
 - Models → Add a model: send a GGUF file from the browser, add one by its
   location on this computer (copied or used where it is), pick one another
   app already downloaded, or paste a link.
+- After adding a model, Check it works loads it and asks one short
+  question: Works, with its speed, or why it didn't answer. Benchmarks have
+  the same one-prompt Quick check.
 
 ### Fixed
 

@@ -352,6 +352,15 @@
       "description": "Un link diretto a un file .gguf. Un link di Hugging Face viene verificato con il checksum del file, e il supporto alle immagini di un modello visivo arriva insieme.",
       "url": "Link",
       "name": "Nome (facoltativo)"
+    },
+    "check": {
+      "prompt": "Controlla che si carichi e risponda.",
+      "waiting": "Il controllo è pronto quando la copia finisce.",
+      "button": "Controlla che funzioni",
+      "running": "Caricamento e una domanda…",
+      "works": "Funziona",
+      "speed": "{{speed}} token al secondo",
+      "failed": "Non ha risposto: {{error}}"
     }
   }
 }

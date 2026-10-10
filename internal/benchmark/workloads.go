@@ -118,6 +118,20 @@ Yggdrasil is a local AI control plane that installs runtimes, downloads GGUF mod
 				},
 			},
 		},
+		{
+			// One short prompt, to check a model added from a file loads
+			// and answers, and how fast (#467).
+			ID:          "quick",
+			Name:        "Quick check",
+			Description: "One short prompt: does the model load and answer, and how fast.",
+			Prompts: []contracts.BenchmarkPrompt{
+				{
+					ID:    "quick-hello",
+					Label: "Say hello",
+					Text:  "In one short sentence, say hello and name one thing you can help with.",
+				},
+			},
+		},
 	}
 }
 
