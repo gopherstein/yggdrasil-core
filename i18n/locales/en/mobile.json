@@ -121,6 +121,19 @@
       "qwen2-5-7b-q4": "Strong general assistant for everyday work.",
       "qwen2-5-coder-7b-q4": "Strong all-round coding model with tool use.",
       "deepseek-r1-distill-7b-q4": "Stronger reasoning for analysis and multi-step problems."
+    },
+    "import": {
+      "button": "Add a model file",
+      "hint": "A GGUF model from your files or another app. It's checked first, and must fit this device.",
+      "checking": "Checking the file…",
+      "added": "Added {{name}}.",
+      "heading": "Added from files",
+      "notGGUF": "Choose a .gguf model file.",
+      "incomplete": "The file is incomplete. Copy it again and try once more.",
+      "notModel": "This file isn't a model this device can use.",
+      "projector": "This is a vision projector, which helps a model see pictures. Choose the model itself.",
+      "tooLarge": "This model is too large for this device.",
+      "failed": "The model couldn't be added."
     }
   },
   "onboarding": {
