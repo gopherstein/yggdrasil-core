@@ -29,6 +29,11 @@ const (
 	RoleWorker = "worker"
 	// RoleReviewer checks the answer.
 	RoleReviewer = "reviewer"
+	// RoleDrafter writes one of the independent drafts Deliberate compares
+	// (#459); slots are "drafter:1", "drafter:2", and so on.
+	RoleDrafter = "drafter"
+	// RoleJudge reconciles Deliberate's drafts into the answer.
+	RoleJudge = "judge"
 )
 
 // legacyOrchestrator is the Team orchestrator id from before Team ran on the

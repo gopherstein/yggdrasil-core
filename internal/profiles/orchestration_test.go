@@ -147,3 +147,14 @@ func TestResetPreset(t *testing.T) {
 		t.Fatal("a custom profile was reset")
 	}
 }
+
+// Deliberate's drafter slots use the drafter model, as worker slots use the
+// worker's; the judge is a role of its own (#459).
+func TestDeliberateRoles(t *testing.T) {
+	p := Profile{Roles: []contracts.ModelRole{{Role: RoleDrafter, ModelID: "qwen"}, {Role: RoleJudge, ModelID: "big"}}}
+	for role, want := range map[string]string{"drafter:1": "qwen", "drafter:3": "qwen", RoleJudge: "big", RoleWorker: ""} {
+		if got := RoleModel(p, role); got != want {
+			t.Errorf("%s: %q, want %q", role, got, want)
+		}
+	}
+}
