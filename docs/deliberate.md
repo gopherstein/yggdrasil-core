@@ -1,6 +1,6 @@
 # Deliberate: design
 
-Status: design (#459). Nothing here has shipped.
+Status: in progress (#459). The reasoning cases and their report, and the plumbing for per-call temperatures and token caps and the `drafter` and `judge` roles, are in; Deliberate itself isn't yet.
 
 Several models answer the same question independently, check each other's reasoning, and a judge writes the final answer, saying so where they still disagree. For a short answer, such as a number or one fact, the cheaper path is a vote. It's opt-in, and it's measured before Auto ever turns it on.
 
@@ -12,8 +12,7 @@ Several models answer the same question independently, check each other's reason
 - **Stop** cancels the turn's context (`App.StopChat`), which every `Generate`, tool call, worker, and remote call shares; the partial answer is kept (`keepStopped`).
 - **Steps and events:** orchestrator events go through `chatExecEnv.Emit` to the run trace, the answer's steps (`turnTrace.meta()` → `MessageMeta.Steps`), the API's progress callback, and the bus.
 - **Gaps:**
-  - `pluginapi.ChatRequest.Temperature` and `nodes.RemoteChatRequest.Temperature` exist, and a paired computer passes a remote request's temperature on (`internalChatStream`), but `generateOnNode`, which sends every chat call, never sets one.
-  - No chat call sets `MaxTokens`, so there's no per-turn token budget.
+  - Per-call temperatures and token caps: done. `pluginapi.WithGenerateOptions` sets them on a call's context, and `generateOnNode` sends them to the local runtime, a paired computer (`RemoteChatRequest`), or an external server.
   - `huginn.Classify` knows Chat, Current, Coding, Research, and Local, but not math, reasoning, or a single factual question.
   - The quality set matches answers by regex and has no category field.
 

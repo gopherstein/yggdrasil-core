@@ -132,7 +132,8 @@ func externalAllowed(p profiles.Profile, keepsLocal bool) error {
 func (a *App) generateExternal(ctx context.Context, modelID string, messages []pluginapi.ChatMessage) (<-chan pluginapi.ChatChunk, error) {
 	model := external.ServerModel(modelID)
 	a.Egress.Add(ctx, egress.ExternalServer, a.External.Host(), "prompt and conversation for "+model)
-	ch, err := a.External.Chat(ctx, model, pluginapi.ChatRequest{Messages: messages, Stream: true})
+	opts := pluginapi.GenerateOptionsFrom(ctx)
+	ch, err := a.External.Chat(ctx, model, pluginapi.ChatRequest{Messages: messages, Stream: true, Temperature: opts.Temperature, MaxTokens: opts.MaxTokens})
 	if err != nil {
 		return nil, contracts.NewError("EXTERNAL_FAILED", nil, err)
 	}

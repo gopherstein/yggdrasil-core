@@ -239,6 +239,9 @@ func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role, adapter
 	if external.IsModel(modelID) {
 		return a.generateExternal(ctx, modelID, messages)
 	}
+	// A temperature or a token cap set for this call, such as a draft's
+	// (#459), goes with it to whichever computer runs it.
+	opts := pluginapi.GenerateOptionsFrom(ctx)
 	cfg := a.Config.Get()
 	if adapter != "" && nodeID != "" && nodeID != cfg.NodeID {
 		return nil, fmt.Errorf("specialized AIs run on the computer that trained them")
@@ -263,6 +266,8 @@ func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role, adapter
 			Stream:         true,
 			Adapter:        adapter,
 			ResponseSchema: structured.SchemaFrom(ctx),
+			Temperature:    opts.Temperature,
+			MaxTokens:      opts.MaxTokens,
 		})
 		if err != nil {
 			return nil, err
@@ -287,6 +292,8 @@ func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role, adapter
 	ch, err := client.Chat(ctx, nodes.RemoteChatRequest{
 		ModelID:           modelID,
 		Messages:          messages,
+		Temperature:       opts.Temperature,
+		MaxTokens:         opts.MaxTokens,
 		Role:              role,
 		RequesterNodeID:   cfg.NodeID,
 		RequesterNodeName: cfg.NodeName,
