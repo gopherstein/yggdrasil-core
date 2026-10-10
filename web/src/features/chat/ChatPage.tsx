@@ -110,6 +110,10 @@ function formatRoleLabel(role: string): string {
   // A plan's worker slots are "worker:1", "worker:2", …
   const worker = /^worker:(\d+)$/.exec(role)
   if (worker) return i18n.t('chat:roles.worker', { n: worker[1] })
+  // Deliberate's drafts are "drafter:2", "drafter:3", … (#459).
+  const drafter = /^drafter:(\d+)$/.exec(role)
+  if (drafter) return i18n.t('chat:roles.drafter', { n: drafter[1] })
+  if (role === 'judge') return i18n.t('chat:roles.judge')
   if (role === 'planner') return i18n.t('chat:roles.planner')
   if (role === 'reviewer') return i18n.t('chat:roles.reviewer')
   const slot = /^([a-z]+):(\d+)$/.exec(role)

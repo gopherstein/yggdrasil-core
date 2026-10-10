@@ -252,7 +252,9 @@
     "answer": "Risposta",
     "planner": "Pianificatore",
     "reviewer": "Revisore",
-    "worker": "Esecutore {{n}}"
+    "worker": "Esecutore {{n}}",
+    "drafter": "Bozza {{n}}",
+    "judge": "Giudice"
   },
   "deleteDialog": {
     "title": "Eliminare questa chat?",
@@ -613,7 +615,19 @@
     "placeDetails": "Ho cercato i dettagli di un luogo",
     "route": "Ho trovato il percorso da {{from}} a {{to}}",
     "git": "Ho controllato il repository Git ({{action}})",
-    "helpAnswered": "Risposta presa dalla guida di Toskar"
+    "helpAnswered": "Risposta presa dalla guida di Toskar",
+    "deliberateAgreed_one": "Confrontata {{count}} bozza indipendente: concordava",
+    "deliberateAgreed_other": "Confrontate {{count}} bozze indipendenti: concordavano",
+    "deliberateAgreed_many": "Confrontate {{count}} bozze indipendenti: concordavano",
+    "deliberateMajority_one": "Confrontata {{count}} bozza indipendente: {{agreeing}} concordavano, quella risposta resta",
+    "deliberateMajority_other": "Confrontate {{count}} bozze indipendenti: {{agreeing}} concordavano, quella risposta resta",
+    "deliberateMajority_many": "Confrontate {{count}} bozze indipendenti: {{agreeing}} concordavano, quella risposta resta",
+    "deliberateDisagreed_one": "Confrontata {{count}} bozza indipendente: non concordavano, quindi questa è la prima",
+    "deliberateDisagreed_other": "Confrontate {{count}} bozze indipendenti: non concordavano, quindi questa è la prima",
+    "deliberateDisagreed_many": "Confrontate {{count}} bozze indipendenti: non concordavano, quindi questa è la prima",
+    "deliberateLong_one": "Scritta {{count}} bozza indipendente; la risposta era troppo lunga da confrontare",
+    "deliberateLong_other": "Scritte {{count}} bozze indipendenti; le risposte erano troppo lunghe da confrontare, quindi questa è la prima",
+    "deliberateLong_many": "Scritte {{count}} bozze indipendenti; le risposte erano troppo lunghe da confrontare, quindi questa è la prima"
   },
   "help": {
     "mcpTools": "Per MCP non c'è nulla da installare: Toskar lo parla già. Per aggiungere gli strumenti di un server MCP, apri **{{tools}} → {{addTools}}** e scegli uno dei quattro modi:\n\n- **Galleria:** scegli un server, come cartelle, un browser, Notion, Linear o GitHub, e rispondi al massimo a una o due domande. I servizi che richiedono l'accesso aprono una finestra per farlo.\n- **Incolla:** incolla ciò che dicono le istruzioni del server: JSON per Claude Desktop, Cursor o VS Code, una riga di comando, una riga `claude mcp add` o un indirizzo web.\n- **Dalle tue altre app:** aggiungi i server già configurati in Claude Desktop, Claude Code, Cursor, VS Code, Windsurf, Gemini CLI o LM Studio.\n- **Personalizzato:** un comando da eseguire o un indirizzo web.\n\nToskar si collega ed elenca gli strumenti del server prima di salvarlo. I server che girano su questo computer richiedono Node.js o uv; l'errore indica quale manca. Gli strumenti che modificano qualcosa ti chiedono prima.",

@@ -242,7 +242,9 @@
     "answer": "回答",
     "planner": "規劃者",
     "reviewer": "審查者",
-    "worker": "工作者 {{n}}"
+    "worker": "工作者 {{n}}",
+    "drafter": "草稿 {{n}}",
+    "judge": "評判"
   },
   "deleteDialog": {
     "title": "要刪除這個聊天嗎？",
@@ -561,7 +563,11 @@
     "placeDetails": "查詢了一個地點的詳細資訊",
     "route": "查詢了從 {{from}} 到 {{to}} 的路線",
     "git": "檢查了 Git 存放庫（{{action}}）",
-    "helpAnswered": "根據 Toskar 指南回答"
+    "helpAnswered": "根據 Toskar 指南回答",
+    "deliberateAgreed_other": "比較了 {{count}} 份獨立草稿：結果一致",
+    "deliberateMajority_other": "比較了 {{count}} 份獨立草稿：{{agreeing}} 份一致，保留了該答案",
+    "deliberateDisagreed_other": "比較了 {{count}} 份獨立草稿：結果不一致，因此這是第一份",
+    "deliberateLong_other": "寫了 {{count}} 份獨立草稿；答案太長無法比較，因此這是第一份"
   },
   "help": {
     "mcpTools": "MCP 本身不需要安裝：Toskar 已經支援它。要新增 MCP 伺服器的工具，請開啟 **{{tools}} → {{addTools}}**，然後從四種方式中擇一：\n\n- **圖庫：** 選擇一個伺服器，例如資料夾、瀏覽器、Notion、Linear 或 GitHub，最多回答一兩個問題。需要登入的服務會開啟登入視窗。\n- **貼上：** 貼上伺服器說明中的內容：適用於 Claude Desktop、Cursor 或 VS Code 的 JSON、一行指令、一行 `claude mcp add` 或一個網址。\n- **從其他應用程式匯入：** 新增你已在 Claude Desktop、Claude Code、Cursor、VS Code、Windsurf、Gemini CLI 或 LM Studio 中設定好的伺服器。\n- **自訂：** 一個要執行的指令或一個網址。\n\nToskar 會先連線到伺服器並列出其工具，然後才儲存。在這台電腦上執行的伺服器需要 Node.js 或 uv；缺少時錯誤訊息會說明缺哪一個。會變更內容的工具會先徵求你的同意。",

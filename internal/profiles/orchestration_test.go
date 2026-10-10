@@ -15,7 +15,7 @@ func TestOrchestrationControls(t *testing.T) {
 	for _, bad := range []contracts.OrchestrationPolicy{
 		{Effort: "maximum"}, {Planning: "maybe"}, {Verification: "twice"}, {MaxWorkers: 1}, {MaxWorkers: 20},
 		{MaxToolCalls: 99}, {TimeoutSeconds: 5}, {ContextShare: 0.95}, {Memory: "on"}, {Strategy: "swarm"},
-		{FallbackModels: []string{""}},
+		{FallbackModels: []string{""}}, {Deliberate: "sometimes"},
 	} {
 		if err := ValidateOrchestration(bad); err == nil || !strings.HasPrefix(err.Error(), "orchestration.") {
 			t.Errorf("%+v accepted (%v)", bad, err)
@@ -155,6 +155,14 @@ func TestDeliberateRoles(t *testing.T) {
 	for role, want := range map[string]string{"drafter:1": "qwen", "drafter:3": "qwen", RoleJudge: "big", RoleWorker: ""} {
 		if got := RoleModel(p, role); got != want {
 			t.Errorf("%s: %q, want %q", role, got, want)
+		}
+	}
+}
+
+func TestDeliberateSetting(t *testing.T) {
+	for _, v := range []string{"", "never", "always", "auto"} {
+		if err := ValidateOrchestration(contracts.OrchestrationPolicy{Deliberate: v}); err != nil {
+			t.Errorf("%q: %v", v, err)
 		}
 	}
 }

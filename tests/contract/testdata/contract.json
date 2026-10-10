@@ -1,5 +1,5 @@
 {
-  "version": "1.22",
+  "version": "1.23",
   "types": {
     "ActivityStep": [
       "kind",
@@ -111,6 +111,7 @@
       "backend",
       "context",
       "contract",
+      "deliberation",
       "device",
       "files",
       "notice",

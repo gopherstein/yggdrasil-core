@@ -194,6 +194,13 @@ func (o *Orchestrator) Run(
 		if climateQuestion(task.Prompt) {
 			instructions += "\n" + climateGuidance
 		}
+		// Deliberate compares drafts by their final answers (#459); small talk
+		// isn't deliberated, and neither is an answer that must be JSON, one
+		// about pictures, or a Team profile's, which has its own reviewer.
+		deliberate := deliberating(profile) && !jsonOnly && len(images) == 0 && !strat.team && !huginn.SmallTalk(task.Prompt)
+		if deliberate {
+			instructions += "\n" + draftGuidance
+		}
 		// evidence is what the answer may draw figures from, for the check.
 		evidence := reference
 		toolPrompt := tools.PromptFor(profile)
@@ -432,6 +439,9 @@ func (o *Orchestrator) Run(
 				}
 			}
 			answer := parsed.Text
+			if deliberate {
+				answer = deliberateAnswer(ctx, env, ch, messages, plainSys, answer, role, nodeID)
+			}
 			if budget.Verify {
 				answer = verifyAnswer(ctx, env, reviewerRole(profile, role), messages, parsed.Text, evidence, task.Prompt, budget.Corrections)
 				answer = checkCode(ctx, env, reviewerRole(profile, role), messages, answer, budget.Corrections)

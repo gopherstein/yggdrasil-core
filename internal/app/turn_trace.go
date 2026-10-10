@@ -40,6 +40,8 @@ type turnTrace struct {
 	runID string
 	// automation is an automation the answer drafted (#204).
 	automation *contracts.AutomationDraft
+	// deliberation is how Deliberate reached the answer (#459).
+	deliberation *contracts.Deliberation
 	// lang is the App language notices are written in (multilingual spec
 	// §16); "" is English.
 	lang string
@@ -546,17 +548,50 @@ func (t *turnTrace) sawUntrusted() bool {
 func (t *turnTrace) meta() *contracts.MessageMeta {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	if len(t.sources) == 0 && len(t.steps) == 0 && t.notice == "" && len(t.files) == 0 && t.runID == "" && t.automation == nil {
+	if len(t.sources) == 0 && len(t.steps) == 0 && t.notice == "" && len(t.files) == 0 && t.runID == "" && t.automation == nil && t.deliberation == nil {
 		return nil
 	}
 	return &contracts.MessageMeta{
-		Sources:    append([]contracts.Citation(nil), t.sources...),
-		Steps:      append([]contracts.ActivityStep(nil), t.steps...),
-		Notice:     t.notice,
-		Files:      append([]contracts.FileRef(nil), t.files...),
-		RunID:      t.runID,
-		Contract:   contracts.ContractVersion,
-		Automation: t.automation,
+		Sources:      append([]contracts.Citation(nil), t.sources...),
+		Steps:        append([]contracts.ActivityStep(nil), t.steps...),
+		Notice:       t.notice,
+		Files:        append([]contracts.FileRef(nil), t.files...),
+		RunID:        t.runID,
+		Contract:     contracts.ContractVersion,
+		Automation:   t.automation,
+		Deliberation: t.deliberation,
+	}
+}
+
+// draft records one of Deliberate's drafts (#459), in the order they came.
+func (t *turnTrace) draft(d contracts.DeliberationDraft) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if t.deliberation == nil {
+		t.deliberation = &contracts.Deliberation{}
+	}
+	t.deliberation.Drafts = append(t.deliberation.Drafts, d)
+}
+
+// deliberated records the drafts' outcome as a step: "3 drafts · they
+// agreed", "· 2 of 3 agreed", or that they disagreed.
+func (t *turnTrace) deliberated(outcome, final string, drafts, agreeing int) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if t.deliberation == nil {
+		t.deliberation = &contracts.Deliberation{}
+	}
+	t.deliberation.Outcome, t.deliberation.Final = outcome, final
+	params := map[string]any{"count": drafts, "agreeing": agreeing}
+	switch outcome {
+	case "agreed":
+		t.step("deliberate", "deliberateAgreed", params)
+	case "majority":
+		t.step("deliberate", "deliberateMajority", params)
+	case "disagreed":
+		t.step("deliberate", "deliberateDisagreed", params)
+	default:
+		t.step("deliberate", "deliberateLong", params)
 	}
 }
 
