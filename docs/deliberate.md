@@ -1,6 +1,6 @@
 # Deliberate: design
 
-Status: in progress (#459). In: the reasoning cases and their report; per-call temperatures and token caps; the `drafter` and `judge` roles; drafts with the short-answer vote, and cross-examination and the judge for drafts that disagree, behind `deliberate: always`; the setting and drafts view in the web app, and the drafts view on the phone; and the user guide's section. Next: the measurements, the `Reasoning` kind, and Auto.
+Status: shipped and measured (#459). `deliberate: always` is available on any single or planned profile, with the drafts shown in the web app and the phone. The first measurement (below) found no clear gain for the cost on one model at three temperatures, so Auto stays off.
 
 Several models answer the same question independently, check each other's reasoning, and a judge writes the final answer, saying so where they still disagree. For a short answer, such as a number or one fact, the cheaper path is a vote. It's opt-in, and it's measured before Auto ever turns it on.
 
@@ -37,7 +37,7 @@ The drafts and the judge are ordinary `Generate` calls, so retries on another co
 ## Controls
 
 - **Profile setting** `orchestration.deliberate`: `never` (the default), `always`, or `auto`. It goes in `contracts.OrchestrationPolicy`, validated in `profiles.ValidateOrchestration`, and shown in the profile's orchestration controls.
-- **Auto** turns it on only for request kinds where the quality run shows a clear gain on the person's hardware class, and only when the computer (or cluster) has room for the extra drafts right now. This needs a new `Reasoning` kind in `huginn.Classify` (math word problems, logic, multi-step questions, trick questions), tested in `tests/quality/text.json`. Until the numbers are in, Auto behaves like `never`.
+- **Auto** would turn it on only for request kinds where the quality run shows a clear gain on the person's hardware class, and only when the computer (or cluster) has room for the extra drafts right now. The first measurement (see Results) showed no kind with a clear gain, so Auto behaves like `never`, and the `Reasoning` kind in `huginn.Classify` it would need waits for a measurement that shows one.
 - **Budgets:**
   - At most three drafts.
   - A per-draft token cap (`MaxTokens`, newly plumbed).
@@ -58,6 +58,24 @@ The drafts and the judge are ordinary `Generate` calls, so retries on another co
 - **The comparison:** each case runs as a single model, as a vote, and as full deliberation, per model and per model pair. The report gives accuracy, time, and tokens for each mode.
 - **The matrix:** `quality.yml` already runs one model at a time. Pairs need two models loaded at once, inside the runner's memory and CPU caps. No quality run starts before the change that caps it is merged.
 - **The Auto rule** is set from these numbers, per request kind and hardware class, and the numbers are published (the blog post: "Do two small models beat one big one?").
+
+## Results
+
+The first measurement (#459; quality runs 38057806202 and 38062186660, 2026-10-10): the 39 reasoning questions, on a Radeon RX 7900 (24 GB, Vulkan), with each model alone and with `deliberate: always`. Every draft came from the same model, at temperatures 0, 0.6, and 0.9, since the runner loads one model at a time.
+
+| Model | Alone | Deliberate | Time | Tokens |
+| --- | --- | --- | --- | --- |
+| qwen2.5-7b | 37 (1.0 s) | 38 (2.4 s) | 2.3× | 2.8× |
+| gemma-2-9b | 35 (0.9 s) | 33 (3.1 s) | 3.4× | 3.9× |
+| qwen2.5-14b | 37 (1.9 s) | 37 (4.2 s) | 2.3× | 2.9× |
+| qwen2.5-32b | 37 (3.8 s) | 39 (8.4 s) | 2.2× | 2.9× |
+
+- **About even, at two to four times the cost.** Across the four models, 146 of 156 right alone and 147 with Deliberate. One of the 32B's two gains is a scoring gap the run found: it answered "one kilogram" to the feathers question, which is right, and the scoring now accepts it.
+- **Same-model drafts share mistakes.** On gemma-2-9b, the higher-temperature drafts agreed on wrong answers to two logic puzzles the model alone got right; logic fell from 7 of 10 to 5 of 10. The 7B gained one logic puzzle, and the 14B traded one fact for one puzzle.
+- **Logic is where the room is.** Math, two-step facts, and trick questions were already 92–100% alone; logic puzzles were 70–90%, and every change either way was there.
+- **A small model deliberating matched a larger one alone.** qwen2.5-7b with Deliberate got 38 right at 2.4 s a question; qwen2.5-32b alone got 37 at 3.8 s.
+- **So Auto stays off.** No request kind showed a clear gain for the extra time and tokens. `always` stays available for people who want it.
+- **Next to measure:** drafts from different model families (a 7B, a 9B, and a 14B together), which the design expects to catch more than one model at three temperatures, once the runner can hold them at once; and harder logic questions, since the rest of the set is near its ceiling.
 
 ## Building it
 
