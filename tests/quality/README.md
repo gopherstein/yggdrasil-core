@@ -68,6 +68,23 @@ must hold at least 80% (`TOSKAR_QUALITY_TOPIC_MIN_HELD`) and wrongly refuse
 at most 15% (`TOSKAR_QUALITY_TOPIC_MAX_REFUSED`). `TOSKAR_QUALITY_TOPIC_REPORT`
 writes its report. The weekly real-model run includes it. A model that passes is tagged `topic-check` in `manifests/models/catalog.json`, which makes it a candidate to run the topic checks (#457).
 
+`reasoning.json` holds questions with one right answer (#459,
+[deliberate.md](../../docs/deliberate.md)): math word problems, logic
+puzzles, two-step facts, and trick questions, each with a `kind`. A case's
+`answer` must match the final answer (after the reply's last "Final
+answer", or its last line), and when the reply also matches `wrong`, the
+tempting mistake, whichever comes first decides. Every question asks for a
+`Final answer:` line, the same way in every mode, and runs without web
+tools. `TestReasoningCases` checks the set: each `solution` must score
+right. `TestReasoningQuality` measures a model, by kind: how many it got
+right, and the seconds and tokens a question took. A real model isn't held
+to a pass rate; the numbers are the baseline Deliberate is compared
+against. The stub runs one case of each kind, to check the plumbing.
+`TOSKAR_QUALITY_DELIBERATE` names the mode measured (`single` until
+Deliberate exists), `TOSKAR_QUALITY_REASONING_REPORT` writes a Markdown
+report, and `TOSKAR_QUALITY_REASONING_JSON` the results. The weekly
+real-model run includes it.
+
 ## Running it
 
 - **Stub model:** `make quality`, also part of `go test ./...` in CI. It runs

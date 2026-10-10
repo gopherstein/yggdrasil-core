@@ -1,0 +1,298 @@
+{
+  "note": "Reasoning cases for Deliberate (#459, docs/deliberate.md). Each has one right answer, checked against the final answer only: it must match `answer`, and when it also matches `wrong` (the tempting mistake), whichever comes first decides, so \"Cara (Ben has the fish)\" is right and \"$0.10, I mean $0.05\" is not. `solution` is the stub's reply. Written for this set.",
+  "cases": [
+    {
+      "id": "math-muffins",
+      "kind": "math",
+      "message": "A bakery sells muffins for $3 each or 4 for $10. Maya buys exactly 10 muffins as cheaply as possible. How much does she pay?",
+      "answer": "\\$?\\b26(\\.00)?\\b",
+      "solution": "$26"
+    },
+    {
+      "id": "math-train",
+      "kind": "math",
+      "message": "A train leaves at 9:40 and the trip takes 2 hours and 35 minutes. At what time does it arrive?",
+      "answer": "\\b12:15\\b",
+      "solution": "12:15"
+    },
+    {
+      "id": "math-marbles",
+      "kind": "math",
+      "message": "Sam has twice as many marbles as Lee. Together they have 36. How many marbles does Sam have?",
+      "answer": "\\b24\\b",
+      "solution": "24"
+    },
+    {
+      "id": "math-discounts",
+      "kind": "math",
+      "message": "A shirt costs $40. It is discounted 25%, and then the sale price is discounted another 10%. What is the final price?",
+      "answer": "\\$?\\b27(\\.00)?\\b",
+      "wrong": "\\b26\\b",
+      "solution": "$27"
+    },
+    {
+      "id": "math-rectangle",
+      "kind": "math",
+      "message": "A rectangle's length is 3 times its width, and its perimeter is 48 cm. What is its area in square centimeters?",
+      "answer": "\\b108\\b",
+      "solution": "108 square centimeters"
+    },
+    {
+      "id": "math-bill",
+      "kind": "math",
+      "message": "Three friends split an $87 bill equally, and each adds a $4 tip. How much does each friend pay in total?",
+      "answer": "\\$?\\b33(\\.00)?\\b",
+      "solution": "$33"
+    },
+    {
+      "id": "math-fuel",
+      "kind": "math",
+      "message": "A car uses 6 liters of fuel per 100 km. How many liters does it use for 350 km?",
+      "answer": "\\b21(\\.0+)?\\b",
+      "solution": "21 liters"
+    },
+    {
+      "id": "math-pages",
+      "kind": "math",
+      "message": "Ana reads 18 pages a day, starting on day 1. Her book has 250 pages. On which day does she finish it?",
+      "answer": "\\b14(th)?\\b|fourteenth",
+      "wrong": "\\b13(th)?\\b",
+      "solution": "Day 14"
+    },
+    {
+      "id": "math-average",
+      "kind": "math",
+      "message": "The average of five numbers is 12. Four of them are 10, 14, 9, and 15. What is the fifth number?",
+      "answer": "\\b12\\b",
+      "solution": "12"
+    },
+    {
+      "id": "math-tank",
+      "kind": "math",
+      "message": "An empty 120-liter tank is filled at 8 liters a minute while a leak drains 3 liters a minute. How many minutes does it take to fill?",
+      "answer": "\\b24\\b",
+      "wrong": "\\b15\\b",
+      "solution": "24 minutes"
+    },
+    {
+      "id": "math-ages",
+      "kind": "math",
+      "message": "Jo is 4 years older than Kim. In 6 years, their ages will add up to 40. How old is Kim now?",
+      "answer": "\\b12\\b",
+      "solution": "12"
+    },
+    {
+      "id": "math-percent",
+      "kind": "math",
+      "message": "What is 17% of 300 plus 23% of 300?",
+      "answer": "\\b120\\b",
+      "solution": "120"
+    },
+    {
+      "id": "logic-pets",
+      "kind": "logic",
+      "message": "Alice, Ben, and Cara each have one pet: a cat, a dog, or a fish. Ben is allergic to fur. Alice's pet barks. Who has the cat?",
+      "answer": "\\bCara\\b",
+      "wrong": "\\b(Ben|Alice)\\b",
+      "solution": "Cara"
+    },
+    {
+      "id": "logic-syllogism",
+      "kind": "logic",
+      "message": "All bloops are razzies. Some razzies are lazzies. Must some bloops be lazzies? Answer yes or no.",
+      "answer": "\\bno\\b",
+      "wrong": "\\byes\\b",
+      "solution": "No"
+    },
+    {
+      "id": "logic-wet-street",
+      "kind": "logic",
+      "message": "If it rains, the street gets wet. The street is not wet. Did it rain? Answer yes or no.",
+      "answer": "\\bno\\b",
+      "wrong": "\\byes\\b",
+      "solution": "No"
+    },
+    {
+      "id": "logic-race",
+      "kind": "logic",
+      "message": "Five runners finish a race with no ties. Dan beat Eve. Fay beat Dan. Gus finished after Eve. Hal finished first. Who finished third?",
+      "answer": "\\bDan\\b",
+      "wrong": "\\b(Eve|Fay|Gus|Hal)\\b",
+      "solution": "Dan"
+    },
+    {
+      "id": "logic-heights",
+      "kind": "logic",
+      "message": "Tom is taller than Jim. Jim is taller than Sue. Sue is taller than Ann. Who is the second shortest?",
+      "answer": "\\bSue\\b",
+      "wrong": "\\b(Ann|Jim|Tom)\\b",
+      "solution": "Sue"
+    },
+    {
+      "id": "logic-socks",
+      "kind": "logic",
+      "message": "A drawer has 3 red, 4 blue, and 5 green socks. In the dark, how many socks must you take out to be sure of having a matching pair?",
+      "answer": "\\b4\\b|\\bfour\\b",
+      "solution": "4"
+    },
+    {
+      "id": "logic-weekday",
+      "kind": "logic",
+      "message": "Today is Wednesday. What day of the week will it be 100 days from today?",
+      "answer": "\\bFriday\\b",
+      "solution": "Friday"
+    },
+    {
+      "id": "logic-clock",
+      "kind": "logic",
+      "message": "A clock shows 3:15. What is the angle between the hour hand and the minute hand, in degrees?",
+      "answer": "\\b7\\.5\\b",
+      "solution": "7.5 degrees"
+    },
+    {
+      "id": "logic-treasure",
+      "kind": "logic",
+      "message": "There are three boxes and one treasure. Exactly one of these statements is true: 1) The treasure is in box 1. 2) The treasure is not in box 2. 3) The treasure is not in box 1. Which box holds the treasure?",
+      "answer": "\\b(box )?2\\b|\\btwo\\b",
+      "solution": "Box 2"
+    },
+    {
+      "id": "logic-siblings",
+      "kind": "logic",
+      "message": "Mia has 3 sisters. Each of her sisters has 2 brothers. How many children are in the family?",
+      "answer": "\\b6\\b|\\bsix\\b",
+      "wrong": "\\b(5|9|11)\\b",
+      "solution": "6"
+    },
+    {
+      "id": "multihop-ophelia",
+      "kind": "multihop",
+      "message": "In which country was the writer of the play with the character Ophelia born?",
+      "answer": "England|\\bUK\\b|United Kingdom",
+      "solution": "England"
+    },
+    {
+      "id": "multihop-element",
+      "kind": "multihop",
+      "message": "What is the chemical symbol of the element whose atomic number is one more than oxygen's?",
+      "answer": "\\bF\\b|fluorine",
+      "wrong": "\\bNe\\b|neon",
+      "solution": "F (fluorine)"
+    },
+    {
+      "id": "multihop-years",
+      "kind": "multihop",
+      "message": "How many years passed between the year the Berlin Wall fell and the year euro banknotes and coins came into circulation?",
+      "answer": "\\b13\\b",
+      "solution": "13"
+    },
+    {
+      "id": "multihop-ocean",
+      "kind": "multihop",
+      "message": "Which ocean lies between the continent Kenya is on and the continent Australia is on?",
+      "answer": "Indian",
+      "solution": "The Indian Ocean"
+    },
+    {
+      "id": "multihop-sides-legs",
+      "kind": "multihop",
+      "message": "What is the number of sides of a hexagon plus the number of legs of a spider?",
+      "answer": "\\b14\\b",
+      "solution": "14"
+    },
+    {
+      "id": "multihop-lima",
+      "kind": "multihop",
+      "message": "On which continent is the country whose capital is Lima?",
+      "answer": "South America",
+      "solution": "South America"
+    },
+    {
+      "id": "multihop-austen",
+      "kind": "multihop",
+      "message": "In which century was the author of Pride and Prejudice born?",
+      "answer": "18th|eighteenth",
+      "wrong": "19th|nineteenth",
+      "solution": "The 18th century"
+    },
+    {
+      "id": "multihop-gold",
+      "kind": "multihop",
+      "message": "What is the atomic number of the element whose chemical symbol is Au?",
+      "answer": "\\b79\\b",
+      "solution": "79"
+    },
+    {
+      "id": "trick-bat-ball",
+      "kind": "trick",
+      "message": "A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost?",
+      "answer": "\\$?0?\\.05\\b|\\b5 ?cents?\\b|five cents",
+      "wrong": "\\$?0?\\.10\\b|\\b10 ?cents?\\b|ten cents",
+      "solution": "$0.05"
+    },
+    {
+      "id": "trick-machines",
+      "kind": "trick",
+      "message": "If 5 machines make 5 parts in 5 minutes, how many minutes would 100 machines take to make 100 parts?",
+      "answer": "\\b5\\b|\\bfive\\b",
+      "wrong": "\\b100\\b",
+      "solution": "5 minutes"
+    },
+    {
+      "id": "trick-lily-pads",
+      "kind": "trick",
+      "message": "A patch of lily pads doubles in size every day. It takes 48 days to cover the whole lake. How many days does it take to cover half the lake?",
+      "answer": "\\b47\\b",
+      "wrong": "\\b24\\b",
+      "solution": "47 days"
+    },
+    {
+      "id": "trick-months",
+      "kind": "trick",
+      "message": "How many months of the year have 28 days?",
+      "answer": "\\b12\\b|twelve|\\ball\\b",
+      "wrong": "\\b(1|one)\\b|only February",
+      "solution": "All 12"
+    },
+    {
+      "id": "trick-sheep",
+      "kind": "trick",
+      "message": "A farmer has 17 sheep. All but 9 run away. How many sheep are left?",
+      "answer": "\\b9\\b|\\bnine\\b",
+      "wrong": "\\b8\\b|\\beight\\b",
+      "solution": "9"
+    },
+    {
+      "id": "trick-overtake",
+      "kind": "trick",
+      "message": "In a race, you overtake the runner in second place. What place are you in now?",
+      "answer": "second|\\b2nd\\b",
+      "wrong": "\\bfirst\\b|\\b1st\\b",
+      "solution": "Second"
+    },
+    {
+      "id": "trick-feathers",
+      "kind": "trick",
+      "message": "Which is heavier: a kilogram of feathers or a kilogram of steel?",
+      "answer": "neither|same|equal|both",
+      "wrong": "^(the )?(steel|feathers)\\b",
+      "solution": "Neither: they weigh the same"
+    },
+    {
+      "id": "trick-pills",
+      "kind": "trick",
+      "message": "A doctor gives you 3 pills and tells you to take one every half hour, starting now. How many minutes until you have taken them all?",
+      "answer": "\\b60\\b|one hour|\\b1 hour",
+      "wrong": "\\b90\\b",
+      "solution": "60 minutes"
+    },
+    {
+      "id": "trick-half",
+      "kind": "trick",
+      "message": "Divide 30 by one half, then add 10. What do you get?",
+      "answer": "\\b70\\b",
+      "wrong": "\\b25\\b",
+      "solution": "70"
+    }
+  ]
+}
