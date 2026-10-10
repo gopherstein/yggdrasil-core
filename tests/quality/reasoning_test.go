@@ -139,6 +139,18 @@ func TestReasoningCases(t *testing.T) {
 			t.Errorf("score(%q) = %v", final, got)
 		}
 	}
+	// The feathers question: "one kilogram" alone is right; the 32B's
+	// answer in the first measurement was scored wrong.
+	for _, c := range loadReasoning(t) {
+		if c.ID != "trick-feathers" {
+			continue
+		}
+		for final, want := range map[string]bool{"one kilogram": true, "1 kg each": true, "Neither": true, "The steel": false, "Feathers, one kilogram": false} {
+			if got, _ := scoreReasoning(c, final); got != want {
+				t.Errorf("feathers: score(%q) = %v", final, got)
+			}
+		}
+	}
 	for answer, want := range map[string]string{
 		"Some working.\nFinal answer: 24":         "24",
 		"**Final answer:** Cara":                  "Cara",

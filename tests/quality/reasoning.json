@@ -274,7 +274,7 @@
       "id": "trick-feathers",
       "kind": "trick",
       "message": "Which is heavier: a kilogram of feathers or a kilogram of steel?",
-      "answer": "neither|same|equal|both",
+      "answer": "neither|same|equal|both|^\\W*(each )?(one|1) ?(kilogram|kg)( each)?\\W*$",
       "wrong": "^(the )?(steel|feathers)\\b",
       "solution": "Neither: they weigh the same"
     },
