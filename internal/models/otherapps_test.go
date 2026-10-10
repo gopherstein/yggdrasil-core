@@ -30,7 +30,8 @@ func TestFindOtherApps(t *testing.T) {
 	if err := os.MkdirAll(filepath.Dir(manifest), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	_ = os.WriteFile(manifest, []byte(`{"layers":[{"mediaType":"application/vnd.ollama.image.model","digest":"sha256:abc123"},{"mediaType":"application/vnd.ollama.image.license","digest":"sha256:def"}]}`), 0o644)
+	projBlob := gguftest.Write(t, filepath.Join(ollama, "blobs"), "sha256-proj9", gguftest.Options{Architecture: "clip", Type: "mmproj"})
+	_ = os.WriteFile(manifest, []byte(`{"layers":[{"mediaType":"application/vnd.ollama.image.model","digest":"sha256:abc123"},{"mediaType":"application/vnd.ollama.image.projector","digest":"sha256:proj9"},{"mediaType":"application/vnd.ollama.image.license","digest":"sha256:def"}]}`), 0o644)
 
 	var llamacpp string
 	for _, d := range otherAppDirs(home, runtime.GOOS, os.Getenv) {
@@ -49,7 +50,7 @@ func TestFindOtherApps(t *testing.T) {
 		t.Fatalf("found %d: %+v", len(found), found)
 	}
 	q, o, p := got["lmstudio:Qwen3 8B"], got["ollama:llama3.2:3b"], got["llamacpp:bartowski_Phi-4-mini-Q8_0"]
-	if q.Quantization != "Q4_K_M" || o.Path != blob || p.Quantization != "Q8_0" {
+	if q.Quantization != "Q4_K_M" || o.Path != blob || o.Projector != projBlob || p.Quantization != "Q8_0" || q.Projector == "" {
 		t.Fatalf("found = %+v", found)
 	}
 
@@ -62,6 +63,10 @@ func TestFindOtherApps(t *testing.T) {
 		if f.Path == blob && f.ModelID != imported.ID {
 			t.Errorf("after adding: %+v, want model %s", f, imported.ID)
 		}
+	}
+	// Its projector blob, which has no .gguf name either, can be paired.
+	if err := m.SetProjector(ctx, imported.ID, o.Projector); err != nil || !m.SeesImages(imported.ID) {
+		t.Errorf("pairing Ollama's projector: %v, sees images %v", err, m.SeesImages(imported.ID))
 	}
 	// A file without a .gguf name that no app lists is still refused.
 	stray := gguftest.Write(t, dir, "stray-blob", gguftest.Options{})

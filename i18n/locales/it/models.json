@@ -361,6 +361,22 @@
       "works": "Funziona",
       "speed": "{{speed}} token al secondo",
       "failed": "Non ha risposto: {{error}}"
+    },
+    "details": {
+      "name": "Nome",
+      "tags": "Bravo in",
+      "tag": {
+        "general": "Domande di tutti i giorni",
+        "coding": "Programmazione",
+        "reasoning": "Ragionamento",
+        "writing": "Scrittura"
+      },
+      "tagsHint": "Quando una chat è su Auto, le richieste di programmazione vanno a un modello bravo a programmare.",
+      "save": "Salva",
+      "saved": "Salvato",
+      "visionOffer": "Insieme è stato trovato il supporto alle immagini, così può vedere le immagini:",
+      "visionAdd": "Aggiungi supporto alle immagini",
+      "visionOn": "Supporto alle immagini aggiunto: può vedere le immagini."
     }
   }
 }

@@ -745,6 +745,20 @@ export const api = {
   importModelPath: (body: { path: string; in_place?: boolean; display_name?: string }) =>
     request<ModelImportResult>('/api/v1/models/import', { method: 'POST', body: JSON.stringify(body) }),
 
+  /** Renames or retags a model added from a file or a link (#467). */
+  updateAddedModel: (id: string, body: { display_name?: string; tags?: string[] }) =>
+    request<{ model_id: string; display_name: string; tags: string[] }>(`/api/v1/models/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
+
+  /** Gives an added model its vision projector, a file on this computer (#467). */
+  setModelProjector: (id: string, path: string) =>
+    request<{ model_id: string; vision: boolean }>(`/api/v1/models/${encodeURIComponent(id)}/projector`, {
+      method: 'PUT',
+      body: JSON.stringify({ path }),
+    }),
+
   /** Models other local AI apps already downloaded on this computer (#467). */
   findModelsInOtherApps: () => request<{ models: FoundModel[] }>('/api/v1/models/import/found'),
 

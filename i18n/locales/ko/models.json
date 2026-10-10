@@ -347,6 +347,22 @@
       "works": "작동함",
       "speed": "초당 {{speed}} 토큰",
       "failed": "답하지 않았습니다: {{error}}"
+    },
+    "details": {
+      "name": "이름",
+      "tags": "잘하는 일",
+      "tag": {
+        "general": "일상적인 질문",
+        "coding": "코딩",
+        "reasoning": "추론",
+        "writing": "글쓰기"
+      },
+      "tagsHint": "채팅이 자동일 때 코딩 요청은 코딩을 잘하는 모델로 갑니다.",
+      "save": "저장",
+      "saved": "저장됨",
+      "visionOffer": "함께 있는 이미지 지원 파일을 찾았습니다. 추가하면 이미지를 볼 수 있습니다:",
+      "visionAdd": "이미지 지원 추가",
+      "visionOn": "이미지 지원을 추가했습니다. 이미지를 볼 수 있습니다."
     }
   }
 }

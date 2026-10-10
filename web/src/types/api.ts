@@ -433,6 +433,8 @@ export interface ModelImportResult {
   model_id: string
   /** copying while the file is copied in, with model.download progress. */
   status: 'copying' | 'installed'
+  /** A vision projector found beside the file, to offer as its image support. */
+  projector?: string
   details: {
     name?: string
     architecture?: string
@@ -456,6 +458,8 @@ export interface FoundModel {
   quantization?: string
   /** Set when it's already a model here. */
   model_id?: string
+  /** Its vision projector, when the app keeps one with it. */
+  projector?: string
 }
 
 /** What a bulk delete removed and skipped (#452, contract 1.25). */

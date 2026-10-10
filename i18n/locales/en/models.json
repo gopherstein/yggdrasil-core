@@ -354,6 +354,22 @@
       "works": "Works",
       "speed": "{{speed}} tokens a second",
       "failed": "It didn't answer: {{error}}"
+    },
+    "details": {
+      "name": "Name",
+      "tags": "Good at",
+      "tag": {
+        "general": "Everyday questions",
+        "coding": "Coding",
+        "reasoning": "Reasoning",
+        "writing": "Writing"
+      },
+      "tagsHint": "When a chat is on Auto, coding requests go to a model good at coding.",
+      "save": "Save",
+      "saved": "Saved",
+      "visionOffer": "Image support was found with it, so it can see pictures:",
+      "visionAdd": "Add image support",
+      "visionOn": "Image support added: it can see pictures."
     }
   }
 }

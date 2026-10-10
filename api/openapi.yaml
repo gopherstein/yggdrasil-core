@@ -2456,6 +2456,9 @@ paths:
                   status:
                     type: string
                     enum: [copying, installed]
+                  projector:
+                    type: string
+                    description: A vision projector found beside the file, to offer with PUT /models/{id}/projector
                   details:
                     type: object
                     properties:
@@ -2516,6 +2519,9 @@ paths:
                         model_id:
                           type: string
                           description: Set when the file is already a model here
+                        projector:
+                          type: string
+                          description: Its vision projector, when the app keeps one with it
   /api/v1/models/install-from-url:
     post:
       summary: Download a GGUF from a URL
@@ -2980,7 +2986,61 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /api/v1/models/{id}/projector:
+    put:
+      summary: Give an added model its vision projector
+      description: A GGUF vision projector (mmproj) on this computer, copied beside the model so it can see pictures (#467).
+      operationId: setModelProjector
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [path]
+              properties:
+                path:
+                  type: string
+      responses:
+        "200":
+          description: The model sees pictures
+        "400":
+          description: MODEL_FILE_INVALID, MODEL_FILE_NOT_PROJECTOR, MODEL_NOT_INSTALLED, or MODEL_NOT_FOUND
   /api/v1/models/{id}:
+    patch:
+      summary: Rename or retag an added model
+      description: For a model added from a file or a link; catalog models keep their own (#467). Tags are general, coding, reasoning, and writing; vision comes with a projector.
+      operationId: updateAddedModel
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: The model's name and tags
+        "400":
+          description: MODEL_NOT_EDITABLE, MODEL_NAME_INVALID, or MODEL_NOT_FOUND
     delete:
       summary: Delete a model file
       operationId: deleteModel

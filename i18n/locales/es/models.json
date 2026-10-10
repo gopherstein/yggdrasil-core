@@ -361,6 +361,22 @@
       "works": "Funciona",
       "speed": "{{speed}} tokens por segundo",
       "failed": "No respondió: {{error}}"
+    },
+    "details": {
+      "name": "Nombre",
+      "tags": "Bueno en",
+      "tag": {
+        "general": "Preguntas cotidianas",
+        "coding": "Programación",
+        "reasoning": "Razonamiento",
+        "writing": "Redacción"
+      },
+      "tagsHint": "Cuando un chat está en Automático, las peticiones de programación van a un modelo bueno programando.",
+      "save": "Guardar",
+      "saved": "Guardado",
+      "visionOffer": "Se encontró compatibilidad con imágenes junto a él, para que pueda ver imágenes:",
+      "visionAdd": "Añadir compatibilidad con imágenes",
+      "visionOn": "Compatibilidad con imágenes añadida: puede ver imágenes."
     }
   }
 }

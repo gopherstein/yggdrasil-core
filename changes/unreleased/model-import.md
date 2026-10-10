@@ -15,6 +15,9 @@
 - After adding a model, Check it works loads it and asks one short
   question: Works, with its speed, or why it didn't answer. Benchmarks have
   the same one-prompt Quick check.
+- A model you added can be renamed and tagged with what it's good at, so
+  Auto sends coding requests to one good at coding. A vision projector found
+  with it (beside the file, or Ollama's) is offered as its image support.
 
 ### Fixed
 

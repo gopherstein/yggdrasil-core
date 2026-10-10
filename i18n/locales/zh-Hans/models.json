@@ -347,6 +347,22 @@
       "works": "可以使用",
       "speed": "每秒 {{speed}} 个 token",
       "failed": "没有回答：{{error}}"
+    },
+    "details": {
+      "name": "名称",
+      "tags": "擅长",
+      "tag": {
+        "general": "日常问题",
+        "coding": "编程",
+        "reasoning": "推理",
+        "writing": "写作"
+      },
+      "tagsHint": "聊天设为“自动”时，编程请求会交给擅长编程的模型。",
+      "save": "保存",
+      "saved": "已保存",
+      "visionOffer": "在它旁边找到了图片支持文件，添加后它就能看图片：",
+      "visionAdd": "添加图片支持",
+      "visionOn": "已添加图片支持：它可以看图片了。"
     }
   }
 }
