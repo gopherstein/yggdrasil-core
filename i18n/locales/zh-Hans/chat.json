@@ -252,7 +252,12 @@
     "untitled": "未命名",
     "cancel": "取消",
     "delete": "删除",
-    "deleting": "正在删除…"
+    "titleMany_other": "删除 {{count}} 个聊天？",
+    "bodyMany": "它们的消息、附件和生成的文件都会被删除。",
+    "includesOpen": "其中包括当前打开的聊天。",
+    "deleteMany_other": "删除 {{count}} 个聊天",
+    "deleted_other": "已删除 {{count}} 个聊天",
+    "undo": "撤销"
   },
   "history": {
     "label": "聊天记录",
@@ -274,6 +279,13 @@
     "rename": "重命名",
     "unpin": "取消置顶",
     "delete": "删除",
+    "select": "选择",
+    "selectHint": "选择多个聊天。按住 Shift 点击可选择一个范围，按住 Cmd 或 Ctrl 点击可逐个添加。",
+    "selected_other": "已选择 {{count}} 个",
+    "cancelSelect": "取消",
+    "selectAll": "全选",
+    "selectNone": "全不选",
+    "deleteSelected_other": "删除 {{count}} 个",
     "groups": {
       "pinned": "已置顶",
       "today": "今天",

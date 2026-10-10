@@ -257,7 +257,15 @@
     "untitled": "Ohne Titel",
     "cancel": "Abbrechen",
     "delete": "Löschen",
-    "deleting": "Wird gelöscht …"
+    "titleMany_one": "{{count}} Chat löschen?",
+    "titleMany_other": "{{count}} Chats löschen?",
+    "bodyMany": "Ihre Nachrichten, Anhänge und erzeugten Dateien werden entfernt.",
+    "includesOpen": "Einer davon ist der gerade geöffnete Chat.",
+    "deleteMany_one": "{{count}} Chat löschen",
+    "deleteMany_other": "{{count}} Chats löschen",
+    "deleted_one": "Chat gelöscht",
+    "deleted_other": "{{count}} Chats gelöscht",
+    "undo": "Rückgängig"
   },
   "history": {
     "label": "Chatverlauf",
@@ -279,6 +287,15 @@
     "rename": "Umbenennen",
     "unpin": "Lösen",
     "delete": "Löschen",
+    "select": "Auswählen",
+    "selectHint": "Mehrere Chats auswählen. Umschalt-Klick wählt einen Bereich, Cmd- oder Strg-Klick fügt einen hinzu.",
+    "selected_one": "{{count}} ausgewählt",
+    "selected_other": "{{count}} ausgewählt",
+    "cancelSelect": "Abbrechen",
+    "selectAll": "Alle auswählen",
+    "selectNone": "Keine auswählen",
+    "deleteSelected_one": "{{count}} löschen",
+    "deleteSelected_other": "{{count}} löschen",
     "groups": {
       "pinned": "Angeheftet",
       "today": "Heute",

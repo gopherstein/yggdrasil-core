@@ -252,7 +252,12 @@
     "untitled": "無題",
     "cancel": "キャンセル",
     "delete": "削除",
-    "deleting": "削除中…"
+    "titleMany_other": "{{count}} 件のチャットを削除しますか？",
+    "bodyMany": "メッセージ、添付ファイル、生成されたファイルも削除されます。",
+    "includesOpen": "その中には、いま開いているチャットも含まれます。",
+    "deleteMany_other": "{{count}} 件を削除",
+    "deleted_other": "{{count}} 件のチャットを削除しました",
+    "undo": "元に戻す"
   },
   "history": {
     "label": "チャット履歴",
@@ -274,6 +279,13 @@
     "rename": "名前を変更",
     "unpin": "ピン留めを解除",
     "delete": "削除",
+    "select": "選択",
+    "selectHint": "複数のチャットを選びます。Shift クリックで範囲を、Cmd または Ctrl クリックで 1 件ずつ追加します。",
+    "selected_other": "{{count}} 件選択",
+    "cancelSelect": "キャンセル",
+    "selectAll": "すべて選択",
+    "selectNone": "選択を解除",
+    "deleteSelected_other": "{{count}} 件を削除",
     "groups": {
       "pinned": "ピン留め",
       "today": "今日",

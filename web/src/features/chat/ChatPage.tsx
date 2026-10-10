@@ -84,6 +84,8 @@ function savedEffort(): Effort {
 
 /** The Model choice that lets Yggdrasil pick an installed model for each message. */
 const AUTO_MODEL_ID = 'auto'
+// How long a deleted chat can be brought back with Undo (#452).
+const UNDO_MS = 10_000
 
 // The landing page's suggestions; each label and prompt is chat:landing.suggestions.<id>.
 const SUGGESTIONS = ['explain', 'code', 'plan'] as const
@@ -264,7 +266,15 @@ export function ChatPage() {
   const [renamingId, setRenamingId] = useState<string | null>(null)
   const [renameValue, setRenameValue] = useState('')
   const [historyOpen, setHistoryOpen] = useState(false)
-  const [pendingDelete, setPendingDelete] = useState<Conversation | null>(null)
+  // The chats a confirmation asks about: one from its menu, or several from
+  // select mode (#452).
+  const [pendingDelete, setPendingDelete] = useState<Conversation[] | null>(null)
+  // A confirmed delete waits UNDO_MS for Undo before it's sent; its chats
+  // are hidden meanwhile. reopen is the chat that was open, for Undo.
+  const [undoable, setUndoable] = useState<{ ids: string[]; reopen: string | null } | null>(null)
+  const undoRef = useRef<{ ids: string[]; reopen: string | null } | null>(null)
+  const undoTimer = useRef<number | null>(null)
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(() => new Set())
   const [listError, setListError] = useState<string | null>(null)
   const [runMode, setRunMode] = useState<RunMode | null>(null)
   const [executionAsked, setExecutionAsked] = useState(false)
@@ -417,6 +427,10 @@ export function ChatPage() {
   }, [searchParams, setSearchParams, setActiveProfileId])
 
   const conversations = conversationsQuery.data ?? []
+  const visibleConversations = useMemo(() => {
+    const all = conversationsQuery.data ?? []
+    return hiddenIds.size === 0 ? all : all.filter((c) => !hiddenIds.has(c.id))
+  }, [conversationsQuery.data, hiddenIds])
   const selectedConversation =
     conversations.find((c) => c.id === selectedId) ?? null
   // Embedding, reranker, and classifier models help Yggdrasil but cannot chat.
@@ -532,31 +546,48 @@ export function ChatPage() {
     setEditing(null)
   }, [selectedId])
 
-  const deleteConversation = useMutation({
-    mutationFn: (id: string) => api.deleteConversation(id),
-    onSuccess: (_data, id) => {
-      setPendingDelete(null)
-      setListError(null)
-      queryClient.setQueryData<Conversation[]>(['conversations'], (current) =>
-        (current ?? []).filter((c) => c.id !== id),
-      )
-      queryClient.invalidateQueries({ queryKey: ['conversations'] })
-      queryClient.removeQueries({ queryKey: ['messages', id] })
-      if (selectedId === id) {
-        setSelectedId(null)
-        setSendError(null)
-        setStreamingContent(null)
-        setTeamSteps([])
-        setPlanSteps([])
+  // Sends a delete once its Undo has passed. A chat that was already gone
+  // comes back skipped, and is gone all the same.
+  const commitDelete = useCallback(
+    async (ids: string[], keepalive = false) => {
+      try {
+        await api.deleteConversations(ids, { keepalive })
+        queryClient.setQueryData<Conversation[]>(['conversations'], (current) =>
+          (current ?? []).filter((c) => !ids.includes(c.id)),
+        )
+        for (const id of ids) queryClient.removeQueries({ queryKey: ['messages', id] })
+        queryClient.invalidateQueries({ queryKey: ['conversations'] })
+      } catch (error) {
+        setListError(error instanceof Error ? error.message : t('send.deleteFailed'))
+      } finally {
+        setHiddenIds((current) => new Set([...current].filter((id) => !ids.includes(id))))
       }
     },
-    onError: (error) => {
-      setPendingDelete(null)
-      setListError(
-        error instanceof Error ? error.message : t('send.deleteFailed'),
-      )
+    [queryClient, t],
+  )
+
+  // Makes the waiting delete final now: when another is confirmed, the
+  // page closes, or its time is up.
+  const finishPendingDelete = useCallback(
+    (keepalive = false) => {
+      const pending = undoRef.current
+      if (undoTimer.current !== null) window.clearTimeout(undoTimer.current)
+      undoTimer.current = null
+      undoRef.current = null
+      setUndoable(null)
+      if (pending) void commitDelete(pending.ids, keepalive)
     },
-  })
+    [commitDelete],
+  )
+
+  useEffect(() => {
+    const flush = () => finishPendingDelete(true)
+    window.addEventListener('pagehide', flush)
+    return () => {
+      window.removeEventListener('pagehide', flush)
+      flush()
+    }
+  }, [finishPendingDelete])
 
   const updateConversation = useMutation({
     mutationFn: ({
@@ -623,9 +654,7 @@ export function ChatPage() {
 
   // Both dialogs keep keyboard focus inside while open. Escape is the safe
   // choice: keep the chat, or deny the tool.
-  const deleteDialogRef = useDialog(Boolean(pendingDelete), () => {
-    if (!deleteConversation.isPending) setPendingDelete(null)
-  })
+  const deleteDialogRef = useDialog(Boolean(pendingDelete), () => setPendingDelete(null))
   const toolDialogRef = useDialog(Boolean(pendingTool), () => {
     if (!toolDeciding) void decidePendingTool(false)
   })
@@ -1233,12 +1262,39 @@ export function ChatPage() {
     event.stopPropagation()
     setListError(null)
     // Native window.confirm is unreliable in the Wails WebView — use in-app confirm.
-    setPendingDelete(conversation)
+    setPendingDelete([conversation])
   }
 
   const confirmDelete = () => {
     if (!pendingDelete) return
-    deleteConversation.mutate(pendingDelete.id)
+    const ids = pendingDelete.map((c) => c.id)
+    setPendingDelete(null)
+    setListError(null)
+    finishPendingDelete()
+    setHiddenIds((current) => new Set([...current, ...ids]))
+    const reopen = selectedId && ids.includes(selectedId) ? selectedId : null
+    if (reopen) {
+      setSelectedId(null)
+      setSendError(null)
+      setStreamingContent(null)
+      setTeamSteps([])
+      setPlanSteps([])
+    }
+    const entry = { ids, reopen }
+    undoRef.current = entry
+    setUndoable(entry)
+    undoTimer.current = window.setTimeout(() => finishPendingDelete(), UNDO_MS)
+  }
+
+  const undoDelete = () => {
+    const pending = undoRef.current
+    if (!pending) return
+    if (undoTimer.current !== null) window.clearTimeout(undoTimer.current)
+    undoTimer.current = null
+    undoRef.current = null
+    setUndoable(null)
+    setHiddenIds((current) => new Set([...current].filter((id) => !pending.ids.includes(id))))
+    if (pending.reopen) setSelectedId(pending.reopen)
   }
 
   const startRename = (conversation: Conversation, event?: MouseEvent) => {
@@ -1343,7 +1399,7 @@ export function ChatPage() {
     <ChatHistoryDrawer
       open={historyOpen}
       mode={historyMode}
-      conversations={conversations}
+      conversations={visibleConversations}
       pinnedIds={pinnedConversationIds}
       selectedId={selectedId}
       loading={conversationsQuery.isLoading}
@@ -1366,6 +1422,10 @@ export function ChatPage() {
       onRename={(conversation) => startRename(conversation)}
       onTogglePin={togglePinnedConversation}
       onDelete={handleDelete}
+      onDeleteMany={(chats) => {
+        setListError(null)
+        setPendingDelete(chats)
+      }}
       onToggleDrawerPinned={() => {
         const next = !chatHistoryPinned
         setChatHistoryPinned(next)
@@ -2085,31 +2145,44 @@ export function ChatPage() {
                 id="delete-chat-title"
                 className="font-display text-lg font-semibold text-ink"
               >
-                {t('deleteDialog.title')}
+                {pendingDelete.length === 1 ? t('deleteDialog.title') : t('deleteDialog.titleMany', { count: pendingDelete.length })}
               </h2>
               <p className="mt-1 break-words text-sm text-ink-muted">
-                {t('deleteDialog.body', { title: pendingDelete.title || t('deleteDialog.untitled') })}
+                {pendingDelete.length === 1
+                  ? t('deleteDialog.body', { title: pendingDelete[0].title || t('deleteDialog.untitled') })
+                  : t('deleteDialog.bodyMany')}
               </p>
+              {pendingDelete.length > 1 && selectedId && pendingDelete.some((c) => c.id === selectedId) ? (
+                <p className="mt-1 text-sm text-ink-muted">{t('deleteDialog.includesOpen')}</p>
+              ) : null}
             </div>
             <div className="flex flex-wrap justify-end gap-2">
               <button
                 type="button"
                 className="btn-secondary"
                 data-autofocus
-                disabled={deleteConversation.isPending}
                 onClick={() => setPendingDelete(null)}
               >
                 {t('deleteDialog.cancel')}
               </button>
-              <button
-                type="button"
-                className="btn-danger"
-                disabled={deleteConversation.isPending}
-                onClick={confirmDelete}
-              >
-                {deleteConversation.isPending ? t('deleteDialog.deleting') : t('deleteDialog.delete')}
+              <button type="button" className="btn-danger" onClick={confirmDelete}>
+                {pendingDelete.length === 1 ? t('deleteDialog.delete') : t('deleteDialog.deleteMany', { count: pendingDelete.length })}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {undoable && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center px-4">
+          <div
+            role="status"
+            className="pointer-events-auto flex items-center gap-3 rounded-xl border border-line/70 bg-surface px-4 py-2.5 text-sm text-ink shadow-panel"
+          >
+            <span>{t('deleteDialog.deleted', { count: undoable.ids.length })}</span>
+            <button type="button" className="font-medium text-primary hover:underline" onClick={undoDelete}>
+              {t('deleteDialog.undo')}
+            </button>
           </div>
         </div>
       )}

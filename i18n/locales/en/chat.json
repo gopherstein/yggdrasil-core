@@ -257,7 +257,15 @@
     "untitled": "Untitled",
     "cancel": "Cancel",
     "delete": "Delete",
-    "deleting": "Deleting…"
+    "titleMany_one": "Delete {{count}} chat?",
+    "titleMany_other": "Delete {{count}} chats?",
+    "bodyMany": "Their messages, attachments, and generated files are removed.",
+    "includesOpen": "One of them is the chat open now.",
+    "deleteMany_one": "Delete {{count}} chat",
+    "deleteMany_other": "Delete {{count}} chats",
+    "deleted_one": "Chat deleted",
+    "deleted_other": "{{count}} chats deleted",
+    "undo": "Undo"
   },
   "history": {
     "label": "Chat history",
@@ -279,6 +287,15 @@
     "rename": "Rename",
     "unpin": "Unpin",
     "delete": "Delete",
+    "select": "Select",
+    "selectHint": "Choose several chats. Shift-click selects a range; Cmd- or Ctrl-click adds one.",
+    "selected_one": "{{count}} selected",
+    "selected_other": "{{count}} selected",
+    "cancelSelect": "Cancel",
+    "selectAll": "Select all",
+    "selectNone": "Select none",
+    "deleteSelected_one": "Delete {{count}}",
+    "deleteSelected_other": "Delete {{count}}",
     "groups": {
       "pinned": "Pinned",
       "today": "Today",

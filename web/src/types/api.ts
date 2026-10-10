@@ -428,6 +428,13 @@ export interface Node {
   address?: string
 }
 
+/** What a bulk delete removed and skipped (#452, contract 1.25). */
+export interface ConversationsDeleted {
+  deleted: string[]
+  /** A chat that doesn't exist or isn't the caller's is not_found. */
+  skipped: { id: string; reason: 'not_found' | string }[]
+}
+
 export interface Conversation {
   id: string
   title: string
