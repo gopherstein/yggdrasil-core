@@ -131,6 +131,32 @@ func (r *ConversationRepo) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
+// DeleteMany removes the request's person's conversations among ids, with
+// their messages, in one transaction (#452), and returns those it removed.
+// An id that isn't one of theirs is left alone.
+func (r *ConversationRepo) DeleteMany(ctx context.Context, ids []string) ([]string, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = tx.Rollback() }()
+	person := auth.PersonID(ctx)
+	deleted := []string{}
+	for _, id := range ids {
+		res, err := tx.ExecContext(ctx, `DELETE FROM conversations WHERE id = ? AND person_id = ?`, id, person)
+		if err != nil {
+			return nil, err
+		}
+		if n, _ := res.RowsAffected(); n > 0 {
+			deleted = append(deleted, id)
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+	return deleted, nil
+}
+
 // DeleteAll removes every conversation and message of the request's person.
 func (r *ConversationRepo) DeleteAll(ctx context.Context) error {
 	person := auth.PersonID(ctx)

@@ -601,6 +601,26 @@ type Conversation struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+// ConversationsDeleteRequest is POST /api/v1/conversations/delete: chats to
+// delete at once (#452, contract 1.25).
+type ConversationsDeleteRequest struct {
+	IDs []string `json:"ids"`
+}
+
+// ConversationsDeleted is what a bulk delete removed, and what it left and
+// why.
+type ConversationsDeleted struct {
+	Deleted []string              `json:"deleted"`
+	Skipped []ConversationSkipped `json:"skipped"`
+}
+
+// ConversationSkipped is a chat a bulk delete left. Reason is not_found:
+// there's no such chat, or it's someone else's.
+type ConversationSkipped struct {
+	ID     string `json:"id"`
+	Reason string `json:"reason"`
+}
+
 // Citation is a source an answer drew on. The product renders citations;
 // the model is not asked to invent citation syntax.
 type Citation struct {

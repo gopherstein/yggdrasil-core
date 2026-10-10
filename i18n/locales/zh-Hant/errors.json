@@ -23,6 +23,7 @@
   "CONVERSATIONS_LIST_FAILED": "無法列出你的聊天。",
   "CONVERSATION_CREATE_FAILED": "無法開始新的聊天。",
   "CONVERSATION_DELETE_FAILED": "{{detail}}",
+  "INVALID_CONVERSATION_IDS": "請指定 1 到 {{max}} 個要刪除的聊天。",
   "CONVERSATION_UPDATE_FAILED": "{{detail}}",
   "CREATE_FAILED": "{{detail}}",
   "DECIDE_FAILED": "{{detail}}",

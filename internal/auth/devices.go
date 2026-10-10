@@ -284,6 +284,7 @@ var deviceRoutes = map[string]bool{
 	"POST /api/v1/conversations":              true,
 	"PATCH /api/v1/conversations/{id}":        true,
 	"DELETE /api/v1/conversations/{id}":       true,
+	"POST /api/v1/conversations/delete":       true,
 	"GET /api/v1/conversations/{id}/messages": true,
 	"GET /api/v1/artifacts/{id}":              true,
 	"GET /api/v1/artifacts/{id}/content":      true,

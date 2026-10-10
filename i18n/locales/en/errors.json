@@ -23,6 +23,7 @@
   "CONVERSATIONS_LIST_FAILED": "Couldn't list your chats.",
   "CONVERSATION_CREATE_FAILED": "Couldn't start a new chat.",
   "CONVERSATION_DELETE_FAILED": "{{detail}}",
+  "INVALID_CONVERSATION_IDS": "Name 1 to {{max}} chats to delete.",
   "CONVERSATION_UPDATE_FAILED": "{{detail}}",
   "CREATE_FAILED": "{{detail}}",
   "DECIDE_FAILED": "{{detail}}",

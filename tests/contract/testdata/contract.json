@@ -1,5 +1,5 @@
 {
-  "version": "1.24",
+  "version": "1.25",
   "types": {
     "ActivityStep": [
       "kind",
@@ -62,6 +62,14 @@
       "profile_id",
       "title",
       "updated_at"
+    ],
+    "ConversationSkipped": [
+      "id",
+      "reason"
+    ],
+    "ConversationsDeleted": [
+      "deleted",
+      "skipped"
     ],
     "EgressRecord": [
       "at",

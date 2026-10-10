@@ -492,14 +492,8 @@ func New(opts Options) (*App, error) {
 				MemoryOff: memoryOff,
 			})
 		},
-		DeleteConversation: func(ctx context.Context, id string) error {
-			if a.Artifacts != nil {
-				if err := a.Artifacts.DeleteConversation(ctx, id); err != nil {
-					return err
-				}
-			}
-			return convRepo.Delete(ctx, id)
-		},
+		DeleteConversation:  a.deleteConversation,
+		DeleteConversations: a.deleteConversations,
 		ListMessages: func(ctx context.Context, id string) ([]contracts.Message, error) {
 			return convRepo.ListMessages(ctx, id)
 		},
