@@ -80,8 +80,11 @@ right. `TestReasoningQuality` measures a model, by kind: how many it got
 right, and the seconds and tokens a question took. A real model isn't held
 to a pass rate; the numbers are the baseline Deliberate is compared
 against. The stub runs one case of each kind, to check the plumbing.
-`TOSKAR_QUALITY_DELIBERATE` names the mode measured (`single` until
-Deliberate exists), `TOSKAR_QUALITY_REASONING_REPORT` writes a Markdown
+`TOSKAR_QUALITY_DELIBERATE` is the mode measured: `single`, or a
+Deliberate setting such as `always`, which each case's profile gets (real
+models only; the stub measures `single`). The Quality workflow's
+**Run workflow** has a `deliberate` input for it; the weekly run measures
+`single`. `TOSKAR_QUALITY_REASONING_REPORT` writes a Markdown
 report, and `TOSKAR_QUALITY_REASONING_JSON` the results. The weekly
 real-model run includes it.
 

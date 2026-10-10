@@ -159,8 +159,11 @@ func TestReasoningCases(t *testing.T) {
 func TestReasoningQuality(t *testing.T) {
 	cases := loadReasoning(t)
 	d, build := qualityDriver(t)
+	// The mode measured: single, or a Deliberate setting such as always,
+	// which the case's profile gets. The stub's scripted replies can't
+	// deliberate, so it always measures single.
 	mode := config.Env("QUALITY_DELIBERATE")
-	if mode == "" {
+	if mode == "" || d.Name() == "stub" {
 		mode = "single"
 	}
 	var results []reasoningResult
@@ -180,6 +183,9 @@ func TestReasoningQuality(t *testing.T) {
 			// Reasoning, not looking it up.
 			Setup: Setup{Tools: map[string]string{"internet.search": "deny", "internet.open": "deny"}},
 		}
+		if mode != "single" {
+			c.Setup.Deliberate = mode
+		}
 		if d.Name() == "stub" {
 			// The same reply for any correction pass the checks ask for.
 			reply := "Working it through step by step.\nFinal answer: " + rc.Solution
@@ -189,7 +195,10 @@ func TestReasoningQuality(t *testing.T) {
 			break
 		}
 		res := reasoningResult{ID: rc.ID, Kind: rc.Kind, Error: "the case stopped before it could be checked; see its log"}
+		// A case left out by -run doesn't count: only the ones that ran do.
+		ran := false
 		t.Run(rc.ID, func(t *testing.T) {
+			ran = true
 			r := d.Run(t, c)
 			res.Error = ""
 			res.Final = finalAnswer(r.Answer)
@@ -214,7 +223,9 @@ func TestReasoningQuality(t *testing.T) {
 				}
 			}
 		})
-		results = append(results, res)
+		if ran {
+			results = append(results, res)
+		}
 	}
 	sum := summarize(results)
 	t.Logf("reasoning with the %s model, %s: %s", d.Name(), mode, sum.line())

@@ -70,6 +70,9 @@ type Setup struct {
 	Tools map[string]string `json:"tools"`
 	// Topics are the profile's topic controls (#345).
 	Topics *contracts.TopicPolicy `json:"topics"`
+	// Deliberate is the profile's orchestration.deliberate (#459), for
+	// measuring a mode; empty leaves the profile's own.
+	Deliberate string `json:"deliberate"`
 }
 
 // Expect is the behavior a case checks. Empty fields are not checked.
