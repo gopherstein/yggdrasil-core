@@ -67,30 +67,8 @@ func (d *Downloader) Download(ctx context.Context, entry CatalogEntry) error {
 	if need == 0 {
 		need = 1
 	}
-	avail, err := d.storage.AvailableDiskBytes()
-	if err != nil {
+	if err := d.checkSpace(ctx, need); err != nil {
 		return err
-	}
-	if avail < need {
-		return fmt.Errorf("insufficient disk space: need %d bytes, have %d", need, avail)
-	}
-	if d.QuotaLimitBytes != nil {
-		limit, qerr := d.QuotaLimitBytes(ctx)
-		if qerr != nil {
-			return qerr
-		}
-		if limit > 0 {
-			used, uerr := d.storage.SumInstalledBytes(ctx)
-			if uerr != nil {
-				return uerr
-			}
-			if used+need > limit {
-				return fmt.Errorf(
-					"model storage limit reached: need %d more bytes, but only %d remain under your %d byte limit (using %d)",
-					need, limit-used, limit, used,
-				)
-			}
-		}
 	}
 
 	downloadID := uuid.NewString()

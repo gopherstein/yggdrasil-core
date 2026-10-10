@@ -580,6 +580,9 @@ func New(opts Options) (*App, error) {
 		DeleteModel: func(ctx context.Context, id, nodeID string) error {
 			return a.deleteModelOn(ctx, id, nodeID)
 		},
+		ImportModel:       a.Models.ImportFile,
+		ModelUploadPath:   a.Models.UploadPath,
+		AdoptModelUpload:  a.Models.AdoptUpload,
 		ListRunningModels: a.listRunningAll,
 		Acceleration:      a.healthAcceleration,
 		StartModel: func(ctx context.Context, id, nodeID string) (contracts.RunningModelView, error) {

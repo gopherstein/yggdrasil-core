@@ -58,8 +58,13 @@ type Dependencies struct {
 	BrowseModels        func(ctx context.Context, query string, limit int) ([]contracts.BrowseModel, error)
 	InstallModel        func(ctx context.Context, id string, wait bool, nodeID string) error
 	InstallModelFromURL func(ctx context.Context, req contracts.InstallFromURLRequest, wait bool) (string, error)
-	DeleteModel         func(ctx context.Context, id string, nodeID string) error
-	ListRunningModels   func(ctx context.Context) ([]contracts.RunningModelView, error)
+	// ImportModel adds a GGUF file on this computer as a model;
+	// ModelUploadPath and AdoptModelUpload add one sent as the body (#467).
+	ImportModel       func(ctx context.Context, req models.ImportRequest) (models.Imported, error)
+	ModelUploadPath   func() (string, error)
+	AdoptModelUpload  func(ctx context.Context, req models.ImportRequest, path string) (models.Imported, error)
+	DeleteModel       func(ctx context.Context, id string, nodeID string) error
+	ListRunningModels func(ctx context.Context) ([]contracts.RunningModelView, error)
 	// Acceleration sums up where this computer's loaded models run, for
 	// health (#317).
 	Acceleration   func(ctx context.Context) string
@@ -270,6 +275,7 @@ func (s *Server) routes() {
 	api.HandleFunc("/models/browse", s.handleBrowseModels).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/models/running", s.handleListRunningModels).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/models/install-from-url", s.handleInstallFromURL).Methods(http.MethodPost)
+	api.HandleFunc("/models/import", s.handleImportModel).Methods(http.MethodPost)
 	api.HandleFunc("/models/{id}/install", s.handleInstallModel).Methods(http.MethodPost)
 	api.HandleFunc("/models/{id}/start", s.handleStartModel).Methods(http.MethodPost)
 	api.HandleFunc("/models/{id}/stop", s.handleStopModel).Methods(http.MethodPost)
