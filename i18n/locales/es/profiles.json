@@ -134,6 +134,8 @@
     "planner": "Planificador",
     "worker": "Trabajador",
     "reviewer": "Revisor",
+    "drafter": "Borrador",
+    "judge": "Juez",
     "numbered": "{{role}} {{n}}",
     "automaticModel": "Modelo automático",
     "pinnedComputer": "Computadora fijada",
@@ -146,7 +148,9 @@
       "planner": "Divide una solicitud en partes.",
       "worker": "Trabaja en una parte de un plan. Las partes pueden ejecutarse en distintas computadoras al mismo tiempo.",
       "reviewer": "Revisa la respuesta antes de que la veas.",
-      "other": "Un paso con nombre en el flujo de trabajo de este perfil."
+      "other": "Un paso con nombre en el flujo de trabajo de este perfil.",
+      "drafter": "Escribe un borrador independiente cuando este perfil compara borradores.",
+      "judge": "Concilia los borradores que no coinciden. Si no se elige, usa el revisor."
     }
   },
   "capabilities": {
@@ -374,6 +378,12 @@
     "context_share": {
       "label": "Presupuesto de contexto",
       "help": "Parte máxima de la ventana que pueden usar los mensajes anteriores (0.1–0.9)."
+    },
+    "deliberate": {
+      "label": "Comparar borradores independientes",
+      "help": "Dos borradores más responden cada pregunta por separado; si sus respuestas finales difieren, se revisan entre sí y un juez escribe la respuesta. Más lento; ideal para matemáticas y razonamiento.",
+      "default": "Desactivado",
+      "always": "Siempre"
     }
   },
   "topics": {

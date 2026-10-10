@@ -134,6 +134,8 @@
     "planner": "Planejador",
     "worker": "Executor",
     "reviewer": "Revisor",
+    "drafter": "Rascunho",
+    "judge": "Juiz",
     "numbered": "{{role}} {{n}}",
     "automaticModel": "Modelo automático",
     "pinnedComputer": "Computador fixo",
@@ -146,7 +148,9 @@
       "planner": "Divide uma solicitação em partes.",
       "worker": "Trabalha em uma parte de um plano. As partes podem ser executadas em computadores diferentes ao mesmo tempo.",
       "reviewer": "Verifica a resposta antes que você a veja.",
-      "other": "Uma etapa nomeada no fluxo de trabalho deste perfil."
+      "other": "Uma etapa nomeada no fluxo de trabalho deste perfil.",
+      "drafter": "Escreve um rascunho independente quando este perfil compara rascunhos.",
+      "judge": "Concilia rascunhos que discordam. Se não definido, usa o revisor."
     }
   },
   "capabilities": {
@@ -374,6 +378,12 @@
     "context_share": {
       "label": "Orçamento de contexto",
       "help": "Parte máxima da janela que as mensagens anteriores podem usar (0,1–0,9)."
+    },
+    "deliberate": {
+      "label": "Comparar rascunhos independentes",
+      "help": "Mais dois rascunhos respondem cada pergunta separadamente; se as respostas finais forem diferentes, eles se verificam e um juiz escreve a resposta. Mais lento; ideal para matemática e raciocínio.",
+      "default": "Desativado",
+      "always": "Sempre"
     }
   },
   "topics": {

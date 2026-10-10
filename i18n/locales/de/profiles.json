@@ -133,6 +133,8 @@
     "planner": "Planer",
     "worker": "Helfer",
     "reviewer": "Prüfer",
+    "drafter": "Entwurf",
+    "judge": "Prüfer",
     "numbered": "{{role}} {{n}}",
     "automaticModel": "Automatisches Modell",
     "pinnedComputer": "Fester Computer",
@@ -145,7 +147,9 @@
       "planner": "Teilt eine Anfrage in Teile auf.",
       "worker": "Bearbeitet einen Teil eines Plans. Teile können gleichzeitig auf verschiedenen Computern laufen.",
       "reviewer": "Prüft die Antwort, bevor du sie siehst.",
-      "other": "Ein benannter Schritt im Ablauf dieses Profils."
+      "other": "Ein benannter Schritt im Ablauf dieses Profils.",
+      "drafter": "Schreibt einen unabhängigen Entwurf, wenn dieses Profil Entwürfe vergleicht.",
+      "judge": "Führt abweichende Entwürfe zusammen. Ohne Auswahl übernimmt das der Prüfer."
     }
   },
   "capabilities": {
@@ -372,6 +376,12 @@
     "context_share": {
       "label": "Kontextbudget",
       "help": "Höchstanteil des Kontextfensters für frühere Nachrichten (0,1–0,9)."
+    },
+    "deliberate": {
+      "label": "Unabhängige Entwürfe vergleichen",
+      "help": "Zwei weitere Entwürfe beantworten jede Frage getrennt; weichen ihre Endantworten ab, prüfen sie sich gegenseitig und ein Prüfer schreibt die Antwort. Langsamer, am besten für Mathematik und logisches Denken.",
+      "default": "Aus",
+      "always": "Immer"
     }
   },
   "topics": {

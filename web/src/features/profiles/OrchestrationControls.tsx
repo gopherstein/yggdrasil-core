@@ -10,6 +10,8 @@ const SELECTS: { key: keyof OrchestrationPolicy; options: string[] }[] = [
   { key: 'verification', options: ['', 'off', 'check', 'correct', 'thorough'] },
   { key: 'memory', options: ['', 'off'] },
   { key: 'fallback', options: ['', 'off'] },
+  // Auto joins when the quality run sets its rule (#459).
+  { key: 'deliberate', options: ['', 'always'] },
 ]
 
 const NUMBERS: { key: keyof OrchestrationPolicy; min: number; max: number; step?: number }[] = [
@@ -51,7 +53,7 @@ export function OrchestrationControls({
   const set = (patch: OrchestrationPolicy) => onChange({ ...value, ...patch })
   const shown = (key: keyof OrchestrationPolicy) => !only || only.includes(key)
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className={only?.length === 1 ? 'grid gap-3' : 'grid gap-3 sm:grid-cols-2'}>
         {SELECTS.filter((s) => shown(s.key)).map((s) => (
           <label key={s.key} className="block text-sm" title={t(`controls.${s.key}.help`)}>
             <span className="text-ink-muted">{t(`controls.${s.key}.label`)}</span>
@@ -63,7 +65,8 @@ export function OrchestrationControls({
             >
               {s.options.map((o) => (
                 <option key={o} value={o}>
-                  {o ? t(`controls.${s.key}.${o}`) : t('controls.default')}
+                  {/* A control can say what its default is, such as Off. */}
+                  {o ? t(`controls.${s.key}.${o}`) : t(`controls.${s.key}.default`, { defaultValue: t('controls.default') })}
                 </option>
               ))}
             </select>

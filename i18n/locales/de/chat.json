@@ -622,5 +622,29 @@
     "edit": "Bearbeiten",
     "editing": "Du bearbeitest deine Nachricht. Senden erstellt eine neue Version; die frühere bleibt.",
     "cancelEdit": "Abbrechen"
+  },
+  "deliberation": {
+    "summary": {
+      "agreed_one": "{{count}} Entwurf · sie stimmten überein",
+      "agreed_other": "{{count}} Entwürfe · sie stimmten überein",
+      "majority_one": "{{count}} Entwurf · die meisten stimmten überein",
+      "majority_other": "{{count}} Entwürfe · die meisten stimmten überein",
+      "disagreed_one": "{{count}} Entwurf · sie wichen ab",
+      "disagreed_other": "{{count}} Entwürfe · sie wichen ab",
+      "long_one": "{{count}} Entwurf · zu lang zum Vergleichen",
+      "long_other": "{{count}} Entwürfe · zu lang zum Vergleichen",
+      "judged_one": "{{count}} Entwurf · ein Prüfer hat sie zusammengeführt",
+      "judged_other": "{{count}} Entwürfe · ein Prüfer hat sie zusammengeführt"
+    },
+    "kept": "Behalten",
+    "failed": "Dieser Entwurf wurde nicht fertig.",
+    "final": "Endgültige Antwort:",
+    "noFinal": "keine angegeben",
+    "showDraft": "Entwurf anzeigen",
+    "hideDraft": "Entwurf ausblenden",
+    "critiques": "Prüfungen",
+    "critique": "Entwurf {{draft}}, geprüft von Entwurf {{critic}}:",
+    "noIssues": "keine Probleme gefunden.",
+    "judgeWrote": "hat die Antwort aus den Entwürfen und Prüfungen geschrieben."
   }
 }
