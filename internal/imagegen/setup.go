@@ -225,7 +225,9 @@ func (s *Setup) unsupported() string {
 func (s *Setup) Status() Status {
 	why := s.unsupported()
 	st := Status{Supported: why == "", Unsupported: why, Release: Release, Program: s.CLI() != "", Active: s.ActiveModel()}
-	st.Ready = st.Supported && st.Program && st.Active != ""
+	// A setup from an earlier release counts as ready: its program is
+	// updated before the next job (update.go).
+	st.Ready = st.Supported && (st.Program || s.stale()) && st.Active != ""
 	memory := s.memory()
 	st.MemoryBytes, st.Accelerated = memory, s.Accelerated()
 	st.Build, st.GPUBuild = s.InstalledBuild(), s.gpuBuildHere()

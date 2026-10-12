@@ -12,7 +12,7 @@ import (
 
 // Release is the stable-diffusion.cpp build setup installs. It is pinned,
 // with each archive's checksum, so an update is a deliberate change here.
-const Release = "master-929-3f8527a"
+const Release = "master-956-1b0ba10"
 
 // Archive is one platform's build.
 type Archive struct {
@@ -43,19 +43,19 @@ func (a Archive) URL() string {
 // which covers NVIDIA, AMD, and Intel at a fraction of the CUDA and ROCm
 // builds' size, and the CPU build otherwise (#154).
 var archives = map[string][]Archive{
-	"darwin/arm64": {{Name: "sd-master-3f8527a-bin-Darwin-macOS-26.6.2-arm64.zip", Size: 35049086,
-		SHA256: "1c8ee6c8e413e3335b1223bbc657ea5d86dae1819f8426a98b84c265587eb192", Build: BuildMetal}},
+	"darwin/arm64": {{Name: "sd-master-1b0ba10-bin-Darwin-macOS-26.6.2-arm64.zip", Size: 35158090,
+		SHA256: "72c18ca1ba4177ca77cd288a9cb1e0f78d63ad3bde4b91fd7c84f3f4187b5761", Build: BuildMetal}},
 	"linux/amd64": {
-		{Name: "sd-master-3f8527a-bin-Linux-Ubuntu-24.04-x86_64-vulkan.zip", Size: 36886217,
-			SHA256: "e35cc73cf5ba9637d1dc1d717760e7b8428376a4905d57e72ec8c871864f62c7", Build: BuildVulkan},
-		{Name: "sd-master-3f8527a-bin-Linux-Ubuntu-24.04-x86_64.zip", Size: 26025088,
-			SHA256: "9ad35ed309dbe59f5e66f35edafac9a69e6cc233ea6b9577071feae829159d37", Build: BuildCPU},
+		{Name: "sd-master-1b0ba10-bin-Linux-Ubuntu-24.04-x86_64-vulkan.zip", Size: 36995435,
+			SHA256: "cecacb8054b4fab56912ee7e109a5f48311cf7a8660c6b311ac3a6eb1156ef73", Build: BuildVulkan},
+		{Name: "sd-master-1b0ba10-bin-Linux-Ubuntu-24.04-x86_64.zip", Size: 26130308,
+			SHA256: "4f6b7e110b641c311f7537b143aae33a3e17b532ead690e391deff972b567da2", Build: BuildCPU},
 	},
 	"windows/amd64": {
-		{Name: "sd-master-3f8527a-bin-win-vulkan-x64.zip", Size: 30067605,
-			SHA256: "60e6850d650417409f18c2170ab5e27335db96da70cd3d1ad1e930bcffc2fd35", Build: BuildVulkan},
-		{Name: "sd-master-3f8527a-bin-win-cpu-x64.zip", Size: 17486440,
-			SHA256: "5e7caca2080321b25a12c1fa4175cb7d953f2b182309f8f73bfc9c725231d26c", Build: BuildCPU},
+		{Name: "sd-master-1b0ba10-bin-win-vulkan-x64.zip", Size: 30123908,
+			SHA256: "9e8b9baff514fe5dfb77e51bf08d85f11e6f10128eac14d4474c87f563309725", Build: BuildVulkan},
+		{Name: "sd-master-1b0ba10-bin-win-cpu-x64.zip", Size: 17543461,
+			SHA256: "39c2ea1cc03f697864c858ad0b22b9b8ce62f945ba428e8596a814527e6db6fb", Build: BuildCPU},
 	},
 }
 

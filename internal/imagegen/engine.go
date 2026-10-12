@@ -161,6 +161,9 @@ func (e *Engine) Generate(ctx context.Context, req Request) (Result, error) {
 	if ok, why := e.Available(); !ok {
 		return Result{}, fmt.Errorf("%s", why)
 	}
+	if err := e.ensureCurrent(ctx); err != nil {
+		return Result{}, err
+	}
 	cli := e.Setup.CLI()
 	model, files, err := e.Setup.paths()
 	if err != nil {
