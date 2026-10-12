@@ -33,6 +33,7 @@ type manifestModel struct {
 	Description    string  `json:"description"`
 	License        string  `json:"license"`
 	MemoryBytes    int64   `json:"memory_bytes"`
+	GraphicsBytes  int64   `json:"graphics_bytes,omitempty"`
 	Edits          bool    `json:"edits,omitempty"`
 	EditOnly       bool    `json:"edit_only,omitempty"`
 	Untested       bool    `json:"untested,omitempty"`
@@ -52,7 +53,7 @@ type manifestModel struct {
 
 func (m manifestModel) model() Model {
 	return Model{ID: m.ID, Name: m.Name, Kind: m.Kind, Tier: m.Tier, Description: m.Description, License: m.License,
-		MemoryBytes: m.MemoryBytes, Edits: m.Edits, EditOnly: m.EditOnly, Untested: m.Untested,
+		MemoryBytes: m.MemoryBytes, GraphicsBytes: m.GraphicsBytes, Edits: m.Edits, EditOnly: m.EditOnly, Untested: m.Untested,
 		Steps: m.Steps, CFG: m.CFG, FlowShift: m.FlowShift, Frames: m.Frames, FPS: m.FPS,
 		HighNoiseSteps: m.HighNoiseSteps, HighNoiseCFG: m.HighNoiseCFG, ModelArgs: m.ModelArgs,
 		NeedsLicense: m.NeedsLicense, LicenseURL: m.LicenseURL, LicenseAllows: m.LicenseAllows,

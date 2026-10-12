@@ -61,7 +61,7 @@ describe('SetupOfferCard', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Set up' }))
     await waitFor(() => expect(onContinue).toHaveBeenCalledWith('Make me an image of a Viking tree'))
-    expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'flux2-klein-4b', undefined)
+    expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'flux2-klein-4b', undefined, { acceptTight: false })
     expect(await screen.findByText('Set up. Finishing your request…')).toBeInTheDocument()
     expect(onContinue).toHaveBeenCalledTimes(1)
   })
@@ -98,7 +98,7 @@ describe('SetupOfferCard', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Set up' }))
     await waitFor(() => expect(onContinue).toHaveBeenCalledWith('Make a video of waves'))
     expect(api.getMediaSetup).toHaveBeenCalledWith('video', undefined)
-    expect(api.startMediaSetup).toHaveBeenCalledWith('video', 'wan2.2-ti2v-5b', undefined)
+    expect(api.startMediaSetup).toHaveBeenCalledWith('video', 'wan2.2-ti2v-5b', undefined, { acceptTight: false })
   })
 
   it('sets up on a paired computer, names it and its free space, and follows the download there', async () => {
@@ -114,7 +114,7 @@ describe('SetupOfferCard', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Set up' }))
     expect(await screen.findByText('Downloading… 1 GB of 5 GB')).toBeInTheDocument()
-    expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'flux2-klein-4b', 'ws')
+    expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'flux2-klein-4b', 'ws', { acceptTight: false })
   })
 
   it('installs a model that can see pictures, then asks again with the pictures (#529)', async () => {

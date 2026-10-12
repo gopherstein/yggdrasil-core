@@ -111,6 +111,8 @@
     "stop": "Interrompi",
     "recommended": "Consigliato per questo computer",
     "untested": "Non ancora testato su hardware reale",
+    "graphicsShort": "La scheda grafica di questo computer ha meno memoria di quella con cui questo modello funziona meglio ({{comfortable}}), quindi una parte gira nella memoria di sistema ed è più lento.",
+    "tightConfirm": "Configuralo comunque: capisco che qui potrebbe essere lento.",
     "needsLicense": "Richiede la tua licenza",
     "licenseLink": "Leggi la licenza",
     "tokenSet": "Il tuo token di Hugging Face è salvato.",

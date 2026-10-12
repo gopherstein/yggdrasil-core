@@ -111,6 +111,8 @@
     "stop": "중지",
     "recommended": "이 컴퓨터에 추천",
     "untested": "아직 실제 하드웨어에서 테스트하지 않음",
+    "graphicsShort": "이 컴퓨터의 그래픽카드 메모리가 이 모델이 원활히 동작하는 용량({{comfortable}})보다 적어 일부가 시스템 메모리에서 실행되므로 더 느립니다.",
+    "tightConfirm": "그래도 설정: 여기서는 느릴 수 있다는 것을 이해합니다.",
     "needsLicense": "라이선스 필요",
     "licenseLink": "라이선스 읽기",
     "tokenSet": "Hugging Face 토큰이 설정되어 있습니다.",

@@ -111,6 +111,8 @@
     "stop": "Stoppen",
     "recommended": "Empfohlen für diesen Computer",
     "untested": "Noch nicht auf echter Hardware getestet",
+    "graphicsShort": "Die Grafikkarte dieses Computers hat weniger Speicher, als dieses Modell am besten braucht ({{comfortable}}), deshalb laufen Teile davon im Arbeitsspeicher und es ist langsamer.",
+    "tightConfirm": "Trotzdem einrichten: Mir ist klar, dass es hier langsam sein kann.",
     "needsLicense": "Braucht deine Lizenz",
     "licenseLink": "Lizenz lesen",
     "tokenSet": "Dein Hugging-Face-Token ist gespeichert.",

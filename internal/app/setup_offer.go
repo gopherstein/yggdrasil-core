@@ -51,7 +51,7 @@ func (a *App) setupOptions(ctx context.Context, s inventory.Snapshot, wait bool)
 			m := best.model
 			out = append(out, inventory.Setup{Ability: k.ability, Option: m.ID, Name: m.Name, SizeBytes: m.SizeBytes,
 				NodeID: best.nodeID, NodeName: best.nodeName, Remote: best.remote, FreeBytes: best.status.FreeBytes,
-				Tools: k.tools, Slow: !best.status.Accelerated, TightMemory: m.TightMemory})
+				Tools: k.tools, Slow: !best.status.Accelerated, TightMemory: m.TightMemory || m.GraphicsShort})
 		}
 	}
 	return out
@@ -94,7 +94,7 @@ func bestSetupPlace(places []setupPlace) (setupPlace, bool) {
 			if p.status.Accelerated {
 				p.score += 100
 			}
-			if !m.TightMemory {
+			if !m.TightMemory && !m.GraphicsShort {
 				p.score += 10
 			}
 			if !p.remote {
@@ -199,7 +199,7 @@ func (a *App) mediaSlow(kind string) bool {
 		return true
 	}
 	for _, m := range setup.Status().Models {
-		if m.ID == setup.ActiveModel() && m.TightMemory {
+		if m.ID == setup.ActiveModel() && (m.TightMemory || m.GraphicsShort) {
 			return true
 		}
 	}

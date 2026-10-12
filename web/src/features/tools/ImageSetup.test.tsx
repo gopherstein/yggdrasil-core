@@ -80,6 +80,20 @@ describe('ImageSetupCard', () => {
 
     fireEvent.click(screen.getByRole('checkbox', { name: /My license covers how I'll use this model/ }))
     fireEvent.click(screen.getByRole('button', { name: /Download/ }))
-    await waitFor(() => expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'flux2-klein-9b', undefined, true))
+    await waitFor(() => expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'flux2-klein-9b', undefined, { acceptLicense: true, acceptTight: undefined }))
+  })
+
+  it('sets up a model that would be slow here only once the person agrees (#550)', async () => {
+    vi.mocked(api.startMediaSetup).mockResolvedValue(null)
+    renderWith({
+      supported: true, ready: true, program: true, release: 'r', active: 'flux2-klein-4b', accelerated: true,
+      models: [model({ installed: true }), model({ id: 'big', name: 'Big', recommended: false, graphics_short: true, graphics_bytes: 16 * 1024 ** 3, verdict: 'tight' })],
+    })
+    fireEvent.click(await screen.findByRole('radio', { name: 'Big' }))
+    expect(screen.getByText(/graphics card has less memory than this model works best with/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Download/ })).toBeDisabled()
+    fireEvent.click(screen.getByRole('checkbox', { name: /Set it up anyway/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Download/ }))
+    await waitFor(() => expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'big', undefined, { acceptLicense: undefined, acceptTight: true }))
   })
 })

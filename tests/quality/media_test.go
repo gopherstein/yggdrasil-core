@@ -321,7 +321,9 @@ func (d realDriver) installMedia(t *testing.T) {
 		} else {
 			t.Logf("setting up %s", s.model)
 		}
-		d.do(t, http.MethodPost, s.path, map[string]any{"model_id": s.model}, nil)
+		// The set agrees to a model that's slow or near the limit here: it
+		// measures it (#550).
+		d.do(t, http.MethodPost, s.path, map[string]any{"model_id": s.model, "accept_tight": true}, nil)
 		deadline := time.Now().Add(installWithin)
 		for !done() {
 			if time.Now().After(deadline) {

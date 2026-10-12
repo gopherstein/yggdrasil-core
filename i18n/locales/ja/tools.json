@@ -111,6 +111,8 @@
     "stop": "停止",
     "recommended": "このコンピュータにおすすめ",
     "untested": "実機ではまだ未テスト",
+    "graphicsShort": "このコンピュータのグラフィックカードは、このモデルが快適に動くメモリ（{{comfortable}}）より少ないため、一部をシステムメモリで動かすので遅くなります。",
+    "tightConfirm": "それでも設定する：ここでは遅くなる可能性があることを理解しています。",
     "needsLicense": "ライセンスが必要",
     "licenseLink": "ライセンスを読む",
     "tokenSet": "Hugging Face のトークンは設定済みです。",

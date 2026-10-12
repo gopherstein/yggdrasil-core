@@ -111,6 +111,8 @@
     "stop": "Parar",
     "recommended": "Recomendado para este computador",
     "untested": "Ainda não testado em hardware real",
+    "graphicsShort": "A placa de vídeo deste computador tem menos memória do que este modelo precisa para funcionar bem ({{comfortable}}), então parte dele roda na memória do sistema e fica mais lento.",
+    "tightConfirm": "Configurar mesmo assim: entendo que pode ser lento aqui.",
     "needsLicense": "Precisa da sua licença",
     "licenseLink": "Ler a licença",
     "tokenSet": "Seu token do Hugging Face está salvo.",

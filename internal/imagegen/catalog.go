@@ -42,8 +42,12 @@ type Model struct {
 	License     string `json:"license"`
 	// MemoryBytes is the memory it is comfortable with; smaller computers
 	// get the smaller model recommended.
-	MemoryBytes int64  `json:"memory_bytes"`
-	Files       []File `json:"files"`
+	MemoryBytes int64 `json:"memory_bytes"`
+	// GraphicsBytes is the graphics memory it is comfortable with on a
+	// computer with its own graphics card; with less, parts of it run from
+	// system memory, more slowly (#550).
+	GraphicsBytes int64  `json:"graphics_bytes,omitempty"`
+	Files         []File `json:"files"`
 	// Edits says whether it can change an image from an instruction, or,
 	// for a video model, animate one.
 	Edits bool `json:"edits"`
