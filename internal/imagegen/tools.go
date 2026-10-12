@@ -245,7 +245,7 @@ func intArg(v any) int {
 
 // detailKeys are what a made picture or clip keeps of how it was made, so
 // it can be made again (#553).
-var detailKeys = []string{"model", "quality", "seed", "prompt", "width", "height", "frames", "length_seconds"}
+var detailKeys = []string{"model", "quality", "seed", "prompt", "width", "height", "frames", "length_seconds", "computer"}
 
 // Details picks those from a picture or clip tool's result.
 func Details(result map[string]any) map[string]any { return details(result) }

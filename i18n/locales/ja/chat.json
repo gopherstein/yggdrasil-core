@@ -105,6 +105,7 @@
   },
   "attachments": {
     "madeWith": "{{model}} · {{size}} · シード {{seed}}",
+    "madeWithOn": "{{model}} · {{size}} · シード {{seed}} · {{computer}} で作成",
     "unsupported": "Toskarはこの種類のファイルをまだ読み取れません",
     "tooLarge": "ファイルは25 MBまでです",
     "addFailed": "ファイルを追加できませんでした。",

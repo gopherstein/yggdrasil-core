@@ -616,6 +616,8 @@ export interface FileRef {
     height?: number
     frames?: number
     length_seconds?: number
+    /** The paired computer that made it, when another one did (#553). */
+    computer?: string
   }
 }
 

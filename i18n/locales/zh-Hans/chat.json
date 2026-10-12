@@ -105,6 +105,7 @@
   },
   "attachments": {
     "madeWith": "{{model}} · {{size}} · 种子 {{seed}}",
+    "madeWithOn": "{{model}} · {{size}} · 种子 {{seed}} · 在 {{computer}} 上",
     "unsupported": "Toskar 暂时无法读取这种类型的文件",
     "tooLarge": "文件最大为 25 MB",
     "addFailed": "无法添加该文件。",
