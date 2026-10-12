@@ -6,7 +6,7 @@ Better hardware makes a model faster, or lets a larger model run. It doesn't cha
 
 ## Quality
 
-Each model has a tier: **fast**, **balanced**, or **best**. Asking for "a high-quality picture" or "a quick draft" uses the set-up model of that tier, and the image and video tools take `quality` (`fast`, `balanced`, or `best`). When that model isn't set up, the current one makes it, and the answer names the model that would give the quality asked for. Edits and clips from a picture use the model that can make them, whatever the quality.
+Each model has a tier: **fast**, **balanced**, or **best**. Asking for "a high-quality picture" or "a quick draft" uses the set-up model of that tier, and the image and video tools take `quality` (`fast`, `balanced`, or `best`). When that model isn't set up, the current one makes it, and the answer names the model that would give the quality asked for. A profile can set the quality used when a request doesn't ask for one (**Profiles & Orchestration → Behavior → Picture and clip quality**), and each answer's steps say which model made the picture or clip. Edits and clips from a picture use the model that can make them, whatever the quality.
 
 | Tier | Pictures | Clips |
 | --- | --- | --- |

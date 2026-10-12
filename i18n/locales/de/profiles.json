@@ -377,6 +377,14 @@
       "label": "Kontextbudget",
       "help": "Höchstanteil des Kontextfensters für frühere Nachrichten (0,1–0,9)."
     },
+    "media_quality": {
+      "label": "Qualität für Bilder und Clips",
+      "help": "Gilt, wenn eine Anfrage keine Qualität nennt: schnell, ausgewogen oder beste, jeweils mit eigenem Modell.",
+      "default": "Modell des Computers",
+      "fast": "Schnell",
+      "balanced": "Ausgewogen",
+      "best": "Beste"
+    },
     "deliberate": {
       "label": "Unabhängige Entwürfe vergleichen",
       "help": "Zwei weitere Entwürfe beantworten jede Frage getrennt; weichen ihre Endantworten ab, prüfen sie sich gegenseitig und ein Prüfer schreibt die Antwort. Langsamer, am besten für Mathematik und logisches Denken.",

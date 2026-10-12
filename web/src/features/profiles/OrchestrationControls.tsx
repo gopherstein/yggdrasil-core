@@ -12,6 +12,7 @@ const SELECTS: { key: keyof OrchestrationPolicy; options: string[] }[] = [
   { key: 'fallback', options: ['', 'off'] },
   // Auto joins when the quality run sets its rule (#459).
   { key: 'deliberate', options: ['', 'always'] },
+  { key: 'media_quality', options: ['', 'fast', 'balanced', 'best'] },
 ]
 
 const NUMBERS: { key: keyof OrchestrationPolicy; min: number; max: number; step?: number }[] = [

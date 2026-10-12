@@ -379,6 +379,14 @@
       "label": "Budget de contexte",
       "help": "Part maximale de la fenêtre que les messages précédents peuvent occuper (0.1–0.9)."
     },
+    "media_quality": {
+      "label": "Qualité des images et des clips",
+      "help": "Utilisée quand une demande ne précise pas de qualité : rapide, équilibrée ou la meilleure, chacune avec son propre modèle.",
+      "default": "Le modèle de l’ordinateur",
+      "fast": "Rapide",
+      "balanced": "Équilibrée",
+      "best": "La meilleure"
+    },
     "deliberate": {
       "label": "Comparer des brouillons indépendants",
       "help": "Deux brouillons de plus répondent séparément à chaque question ; si leurs réponses finales diffèrent, ils se vérifient mutuellement et un arbitre rédige la réponse. Plus lent, idéal pour les maths et le raisonnement.",

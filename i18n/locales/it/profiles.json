@@ -379,6 +379,14 @@
       "label": "Budget di contesto",
       "help": "Quota massima della finestra che i messaggi precedenti possono usare (0.1–0.9)."
     },
+    "media_quality": {
+      "label": "Qualità di immagini e clip",
+      "help": "Usata quando una richiesta non chiede una qualità: veloce, bilanciata o la migliore, ognuna con il suo modello.",
+      "default": "Il modello del computer",
+      "fast": "Veloce",
+      "balanced": "Bilanciata",
+      "best": "La migliore"
+    },
     "deliberate": {
       "label": "Confronta bozze indipendenti",
       "help": "Altre due bozze rispondono separatamente a ogni domanda; se le risposte finali differiscono, si controllano a vicenda e un giudice scrive la risposta. Più lento, ideale per matematica e ragionamento.",

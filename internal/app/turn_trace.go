@@ -401,6 +401,13 @@ func (t *turnTrace) tool(toolID string, args, result map[string]any) {
 			t.automation = draft
 			t.step("automation", "draftedAutomation", map[string]any{"name": draft.Name})
 		}
+	case "image.generate", "image.edit", "video.generate":
+		// Which model made it, so a picture or clip can be made again the
+		// same way (#549).
+		if model := str(result, "model"); model != "" {
+			key := map[string]string{"image.generate": "madePicture", "image.edit": "editedPicture", "video.generate": "madeClip"}[toolID]
+			t.step("create", key, map[string]any{"model": model})
+		}
 	case "terminal":
 		t.untrusted = true
 		t.step("command", "ranCommand", nil)

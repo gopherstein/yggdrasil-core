@@ -377,6 +377,14 @@
       "label": "Context budget",
       "help": "Most of the window earlier messages may use (0.1–0.9)."
     },
+    "media_quality": {
+      "label": "Picture and clip quality",
+      "help": "Used when a request doesn't ask for a quality: fast, balanced, or best, each with its own model.",
+      "default": "The computer's model",
+      "fast": "Fast",
+      "balanced": "Balanced",
+      "best": "Best"
+    },
     "deliberate": {
       "label": "Compare independent drafts",
       "help": "Two more drafts answer each question separately; when their final answers differ, they check each other and a judge writes the answer. Slower, and best for math and reasoning.",

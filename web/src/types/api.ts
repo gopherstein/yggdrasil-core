@@ -405,6 +405,8 @@ export interface OrchestrationPolicy {
   fallback_models?: string[]
   /** Whether answers are drafted independently and compared (#459). */
   deliberate?: '' | 'never' | 'always' | 'auto'
+  /** The quality pictures and clips are made at when a request doesn't ask: fast, balanced, or best (#549). */
+  media_quality?: '' | 'fast' | 'balanced' | 'best'
   retries?: number
   timeout_seconds?: number
 }
