@@ -268,12 +268,12 @@ func (s *Setup) installed(id string) bool {
 // the first installed one.
 func (s *Setup) ActiveModel() string {
 	if raw, err := os.ReadFile(filepath.Join(s.ModelsDir, "active")); err == nil {
-		if id := strings.TrimSpace(string(raw)); s.installed(id) {
+		if id := strings.TrimSpace(string(raw)); s.installed(id) && !s.editOnly(id) {
 			return id
 		}
 	}
 	for _, m := range s.models() {
-		if s.installed(m.ID) {
+		if s.installed(m.ID) && !m.EditOnly {
 			return m.ID
 		}
 	}
@@ -282,6 +282,12 @@ func (s *Setup) ActiveModel() string {
 
 // paths returns the active model and its files by role.
 func (s *Setup) paths() (Model, map[string]string, error) { return s.pathsFor(false) }
+
+// editOnly reports a model that only edits, which is never the active one.
+func (s *Setup) editOnly(id string) bool {
+	m, ok := s.lookup(id)
+	return ok && m.EditOnly
+}
 
 // canEdit reports an installed model that can edit pictures.
 func (s *Setup) canEdit() bool {
@@ -318,11 +324,21 @@ func (s *Setup) pathsFor(edit bool) (Model, map[string]string, error) {
 	if !ok {
 		return Model{}, nil, errors.New("no model is installed")
 	}
-	if edit && !m.Edits {
+	if edit {
+		// A model made for editing comes first, then the active model if
+		// it edits, then any installed model that edits.
 		for _, other := range s.models() {
-			if other.Edits && s.installed(other.ID) {
+			if other.EditOnly && s.installed(other.ID) {
 				m, id = other, other.ID
 				break
+			}
+		}
+		if !m.Edits {
+			for _, other := range s.models() {
+				if other.Edits && s.installed(other.ID) {
+					m, id = other, other.ID
+					break
+				}
 			}
 		}
 	}
@@ -441,6 +457,10 @@ func (s *Setup) install(ctx context.Context, j *job, m Model, program bool, arch
 		if err := os.WriteFile(filepath.Join(dir, "ready"), []byte(m.ID+"\n"), 0o644); err != nil {
 			return err
 		}
+	}
+	// An editor is used for edits beside the picture model, not in its place.
+	if m.EditOnly {
+		return nil
 	}
 	return os.WriteFile(filepath.Join(s.ModelsDir, "active"), []byte(m.ID+"\n"), 0o644)
 }

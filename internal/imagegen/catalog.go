@@ -6,7 +6,9 @@ package imagegen
 
 // File is one download a model needs.
 type File struct {
-	// Role is how sd-cli takes it: diffusion, vae, or llm (the text encoder).
+	// Role is how sd-cli takes it: diffusion, vae, llm (the text encoder),
+	// or llm_vision (the text encoder's image encoder, for an editor that
+	// reads the picture it changes).
 	Role   string `json:"role"`
 	Repo   string `json:"repo"`
 	Path   string `json:"path"`
@@ -44,6 +46,12 @@ type Model struct {
 	// real hardware (#548, #553): it can be chosen, but it's never
 	// recommended or picked for the person.
 	Untested bool `json:"untested,omitempty"`
+	// EditOnly is a model that changes pictures but doesn't make new ones:
+	// edits prefer it, and new pictures never use it.
+	EditOnly bool `json:"edit_only,omitempty"`
+	// ModelArgs is passed to sd-cli as --model-args, for a model that needs
+	// one to work as intended.
+	ModelArgs string `json:"-"`
 	// Steps and CFG are its sampling defaults; FlowShift, Frames, and FPS
 	// are a video model's.
 	Steps     int     `json:"-"`
@@ -74,6 +82,9 @@ var revisions = map[string]string{
 	"leejet/Z-Image-Turbo-GGUF":              "c61c0e422dc8b541b7548cf33a4ef8302b0f8085",
 	"unsloth/Qwen3-4B-Instruct-2507-GGUF":    "a06e946bb6b655725eafa393f4a9745d460374c9",
 	"Comfy-Org/z_image_turbo":                "6fc90a3b1b653e935a0d175e260736de25b84df5",
+	"unsloth/Qwen-Image-Edit-2511-GGUF":      "0d33d9692b4b26212297240d87b0d4719aa4fd06",
+	"unsloth/Qwen2.5-VL-7B-Instruct-GGUF":    "68bb8bc4b7df5289c143aaec0ab477a7d4051aab",
+	"Comfy-Org/Qwen-Image_ComfyUI":           "1f12b17be14c89b026c51a91d67c32f84bb047bc",
 }
 
 var vae = File{Role: "vae", Repo: "black-forest-labs/FLUX.2-small-decoder", Path: "full_encoder_small_decoder.safetensors",
@@ -123,6 +134,26 @@ func Catalog() []Model {
 					Size: 2497281120, SHA256: "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597"},
 				{Role: "vae", Repo: "Comfy-Org/z_image_turbo", Path: "split_files/vae/ae.safetensors",
 					Size: 335304388, SHA256: "afc8e28272cd15db3919bacdb6918ce9c1ed22e96cb12c4d5ed0fba823529e38"},
+			},
+		},
+		// Qwen-Image-Edit-2511 (Qwen) changes a picture from an instruction,
+		// keeping what wasn't asked to change, and edits text in pictures. It
+		// only edits. 2511 needs zero_cond_t, or its edits degrade. It, its
+		// Qwen2.5-VL text encoder, and its VAE are Apache 2.0.
+		{
+			ID: "qwen-image-edit-2511", Name: "Qwen-Image-Edit-2511", Kind: "image", Untested: true,
+			Description: "Changes pictures from an instruction, keeping the rest, and edits text in them. It only edits; a large download for computers with 32 GB of memory or more.",
+			License:     "Apache-2.0", MemoryBytes: 32 << 30, Edits: true, EditOnly: true, Steps: 20, CFG: 2.5, FlowShift: 3,
+			ModelArgs: "qwen_image_zero_cond_t=true",
+			Files: []File{
+				{Role: "diffusion", Repo: "unsloth/Qwen-Image-Edit-2511-GGUF", Path: "qwen-image-edit-2511-Q4_K_M.gguf",
+					Size: 13244758624, SHA256: "8677bac90627adbbc11efab87b1870e701c4eb3689ee865a3de8ab81b705a723"},
+				{Role: "llm", Repo: "unsloth/Qwen2.5-VL-7B-Instruct-GGUF", Path: "Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf",
+					Size: 4683072384, SHA256: "d16776dcd9a28d42758c2958ed3a752aabf20a305252cd64ff2be72b4a78c503"},
+				{Role: "llm_vision", Repo: "unsloth/Qwen2.5-VL-7B-Instruct-GGUF", Path: "mmproj-F16.gguf",
+					Size: 1354163040, SHA256: "987dd0733033fb5dd9b124d1ca926ae865572e432384eee7618b2eec3e735e17"},
+				{Role: "vae", Repo: "Comfy-Org/Qwen-Image_ComfyUI", Path: "split_files/vae/qwen_image_vae.safetensors",
+					Size: 253806246, SHA256: "a70580f0213e67967ee9c95f05bb400e8fb08307e017a924bf3441223e023d1f"},
 			},
 		},
 	}

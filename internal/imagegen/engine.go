@@ -218,6 +218,15 @@ func (e *Engine) Generate(ctx context.Context, req Request) (Result, error) {
 		// computer with less graphics memory can still run the model.
 		"--offload-to-cpu", "--diffusion-fa",
 	}
+	if v := files["llm_vision"]; v != "" {
+		args = append(args, "--llm_vision", v)
+	}
+	if model.FlowShift > 0 {
+		args = append(args, "--flow-shift", strconv.FormatFloat(model.FlowShift, 'f', -1, 64))
+	}
+	if model.ModelArgs != "" {
+		args = append(args, "--model-args", model.ModelArgs)
+	}
 	if req.Reference != nil {
 		ext := strings.ToLower(filepath.Ext(req.RefName))
 		if ext != ".jpg" && ext != ".jpeg" {

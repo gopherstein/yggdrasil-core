@@ -286,31 +286,44 @@ func (d realDriver) installMedia(t *testing.T) {
 		var status struct {
 			Ready  bool   `json:"ready"`
 			Active string `json:"active"`
-			Job    *struct {
+			Models []struct {
+				ID        string `json:"id"`
+				Installed bool   `json:"installed"`
+				EditOnly  bool   `json:"edit_only"`
+			} `json:"models"`
+			Job *struct {
 				Running bool   `json:"running"`
 				Error   string `json:"error"`
 			} `json:"job"`
 		}
 		d.do(t, http.MethodGet, s.path, nil, &status)
-		// Setting a model up makes it the active one.
-		if status.Ready && status.Active != s.model {
-			t.Logf("setting up %s in place of %s", s.model, status.Active)
-			d.do(t, http.MethodPost, s.path, map[string]any{"model_id": s.model}, nil)
-			status.Ready = false
-		} else if !status.Ready {
-			t.Logf("setting up %s", s.model)
-			d.do(t, http.MethodPost, s.path, map[string]any{"model_id": s.model}, nil)
+		// Setting a model up makes it the active one, except a model that
+		// only edits, which is used for edits beside it: that one is done
+		// when it's installed.
+		done := func() bool {
+			for _, m := range status.Models {
+				if m.ID == s.model && m.EditOnly {
+					return m.Installed
+				}
+			}
+			return status.Ready && status.Active == s.model
 		}
+		if done() {
+			continue
+		}
+		if status.Ready {
+			t.Logf("setting up %s beside %s", s.model, status.Active)
+		} else {
+			t.Logf("setting up %s", s.model)
+		}
+		d.do(t, http.MethodPost, s.path, map[string]any{"model_id": s.model}, nil)
 		deadline := time.Now().Add(installWithin)
-		for !status.Ready {
+		for !done() {
 			if time.Now().After(deadline) {
 				t.Fatalf("%s wasn't ready within %s", s.model, installWithin)
 			}
 			time.Sleep(10 * time.Second)
 			d.do(t, http.MethodGet, s.path, nil, &status)
-			if status.Active != s.model {
-				status.Ready = false
-			}
 			if status.Job != nil && !status.Job.Running && status.Job.Error != "" {
 				t.Fatalf("setting up %s failed: %s", s.model, status.Job.Error)
 			}
