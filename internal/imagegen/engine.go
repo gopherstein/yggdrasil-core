@@ -8,6 +8,7 @@ import (
 	"image"
 	_ "image/jpeg" // DecodeConfig reads the size of an image to edit
 	_ "image/png"
+	"log/slog"
 	"math"
 	"math/rand/v2"
 	"os"
@@ -41,6 +42,11 @@ type Engine struct {
 	// What names what it makes in messages: image generation (the
 	// default) or video generation.
 	What string
+	// Room, when set, frees memory for a job needing need bytes before it
+	// starts and keeps it free until release is called (#541).
+	Room func(ctx context.Context, need int64, what string) (release func(), err error)
+	// Logger records what sd-cli printed when a job fails.
+	Logger *slog.Logger
 
 	// mu runs one image at a time; each uses all of the memory it can.
 	mu sync.Mutex
@@ -186,6 +192,11 @@ func (e *Engine) Generate(ctx context.Context, req Request) (Result, error) {
 
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	release, err := e.makeRoom(ctx, model, "image")
+	if err != nil {
+		return Result{}, err
+	}
+	defer release()
 	if err := os.MkdirAll(e.WorkDir, 0o700); err != nil {
 		return Result{}, err
 	}
@@ -228,7 +239,10 @@ func (e *Engine) Generate(ctx context.Context, req Request) (Result, error) {
 func (e *Engine) runWithFallback(ctx context.Context, cli, dir string, args []string, out, what string, limit time.Duration) ([]byte, error) {
 	data, err := runCLI(ctx, cli, dir, args, out, what, limit)
 	var failed *cliError
-	if err == nil || !errors.As(err, &failed) || !gpuFailure(failed.output) || e.Setup.InstalledBuild() != BuildVulkan {
+	if errors.As(err, &failed) && e.Logger != nil {
+		e.Logger.Warn("sd-cli failed", "what", what, "kind", failed.kind, "output", lastBytes(failed.output, 4<<10))
+	}
+	if err == nil || failed == nil || !gpuFailure(failed.output) || e.Setup.InstalledBuild() != BuildVulkan {
 		return data, err
 	}
 	if ferr := e.Setup.fallBackToCPU(ctx); ferr != nil {
@@ -241,9 +255,20 @@ func (e *Engine) runWithFallback(ctx context.Context, cli, dir string, args []st
 type cliError struct {
 	msg    string
 	output string
+	kind   string
 }
 
 func (e *cliError) Error() string { return e.msg }
+
+// Kind is the failure's kind, such as FailureMemory.
+func (e *cliError) Kind() string { return e.kind }
+
+func lastBytes(s string, n int) string {
+	if len(s) <= n {
+		return s
+	}
+	return s[len(s)-n:]
+}
 
 // gpuStartFailures are what a Vulkan build prints when it can't start on
 // the GPU at all: no device, no loader, or a driver that won't initialize.
@@ -283,7 +308,8 @@ func runCLI(ctx context.Context, cli, dir string, args []string, out, what strin
 		if ctx.Err() != nil {
 			return nil, ctx.Err()
 		}
-		return nil, &cliError{msg: fmt.Sprintf("the %s could not be made: %s", what, stderr.lastLine(err)), output: string(stderr.b)}
+		kind := failureKind(string(stderr.b), err)
+		return nil, &cliError{msg: failureMessage(kind, what, stderr.lastLine(err)), output: string(stderr.b), kind: kind}
 	}
 	data, err := os.ReadFile(out)
 	if err != nil {

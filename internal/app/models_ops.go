@@ -166,6 +166,9 @@ func (a *App) startModelLocal(ctx context.Context, modelID string) (contracts.Ru
 	if err != nil {
 		return contracts.RunningModelView{}, err
 	}
+	if err := a.waitForMedia(ctx, modelID); err != nil {
+		return contracts.RunningModelView{}, err
+	}
 	running, err := a.Runtimes.StartModel(ctx, "llamacpp", pluginapi.ModelStartConfig{
 		ModelID: modelID, ModelPath: path, Adapters: a.localAdapters(ctx, modelID),
 		Projector: a.Models.ProjectorPath(modelID),
