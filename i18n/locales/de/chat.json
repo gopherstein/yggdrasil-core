@@ -497,6 +497,9 @@
   },
   "notices": {
     "languageWeak": "{{model}} schreibt {{language}} womöglich weniger gut als Englisch, und kein installiertes Modell, das passt, kann es besser. Modelle mit guter Bewertung für {{language}} findest du unter „Modelle“.",
+    "mediaLength": "Clips können vorerst höchstens {{max}} s lang sein, deshalb ist dieser {{made}} s statt der gewünschten {{asked}} s lang.",
+    "mediaSizePicture": "{{model}} erstellt Bilder bis {{made}}, deshalb ist dieses kleiner als die gewünschten {{asked}}.",
+    "mediaSizeClip": "{{model}} erstellt Clips bis {{made}}, deshalb ist dieser kleiner als die gewünschten {{asked}}.",
     "noVision": "Kein installiertes Modell kann Bilder sehen, deshalb geht die Antwort nicht auf sie ein. Installiere Gemma 3 4B oder ein anderes Bildmodell unter „Modelle“.",
     "unconfirmedFigures": "Toskar konnte {{figures}} in den Quellen nicht bestätigen. Prüfe das, bevor du dich darauf verlässt.",
     "codeErrors": "Ein Teil des Codes lässt sich nicht parsen: {{errors}}. Behebe das, bevor du ihn ausführst.",

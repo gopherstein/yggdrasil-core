@@ -516,6 +516,9 @@
   },
   "notices": {
     "languageWeak": "Puede que {{model}} escriba en {{language}} peor que en inglés, y ningún modelo instalado que quepa lo hace mejor. En la página Modelos encontrarás modelos con buena valoración en {{language}}.",
+    "mediaLength": "Por ahora los clips duran como máximo {{max}} s, así que este dura {{made}} s en lugar de los {{asked}} s pedidos.",
+    "mediaSizePicture": "{{model}} hace imágenes de hasta {{made}}, así que esta es más pequeña que los {{asked}} pedidos.",
+    "mediaSizeClip": "{{model}} hace clips de hasta {{made}}, así que este es más pequeño que los {{asked}} pedidos.",
     "noVision": "Ningún modelo instalado puede ver imágenes, así que la respuesta no las mira. Instala Gemma 3 4B u otro modelo de visión en la página Modelos.",
     "unconfirmedFigures": "Toskar no pudo confirmar {{figures}} en las fuentes. Compruébalo antes de fiarte.",
     "codeErrors": "Parte del código no se puede analizar: {{errors}}. Corrígelo antes de ejecutarlo.",

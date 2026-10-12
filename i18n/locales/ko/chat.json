@@ -478,6 +478,9 @@
   },
   "notices": {
     "languageWeak": "{{model}}은(는) 영어보다 {{language}}를 덜 잘 쓸 수 있고, 설치된 모델 중 이 컴퓨터에 맞으면서 더 잘 쓰는 모델이 없어요. {{language}} 평가가 좋은 모델은 모델 페이지에서 볼 수 있어요.",
+    "mediaLength": "지금은 클립 길이가 최대 {{max}}초라서, 이 클립은 요청한 {{asked}}초가 아닌 {{made}}초입니다.",
+    "mediaSizePicture": "{{model}}은(는) 최대 {{made}} 크기의 이미지를 만들 수 있어, 이 이미지는 요청한 {{asked}}보다 작습니다.",
+    "mediaSizeClip": "{{model}}은(는) 최대 {{made}} 크기의 클립을 만들 수 있어, 이 클립은 요청한 {{asked}}보다 작습니다.",
     "noVision": "그림을 볼 수 있는 모델이 설치되어 있지 않아서 답변이 그림을 보지 않았어요. 모델 페이지에서 Gemma 3 4B 같은 비전 모델을 설치하세요.",
     "unconfirmedFigures": "Toskar가 소스에서 {{figures}}을(를) 확인하지 못했어요. 믿기 전에 확인하세요.",
     "codeErrors": "코드 일부에 구문 오류가 있습니다: {{errors}}. 실행하기 전에 고치세요.",
