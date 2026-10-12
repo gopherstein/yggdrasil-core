@@ -661,7 +661,8 @@ export interface ImageModel {
   /** This computer has less memory than it's comfortable with, so it may be slow or fail. */
   tight_memory?: boolean
   /** Not yet tested on real hardware: it can be chosen, but it's never recommended (#548). */
-  untested?: boolean
+  untested?: boolean  /** It changes pictures but doesn't make new ones: edits prefer it, and it's never the active model (#548). */
+  edit_only?: boolean
 }
 
 /** What image generation has installed, and any setup in progress. */
