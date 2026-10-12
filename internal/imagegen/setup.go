@@ -281,11 +281,50 @@ func (s *Setup) ActiveModel() string {
 }
 
 // paths returns the active model and its files by role.
-func (s *Setup) paths() (Model, map[string]string, error) {
+func (s *Setup) paths() (Model, map[string]string, error) { return s.pathsFor(false) }
+
+// canEdit reports an installed model that can edit pictures.
+func (s *Setup) canEdit() bool {
+	for _, m := range s.models() {
+		if m.Edits && s.installed(m.ID) {
+			return true
+		}
+	}
+	return false
+}
+
+// editModelMissing says what to set up to edit pictures.
+func editModelMissing(s *Setup) string {
+	name := "A model that edits pictures"
+	for _, m := range s.models() {
+		if m.Edits && !m.Untested {
+			name = m.Name
+			break
+		}
+	}
+	active := "The model set up here"
+	if m, ok := s.lookup(s.ActiveModel()); ok {
+		active = m.Name
+	}
+	return fmt.Sprintf("%s can't edit pictures. Set up %s on the Tools page to edit them.", active, name)
+}
+
+// pathsFor returns the model for a job and its files by role: the active
+// model, or for an edit the active model can't make, an installed one that
+// can (#548).
+func (s *Setup) pathsFor(edit bool) (Model, map[string]string, error) {
 	id := s.ActiveModel()
 	m, ok := s.lookup(id)
 	if !ok {
 		return Model{}, nil, errors.New("no model is installed")
+	}
+	if edit && !m.Edits {
+		for _, other := range s.models() {
+			if other.Edits && s.installed(other.ID) {
+				m, id = other, other.ID
+				break
+			}
+		}
 	}
 	out := map[string]string{}
 	for _, f := range m.Files {

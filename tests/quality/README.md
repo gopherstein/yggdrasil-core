@@ -120,6 +120,9 @@ runs; a real daemon at least 75% (`TOSKAR_QUALITY_MEDIA_MIN_PASS`), since
 another model does the judging. `TOSKAR_QUALITY_MEDIA_INSTALL` sets up
 picture and video making, the judge, and speech first. The weekly run
 includes it once, with the recommended models.
+`TOSKAR_QUALITY_MEDIA_IMAGE_MODEL` (the workflow's `image_model` input)
+tests another picture model, such as one marked untested (#548); FLUX.2
+[klein] 4B is still set up, for edits.
 
 ## Running it
 

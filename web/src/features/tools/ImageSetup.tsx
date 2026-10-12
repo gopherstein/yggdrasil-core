@@ -143,6 +143,7 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
                 <p className="text-sm font-medium text-ink">
                   {model.name}
                   {model.recommended ? <span className="ms-2 text-xs font-normal text-success">{t('images.recommended')}</span> : null}
+                  {model.untested ? <span className="ms-2 text-xs font-normal text-warning">{t('images.untested')}</span> : null}
                   {model.id === status.active ? <span className="ms-2 text-xs font-normal text-ink-faint">{t('images.inUse')}</span> : null}
                 </p>
                 <p className="mt-0.5 text-xs text-ink-muted">{model.description}</p>

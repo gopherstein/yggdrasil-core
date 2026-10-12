@@ -165,14 +165,14 @@ func (e *Engine) Generate(ctx context.Context, req Request) (Result, error) {
 		return Result{}, err
 	}
 	cli := e.Setup.CLI()
-	model, files, err := e.Setup.paths()
+	model, files, err := e.Setup.pathsFor(req.Reference != nil)
 	if err != nil {
 		return Result{}, err
 	}
 	w, h := req.Width, req.Height
 	if req.Reference != nil {
 		if !model.Edits {
-			return Result{}, fmt.Errorf("%s cannot edit images", model.Name)
+			return Result{}, errors.New(editModelMissing(e.Setup))
 		}
 		cfg, _, err := image.DecodeConfig(bytes.NewReader(req.Reference))
 		if err != nil {

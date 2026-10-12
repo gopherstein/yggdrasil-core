@@ -110,6 +110,7 @@
     "progress": "{{done}} / {{total}}",
     "stop": "停止",
     "recommended": "推薦給這台電腦",
+    "untested": "尚未在真實硬體上測試",
     "inUse": "使用中",
     "makesAndEdits": " · 製作和編輯圖片",
     "makes": " · 製作圖片",

@@ -110,6 +110,7 @@
     "progress": "{{done}}/{{total}}",
     "stop": "停止",
     "recommended": "推荐用于这台电脑",
+    "untested": "尚未在真实硬件上测试",
     "inUse": "使用中",
     "makesAndEdits": " · 生成和编辑图片",
     "makes": " · 生成图片",
