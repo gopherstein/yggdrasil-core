@@ -162,6 +162,9 @@ func (k *knowledgeModels) startLocal(ctx context.Context, modelID, mode string) 
 	if err != nil {
 		return "", err
 	}
+	if err := a.waitForMedia(ctx, modelID); err != nil {
+		return "", err
+	}
 	running, err := a.Runtimes.StartModel(ctx, "llamacpp", pluginapi.ModelStartConfig{ModelID: modelID, ModelPath: path, Mode: mode})
 	if err != nil {
 		return "", err

@@ -200,6 +200,9 @@ type App struct {
 	Images *imagegen.Setup
 	// Video makes short clips on this computer (Gungnir §27).
 	Video *imagegen.Setup
+	// media is the picture or clip being made here, which holds memory
+	// and model starts until it ends (#541).
+	media mediaHold
 	// browser runs each chat's isolated browser (Gungnir §26).
 	browser *browser.Manager
 	// health turns computer and model health changes into notifications.
@@ -854,14 +857,14 @@ func New(opts Options) (*App, error) {
 	a.API.BindArtifacts(a.Artifacts)
 	a.API.BindKnowledge(a.Mimir)
 	a.Images = a.newImageSetup(cfg)
-	images := &imagegen.Engine{Setup: a.Images, WorkDir: filepath.Join(cfg.DataDir, "image-jobs")}
+	images := &imagegen.Engine{Setup: a.Images, WorkDir: filepath.Join(cfg.DataDir, "image-jobs"), Room: a.mediaRoom, Logger: logger}
 	a.registerPortable(&imagegen.GenerateTool{Engine: images, Store: a.Artifacts})
 	a.registerPortable(&imagegen.EditTool{Engine: images, Store: a.Artifacts})
 	a.registerPlaces(cfg)
 	a.registerBrowser(cfg)
 	a.API.BindImages(a.Images)
 	a.Video = a.newVideoSetup(cfg)
-	videos := &imagegen.Engine{Setup: a.Video, WorkDir: filepath.Join(cfg.DataDir, "video-jobs"), What: "video generation"}
+	videos := &imagegen.Engine{Setup: a.Video, WorkDir: filepath.Join(cfg.DataDir, "video-jobs"), What: "video generation", Room: a.mediaRoom, Logger: logger}
 	a.registerPortable(&imagegen.VideoTool{Engine: videos, Store: a.Artifacts})
 	a.API.BindVideo(a.Video)
 	a.API.BindRemoteMediaSetup(a.RemoteMediaSetup)

@@ -123,6 +123,11 @@ func (e *Engine) GenerateVideo(ctx context.Context, req VideoRequest) (VideoResu
 
 	e.mu.Lock()
 	defer e.mu.Unlock()
+	release, err := e.makeRoom(ctx, model, "clip")
+	if err != nil {
+		return VideoResult{}, err
+	}
+	defer release()
 	if err := os.MkdirAll(e.WorkDir, 0o700); err != nil {
 		return VideoResult{}, err
 	}
