@@ -312,6 +312,9 @@ func editModelMissing(s *Setup) string {
 	if m, ok := s.lookup(s.ActiveModel()); ok {
 		active = m.Name
 	}
+	if list := s.models(); len(list) > 0 && list[0].Kind == "video" {
+		return fmt.Sprintf("%s can't bring pictures to life. Set up %s on the Tools page for clips from pictures.", active, name)
+	}
 	return fmt.Sprintf("%s can't edit pictures. Set up %s on the Tools page to edit them.", active, name)
 }
 

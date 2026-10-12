@@ -7,8 +7,9 @@ package imagegen
 // File is one download a model needs.
 type File struct {
 	// Role is how sd-cli takes it: diffusion, vae, llm (the text encoder),
-	// or llm_vision (the text encoder's image encoder, for an editor that
-	// reads the picture it changes).
+	// llm_vision (the text encoder's image encoder, for an editor that
+	// reads the picture it changes), or high_noise (a two-stage video
+	// model's first stage).
 	Role   string `json:"role"`
 	Repo   string `json:"repo"`
 	Path   string `json:"path"`
@@ -59,6 +60,10 @@ type Model struct {
 	FlowShift float64 `json:"-"`
 	Frames    int     `json:"-"`
 	FPS       int     `json:"-"`
+	// HighNoiseSteps and HighNoiseCFG are a two-stage video model's first
+	// stage, which lays out the clip before the second adds detail.
+	HighNoiseSteps int     `json:"-"`
+	HighNoiseCFG   float64 `json:"-"`
 }
 
 // SizeBytes is the total download.
@@ -85,6 +90,8 @@ var revisions = map[string]string{
 	"unsloth/Qwen-Image-Edit-2511-GGUF":      "0d33d9692b4b26212297240d87b0d4719aa4fd06",
 	"unsloth/Qwen2.5-VL-7B-Instruct-GGUF":    "68bb8bc4b7df5289c143aaec0ab477a7d4051aab",
 	"Comfy-Org/Qwen-Image_ComfyUI":           "1f12b17be14c89b026c51a91d67c32f84bb047bc",
+	"QuantStack/Wan2.2-T2V-A14B-GGUF":        "73eafba53a1a8f29254e4c77f92e74ea27d7cd6f",
+	"Comfy-Org/Wan_2.1_ComfyUI_repackaged":   "123acf1cc74bccbb9bfff8ac1ee72edc08c2341d",
 }
 
 var vae = File{Role: "vae", Repo: "black-forest-labs/FLUX.2-small-decoder", Path: "full_encoder_small_decoder.safetensors",
@@ -179,6 +186,28 @@ func VideoCatalog() []Model {
 			{Role: "tae", Repo: "madebyollin/taehv", Path: "safetensors/taew2_2.safetensors",
 				Size: 22848048, SHA256: "b84609b2a133d48434bd9636bfcb44bf05168dc436e2d3cecf26256faa1f5325",
 				Source: "https://raw.githubusercontent.com/madebyollin/taehv/011dfc2112197741c540e0bdd5b7b67bcc930771/safetensors/taew2_2.safetensors"},
+		},
+	}, {
+		// Wan 2.2 T2V A14B makes clips from a description in two stages, a
+		// 14B model each: one lays the clip out, the other adds detail. It
+		// doesn't take a picture; those clips are made with the 5B model. It
+		// and its parts are Apache 2.0, and TAEHV's Wan 2.1 decoder is MIT.
+		ID: "wan2.2-t2v-a14b", Name: "Wan 2.2 T2V A14B", Kind: "video", Untested: true,
+		Description: "Higher-quality clips from a description, more slowly. Pictures are brought to life with Wan 2.2 TI2V 5B. A large download for computers with 32 GB of memory or more.",
+		License:     "Apache-2.0", MemoryBytes: 32 << 30, Steps: 10, CFG: 3.5, FlowShift: 3, FPS: 16,
+		HighNoiseSteps: 8, HighNoiseCFG: 3.5,
+		Files: []File{
+			{Role: "diffusion", Repo: "QuantStack/Wan2.2-T2V-A14B-GGUF", Path: "LowNoise/Wan2.2-T2V-A14B-LowNoise-Q4_K_M.gguf",
+				Size: 9650090496, SHA256: "091a5bae02e14aa016bc9b10a7892efda4c629346b81c5dcebbe30ea2ac8923a"},
+			{Role: "high_noise", Repo: "QuantStack/Wan2.2-T2V-A14B-GGUF", Path: "HighNoise/Wan2.2-T2V-A14B-HighNoise-Q4_K_M.gguf",
+				Size: 9650090496, SHA256: "e0c490c6e316fd91ff52034e4ca66b825717e33ff11624585c0ccfcb5d410c59"},
+			{Role: "t5xxl", Repo: "city96/umt5-xxl-encoder-gguf", Path: "umt5-xxl-encoder-Q4_K_M.gguf",
+				Size: 3655145312, SHA256: "17cf97a5bbbc60a646d6105b832b6f657ce904a8a1ad970e4b59df0c67584a40"},
+			{Role: "vae", Repo: "Comfy-Org/Wan_2.1_ComfyUI_repackaged", Path: "split_files/vae/wan_2.1_vae.safetensors",
+				Size: 253815318, SHA256: "2fc39d31359a4b0a64f55876d8ff7fa8d780956ae2cb13463b0223e15148976b"},
+			{Role: "tae", Repo: "madebyollin/taehv", Path: "safetensors/taew2_1.safetensors",
+				Size: 22642902, SHA256: "04766eac0221b5390b985ae3fdcca652cbb4b1e8b82b28ea7ff89dfad1b1a93f",
+				Source: "https://raw.githubusercontent.com/madebyollin/taehv/011dfc2112197741c540e0bdd5b7b67bcc930771/safetensors/taew2_1.safetensors"},
 		},
 	}}
 }

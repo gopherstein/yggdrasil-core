@@ -3,6 +3,7 @@ package imagegen
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"image"
 	"math"
@@ -105,9 +106,13 @@ func (e *Engine) GenerateVideo(ctx context.Context, req VideoRequest) (VideoResu
 		return VideoResult{}, err
 	}
 	cli := e.Setup.CLI()
-	model, files, err := e.Setup.paths()
+	// A clip from a picture uses a model that takes one.
+	model, files, err := e.Setup.pathsFor(req.Image != nil)
 	if err != nil {
 		return VideoResult{}, err
+	}
+	if req.Image != nil && !model.Edits {
+		return VideoResult{}, errors.New(editModelMissing(e.Setup))
 	}
 	if model.Kind != "video" {
 		return VideoResult{}, fmt.Errorf("%s does not make video", model.Name)
@@ -151,6 +156,10 @@ func (e *Engine) GenerateVideo(ctx context.Context, req VideoRequest) (VideoResu
 		// Guided and unguided passes run one after the other, as before
 		// master-956, so a clip needs no more memory than it did (#548).
 		"--batched-cfg", "off",
+	}
+	if hn := files["high_noise"]; hn != "" {
+		args = append(args, "--high-noise-diffusion-model", hn, "--high-noise-steps", strconv.Itoa(model.HighNoiseSteps),
+			"--high-noise-cfg-scale", f(model.HighNoiseCFG), "--high-noise-sampling-method", "euler")
 	}
 	if tae := files["tae"]; tae != "" {
 		// The tiny decoder turns the clip into frames in seconds.
