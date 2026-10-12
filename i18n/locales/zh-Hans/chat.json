@@ -482,6 +482,7 @@
   "notices": {
     "languageWeak": "{{model}} 写{{language}}可能不如写英文好，而已安装且能运行的模型中没有更擅长的。{{language}}评级良好的模型可在“模型”页面找到。",
     "mediaLength": "目前短片最长 {{max}} 秒，所以这段是 {{made}} 秒，而不是要求的 {{asked}} 秒。",
+    "mediaQuality": "所要求的质量需要 {{model}}，但这里尚未设置，所以这次用 {{used}} 生成。你可以在“工具”页面设置它。",
     "mediaSizePicture": "{{model}} 生成的图片最大为 {{made}}，所以这张比要求的 {{asked}} 小。",
     "mediaSizeClip": "{{model}} 生成的短片最大为 {{made}}，所以这段比要求的 {{asked}} 小。",
     "noVision": "没有已安装的模型能看图片，所以回答没有看这些图片。请在“模型”页面安装 Gemma 3 4B 或其他视觉模型。",

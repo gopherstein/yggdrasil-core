@@ -329,11 +329,34 @@ func editModelMissing(s *Setup) string {
 // pathsFor returns the model for a job and its files by role: the active
 // model, or for an edit the active model can't make, an installed one that
 // can (#548).
-func (s *Setup) pathsFor(edit bool) (Model, map[string]string, error) {
+//
+// For a new picture or clip at a quality, it's the installed model of that
+// tier, or the active model when none is, with the name of the catalog
+// model that would give it, so the person can be told (#549). Edits and
+// clips from pictures keep their own routing.
+func (s *Setup) pathsFor(edit bool, quality string) (Model, map[string]string, string, error) {
 	id := s.ActiveModel()
 	m, ok := s.lookup(id)
 	if !ok {
-		return Model{}, nil, errors.New("no model is installed")
+		return Model{}, nil, "", errors.New("no model is installed")
+	}
+	missing := ""
+	if quality != "" && !edit && m.Tier != quality {
+		found := false
+		for _, other := range s.models() {
+			if other.Tier == quality && !other.EditOnly && s.installed(other.ID) {
+				m, id, found = other, other.ID, true
+				break
+			}
+		}
+		if !found {
+			for _, other := range s.models() {
+				if other.Tier == quality && !other.EditOnly {
+					missing = other.Name
+					break
+				}
+			}
+		}
 	}
 	if edit {
 		// A model made for editing comes first, then the active model if
@@ -357,7 +380,7 @@ func (s *Setup) pathsFor(edit bool) (Model, map[string]string, error) {
 	for _, f := range m.Files {
 		out[f.Role] = filepath.Join(s.modelDir(id), filepath.Base(f.Path))
 	}
-	return m, out, nil
+	return m, out, missing, nil
 }
 
 // Start installs what the model needs, in the background. Status reports

@@ -128,7 +128,7 @@ All of them and their parts are Apache 2.0 and need no account to download. [Ima
 
 - **Other computers:** a paired computer with image generation set up makes images for this one, preferring one whose GPU does the work ([tools on other computers](clustering.md#tools-on-other-computers)).
 - **Platforms:** macOS on Apple silicon (Metal), and Linux x86-64 and Windows x64 (Vulkan on a GPU with a Vulkan driver, otherwise the much slower CPU build; see [GPU acceleration](gpu.md)). Elsewhere, and in the Mac App Store build, which cannot run a program it downloads, the tools are unavailable and say why.
-- **Generating:** `prompt` is up to 2,000 characters. `width` and `height` default to 1024 and are rounded to multiples of 64, between 256 and 1536 and up to about 1.5 megapixels. `seed` repeats an image, and each result includes its seed. Images are saved as PNG files attached to the answer.
+- **Generating:** `prompt` is up to 2,000 characters. `width` and `height` default to 1024 and are rounded to multiples of 64, between 256 and 1536 and up to about 1.5 megapixels. `seed` repeats an image, and each result includes its seed. `quality` (`fast`, `balanced`, or `best`) uses the set-up model of that [tier](media-models.md#quality); asking for "high quality" or "a quick draft" sets it. Images are saved as PNG files attached to the answer.
 - **Editing:** `file` is an image in the chat by name or id. The result keeps the image's shape, at up to 1024 pixels on the longer side, and is attached as a new file, so the original is kept.
 - **Limits:** one image at a time, 20 minutes each.
 
@@ -148,7 +148,7 @@ Clips from an image use Wan 2.2 TI2V 5B, the only one that takes an image. See [
 
 The model is Wan 2.2 TI2V 5B (GGUF, Q4_K_M) with the umt5-xxl text encoder (GGUF) and the Wan 2.2 VAE, all Apache 2.0. It also includes TAEHV (`taew2_2`, MIT, 23 MB from GitHub), a small decoder that turns the clip into frames in about 2 seconds; the full VAE's decode takes most of an hour on a 24 GB Mac. None of the files needs an account to download.
 
-- **Clips:** `prompt` describes the subject, motion, camera, and style. `seconds` is 1 to 5 (default 2), made at 16 frames a second. The size is 832×480, or the image's shape (480×832 for a tall one, 640×640 for a square one); `width` and `height` change it, within about 832×480 pixels, in multiples of 32. `seed` repeats a clip, and each result includes it.
+- **Clips:** `prompt` describes the subject, motion, camera, and style. `seconds` is 1 to 5 (default 2), made at 16 frames a second. The size is 832×480, or the image's shape (480×832 for a tall one, 640×640 for a square one); `width` and `height` change it, within about 832×480 pixels, in multiples of 32. `seed` repeats a clip, and each result includes it. `quality` picks the [tier](media-models.md#quality), as for images.
 - **From an image:** `image` is a PNG or JPEG in the chat, by name or id. It becomes the first frame.
 - **Output:** clips are WebM (VP8), attached to the answer, where they play.
 - **Other computers:** a paired computer with video set up makes clips for this one, preferring one whose GPU does the work. A laptop can ask a workstation.

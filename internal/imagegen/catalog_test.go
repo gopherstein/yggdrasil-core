@@ -159,3 +159,70 @@ func TestLightClipModel(t *testing.T) {
 		t.Fatalf("64 GB: %q", got)
 	}
 }
+
+// Every picture and clip model has a tier, and a request for a quality uses
+// the installed model of that tier; when it isn't set up, the active model
+// makes it and the result names the one that would (#549).
+func TestQualityTiers(t *testing.T) {
+	for _, list := range [][]Model{Catalog(), VideoCatalog()} {
+		tiers := map[string]bool{}
+		for _, m := range list {
+			if !m.EditOnly && m.Tier == "" {
+				t.Errorf("%s has no tier", m.ID)
+			}
+			tiers[m.Tier] = true
+		}
+		for _, want := range []string{"fast", "balanced", "best"} {
+			if !tiers[want] {
+				t.Errorf("no %s model in %s's catalog", want, list[0].Kind)
+			}
+		}
+	}
+	for in, want := range map[string]string{"best": "best", "High": "best", "draft": "fast", "normal": "balanced", "": "", "purple": ""} {
+		if got := qualityArg(in); got != want {
+			t.Errorf("qualityArg(%q) = %q, want %q", in, got, want)
+		}
+	}
+
+	f := newFixture(t)
+	base := f.model(t)
+	fast, best := base, base
+	fast.ID, fast.Name, fast.Tier, fast.Edits = "fast", "Fast", "fast", true
+	best.ID, best.Name, best.Tier, best.Edits = "best", "Best", "best", false
+	balanced := base
+	balanced.ID, balanced.Name, balanced.Tier = "balanced", "Balanced", "balanced"
+	f.setup.Catalog = func() []Model { return []Model{fast, balanced, best} }
+	eng := &Engine{Setup: f.setup, WorkDir: t.TempDir()}
+	ctx := context.Background()
+	archive, _ := f.setup.platform()
+	if err := f.setup.install(ctx, &job{}, best, true, archive); err != nil {
+		t.Fatal(err)
+	}
+	if err := f.setup.install(ctx, &job{}, fast, false, archive); err != nil {
+		t.Fatal(err)
+	}
+	// Fast is active; best quality uses the best model.
+	res, err := eng.Generate(ctx, Request{Prompt: "a dog", Quality: "best"})
+	if err != nil || res.Model != "Best" || res.Tier != "best" || res.Missing != "" {
+		t.Fatalf("best = %+v, %v", res, err)
+	}
+	// Balanced isn't set up: the active model makes it, and says which would.
+	res, err = eng.Generate(ctx, Request{Prompt: "a dog", Quality: "balanced"})
+	if err != nil || res.Model != "Fast" || res.Missing != "Balanced" {
+		t.Fatalf("balanced = %+v, %v", res, err)
+	}
+	// No quality: the active model.
+	if res, _ := eng.Generate(ctx, Request{Prompt: "a dog"}); res.Model != "Fast" || res.Missing != "" {
+		t.Fatalf("default = %+v", res)
+	}
+	// An edit keeps its own routing whatever the quality.
+	res, err = eng.Generate(ctx, Request{Prompt: "make it blue", Quality: "best", Reference: samplePNG(t, 64, 64), RefName: "a.png"})
+	if err != nil || res.Model != "Fast" || res.Missing != "" {
+		t.Fatalf("edit = %+v, %v", res, err)
+	}
+	// The tool reports the tier, and the missing model under limited.
+	out := output(Result{PNG: []byte("x"), Width: 1, Height: 1, Model: "Fast", Tier: "fast", Missing: "Balanced"}, "", "a dog", 0, 0)
+	if out.Result["quality"] != "fast" || out.Result["limited"].(map[string]any)["quality_model"] != "Balanced" {
+		t.Fatalf("result %v", out.Result)
+	}
+}

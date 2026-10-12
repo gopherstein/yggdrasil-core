@@ -39,6 +39,8 @@ type VideoRequest struct {
 	// Image, when set, is the first frame to bring to life.
 	Image     []byte
 	ImageName string
+	// Quality asks for a tier: fast, balanced, or best (#549).
+	Quality string
 }
 
 // VideoResult is a made clip.
@@ -51,6 +53,9 @@ type VideoResult struct {
 	Seed    int64
 	Seconds float64
 	Model   string
+	// Tier and Missing are as for Result.
+	Tier    string
+	Missing string
 }
 
 // videoSize picks a size: the request's, or the image's shape, rounded to
@@ -107,7 +112,7 @@ func (e *Engine) GenerateVideo(ctx context.Context, req VideoRequest) (VideoResu
 	}
 	cli := e.Setup.CLI()
 	// A clip from a picture uses a model that takes one.
-	model, files, err := e.Setup.pathsFor(req.Image != nil)
+	model, files, missing, err := e.Setup.pathsFor(req.Image != nil, req.Quality)
 	if err != nil {
 		return VideoResult{}, err
 	}
@@ -186,7 +191,7 @@ func (e *Engine) GenerateVideo(ctx context.Context, req VideoRequest) (VideoResu
 		return VideoResult{}, err
 	}
 	return VideoResult{WebM: data, Width: w, Height: h, Frames: n, Length: math.Round(float64(n-1)/float64(model.FPS)*10) / 10,
-		Seed: seed, Seconds: time.Since(start).Seconds(), Model: model.Name}, nil
+		Seed: seed, Seconds: time.Since(start).Seconds(), Model: model.Name, Tier: model.Tier, Missing: missing}, nil
 }
 
 // webmMagic starts a WebM (EBML) file.
@@ -225,7 +230,8 @@ func (t *VideoTool) Prepare(ctx context.Context, args map[string]any) (remotetoo
 func (t *VideoTool) Run(ctx context.Context, job remotetools.Job) (remotetools.Output, error) {
 	prompt, _ := job.Args["prompt"].(string)
 	seconds, _ := job.Args["seconds"].(float64)
-	req := VideoRequest{Prompt: prompt, Width: intArg(job.Args["width"]), Height: intArg(job.Args["height"]), Seconds: seconds, Seed: int64(intArg(job.Args["seed"]))}
+	req := VideoRequest{Prompt: prompt, Width: intArg(job.Args["width"]), Height: intArg(job.Args["height"]), Seconds: seconds, Seed: int64(intArg(job.Args["seed"])),
+		Quality: qualityArg(job.Args["quality"])}
 	if len(job.Files) == 1 {
 		req.Image, req.ImageName = job.Files[0].Data, job.Files[0].Name
 	}
@@ -241,7 +247,10 @@ func (t *VideoTool) Run(ctx context.Context, job remotetools.Job) (remotetools.O
 	name = strings.TrimSuffix(name, filepath.Ext(name)) + ".webm"
 	result := map[string]any{"width": res.Width, "height": res.Height, "frames": res.Frames, "length_seconds": res.Length,
 		"seed": res.Seed, "model": res.Model, "seconds": math.Round(res.Seconds)}
-	if l := limits(req.Width, req.Height, res.Width, res.Height, seconds, res.Length); l != nil {
+	if res.Tier != "" {
+		result["quality"] = res.Tier
+	}
+	if l := withMissing(limits(req.Width, req.Height, res.Width, res.Height, seconds, res.Length), res.Missing); l != nil {
 		result["limited"] = l
 	}
 	return remotetools.Output{

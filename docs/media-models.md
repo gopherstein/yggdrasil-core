@@ -4,6 +4,16 @@ Toskar makes pictures and clips on your own computers with [stable-diffusion.cpp
 
 Better hardware makes a model faster, or lets a larger model run. It doesn't change what a given model can draw.
 
+## Quality
+
+Each model has a tier: **fast**, **balanced**, or **best**. Asking for "a high-quality picture" or "a quick draft" uses the set-up model of that tier, and the image and video tools take `quality` (`fast`, `balanced`, or `best`). When that model isn't set up, the current one makes it, and the answer names the model that would give the quality asked for. Edits and clips from a picture use the model that can make them, whatever the quality.
+
+| Tier | Pictures | Clips |
+| --- | --- | --- |
+| Fast | FLUX.2 [klein] 4B | Wan 2.1 T2V 1.3B |
+| Balanced | FLUX.2 [klein] 4B, high quality | Wan 2.2 TI2V 5B |
+| Best | Z-Image-Turbo | Wan 2.2 T2V A14B |
+
 ## Pictures
 
 | Model | Does | Download | Comfortable with | Tested |

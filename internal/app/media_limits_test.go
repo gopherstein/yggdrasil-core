@@ -27,4 +27,8 @@ func TestMediaLimitNotice(t *testing.T) {
 	if got := mediaLimitNotice("en", "image.generate", map[string]any{"width": 1024}); got != "" {
 		t.Errorf("notice for a picture made as asked: %q", got)
 	}
+	missing := map[string]any{"model": "FLUX.2 [klein] 4B", "limited": map[string]any{"quality_model": "Z-Image-Turbo"}}
+	if got := mediaLimitNotice("en", "image.generate", missing); got != "Z-Image-Turbo gives the quality asked for, but it isn't set up here, so this was made with FLUX.2 [klein] 4B. You can set it up on the Tools page." {
+		t.Errorf("quality notice %q", got)
+	}
 }

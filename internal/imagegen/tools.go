@@ -35,7 +35,8 @@ func (t *GenerateTool) Prepare(_ context.Context, args map[string]any) (remoteto
 // Run makes the image.
 func (t *GenerateTool) Run(ctx context.Context, job remotetools.Job) (remotetools.Output, error) {
 	prompt, _ := job.Args["prompt"].(string)
-	res, err := t.Engine.Generate(ctx, Request{Prompt: prompt, Width: intArg(job.Args["width"]), Height: intArg(job.Args["height"]), Seed: int64(intArg(job.Args["seed"]))})
+	res, err := t.Engine.Generate(ctx, Request{Prompt: prompt, Width: intArg(job.Args["width"]), Height: intArg(job.Args["height"]), Seed: int64(intArg(job.Args["seed"])),
+		Quality: qualityArg(job.Args["quality"])})
 	if err != nil {
 		return remotetools.Output{}, err
 	}
@@ -153,10 +154,41 @@ func output(res Result, name, prompt string, askedW, askedH int) remotetools.Out
 	}
 	result := map[string]any{"width": res.Width, "height": res.Height, "seed": res.Seed, "model": res.Model,
 		"seconds": math.Round(res.Seconds*10) / 10}
-	if l := limits(askedW, askedH, res.Width, res.Height, 0, 0); l != nil {
+	if res.Tier != "" {
+		result["quality"] = res.Tier
+	}
+	if l := withMissing(limits(askedW, askedH, res.Width, res.Height, 0, 0), res.Missing); l != nil {
 		result["limited"] = l
 	}
 	return remotetools.Output{Result: result, Files: []remotetools.File{{Name: name, Data: res.PNG}}}
+}
+
+// qualityArg reads a tool's "quality": fast, balanced, or best, with the
+// words a model may use for them; "" leaves the active model.
+func qualityArg(v any) string {
+	s, _ := v.(string)
+	switch strings.ToLower(strings.TrimSpace(s)) {
+	case "fast", "quick", "draft", "low", "speed":
+		return "fast"
+	case "balanced", "normal", "standard", "medium", "default":
+		return "balanced"
+	case "best", "high", "highest", "quality", "max", "detailed":
+		return "best"
+	}
+	return ""
+}
+
+// withMissing adds to limits the model that gives the quality asked for,
+// when it isn't set up (#549).
+func withMissing(l map[string]any, missing string) map[string]any {
+	if missing == "" {
+		return l
+	}
+	if l == nil {
+		l = map[string]any{}
+	}
+	l["quality_model"] = missing
+	return l
 }
 
 // finish saves the image to the chat and completes the result.
