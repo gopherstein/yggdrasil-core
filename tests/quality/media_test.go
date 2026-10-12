@@ -372,6 +372,10 @@ func TestMediaCasesValid(t *testing.T) {
 // a report; TOSKAR_QUALITY_MEDIA_MIN_PASS (default 0.75) is the share a
 // real daemon must pass, since a picture is judged by another model.
 func TestMediaQuality(t *testing.T) {
+	// A clip from Wan 2.2 A14B takes well over ten minutes (#548).
+	saved := requestTimeout
+	requestTimeout = 80 * time.Minute
+	t.Cleanup(func() { requestTimeout = saved })
 	d, build := qualityDriver(t)
 	real, isReal := d.(realDriver)
 	if isReal && config.Env("QUALITY_MEDIA_INSTALL") != "" {

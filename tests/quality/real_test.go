@@ -86,7 +86,7 @@ func (d realDriver) request(method, path string, body, out any, logf func(string
 		if key := config.Env("QUALITY_KEY"); key != "" {
 			req.Header.Set("Authorization", "Bearer "+key)
 		}
-		resp, err := (&http.Client{Timeout: 10 * time.Minute}).Do(req)
+		resp, err := (&http.Client{Timeout: requestTimeout}).Do(req)
 		retry := (err != nil && unreached(err)) || (err == nil && resp.StatusCode == http.StatusServiceUnavailable)
 		if retry && time.Now().Add(wait).Before(deadline) {
 			if resp != nil {
@@ -325,3 +325,8 @@ func (d realDriver) Run(t *testing.T, c Case) Result {
 	t.Logf("answer: %.200s", r.Answer)
 	return r
 }
+
+// requestTimeout is how long one request to the daemon may take. A chat
+// answer comes in minutes; the media set raises it, since a clip from a
+// large model takes longer (the daemon allows one 75 minutes).
+var requestTimeout = 10 * time.Minute
