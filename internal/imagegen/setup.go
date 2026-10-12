@@ -221,6 +221,18 @@ type Status struct {
 	// TokenSet reports a Hugging Face token set for models behind a
 	// license (#551).
 	TokenSet bool `json:"huggingface_token_set,omitempty"`
+	// Elsewhere are paired computers a model works well on, for a model
+	// that's tight or too large here (#550). The app fills it in.
+	Elsewhere []Place `json:"elsewhere,omitempty"`
+}
+
+// Place is a paired computer a model works well on, and whether it's set
+// up there already.
+type Place struct {
+	NodeID    string `json:"node_id"`
+	NodeName  string `json:"node_name"`
+	ModelID   string `json:"model_id"`
+	Installed bool   `json:"installed,omitempty"`
 }
 
 func (s *Setup) models() []Model {

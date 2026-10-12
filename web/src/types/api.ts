@@ -710,6 +710,8 @@ export interface ImageSetup {
   models: ImageModel[]
   /** The person's Hugging Face token is set, for models behind a license (#551). */
   huggingface_token_set?: boolean
+  /** Paired computers each model works well on, for one that's tight or too large here (#550). */
+  elsewhere?: { node_id: string; node_name: string; model_id: string; installed?: boolean }[]
   job?: {
     model_id: string
     stage: 'program' | 'model'

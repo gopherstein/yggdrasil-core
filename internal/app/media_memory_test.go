@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/yeixio/toskar-core/internal/imagegen"
 )
 
 func ids(ms []loadedModel) string {
@@ -85,5 +87,25 @@ func TestMediaHoldsStarts(t *testing.T) {
 	}
 	if err := a.waitForMedia(ctx, "qwen"); err != nil {
 		t.Fatal(err)
+	}
+}
+
+// A model works well on a paired computer by its verdict, or, from a
+// computer that reports none, by its memory (#550).
+func TestWorksWell(t *testing.T) {
+	for _, c := range []struct {
+		m    imagegen.ModelStatus
+		want bool
+	}{
+		{imagegen.ModelStatus{Verdict: imagegen.VerdictWorks}, true},
+		{imagegen.ModelStatus{Verdict: imagegen.VerdictTight}, false},
+		{imagegen.ModelStatus{Verdict: imagegen.VerdictUnsupported}, false},
+		{imagegen.ModelStatus{}, true},
+		{imagegen.ModelStatus{TightMemory: true}, false},
+		{imagegen.ModelStatus{TooLittleMemory: true}, false},
+	} {
+		if got := worksWell(c.m); got != c.want {
+			t.Errorf("%+v = %v", c.m, got)
+		}
 	}
 }

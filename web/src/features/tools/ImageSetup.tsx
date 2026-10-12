@@ -62,6 +62,14 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
   // A model that would be slow or near the limit here: the person agrees (#550).
   const [tightOK, setTightOK] = useState(false)
   const [token, setToken] = useState('')
+  // A model that's tight or too large here can be set up on a paired
+  // computer it works well on (#550).
+  const [startedOn, setStartedOn] = useState<string | null>(null)
+  const startThere = useMutation({
+    mutationFn: ({ id, node }: { id: string; node: { node_id: string; node_name: string } }) =>
+      api.startMediaSetup(kind, id, node.node_id).then(() => node.node_name),
+    onSuccess: (name) => setStartedOn(name),
+  })
   const saveToken = useMutation({
     mutationFn: (value: string) => api.updateSettings({ huggingface_token: value }),
     onSuccess: () => {
@@ -180,6 +188,30 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
                 ) : model.graphics_short ? (
                   <p className="mt-1 text-xs text-warning">{t('images.graphicsShort', { comfortable: gb(model.graphics_bytes ?? 0) })}</p>
                 ) : null}
+                {model.verdict && model.verdict !== 'works'
+                  ? (status.elsewhere ?? [])
+                      .filter((place) => place.model_id === model.id)
+                      .slice(0, 2)
+                      .map((place) => (
+                        <p key={place.node_id} className="mt-1 flex flex-wrap items-center gap-2 text-xs text-ink-muted">
+                          <span>
+                            {place.installed
+                              ? t('images.elsewhereInstalled', { node: place.node_name })
+                              : t('images.elsewhereWorks', { node: place.node_name })}
+                          </span>
+                          {!place.installed ? (
+                            <button
+                              type="button"
+                              className="btn-secondary px-2 py-0.5 text-xs"
+                              disabled={startThere.isPending}
+                              onClick={() => startThere.mutate({ id: model.id, node: place })}
+                            >
+                              {t('images.elsewhereSetUp')}
+                            </button>
+                          ) : null}
+                        </p>
+                      ))
+                  : null}
               </div>
               {model.installed ? (
                 <span className="flex gap-2">
@@ -266,6 +298,8 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
         </button>
       ) : null}
 
+      {startedOn ? <p className="text-xs text-ink-muted">{t('images.elsewhereStarted', { node: startedOn })}</p> : null}
+      {startThere.error instanceof Error ? <p className="text-xs text-danger">{startThere.error.message}</p> : null}
       {error ? <p className="text-xs text-danger">{error}</p> : null}
     </section>
   )
