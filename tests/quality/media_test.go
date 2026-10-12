@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"image"
 	"image/png"
 	"net/http"
 	"os"
@@ -41,6 +42,9 @@ type Judge struct {
 	MaxWER float64 `json:"max_wer"`
 	// MinSide is the smallest a picture's sides may be, in pixels.
 	MinSide int `json:"min_side"`
+	// Moves asks the judge whether a clip's frames change, so a frozen
+	// clip fails (#553).
+	Moves bool `json:"moves,omitempty"`
 }
 
 // mediaCase is a case in media.json.
@@ -96,6 +100,11 @@ func fileFailures(j *Judge, r Result, real bool) []string {
 		// The stub's stand-in is small; a real picture must be the size of one.
 		if b := img.Bounds(); real && (b.Dx() < j.MinSide || b.Dy() < j.MinSide) {
 			return []string{fmt.Sprintf("%s is %dx%d; each side should be at least %d", name, b.Dx(), b.Dy(), j.MinSide)}
+		}
+		// A picture of one flat color, such as all black, is a failed run,
+		// whatever a judge makes of it (#553).
+		if real && flat(img) {
+			return []string{fmt.Sprintf("%s is blank: nearly every pixel is the same color", name)}
 		}
 	case "audio":
 		seconds, err := wavSeconds(data)
@@ -192,8 +201,18 @@ func judgeFailures(t *testing.T, d realDriver, j *Judge, r Result) []string {
 		if err != nil {
 			return []string{fmt.Sprintf("the judge couldn't look at %s: %v", name, err)}
 		}
-		if !strings.HasPrefix(strings.ToLower(strings.Trim(strings.TrimSpace(answer), "*`\"'")), "yes") {
+		if !saysYes(answer) {
 			return []string{fmt.Sprintf("the judge says %s doesn't show %s: %.200q", name, j.Shows, answer)}
+		}
+		if j.Kind == "video" && j.Moves {
+			moving, err := d.askAbout(t, judgeModel(), name, data,
+				"Do these frames of a video change from one to the next, with something moving, or are they all the same picture? Answer yes if something moves or changes, or no if they're the same, on the first line.")
+			if err != nil {
+				return []string{fmt.Sprintf("the judge couldn't look at %s: %v", name, err)}
+			}
+			if !saysYes(moving) {
+				return []string{fmt.Sprintf("the judge says nothing moves in %s: %.200q", name, moving)}
+			}
 		}
 	case "audio":
 		answer, err := d.askAbout(t, d.modelID(), name, data, "Transcribe this recording word for word. Reply with only the words it says.")
@@ -463,4 +482,37 @@ func orDefault(s, def string) string {
 		return def
 	}
 	return s
+}
+
+// saysYes reads a judge's yes-or-no first line.
+func saysYes(answer string) bool {
+	return strings.HasPrefix(strings.ToLower(strings.Trim(strings.TrimSpace(answer), "*`\"'")), "yes")
+}
+
+// flat reports a picture of nearly one color: samples across it differ
+// from their average by almost nothing.
+func flat(img image.Image) bool {
+	b := img.Bounds()
+	var sum, sq [3]float64
+	n := 0
+	for y := b.Min.Y; y < b.Max.Y; y += max(1, b.Dy()/64) {
+		for x := b.Min.X; x < b.Max.X; x += max(1, b.Dx()/64) {
+			r, g, bl, _ := img.At(x, y).RGBA()
+			for i, v := range []float64{float64(r >> 8), float64(g >> 8), float64(bl >> 8)} {
+				sum[i] += v
+				sq[i] += v * v
+			}
+			n++
+		}
+	}
+	if n == 0 {
+		return true
+	}
+	spread := 0.0
+	for i := range sum {
+		mean := sum[i] / float64(n)
+		spread = max(spread, sq[i]/float64(n)-mean*mean)
+	}
+	// A standard deviation under 3 of 255 in every channel.
+	return spread < 9
 }

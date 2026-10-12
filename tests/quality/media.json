@@ -44,6 +44,27 @@
       }
     },
     {
+      "id": "make_image_text",
+      "what": "Text asked for in a picture is written so it can be read (#553).",
+      "message": "Make a picture of a wooden shop sign that says \"OPEN\" in big letters.",
+      "stub": [
+        "A rustic wooden shop sign with the word OPEN painted in large white letters.",
+        "Here it is, attached below."
+      ],
+      "expect": {
+        "tools_run": [
+          "image.generate"
+        ],
+        "answer_lacks": "(?i)(can'?t|cannot|unable to|not able to) (draw|create|make|generate|produce|edit)|as an ai|text-based|language model"
+      },
+      "judge": {
+        "kind": "image",
+        "ext": ".png",
+        "shows": "a sign with the word OPEN written on it, spelled correctly",
+        "min_side": 512
+      }
+    },
+    {
       "id": "edit_image_background",
       "what": "An attached picture is edited as asked, and keeps what wasn't asked to change.",
       "message": "Change the background of this picture to blue, and keep the red circle.",
@@ -86,7 +107,8 @@
       "judge": {
         "kind": "video",
         "ext": ".webm",
-        "shows": "waves or the sea at a beach"
+        "shows": "waves or the sea at a beach",
+        "moves": true
       }
     },
     {
