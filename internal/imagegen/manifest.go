@@ -44,6 +44,9 @@ type manifestModel struct {
 	HighNoiseSteps int     `json:"high_noise_steps,omitempty"`
 	HighNoiseCFG   float64 `json:"high_noise_cfg,omitempty"`
 	ModelArgs      string  `json:"model_args,omitempty"`
+	NeedsLicense   bool    `json:"needs_license,omitempty"`
+	LicenseURL     string  `json:"license_url,omitempty"`
+	LicenseAllows  string  `json:"license_allows,omitempty"`
 	Files          []File  `json:"files"`
 }
 
@@ -52,6 +55,7 @@ func (m manifestModel) model() Model {
 		MemoryBytes: m.MemoryBytes, Edits: m.Edits, EditOnly: m.EditOnly, Untested: m.Untested,
 		Steps: m.Steps, CFG: m.CFG, FlowShift: m.FlowShift, Frames: m.Frames, FPS: m.FPS,
 		HighNoiseSteps: m.HighNoiseSteps, HighNoiseCFG: m.HighNoiseCFG, ModelArgs: m.ModelArgs,
+		NeedsLicense: m.NeedsLicense, LicenseURL: m.LicenseURL, LicenseAllows: m.LicenseAllows,
 		Files: append([]File(nil), m.Files...)}
 }
 
@@ -74,7 +78,13 @@ func parseManifest(raw []byte) (*mediaManifest, error) {
 			if model.ID == "" || model.Steps <= 0 || len(model.Files) == 0 {
 				return nil, fmt.Errorf("media.json: model %q is incomplete", model.ID)
 			}
+			if model.NeedsLicense && (model.LicenseURL == "" || model.LicenseAllows == "") {
+				return nil, fmt.Errorf("media.json: %s needs a license but doesn't link or describe it", model.ID)
+			}
 			for _, f := range model.Files {
+				if f.Gated && !model.NeedsLicense {
+					return nil, fmt.Errorf("media.json: %s has a gated file but doesn't need a license", model.ID)
+				}
 				if f.Role == "" || f.Size <= 0 || len(f.SHA256) != 64 || (f.Source == "" && (f.Repo == "" || f.Revision == "")) {
 					return nil, fmt.Errorf("media.json: %s's %s is not pinned", model.ID, f.Path)
 				}

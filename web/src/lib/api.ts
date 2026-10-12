@@ -1132,8 +1132,11 @@ export const api = {
   getMediaSetup: (kind: MediaKind, nodeId?: string) => request<ImageSetup>(mediaSetupPath(kind, nodeId)),
 
   /** Install stable-diffusion.cpp and a model of that kind in the background, here or on a paired computer. */
-  startMediaSetup: (kind: MediaKind, modelId: string, nodeId?: string) =>
-    request<ImageSetup>(mediaSetupPath(kind, nodeId), { method: 'POST', body: JSON.stringify({ model_id: modelId }) }),
+  startMediaSetup: (kind: MediaKind, modelId: string, nodeId?: string, acceptLicense?: boolean) =>
+    request<ImageSetup>(mediaSetupPath(kind, nodeId), {
+      method: 'POST',
+      body: JSON.stringify(acceptLicense ? { model_id: modelId, accept_license: true } : { model_id: modelId }),
+    }),
 
   /** Stop the setup; what was downloaded is kept. */
   cancelMediaSetup: (kind: MediaKind, nodeId?: string) => request<ImageSetup>(mediaSetupPath(kind, nodeId), { method: 'DELETE' }),

@@ -213,6 +213,7 @@
   "REMOTE_ACCESS_OFF": "El acceso desde cualquier lugar está desactivado, así que no hay nada que comprobar. Actívalo primero.",
   "RELAY_INVALID": "Escribe el nombre del relé, como relay.example.com, con un puerto solo si no es el 443.",
   "RELAY_SECRET_INVALID": "Eso no es un secreto de inscripción. Cópialo del archivo enroll.secret del relé.",
+  "HUGGINGFACE_TOKEN_INVALID": "Eso no es un token de Hugging Face. Copia un token de lectura de huggingface.co/settings/tokens; empieza por hf_.",
   "RELAY_TOKEN_INVALID": "Ese token del relé no es para esta computadora o ya caducó. Vuelve a suscribirte desde este dispositivo.",
   "RELAY_TOKEN_NOT_NEEDED": "Esta computadora usa el relé de tu organización, así que no necesita una suscripción.",
   "RELAY_TOKEN_FAILED": "No se pudo guardar el token del relé en esta computadora.",

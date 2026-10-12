@@ -27,6 +27,9 @@ export function VideoSetupCard() {
   return <MediaSetupCard kind="video" />
 }
 
+// Hugging Face read tokens start with hf_; the hint isn't translated.
+const TOKEN_HINT = 'hf_…'
+
 /**
  * Set up a kind of generated media with a recommended model, watch the
  * download, and remove models to free space.
@@ -49,7 +52,20 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
     // Tools become ready, or stop being ready.
     void queryClient.invalidateQueries({ queryKey: ['tools'] })
   }
-  const start = useMutation({ mutationFn: (id: string) => api.startMediaSetup(kind, id), onSuccess: update })
+  const start = useMutation({
+    mutationFn: ({ id, accept }: { id: string; accept?: boolean }) => api.startMediaSetup(kind, id, undefined, accept),
+    onSuccess: update,
+  })
+  // A model behind a license: the person's token, and their word (#551).
+  const [licenseOK, setLicenseOK] = useState(false)
+  const [token, setToken] = useState('')
+  const saveToken = useMutation({
+    mutationFn: (value: string) => api.updateSettings({ huggingface_token: value }),
+    onSuccess: () => {
+      setToken('')
+      void queryClient.invalidateQueries({ queryKey: [kind, 'setup'] })
+    },
+  })
   const cancel = useMutation({ mutationFn: () => api.cancelMediaSetup(kind), onSuccess: update })
   const remove = useMutation({ mutationFn: (id: string) => api.removeMediaModel(kind, id), onSuccess: update })
   const switchBuild = useMutation({ mutationFn: (build: 'gpu' | 'cpu') => api.useMediaBuild(kind, build), onSuccess: update })
@@ -144,6 +160,7 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
                   {model.name}
                   {model.recommended ? <span className="ms-2 text-xs font-normal text-success">{t('images.recommended')}</span> : null}
                   {model.untested ? <span className="ms-2 text-xs font-normal text-warning">{t('images.untested')}</span> : null}
+                  {model.needs_license ? <span className="ms-2 text-xs font-normal text-warning">{t('images.needsLicense')}</span> : null}
                   {model.id === status.active ? <span className="ms-2 text-xs font-normal text-ink-faint">{t('images.inUse')}</span> : null}
                 </p>
                 <p className="mt-0.5 text-xs text-ink-muted">{model.description}</p>
@@ -162,7 +179,7 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
               {model.installed ? (
                 <span className="flex gap-2">
                   {model.id !== status.active ? (
-                    <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={() => start.mutate(model.id)}>
+                    <button type="button" className="btn-secondary px-3 py-1.5 text-xs" onClick={() => start.mutate({ id: model.id })}>
                       {t('images.use')}
                     </button>
                   ) : null}
@@ -181,8 +198,55 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
         </ul>
       ) : null}
 
+      {status.supported && !running && selectedModel?.needs_license && !selectedModel.installed && !selectedModel.too_little_memory ? (
+        <div className="space-y-2 rounded-lg border border-warning/40 bg-warning/5 p-3 text-xs">
+          <p className="text-ink">
+            {selectedModel.license_allows}{' '}
+            <a className="underline underline-offset-2" href={selectedModel.license_url} target="_blank" rel="noreferrer">
+              {t('images.licenseLink')}
+            </a>
+          </p>
+          {status.huggingface_token_set ? (
+            <p className="text-ink-muted">{t('images.tokenSet')}</p>
+          ) : (
+            <div className="space-y-1">
+              <label className="block text-ink-muted">
+                {t('images.tokenLabel')}
+                <span className="mt-1 flex gap-2">
+                  <input
+                    type="password"
+                    autoComplete="off"
+                    className="field min-w-0 flex-1 py-1 text-xs"
+                    value={token}
+                    placeholder={TOKEN_HINT}
+                    onChange={(e) => setToken(e.target.value)}
+                  />
+                  <button type="button" className="btn-secondary px-3 py-1 text-xs" disabled={!token.trim() || saveToken.isPending} onClick={() => saveToken.mutate(token.trim())}>
+                    {t('images.tokenSave')}
+                  </button>
+                </span>
+              </label>
+              <p className="text-ink-faint">{t('images.tokenHelp')}</p>
+              {saveToken.error instanceof Error ? <p className="text-danger">{saveToken.error.message}</p> : null}
+            </div>
+          )}
+          <label className="flex items-start gap-2 text-ink">
+            <input type="checkbox" className="mt-0.5" checked={licenseOK || !!selectedModel.license_accepted} onChange={(e) => setLicenseOK(e.target.checked)} />
+            <span>{t('images.licenseConfirm')}</span>
+          </label>
+        </div>
+      ) : null}
+
       {status.supported && !running && selected && !selectedModel?.installed && !selectedModel?.too_little_memory ? (
-        <button type="button" className="btn-primary px-4 py-2 text-sm" disabled={start.isPending} onClick={() => start.mutate(selected)}>
+        <button
+          type="button"
+          className="btn-primary px-4 py-2 text-sm"
+          disabled={
+            start.isPending ||
+            (!!selectedModel?.needs_license && (!status.huggingface_token_set || !(licenseOK || selectedModel.license_accepted)))
+          }
+          onClick={() => start.mutate({ id: selected, accept: selectedModel?.needs_license ? true : undefined })}
+        >
           {status.ready ? t('images.download') : t('images.setUp')}
         </button>
       ) : null}

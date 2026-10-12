@@ -213,6 +213,7 @@
   "REMOTE_ACCESS_OFF": "어디서나 접속이 꺼져 있어서 확인할 것이 없어요. 먼저 켜세요.",
   "RELAY_INVALID": "relay.example.com처럼 릴레이 이름을 입력하세요. 포트는 443이 아닐 때만 붙이세요.",
   "RELAY_SECRET_INVALID": "등록 비밀이 아니에요. 릴레이의 enroll.secret 파일에서 복사하세요.",
+  "HUGGINGFACE_TOKEN_INVALID": "Hugging Face 토큰이 아닙니다. huggingface.co/settings/tokens에서 읽기 토큰(hf_로 시작)을 복사하세요.",
   "RELAY_TOKEN_INVALID": "이 릴레이 토큰은 이 컴퓨터용이 아니거나 만료되었어요. 이 기기에서 다시 구독하세요.",
   "RELAY_TOKEN_NOT_NEEDED": "이 컴퓨터는 조직의 릴레이를 사용하므로 구독이 필요 없어요.",
   "RELAY_TOKEN_FAILED": "이 컴퓨터에 릴레이 토큰을 저장하지 못했어요.",

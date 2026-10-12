@@ -7,7 +7,7 @@ import { ImageSetupCard } from './ImageSetup'
 
 vi.mock('@/lib/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/api')>()
-  return { ...actual, api: { ...actual.api, getMediaSetup: vi.fn(), startMediaSetup: vi.fn(), useMediaBuild: vi.fn(), cancelMediaSetup: vi.fn(), removeMediaModel: vi.fn() } }
+  return { ...actual, api: { ...actual.api, getMediaSetup: vi.fn(), startMediaSetup: vi.fn(), useMediaBuild: vi.fn(), cancelMediaSetup: vi.fn(), removeMediaModel: vi.fn(), updateSettings: vi.fn() } }
 })
 
 const model = (over: Partial<ImageModel>): ImageModel => ({
@@ -54,5 +54,32 @@ describe('ImageSetupCard', () => {
     renderWith({ supported: true, ready: true, program: true, release: 'r', active: 'flux2-klein-4b', accelerated: true, build: 'vulkan', gpu_build: 'vulkan', models: [model({ installed: true })] })
     expect(await screen.findByText('Makes them on the GPU (Vulkan).')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Use the CPU build' })).toBeInTheDocument()
+  })
+
+  it('sets up a model behind a license only with a token and the person\'s word (#551)', async () => {
+    const licensed = model({
+      id: 'flux2-klein-9b', name: 'FLUX.2 [klein] 9B', recommended: false, needs_license: true,
+      license_url: 'https://huggingface.co/black-forest-labs/FLUX.2-klein-9B', license_allows: 'Non-commercial use.',
+    })
+    const base = { supported: true, ready: true, program: true, release: 'r', active: 'flux2-klein-4b', accelerated: true, models: [model({ installed: true }), licensed] }
+    vi.mocked(api.updateSettings).mockResolvedValue({} as Awaited<ReturnType<typeof api.updateSettings>>)
+    vi.mocked(api.startMediaSetup).mockResolvedValue(null)
+    renderWith({ ...base, huggingface_token_set: false })
+    fireEvent.click(await screen.findByRole('radio', { name: 'FLUX.2 [klein] 9B' }))
+    expect(screen.getByText('Needs your license')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Read the license' })).toHaveAttribute('href', licensed.license_url)
+    const setUp = screen.getByRole('button', { name: /Download/ })
+    expect(setUp).toBeDisabled()
+
+    fireEvent.change(screen.getByLabelText(/Your Hugging Face token/), { target: { value: 'hf_abcdefghijklmnopqrstuvwxyz' } })
+    vi.mocked(api.getMediaSetup).mockResolvedValue({ ...base, huggingface_token_set: true })
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+    await waitFor(() => expect(api.updateSettings).toHaveBeenCalledWith({ huggingface_token: 'hf_abcdefghijklmnopqrstuvwxyz' }))
+    expect(await screen.findByText('Your Hugging Face token is set.')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Download/ })).toBeDisabled()
+
+    fireEvent.click(screen.getByRole('checkbox', { name: /My license covers how I'll use this model/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Download/ }))
+    await waitFor(() => expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'flux2-klein-9b', undefined, true))
   })
 })

@@ -213,6 +213,7 @@
   "REMOTE_ACCESS_OFF": "L'accesso ovunque è disattivato, quindi non c'è niente da verificare. Attivalo prima.",
   "RELAY_INVALID": "Inserisci il nome del relay, ad esempio relay.example.com, con una porta solo se non è la 443.",
   "RELAY_SECRET_INVALID": "Questo non è un segreto di registrazione. Copialo dal file enroll.secret del relay.",
+  "HUGGINGFACE_TOKEN_INVALID": "Questo non è un token di Hugging Face. Copia un token di lettura da huggingface.co/settings/tokens; inizia con hf_.",
   "RELAY_TOKEN_INVALID": "Questo token del relay non è per questo computer o è scaduto. Abbonati di nuovo da questo dispositivo.",
   "RELAY_TOKEN_NOT_NEEDED": "Questo computer usa il relay della tua organizzazione, quindi non serve un abbonamento.",
   "RELAY_TOKEN_FAILED": "Impossibile salvare il token del relay su questo computer.",

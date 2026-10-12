@@ -676,6 +676,11 @@ export interface ImageModel {
   /** Not yet tested on real hardware: it can be chosen, but it's never recommended (#548). */
   untested?: boolean  /** It changes pictures but doesn't make new ones: edits prefer it, and it's never the active model (#548). */
   edit_only?: boolean
+  /** Toskar can't give it out: it's set up with the person's own Hugging Face token and their confirmation that their license covers their use (#551). */
+  needs_license?: boolean
+  license_url?: string
+  license_allows?: string
+  license_accepted?: boolean
 }
 
 /** What image generation has installed, and any setup in progress. */
@@ -697,6 +702,8 @@ export interface ImageSetup {
   build?: 'metal' | 'vulkan' | 'cpu'
   gpu_build?: 'metal' | 'vulkan'
   models: ImageModel[]
+  /** The person's Hugging Face token is set, for models behind a license (#551). */
+  huggingface_token_set?: boolean
   job?: {
     model_id: string
     stage: 'program' | 'model'
@@ -1032,6 +1039,8 @@ export interface ToolRequestedPayload {
 
 export interface SettingsPatch {
   ui_locale?: string
+  /** The person's Hugging Face token, for models behind a license; '' forgets it. Never read back (#551). */
+  huggingface_token?: string
   community_ratings?: boolean
   update_check?: boolean
   ratings_prompts?: boolean

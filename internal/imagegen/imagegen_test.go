@@ -61,6 +61,8 @@ type fixture struct {
 	setup    *Setup
 	requests atomic.Int32
 	files    map[string][]byte
+	// gated are files the server gives only with this token.
+	gated map[string]string
 }
 
 func newFixture(t *testing.T) *fixture {
@@ -97,6 +99,10 @@ func newFixture(t *testing.T) *fixture {
 	}}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		f.requests.Add(1)
+		if want, ok := f.gated[strings.TrimPrefix(r.URL.Path, "/")]; ok && r.Header.Get("Authorization") != "Bearer "+want {
+			http.Error(w, "gated", http.StatusForbidden)
+			return
+		}
 		data, ok := f.files[strings.TrimPrefix(r.URL.Path, "/")]
 		if !ok {
 			http.NotFound(w, r)
