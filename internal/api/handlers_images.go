@@ -33,6 +33,15 @@ func (s *Server) BindRemoteMediaSetup(fn RemoteMediaSetup) {
 	s.remoteMedia = fn
 }
 
+// MediaElsewhere lists the paired computers each model of a kind works
+// well on (#550).
+type MediaElsewhere func(ctx context.Context, kind string) []imagegen.Place
+
+// BindMediaElsewhere adds those to this computer's setup status.
+func (s *Server) BindMediaElsewhere(fn MediaElsewhere) {
+	s.mediaElsewhere = fn
+}
+
 func (s *Server) imageRoutes(api *mux.Router) {
 	s.setupRoutes(api, "/images", func() *imagegen.Setup { return s.images }, "Image generation is not available.")
 	s.setupRoutes(api, "/video", func() *imagegen.Setup { return s.video }, "Video generation is not available.")
@@ -93,7 +102,11 @@ func (s *Server) setupRoutes(api *mux.Router, prefix string, setup func() *image
 			return
 		}
 		if st := bound(w); st != nil {
-			writeJSON(w, http.StatusOK, st.Status())
+			status := st.Status()
+			if s.mediaElsewhere != nil {
+				status.Elsewhere = s.mediaElsewhere(r.Context(), kind)
+			}
+			writeJSON(w, http.StatusOK, status)
 		}
 	}).Methods(http.MethodGet)
 	// Install stable-diffusion.cpp and a model in the background.

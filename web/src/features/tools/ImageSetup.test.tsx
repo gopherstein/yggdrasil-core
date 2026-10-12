@@ -96,4 +96,17 @@ describe('ImageSetupCard', () => {
     fireEvent.click(screen.getByRole('button', { name: /Download/ }))
     await waitFor(() => expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'big', undefined, { acceptLicense: undefined, acceptTight: true }))
   })
+
+  it('names a paired computer a tight model works well on, and sets it up there (#550)', async () => {
+    vi.mocked(api.startMediaSetup).mockResolvedValue(null)
+    renderWith({
+      supported: true, ready: true, program: true, release: 'r', active: 'flux2-klein-4b', accelerated: true,
+      models: [model({ installed: true }), model({ id: 'big', name: 'Big', recommended: false, graphics_short: true, graphics_bytes: 16 * 1024 ** 3, verdict: 'tight' })],
+      elsewhere: [{ node_id: 'ws', node_name: 'Workstation', model_id: 'big' }],
+    })
+    expect(await screen.findByText('Works well on Workstation.')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Set it up there' }))
+    await waitFor(() => expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'big', 'ws'))
+    expect(await screen.findByText(/Setting it up on Workstation/)).toBeInTheDocument()
+  })
 })

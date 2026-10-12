@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
+	"strings"
 	"sync"
 	"time"
 
@@ -271,4 +273,41 @@ func (a *App) fetchPeerMedia(ctx context.Context, n contracts.Node) {
 		return
 	}
 	e.at, e.fetching, e.kinds = time.Now(), false, kinds
+}
+
+// mediaElsewhere lists, for each model of a kind, the online paired
+// computers it works well on, from what they last reported (#550). It
+// doesn't wait for a computer that hasn't answered yet.
+func (a *App) mediaElsewhere(ctx context.Context, kind string) []imagegen.Place {
+	names := map[string]string{}
+	if a.Nodes != nil {
+		if list, err := a.Nodes.List(ctx); err == nil {
+			for _, n := range list {
+				names[n.ID] = n.Name
+			}
+		}
+	}
+	var out []imagegen.Place
+	for id, byKind := range a.peerMediaSetups(ctx, false) {
+		st := byKind[kind]
+		if st == nil || !st.Supported {
+			continue
+		}
+		for _, m := range st.Models {
+			if worksWell(m) {
+				out = append(out, imagegen.Place{NodeID: id, NodeName: names[id], ModelID: m.ID, Installed: m.Installed})
+			}
+		}
+	}
+	slices.SortFunc(out, func(x, y imagegen.Place) int { return strings.Compare(x.NodeName+x.ModelID, y.NodeName+y.ModelID) })
+	return out
+}
+
+// worksWell reports a model that works well on the computer that reported
+// it; for a computer from before verdicts, memory decides.
+func worksWell(m imagegen.ModelStatus) bool {
+	if m.Verdict == "" {
+		return !m.TooLittleMemory && !m.TightMemory
+	}
+	return m.Verdict == imagegen.VerdictWorks
 }

@@ -879,6 +879,7 @@ func New(opts Options) (*App, error) {
 	a.registerPortable(&imagegen.VideoTool{Engine: videos, Store: a.Artifacts})
 	a.API.BindVideo(a.Video)
 	a.API.BindRemoteMediaSetup(a.RemoteMediaSetup)
+	a.API.BindMediaElsewhere(a.mediaElsewhere)
 	a.Training = a.newTrainingService()
 	if err := a.Training.Recover(context.Background()); err != nil {
 		return nil, fmt.Errorf("training: %w", err)

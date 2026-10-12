@@ -235,18 +235,20 @@ type Server struct {
 	// remote is the listener for access from anywhere (#456).
 	remote remoteListener
 
-	knowledge     KnowledgeService
-	memory        *muninn.Store
-	artifacts     *artifacts.Store
-	speech        *speech.Engine
-	speechStore   *artifacts.Store
-	images        *imagegen.Setup
-	video         *imagegen.Setup
-	remoteMedia   RemoteMediaSetup
-	notifications *gjallarhorn.Hub
-	connectors    *connectors.Manager
-	mcp           *mcp.Manager
-	mcpServer     *mcp.Server
+	knowledge   KnowledgeService
+	memory      *muninn.Store
+	artifacts   *artifacts.Store
+	speech      *speech.Engine
+	speechStore *artifacts.Store
+	images      *imagegen.Setup
+	video       *imagegen.Setup
+	remoteMedia RemoteMediaSetup
+	// mediaElsewhere lists paired computers a model works well on (#550).
+	mediaElsewhere MediaElsewhere
+	notifications  *gjallarhorn.Hub
+	connectors     *connectors.Manager
+	mcp            *mcp.Manager
+	mcpServer      *mcp.Server
 	// oidcState is the OpenID Connect provider's client (#206).
 	oidcState oidcHolder
 	// portalLimits keeps chat portals' limits (#205).
