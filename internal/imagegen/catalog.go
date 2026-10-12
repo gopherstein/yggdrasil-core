@@ -127,11 +127,13 @@ func Catalog() []Model {
 			},
 		},
 		// Z-Image-Turbo (Tongyi-MAI) makes photorealistic pictures, and
-		// writes text in them well, in eight steps. It doesn't edit. It and
+		// writes text in them well, in eight steps. It doesn't edit. Tested
+		// on an RX 7900 XTX: about 35–40 s a picture, against FLUX.2 klein's
+		// 12–15 s (quality run 38306108732). It and
 		// its parts are Apache 2.0; the FLUX.1 VAE comes from ComfyUI's
 		// repackage, which needs no account.
 		{
-			ID: "z-image-turbo", Name: "Z-Image-Turbo", Kind: "image", Untested: true,
+			ID: "z-image-turbo", Name: "Z-Image-Turbo", Kind: "image",
 			Description: "Photorealistic pictures, with clear text in them, in a few steps. It can't edit pictures.",
 			License:     "Apache-2.0", MemoryBytes: 14 << 30, Steps: 8, CFG: 1,
 			Files: []File{
@@ -246,10 +248,13 @@ func lookupIn(list []Model, id string) (Model, bool) {
 // the largest it is comfortable with, else the smallest.
 func Recommend(memoryBytes int64) Model { return recommendIn(Catalog(), memoryBytes) }
 
+// recommendIn picks from models that do everything the tools offer: make
+// pictures and edit them, or make clips and bring pictures to life. A model
+// that only makes, or only edits, is set up by choice beside it (#548).
 func recommendIn(list []Model, memoryBytes int64) Model {
 	best := list[0]
 	for _, m := range list {
-		if !m.Untested && m.MemoryBytes <= memoryBytes && m.MemoryBytes > best.MemoryBytes {
+		if !m.Untested && m.Edits && !m.EditOnly && m.MemoryBytes <= memoryBytes && m.MemoryBytes > best.MemoryBytes {
 			best = m
 		}
 	}

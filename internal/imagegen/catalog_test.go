@@ -8,8 +8,8 @@ import (
 	"testing"
 )
 
-// A model not yet tested on real hardware is offered but never recommended
-// (#548).
+// A model not yet tested on real hardware is offered but never recommended,
+// and neither is one that only makes or only edits (#548).
 func TestUntestedIsNeverRecommended(t *testing.T) {
 	for _, mem := range []int64{8 << 30, 16 << 30, 64 << 30} {
 		if m := Recommend(mem); m.Untested {
@@ -17,8 +17,17 @@ func TestUntestedIsNeverRecommended(t *testing.T) {
 		}
 	}
 	z, ok := Lookup("z-image-turbo")
-	if !ok || !z.Untested || z.Edits || z.License != "Apache-2.0" {
+	if !ok || z.Untested || z.Edits || z.License != "Apache-2.0" {
 		t.Fatalf("z-image-turbo = %+v", z)
+	}
+	// Tested now, but it doesn't edit, so it's chosen, never recommended.
+	for _, mem := range []int64{8 << 30, 16 << 30, 64 << 30} {
+		if m := Recommend(mem); !m.Edits || m.EditOnly {
+			t.Errorf("%d GB recommends %s, which doesn't do everything", mem>>30, m.ID)
+		}
+		if m := recommendIn(VideoCatalog(), mem); !m.Edits {
+			t.Errorf("%d GB recommends clip model %s, which takes no picture", mem>>30, m.ID)
+		}
 	}
 }
 
