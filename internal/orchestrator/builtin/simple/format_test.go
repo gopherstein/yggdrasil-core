@@ -23,6 +23,10 @@ func TestAskedFormat(t *testing.T) {
 		{"Make a 90s style video of a mall", "video.generate", "map[]"},
 		{"Draw a dog", "image.generate", "map[]"},
 		{"Draw a dog that is 10 seconds old", "image.generate", "map[]"},
+		{"Draw a high-quality portrait of an old fisherman", "image.generate", "map[height:1024 quality:best width:576]"},
+		{"Make a quick draft of a logo", "image.generate", "map[quality:fast]"},
+		{"Haz una imagen en alta calidad de un faro", "image.generate", "map[quality:best]"},
+		{"高画質で猫の動画を作って", "video.generate", "map[quality:best]"},
 	} {
 		got := askedFormat(c.prompt, c.tool)
 		if s := fmt.Sprint(got); s != c.want {
@@ -36,6 +40,15 @@ func TestClipRequestKeepsItsLength(t *testing.T) {
 	env := &mediaEnv{scriptedEnv: scriptedEnv{replies: []string{"Waves rolling onto a beach.", "It's below."}}}
 	runText(t, env, "Make a 10-second 720p video of waves on a beach", mediaProfile)
 	if env.toolID != "video.generate" || env.args["seconds"] != 10.0 || env.args["width"] != 1280.0 || env.args["height"] != 720.0 {
+		t.Fatalf("called %s %v", env.toolID, env.args)
+	}
+}
+
+// "A high-quality picture" reaches the tool asking for the best tier (#549).
+func TestPictureRequestKeepsItsQuality(t *testing.T) {
+	env := &mediaEnv{scriptedEnv: scriptedEnv{replies: []string{"An old fisherman mending a net at dawn.", "It's below."}}}
+	runText(t, env, "Draw a high-quality picture of an old fisherman", mediaProfile)
+	if env.toolID != "image.generate" || env.args["quality"] != "best" {
 		t.Fatalf("called %s %v", env.toolID, env.args)
 	}
 }

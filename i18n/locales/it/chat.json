@@ -520,6 +520,7 @@
   "notices": {
     "languageWeak": "{{model}} potrebbe scrivere in {{language}} peggio che in inglese, e nessun modello installato adatto lo fa meglio. Nella pagina Modelli trovi i modelli con buona valutazione in {{language}}.",
     "mediaLength": "Per ora i clip durano al massimo {{max}} s, quindi questo dura {{made}} s invece dei {{asked}} s richiesti.",
+    "mediaQuality": "{{model}} offre la qualità richiesta, ma non è configurato qui, quindi questo è stato creato con {{used}}. Puoi configurarlo nella pagina Strumenti.",
     "mediaSizePicture": "{{model}} crea immagini fino a {{made}}, quindi questa è più piccola dei {{asked}} richiesti.",
     "mediaSizeClip": "{{model}} crea clip fino a {{made}}, quindi questo è più piccolo dei {{asked}} richiesti.",
     "noVision": "Nessun modello installato può vedere le immagini, quindi la risposta non le guarda. Installa Gemma 3 4B o un altro modello di visione nella pagina Modelli.",

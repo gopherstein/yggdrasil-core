@@ -116,6 +116,8 @@ type Request struct {
 	// Reference is the image to edit, and RefName its file name.
 	Reference []byte
 	RefName   string
+	// Quality asks for a tier: fast, balanced, or best (#549).
+	Quality string
 }
 
 // Result is a made image.
@@ -126,6 +128,10 @@ type Result struct {
 	Seed    int64
 	Seconds float64
 	Model   string
+	// Tier is the quality the model gives, and Missing the model that
+	// would give the quality asked for, when it isn't set up.
+	Tier    string
+	Missing string
 }
 
 // side rounds a dimension to what the model takes: a multiple of 64 in range.
@@ -165,7 +171,7 @@ func (e *Engine) Generate(ctx context.Context, req Request) (Result, error) {
 		return Result{}, err
 	}
 	cli := e.Setup.CLI()
-	model, files, err := e.Setup.pathsFor(req.Reference != nil)
+	model, files, missing, err := e.Setup.pathsFor(req.Reference != nil, req.Quality)
 	if err != nil {
 		return Result{}, err
 	}
@@ -243,7 +249,8 @@ func (e *Engine) Generate(ctx context.Context, req Request) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
-	return Result{PNG: data, Width: w, Height: h, Seed: seed, Seconds: time.Since(start).Seconds(), Model: model.Name}, nil
+	return Result{PNG: data, Width: w, Height: h, Seed: seed, Seconds: time.Since(start).Seconds(), Model: model.Name,
+		Tier: model.Tier, Missing: missing}, nil
 }
 
 // runWithFallback runs sd-cli, and when the Vulkan build can't start its

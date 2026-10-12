@@ -23,6 +23,10 @@ var (
 	sizeRe = regexp.MustCompile(`\b(\d{3,4})\s*[x×]\s*(\d{3,4})\b`)
 	// linesRe is a video standard: "720p", "1080p", "4k".
 	linesRe = regexp.MustCompile(`(?i)\b(480|540|720|1080|1440|2160)p\b|\b(4k|uhd)\b`)
+	// bestRe and fastRe ask for a quality (#549): high quality, or a quick
+	// draft. Words in scripts without spaces have no word boundaries.
+	bestRe = regexp.MustCompile(`(?i)\b(high[- ]quality|higher[- ]quality|best[- ]quality|highest[- ]quality|top[- ]quality|max(imum)?[- ]quality|ultra[- ]detailed|alta calidad|mejor calidad|haute qualité|meilleure qualité|alta qualità|massima qualità|hohe[rnm]? qualität|beste[rnm]? qualität|höchste[rnm]? qualität|alta qualidade|melhor qualidade)\b|高画質|高品質|最高品質|高画质|高质量|最高质量|고화질|고품질|최고 품질`)
+	fastRe = regexp.MustCompile(`(?i)\b(quick (draft|preview|version|sketch)|rough (draft|version|sketch)|draft|low[- ]quality|fast version|borrador|brouillon|bozza|entwurf|rascunho)\b|下書き|ラフ|草稿|草图|초안`)
 	// shapeRe is a shape without a size.
 	shapeRe = regexp.MustCompile(`(?i)\b(vertical|portrait|square|landscape|widescreen)\b|\b(9:16|16:9|1:1|4:3|3:4)\b`)
 )
@@ -75,6 +79,12 @@ func askedFormat(prompt, tool string) map[string]any {
 	}
 	if w > 0 && h > 0 {
 		out["width"], out["height"] = float64(w), float64(h)
+	}
+	switch {
+	case bestRe.MatchString(prompt):
+		out["quality"] = "best"
+	case fastRe.MatchString(prompt):
+		out["quality"] = "fast"
 	}
 	return out
 }

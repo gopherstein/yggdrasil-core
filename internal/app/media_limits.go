@@ -37,6 +37,10 @@ func mediaLimitNotice(lang, toolID string, result map[string]any) string {
 		parts = append(parts, locale.T(lang, key, map[string]any{
 			"model": model, "made": fmt.Sprintf("%.0f×%.0f", mw, mh), "asked": fmt.Sprintf("%.0f×%.0f", aw, ah)}))
 	}
+	if model, ok := limited["quality_model"].(string); ok && model != "" {
+		used, _ := result["model"].(string)
+		parts = append(parts, locale.T(lang, "chat:notices.mediaQuality", map[string]any{"model": model, "used": used}))
+	}
 	return strings.Join(parts, " ")
 }
 

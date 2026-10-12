@@ -53,6 +53,10 @@ type Model struct {
 	// ModelArgs is passed to sd-cli as --model-args, for a model that needs
 	// one to work as intended.
 	ModelArgs string `json:"-"`
+	// Tier is the quality a model gives among those of its kind: fast,
+	// balanced, or best (#549). A request for a quality uses the installed
+	// model of that tier.
+	Tier string `json:"tier,omitempty"`
 	// Steps and CFG are its sampling defaults; FlowShift, Frames, and FPS
 	// are a video model's.
 	Steps     int     `json:"-"`
@@ -103,7 +107,7 @@ var vae = File{Role: "vae", Repo: "black-forest-labs/FLUX.2-small-decoder", Path
 func Catalog() []Model {
 	return []Model{
 		{
-			ID: "flux2-klein-4b", Name: "FLUX.2 [klein] 4B", Kind: "image",
+			ID: "flux2-klein-4b", Tier: "fast", Name: "FLUX.2 [klein] 4B", Kind: "image",
 			Description: "Makes and edits images in a few steps. Fits most computers with 16 GB of memory.",
 			License:     "Apache-2.0", MemoryBytes: 12 << 30, Edits: true, Steps: 4, CFG: 1,
 			Files: []File{
@@ -115,7 +119,7 @@ func Catalog() []Model {
 			},
 		},
 		{
-			ID: "flux2-klein-4b-q8", Name: "FLUX.2 [klein] 4B, high quality", Kind: "image",
+			ID: "flux2-klein-4b-q8", Tier: "balanced", Name: "FLUX.2 [klein] 4B, high quality", Kind: "image",
 			Description: "The same model with more detail, for computers with 24 GB of memory or more.",
 			License:     "Apache-2.0", MemoryBytes: 20 << 30, Edits: true, Steps: 4, CFG: 1,
 			Files: []File{
@@ -133,7 +137,7 @@ func Catalog() []Model {
 		// its parts are Apache 2.0; the FLUX.1 VAE comes from ComfyUI's
 		// repackage, which needs no account.
 		{
-			ID: "z-image-turbo", Name: "Z-Image-Turbo", Kind: "image",
+			ID: "z-image-turbo", Tier: "best", Name: "Z-Image-Turbo", Kind: "image",
 			Description: "Photorealistic pictures, with clear text in them, in a few steps. It can't edit pictures.",
 			License:     "Apache-2.0", MemoryBytes: 14 << 30, Steps: 8, CFG: 1,
 			Files: []File{
@@ -173,7 +177,7 @@ func Catalog() []Model {
 // parts are Apache 2.0 and need no account to download.
 func VideoCatalog() []Model {
 	return []Model{{
-		ID: "wan2.2-ti2v-5b", Name: "Wan 2.2 TI2V 5B", Kind: "video",
+		ID: "wan2.2-ti2v-5b", Tier: "balanced", Name: "Wan 2.2 TI2V 5B", Kind: "video",
 		Description: "Makes short clips from a description, or from an image. Needs about 16 GB of memory; a clip takes minutes.",
 		License:     "Apache-2.0", MemoryBytes: 16 << 30, Edits: true, Steps: 20, CFG: 6, FlowShift: 3, Frames: 33, FPS: 16,
 		Files: []File{
@@ -194,7 +198,7 @@ func VideoCatalog() []Model {
 		// 14B model each: one lays the clip out, the other adds detail. It
 		// doesn't take a picture; those clips are made with the 5B model. It
 		// and its parts are Apache 2.0, and TAEHV's Wan 2.1 decoder is MIT.
-		ID: "wan2.2-t2v-a14b", Name: "Wan 2.2 T2V A14B", Kind: "video", Untested: true,
+		ID: "wan2.2-t2v-a14b", Tier: "best", Name: "Wan 2.2 T2V A14B", Kind: "video", Untested: true,
 		Description: "Higher-quality clips from a description, more slowly. Pictures are brought to life with Wan 2.2 TI2V 5B. A large download for computers with 32 GB of memory or more.",
 		License:     "Apache-2.0", MemoryBytes: 32 << 30, Steps: 10, CFG: 3.5, FlowShift: 3, FPS: 16,
 		HighNoiseSteps: 8, HighNoiseCFG: 3.5,
@@ -215,7 +219,7 @@ func VideoCatalog() []Model {
 		// Wan 2.1 T2V 1.3B makes clips from a description on computers too
 		// small for the 5B model. It doesn't take a picture. It and its
 		// parts are Apache 2.0.
-		ID: "wan2.1-t2v-1.3b", Name: "Wan 2.1 T2V 1.3B", Kind: "video", Untested: true,
+		ID: "wan2.1-t2v-1.3b", Tier: "fast", Name: "Wan 2.1 T2V 1.3B", Kind: "video", Untested: true,
 		Description: "Short clips from a description on computers with less memory, at lower quality. It can't start from a picture.",
 		License:     "Apache-2.0", MemoryBytes: 10 << 30, Steps: 20, CFG: 6, FlowShift: 3, FPS: 16,
 		Files: []File{
