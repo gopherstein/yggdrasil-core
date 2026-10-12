@@ -125,3 +125,28 @@ func TestEditOnlyModel(t *testing.T) {
 		t.Fatalf("the editor became active: %s", got)
 	}
 }
+
+// The light clip model is untested and takes no picture; on a computer
+// where no model that takes one fits, the message says so instead of
+// naming one that can't be set up (#548).
+func TestLightClipModel(t *testing.T) {
+	m, ok := lookupIn(VideoCatalog(), "wan2.1-t2v-1.3b")
+	if !ok || !m.Untested || m.Edits || m.MemoryBytes >= 16<<30 {
+		t.Fatalf("wan2.1-t2v-1.3b = %+v", m)
+	}
+	for _, v := range VideoCatalog() {
+		for _, file := range v.Files {
+			if file.Source == "" && revisions[file.Repo] == "" || len(file.SHA256) != 64 || file.Size == 0 {
+				t.Errorf("%s: %s is not pinned", v.ID, file.Path)
+			}
+		}
+	}
+	small := &Setup{ModelsDir: t.TempDir(), Catalog: VideoCatalog, Memory: func() int64 { return 8 << 30 }}
+	if got := editModelMissing(small); !strings.Contains(got, "no model that can fits this computer") {
+		t.Fatalf("8 GB: %q", got)
+	}
+	big := &Setup{ModelsDir: t.TempDir(), Catalog: VideoCatalog, Memory: func() int64 { return 64 << 30 }}
+	if got := editModelMissing(big); !strings.Contains(got, "Set up Wan 2.2 TI2V 5B") {
+		t.Fatalf("64 GB: %q", got)
+	}
+}

@@ -209,6 +209,24 @@ func VideoCatalog() []Model {
 				Size: 22642902, SHA256: "04766eac0221b5390b985ae3fdcca652cbb4b1e8b82b28ea7ff89dfad1b1a93f",
 				Source: "https://raw.githubusercontent.com/madebyollin/taehv/011dfc2112197741c540e0bdd5b7b67bcc930771/safetensors/taew2_1.safetensors"},
 		},
+	}, {
+		// Wan 2.1 T2V 1.3B makes clips from a description on computers too
+		// small for the 5B model. It doesn't take a picture. It and its
+		// parts are Apache 2.0.
+		ID: "wan2.1-t2v-1.3b", Name: "Wan 2.1 T2V 1.3B", Kind: "video", Untested: true,
+		Description: "Short clips from a description on computers with less memory, at lower quality. It can't start from a picture.",
+		License:     "Apache-2.0", MemoryBytes: 10 << 30, Steps: 20, CFG: 6, FlowShift: 3, FPS: 16,
+		Files: []File{
+			{Role: "diffusion", Repo: "Comfy-Org/Wan_2.1_ComfyUI_repackaged", Path: "split_files/diffusion_models/wan2.1_t2v_1.3B_fp16.safetensors",
+				Size: 2838303560, SHA256: "be531024cd9018cb5b48c40cfbb6a6191645b1c792eb8bf4f8c1c6e10f924dc5"},
+			{Role: "t5xxl", Repo: "city96/umt5-xxl-encoder-gguf", Path: "umt5-xxl-encoder-Q4_K_M.gguf",
+				Size: 3655145312, SHA256: "17cf97a5bbbc60a646d6105b832b6f657ce904a8a1ad970e4b59df0c67584a40"},
+			{Role: "vae", Repo: "Comfy-Org/Wan_2.1_ComfyUI_repackaged", Path: "split_files/vae/wan_2.1_vae.safetensors",
+				Size: 253815318, SHA256: "2fc39d31359a4b0a64f55876d8ff7fa8d780956ae2cb13463b0223e15148976b"},
+			{Role: "tae", Repo: "madebyollin/taehv", Path: "safetensors/taew2_1.safetensors",
+				Size: 22642902, SHA256: "04766eac0221b5390b985ae3fdcca652cbb4b1e8b82b28ea7ff89dfad1b1a93f",
+				Source: "https://raw.githubusercontent.com/madebyollin/taehv/011dfc2112197741c540e0bdd5b7b67bcc930771/safetensors/taew2_1.safetensors"},
+		},
 	}}
 }
 

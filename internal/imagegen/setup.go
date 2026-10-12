@@ -298,9 +298,9 @@ func (s *Setup) canEdit() bool {
 
 // editModelMissing says what to set up to edit pictures.
 func editModelMissing(s *Setup) string {
-	name := "A model that edits pictures"
+	name := ""
 	for _, m := range s.models() {
-		if m.Edits && !m.Untested {
+		if m.Edits && !m.Untested && !tooLittleMemory(m, s.memory()) {
 			name = m.Name
 			break
 		}
@@ -309,7 +309,18 @@ func editModelMissing(s *Setup) string {
 	if m, ok := s.lookup(s.ActiveModel()); ok {
 		active = m.Name
 	}
+	video := false
 	if list := s.models(); len(list) > 0 && list[0].Kind == "video" {
+		video = true
+	}
+	// None that takes a picture fits this computer: a paired computer
+	// with more memory can.
+	switch {
+	case name == "" && video:
+		return fmt.Sprintf("%s can't bring pictures to life, and no model that can fits this computer; a paired computer with more memory can.", active)
+	case name == "":
+		return fmt.Sprintf("%s can't edit pictures, and no model that can fits this computer; a paired computer with more memory can.", active)
+	case video:
 		return fmt.Sprintf("%s can't bring pictures to life. Set up %s on the Tools page for clips from pictures.", active, name)
 	}
 	return fmt.Sprintf("%s can't edit pictures. Set up %s on the Tools page to edit them.", active, name)
