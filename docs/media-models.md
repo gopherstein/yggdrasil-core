@@ -1,0 +1,68 @@
+# Image and video models
+
+Toskar makes pictures and clips on your own computers with [stable-diffusion.cpp](https://github.com/leejet/stable-diffusion.cpp). The prompt, the pictures, and the clips aren't sent anywhere. This page lists the models it can set up, what each needs, and what to expect. For the tools themselves, see [Images](tools.md#images) and [Video](tools.md#video).
+
+Better hardware makes a model faster, or lets a larger model run. It doesn't change what a given model can draw.
+
+## Pictures
+
+| Model | Does | Download | Comfortable with | Tested |
+| --- | --- | --- | --- | --- |
+| FLUX.2 [klein] 4B | Makes and edits | 5.2 GB | 12 GB of memory | Yes: RX 7900 XTX, about 12–15 s a picture |
+| FLUX.2 [klein] 4B, high quality | Makes and edits, with more detail | 8.8 GB | 20 GB | Not yet |
+| Z-Image-Turbo | Makes photorealistic pictures, with clear text in them | 6.7 GB | 14 GB (estimate) | Yes: RX 7900 XTX, about 35–40 s a picture |
+| Qwen-Image-Edit-2511 | Edits only: changes what's asked, keeps the rest, edits text | 19.5 GB | 32 GB (estimate) | Not yet |
+
+- **Recommended:** the model Toskar picks for you does everything, making and editing. That's one of the FLUX.2 [klein] 4B builds, by memory. The others are set up by choice on the Tools page.
+- **Several at once:** with Z-Image-Turbo as your picture model, edits use FLUX.2 [klein] when it's set up. With Qwen-Image-Edit-2511 set up, edits use it, and new pictures use your picture model.
+- **Size:** pictures are up to 1536 pixels on a side and about 1.5 megapixels. Asking for more makes the largest picture the model allows, and the answer says so.
+
+## Clips
+
+| Model | Does | Download | Comfortable with | Tested |
+| --- | --- | --- | --- | --- |
+| Wan 2.2 TI2V 5B | Clips from a description or a picture | 8.5 GB | 16 GB | Yes: about 1 minute for 2 seconds on an RX 7900 XTX, 3½ minutes on an M5 Pro with 24 GB |
+| Wan 2.2 T2V A14B | Higher-quality clips from a description, more slowly | 23 GB | 32 GB (estimate) | Not yet |
+| Wan 2.1 T2V 1.3B | Short clips from a description, on smaller computers | 6.8 GB | 10 GB (estimate) | Not yet |
+
+- **Recommended:** Wan 2.2 TI2V 5B, which also brings pictures to life. The A14B and 1.3B models take no picture, so clips from a picture use the 5B model when it's set up.
+- **Length and size:** clips are 2 seconds unless you ask for more, up to 5 seconds, at up to about 832×480. Asking for longer or larger makes the most the model allows, and the answer says so.
+
+"Comfortable with" is the memory a model runs well with: graphics memory plus system memory on a computer with its own graphics card, or unified memory on Apple silicon. Setup refuses a model that can't fit at all and warns when one is tight. An estimate hasn't been measured on real hardware yet; "Not yet" models can be set up, but they're labeled as untested and never recommended.
+
+## Test machines
+
+| Computer | Status |
+| --- | --- |
+| Linux, AMD Radeon RX 7900 XTX 24 GB, Vulkan | Tested in the [media quality set](../tests/quality/README.md) |
+| Mac, Apple silicon (M5 Pro), 24 GB unified memory, Metal | Wan 2.2 TI2V 5B measured; the others not yet |
+| Windows or Linux, NVIDIA RTX 3080 10–12 GB, Vulkan | Not yet measured |
+
+24 GB of unified memory isn't 24 GB of graphics memory: the system and other apps share it, so a model comfortable with 24 GB may be tight on a 24 GB Mac.
+
+## When memory is short
+
+- **Before a picture or clip:** Toskar unloads the chat models in its way, waiting for an answer being written to finish, and holds new model loads until the picture or clip is done.
+- **If it still runs out:** the answer says so plainly and suggests a smaller picture, a shorter or smaller clip, or a [paired computer](clustering.md#tools-on-other-computers) with more memory.
+- **A paired computer:** one with image or video generation set up can make them for this one. Toskar prefers one whose GPU does the work.
+
+## Troubleshooting
+
+- **Slow pictures or clips:** check the Tools page. It says whether the GPU build or the CPU build makes them. On Linux and Windows the GPU build needs a Vulkan driver; see [GPU acceleration](gpu.md). Without one, a picture takes minutes and a clip can take most of an hour.
+- **"Ran out of memory":** close other large apps, ask for a smaller picture or shorter clip, or set up a lighter model.
+- **"The graphics card stopped responding":** try again. If it keeps happening, restart the computer or update the graphics driver.
+- **Mac App Store build:** image and video generation aren't available, since the App Sandbox can't run a program Toskar downloads. Use a copy of Toskar from outside the Mac App Store, or a paired computer.
+
+## Licenses and sources
+
+Every model and part Toskar sets up is under Apache 2.0, except TAEHV's fast video decoders, which are MIT. None needs an account to download. Each file is pinned to a revision and checked against its SHA-256.
+
+| Model | Source |
+| --- | --- |
+| FLUX.2 [klein] 4B | [black-forest-labs/FLUX.2-klein-4B](https://huggingface.co/black-forest-labs/FLUX.2-klein-4B) |
+| Z-Image-Turbo | [Tongyi-MAI/Z-Image-Turbo](https://huggingface.co/Tongyi-MAI/Z-Image-Turbo) |
+| Qwen-Image-Edit-2511 | [Qwen/Qwen-Image-Edit-2511](https://huggingface.co/Qwen/Qwen-Image-Edit-2511) |
+| Wan 2.2 | [Wan-Video/Wan2.2](https://github.com/Wan-Video/Wan2.2) |
+| Wan 2.1 | [Wan-Video/Wan2.1](https://github.com/Wan-Video/Wan2.1) |
+
+Models under non-commercial or community licenses, such as FLUX.2 Dev, aren't set up by Toskar ([#551](https://github.com/yeixio/toskar-core/issues/551)).
