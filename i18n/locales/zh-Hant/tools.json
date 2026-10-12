@@ -111,6 +111,8 @@
     "stop": "停止",
     "recommended": "推薦給這台電腦",
     "untested": "尚未在真實硬體上測試",
+    "graphicsShort": "這台電腦的顯示卡記憶體少於這個模型順暢運作所需的 {{comfortable}}，部分會在系統記憶體中執行，速度較慢。",
+    "tightConfirm": "仍然設定：我了解在這裡可能會很慢。",
     "needsLicense": "需要你的授權",
     "licenseLink": "閱讀授權",
     "tokenSet": "你的 Hugging Face 權杖已設定。",

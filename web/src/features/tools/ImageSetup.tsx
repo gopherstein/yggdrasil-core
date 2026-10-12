@@ -53,11 +53,14 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
     void queryClient.invalidateQueries({ queryKey: ['tools'] })
   }
   const start = useMutation({
-    mutationFn: ({ id, accept }: { id: string; accept?: boolean }) => api.startMediaSetup(kind, id, undefined, accept),
+    mutationFn: ({ id, accept, tight }: { id: string; accept?: boolean; tight?: boolean }) =>
+      api.startMediaSetup(kind, id, undefined, { acceptLicense: accept, acceptTight: tight }),
     onSuccess: update,
   })
   // A model behind a license: the person's token, and their word (#551).
   const [licenseOK, setLicenseOK] = useState(false)
+  // A model that would be slow or near the limit here: the person agrees (#550).
+  const [tightOK, setTightOK] = useState(false)
   const [token, setToken] = useState('')
   const saveToken = useMutation({
     mutationFn: (value: string) => api.updateSettings({ huggingface_token: value }),
@@ -174,6 +177,8 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
                   </p>
                 ) : model.tight_memory ? (
                   <p className="mt-1 text-xs text-warning">{t('images.tightMemory', { comfortable: gb(model.memory_bytes) })}</p>
+                ) : model.graphics_short ? (
+                  <p className="mt-1 text-xs text-warning">{t('images.graphicsShort', { comfortable: gb(model.graphics_bytes ?? 0) })}</p>
                 ) : null}
               </div>
               {model.installed ? (
@@ -237,15 +242,25 @@ function MediaSetupCard({ kind }: { kind: MediaKind }) {
         </div>
       ) : null}
 
+      {status.supported && !running && selectedModel?.verdict === 'tight' && !selectedModel.installed ? (
+        <label className="flex items-start gap-2 text-xs text-ink">
+          <input type="checkbox" className="mt-0.5" checked={tightOK} onChange={(e) => setTightOK(e.target.checked)} />
+          <span>{t('images.tightConfirm')}</span>
+        </label>
+      ) : null}
+
       {status.supported && !running && selected && !selectedModel?.installed && !selectedModel?.too_little_memory ? (
         <button
           type="button"
           className="btn-primary px-4 py-2 text-sm"
           disabled={
             start.isPending ||
+            (selectedModel?.verdict === 'tight' && !tightOK) ||
             (!!selectedModel?.needs_license && (!status.huggingface_token_set || !(licenseOK || selectedModel.license_accepted)))
           }
-          onClick={() => start.mutate({ id: selected, accept: selectedModel?.needs_license ? true : undefined })}
+          onClick={() =>
+            start.mutate({ id: selected, accept: selectedModel?.needs_license ? true : undefined, tight: selectedModel?.verdict === 'tight' ? true : undefined })
+          }
         >
           {status.ready ? t('images.download') : t('images.setUp')}
         </button>

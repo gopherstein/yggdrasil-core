@@ -111,6 +111,8 @@
     "stop": "Stop",
     "recommended": "Recommended for this computer",
     "untested": "Not tested on real hardware yet",
+    "graphicsShort": "This computer's graphics card has less memory than this model works best with ({{comfortable}}), so parts of it run from system memory and it's slower.",
+    "tightConfirm": "Set it up anyway: I understand it may be slow here.",
     "needsLicense": "Needs your license",
     "licenseLink": "Read the license",
     "tokenSet": "Your Hugging Face token is set.",

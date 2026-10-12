@@ -227,3 +227,52 @@ func TestQualityTiers(t *testing.T) {
 		t.Fatalf("result %v", out.Result)
 	}
 }
+
+// A model gets a verdict for this computer: unsupported when it can't
+// fit, tight when it's below the memory or graphics memory it's
+// comfortable with, and works otherwise; a tight one is set up only when
+// the person agrees (#550).
+func TestVerdicts(t *testing.T) {
+	m := Model{Name: "Big", MemoryBytes: 16 << 30, GraphicsBytes: 12 << 30, Files: []File{{Size: 6 << 30}}}
+	for _, c := range []struct {
+		memory, graphics int64
+		want             string
+	}{
+		{4 << 30, 0, VerdictUnsupported},
+		{12 << 30, 0, VerdictTight},
+		{32 << 30, 8 << 30, VerdictTight},
+		{32 << 30, 24 << 30, VerdictWorks},
+		{32 << 30, 0, VerdictWorks},
+	} {
+		if got := verdict(m, c.memory, c.graphics); got != c.want {
+			t.Errorf("%d GB / %d GB graphics = %s, want %s", c.memory>>30, c.graphics>>30, got, c.want)
+		}
+	}
+	for _, list := range [][]Model{Catalog(), VideoCatalog()} {
+		for _, x := range list {
+			if x.GraphicsBytes == 0 {
+				t.Errorf("%s has no graphics memory figure", x.ID)
+			}
+		}
+	}
+
+	f := newFixture(t)
+	model := f.model(t)
+	model.GraphicsBytes = 64 << 30
+	f.setup.Catalog = func() []Model { return []Model{model} }
+	f.setup.Graphics = func() int64 { return 8 << 30 }
+	st := f.setup.Status()
+	if st.Models[0].Verdict != VerdictTight || !st.Models[0].GraphicsShort {
+		t.Fatalf("status %+v", st.Models[0])
+	}
+	if err := f.setup.Start(model.ID); err == nil || !strings.Contains(err.Error(), "graphics card has 8 GB") {
+		t.Fatalf("set up without agreeing: %v", err)
+	}
+	f.setup.AllowTight(model.ID)
+	if err := f.setup.Start(model.ID); err != nil {
+		t.Fatal(err)
+	}
+	if j := waitJob(t, f.setup); j.Error != "" {
+		t.Fatalf("setup failed: %s", j.Error)
+	}
+}

@@ -110,6 +110,9 @@ func (s *Server) setupRoutes(api *mux.Router, prefix string, setup func() *image
 			// AcceptLicense is the person confirming their license covers
 			// how they'll use a model behind one (#551).
 			AcceptLicense bool `json:"accept_license"`
+			// AcceptTight is the person agreeing to set up a model that
+			// would be slow or near the limit here (#550).
+			AcceptTight bool `json:"accept_tight"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			writeErr(w, http.StatusBadRequest, "INVALID_JSON", "invalid body", nil)
@@ -120,6 +123,9 @@ func (s *Server) setupRoutes(api *mux.Router, prefix string, setup func() *image
 				writeErrFrom(w, http.StatusConflict, "SETUP_REFUSED", err)
 				return
 			}
+		}
+		if body.AcceptTight {
+			st.AllowTight(body.ModelID)
 		}
 		if err := st.Start(body.ModelID); err != nil {
 			writeErrFrom(w, http.StatusConflict, "SETUP_REFUSED", err)

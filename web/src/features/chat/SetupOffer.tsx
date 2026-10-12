@@ -115,7 +115,9 @@ function MediaOfferCard({ offer, onContinue }: { offer: SetupOffer; onContinue: 
             onClick={async () => {
               setError(null)
               try {
-                const next = await api.startMediaSetup(kind, offer.option, nodeId)
+                // The warning above was shown before Set up, so a tight
+                // computer has been agreed to (#550).
+                const next = await api.startMediaSetup(kind, offer.option, nodeId, { acceptTight: !!offer.tight_memory })
                 setStarted(true)
                 if (next) queryClient.setQueryData(statusKey, next)
                 else void statusQuery.refetch()

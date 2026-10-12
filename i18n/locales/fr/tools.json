@@ -111,6 +111,8 @@
     "stop": "Arrêter",
     "recommended": "Recommandé pour cet ordinateur",
     "untested": "Pas encore testé sur du vrai matériel",
+    "graphicsShort": "La carte graphique de cet ordinateur a moins de mémoire que ce modèle n’en demande pour bien tourner ({{comfortable}}) : une partie tourne en mémoire système, plus lentement.",
+    "tightConfirm": "L’installer quand même : je comprends qu’il peut être lent ici.",
     "needsLicense": "Nécessite ta licence",
     "licenseLink": "Lire la licence",
     "tokenSet": "Ton jeton Hugging Face est enregistré.",

@@ -35,6 +35,9 @@ type Setup struct {
 	Changed func()
 	// Catalog lists the models this setup offers; nil is the image models.
 	Catalog func() []Model
+	// Graphics is this computer's own graphics memory, or 0 when it has
+	// none, shares system memory (Apple silicon), or it isn't known (#550).
+	Graphics func() int64
 	// Token is the person's Hugging Face token, for files behind a
 	// model's license (#551); "" when none is set.
 	Token func() string
@@ -51,6 +54,9 @@ type Setup struct {
 	mu     sync.Mutex
 	job    *job
 	cancel context.CancelFunc
+	// tightOK are models the person agreed to set up though they would
+	// be slow or near the limit here.
+	tightOK map[string]bool
 }
 
 type job struct {
@@ -88,6 +94,38 @@ type ModelStatus struct {
 	// LicenseAccepted is a model behind a license that the person has
 	// confirmed their license covers (#551).
 	LicenseAccepted bool `json:"license_accepted,omitempty"`
+	// GraphicsShort is a model this computer's own graphics card has less
+	// memory for than it's comfortable with: parts of it run from system
+	// memory, more slowly (#550).
+	GraphicsShort bool `json:"graphics_short,omitempty"`
+	// Verdict is works, tight (it runs, slowly or near the limit, and is
+	// set up only when the person agrees), or unsupported (#550).
+	Verdict string `json:"verdict"`
+}
+
+// Verdicts (#550).
+const (
+	VerdictWorks       = "works"
+	VerdictTight       = "tight"
+	VerdictUnsupported = "unsupported"
+)
+
+// graphicsShort reports a graphics card with less memory than m is
+// comfortable with. Without a card of its own, memory decides.
+func graphicsShort(m Model, graphics int64) bool {
+	return graphics > 0 && m.GraphicsBytes > 0 && graphics < m.GraphicsBytes
+}
+
+// verdict sums up whether m runs on a computer with this memory and
+// graphics memory.
+func verdict(m Model, memory, graphics int64) string {
+	switch {
+	case tooLittleMemory(m, memory):
+		return VerdictUnsupported
+	case tightMemory(m, memory) || graphicsShort(m, graphics):
+		return VerdictTight
+	}
+	return VerdictWorks
 }
 
 // headroom is memory beyond a model's files that making a picture needs.
@@ -241,10 +279,12 @@ func (s *Setup) Status() Status {
 	memory := s.memory()
 	st.MemoryBytes, st.Accelerated = memory, s.Accelerated()
 	st.Build, st.GPUBuild = s.InstalledBuild(), s.gpuBuildHere()
+	graphics := s.graphics()
 	rec := recommendIn(s.models(), memory).ID
 	for _, m := range s.models() {
 		st.Models = append(st.Models, ModelStatus{Model: m, SizeBytes: m.SizeBytes(), Installed: s.installed(m.ID), Recommended: m.ID == rec,
-			TooLittleMemory: tooLittleMemory(m, memory), TightMemory: tightMemory(m, memory), LicenseAccepted: m.NeedsLicense && s.licenseAccepted(m.ID)})
+			TooLittleMemory: tooLittleMemory(m, memory), TightMemory: tightMemory(m, memory), LicenseAccepted: m.NeedsLicense && s.licenseAccepted(m.ID),
+			GraphicsShort: graphicsShort(m, graphics), Verdict: verdict(m, memory, graphics)})
 	}
 	st.TokenSet = s.token() != ""
 	s.mu.Lock()
@@ -416,6 +456,11 @@ func (s *Setup) Start(id string) error {
 	}
 	if memory := s.memory(); tooLittleMemory(m, memory) {
 		return errors.New(memoryShort(m, memory))
+	}
+	// A model that would be slow or near the limit here is set up only
+	// when the person agrees (#550).
+	if !s.installed(id) && verdict(m, s.memory(), s.graphics()) == VerdictTight && !s.tightAllowed(id) {
+		return errors.New(tightReason(m, s.memory(), s.graphics()))
 	}
 	need := int64(0)
 	if !s.installed(id) {
@@ -684,4 +729,37 @@ func (s *Setup) AcceptLicense(id string, now time.Time) error {
 	}
 	record := fmt.Sprintf("%s\n%s\n", now.UTC().Format(time.RFC3339), m.LicenseURL)
 	return os.WriteFile(s.licenseFile(id), []byte(record), 0o644)
+}
+
+// graphics is this computer's own graphics memory, or 0.
+func (s *Setup) graphics() int64 {
+	if s.Graphics == nil {
+		return 0
+	}
+	return s.Graphics()
+}
+
+// AllowTight records that the person agreed to set up a model that would
+// be slow or near the limit here (#550).
+func (s *Setup) AllowTight(id string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.tightOK == nil {
+		s.tightOK = map[string]bool{}
+	}
+	s.tightOK[id] = true
+}
+
+func (s *Setup) tightAllowed(id string) bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.tightOK[id]
+}
+
+// tightReason says why a model would be slow or near the limit here.
+func tightReason(m Model, memory, graphics int64) string {
+	if graphicsShort(m, graphics) {
+		return fmt.Sprintf("%s works best with %.0f GB of graphics memory, and this computer's graphics card has %.0f GB, so parts of it run from system memory and it's slower; agree to set it up anyway, or choose a lighter model", m.Name, gb(m.GraphicsBytes), gb(graphics))
+	}
+	return fmt.Sprintf("%s is comfortable with %.0f GB of memory, and this computer has %.0f GB, so it may be slow or fail; agree to set it up anyway, or choose a lighter model", m.Name, gb(m.MemoryBytes), gb(memory))
 }

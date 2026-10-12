@@ -1132,10 +1132,15 @@ export const api = {
   getMediaSetup: (kind: MediaKind, nodeId?: string) => request<ImageSetup>(mediaSetupPath(kind, nodeId)),
 
   /** Install stable-diffusion.cpp and a model of that kind in the background, here or on a paired computer. */
-  startMediaSetup: (kind: MediaKind, modelId: string, nodeId?: string, acceptLicense?: boolean) =>
+  /** acceptLicense confirms the person's license covers a model behind one (#551); acceptTight agrees to a model that would be slow or near the limit here (#550). */
+  startMediaSetup: (kind: MediaKind, modelId: string, nodeId?: string, opts?: { acceptLicense?: boolean; acceptTight?: boolean }) =>
     request<ImageSetup>(mediaSetupPath(kind, nodeId), {
       method: 'POST',
-      body: JSON.stringify(acceptLicense ? { model_id: modelId, accept_license: true } : { model_id: modelId }),
+      body: JSON.stringify({
+        model_id: modelId,
+        ...(opts?.acceptLicense ? { accept_license: true } : {}),
+        ...(opts?.acceptTight ? { accept_tight: true } : {}),
+      }),
     }),
 
   /** Stop the setup; what was downloaded is kept. */

@@ -31,8 +31,24 @@ func (a *App) newSDSetup(cfg config.Config, folder string, catalog func() []imag
 		}
 		return int64(inv.Memory.TotalBytes)
 	})
+	// A graphics card's own memory; 0 on Apple silicon, which shares
+	// system memory, or without a card (#550).
+	graphics := sync.OnceValue(func() int64 {
+		inv, err := a.hw.Detect(context.Background())
+		if err != nil {
+			return 0
+		}
+		var most uint64
+		for _, ac := range inv.Accelerators {
+			if ac.Kind == "gpu" && !softwareAdapter(ac.Model) {
+				most = max(most, ac.DedicatedVRAM)
+			}
+		}
+		return int64(most)
+	})
 	return &imagegen.Setup{
 		ProgramDir: filepath.Join(cfg.RuntimesDir, "sdcpp"),
+		Graphics:   graphics,
 		ModelsDir:  filepath.Join(cfg.ModelsDir, folder),
 		Catalog:    catalog,
 		Memory:     memory,

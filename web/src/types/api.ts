@@ -674,7 +674,13 @@ export interface ImageModel {
   /** This computer has less memory than it's comfortable with, so it may be slow or fail. */
   tight_memory?: boolean
   /** Not yet tested on real hardware: it can be chosen, but it's never recommended (#548). */
-  untested?: boolean  /** It changes pictures but doesn't make new ones: edits prefer it, and it's never the active model (#548). */
+  untested?: boolean
+  /** The graphics memory it's comfortable with on a computer with its own graphics card (#550). */
+  graphics_bytes?: number
+  /** This computer's graphics card has less memory than that: parts run from system memory, more slowly. */
+  graphics_short?: boolean
+  /** works, tight (set up only when the person agrees), or unsupported (#550). */
+  verdict?: 'works' | 'tight' | 'unsupported'   /** It changes pictures but doesn't make new ones: edits prefer it, and it's never the active model (#548). */
   edit_only?: boolean
   /** Toskar can't give it out: it's set up with the person's own Hugging Face token and their confirmation that their license covers their use (#551). */
   needs_license?: boolean
