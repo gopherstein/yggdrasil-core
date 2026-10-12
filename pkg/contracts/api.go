@@ -846,6 +846,9 @@ type FileRef struct {
 	Size int64  `json:"size_bytes"`
 	// Producer is user for an attachment, assistant for a produced file.
 	Producer string `json:"producer"`
+	// Details are how a made file was made, such as a picture's model,
+	// quality, seed, size, and prompt (contract 1.29, #553).
+	Details map[string]any `json:"details,omitempty"`
 }
 
 // Message is a chat message.

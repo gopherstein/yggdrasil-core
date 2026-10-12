@@ -105,6 +105,7 @@
     "deleteFailed": "Dieser Chat konnte nicht gelöscht werden."
   },
   "attachments": {
+    "madeWith": "{{model}} · {{size}} · Seed {{seed}}",
     "unsupported": "Diesen Dateityp kann Toskar noch nicht lesen",
     "tooLarge": "Dateien dürfen bis zu 25 MB groß sein",
     "addFailed": "Die Datei konnte nicht hinzugefügt werden.",

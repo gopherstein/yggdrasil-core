@@ -204,6 +204,7 @@ export function ImageChip({ file }: { file: FileRef }) {
           ↓
         </button>
       </span>
+      <MadeWith file={file} />
     </span>
   )
 }
@@ -254,6 +255,7 @@ export function VideoChip({ file }: { file: FileRef }) {
           ↓
         </button>
       </span>
+      <MadeWith file={file} />
     </span>
   )
 }
@@ -296,6 +298,23 @@ export function PendingFileChip({ file, onRemove }: { file: PendingFile; onRemov
       >
         ×
       </button>
+    </span>
+  )
+}
+
+/**
+ * How a made picture or clip was made: its model, size, and seed, with the
+ * prompt on hover, so it can be made again (#553).
+ */
+function MadeWith({ file }: { file: FileRef }) {
+  const { t } = useTranslation('chat')
+  const d = file.details
+  if (!d?.model) return null
+  const size = d.width && d.height ? `${d.width}×${d.height}` : ''
+  return (
+    <span className="truncate px-1 text-[11px] text-ink-faint" title={d.prompt}>
+      {/* A seed is an identifier, so it isn't grouped like a number. */}
+      {t('attachments.madeWith', { model: d.model, size, seed: d.seed != null ? String(d.seed) : '' })}
     </span>
   )
 }

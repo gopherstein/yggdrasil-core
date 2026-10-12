@@ -65,3 +65,18 @@ func TestMediaStepNamesTheModel(t *testing.T) {
 		t.Fatalf("steps %q", got)
 	}
 }
+
+// A made picture's file carries how it was made, and has one step, naming
+// its model (#553, #549).
+func TestMadePictureCarriesDetails(t *testing.T) {
+	tr := &turnTrace{lang: "en"}
+	tr.tool("image.generate", map[string]any{"prompt": "a dog"}, map[string]any{
+		"id": "a1", "name": "dog.png", "kind": "image", "model": "Z-Image-Turbo", "seed": int64(7), "prompt": "a dog", "width": 1024, "height": 576, "seconds": 35.0,
+	})
+	if len(tr.files) != 1 || tr.files[0].Details["model"] != "Z-Image-Turbo" || tr.files[0].Details["seed"] != int64(7) || tr.files[0].Details["seconds"] != nil {
+		t.Fatalf("files %+v", tr.files)
+	}
+	if len(tr.steps) != 1 || tr.steps[0].Text != "Made the picture with Z-Image-Turbo" {
+		t.Fatalf("steps %+v", tr.steps)
+	}
+}
