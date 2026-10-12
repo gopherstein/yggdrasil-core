@@ -115,17 +115,19 @@ Speech runs on this computer: audio and text are not sent anywhere. Both tools a
 - stable-diffusion.cpp release `master-956-1b0ba10` from GitHub, 17–35 MB.
 - A model from Hugging Face.
 
-Each download is pinned to a revision and checked against its SHA-256. A stopped setup resumes where it left off. The recommended model depends on this computer's memory.
+Each download is pinned to a revision and checked against its SHA-256. A stopped setup resumes where it left off. The recommended model depends on this computer's memory, and always both makes and edits.
 
 | Model | Download | For | What it does |
 | --- | --- | --- | --- |
 | FLUX.2 [klein] 4B | 5.2 GB | 16 GB of memory | Makes and edits images in four steps |
 | FLUX.2 [klein] 4B, high quality | 8.8 GB | 24 GB of memory or more | The same, with more detail |
+| Z-Image-Turbo | 6.7 GB | 16 GB of memory | Makes photorealistic images, with clear text in them; doesn't edit |
+| Qwen-Image-Edit-2511 | 19.5 GB | 32 GB of memory or more | Only edits; when set up, edits use it |
 
-Each is the [FLUX.2 [klein] 4B](https://huggingface.co/black-forest-labs/FLUX.2-klein-4B) diffusion model (GGUF, Q4_0 or Q8_0), the Qwen3 4B text encoder (GGUF), and the FLUX.2 small decoder VAE. All three are Apache 2.0 and need no account to download.
+All of them and their parts are Apache 2.0 and need no account to download. [Image and video models](media-models.md) has what each needs, measured times, and which are still untested.
 
 - **Other computers:** a paired computer with image generation set up makes images for this one, preferring one whose GPU does the work ([tools on other computers](clustering.md#tools-on-other-computers)).
-- **Platforms:** macOS on Apple silicon (Metal), and Linux x86-64 and Windows x64 (CPU builds, which are much slower). Elsewhere, and in the Mac App Store build, which cannot run a program it downloads, the tools are unavailable and say why.
+- **Platforms:** macOS on Apple silicon (Metal), and Linux x86-64 and Windows x64 (Vulkan on a GPU with a Vulkan driver, otherwise the much slower CPU build; see [GPU acceleration](gpu.md)). Elsewhere, and in the Mac App Store build, which cannot run a program it downloads, the tools are unavailable and say why.
 - **Generating:** `prompt` is up to 2,000 characters. `width` and `height` default to 1024 and are rounded to multiples of 64, between 256 and 1536 and up to about 1.5 megapixels. `seed` repeats an image, and each result includes its seed. Images are saved as PNG files attached to the answer.
 - **Editing:** `file` is an image in the chat by name or id. The result keeps the image's shape, at up to 1024 pixels on the longer side, and is attached as a new file, so the original is kept.
 - **Limits:** one image at a time, 20 minutes each.
@@ -139,6 +141,10 @@ Each is the [FLUX.2 [klein] 4B](https://huggingface.co/black-forest-labs/FLUX.2-
 | Model | Download | For | What it does |
 | --- | --- | --- | --- |
 | Wan 2.2 TI2V 5B | 8.5 GB | 16 GB of memory | A clip from a description, or from an image |
+| Wan 2.2 T2V A14B | 23 GB | 32 GB of memory or more | Higher-quality clips from a description, more slowly |
+| Wan 2.1 T2V 1.3B | 6.8 GB | 10 GB of memory | Short clips from a description, at lower quality |
+
+Clips from an image use Wan 2.2 TI2V 5B, the only one that takes an image. See [Image and video models](media-models.md).
 
 The model is Wan 2.2 TI2V 5B (GGUF, Q4_K_M) with the umt5-xxl text encoder (GGUF) and the Wan 2.2 VAE, all Apache 2.0. It also includes TAEHV (`taew2_2`, MIT, 23 MB from GitHub), a small decoder that turns the clip into frames in about 2 seconds; the full VAE's decode takes most of an hour on a 24 GB Mac. None of the files needs an account to download.
 
