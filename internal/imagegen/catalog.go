@@ -151,10 +151,12 @@ func Catalog() []Model {
 		},
 		// Qwen-Image-Edit-2511 (Qwen) changes a picture from an instruction,
 		// keeping what wasn't asked to change, and edits text in pictures. It
-		// only edits. 2511 needs zero_cond_t, or its edits degrade. It, its
+		// only edits. 2511 needs zero_cond_t, or its edits degrade. Tested on
+		// an RX 7900 XTX: about 80 s an edit, against FLUX.2 klein's 17 s
+		// (quality run 38309280682). It, its
 		// Qwen2.5-VL text encoder, and its VAE are Apache 2.0.
 		{
-			ID: "qwen-image-edit-2511", Name: "Qwen-Image-Edit-2511", Kind: "image", Untested: true,
+			ID: "qwen-image-edit-2511", Name: "Qwen-Image-Edit-2511", Kind: "image",
 			Description: "Changes pictures from an instruction, keeping the rest, and edits text in them. It only edits; a large download for computers with 32 GB of memory or more.",
 			License:     "Apache-2.0", MemoryBytes: 32 << 30, Edits: true, EditOnly: true, Steps: 20, CFG: 2.5, FlowShift: 3,
 			ModelArgs: "qwen_image_zero_cond_t=true",
