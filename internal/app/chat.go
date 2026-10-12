@@ -264,6 +264,12 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 			profile = withChatModel(profile, modelID)
 			routeReason = locale.T(appLang, "chat:steps.seesPictures", map[string]any{"model": a.modelName(modelID)})
 		default:
+			// One that sees can be installed: offer it, then answer (#529).
+			if !topical && !branch.Any() {
+				if ch, ok := a.offerVision(ctx, conversationID, message, appLang, attached, pictures); ok {
+					return ch, nil
+				}
+			}
 			if routeNotice == "" {
 				routeNotice = locale.T(appLang, "chat:notices.noVision", nil)
 			}
