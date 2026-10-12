@@ -280,9 +280,6 @@ func (s *Setup) ActiveModel() string {
 	return ""
 }
 
-// paths returns the active model and its files by role.
-func (s *Setup) paths() (Model, map[string]string, error) { return s.pathsFor(false) }
-
 // editOnly reports a model that only edits, which is never the active one.
 func (s *Setup) editOnly(id string) bool {
 	m, ok := s.lookup(id)
