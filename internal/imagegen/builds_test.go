@@ -38,7 +38,7 @@ func TestPickArchive(t *testing.T) {
 	}
 	for platform, list := range archives {
 		for _, a := range list {
-			if len(a.SHA256) != 64 || a.Size <= 0 || !strings.Contains(a.Name, "3f8527a") {
+			if len(a.SHA256) != 64 || a.Size <= 0 || !strings.Contains(a.Name, "1b0ba10") {
 				t.Errorf("%s: %+v", platform, a)
 			}
 		}

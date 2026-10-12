@@ -101,6 +101,9 @@ func (e *Engine) GenerateVideo(ctx context.Context, req VideoRequest) (VideoResu
 	if ok, why := e.Available(); !ok {
 		return VideoResult{}, fmt.Errorf("%s", why)
 	}
+	if err := e.ensureCurrent(ctx); err != nil {
+		return VideoResult{}, err
+	}
 	cli := e.Setup.CLI()
 	model, files, err := e.Setup.paths()
 	if err != nil {
@@ -145,6 +148,9 @@ func (e *Engine) GenerateVideo(ctx context.Context, req VideoRequest) (VideoResu
 		"--steps", strconv.Itoa(model.Steps), "--cfg-scale", f(model.CFG), "--flow-shift", f(model.FlowShift),
 		"--sampling-method", "euler", "-s", strconv.FormatInt(seed, 10), "-o", out,
 		"--offload-to-cpu", "--diffusion-fa",
+		// Guided and unguided passes run one after the other, as before
+		// master-956, so a clip needs no more memory than it did (#548).
+		"--batched-cfg", "off",
 	}
 	if tae := files["tae"]; tae != "" {
 		// The tiny decoder turns the clip into frames in seconds.
