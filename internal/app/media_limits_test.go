@@ -32,3 +32,36 @@ func TestMediaLimitNotice(t *testing.T) {
 		t.Errorf("quality notice %q", got)
 	}
 }
+
+// A profile's picture and clip quality fills in a request that asks for
+// none, and only for those tools (#549).
+func TestWithMediaQuality(t *testing.T) {
+	args := map[string]any{"prompt": "a dog"}
+	if got := withMediaQuality("best", "image.generate", args); got["quality"] != "best" || args["quality"] != nil {
+		t.Fatalf("image = %v (original %v)", got, args)
+	}
+	if got := withMediaQuality("best", "video.generate", map[string]any{"quality": "fast"}); got["quality"] != "fast" {
+		t.Fatalf("asked quality replaced: %v", got)
+	}
+	if got := withMediaQuality("best", "image.edit", args); got["quality"] != nil {
+		t.Fatalf("edit got a quality: %v", got)
+	}
+	if got := withMediaQuality("", "image.generate", args); got["quality"] != nil {
+		t.Fatalf("no profile quality: %v", got)
+	}
+}
+
+// The steps say which model made a picture or clip (#549).
+func TestMediaStepNamesTheModel(t *testing.T) {
+	tr := &turnTrace{lang: "en"}
+	tr.tool("image.generate", map[string]any{"prompt": "a dog"}, map[string]any{"model": "Z-Image-Turbo"})
+	tr.tool("video.generate", map[string]any{"prompt": "waves"}, map[string]any{"model": "Wan 2.2 TI2V 5B"})
+	var texts []string
+	for _, s := range tr.steps {
+		texts = append(texts, s.Text)
+	}
+	got := strings.Join(texts, " | ")
+	if !strings.Contains(got, "Made the picture with Z-Image-Turbo") || !strings.Contains(got, "Made the clip with Wan 2.2 TI2V 5B") {
+		t.Fatalf("steps %q", got)
+	}
+}

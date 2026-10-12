@@ -1300,6 +1300,7 @@ func (e *chatExecEnv) ExecuteTool(ctx context.Context, toolID string, args map[s
 		e.progress(events.ToolFailed, map[string]any{"tool_id": toolID, "error": err.Error()})
 		return nil, err
 	}
+	args = withMediaQuality(e.profile.Orchestration.MediaQuality, toolID, args)
 	e.progress(events.ToolStarted, map[string]any{"tool_id": toolID, "args": args})
 	toolStarted := time.Now()
 	result, err := e.app.Tools.Execute(ctx, toolID, args, policy, "chat requested tool", meta)

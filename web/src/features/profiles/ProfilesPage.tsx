@@ -961,6 +961,7 @@ function AdvancedEditor({
             {strategy !== 'team' && (
               <OrchestrationControls value={orchestration} onChange={setOrchestration} disabled={saving} only={['deliberate']} />
             )}
+            <OrchestrationControls value={orchestration} onChange={setOrchestration} disabled={saving} only={['media_quality']} />
             {advancedMode && (
               <OrchestrationControls value={orchestration} onChange={setOrchestration} disabled={saving} only={ORCHESTRATION_KEYS} />
             )}

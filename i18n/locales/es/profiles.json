@@ -379,6 +379,14 @@
       "label": "Presupuesto de contexto",
       "help": "Parte máxima de la ventana que pueden usar los mensajes anteriores (0.1–0.9)."
     },
+    "media_quality": {
+      "label": "Calidad de imágenes y clips",
+      "help": "Se usa cuando una petición no pide una calidad: rápida, equilibrada o la mejor, cada una con su propio modelo.",
+      "default": "El modelo del equipo",
+      "fast": "Rápida",
+      "balanced": "Equilibrada",
+      "best": "La mejor"
+    },
     "deliberate": {
       "label": "Comparar borradores independientes",
       "help": "Dos borradores más responden cada pregunta por separado; si sus respuestas finales difieren, se revisan entre sí y un juez escribe la respuesta. Más lento; ideal para matemáticas y razonamiento.",

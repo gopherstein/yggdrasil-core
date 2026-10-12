@@ -379,6 +379,14 @@
       "label": "Orçamento de contexto",
       "help": "Parte máxima da janela que as mensagens anteriores podem usar (0,1–0,9)."
     },
+    "media_quality": {
+      "label": "Qualidade de imagens e clipes",
+      "help": "Usada quando um pedido não pede uma qualidade: rápida, equilibrada ou a melhor, cada uma com seu próprio modelo.",
+      "default": "O modelo do computador",
+      "fast": "Rápida",
+      "balanced": "Equilibrada",
+      "best": "A melhor"
+    },
     "deliberate": {
       "label": "Comparar rascunhos independentes",
       "help": "Mais dois rascunhos respondem cada pergunta separadamente; se as respostas finais forem diferentes, eles se verificam e um juiz escreve a resposta. Mais lento; ideal para matemática e raciocínio.",

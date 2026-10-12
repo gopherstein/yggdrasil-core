@@ -62,3 +62,21 @@ func num(v any) (float64, bool) {
 func seconds(s float64) string {
 	return strconv.FormatFloat(s, 'f', -1, 64)
 }
+
+// withMediaQuality adds the profile's picture and clip quality to a
+// request that doesn't ask for one (#549).
+func withMediaQuality(quality, toolID string, args map[string]any) map[string]any {
+	id := tools.Canonical(toolID)
+	if quality == "" || (id != "image.generate" && id != "video.generate") {
+		return args
+	}
+	if q, _ := args["quality"].(string); q != "" {
+		return args
+	}
+	out := make(map[string]any, len(args)+1)
+	for k, v := range args {
+		out[k] = v
+	}
+	out["quality"] = quality
+	return out
+}

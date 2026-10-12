@@ -593,6 +593,10 @@ type OrchestrationPolicy struct {
 	// docs/deliberate.md). Empty is never; auto behaves like never until
 	// the quality run shows where it helps.
 	Deliberate string `json:"deliberate,omitempty"`
+	// MediaQuality is the quality pictures and clips are made at when a
+	// request doesn't ask for one: fast, balanced, or best (#549). Empty
+	// uses the model set up as the computer's picture or clip model.
+	MediaQuality string `json:"media_quality,omitempty"`
 	// Fallback is off to show a failure instead of quietly answering on
 	// another model.
 	Fallback string `json:"fallback,omitempty"`
