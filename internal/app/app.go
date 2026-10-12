@@ -860,6 +860,13 @@ func New(opts Options) (*App, error) {
 	a.Tools.Register(&scheduleTool{app: a})
 	a.API.BindArtifacts(a.Artifacts)
 	a.API.BindKnowledge(a.Mimir)
+	// A media.json in the data folder replaces the built-in picture and
+	// clip models (#551); one that isn't fully pinned is refused.
+	if path := filepath.Join(cfg.DataDir, "manifests", "models", "media.json"); fileExists(path) {
+		if err := imagegen.UseManifest(path); err != nil {
+			logger.Warn("media.json refused; using the built-in models", "path", path, "error", err)
+		}
+	}
 	a.Images = a.newImageSetup(cfg)
 	images := &imagegen.Engine{Setup: a.Images, WorkDir: filepath.Join(cfg.DataDir, "image-jobs"), Room: a.mediaRoom, Logger: logger}
 	a.registerPortable(&imagegen.GenerateTool{Engine: images, Store: a.Artifacts})

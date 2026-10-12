@@ -63,6 +63,10 @@ Each model has a tier: **fast**, **balanced**, or **best**. Asking for "a high-q
 - **"The graphics card stopped responding":** try again. If it keeps happening, restart the computer or update the graphics driver.
 - **Mac App Store build:** image and video generation aren't available, since the App Sandbox can't run a program Toskar downloads. Use a copy of Toskar from outside the Mac App Store, or a paired computer.
 
+## Where the list comes from
+
+The models are listed in `manifests/models/media.json`, built into Toskar. A `media.json` in the data folder's `manifests/models` replaces it, as `catalog.json` does for chat models. Every file in it must be pinned, with its size, SHA-256, and a revision or full address; a file that isn't is refused, and the built-in list stays.
+
 ## Licenses and sources
 
 Every model and part Toskar sets up is under Apache 2.0, except TAEHV's fast video decoders, which are MIT. None needs an account to download. Each file is pinned to a revision and checked against its SHA-256.

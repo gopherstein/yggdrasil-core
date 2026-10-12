@@ -145,7 +145,7 @@ func TestLightClipModel(t *testing.T) {
 	}
 	for _, v := range VideoCatalog() {
 		for _, file := range v.Files {
-			if file.Source == "" && revisions[file.Repo] == "" || len(file.SHA256) != 64 || file.Size == 0 {
+			if file.Source == "" && file.Revision == "" || len(file.SHA256) != 64 || file.Size == 0 {
 				t.Errorf("%s: %s is not pinned", v.ID, file.Path)
 			}
 		}
