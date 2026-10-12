@@ -210,6 +210,11 @@ jobs:
       # kept in the models volume), so the other models don't repeat it.
       - name: Media
         if: ${{ !cancelled() && matrix.model == 'recommended' }}
+        # A Hugging Face token whose account accepted a gated model's
+        # license, for testing a model that needs one (#551). It reaches the
+        # container through the environment, never the command line.
+        env:
+          TOSKAR_QUALITY_HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           mkdir -p .quality
           docker run --rm --network "$NAME" \
@@ -224,6 +229,7 @@ jobs:
             -e TOSKAR_QUALITY_MEDIA_INSTALL=1 \
             -e TOSKAR_QUALITY_MEDIA_IMAGE_MODEL="${{ inputs.image_model }}" \
             -e TOSKAR_QUALITY_MEDIA_VIDEO_MODEL="${{ inputs.video_model }}" \
+            -e TOSKAR_QUALITY_HF_TOKEN \
             -e TOSKAR_QUALITY_MEDIA_REPORT=/src/.quality/media.md \
             golang:1.26-bookworm \
             go test ./tests/quality -run 'TestMedia' -count=1 -v -timeout 180m

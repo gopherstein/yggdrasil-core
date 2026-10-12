@@ -124,7 +124,10 @@ includes it once, with the recommended models.
 tests another picture model or editor, such as one marked untested (#548);
 FLUX.2 [klein] 4B is still set up, for edits and, beside an editor, for new
 pictures. `TOSKAR_QUALITY_MEDIA_VIDEO_MODEL` (`video_model`) does the same for
-clips, with Wan 2.2 TI2V 5B kept for clips from pictures.
+clips, with Wan 2.2 TI2V 5B kept for clips from pictures. A model that needs
+a license (#551) is tested with `TOSKAR_QUALITY_HF_TOKEN`, the token of a
+Hugging Face account that accepted it (the workflow's `HF_TOKEN` secret);
+the set confirms the license for that run.
 
 ## Running it
 
