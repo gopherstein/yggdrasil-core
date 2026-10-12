@@ -87,7 +87,7 @@ func TestEditsUseAModelThatEdits(t *testing.T) {
 // text encoder's image encoder, flow shift, and model args (#548).
 func TestEditOnlyModel(t *testing.T) {
 	q, ok := Lookup("qwen-image-edit-2511")
-	if !ok || !q.EditOnly || !q.Edits || !q.Untested || q.ModelArgs != "qwen_image_zero_cond_t=true" {
+	if !ok || !q.EditOnly || !q.Edits || q.Untested || q.ModelArgs != "qwen_image_zero_cond_t=true" {
 		t.Fatalf("qwen-image-edit-2511 = %+v", q)
 	}
 	f := newFixture(t)

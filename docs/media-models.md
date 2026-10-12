@@ -21,7 +21,7 @@ Each model has a tier: **fast**, **balanced**, or **best**. Asking for "a high-q
 | FLUX.2 [klein] 4B | Makes and edits | 5.2 GB | 12 GB of memory | Yes: RX 7900 XTX, about 12–15 s a picture |
 | FLUX.2 [klein] 4B, high quality | Makes and edits, with more detail | 8.8 GB | 20 GB | Not yet |
 | Z-Image-Turbo | Makes photorealistic pictures, with clear text in them | 6.7 GB | 14 GB (estimate) | Yes: RX 7900 XTX, about 35–40 s a picture |
-| Qwen-Image-Edit-2511 | Edits only: changes what's asked, keeps the rest, edits text | 19.5 GB | 32 GB (estimate) | Not yet |
+| Qwen-Image-Edit-2511 | Edits only: changes what's asked, keeps the rest, edits text | 19.5 GB | 32 GB (estimate) | Yes: RX 7900 XTX, about 80 s an edit |
 
 - **Recommended:** the model Toskar picks for you does everything, making and editing. That's one of the FLUX.2 [klein] 4B builds, by memory. The others are set up by choice on the Tools page.
 - **Several at once:** with Z-Image-Turbo as your picture model, edits use FLUX.2 [klein] when it's set up. With Qwen-Image-Edit-2511 set up, edits use it, and new pictures use your picture model.
