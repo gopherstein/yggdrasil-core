@@ -480,7 +480,7 @@ func (s *Setup) install(ctx context.Context, j *job, m Model, program bool, arch
 			return err
 		}
 		for _, f := range m.Files {
-			url := f.URL(revisions[f.Repo])
+			url := f.URL()
 			if s.fileURL != nil {
 				url = s.fileURL(f)
 			}

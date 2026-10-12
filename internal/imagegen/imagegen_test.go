@@ -231,7 +231,7 @@ func TestRecommendBySize(t *testing.T) {
 	}
 	for _, m := range Catalog() {
 		for _, file := range m.Files {
-			if revisions[file.Repo] == "" || len(file.SHA256) != 64 || file.Size == 0 {
+			if (file.Source == "" && file.Revision == "") || len(file.SHA256) != 64 || file.Size == 0 {
 				t.Errorf("%s: %s is not pinned", m.ID, file.Path)
 			}
 		}
