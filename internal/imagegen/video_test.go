@@ -102,7 +102,7 @@ func TestVideoNotSetUp(t *testing.T) {
 // without one says what to set up (#548).
 func TestTwoStageVideoModel(t *testing.T) {
 	a14b, ok := lookupIn(VideoCatalog(), "wan2.2-t2v-a14b")
-	if !ok || a14b.Edits || !a14b.Untested || a14b.HighNoiseSteps == 0 {
+	if !ok || a14b.Edits || a14b.Untested || a14b.HighNoiseSteps == 0 || a14b.MemoryBytes < 48<<30 {
 		t.Fatalf("wan2.2-t2v-a14b = %+v", a14b)
 	}
 	f, eng, _, ctx := videoFixture(t)

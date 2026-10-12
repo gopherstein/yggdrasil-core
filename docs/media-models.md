@@ -18,10 +18,10 @@ Each model has a tier: **fast**, **balanced**, or **best**. Asking for "a high-q
 
 | Model | Does | Download | Comfortable with | Tested |
 | --- | --- | --- | --- | --- |
-| FLUX.2 [klein] 4B | Makes and edits | 5.2 GB | 12 GB of memory | Yes: RX 7900 XTX, about 12–15 s a picture |
+| FLUX.2 [klein] 4B | Makes and edits | 5.2 GB | 12 GB of memory | Yes: RX 7900 XTX, about 10–22 s a picture, peak 6–9 GB of graphics memory |
 | FLUX.2 [klein] 4B, high quality | Makes and edits, with more detail | 8.8 GB | 20 GB | Not yet |
 | Z-Image-Turbo | Makes photorealistic pictures, with clear text in them | 6.7 GB | 14 GB (estimate) | Yes: RX 7900 XTX, about 35–40 s a picture |
-| Qwen-Image-Edit-2511 | Edits only: changes what's asked, keeps the rest, edits text | 19.5 GB | 32 GB (estimate) | Yes: RX 7900 XTX, about 80 s an edit |
+| Qwen-Image-Edit-2511 | Edits only: changes what's asked, keeps the rest, edits text | 19.5 GB | 32 GB | Yes: RX 7900 XTX, about 80 s an edit, peak 24 GB of memory and 14 GB of graphics memory |
 
 - **Recommended:** the model Toskar picks for you does everything, making and editing. That's one of the FLUX.2 [klein] 4B builds, by memory. The others are set up by choice on the Tools page.
 - **Several at once:** with Z-Image-Turbo as your picture model, edits use FLUX.2 [klein] when it's set up. With Qwen-Image-Edit-2511 set up, edits use it, and new pictures use your picture model.
@@ -46,7 +46,7 @@ The files come straight from the vendor's own repository, never a mirror. These 
 | Model | Does | Download | Comfortable with | Tested |
 | --- | --- | --- | --- | --- |
 | Wan 2.2 TI2V 5B | Clips from a description or a picture | 8.5 GB | 16 GB | Yes: about 1 minute for 2 seconds on an RX 7900 XTX, 3½ minutes on an M5 Pro with 24 GB |
-| Wan 2.2 T2V A14B | Higher-quality clips from a description, more slowly | 23 GB | 32 GB (estimate) | Not yet |
+| Wan 2.2 T2V A14B | Higher-quality clips from a description, much more slowly | 23 GB | 48 GB | Yes: RX 7900 XTX, about 13 minutes for 2 seconds, peak 46 GB of memory |
 | Wan 2.1 T2V 1.3B | Short clips from a description, on smaller computers | 6.8 GB | 10 GB (estimate) | Not yet |
 
 - **Recommended:** Wan 2.2 TI2V 5B, which also brings pictures to life. The A14B and 1.3B models take no picture, so clips from a picture use the 5B model when it's set up.

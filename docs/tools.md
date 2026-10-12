@@ -141,7 +141,7 @@ All of them and their parts are Apache 2.0 and need no account to download. [Ima
 | Model | Download | For | What it does |
 | --- | --- | --- | --- |
 | Wan 2.2 TI2V 5B | 8.5 GB | 16 GB of memory | A clip from a description, or from an image |
-| Wan 2.2 T2V A14B | 23 GB | 32 GB of memory or more | Higher-quality clips from a description, more slowly |
+| Wan 2.2 T2V A14B | 23 GB | 48 GB of memory or more | Higher-quality clips from a description, much more slowly (about 13 minutes for 2 seconds) |
 | Wan 2.1 T2V 1.3B | 6.8 GB | 10 GB of memory | Short clips from a description, at lower quality |
 
 Clips from an image use Wan 2.2 TI2V 5B, the only one that takes an image. See [Image and video models](media-models.md).
