@@ -40,7 +40,7 @@ func (t *GenerateTool) Run(ctx context.Context, job remotetools.Job) (remotetool
 		return remotetools.Output{}, err
 	}
 	name, _ := job.Args["name"].(string)
-	return output(res, name, prompt), nil
+	return output(res, name, prompt, intArg(job.Args["width"]), intArg(job.Args["height"])), nil
 }
 
 // Finish attaches the image to the chat.
@@ -96,7 +96,7 @@ func (t *EditTool) Run(ctx context.Context, job remotetools.Job) (remotetools.Ou
 		return remotetools.Output{}, err
 	}
 	name, _ := job.Args["name"].(string)
-	return output(res, name, prompt), nil
+	return output(res, name, prompt, intArg(job.Args["width"]), intArg(job.Args["height"])), nil
 }
 
 // Finish attaches the changed image to the chat.
@@ -132,7 +132,7 @@ func findImage(ctx context.Context, store *artifacts.Store, ref string) (artifac
 }
 
 // output is a made image as a file named for the request.
-func output(res Result, name, prompt string) remotetools.Output {
+func output(res Result, name, prompt string, askedW, askedH int) remotetools.Output {
 	name = artifacts.CleanName(strings.TrimSpace(name))
 	if name == "" || name == "file" {
 		name = nameFrom(prompt)
@@ -140,11 +140,12 @@ func output(res Result, name, prompt string) remotetools.Output {
 	if strings.ToLower(filepath.Ext(name)) != ".png" {
 		name = strings.TrimSuffix(name, filepath.Ext(name)) + ".png"
 	}
-	return remotetools.Output{
-		Result: map[string]any{"width": res.Width, "height": res.Height, "seed": res.Seed, "model": res.Model,
-			"seconds": math.Round(res.Seconds*10) / 10},
-		Files: []remotetools.File{{Name: name, Data: res.PNG}},
+	result := map[string]any{"width": res.Width, "height": res.Height, "seed": res.Seed, "model": res.Model,
+		"seconds": math.Round(res.Seconds*10) / 10}
+	if l := limits(askedW, askedH, res.Width, res.Height, 0, 0); l != nil {
+		result["limited"] = l
 	}
+	return remotetools.Output{Result: result, Files: []remotetools.File{{Name: name, Data: res.PNG}}}
 }
 
 // finish saves the image to the chat and completes the result.

@@ -224,10 +224,14 @@ func (t *VideoTool) Run(ctx context.Context, job remotetools.Job) (remotetools.O
 		name = nameFrom(prompt)
 	}
 	name = strings.TrimSuffix(name, filepath.Ext(name)) + ".webm"
+	result := map[string]any{"width": res.Width, "height": res.Height, "frames": res.Frames, "length_seconds": res.Length,
+		"seed": res.Seed, "model": res.Model, "seconds": math.Round(res.Seconds)}
+	if l := limits(req.Width, req.Height, res.Width, res.Height, seconds, res.Length); l != nil {
+		result["limited"] = l
+	}
 	return remotetools.Output{
-		Result: map[string]any{"width": res.Width, "height": res.Height, "frames": res.Frames, "length_seconds": res.Length,
-			"seed": res.Seed, "model": res.Model, "seconds": math.Round(res.Seconds)},
-		Files: []remotetools.File{{Name: name, Data: res.WebM}},
+		Result: result,
+		Files:  []remotetools.File{{Name: name, Data: res.WebM}},
 	}, nil
 }
 

@@ -478,6 +478,9 @@
   },
   "notices": {
     "languageWeak": "{{model}} 寫{{language}}可能不如寫英文好，而已安裝且能執行的模型中沒有更擅長的。{{language}}評級良好的模型可在「模型」頁面找到。",
+    "mediaLength": "目前短片最長 {{max}} 秒，所以這段是 {{made}} 秒，而不是要求的 {{asked}} 秒。",
+    "mediaSizePicture": "{{model}} 產生的圖片最大為 {{made}}，所以這張比要求的 {{asked}} 小。",
+    "mediaSizeClip": "{{model}} 產生的短片最大為 {{made}}，所以這段比要求的 {{asked}} 小。",
     "noVision": "沒有已安裝的模型能看圖片，所以回答沒有看這些圖片。請在「模型」頁面安裝 Gemma 3 4B 或其他視覺模型。",
     "unconfirmedFigures": "Toskar 無法在來源中確認 {{figures}}。請先檢查再依賴它。",
     "codeErrors": "部分程式碼無法解析：{{errors}}。執行前請先修正。",

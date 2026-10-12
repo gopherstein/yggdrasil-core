@@ -235,6 +235,9 @@ func makeMedia(ctx context.Context, env pluginapi.ExecutionEnvironment, profile 
 		description = requestText(prompt)
 	}
 	args := map[string]any{"prompt": description}
+	for k, v := range askedFormat(prompt, req.Tool) {
+		args[k] = v
+	}
 	switch req.Tool {
 	case "image.edit":
 		args["file"] = req.File

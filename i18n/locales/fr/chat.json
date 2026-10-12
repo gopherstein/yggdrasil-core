@@ -516,6 +516,9 @@
   },
   "notices": {
     "languageWeak": "{{model}} écrit peut-être moins bien en {{language}} qu'en anglais, et aucun modèle installé qui convient ne le fait mieux. La page Modèles indique les modèles bien notés en {{language}}.",
+    "mediaLength": "Pour l’instant, les clips durent au plus {{max}} s : celui-ci dure donc {{made}} s au lieu des {{asked}} s demandées.",
+    "mediaSizePicture": "{{model}} crée des images jusqu’à {{made}} : celle-ci est donc plus petite que les {{asked}} demandés.",
+    "mediaSizeClip": "{{model}} crée des clips jusqu’à {{made}} : celui-ci est donc plus petit que les {{asked}} demandés.",
     "noVision": "Aucun modèle installé ne peut voir les images, donc la réponse ne les regarde pas. Installez Gemma 3 4B ou un autre modèle de vision sur la page Modèles.",
     "unconfirmedFigures": "Toskar n'a pas pu confirmer {{figures}} dans les sources. Vérifiez avant de vous y fier.",
     "codeErrors": "Une partie du code ne s'analyse pas : {{errors}}. Corrigez-la avant de l'exécuter.",
