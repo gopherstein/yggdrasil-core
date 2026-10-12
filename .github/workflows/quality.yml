@@ -29,6 +29,9 @@ on:
       image_model:
         description: The picture model the media set tests, such as z-image-turbo (#548). Blank for FLUX.2 [klein] 4B.
         default: ""
+      video_model:
+        description: The clip model the media set tests, such as wan2.2-t2v-a14b (#548). Blank for Wan 2.2 TI2V 5B.
+        default: ""
 
 jobs:
   # The quality set with a real model on CPU (Llama 3.2 1B through
@@ -220,6 +223,7 @@ jobs:
             -e TOSKAR_QUALITY_MODEL="${{ matrix.model }}" \
             -e TOSKAR_QUALITY_MEDIA_INSTALL=1 \
             -e TOSKAR_QUALITY_MEDIA_IMAGE_MODEL="${{ inputs.image_model }}" \
+            -e TOSKAR_QUALITY_MEDIA_VIDEO_MODEL="${{ inputs.video_model }}" \
             -e TOSKAR_QUALITY_MEDIA_REPORT=/src/.quality/media.md \
             golang:1.26-bookworm \
             go test ./tests/quality -run 'TestMedia' -count=1 -v -timeout 180m

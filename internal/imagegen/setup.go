@@ -280,9 +280,6 @@ func (s *Setup) ActiveModel() string {
 	return ""
 }
 
-// paths returns the active model and its files by role.
-func (s *Setup) paths() (Model, map[string]string, error) { return s.pathsFor(false) }
-
 // editOnly reports a model that only edits, which is never the active one.
 func (s *Setup) editOnly(id string) bool {
 	m, ok := s.lookup(id)
@@ -311,6 +308,9 @@ func editModelMissing(s *Setup) string {
 	active := "The model set up here"
 	if m, ok := s.lookup(s.ActiveModel()); ok {
 		active = m.Name
+	}
+	if list := s.models(); len(list) > 0 && list[0].Kind == "video" {
+		return fmt.Sprintf("%s can't bring pictures to life. Set up %s on the Tools page for clips from pictures.", active, name)
 	}
 	return fmt.Sprintf("%s can't edit pictures. Set up %s on the Tools page to edit them.", active, name)
 }

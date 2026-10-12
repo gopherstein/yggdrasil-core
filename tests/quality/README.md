@@ -123,7 +123,8 @@ includes it once, with the recommended models.
 `TOSKAR_QUALITY_MEDIA_IMAGE_MODEL` (the workflow's `image_model` input)
 tests another picture model or editor, such as one marked untested (#548);
 FLUX.2 [klein] 4B is still set up, for edits and, beside an editor, for new
-pictures.
+pictures. `TOSKAR_QUALITY_MEDIA_VIDEO_MODEL` (`video_model`) does the same for
+clips, with Wan 2.2 TI2V 5B kept for clips from pictures.
 
 ## Running it
 

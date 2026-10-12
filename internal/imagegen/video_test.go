@@ -2,6 +2,7 @@ package imagegen
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -93,5 +94,50 @@ func TestVideoNotSetUp(t *testing.T) {
 	ok, why := (&Engine{Setup: vs, What: "video generation"}).Available()
 	if ok || !strings.HasPrefix(why, "video generation isn't set up yet") || !strings.Contains(why, "Wan 2.2 TI2V 5B, 8.5 GB to download") {
 		t.Fatalf("available %v %q", ok, why)
+	}
+}
+
+// A two-stage model makes clips from descriptions with its first stage's
+// settings; a clip from a picture uses the model that takes one, and
+// without one says what to set up (#548).
+func TestTwoStageVideoModel(t *testing.T) {
+	a14b, ok := lookupIn(VideoCatalog(), "wan2.2-t2v-a14b")
+	if !ok || a14b.Edits || !a14b.Untested || a14b.HighNoiseSteps == 0 {
+		t.Fatalf("wan2.2-t2v-a14b = %+v", a14b)
+	}
+	f, eng, _, ctx := videoFixture(t)
+	five := eng.Setup.models()[0]
+	big := five
+	big.ID, big.Name, big.Edits, big.HighNoiseSteps, big.HighNoiseCFG = "big", "Big", false, 8, 3.5
+	big.Files = append(append([]File(nil), five.Files...), File{Role: "high_noise", Path: "high.gguf", Size: 4, SHA256: sum([]byte("high"))})
+	f.files["high.gguf"] = []byte("high")
+	eng.Setup.Catalog = func() []Model { return []Model{five, big} }
+	archive := *eng.Setup.archive
+	if err := eng.Setup.install(ctx, &job{}, big, false, archive); err != nil {
+		t.Fatal(err)
+	}
+	if got := eng.Setup.ActiveModel(); got != "big" {
+		t.Fatalf("active = %s", got)
+	}
+	if _, err := eng.GenerateVideo(ctx, VideoRequest{Prompt: "waves"}); err != nil {
+		t.Fatal(err)
+	}
+	got := args(t, f)
+	if filepath.Base(flag(got, "--high-noise-diffusion-model")) != "high.gguf" || flag(got, "--high-noise-steps") != "8" || flag(got, "--high-noise-cfg-scale") != "3.5" {
+		t.Fatalf("two-stage args %q", got)
+	}
+	// From a picture: the 5B model, which takes one.
+	if _, err := eng.GenerateVideo(ctx, VideoRequest{Prompt: "bring it to life", Image: samplePNG(t, 64, 64), ImageName: "a.png"}); err != nil {
+		t.Fatal(err)
+	}
+	got = args(t, f)
+	if flag(got, "--high-noise-diffusion-model") != "" || !strings.Contains(flag(got, "--diffusion-model"), string(filepath.Separator)+five.ID+string(filepath.Separator)) {
+		t.Fatalf("picture clip args %q", got)
+	}
+	// Without it, a clip from a picture says what to set up.
+	_ = os.RemoveAll(eng.Setup.modelDir(five.ID))
+	if _, err := eng.GenerateVideo(ctx, VideoRequest{Prompt: "bring it to life", Image: samplePNG(t, 64, 64), ImageName: "a.png"}); err == nil ||
+		!strings.Contains(err.Error(), "Big can't bring pictures to life. Set up "+five.Name) {
+		t.Fatalf("without a model that takes pictures: %v", err)
 	}
 }

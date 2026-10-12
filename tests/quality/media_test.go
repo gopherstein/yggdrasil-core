@@ -281,7 +281,12 @@ func (d realDriver) installMedia(t *testing.T) {
 	if m := config.Env("QUALITY_MEDIA_IMAGE_MODEL"); m != "" && m != "flux2-klein-4b" {
 		steps = append(steps, struct{ path, model string }{"/api/v1/images/setup", m})
 	}
+	// TOSKAR_QUALITY_MEDIA_VIDEO_MODEL does the same for clips; Wan 2.2
+	// TI2V 5B is set up first, for clips from pictures.
 	steps = append(steps, struct{ path, model string }{"/api/v1/video/setup", "wan2.2-ti2v-5b"})
+	if m := config.Env("QUALITY_MEDIA_VIDEO_MODEL"); m != "" && m != "wan2.2-ti2v-5b" {
+		steps = append(steps, struct{ path, model string }{"/api/v1/video/setup", m})
+	}
 	for _, s := range steps {
 		var status struct {
 			Ready  bool   `json:"ready"`
