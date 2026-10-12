@@ -591,6 +591,8 @@ export interface SetupOffer {
   /** node_id is a paired computer, set up there with ?node_id=, and free_bytes its free disk space (contract 1.14, #153). */
   remote?: boolean
   free_bytes?: number
+  /** Files to send again with request, such as the pictures a vision model is set up for; ability "vision" installs option as a model (contract 1.28, #529). */
+  attachments?: string[]
 }
 
 /** A stored file: an attachment or a file the assistant produced. */

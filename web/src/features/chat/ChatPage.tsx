@@ -16,6 +16,7 @@ import type {
   AIProfile,
   ChatTokenPayload,
   Conversation,
+  FileRef,
   Message,
   OrchestrationRolePayload,
   ToolRequestedPayload,
@@ -1039,11 +1040,16 @@ export function ChatPage() {
 
   // A setup offered in an answer finishes the request once it is ready
   // (Gungnir §29); the card holds a stable callback to the latest send.
-  const sendRef = useRef<(text: string) => void>(() => {})
+  const sendRef = useRef<(text: string, attachments?: string[]) => void>(() => {})
   useEffect(() => {
-    sendRef.current = (text: string) => void sendMessage(text)
+    sendRef.current = (text: string, attachments?: string[]) => {
+      // The files are the ones already in the chat, found by id.
+      const known = (queryClient.getQueryData<Message[]>(['messages', selectedId]) ?? []).flatMap((m) => m.meta?.files ?? [])
+      const files = attachments?.flatMap((id) => known.filter((f) => f.id === id).slice(0, 1))
+      void sendMessage(text, undefined, files && files.length > 0 ? files : undefined)
+    }
   })
-  const continueAfterSetup = useCallback((text: string) => sendRef.current(text), [])
+  const continueAfterSetup = useCallback((text: string, attachments?: string[]) => sendRef.current(text, attachments), [])
 
   /**
    * Sends a message, or with branch, answers from a point in the chat as a
@@ -1051,7 +1057,11 @@ export function ChatPage() {
    * editOf sends the text in place of a sent message, and modelId answers
    * with another model.
    */
-  const sendMessage = async (overrideText?: string, branch?: { retryOf?: string; editOf?: string; modelId?: string }) => {
+  const sendMessage = async (
+    overrideText?: string,
+    branch?: { retryOf?: string; editOf?: string; modelId?: string },
+    resendFiles?: FileRef[],
+  ) => {
     if (!branch && editing && overrideText == null) branch = { editOf: editing }
     const current = queryClient.getQueryData<Message[]>(['messages', selectedId]) ?? []
     const branchAt = branch?.retryOf ?? branch?.editOf
@@ -1101,7 +1111,8 @@ export function ChatPage() {
       setDraft('')
       setEditing(null)
     }
-    const attachments = readyFiles.map((f) => f.file!)
+    // A request sent again after a setup keeps the files it was sent with.
+    const attachments = resendFiles ?? readyFiles.map((f) => f.file!)
     if (overrideText == null) setPendingFiles([])
     setIsSending(true)
     setSendError(null)

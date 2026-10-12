@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { formatSize } from '@/i18n/format'
 import { api, type MediaKind } from '@/lib/api'
-import type { SetupOffer } from '@/types/api'
+import { subscribeEvents } from '@/lib/events'
+import type { ModelDownloadProgressPayload, SetupOffer } from '@/types/api'
 
 function gb(bytes: number): string {
   return formatSize(bytes, { base: 1000 })
@@ -14,7 +15,12 @@ function gb(bytes: number): string {
  * size, and where it runs. Once it is installed from here, the request is
  * sent again so it is finished.
  */
-export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onContinue: (text: string) => void }) {
+export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onContinue: (text: string, attachments?: string[]) => void }) {
+  if (offer.ability === 'vision') return <VisionOfferCard offer={offer} onContinue={onContinue} />
+  return <MediaOfferCard offer={offer} onContinue={onContinue} />
+}
+
+function MediaOfferCard({ offer, onContinue }: { offer: SetupOffer; onContinue: (text: string) => void }) {
   const { t } = useTranslation('chat')
   const queryClient = useQueryClient()
   const [started, setStarted] = useState(false)
@@ -123,6 +129,99 @@ export function SetupOfferCard({ offer, onContinue }: { offer: SetupOffer; onCon
         </div>
       )}
       {failed && !ready ? <p className="text-xs text-danger">{failed}</p> : null}
+    </div>
+  )
+}
+
+/**
+ * Offers a model that can see pictures, for a question sent with pictures
+ * no installed model can see (#529). Once it's installed from here, the
+ * question is sent again with its pictures.
+ */
+function VisionOfferCard({ offer, onContinue }: { offer: SetupOffer; onContinue: (text: string, attachments?: string[]) => void }) {
+  const { t } = useTranslation('chat')
+  const queryClient = useQueryClient()
+  const [started, setStarted] = useState(false)
+  const [progress, setProgress] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const continued = useRef(false)
+  // While its download runs, the list is checked too, in case the end
+  // came before the events were followed.
+  const modelsQuery = useQuery({
+    queryKey: ['models'],
+    queryFn: () => api.getModels(),
+    retry: false,
+    refetchInterval: (query) => (started && !query.state.data?.find((m) => m.id === offer.option)?.installed ? 3000 : false),
+  })
+  const installed = !!modelsQuery.data?.find((m) => m.id === offer.option)?.installed
+
+  // Follow the download this card started.
+  useEffect(() => {
+    if (!started) return
+    return subscribeEvents({
+      onEvent: (event) => {
+        const payload = event.payload as Partial<ModelDownloadProgressPayload> & { model_id?: string; error?: string } | undefined
+        if (payload?.model_id !== offer.option) return
+        if (event.type === 'model.download.progress') setProgress(Math.round(payload.percent ?? 0))
+        if (event.type === 'model.download.failed') {
+          setProgress(null)
+          setError(payload.error ?? t('send.downloadFailed'))
+        }
+        if (event.type === 'model.download.completed') void queryClient.invalidateQueries({ queryKey: ['models'] })
+      },
+    })
+  }, [started, offer.option, queryClient, t])
+
+  // Installed from this card: answer the question, with its pictures, once.
+  useEffect(() => {
+    if (!installed || !started || continued.current) return
+    continued.current = true
+    if (offer.request) onContinue(offer.request, offer.attachments)
+  }, [installed, started, offer.request, offer.attachments, onContinue])
+
+  return (
+    <div className="mt-3 space-y-2 rounded-xl border border-line/70 bg-surface px-3 py-2.5 text-sm">
+      {installed ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span>{started && offer.request ? t('setup.continuing') : t('setup.ready', { label: offer.label })}</span>
+          {!started && offer.request ? (
+            <button type="button" className="btn-secondary px-3 py-1 text-xs" onClick={() => onContinue(offer.request!, offer.attachments)}>
+              {t('setup.continue')}
+            </button>
+          ) : null}
+        </div>
+      ) : started && !error ? (
+        <div className="space-y-1.5">
+          <div className="text-xs text-ink-muted">
+            {t('setup.downloading', { done: gb((offer.size_bytes * (progress ?? 0)) / 100), total: gb(offer.size_bytes) })}
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-raised" role="progressbar" aria-valuenow={progress ?? 0} aria-valuemin={0} aria-valuemax={100}>
+            <div className="h-full bg-primary transition-[width] duration-500" style={{ width: `${progress ?? 0}%` }} />
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span className="min-w-0 flex-1 text-xs text-ink-muted">
+            {t('setup.details', { name: offer.name, size: gb(offer.size_bytes), node: t('setup.thisComputer') })}
+          </span>
+          <button
+            type="button"
+            className="btn-primary px-3 py-1.5 text-xs"
+            onClick={async () => {
+              setError(null)
+              try {
+                await api.installModel(offer.option)
+                setStarted(true)
+              } catch (err) {
+                setError(err instanceof Error ? err.message : String(err))
+              }
+            }}
+          >
+            {t('setup.install')}
+          </button>
+        </div>
+      )}
+      {error && !installed ? <p className="text-xs text-danger">{error}</p> : null}
     </div>
   )
 }

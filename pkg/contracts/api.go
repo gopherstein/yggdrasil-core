@@ -824,6 +824,11 @@ type SetupOffer struct {
 	// it up there with ?node_id= on the setup routes.
 	Remote    bool   `json:"remote,omitempty"`
 	FreeBytes uint64 `json:"free_bytes,omitempty"`
+	// Attachments are the files to send again with Request, such as the
+	// pictures a vision model is set up to look at (contract 1.28, #529).
+	// For ability "vision", Option is the model id for
+	// POST /api/v1/models/{id}/install.
+	Attachments []string `json:"attachments,omitempty"`
 }
 
 // FileRef points at a stored file (an artifact). Its bytes are at

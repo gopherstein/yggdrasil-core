@@ -144,6 +144,8 @@ func TestPicturesWithoutAModelThatSees(t *testing.T) {
 	if _, ok := a.seeingModel(ctx); ok {
 		t.Fatal("a vision model without its projector counts as seeing")
 	}
+	// No model that sees can be installed either, so none is offered.
+	noVisionToInstall(a)
 	runPictureChat(t, a, conv.ID, "Tell me about this photo.", pic.ID)
 	if (*used)[len(*used)-1] != "text-model" || len(lastUser((*sent)[len(*sent)-1]).Images) != 0 {
 		t.Fatalf("models = %v", *used)
@@ -235,5 +237,49 @@ func TestVideoFramesReachAModelThatSees(t *testing.T) {
 	runPictureChat(t, a, conv.ID, "What color is the dog?")
 	if len(lastUser((*sent)[len(*sent)-1]).Images) != framesPerVideo {
 		t.Fatal("the follow-up didn't see the video")
+	}
+}
+
+// noVisionToInstall takes the image encoders out of the catalog's models
+// that aren't installed, so none could be offered for pictures.
+func noVisionToInstall(a *App) {
+	for _, e := range a.Models.Catalog().List() {
+		if e.Projector != nil && e.ID != "see-model" {
+			e.Projector = nil
+			a.Models.Catalog().Upsert(e)
+		}
+	}
+}
+
+// A picture no installed model can see is answered with an offer to
+// install the smallest one that fits, which keeps the question's pictures
+// to send again; a follow-up isn't offered it again (#529).
+func TestPicturesOfferAModelThatSees(t *testing.T) {
+	a, used, _ := pictureApp(t, false)
+	ctx := context.Background()
+	conv, _ := a.Conversations.Create(ctx, "pictures", "general-assistant", "text-model")
+	pic, _ := a.Artifacts.Save(ctx, artifacts.Input{Name: "dog.jpg", Data: []byte("\xff\xd8 pixels"), ConversationID: conv.ID})
+	want, size, ok := a.visionOption(ctx)
+	if !ok {
+		t.Skip("no catalog model that sees fits this computer's memory")
+	}
+	reply := runPictureChat(t, a, conv.ID, "What type of dog is this?", pic.ID)
+	if !strings.Contains(reply, "I can't see pictures yet, but I can set up "+want.DisplayName) || len(*used) != 0 {
+		t.Fatalf("reply %q, models %v", reply, *used)
+	}
+	msgs, _ := a.Conversations.ListMessages(ctx, conv.ID)
+	question, answer := msgs[len(msgs)-2], msgs[len(msgs)-1]
+	if question.Meta == nil || len(question.Meta.Files) != 1 || question.Meta.Files[0].ID != pic.ID {
+		t.Fatalf("the question lost its picture: %+v", question.Meta)
+	}
+	offer := answer.Meta.Setup
+	if offer == nil || offer.Ability != "vision" || offer.Option != want.ID || offer.SizeBytes != size ||
+		offer.Request != "What type of dog is this?" || !slices.Equal(offer.Attachments, []string{pic.ID}) {
+		t.Fatalf("offer %+v", offer)
+	}
+	// A follow-up without pictures is answered, with the notice.
+	runPictureChat(t, a, conv.ID, "Thanks anyway.")
+	if len(*used) == 0 {
+		t.Fatal("the follow-up got the offer again")
 	}
 }

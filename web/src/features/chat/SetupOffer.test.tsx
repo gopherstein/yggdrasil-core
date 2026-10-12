@@ -7,7 +7,18 @@ import type { ImageSetup, SetupOffer } from '@/types/api'
 import { SetupOfferCard } from './SetupOffer'
 
 vi.mock('@/lib/api', () => ({
-  api: { getMediaSetup: vi.fn(), startMediaSetup: vi.fn(), cancelMediaSetup: vi.fn() },
+  api: { getMediaSetup: vi.fn(), startMediaSetup: vi.fn(), cancelMediaSetup: vi.fn(), getModels: vi.fn(), installModel: vi.fn() },
+}))
+
+// The events the vision card follows, sent by the test.
+let sendEvent: ((event: { type: string; payload?: unknown }) => void) | null = null
+vi.mock('@/lib/events', () => ({
+  subscribeEvents: ({ onEvent }: { onEvent: (event: { type: string; payload?: unknown }) => void }) => {
+    sendEvent = onEvent
+    return () => {
+      sendEvent = null
+    }
+  },
 }))
 
 const offer: SetupOffer = {
@@ -24,7 +35,7 @@ function status(over: Partial<ImageSetup>): ImageSetup {
   return { supported: true, ready: false, program: false, release: 'r', models: [], ...over }
 }
 
-function renderIt(onContinue: (text: string) => void, o: SetupOffer = offer) {
+function renderIt(onContinue: (text: string, attachments?: string[]) => void, o: SetupOffer = offer) {
   return render(
     <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
       <SetupOfferCard offer={o} onContinue={onContinue} />
@@ -104,5 +115,34 @@ describe('SetupOfferCard', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Set up' }))
     expect(await screen.findByText('Downloading… 1 GB of 5 GB')).toBeInTheDocument()
     expect(api.startMediaSetup).toHaveBeenCalledWith('images', 'flux2-klein-4b', 'ws')
+  })
+
+  it('installs a model that can see pictures, then asks again with the pictures (#529)', async () => {
+    const vision: SetupOffer = {
+      ability: 'vision',
+      label: 'Seeing pictures',
+      option: 'gemma-3-4b-q4',
+      name: 'Gemma 3 4B',
+      size_bytes: 4_192_260_064,
+      request: 'What type of dog is this?',
+      attachments: ['art-1'],
+    }
+    const model = (installed: boolean) => [{ id: 'gemma-3-4b-q4', installed }] as Awaited<ReturnType<typeof api.getModels>>
+    vi.mocked(api.getModels).mockResolvedValue(model(false))
+    vi.mocked(api.installModel).mockResolvedValue({ status: 'downloading', model_id: 'gemma-3-4b-q4' })
+    const onContinue = vi.fn()
+    renderIt(onContinue, vision)
+    expect(await screen.findByText('Gemma 3 4B · 4.2 GB download · on this computer')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Set up' }))
+    await waitFor(() => expect(sendEvent).not.toBeNull())
+    expect(api.installModel).toHaveBeenCalledWith('gemma-3-4b-q4')
+    sendEvent!({ type: 'model.download.progress', payload: { model_id: 'gemma-3-4b-q4', percent: 50, bytes_downloaded: 1, bytes_total: 2 } })
+    expect(await screen.findByText('Downloading… 2.1 GB of 4.2 GB')).toBeInTheDocument()
+    expect(onContinue).not.toHaveBeenCalled()
+
+    vi.mocked(api.getModels).mockResolvedValue(model(true))
+    sendEvent!({ type: 'model.download.completed', payload: { model_id: 'gemma-3-4b-q4' } })
+    await waitFor(() => expect(onContinue).toHaveBeenCalledWith('What type of dog is this?', ['art-1']))
+    expect(onContinue).toHaveBeenCalledTimes(1)
   })
 })
