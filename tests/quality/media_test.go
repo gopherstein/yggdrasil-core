@@ -378,6 +378,7 @@ func TestMediaQuality(t *testing.T) {
 		real.installMedia(t)
 	}
 	var report []reportRow
+	var peaks []memoryPeak
 	for _, mc := range loadMediaCases(t) {
 		if mc.RealOnly && !isReal {
 			continue
@@ -392,7 +393,14 @@ func TestMediaQuality(t *testing.T) {
 			if mc.Recording != "" {
 				c.Attach = append(c.Attach, Attachment{Name: "recording.wav", Content: string(real.recording(t, mc.Recording))})
 			}
+			var stop func() memoryPeak
+			if isReal {
+				stop = real.watchMemory(c.ID)
+			}
 			r := d.Run(t, c)
+			if stop != nil {
+				peaks = append(peaks, stop())
+			}
 			failures = check(d.Name(), c, r, nil)
 			if j := mc.Judge; j != nil {
 				failures = append(failures, fileFailures(j, r, isReal)...)
@@ -426,9 +434,21 @@ func TestMediaQuality(t *testing.T) {
 	t.Logf("media: %d of %d cases passed (%.0f%%) with the %s model", passed, len(report), rate*100, d.Name())
 	if path := config.Env("QUALITY_MEDIA_REPORT"); path != "" {
 		md := strings.Replace(markdownReport(d.Name(), report, rate, min), "# Chat quality:", "# Media quality:", 1)
+		models := ""
+		if isReal {
+			models = fmt.Sprintf("Picture model: %s. Clip model: %s.", orDefault(config.Env("QUALITY_MEDIA_IMAGE_MODEL"), "flux2-klein-4b"), orDefault(config.Env("QUALITY_MEDIA_VIDEO_MODEL"), "wan2.2-ti2v-5b"))
+		}
+		md += memoryTable(models, peaks)
 		writeReport(t, d, build, path, md)
 	}
 	if rate < min {
 		t.Errorf("%.0f%% of cases passed; at least %.0f%% must", rate*100, min*100)
 	}
+}
+
+func orDefault(s, def string) string {
+	if s == "" {
+		return def
+	}
+	return s
 }
