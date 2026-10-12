@@ -213,6 +213,7 @@
   "REMOTE_ACCESS_OFF": "Access from anywhere is off, so there's nothing to check. Turn it on first.",
   "RELAY_INVALID": "Enter the relay's name, such as relay.example.com, with a port only when it isn't 443.",
   "RELAY_SECRET_INVALID": "That isn't an enrollment secret. Copy it from the relay's enroll.secret file.",
+  "HUGGINGFACE_TOKEN_INVALID": "That isn't a Hugging Face token. Copy a read token from huggingface.co/settings/tokens; it starts with hf_.",
   "RELAY_TOKEN_INVALID": "That relay token isn't for this computer, or it has run out. Subscribe again from this device.",
   "RELAY_TOKEN_NOT_NEEDED": "This computer uses your organization's relay, so it doesn't need a subscription.",
   "RELAY_TOKEN_FAILED": "Couldn't save the relay token on this computer.",

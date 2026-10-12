@@ -1337,7 +1337,8 @@ func (a *App) settingsView(ctx context.Context) (contracts.SettingsView, error) 
 		RemoteAccessEnabled: cfg.RemoteAccess.Enabled, RemoteAccessPort: cfg.RemotePort(), RemoteAccessAddress: cfg.RemoteAccess.Address,
 		RemoteAccessPortMapping: !cfg.RemoteAccess.NoPortMapping,
 		RemoteAccessRelay:       cfg.RemoteAccess.Relay, RemoteAccessRelayEnrolled: a.relayEnrolled(cfg),
-		DiscoveryEnabled: cfg.DiscoveryEnabled, NodeName: cfg.NodeName, NodeID: cfg.NodeID,
+		HuggingFaceTokenSet: a.huggingFaceToken() != "",
+		DiscoveryEnabled:    cfg.DiscoveryEnabled, NodeName: cfg.NodeName, NodeID: cfg.NodeID,
 		AdvancedMode: advanced, ModelLifecycle: lifecycle, IdleUnloadMinutes: idleMins,
 		KeepRunningInBackground: keepBackground,
 		DefaultProfileID:        defaultProfile,
@@ -1383,6 +1384,11 @@ func setSettingString(ctx context.Context, repo *repositories.SettingsRepo, key,
 }
 
 func (a *App) applySettingsPatch(ctx context.Context, patch map[string]any) error {
+	if v, ok := patch["huggingface_token"].(string); ok {
+		if err := a.setHuggingFaceToken(v); err != nil {
+			return err
+		}
+	}
 	if v, ok := patch["memory_enabled"].(bool); ok {
 		if err := a.Settings.SetBool(ctx, "memory_enabled", v); err != nil {
 			return err

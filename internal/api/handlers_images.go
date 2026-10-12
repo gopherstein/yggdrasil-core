@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/yeixio/toskar-core/internal/imagegen"
@@ -106,10 +107,19 @@ func (s *Server) setupRoutes(api *mux.Router, prefix string, setup func() *image
 		}
 		var body struct {
 			ModelID string `json:"model_id"`
+			// AcceptLicense is the person confirming their license covers
+			// how they'll use a model behind one (#551).
+			AcceptLicense bool `json:"accept_license"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			writeErr(w, http.StatusBadRequest, "INVALID_JSON", "invalid body", nil)
 			return
+		}
+		if body.AcceptLicense {
+			if err := st.AcceptLicense(body.ModelID, time.Now()); err != nil {
+				writeErrFrom(w, http.StatusConflict, "SETUP_REFUSED", err)
+				return
+			}
 		}
 		if err := st.Start(body.ModelID); err != nil {
 			writeErrFrom(w, http.StatusConflict, "SETUP_REFUSED", err)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +14,17 @@ import (
 // download fetches url into path, resuming a partial file, and checks its
 // size and checksum. progress is called with the bytes this call has added.
 func download(ctx context.Context, client *http.Client, url, path string, size int64, sum string, progress func(int64)) error {
+	return downloadAs(ctx, client, url, "", path, size, sum, progress)
+}
+
+// errNoAccess is a gated file the token can't get: none was given, or its
+// account hasn't accepted the model's license (#551).
+var errNoAccess = errors.New("no access")
+
+// downloadAs is download with the person's Hugging Face token, for a file
+// behind a license (#551). The token goes only to the address asked for;
+// Go drops it when the download is redirected to another host.
+func downloadAs(ctx context.Context, client *http.Client, url, token, path string, size int64, sum string, progress func(int64)) error {
 	if done, _ := os.Stat(path); done != nil && done.Size() == size {
 		if ok, err := checksum(path, sum); err == nil && ok {
 			progress(size)
@@ -32,6 +44,9 @@ func download(ctx context.Context, client *http.Client, url, path string, size i
 		return err
 	}
 	req.Header.Set("User-Agent", "toskar-daemon")
+	if token != "" {
+		req.Header.Set("Authorization", "Bearer "+token)
+	}
 	if offset > 0 {
 		req.Header.Set("Range", fmt.Sprintf("bytes=%d-", offset))
 	}
@@ -44,6 +59,8 @@ func download(ctx context.Context, client *http.Client, url, path string, size i
 	case http.StatusPartialContent:
 	case http.StatusOK:
 		offset = 0
+	case http.StatusUnauthorized, http.StatusForbidden:
+		return errNoAccess
 	default:
 		return fmt.Errorf("HTTP %d", resp.StatusCode)
 	}

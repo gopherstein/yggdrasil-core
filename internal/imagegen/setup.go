@@ -11,6 +11,7 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 // Setup installs stable-diffusion.cpp and image models, and knows which
@@ -34,6 +35,9 @@ type Setup struct {
 	Changed func()
 	// Catalog lists the models this setup offers; nil is the image models.
 	Catalog func() []Model
+	// Token is the person's Hugging Face token, for files behind a
+	// model's license (#551); "" when none is set.
+	Token func() string
 	// GPU reports whether the Vulkan build would use a GPU here (#154);
 	// nil means it wouldn't, and the CPU build is used.
 	GPU func() bool
@@ -81,6 +85,9 @@ type ModelStatus struct {
 	// memory it's comfortable with, so it may be slow or fail.
 	TooLittleMemory bool `json:"too_little_memory,omitempty"`
 	TightMemory     bool `json:"tight_memory,omitempty"`
+	// LicenseAccepted is a model behind a license that the person has
+	// confirmed their license covers (#551).
+	LicenseAccepted bool `json:"license_accepted,omitempty"`
 }
 
 // headroom is memory beyond a model's files that making a picture needs.
@@ -173,6 +180,9 @@ type Status struct {
 	GPUBuild string        `json:"gpu_build,omitempty"`
 	Models   []ModelStatus `json:"models"`
 	Job      *Job          `json:"job,omitempty"`
+	// TokenSet reports a Hugging Face token set for models behind a
+	// license (#551).
+	TokenSet bool `json:"huggingface_token_set,omitempty"`
 }
 
 func (s *Setup) models() []Model {
@@ -234,8 +244,9 @@ func (s *Setup) Status() Status {
 	rec := recommendIn(s.models(), memory).ID
 	for _, m := range s.models() {
 		st.Models = append(st.Models, ModelStatus{Model: m, SizeBytes: m.SizeBytes(), Installed: s.installed(m.ID), Recommended: m.ID == rec,
-			TooLittleMemory: tooLittleMemory(m, memory), TightMemory: tightMemory(m, memory)})
+			TooLittleMemory: tooLittleMemory(m, memory), TightMemory: tightMemory(m, memory), LicenseAccepted: m.NeedsLicense && s.licenseAccepted(m.ID)})
 	}
+	st.TokenSet = s.token() != ""
 	s.mu.Lock()
 	if j := s.job; j != nil {
 		st.Job = &Job{ModelID: j.model, Stage: j.stage, Done: j.done.Load(), Total: j.total, Running: j.running, Error: j.err}
@@ -393,6 +404,16 @@ func (s *Setup) Start(id string) error {
 	if !ok {
 		return fmt.Errorf("unknown model %q", id)
 	}
+	// A model behind a license needs the person's token and their word
+	// that their license covers their use (#551).
+	if m.NeedsLicense && !s.installed(id) {
+		if s.token() == "" {
+			return fmt.Errorf("%s needs your own Hugging Face token: add it in Settings, after accepting the license at %s", m.Name, m.LicenseURL)
+		}
+		if !s.licenseAccepted(id) {
+			return fmt.Errorf("confirm that your license for %s covers how you'll use it before setting it up", m.Name)
+		}
+	}
 	if memory := s.memory(); tooLittleMemory(m, memory) {
 		return errors.New(memoryShort(m, memory))
 	}
@@ -484,7 +505,14 @@ func (s *Setup) install(ctx context.Context, j *job, m Model, program bool, arch
 			if s.fileURL != nil {
 				url = s.fileURL(f)
 			}
-			if err := download(ctx, s.client(), url, filepath.Join(dir, filepath.Base(f.Path)), f.Size, f.SHA256, add); err != nil {
+			token := ""
+			if f.Gated {
+				token = s.token()
+			}
+			if err := downloadAs(ctx, s.client(), url, token, filepath.Join(dir, filepath.Base(f.Path)), f.Size, f.SHA256, add); err != nil {
+				if errors.Is(err, errNoAccess) {
+					return fmt.Errorf("the download of %s was refused by Hugging Face: accept its license at %s with the account your token belongs to, then set it up again", m.Name, m.LicenseURL)
+				}
 				return fmt.Errorf("%s could not be downloaded: %w", f.Path, err)
 			}
 		}
@@ -620,4 +648,40 @@ func (s *Setup) Remove(id string) error {
 		s.Changed()
 	}
 	return err
+}
+
+func (s *Setup) token() string {
+	if s.Token == nil {
+		return ""
+	}
+	return strings.TrimSpace(s.Token())
+}
+
+// licenseFile records that the person confirmed their license covers a
+// model, and when.
+func (s *Setup) licenseFile(id string) string {
+	return filepath.Join(s.modelDir(id), "license-accepted")
+}
+
+func (s *Setup) licenseAccepted(id string) bool {
+	_, err := os.Stat(s.licenseFile(id))
+	return err == nil
+}
+
+// AcceptLicense records the person's confirmation that their license for a
+// model behind one covers how they'll use it (#551). Toskar can't check a
+// license; it keeps the person's word, with the time and the license.
+func (s *Setup) AcceptLicense(id string, now time.Time) error {
+	m, ok := s.lookup(id)
+	if !ok {
+		return fmt.Errorf("unknown model %q", id)
+	}
+	if !m.NeedsLicense {
+		return nil
+	}
+	if err := os.MkdirAll(s.modelDir(id), 0o755); err != nil {
+		return err
+	}
+	record := fmt.Sprintf("%s\n%s\n", now.UTC().Format(time.RFC3339), m.LicenseURL)
+	return os.WriteFile(s.licenseFile(id), []byte(record), 0o644)
 }

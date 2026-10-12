@@ -1080,13 +1080,17 @@ type SettingsView struct {
 	// (the secret itself is never shown).
 	RemoteAccessRelay         string `json:"remote_access_relay,omitempty"`
 	RemoteAccessRelayEnrolled bool   `json:"remote_access_relay_enrolled"`
-	WebUIEnabled              bool   `json:"web_ui_enabled"`
-	DiscoveryEnabled          bool   `json:"discovery_enabled"`
-	NodeName                  string `json:"node_name"`
-	NodeID                    string `json:"node_id"`
-	AdvancedMode              bool   `json:"advanced_mode"`
-	ModelLifecycle            string `json:"model_lifecycle"`     // automatic | manual
-	IdleUnloadMinutes         int    `json:"idle_unload_minutes"` // 0 = never
+	// HuggingFaceTokenSet is whether the person's Hugging Face token is
+	// set, for picture and clip models behind a license (#551); the token
+	// itself is never shown, and is set with huggingface_token.
+	HuggingFaceTokenSet bool   `json:"huggingface_token_set"`
+	WebUIEnabled        bool   `json:"web_ui_enabled"`
+	DiscoveryEnabled    bool   `json:"discovery_enabled"`
+	NodeName            string `json:"node_name"`
+	NodeID              string `json:"node_id"`
+	AdvancedMode        bool   `json:"advanced_mode"`
+	ModelLifecycle      string `json:"model_lifecycle"`     // automatic | manual
+	IdleUnloadMinutes   int    `json:"idle_unload_minutes"` // 0 = never
 	// KeepRunningInBackground keeps the local daemon (and desktop tray) alive
 	// when the main window is closed. Default false. A saved schedule turns it on,
 	// because the scheduler stops when the daemon stops.

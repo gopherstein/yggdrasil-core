@@ -27,6 +27,20 @@ Each model has a tier: **fast**, **balanced**, or **best**. Asking for "a high-q
 - **Several at once:** with Z-Image-Turbo as your picture model, edits use FLUX.2 [klein] when it's set up. With Qwen-Image-Edit-2511 set up, edits use it, and new pictures use your picture model.
 - **Size:** pictures are up to 1536 pixels on a side and about 1.5 megapixels. Asking for more makes the largest picture the model allows, and the answer says so.
 
+## Needs your license
+
+Some models can't be given out by Toskar: their license is non-commercial, or allows commercial use only under the vendor's terms. Toskar sets one up only when you bring your own license:
+
+1. Accept the model's license on Hugging Face with your account.
+2. Add a Hugging Face read token on the Tools page, or as `huggingface_token` in Settings. It's kept on this computer, never shown again, and sent only to Hugging Face, for that model's files.
+3. Confirm that your license covers how you'll use the model. Toskar can't check a license; it keeps your confirmation and when you gave it.
+
+The files come straight from the vendor's own repository, never a mirror. These models are never recommended or picked by quality.
+
+| Model | Does | Download | Comfortable with | License |
+| --- | --- | --- | --- | --- |
+| FLUX.2 [klein] 9B | Makes and edits, with more detail than the 4B | 23.4 GB | 32 GB (estimate; not yet tested) | [FLUX Non-Commercial](https://huggingface.co/black-forest-labs/FLUX.2-klein-9B): non-commercial use, or a commercial license from Black Forest Labs |
+
 ## Clips
 
 | Model | Does | Download | Comfortable with | Tested |
@@ -79,4 +93,4 @@ Every model and part Toskar sets up is under Apache 2.0, except TAEHV's fast vid
 | Wan 2.2 | [Wan-Video/Wan2.2](https://github.com/Wan-Video/Wan2.2) |
 | Wan 2.1 | [Wan-Video/Wan2.1](https://github.com/Wan-Video/Wan2.1) |
 
-Models under non-commercial or community licenses, such as FLUX.2 Dev, aren't set up by Toskar ([#551](https://github.com/yeixio/toskar-core/issues/551)).
+Models under non-commercial or community licenses are set up only with your own license (see [Needs your license](#needs-your-license)). FLUX.2 Dev isn't offered: its official files are 64 GB with a 24B text encoder.

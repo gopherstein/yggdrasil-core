@@ -164,6 +164,49 @@
           "revision": "1f12b17be14c89b026c51a91d67c32f84bb047bc"
         }
       ]
+    },
+    {
+      "id": "flux2-klein-9b",
+      "name": "FLUX.2 [klein] 9B",
+      "note": "Black Forest Labs, FLUX Non-Commercial License, gated: the diffusion model downloads from black-forest-labs with the person's own token, never a mirror. The Qwen3 8B text encoder and the FLUX.2 small decoder are Apache 2.0. Settings from stable-diffusion.cpp's docs.",
+      "kind": "image",
+      "description": "Makes and edits images with more detail than the 4B model, in four steps. Needs your own license: non-commercial use, or a commercial license from Black Forest Labs.",
+      "license": "FLUX Non-Commercial License",
+      "memory_bytes": 34359738368,
+      "edits": true,
+      "untested": true,
+      "steps": 4,
+      "cfg": 1,
+      "needs_license": true,
+      "license_url": "https://huggingface.co/black-forest-labs/FLUX.2-klein-9B",
+      "license_allows": "Non-commercial use. For commercial use, buy a license from Black Forest Labs.",
+      "files": [
+        {
+          "role": "diffusion",
+          "repo": "black-forest-labs/FLUX.2-klein-9B",
+          "path": "flux-2-klein-9b.safetensors",
+          "size_bytes": 18157185168,
+          "sha256": "0975d6b77b5f510b99547d6724a208e36527df654e8f6134f59ece3f9f30da58",
+          "revision": "92196c8e11f7b6cf2b7493e037d8c5345c559216",
+          "gated": true
+        },
+        {
+          "role": "llm",
+          "repo": "unsloth/Qwen3-8B-GGUF",
+          "path": "Qwen3-8B-Q4_K_M.gguf",
+          "size_bytes": 5027784512,
+          "sha256": "120307ba529eb2439d6c430d94104dabd578497bc7bfe7e322b5d9933b449bd4",
+          "revision": "a6adef130ffb23ddaf1a62fec9dced968c9bc482"
+        },
+        {
+          "role": "vae",
+          "repo": "black-forest-labs/FLUX.2-small-decoder",
+          "path": "full_encoder_small_decoder.safetensors",
+          "size_bytes": 249519092,
+          "sha256": "ea4273f02d1fafbf8e1d1c2cf6018ed8748652eb0bf34f2dd91171f16f15ab62",
+          "revision": "a3efc24f613ef42d9428af62fdbd6f5fd8856c4a"
+        }
+      ]
     }
   ],
   "video": [

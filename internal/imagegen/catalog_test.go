@@ -167,7 +167,8 @@ func TestQualityTiers(t *testing.T) {
 	for _, list := range [][]Model{Catalog(), VideoCatalog()} {
 		tiers := map[string]bool{}
 		for _, m := range list {
-			if !m.EditOnly && m.Tier == "" {
+			// Edit-only and licensed models are chosen, not picked by tier.
+			if !m.EditOnly && !m.NeedsLicense && m.Tier == "" {
 				t.Errorf("%s has no tier", m.ID)
 			}
 			tiers[m.Tier] = true

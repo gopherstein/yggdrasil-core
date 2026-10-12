@@ -44,6 +44,8 @@ func (a *App) newSDSetup(cfg config.Config, folder string, catalog func() []imag
 			return int64(inv.Disk.AvailableBytes), nil
 		},
 		Sandboxed: a.python.Sandboxed,
+		// Models behind a license download with the person's own token.
+		Token: a.huggingFaceToken,
 		// The Vulkan build when a GPU can run it (#154), checked once: it
 		// runs vulkaninfo, and the answer doesn't change while running.
 		GPU: vulkanUsable,

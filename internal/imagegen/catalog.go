@@ -21,6 +21,9 @@ type File struct {
 	// Revision pins a Hugging Face file to a commit, so it never changes
 	// under its checksum.
 	Revision string `json:"revision,omitempty"`
+	// Gated is a file behind its model's license on Hugging Face: it's
+	// downloaded with the person's own token, from the vendor (#551).
+	Gated bool `json:"gated,omitempty"`
 }
 
 // URL is where the file is downloaded from, pinned to its revision.
@@ -56,6 +59,13 @@ type Model struct {
 	// ModelArgs is passed to sd-cli as --model-args, for a model that needs
 	// one to work as intended.
 	ModelArgs string `json:"-"`
+	// NeedsLicense is a model Toskar can't give out: the person accepts
+	// its license on Hugging Face, adds their own token, and confirms
+	// their license covers their use before it's set up (#551).
+	// LicenseURL is the license, and LicenseAllows says what it allows.
+	NeedsLicense  bool   `json:"needs_license,omitempty"`
+	LicenseURL    string `json:"license_url,omitempty"`
+	LicenseAllows string `json:"license_allows,omitempty"`
 	// Tier is the quality a model gives among those of its kind: fast,
 	// balanced, or best (#549). A request for a quality uses the installed
 	// model of that tier.
@@ -114,7 +124,7 @@ func Recommend(memoryBytes int64) Model { return recommendIn(Catalog(), memoryBy
 func recommendIn(list []Model, memoryBytes int64) Model {
 	best := list[0]
 	for _, m := range list {
-		if !m.Untested && m.Edits && !m.EditOnly && m.MemoryBytes <= memoryBytes && m.MemoryBytes > best.MemoryBytes {
+		if !m.Untested && !m.NeedsLicense && m.Edits && !m.EditOnly && m.MemoryBytes <= memoryBytes && m.MemoryBytes > best.MemoryBytes {
 			best = m
 		}
 	}
