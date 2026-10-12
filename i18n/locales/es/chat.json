@@ -107,6 +107,7 @@
   },
   "attachments": {
     "madeWith": "{{model}} · {{size}} · semilla {{seed}}",
+    "madeWithOn": "{{model}} · {{size}} · semilla {{seed}} · en {{computer}}",
     "unsupported": "Toskar todavía no puede leer este tipo de archivo",
     "tooLarge": "Los archivos pueden tener hasta 25 MB",
     "addFailed": "No se pudo agregar el archivo.",

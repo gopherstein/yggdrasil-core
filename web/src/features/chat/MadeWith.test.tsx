@@ -34,4 +34,9 @@ describe('made pictures and clips', () => {
     render(<FileChip file={{ ...picture, details: undefined }} />)
     expect(screen.queryByText(/seed/)).toBeNull()
   })
+
+  it('say which computer made it, when another one did', async () => {
+    render(<FileChip file={{ ...picture, details: { ...picture.details, computer: 'Workstation' } }} />)
+    expect(await screen.findByText('Z-Image-Turbo · 1024×576 · seed 4211 · on Workstation')).toBeInTheDocument()
+  })
 })

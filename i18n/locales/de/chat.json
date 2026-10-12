@@ -106,6 +106,7 @@
   },
   "attachments": {
     "madeWith": "{{model}} · {{size}} · Seed {{seed}}",
+    "madeWithOn": "{{model}} · {{size}} · Seed {{seed}} · auf {{computer}}",
     "unsupported": "Diesen Dateityp kann Toskar noch nicht lesen",
     "tooLarge": "Dateien dürfen bis zu 25 MB groß sein",
     "addFailed": "Die Datei konnte nicht hinzugefügt werden.",

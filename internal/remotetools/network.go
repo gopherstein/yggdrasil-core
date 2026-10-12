@@ -262,6 +262,12 @@ func (p *Proxy) runOn(ctx context.Context, peer Peer, args map[string]any) (map[
 	if err != nil {
 		return nil, err
 	}
+	// Which computer made it goes in before Finish, so a file it saves
+	// keeps it with how it was made (#553).
+	if out.Result == nil {
+		out.Result = map[string]any{}
+	}
+	out.Result["computer"] = peer.Name
 	res, err := p.local.Finish(ctx, out)
 	if err != nil {
 		return nil, err

@@ -105,6 +105,7 @@
   },
   "attachments": {
     "madeWith": "{{model}} · {{size}} · 種子 {{seed}}",
+    "madeWithOn": "{{model}} · {{size}} · 種子 {{seed}} · 在 {{computer}} 上",
     "unsupported": "Toskar 目前還無法讀取這種類型的檔案",
     "tooLarge": "檔案大小上限為 25 MB",
     "addFailed": "無法加入這個檔案。",

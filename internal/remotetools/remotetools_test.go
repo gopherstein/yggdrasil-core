@@ -28,6 +28,7 @@ type fakeTool struct {
 	fail        string
 	mu          sync.Mutex
 	finished    []string
+	computer    string
 }
 
 func (f *fakeTool) ID() string          { return "image.generate" }
@@ -66,6 +67,8 @@ func (f *fakeTool) Run(ctx context.Context, job Job) (Output, error) {
 func (f *fakeTool) Finish(_ context.Context, out Output) (map[string]any, error) {
 	f.mu.Lock()
 	f.finished = append(f.finished, string(out.Files[0].Data))
+	// What Finish saves can say which computer made it (#553).
+	f.computer, _ = out.Result["computer"].(string)
 	f.mu.Unlock()
 	res := map[string]any{"finished_on": f.where}
 	for k, v := range out.Result {
@@ -116,8 +119,8 @@ func TestRunsWhereTheProviderIs(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if res["ran_on"] != "workstation" || res["finished_on"] != "laptop" || res["computer"] != "Workstation" {
-		t.Fatalf("result %v", res)
+	if res["ran_on"] != "workstation" || res["finished_on"] != "laptop" || res["computer"] != "Workstation" || local.computer != "Workstation" {
+		t.Fatalf("result %v, Finish saw computer %q", res, local.computer)
 	}
 	if local.finished[0] != "PREPARED ON LAPTOP" || local.runs.Load() != 0 || remote.runs.Load() != 1 {
 		t.Fatalf("finished %v, runs here %d there %d", local.finished, local.runs.Load(), remote.runs.Load())

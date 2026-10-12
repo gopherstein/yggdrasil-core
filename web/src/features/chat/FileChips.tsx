@@ -314,7 +314,12 @@ function MadeWith({ file }: { file: FileRef }) {
   return (
     <span className="truncate px-1 text-[11px] text-ink-faint" title={d.prompt}>
       {/* A seed is an identifier, so it isn't grouped like a number. */}
-      {t('attachments.madeWith', { model: d.model, size, seed: d.seed != null ? String(d.seed) : '' })}
+      {t(d.computer ? 'attachments.madeWithOn' : 'attachments.madeWith', {
+        model: d.model,
+        size,
+        seed: d.seed != null ? String(d.seed) : '',
+        computer: d.computer,
+      })}
     </span>
   )
 }

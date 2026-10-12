@@ -105,6 +105,7 @@
   },
   "attachments": {
     "madeWith": "{{model}} · {{size}} · 시드 {{seed}}",
+    "madeWithOn": "{{model}} · {{size}} · 시드 {{seed}} · {{computer}}에서",
     "unsupported": "Toskar가 아직 이 형식의 파일을 읽을 수 없어요",
     "tooLarge": "파일은 최대 25MB까지 첨부할 수 있어요",
     "addFailed": "파일을 추가할 수 없어요.",
