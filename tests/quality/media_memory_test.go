@@ -1,7 +1,10 @@
 package quality
 
 import (
+	"bytes"
 	"fmt"
+	"image"
+	"image/png"
 	"net/http"
 	"strings"
 	"sync"
@@ -114,5 +117,28 @@ func TestMemoryTable(t *testing.T) {
 	}
 	if memoryTable("", nil) != "" {
 		t.Error("an empty table was written")
+	}
+}
+
+func TestFlatPicture(t *testing.T) {
+	blank := image.NewRGBA(image.Rect(0, 0, 64, 64))
+	if !flat(blank) {
+		t.Error("an all-black picture isn't flat")
+	}
+	shapes, err := shapesPNG("size=128 bg=white shape=circle color=red count=2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	img, err := png.Decode(bytes.NewReader(shapes))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if flat(img) {
+		t.Error("a picture of two red circles counts as flat")
+	}
+	for in, want := range map[string]bool{"Yes, waves roll in.": true, "**yes**": true, "No, the frames are the same.": false, "": false} {
+		if saysYes(in) != want {
+			t.Errorf("saysYes(%q) = %v", in, !want)
+		}
 	}
 }
