@@ -47,7 +47,7 @@ func (a *App) resolveAttachments(ctx context.Context, conversationID string, ids
 }
 
 func fileRef(a artifacts.Artifact) contracts.FileRef {
-	return contracts.FileRef{ID: a.ID, Name: a.Name, MimeType: a.MimeType, Kind: a.Kind, Size: a.Size, Producer: a.Producer}
+	return contracts.FileRef{ID: a.ID, Name: a.Name, MimeType: a.MimeType, Kind: a.Kind, Size: a.Size, Producer: a.Producer, Details: a.Details}
 }
 
 func fileRefs(list []artifacts.Artifact) []contracts.FileRef {

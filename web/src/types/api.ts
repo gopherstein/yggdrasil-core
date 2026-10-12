@@ -606,6 +606,17 @@ export interface FileRef {
   kind: string
   size_bytes: number
   producer: 'user' | 'assistant'
+  /** How a made file was made: a picture's or clip's model, quality, seed, size, and prompt (contract 1.29, #553). */
+  details?: {
+    model?: string
+    quality?: string
+    seed?: number
+    prompt?: string
+    width?: number
+    height?: number
+    frames?: number
+    length_seconds?: number
+  }
 }
 
 export interface Artifact extends FileRef {

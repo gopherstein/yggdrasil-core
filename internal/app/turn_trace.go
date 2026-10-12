@@ -9,6 +9,7 @@ import (
 
 	"github.com/yeixio/toskar-core/internal/artifacts"
 	"github.com/yeixio/toskar-core/internal/huginn"
+	"github.com/yeixio/toskar-core/internal/imagegen"
 	"github.com/yeixio/toskar-core/internal/locale"
 	"github.com/yeixio/toskar-core/internal/mimir"
 	"github.com/yeixio/toskar-core/internal/muninn"
@@ -493,8 +494,19 @@ func (t *turnTrace) produced(toolID string, result map[string]any) {
 		case float64:
 			size = int64(v)
 		}
-		t.files = append(t.files, contracts.FileRef{ID: id, Name: name, Kind: kind, Size: size, Producer: "assistant"})
-		t.step("create", "created", map[string]any{"name": name})
+		ref := contracts.FileRef{ID: id, Name: name, Kind: kind, Size: size, Producer: "assistant"}
+		media := toolID == "image.generate" || toolID == "image.edit" || toolID == "video.generate"
+		if media {
+			// How it was made goes with it (#553).
+			if d := imagegen.Details(m); len(d) > 0 {
+				ref.Details = d
+			}
+		}
+		t.files = append(t.files, ref)
+		// A picture or clip has its own step, naming its model (#549).
+		if !media {
+			t.step("create", "created", map[string]any{"name": name})
+		}
 	}
 	add(result)
 	switch list := result["files"].(type) {

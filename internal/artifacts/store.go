@@ -6,6 +6,7 @@ package artifacts
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"mime"
@@ -48,7 +49,10 @@ type Artifact struct {
 	// ExpiresAt is when a file that belongs to no chat is removed (#191).
 	// A file in a chat has none and stays with the chat.
 	ExpiresAt *time.Time `json:"expires_at,omitempty"`
-	path      string
+	// Details are how it was made, such as a picture's model, seed, and
+	// prompt (#553).
+	Details map[string]any `json:"details,omitempty"`
+	path    string
 }
 
 // UnfiledTTL is how long a file that belongs to no chat is kept: one an
@@ -63,6 +67,8 @@ type Input struct {
 	Producer       string
 	SourceTask     string
 	Data           []byte
+	// Details are how it was made, kept with it (#553).
+	Details map[string]any
 }
 
 // Store saves and finds artifacts.
@@ -183,6 +189,7 @@ func (s *Store) Save(ctx context.Context, in Input) (Artifact, error) {
 		ID: uuid.NewString(), ConversationID: in.ConversationID, Name: name, MimeType: MimeType(name),
 		Kind: kindOf(name), Size: int64(len(in.Data)), Producer: producer, SourceTask: in.SourceTask,
 		CreatedAt: s.now().UTC(),
+		Details:   in.Details,
 	}
 	if in.ConversationID == "" {
 		exp := a.CreatedAt.Add(UnfiledTTL)
@@ -201,10 +208,10 @@ func (s *Store) Save(ctx context.Context, in Input) (Artifact, error) {
 		return Artifact{}, err
 	}
 	_, err := s.db.ExecContext(ctx, `
-		INSERT INTO artifacts (id, conversation_id, name, mime_type, kind, size_bytes, producer, source_task, path, created_at, expires_at, person_id)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		INSERT INTO artifacts (id, conversation_id, name, mime_type, kind, size_bytes, producer, source_task, path, created_at, expires_at, person_id, details)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		a.ID, nullable(a.ConversationID), a.Name, a.MimeType, a.Kind, a.Size, a.Producer, nullable(a.SourceTask), a.path,
-		a.CreatedAt.Format(time.RFC3339Nano), stamp(a.ExpiresAt), auth.PersonID(ctx))
+		a.CreatedAt.Format(time.RFC3339Nano), stamp(a.ExpiresAt), auth.PersonID(ctx), detailsJSON(a.Details))
 	if err != nil {
 		_ = os.Remove(full)
 		return Artifact{}, err
@@ -212,13 +219,16 @@ func (s *Store) Save(ctx context.Context, in Input) (Artifact, error) {
 	return a, nil
 }
 
-const columns = `id, COALESCE(conversation_id, ''), name, mime_type, kind, size_bytes, producer, COALESCE(source_task, ''), path, created_at, COALESCE(expires_at, '')`
+const columns = `id, COALESCE(conversation_id, ''), name, mime_type, kind, size_bytes, producer, COALESCE(source_task, ''), path, created_at, COALESCE(expires_at, ''), COALESCE(details, '')`
 
 func scan(row interface{ Scan(...any) error }) (Artifact, error) {
 	var a Artifact
-	var created, expires string
-	if err := row.Scan(&a.ID, &a.ConversationID, &a.Name, &a.MimeType, &a.Kind, &a.Size, &a.Producer, &a.SourceTask, &a.path, &created, &expires); err != nil {
+	var created, expires, details string
+	if err := row.Scan(&a.ID, &a.ConversationID, &a.Name, &a.MimeType, &a.Kind, &a.Size, &a.Producer, &a.SourceTask, &a.path, &created, &expires, &details); err != nil {
 		return Artifact{}, err
+	}
+	if details != "" {
+		_ = json.Unmarshal([]byte(details), &a.Details)
 	}
 	a.CreatedAt, _ = time.Parse(time.RFC3339Nano, created)
 	if t, err := time.Parse(time.RFC3339Nano, expires); err == nil {
@@ -406,4 +416,16 @@ func WithAttachments(ctx context.Context, ids []string) context.Context {
 func AttachmentsFrom(ctx context.Context) []string {
 	ids, _ := ctx.Value(ctxKey{}).([]string)
 	return ids
+}
+
+// detailsJSON is details for the details column, or NULL.
+func detailsJSON(d map[string]any) any {
+	if len(d) == 0 {
+		return nil
+	}
+	raw, err := json.Marshal(d)
+	if err != nil {
+		return nil
+	}
+	return string(raw)
 }

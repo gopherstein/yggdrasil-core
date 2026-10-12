@@ -104,6 +104,7 @@
     "deleteFailed": "无法删除这个聊天。"
   },
   "attachments": {
+    "madeWith": "{{model}} · {{size}} · 种子 {{seed}}",
     "unsupported": "Toskar 暂时无法读取这种类型的文件",
     "tooLarge": "文件最大为 25 MB",
     "addFailed": "无法添加该文件。",

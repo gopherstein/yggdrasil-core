@@ -246,7 +246,7 @@ func (t *VideoTool) Run(ctx context.Context, job remotetools.Job) (remotetools.O
 	}
 	name = strings.TrimSuffix(name, filepath.Ext(name)) + ".webm"
 	result := map[string]any{"width": res.Width, "height": res.Height, "frames": res.Frames, "length_seconds": res.Length,
-		"seed": res.Seed, "model": res.Model, "seconds": math.Round(res.Seconds)}
+		"seed": res.Seed, "model": res.Model, "seconds": math.Round(res.Seconds), "prompt": prompt}
 	if res.Tier != "" {
 		result["quality"] = res.Tier
 	}
@@ -265,7 +265,8 @@ func (t *VideoTool) Finish(ctx context.Context, out remotetools.Output) (map[str
 		return nil, fmt.Errorf("no clip came back")
 	}
 	f := out.Files[0]
-	a, err := t.Store.Save(ctx, artifacts.Input{ConversationID: artifacts.ConversationFrom(ctx), Name: artifacts.CleanName(f.Name), Producer: artifacts.ProducerAssistant, Data: f.Data})
+	a, err := t.Store.Save(ctx, artifacts.Input{ConversationID: artifacts.ConversationFrom(ctx), Name: artifacts.CleanName(f.Name), Producer: artifacts.ProducerAssistant, Data: f.Data,
+		Details: details(out.Result)})
 	if err != nil {
 		return nil, err
 	}

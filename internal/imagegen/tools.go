@@ -153,7 +153,7 @@ func output(res Result, name, prompt string, askedW, askedH int) remotetools.Out
 		name = strings.TrimSuffix(name, filepath.Ext(name)) + ".png"
 	}
 	result := map[string]any{"width": res.Width, "height": res.Height, "seed": res.Seed, "model": res.Model,
-		"seconds": math.Round(res.Seconds*10) / 10}
+		"seconds": math.Round(res.Seconds*10) / 10, "prompt": prompt}
 	if res.Tier != "" {
 		result["quality"] = res.Tier
 	}
@@ -197,7 +197,8 @@ func finish(ctx context.Context, store *artifacts.Store, out remotetools.Output)
 		return nil, fmt.Errorf("no image came back")
 	}
 	f := out.Files[0]
-	a, err := store.Save(ctx, artifacts.Input{ConversationID: artifacts.ConversationFrom(ctx), Name: artifacts.CleanName(f.Name), Producer: artifacts.ProducerAssistant, Data: f.Data})
+	a, err := store.Save(ctx, artifacts.Input{ConversationID: artifacts.ConversationFrom(ctx), Name: artifacts.CleanName(f.Name), Producer: artifacts.ProducerAssistant, Data: f.Data,
+		Details: details(out.Result)})
 	if err != nil {
 		return nil, err
 	}
@@ -240,4 +241,22 @@ func intArg(v any) int {
 		return int(n)
 	}
 	return 0
+}
+
+// detailKeys are what a made picture or clip keeps of how it was made, so
+// it can be made again (#553).
+var detailKeys = []string{"model", "quality", "seed", "prompt", "width", "height", "frames", "length_seconds"}
+
+// Details picks those from a picture or clip tool's result.
+func Details(result map[string]any) map[string]any { return details(result) }
+
+// details picks those from a tool's result.
+func details(result map[string]any) map[string]any {
+	out := map[string]any{}
+	for _, k := range detailKeys {
+		if v, ok := result[k]; ok && v != nil && v != "" {
+			out[k] = v
+		}
+	}
+	return out
 }

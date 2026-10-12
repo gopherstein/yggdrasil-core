@@ -104,6 +104,7 @@
     "deleteFailed": "このチャットを削除できませんでした。"
   },
   "attachments": {
+    "madeWith": "{{model}} · {{size}} · シード {{seed}}",
     "unsupported": "Toskarはこの種類のファイルをまだ読み取れません",
     "tooLarge": "ファイルは25 MBまでです",
     "addFailed": "ファイルを追加できませんでした。",

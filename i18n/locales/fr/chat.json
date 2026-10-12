@@ -106,6 +106,7 @@
     "deleteFailed": "Impossible de supprimer cette discussion."
   },
   "attachments": {
+    "madeWith": "{{model}} · {{size}} · graine {{seed}}",
     "unsupported": "Toskar ne peut pas encore lire ce type de fichier",
     "tooLarge": "Les fichiers peuvent faire jusqu'à 25 Mo",
     "addFailed": "Impossible d'ajouter le fichier.",
