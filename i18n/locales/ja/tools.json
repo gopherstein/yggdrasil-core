@@ -110,6 +110,7 @@
     "progress": "{{total}}中{{done}}",
     "stop": "停止",
     "recommended": "このコンピュータにおすすめ",
+    "untested": "実機ではまだ未テスト",
     "inUse": "使用中",
     "makesAndEdits": " · 画像の作成と編集",
     "makes": " · 画像の作成",

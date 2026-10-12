@@ -110,6 +110,7 @@
     "progress": "{{done}} de {{total}}",
     "stop": "Parar",
     "recommended": "Recomendado para este computador",
+    "untested": "Ainda não testado em hardware real",
     "inUse": "Em uso",
     "makesAndEdits": " · cria e edita imagens",
     "makes": " · cria imagens",

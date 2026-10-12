@@ -274,16 +274,30 @@ func (d realDriver) recording(t *testing.T, text string) []byte {
 // speech, for a daemon started fresh for the run (TOSKAR_QUALITY_MEDIA_INSTALL).
 func (d realDriver) installMedia(t *testing.T) {
 	t.Helper()
-	for _, s := range []struct{ path, model string }{{"/api/v1/images/setup", "flux2-klein-4b"}, {"/api/v1/video/setup", "wan2.2-ti2v-5b"}} {
+	// TOSKAR_QUALITY_MEDIA_IMAGE_MODEL tests another picture model, such as
+	// one not yet tested on real hardware (#548). FLUX.2 [klein] 4B is set
+	// up first anyway, so edits have a model that edits.
+	steps := []struct{ path, model string }{{"/api/v1/images/setup", "flux2-klein-4b"}}
+	if m := config.Env("QUALITY_MEDIA_IMAGE_MODEL"); m != "" && m != "flux2-klein-4b" {
+		steps = append(steps, struct{ path, model string }{"/api/v1/images/setup", m})
+	}
+	steps = append(steps, struct{ path, model string }{"/api/v1/video/setup", "wan2.2-ti2v-5b"})
+	for _, s := range steps {
 		var status struct {
-			Ready bool `json:"ready"`
-			Job   *struct {
+			Ready  bool   `json:"ready"`
+			Active string `json:"active"`
+			Job    *struct {
 				Running bool   `json:"running"`
 				Error   string `json:"error"`
 			} `json:"job"`
 		}
 		d.do(t, http.MethodGet, s.path, nil, &status)
-		if !status.Ready {
+		// Setting a model up makes it the active one.
+		if status.Ready && status.Active != s.model {
+			t.Logf("setting up %s in place of %s", s.model, status.Active)
+			d.do(t, http.MethodPost, s.path, map[string]any{"model_id": s.model}, nil)
+			status.Ready = false
+		} else if !status.Ready {
 			t.Logf("setting up %s", s.model)
 			d.do(t, http.MethodPost, s.path, map[string]any{"model_id": s.model}, nil)
 		}
@@ -294,6 +308,9 @@ func (d realDriver) installMedia(t *testing.T) {
 			}
 			time.Sleep(10 * time.Second)
 			d.do(t, http.MethodGet, s.path, nil, &status)
+			if status.Active != s.model {
+				status.Ready = false
+			}
 			if status.Job != nil && !status.Job.Running && status.Job.Error != "" {
 				t.Fatalf("setting up %s failed: %s", s.model, status.Job.Error)
 			}

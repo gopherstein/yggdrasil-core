@@ -40,6 +40,10 @@ type Model struct {
 	Edits bool `json:"edits"`
 	// Kind is image or video.
 	Kind string `json:"kind"`
+	// Untested is a model that hasn't yet passed the media quality set on
+	// real hardware (#548, #553): it can be chosen, but it's never
+	// recommended or picked for the person.
+	Untested bool `json:"untested,omitempty"`
 	// Steps and CFG are its sampling defaults; FlowShift, Frames, and FPS
 	// are a video model's.
 	Steps     int     `json:"-"`
@@ -67,6 +71,9 @@ var revisions = map[string]string{
 	"city96/umt5-xxl-encoder-gguf":           "b535255bee98c2b0a59ea7c0ae2dcd0c6657b3b7",
 	"Comfy-Org/Wan_2.2_ComfyUI_Repackaged":   "ee6f4a40737a995bf5818954cfce6d59443b0f04",
 	"madebyollin/taehv":                      "011dfc2112197741c540e0bdd5b7b67bcc930771",
+	"leejet/Z-Image-Turbo-GGUF":              "c61c0e422dc8b541b7548cf33a4ef8302b0f8085",
+	"unsloth/Qwen3-4B-Instruct-2507-GGUF":    "a06e946bb6b655725eafa393f4a9745d460374c9",
+	"Comfy-Org/z_image_turbo":                "6fc90a3b1b653e935a0d175e260736de25b84df5",
 }
 
 var vae = File{Role: "vae", Repo: "black-forest-labs/FLUX.2-small-decoder", Path: "full_encoder_small_decoder.safetensors",
@@ -99,6 +106,23 @@ func Catalog() []Model {
 				{Role: "llm", Repo: "unsloth/Qwen3-4B-GGUF", Path: "Qwen3-4B-Q8_0.gguf",
 					Size: 4280405792, SHA256: "eed555233267a33c7e8ee31682762cc7751b3f6d224039086e0e846f05fffa5d"},
 				vae,
+			},
+		},
+		// Z-Image-Turbo (Tongyi-MAI) makes photorealistic pictures, and
+		// writes text in them well, in eight steps. It doesn't edit. It and
+		// its parts are Apache 2.0; the FLUX.1 VAE comes from ComfyUI's
+		// repackage, which needs no account.
+		{
+			ID: "z-image-turbo", Name: "Z-Image-Turbo", Kind: "image", Untested: true,
+			Description: "Photorealistic pictures, with clear text in them, in a few steps. It can't edit pictures.",
+			License:     "Apache-2.0", MemoryBytes: 14 << 30, Steps: 8, CFG: 1,
+			Files: []File{
+				{Role: "diffusion", Repo: "leejet/Z-Image-Turbo-GGUF", Path: "z_image_turbo-Q4_K.gguf",
+					Size: 3864250304, SHA256: "14b375ab4f226bc5378f68f37e899ef3c2242b8541e61e2bc1aff40976086fbd"},
+				{Role: "llm", Repo: "unsloth/Qwen3-4B-Instruct-2507-GGUF", Path: "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+					Size: 2497281120, SHA256: "3605803b982cb64aead44f6c1b2ae36e3acdb41d8e46c8a94c6533bc4c67e597"},
+				{Role: "vae", Repo: "Comfy-Org/z_image_turbo", Path: "split_files/vae/ae.safetensors",
+					Size: 335304388, SHA256: "afc8e28272cd15db3919bacdb6918ce9c1ed22e96cb12c4d5ed0fba823529e38"},
 			},
 		},
 	}
@@ -147,7 +171,7 @@ func Recommend(memoryBytes int64) Model { return recommendIn(Catalog(), memoryBy
 func recommendIn(list []Model, memoryBytes int64) Model {
 	best := list[0]
 	for _, m := range list {
-		if m.MemoryBytes <= memoryBytes && m.MemoryBytes > best.MemoryBytes {
+		if !m.Untested && m.MemoryBytes <= memoryBytes && m.MemoryBytes > best.MemoryBytes {
 			best = m
 		}
 	}

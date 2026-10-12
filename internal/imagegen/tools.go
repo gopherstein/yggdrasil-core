@@ -54,10 +54,21 @@ type EditTool struct {
 	Store  *artifacts.Store
 }
 
-func (t *EditTool) ID() string                     { return "image.edit" }
-func (t *EditTool) DisplayName() string            { return "Edit Image" }
-func (t *EditTool) Description() string            { return "Change an image in this chat from an instruction" }
-func (t *EditTool) Available() (bool, string)      { return t.Engine.Available() }
+func (t *EditTool) ID() string          { return "image.edit" }
+func (t *EditTool) DisplayName() string { return "Edit Image" }
+func (t *EditTool) Description() string { return "Change an image in this chat from an instruction" }
+
+// Available reports pictures can be edited here: images are set up, and an
+// installed model can edit.
+func (t *EditTool) Available() (bool, string) {
+	if ok, why := t.Engine.Available(); !ok {
+		return false, why
+	}
+	if !t.Engine.Setup.canEdit() {
+		return false, editModelMissing(t.Engine.Setup)
+	}
+	return true, ""
+}
 func (t *EditTool) Provider() remotetools.Provider { return t.Engine.provider(t.ID()) }
 func (t *EditTool) Execute(ctx context.Context, args map[string]any) (map[string]any, error) {
 	return remotetools.Execute(ctx, t, args)

@@ -110,6 +110,7 @@
     "progress": "{{total}} 중 {{done}}",
     "stop": "중지",
     "recommended": "이 컴퓨터에 추천",
+    "untested": "아직 실제 하드웨어에서 테스트하지 않음",
     "inUse": "사용 중",
     "makesAndEdits": " · 이미지 생성 및 편집",
     "makes": " · 이미지 생성",
