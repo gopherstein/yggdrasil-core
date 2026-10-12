@@ -10,9 +10,13 @@ import (
 )
 
 // startLive reads this computer's CPU, memory, and GPU figures, often while
-// a model is loaded and once a minute otherwise (#317).
+// a model is loaded or a picture or clip is being made (which may have
+// unloaded the models, #542), and once a minute otherwise (#317).
 func (a *App) startLive(ctx context.Context) {
 	a.live = telemetry.NewSampler(telemetry.NewReader(), func() bool {
+		if _, _, making := a.media.running(); making {
+			return true
+		}
 		if a.Runtimes == nil {
 			return false
 		}
