@@ -283,6 +283,12 @@ func (d realDriver) installMedia(t *testing.T) {
 	}
 	// TOSKAR_QUALITY_MEDIA_VIDEO_MODEL does the same for clips; Wan 2.2
 	// TI2V 5B is set up first, for clips from pictures.
+	// A model that needs a license is tested with the token of an account
+	// that accepted it (TOSKAR_QUALITY_HF_TOKEN), and the set confirms the
+	// license for that run (#551).
+	if token := config.Env("QUALITY_HF_TOKEN"); token != "" {
+		d.do(t, http.MethodPatch, "/api/v1/settings", map[string]any{"huggingface_token": token}, nil)
+	}
 	steps = append(steps, struct{ path, model string }{"/api/v1/video/setup", "wan2.2-ti2v-5b"})
 	if m := config.Env("QUALITY_MEDIA_VIDEO_MODEL"); m != "" && m != "wan2.2-ti2v-5b" {
 		steps = append(steps, struct{ path, model string }{"/api/v1/video/setup", m})
@@ -323,7 +329,7 @@ func (d realDriver) installMedia(t *testing.T) {
 		}
 		// The set agrees to a model that's slow or near the limit here: it
 		// measures it (#550).
-		d.do(t, http.MethodPost, s.path, map[string]any{"model_id": s.model, "accept_tight": true}, nil)
+		d.do(t, http.MethodPost, s.path, map[string]any{"model_id": s.model, "accept_tight": true, "accept_license": true}, nil)
 		deadline := time.Now().Add(installWithin)
 		for !done() {
 			if time.Now().After(deadline) {
