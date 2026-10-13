@@ -47,6 +47,9 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+          # The newest patch release, not one a runner has cached: patches
+          # fix security problems in the standard library that builds ship.
+          check-latest: true
       - uses: actions/cache@v6
         with:
           path: .quality-cache

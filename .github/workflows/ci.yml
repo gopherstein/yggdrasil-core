@@ -45,6 +45,9 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+          # The newest patch release, not one a runner has cached: patches
+          # fix security problems in the standard library that builds ship.
+          check-latest: true
           # Self-hosted runners keep Go's caches on disk; uploading them
           # to GitHub's cache only held jobs up for many minutes.
           cache: ${{ !vars.CI_RUNS_ON }}
@@ -116,6 +119,9 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+          # The newest patch release, not one a runner has cached: patches
+          # fix security problems in the standard library that builds ship.
+          check-latest: true
           # Self-hosted runners keep Go's caches on disk; uploading them
           # to GitHub's cache only held jobs up for many minutes.
           cache: ${{ !vars.CI_RUNS_ON }}
@@ -152,6 +158,9 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+          # The newest patch release, not one a runner has cached: patches
+          # fix security problems in the standard library that builds ship.
+          check-latest: true
       # Each job gets its own pnpm: self-hosted runners share a home folder,
       # and two jobs installing into ~/setup-pnpm at once break each other.
       - uses: pnpm/action-setup@v6
@@ -187,6 +196,9 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+          # The newest patch release, not one a runner has cached: patches
+          # fix security problems in the standard library that builds ship.
+          check-latest: true
           # Self-hosted runners keep Go's caches on disk; uploading them
           # to GitHub's cache only held jobs up for many minutes.
           cache: ${{ !vars.CI_RUNS_ON }}
@@ -240,6 +252,9 @@ jobs:
       - uses: actions/setup-go@v7
         with:
           go-version: "1.26.x"
+          # The newest patch release, not one a runner has cached: patches
+          # fix security problems in the standard library that builds ship.
+          check-latest: true
           # Self-hosted runners keep Go's caches on disk; uploading them
           # to GitHub's cache only held jobs up for many minutes.
           cache: ${{ !vars.CI_RUNS_ON }}
