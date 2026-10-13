@@ -160,6 +160,7 @@
     },
     "check": {
       "reachable": "Accesible desde fuera de tu red",
+      "reachableViaRelay": "Accesible desde fuera de tu red, a través del relay",
       "unreachable": "No accesible desde fuera de tu red",
       "unchecked": "Aún no se comprobó desde fuera",
       "checked": "Comprobado {{when}}",
@@ -193,7 +194,8 @@
         "RELAY_UNREACHABLE": "No se pudo llegar al relé para comprobar.",
         "other": "La comprobación no pudo ejecutarse ({{code}})."
       },
-      "nextSteps": "Los dispositivos fuera de casa no llegan a esta computadora. Corrige lo marcado y vuelve a comprobar, o usa un relé, que funciona detrás de cualquier router."
+      "nextSteps": "Los dispositivos fuera de casa no llegan a esta computadora. Corrige lo marcado y vuelve a comprobar, o usa un relé, que funciona detrás de cualquier router.",
+      "directOptional": "Los dispositivos fuera de casa entran a través del relay, así que no hay nada que arreglar. Un acceso directo es opcional: puede hacer las respuestas un poco más rápidas."
     },
     "relay": {
       "title": "Relé de tu organización",

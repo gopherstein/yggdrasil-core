@@ -160,6 +160,7 @@
     },
     "check": {
       "reachable": "Raggiungibile dall'esterno della tua rete",
+      "reachableViaRelay": "Raggiungibile dall’esterno della tua rete, tramite il relay",
       "unreachable": "Non raggiungibile dall'esterno della tua rete",
       "unchecked": "Non ancora verificato dall'esterno",
       "checked": "Verificato {{when}}",
@@ -193,7 +194,8 @@
         "RELAY_UNREACHABLE": "Non è stato possibile raggiungere il relay per la verifica.",
         "other": "La verifica non è riuscita ({{code}})."
       },
-      "nextSteps": "I dispositivi fuori casa non raggiungono questo computer. Correggi ciò che è segnato e verifica di nuovo, oppure usa un relay, che funziona dietro qualsiasi router."
+      "nextSteps": "I dispositivi fuori casa non raggiungono questo computer. Correggi ciò che è segnato e verifica di nuovo, oppure usa un relay, che funziona dietro qualsiasi router.",
+      "directOptional": "I dispositivi fuori casa entrano tramite il relay, quindi non c’è nulla da sistemare. Un accesso diretto è facoltativo: può rendere le risposte un po’ più veloci."
     },
     "relay": {
       "title": "Relay della tua organizzazione",
