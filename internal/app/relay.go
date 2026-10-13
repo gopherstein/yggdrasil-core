@@ -104,6 +104,7 @@ func (a *App) applyRelay() {
 		Relay:        relayName(cfg),
 		Secret:       routeSecret,
 		EnrollSecret: enrollSecret(cfg, secrets),
+		Name:         func() string { return a.Config.Get().NodeName },
 		Store:        secrets,
 		Certificate:  a.API.TLSCertificate,
 		Addresses:    a.directAddresses,

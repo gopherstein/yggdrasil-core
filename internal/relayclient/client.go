@@ -19,6 +19,7 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -62,6 +63,10 @@ type Client struct {
 	Secret []byte
 	// EnrollSecret, when set, is traded for a token (a self-hosted relay).
 	EnrollSecret string
+	// Name is this computer's name, such as "linix-rig", sent when the
+	// tunnel opens so the relay's operator can tell computers apart on its
+	// dashboard (#602). It never reaches devices or the address record.
+	Name func() string
 	// Store keeps the token.
 	Store Store
 	// Certificate is the API certificate the record is signed with.
@@ -412,6 +417,11 @@ func (c *Client) tunnel(ctx context.Context) (string, error) {
 		return "", err
 	}
 	req.Header.Set("Authorization", "Bearer "+tok)
+	if c.Name != nil {
+		if name := strings.TrimSpace(c.Name()); name != "" {
+			req.Header.Set("Toskar-Computer-Name", url.QueryEscape(name))
+		}
+	}
 	hc := c.httpClient()
 	hc.Timeout = 0 // the stream stays open
 	resp, err := hc.Do(req)
