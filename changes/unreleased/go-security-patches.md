@@ -1,5 +1,5 @@
 ### Security
 
-- Toskar is built with the newest Go patch release, which fixes security
-  problems in its web server code (GO-2026-6612, GO-2026-6613, and
-  GO-2026-6617), and with golang.org/x/net 0.60.0.
+- Toskar is built with the newest Go patch release and golang.org/x/net
+  0.60.0, which fix ten security problems govulncheck found in Go's web
+  server, TLS, and HTML template code (GO-2026-6603 to GO-2026-6617).
