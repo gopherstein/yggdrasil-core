@@ -1262,6 +1262,9 @@ func (e *chatExecEnv) Generate(ctx context.Context, role string, messages []plug
 		messages = withoutImages(messages)
 	}
 	e.app.Bus.Publish(events.New(events.ModelLoadStarted, e.app.loadStartedPayload(ctx, e.conversationID, modelID, nodeID, role)))
+	if fromDevice(runlog.OriginFrom(ctx)) && (nodeID == "" || nodeID == e.app.Config.Get().NodeID) {
+		e.app.noteDeviceUse(modelID)
+	}
 	started := time.Now()
 	ch, err := e.app.generateOnNode(ctx, nodeID, modelID, role, e.adapter, messages)
 	if err != nil {

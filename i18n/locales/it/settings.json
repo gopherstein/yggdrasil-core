@@ -101,9 +101,15 @@
     "description": "Automatico mantiene i modelli pronti dopo la chat. Manuale lascia a te Avvia e Arresta.",
     "automatic": "Automatico",
     "manual": "Manuale",
-    "idleUnload": "Scarica i modelli inattivi dopo",
-    "idleUnloadHint": "Libera memoria quando un modello non viene usato da un po'. Usa 0 per tenere i modelli caricati.",
-    "minutes": "minuti"
+    "keepReady": "Tieni i modelli pronti",
+    "keepReadyHint": "Per quanto tempo un modello resta caricato dopo l’ultima risposta, così la domanda successiva parte subito. Un modello usato da un telefono, tablet, orologio o TV resta caricato almeno un’ora.",
+    "keepMinutes_one": "{{count}} minuto",
+    "keepMinutes_many": "{{count}} minuti",
+    "keepMinutes_other": "{{count}} minuti",
+    "keepHours_one": "1 ora",
+    "keepHours_many": "{{count}} ore",
+    "keepHours_other": "{{count}} ore",
+    "keepAlways": "Finché non li fermo"
   },
   "downloads": {
     "title": "Scarica modelli",

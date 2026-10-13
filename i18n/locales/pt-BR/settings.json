@@ -101,9 +101,15 @@
     "description": "Automático mantém os modelos carregados depois do chat. Manual deixa Iniciar e Parar com você.",
     "automatic": "Automático",
     "manual": "Manual",
-    "idleUnload": "Descarregar modelos ociosos após",
-    "idleUnloadHint": "Libera memória quando um modelo não é usado há algum tempo. Use 0 para manter os modelos carregados.",
-    "minutes": "minutos"
+    "keepReady": "Manter os modelos prontos",
+    "keepReadyHint": "Por quanto tempo um modelo continua carregado depois da última resposta, para a próxima pergunta começar na hora. Um modelo usado por um celular, tablet, relógio ou TV continua carregado por pelo menos uma hora.",
+    "keepMinutes_one": "{{count}} minuto",
+    "keepMinutes_many": "{{count}} minutos",
+    "keepMinutes_other": "{{count}} minutos",
+    "keepHours_one": "1 hora",
+    "keepHours_many": "{{count}} horas",
+    "keepHours_other": "{{count}} horas",
+    "keepAlways": "Até eu parar"
   },
   "downloads": {
     "title": "Baixar modelos",

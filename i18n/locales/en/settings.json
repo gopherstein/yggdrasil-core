@@ -101,9 +101,13 @@
     "description": "Automatic keeps models warm after chat. Manual leaves Start and Stop to you.",
     "automatic": "Automatic",
     "manual": "Manual",
-    "idleUnload": "Unload idle models after",
-    "idleUnloadHint": "Frees memory when a model hasn’t been used for a while. Use 0 to keep models loaded.",
-    "minutes": "minutes"
+    "keepReady": "Keep models ready",
+    "keepReadyHint": "How long a model stays loaded after its last answer, so the next question starts at once. A model a phone, tablet, watch, or TV used stays loaded for at least an hour.",
+    "keepMinutes_one": "{{count}} minute",
+    "keepMinutes_other": "{{count}} minutes",
+    "keepHours_one": "1 hour",
+    "keepHours_other": "{{count}} hours",
+    "keepAlways": "Until I stop them"
   },
   "downloads": {
     "title": "Download models",

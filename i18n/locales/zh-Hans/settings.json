@@ -101,9 +101,11 @@
     "description": "“自动”会在聊天后让模型保持加载状态。“手动”则由你自己启动和停止。",
     "automatic": "自动",
     "manual": "手动",
-    "idleUnload": "空闲模型卸载时间",
-    "idleUnloadHint": "模型一段时间未使用时释放内存。设为 0 则保持模型加载。",
-    "minutes": "分钟"
+    "keepReady": "让模型保持就绪",
+    "keepReadyHint": "模型在最后一次回答后保持加载的时间，下一个问题可以立即开始。手机、平板、手表或电视用过的模型至少保持加载一小时。",
+    "keepMinutes_other": "{{count}} 分钟",
+    "keepHours_other": "{{count}} 小时",
+    "keepAlways": "直到我停止它们"
   },
   "downloads": {
     "title": "下载模型",

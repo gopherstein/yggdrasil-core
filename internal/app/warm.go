@@ -29,6 +29,8 @@ func (a *App) warmChat(ctx context.Context, req contracts.ModelWarmRequest) (con
 	if modelID == "" {
 		return contracts.ModelWarmResponse{Status: "none"}, nil
 	}
+	// Only the phone, tablet, watch, and TV apps warm up.
+	a.noteDeviceUse(modelID)
 	running, _ := a.localRunningViews(ctx)
 	_, inflight := a.warming.Load(modelID)
 	generating := a.Health != nil && len(a.Health.Generating()) > 0

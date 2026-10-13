@@ -33,6 +33,9 @@ type Sweeper struct {
 	Now      func() time.Time
 	// OnUnload is called after an idle model is stopped.
 	OnUnload func(inst Instance)
+	// Keep, when set, holds an idle model loaded anyway, such as the chat
+	// model while another device is in use (#498).
+	Keep func(ctx context.Context, inst Instance) bool
 
 	mu     sync.Mutex
 	cancel context.CancelFunc
@@ -98,6 +101,9 @@ func (s *Sweeper) tick(ctx context.Context, now time.Time) {
 			continue
 		}
 		if last.After(cutoff) {
+			continue
+		}
+		if s.Keep != nil && s.Keep(ctx, inst) {
 			continue
 		}
 		if err := s.Stop(ctx, inst.InstanceID); err != nil {

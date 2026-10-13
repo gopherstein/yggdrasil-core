@@ -101,9 +101,15 @@
     "description": "En automático, los modelos se mantienen cargados después del chat. En manual, tú decides cuándo iniciarlos y detenerlos.",
     "automatic": "Automático",
     "manual": "Manual",
-    "idleUnload": "Descargar de la memoria los modelos inactivos después de",
-    "idleUnloadHint": "Libera memoria cuando un modelo no se ha usado por un tiempo. Usa 0 para mantener los modelos cargados.",
-    "minutes": "minutos"
+    "keepReady": "Mantener los modelos listos",
+    "keepReadyHint": "Cuánto tiempo sigue cargado un modelo después de su última respuesta, para que la siguiente pregunta empiece al instante. Un modelo que usó un teléfono, tableta, reloj o televisor sigue cargado al menos una hora.",
+    "keepMinutes_one": "{{count}} minuto",
+    "keepMinutes_many": "{{count}} minutos",
+    "keepMinutes_other": "{{count}} minutos",
+    "keepHours_one": "1 hora",
+    "keepHours_many": "{{count}} horas",
+    "keepHours_other": "{{count}} horas",
+    "keepAlways": "Hasta que los detenga"
   },
   "downloads": {
     "title": "Descargar modelos",

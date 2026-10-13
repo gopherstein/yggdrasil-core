@@ -101,9 +101,13 @@
     "description": "„Automatisch“ hält Modelle nach dem Chat bereit. Bei „Manuell“ startest und stoppst du sie selbst.",
     "automatic": "Automatisch",
     "manual": "Manuell",
-    "idleUnload": "Ungenutzte Modelle entladen nach",
-    "idleUnloadHint": "Gibt Speicher frei, wenn ein Modell eine Weile nicht genutzt wurde. 0 hält Modelle geladen.",
-    "minutes": "Minuten"
+    "keepReady": "Modelle bereithalten",
+    "keepReadyHint": "Wie lange ein Modell nach seiner letzten Antwort geladen bleibt, damit die nächste Frage sofort beginnt. Ein Modell, das ein Telefon, Tablet, eine Uhr oder ein Fernseher genutzt hat, bleibt mindestens eine Stunde geladen.",
+    "keepMinutes_one": "{{count}} Minute",
+    "keepMinutes_other": "{{count}} Minuten",
+    "keepHours_one": "1 Stunde",
+    "keepHours_other": "{{count}} Stunden",
+    "keepAlways": "Bis ich sie stoppe"
   },
   "downloads": {
     "title": "Modelle laden",
