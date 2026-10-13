@@ -157,6 +157,8 @@
     "searchingWeb": "正在搜尋網路…",
     "loadingRoleOn": "正在 {{computer}} 上載入 {{role}}…",
     "loadingModelOn": "正在 {{computer}} 上載入模型…",
+    "loadingNamedOn": "正在 {{computer}} 上載入 {{model}}…",
+    "loadingNamedOnAbout": "正在 {{computer}} 上載入 {{model}}，約 {{time}}…",
     "loadingModel": "正在載入模型…",
     "roleGeneratingOn": "{{role}} 正在 {{computer}} 上生成…",
     "generatingOn": "正在 {{computer}} 上生成…",

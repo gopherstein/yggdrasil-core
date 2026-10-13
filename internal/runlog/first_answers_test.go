@@ -94,3 +94,34 @@ func TestSinceSkipsAutomationsAndOldRuns(t *testing.T) {
 		t.Fatalf("since = %+v, %v", got, err)
 	}
 }
+
+func TestLoadTimeIsTheRecentMedianOnThatComputer(t *testing.T) {
+	db, err := store.Open(filepath.Join(t.TempDir(), "test.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = db.Close() })
+	s := NewStore(db.SQL)
+	ctx := context.Background()
+	now := time.Now().UTC()
+	for i, load := range []float64{0, 4000, 6000, 20000} {
+		r := run(string(rune('a'+i)), "phone", now.Add(time.Duration(i)*time.Second), 0, 1, load)
+		r.Models[0].Node = "Office"
+		if err := s.Save(ctx, r); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if ms, ok := s.LoadTime(ctx, "m", "Office"); !ok || ms != 6000 {
+		t.Fatalf("load time = %v, %v", ms, ok)
+	}
+	if _, ok := s.LoadTime(ctx, "m", "Den"); ok {
+		t.Fatal("another computer's loads count")
+	}
+	if _, ok := s.LoadTime(ctx, "other", ""); ok {
+		t.Fatal("a model that never loaded has a time")
+	}
+	var none *Store
+	if _, ok := none.LoadTime(ctx, "m", ""); ok {
+		t.Fatal("nil store")
+	}
+}

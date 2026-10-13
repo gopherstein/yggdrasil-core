@@ -140,3 +140,39 @@ func percentile(xs []float64, p int) float64 {
 	}
 	return s[i-1]
 }
+
+// loadTimesRuns is how many recent runs LoadTime looks through.
+const loadTimesRuns = 300
+
+// LoadTime is the median of the latest times, up to ten, that modelID took
+// to load on node (a computer's name, as in ModelUse.Node; "" for any), so
+// a device can say about how long a load will take (#498). ok is false when
+// it has never loaded in the recent runs.
+func (s *Store) LoadTime(ctx context.Context, modelID, node string) (ms float64, ok bool) {
+	if s == nil || s.db == nil || modelID == "" {
+		return 0, false
+	}
+	rows, err := s.db.QueryContext(ctx, `SELECT detail_json FROM runs ORDER BY started_at DESC LIMIT ?`, loadTimesRuns)
+	if err != nil {
+		return 0, false
+	}
+	defer rows.Close()
+	var times []float64
+	for rows.Next() && len(times) < 10 {
+		var raw string
+		var r Run
+		if rows.Scan(&raw) != nil || json.Unmarshal([]byte(raw), &r) != nil {
+			continue
+		}
+		for _, m := range r.Models {
+			if m.ModelID == modelID && m.LoadMs > 0 && (node == "" || m.Node == node) {
+				times = append(times, m.LoadMs)
+				break
+			}
+		}
+	}
+	if len(times) == 0 {
+		return 0, false
+	}
+	return percentile(times, 50), true
+}

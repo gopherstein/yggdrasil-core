@@ -157,6 +157,8 @@
     "searchingWeb": "Webを検索しています…",
     "loadingRoleOn": "{{computer}}で{{role}}を読み込んでいます…",
     "loadingModelOn": "{{computer}}でモデルを読み込んでいます…",
+    "loadingNamedOn": "{{computer}}で{{model}}を読み込んでいます…",
+    "loadingNamedOnAbout": "{{computer}}で{{model}}を読み込んでいます（約 {{time}}）…",
     "loadingModel": "モデルを読み込んでいます…",
     "roleGeneratingOn": "{{computer}}で{{role}}が生成しています…",
     "generatingOn": "{{computer}}で生成しています…",

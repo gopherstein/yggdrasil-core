@@ -285,8 +285,13 @@ func (a *App) generateOnNode(ctx context.Context, nodeID, modelID, role, adapter
 		)
 	}
 	client := a.peerClient(n)
+	loadStarted := time.Now()
 	if _, err := client.StartModel(ctx, modelID); err != nil && isConnectivityErr(err) {
 		return nil, remoteUnreachableErr(n, err)
+	}
+	// A load on the paired computer is load time too (#498).
+	if d := time.Since(loadStarted); d >= minLoad {
+		runlog.From(ctx).Loaded(modelID, d)
 	}
 	a.Egress.Add(ctx, egress.PairedComputer, nodeDisplayName(n), fmt.Sprintf("prompt and context for %s", modelID))
 	ch, err := client.Chat(ctx, nodes.RemoteChatRequest{

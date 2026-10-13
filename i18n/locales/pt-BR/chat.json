@@ -161,6 +161,8 @@
     "searchingWeb": "Pesquisando na web…",
     "loadingRoleOn": "Carregando {{role}} em {{computer}}…",
     "loadingModelOn": "Carregando o modelo em {{computer}}…",
+    "loadingNamedOn": "Carregando {{model}} em {{computer}}…",
+    "loadingNamedOnAbout": "Carregando {{model}} em {{computer}}, cerca de {{time}}…",
     "loadingModel": "Carregando o modelo…",
     "roleGeneratingOn": "{{role}} gerando em {{computer}}…",
     "generatingOn": "Gerando em {{computer}}…",

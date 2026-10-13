@@ -757,7 +757,7 @@ A chat that fails while streaming sends `event: error_code` with the same `code`
 | `notification.created` | A notification is stored |
 | `notification.desktop` | A desktop notice for the desktop app to post, with `id`, `severity`, `title`, `body` (in the App language), and `link`. Sent only when the daemon runs with `TOSKAR_DESKTOP_NOTIFICATIONS=shell`; otherwise the daemon posts desktop notices itself. |
 | `model.download.started`, `.progress`, `.completed`, `.failed` | A model downloads |
-| `model.load.started`, `model.load.completed`, `model.unloaded` | A model loads, or the idle sweeper unloads it |
+| `model.load.started`, `model.load.completed`, `model.unloaded` | A turn is about to use a model, it is ready, or the idle sweeper unloads it. `model.load.started` carries `model_id`, `model_name`, `node_id`, `node_name`, `role`, and the chat's `conversation_id`. When this computer runs the model, `cold` says whether it has to load first. `expected_ms`, the median of its recent loads on that computer, is there when it loads and has loaded before, so a device can say "Loading Qwen 2.5 7B on Office, about 20 s" (#498). |
 | `model.health.degraded`, `model.health.failed` | A loaded model stops answering health checks |
 | `model.cleanup.started`, `.completed`, `.failed` | Model files are removed |
 | `node.discovered`, `node.online`, `node.offline`, `node.paired` | Another computer is found, comes online, goes offline, or pairs |
