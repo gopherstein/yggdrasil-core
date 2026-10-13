@@ -140,7 +140,7 @@ func TestEditOnlyModel(t *testing.T) {
 // naming one that can't be set up (#548).
 func TestLightClipModel(t *testing.T) {
 	m, ok := lookupIn(VideoCatalog(), "wan2.1-t2v-1.3b")
-	if !ok || !m.Untested || m.Edits || m.MemoryBytes >= 16<<30 {
+	if !ok || m.Untested || m.Edits || m.MemoryBytes >= 16<<30 {
 		t.Fatalf("wan2.1-t2v-1.3b = %+v", m)
 	}
 	for _, v := range VideoCatalog() {
