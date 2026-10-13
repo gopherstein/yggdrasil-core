@@ -26,6 +26,11 @@ type Way struct {
 	// unresolved, refused, timeout, unreachable, tls, wrong_computer, http.
 	Reason string `json:"reason,omitempty"`
 	MS     int64  `json:"ms,omitempty"`
+	// Status is the HTTP status that answered, for http; Answered names
+	// the other Toskar that answered, for wrong_computer, such as "Toskar
+	// on linix-rig" (#602). Both come from relays from 0.3.4.
+	Status   int    `json:"status,omitempty"`
+	Answered string `json:"answered,omitempty"`
 }
 
 // CheckResult is one outside check.

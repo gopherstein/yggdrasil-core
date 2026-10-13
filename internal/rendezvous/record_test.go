@@ -11,6 +11,7 @@ import (
 	"errors"
 	"math/big"
 	"slices"
+	"sync"
 	"testing"
 	"time"
 
@@ -41,6 +42,46 @@ func TestRouteSecret(t *testing.T) {
 		if (c < 'a' || c > 'z') && (c < '2' || c > '7') {
 			t.Fatalf("not a DNS label: %q", id)
 		}
+	}
+}
+
+// Callers starting at once get one secret, not one each (#602).
+func TestRouteSecretIsMadeOnce(t *testing.T) {
+	store := auth.NewSecretStore(t.TempDir())
+	const n = 16
+	got := make([][]byte, n)
+	var wg sync.WaitGroup
+	for i := range n {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			b, err := RouteSecret(store)
+			if err != nil {
+				t.Error(err)
+			}
+			got[i] = b
+		}()
+	}
+	wg.Wait()
+	for i := 1; i < n; i++ {
+		if !slices.Equal(got[0], got[i]) {
+			t.Fatalf("caller %d got another secret", i)
+		}
+	}
+	if b, _ := RouteSecret(store); !slices.Equal(b, got[0]) {
+		t.Fatal("the stored secret isn't the one handed out")
+	}
+	// A broken secret on disk is replaced, as before.
+	broken := auth.NewSecretStore(t.TempDir())
+	if err := broken.Write(secretName, "x"); err != nil {
+		t.Fatal(err)
+	}
+	b, err := RouteSecret(broken)
+	if err != nil || len(b) != SecretSize {
+		t.Fatalf("broken: %v %v", b, err)
+	}
+	if again, _ := RouteSecret(broken); !slices.Equal(again, b) {
+		t.Fatal("the replacement wasn't kept")
 	}
 }
 

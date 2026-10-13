@@ -97,9 +97,9 @@ func (a *App) reachCheck() *api.ReachCheck {
 	out := &api.ReachCheck{Tried: a.reach.tried, Error: a.reach.failed}
 	if r := a.reach.last; r != nil {
 		out.At = r.At
-		out.Relay = &api.ReachWay{OK: r.Relay.OK, Reason: r.Relay.Reason, MS: r.Relay.MS}
+		out.Relay = &api.ReachWay{OK: r.Relay.OK, Reason: r.Relay.Reason, MS: r.Relay.MS, Status: r.Relay.Status, Answered: r.Relay.Answered}
 		for _, d := range r.Direct {
-			out.Direct = append(out.Direct, api.ReachWay{Address: d.Address, OK: d.OK, Reason: d.Reason, MS: d.MS})
+			out.Direct = append(out.Direct, api.ReachWay{Address: d.Address, OK: d.OK, Reason: d.Reason, MS: d.MS, Status: d.Status, Answered: d.Answered})
 		}
 	}
 	return out

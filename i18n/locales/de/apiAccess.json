@@ -166,6 +166,7 @@
       "now": "Jetzt prüfen",
       "checking": "Wird geprüft…",
       "viaRelay": "Über {{relay}}",
+      "route": "Route dieses Computers beim Relay: {{route}}",
       "ok": "erreicht in {{ms}} ms",
       "reason": {
         "no_tunnel": "Dieser Computer ist gerade nicht mit dem Relay verbunden.",
@@ -175,8 +176,10 @@
         "timeout": "Aus dem Internet kam keine Antwort. Ein zweiter Router davor (Double NAT) oder eine Firewall blockiert ihn vielleicht.",
         "unreachable": "Das Internet erreicht diese Adresse nicht.",
         "tls": "Auf diesem Port hat etwas anderes als Toskar geantwortet.",
-        "http": "Auf diesem Port hat etwas anderes als Toskar geantwortet.",
-        "wrong_computer": "Auf diesem Port hat ein anderer Computer geantwortet. Leite den Port auf diesen weiter."
+        "http": "Dieser Computer hat geantwortet, aber nicht wie erwartet.",
+        "httpStatus": "Dieser Computer hat geantwortet, aber nicht wie erwartet (HTTP {{status}}).",
+        "wrong_computer": "Auf diesem Port hat ein Webserver geantwortet, der nicht Toskar ist. Leite den Port an diesen Computer weiter.",
+        "wrongToskar": "Auf diesem Port hat {{name}} statt dieses Computers geantwortet. Leite den Port an diesen weiter."
       },
       "relayState": {
         "connecting": "Verbindung zu {{relay}} wird hergestellt…",
@@ -185,7 +188,7 @@
       },
       "error": {
         "CHECK_UNSUPPORTED": "Dieses Relay kann noch nicht von außen prüfen.",
-        "CHECK_TOO_SOON": "Gerade eben geprüft. Versuch es in einer Minute noch einmal.",
+        "CHECK_TOO_SOON": "Vor weniger als einer Minute geprüft, das ist also das neueste Ergebnis. In einer Minute kannst du erneut prüfen.",
         "NO_TOKEN": "Es gibt noch keinen Relay-Token zum Prüfen.",
         "RELAY_UNREACHABLE": "Das Relay war für die Prüfung nicht erreichbar.",
         "other": "Die Prüfung konnte nicht laufen ({{code}})."

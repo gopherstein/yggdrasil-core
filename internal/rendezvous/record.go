@@ -39,10 +39,12 @@ const SecretSize = 32
 // devices get it; the route ID and the record key come from it, so someone
 // who knows only the certificate's fingerprint can't find the computer.
 func RouteSecret(secrets *auth.SecretStore) ([]byte, error) {
+	broken := false
 	if raw, err := secrets.Read(secretName); err == nil {
 		if b, err := base64.RawURLEncoding.DecodeString(strings.TrimSpace(raw)); err == nil && len(b) == SecretSize {
 			return b, nil
 		}
+		broken = true
 	} else if !errors.Is(err, os.ErrNotExist) {
 		return nil, err
 	}
@@ -50,10 +52,22 @@ func RouteSecret(secrets *auth.SecretStore) ([]byte, error) {
 	if _, err := rand.Read(b); err != nil {
 		return nil, err
 	}
-	if err := secrets.Write(secretName, base64.RawURLEncoding.EncodeToString(b)); err != nil {
+	encoded := base64.RawURLEncoding.EncodeToString(b)
+	if broken {
+		return b, secrets.Write(secretName, encoded)
+	}
+	// Made only once, however many callers start at the same moment: two
+	// secrets would enroll the computer on the relay twice, under two
+	// routes, with its devices knowing only one (#602).
+	raw, err := secrets.Create(secretName, encoded)
+	if err != nil {
 		return nil, err
 	}
-	return b, nil
+	stored, err := base64.RawURLEncoding.DecodeString(strings.TrimSpace(raw))
+	if err != nil || len(stored) != SecretSize {
+		return nil, errors.New("the route secret on disk isn't valid")
+	}
+	return stored, nil
 }
 
 // EncodeSecret is the route secret as paired devices get it.

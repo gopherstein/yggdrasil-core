@@ -73,6 +73,9 @@ func (a *App) remoteReach() api.RemoteReach {
 	if name, st := a.relayStatus(); st != nil {
 		out.Relay, out.RelayState, out.RelayError = name, st.State, st.Error
 		relayed = st.State == "connected"
+		if _, route, err := a.routeSecret(); err == nil && len(route) >= 8 {
+			out.Route = route[:8]
+		}
 	}
 	out.Reachable, out.Reason = reachOf(cfg, listening, m, len(out.IPv6) > 0, relayed)
 	out.Check = a.reachCheck()
