@@ -1370,6 +1370,8 @@ func (e *chatExecEnv) Emit(eventType string, payload map[string]any) {
 			e.trace.verified(issues, fixed, figures)
 		case simple.EventUnconfirmedAction:
 			e.trace.unconfirmedAction()
+		case simple.EventCommandRemoved:
+			e.trace.commandRemoved()
 		case simple.EventCodeChecked:
 			issues, _ := payload["issues"].(int)
 			fixed, _ := payload["fixed"].(int)

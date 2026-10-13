@@ -26,6 +26,9 @@ const (
 	// EventLinksChecked reports the answer's links checked against the
 	// sources.
 	EventLinksChecked = "verify.links"
+	// EventCommandRemoved says a destructive command the person asked
+	// Toskar to run was taken out of the answer (#557).
+	EventCommandRemoved = "verify.command"
 )
 
 // checkLinks finds the answer's links to pages no source gave, which a

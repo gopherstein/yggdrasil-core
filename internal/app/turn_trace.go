@@ -256,6 +256,16 @@ func (t *turnTrace) unconfirmedAction() {
 	t.notice = t.noticeText("nothingChanged", nil)
 }
 
+// commandRemoved records that a destructive command the person asked
+// Toskar to run was taken out of the answer, rather than handed over to run
+// without their approval (#557).
+func (t *turnTrace) commandRemoved() {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.step("verify", "removedCommand", nil)
+	t.notice = t.noticeText("commandRemoved", nil)
+}
+
 // stopped records that the user stopped the turn. kept says whether part
 // of the answer was written and saved.
 func (t *turnTrace) stopped(kept, timedOut bool) {

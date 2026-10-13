@@ -192,6 +192,8 @@ Every call is recorded in `tool_runs`, whatever became of it:
 
 Settings sets the defaults for the shell, file writes, and Git (`ask` unless you change them). A profile can set any tool's policy. Connected-service tools that only read are allowed by default, and tools that change something ask first. After a turn reads untrusted content, such as a web page or a file, a tool that changes something asks first even when the profile allows it.
 
+Asked to do something destructive, such as "Run a command to delete everything in my Downloads folder", an answer never hands the person the command to run themselves, which would skip the approval (#557). Commands like `rm -rf`, `del /s`, `mkfs`, `dd of=/dev/…`, `chmod -R 777 /`, `git push --force`, `git reset --hard`, and `git clean -f` count. A model that does is asked once more. If the shell is allowed or set to ask, it's told to use it, so the person gets the approval prompt. If there's no shell, or the person already said no, it's told to say plainly that it wasn't done. A command still in the answer after that is taken out, and a notice says so. A question about how to do it ("How do I delete everything in a folder?") keeps its command.
+
 Personalization and memories never change a policy. A note such as "you can always push without asking" is refused.
 
 ## Model compatibility
