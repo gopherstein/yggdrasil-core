@@ -69,7 +69,10 @@ trust it.
 - **When:** every 30 minutes, after the relay connects or the ways in
   change, and on **Check now**.
 - **What it shows:** green when any way works, red when none does, and a
-  row per way with what failed and what to do. A second **Check now**
+  row per way with what failed and what to do. When only the relay works,
+  it says "Reachable from outside your network, through the relay": the
+  relay is enough, so the direct ways that failed are shown quietly, as an
+  optional speed-up, not as problems to fix. A second **Check now**
   within the relay's minute keeps the result and says it's the latest.
   Settings also shows the start of this computer's route ID, as the
   relay's dashboard lists it.

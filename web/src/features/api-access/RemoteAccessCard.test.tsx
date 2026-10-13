@@ -92,9 +92,13 @@ describe('RemoteAccessCard (#456)', () => {
     expect(screen.getByText(/Another router in front of yours \(double NAT\)/)).toBeInTheDocument()
     expect(screen.getByText(/subscribe to access from anywhere in the Toskar app/)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Check now' }))
-    expect(await screen.findByText('Reachable from outside your network')).toBeInTheDocument()
+    // The relay works and direct doesn't: reachable, and direct is only a speed-up (#602).
+    expect(await screen.findByText('Reachable from outside your network, through the relay')).toBeInTheDocument()
     expect(screen.getByText(/reached in 84 ms/)).toBeInTheDocument()
     expect(screen.getByText('Through relay.toskar.ai')).toBeInTheDocument()
+    expect(screen.getByText(/A direct way in is optional/)).toBeInTheDocument()
+    expect(screen.getByText('198.51.100.9:7333').closest('li')).toHaveClass('text-ink-muted')
+    expect(screen.queryByText(/Devices away from home can't reach this computer/)).not.toBeInTheDocument()
   })
 
   it('names what answered, shows the route, and keeps "checked moments ago" a note (#602)', async () => {

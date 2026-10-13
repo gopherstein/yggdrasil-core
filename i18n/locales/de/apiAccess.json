@@ -160,6 +160,7 @@
     },
     "check": {
       "reachable": "Von außerhalb deines Netzwerks erreichbar",
+      "reachableViaRelay": "Von außerhalb deines Netzwerks erreichbar, über das Relay",
       "unreachable": "Von außerhalb deines Netzwerks nicht erreichbar",
       "unchecked": "Noch nicht von außen geprüft",
       "checked": "Geprüft {{when}}",
@@ -193,7 +194,8 @@
         "RELAY_UNREACHABLE": "Das Relay war für die Prüfung nicht erreichbar.",
         "other": "Die Prüfung konnte nicht laufen ({{code}})."
       },
-      "nextSteps": "Geräte unterwegs erreichen diesen Computer nicht. Behebe, was markiert ist, und prüfe noch einmal, oder nutze ein Relay, das hinter jedem Router funktioniert."
+      "nextSteps": "Geräte unterwegs erreichen diesen Computer nicht. Behebe, was markiert ist, und prüfe noch einmal, oder nutze ein Relay, das hinter jedem Router funktioniert.",
+      "directOptional": "Geräte unterwegs kommen über das Relay herein, es muss also nichts behoben werden. Ein direkter Weg ist optional: Er kann Antworten etwas schneller machen."
     },
     "relay": {
       "title": "Relay deiner Organisation",

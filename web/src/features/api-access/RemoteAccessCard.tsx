@@ -239,9 +239,12 @@ function OutsideCheck({ status }: { status: Status }) {
   const result = status.check
   const ways = result?.at ? [...(result.relay ? [result.relay] : []), ...(result.direct ?? [])] : []
   const reachable = ways.some((w) => w.ok)
-  const summary = !result?.at ? 'unchecked' : reachable ? 'reachable' : 'unreachable'
-  const tone = { reachable: 'text-success', unreachable: 'text-danger', unchecked: 'text-ink-muted' }[summary]
-  const dot = { reachable: 'bg-success', unreachable: 'bg-danger', unchecked: 'bg-ink-faint' }[summary]
+  // A working relay is enough: devices get in through it, and a direct way
+  // in is only a speed-up, so its failures aren't problems (#602).
+  const onlyRelay = Boolean(result?.relay?.ok) && !(result?.direct ?? []).some((w) => w.ok)
+  const summary = !result?.at ? 'unchecked' : onlyRelay ? 'reachableViaRelay' : reachable ? 'reachable' : 'unreachable'
+  const tone = { reachable: 'text-success', reachableViaRelay: 'text-success', unreachable: 'text-danger', unchecked: 'text-ink-muted' }[summary]
+  const dot = { reachable: 'bg-success', reachableViaRelay: 'bg-success', unreachable: 'bg-danger', unchecked: 'bg-ink-faint' }[summary]
   return (
     <div className="space-y-3 rounded-lg border border-line p-3" role="status" aria-live="polite">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -260,7 +263,7 @@ function OutsideCheck({ status }: { status: Status }) {
         <ul className="space-y-2">
           {result.relay ? <WayRow way={result.relay} label={t('remote.check.viaRelay', { relay: (status.relay?.name ?? '').replace(/:\d+$/, '') })} /> : null}
           {(result.direct ?? []).map((way) => (
-            <WayRow key={way.address} way={way} label={way.address ?? ''} />
+            <WayRow key={way.address} way={way} label={way.address ?? ''} optional={onlyRelay} />
           ))}
         </ul>
       ) : (
@@ -272,6 +275,7 @@ function OutsideCheck({ status }: { status: Status }) {
       ) : null}
       <CheckProblem result={result} failed={check.error} />
       {result?.at && !reachable ? <p className="text-xs text-ink-muted">{t('remote.check.nextSteps')}</p> : null}
+      {onlyRelay && (result?.direct ?? []).length > 0 ? <p className="text-xs text-ink-muted">{t('remote.check.directOptional')}</p> : null}
     </div>
   )
 }
@@ -284,12 +288,15 @@ function wayReason(way: ReachWay): string {
 }
 
 /** One way in: what it is, and whether the internet reached it. */
-function WayRow({ way, label }: { way: ReachWay; label: string }) {
+function WayRow({ way, label, optional = false }: { way: ReachWay; label: string; optional?: boolean }) {
   const { t } = useTranslation('apiAccess')
+  // A direct way in that failed while the relay works is an optional
+  // speed-up, not a problem: shown quietly, not in red.
+  const quiet = optional && !way.ok
   return (
-    <li className="flex gap-2 text-sm">
-      <span className={way.ok ? 'text-success' : 'text-danger'} aria-hidden>
-        {way.ok ? '✓' : '✗'}
+    <li className={`flex gap-2 text-sm ${quiet ? 'text-ink-muted' : ''}`}>
+      <span className={way.ok ? 'text-success' : quiet ? 'text-ink-faint' : 'text-danger'} aria-hidden>
+        {way.ok ? '✓' : quiet ? '–' : '✗'}
       </span>
       <span>
         <span className="font-medium">{label}</span>

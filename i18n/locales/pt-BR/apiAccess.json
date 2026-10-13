@@ -160,6 +160,7 @@
     },
     "check": {
       "reachable": "Acessível de fora da sua rede",
+      "reachableViaRelay": "Acessível de fora da sua rede, pelo relay",
       "unreachable": "Não acessível de fora da sua rede",
       "unchecked": "Ainda não verificado de fora",
       "checked": "Verificado {{when}}",
@@ -193,7 +194,8 @@
         "RELAY_UNREACHABLE": "Não foi possível alcançar o relay para verificar.",
         "other": "A verificação não pôde ser feita ({{code}})."
       },
-      "nextSteps": "Dispositivos fora de casa não alcançam este computador. Corrija o que está marcado e verifique de novo, ou use um relay, que funciona atrás de qualquer roteador."
+      "nextSteps": "Dispositivos fora de casa não alcançam este computador. Corrija o que está marcado e verifique de novo, ou use um relay, que funciona atrás de qualquer roteador.",
+      "directOptional": "Os dispositivos fora de casa entram pelo relay, então não há nada a corrigir. Um acesso direto é opcional: ele pode deixar as respostas um pouco mais rápidas."
     },
     "relay": {
       "title": "Relay da sua organização",

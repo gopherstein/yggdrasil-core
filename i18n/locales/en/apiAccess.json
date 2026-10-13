@@ -160,6 +160,7 @@
     },
     "check": {
       "reachable": "Reachable from outside your network",
+      "reachableViaRelay": "Reachable from outside your network, through the relay",
       "unreachable": "Not reachable from outside your network",
       "unchecked": "Not checked from outside yet",
       "checked": "Checked {{when}}",
@@ -193,7 +194,8 @@
         "RELAY_UNREACHABLE": "The relay couldn't be reached to run the check.",
         "other": "The check couldn't run ({{code}})."
       },
-      "nextSteps": "Devices away from home can't reach this computer. Fix what's marked and check again, or use a relay, which works behind any router."
+      "nextSteps": "Devices away from home can't reach this computer. Fix what's marked and check again, or use a relay, which works behind any router.",
+      "directOptional": "Devices away from home get in through the relay, so nothing needs fixing. A direct way in is optional: it can make answers a little faster."
     },
     "relay": {
       "title": "Your organization's relay",

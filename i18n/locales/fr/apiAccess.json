@@ -160,6 +160,7 @@
     },
     "check": {
       "reachable": "Joignable depuis l’extérieur de votre réseau",
+      "reachableViaRelay": "Accessible depuis l’extérieur de ton réseau, via le relais",
       "unreachable": "Injoignable depuis l’extérieur de votre réseau",
       "unchecked": "Pas encore vérifié depuis l’extérieur",
       "checked": "Vérifié {{when}}",
@@ -193,7 +194,8 @@
         "RELAY_UNREACHABLE": "Le relais était injoignable pour la vérification.",
         "other": "La vérification n’a pas pu se faire ({{code}})."
       },
-      "nextSteps": "Les appareils hors de chez vous ne joignent pas cet ordinateur. Corrigez ce qui est signalé et vérifiez à nouveau, ou utilisez un relais, qui fonctionne derrière n’importe quel routeur."
+      "nextSteps": "Les appareils hors de chez vous ne joignent pas cet ordinateur. Corrigez ce qui est signalé et vérifiez à nouveau, ou utilisez un relais, qui fonctionne derrière n’importe quel routeur.",
+      "directOptional": "Les appareils hors de chez toi passent par le relais, il n’y a donc rien à corriger. Un accès direct est facultatif : il peut rendre les réponses un peu plus rapides."
     },
     "relay": {
       "title": "Relais de votre organisation",
