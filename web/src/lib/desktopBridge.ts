@@ -191,6 +191,11 @@ export async function saveText(name: string, text: string): Promise<string | nul
  * Windows, Wails hands over a proxied response only once it ends, and an
  * event stream never ends), so the shell reads it and relays each event.
  */
+/** Which app this page is in, sent with each chat so its first-answer times count for it (#498). */
+export function clientKind(): 'desktop' | 'web' {
+  return wailsGoApp() ? 'desktop' : 'web'
+}
+
 export function hasEventRelay(): boolean {
   return Boolean(wailsGoApp()?.HasEventRelay && wailsRuntime()?.EventsOn)
 }

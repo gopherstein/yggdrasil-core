@@ -372,6 +372,7 @@ func (a *App) RunChat(ctx context.Context, profileID, conversationID, message st
 		// took, and the run is saved however the turn ends.
 		run := runlog.New(task.ID, conversationID, profile.ID, source)
 		ctx = runlog.With(ctx, run)
+		run.SetOrigin(runlog.OriginFrom(ctx))
 		run.SetLanguage(appLang)
 		if key := strategyNote(profile); key != "" {
 			run.Note(key, nil)

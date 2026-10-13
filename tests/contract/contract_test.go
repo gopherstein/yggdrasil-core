@@ -37,6 +37,8 @@ var covered = map[string]any{
 	"Run":                  runlog.Run{},
 	"ModelUse":             runlog.ModelUse{},
 	"ToolUse":              runlog.ToolUse{},
+	"FirstAnswers":         runlog.FirstAnswers{},
+	"FirstAnswersGroup":    runlog.FirstAnswersGroup{},
 	"Message":              contracts.Message{},
 	"MessageMeta":          contracts.MessageMeta{},
 	"Citation":             contracts.Citation{},

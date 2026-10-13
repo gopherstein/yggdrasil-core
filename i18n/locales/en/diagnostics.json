@@ -209,5 +209,26 @@
     "chartLabel_other": "Memory over the last {{count}} hours",
     "growing_one": "Memory has grown steadily for {{count}} hour. Export diagnostics and attach the bundle to an issue.",
     "growing_other": "Memory has grown steadily for {{count}} hours. Export diagnostics and attach the bundle to an issue."
+  },
+  "firstAnswers": {
+    "title": "How fast answers start",
+    "description": "The wait from sending a message to the first word of the answer, over the last week. Each time is the middle answer: half were faster.",
+    "app": "App",
+    "warm": "Model ready",
+    "cold": "Model loaded first",
+    "answers_one": "{{count}} answer",
+    "answers_other": "{{count}} answers",
+    "coldDetail_one": "{{count}} answer · loading {{load}}",
+    "coldDetail_other": "{{count}} answers · loading {{load}}",
+    "clients": {
+      "phone": "Phone",
+      "tablet": "Tablet",
+      "watch": "Watch",
+      "tv": "TV",
+      "desktop": "Desktop app",
+      "web": "Browser",
+      "other": "Other app",
+      "unnamed": "Older apps and API"
+    }
   }
 }

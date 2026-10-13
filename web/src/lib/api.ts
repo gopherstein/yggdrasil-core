@@ -1,4 +1,5 @@
 import type {
+  FirstAnswers,
   RuntimeHistory,
   AIProfile,
   APIKeyPermissions,
@@ -129,7 +130,7 @@ import type { Upload } from '@/lib/upload'
 
 /** A kind of generated media with its own setup: images or video. */
 export type MediaKind = 'images' | 'video'
-import { hasEventRelay, onRelayedEvent, saveFromDaemon, signInReturnAddress } from '@/lib/desktopBridge'
+import { clientKind, hasEventRelay, onRelayedEvent, saveFromDaemon, signInReturnAddress } from '@/lib/desktopBridge'
 import i18n from '@/i18n'
 import { formatLocale } from '@/i18n/format'
 import { moveStored } from '@/lib/storage'
@@ -491,7 +492,7 @@ async function readChatStream({
       'Content-Type': 'application/json',
       ...authHeaders(),
     },
-    body: JSON.stringify({ time_zone: localTimeZone(), ...body, stream: true }),
+    body: JSON.stringify({ time_zone: localTimeZone(), client: clientKind(), ...body, stream: true }),
     signal,
   })
 
@@ -1010,7 +1011,7 @@ export const api = {
   sendChat: (body: ChatRequest) =>
     request<ChatResponse>('/api/v1/chat', {
       method: 'POST',
-      body: JSON.stringify({ time_zone: localTimeZone(), ...body, stream: false }),
+      body: JSON.stringify({ time_zone: localTimeZone(), client: clientKind(), ...body, stream: false }),
     }),
 
   listLogs: () => request<LogEntry[]>('/api/v1/logs'),
@@ -1443,6 +1444,7 @@ export const api = {
     `${getApiBase()}/api/v1/training/ais/${id}/revisions/${revision}/export/file`,
 
   getRuntimeHistory: () => request<RuntimeHistory>('/api/v1/diagnostics/runtime'),
+  getFirstAnswers: (days = 7) => request<FirstAnswers>(`/api/v1/diagnostics/first-answers?days=${days}`),
   /** Each computer's live CPU, memory, and GPU figures, this one first (#317). */
   getLiveFigures: () => request<LiveFigures[]>('/api/v1/performance/live'),
   /** What this computer still needs for Toskar to use its GPU (#317). */

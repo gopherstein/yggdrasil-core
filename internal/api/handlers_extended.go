@@ -17,6 +17,7 @@ import (
 	"github.com/yeixio/toskar-core/internal/diagnostics"
 	"github.com/yeixio/toskar-core/internal/huginn"
 	"github.com/yeixio/toskar-core/internal/locale"
+	"github.com/yeixio/toskar-core/internal/runlog"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
@@ -337,6 +338,9 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 		ParentID string `json:"parent_id"`
 		RetryOf  string `json:"retry_of"`
 		EditOf   string `json:"edit_of"`
+		// Client is the app asking: phone, tablet, watch, tv, desktop, or
+		// web. Its run is traced with it, to measure first answers (#498).
+		Client string `json:"client"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "invalid body", nil)
@@ -395,6 +399,7 @@ func (s *Server) handleChat(w http.ResponseWriter, r *http.Request) {
 		ctx = turnopts.With(ctx, &turnopts.Options{Memory: true, Knowledge: true, FixedProfile: true})
 	}
 	ctx = turnopts.WithBranch(ctx, turnopts.Branch{ParentID: body.ParentID, RetryOf: body.RetryOf, EditOf: body.EditOf})
+	ctx = runlog.WithOrigin(ctx, runlog.Origin{Client: body.Client, Remote: remoteRequest(r) || !auth.FromLocalNetwork(r)})
 	r = r.WithContext(locale.WithTimeZone(ctx, body.TimeZone))
 	if err := s.deps.Chat(w, r, body.ConversationID, body.ProfileID, body.ModelID, body.Message, body.Stream, body.Execution); err != nil {
 		writeErrFrom(w, http.StatusInternalServerError, "CHAT_FAILED", err)

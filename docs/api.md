@@ -161,6 +161,7 @@ Control-plane routes are under `/api/v1`. The OpenAI-compatible routes are under
 | GET, PATCH | `/settings` | Read or change settings (see [Configuration](configuration.md#settings)). `PUT` is accepted as `PATCH`. |
 | POST | `/settings/reset` | Clear application state; `delete_models=true` also removes model files |
 | GET, POST | `/diagnostics` | Build the diagnostic bundle, which omits secrets. `?include_conversations=true` adds chats. |
+| GET | `/diagnostics/first-answers` | How long answers took to start over the last `?days=` (7, at most 90): chat runs that reached a first token, in `groups` by `client` and `cold` (a model loaded first), each with `runs`, `remote`, the median `first_word_ms` and `first_word_p90_ms` from the request to the first token, and the median `load_ms`. Automations are left out. The Diagnostics page shows it. |
 | GET | `/diagnostics/runtime` | The daemon's memory (`heap_bytes`, `sys_bytes`) and goroutines `now` and in `samples` taken every `interval_seconds` (five minutes) for the last day, oldest first, since `started_at`. The Diagnostics page charts it. |
 | GET | `/logs` | Log files. `GET /logs/{name}` returns one; `?tail_bytes=` limits it to the end. |
 | GET | `/events` | Server-sent event stream (see [Events](#events)) |
@@ -172,7 +173,7 @@ Control-plane routes are under `/api/v1`. The OpenAI-compatible routes are under
 
 | Method | Path | Purpose |
 | --- | --- | --- |
-| POST | `/chat` | Send a message through a profile. Takes `conversation_id`, `message`, `profile_id`, `model_id` (`auto` for Auto), `effort`, `attachments` (artifact ids), `execution` (where it runs), `time_zone` (the person's IANA time zone, such as `America/Juneau`; the app sends the browser's), and `stream`. Every turn is told the current date and time in that zone, or this computer's when it is empty or unknown; an automation's run uses its schedule's zone. Progress arrives on `/events`. |
+| POST | `/chat` | Send a message through a profile. Takes `conversation_id`, `message`, `profile_id`, `model_id` (`auto` for Auto), `effort`, `attachments` (artifact ids), `execution` (where it runs), `time_zone` (the person's IANA time zone, such as `America/Juneau`; the app sends the browser's), `client` (the app asking: `phone`, `tablet`, `watch`, `tv`, `desktop`, or `web`; its run is traced with it, contract 1.30), and `stream`. Every turn is told the current date and time in that zone, or this computer's when it is empty or unknown; an automation's run uses its schedule's zone. Progress arrives on `/events`. |
 | POST | `/chat/stop` | Stop a conversation's running turn: `{"conversation_id": "..."}` returns `{"stopped": true}` when one was running |
 | GET, POST | `/conversations` | List or create chats |
 | PATCH, DELETE | `/conversations/{id}` | Change a chat's `title`, `profile_id`, `model_id`, or `memory_off`, or delete it with its files |
@@ -189,7 +190,7 @@ Control-plane routes are under `/api/v1`. The OpenAI-compatible routes are under
 | GET, POST | `/memory` | Memories (Muninn). GET returns `memories` and `categories`. |
 | PATCH, DELETE | `/memory/{id}` | Change a memory's `content`, `category`, `enabled`, or `local_only`, or delete it |
 | GET, PUT | `/personalization` | How answers should look: `length`, `tone`, `format`, `units`, `about_me`, `instructions` |
-| GET | `/runs` | Run traces, newest first. `?conversation_id=`, `?limit=`. `GET /runs/{id}` returns one. |
+| GET | `/runs` | Run traces, newest first. `?conversation_id=`, `?limit=`. `GET /runs/{id}` returns one. A run has `client` (as sent, `other` for an app it doesn't know, empty when not sent) and `remote` when it came from outside the home network. |
 | GET, POST | `/tasks` | Orchestration tasks. `GET /tasks/{id}` returns one with its steps. |
 
 ### Models and runtimes

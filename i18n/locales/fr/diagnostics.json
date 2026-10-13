@@ -225,5 +225,28 @@
     "growing_one": "La mémoire augmente régulièrement depuis {{count}} heure. Exportez les diagnostics et joignez le paquet à un ticket.",
     "growing_many": "La mémoire augmente régulièrement depuis {{count}} heures. Exportez les diagnostics et joignez le paquet à un ticket.",
     "growing_other": "La mémoire augmente régulièrement depuis {{count}} heures. Exportez les diagnostics et joignez le paquet à un ticket."
+  },
+  "firstAnswers": {
+    "title": "Rapidité des débuts de réponse",
+    "description": "L’attente entre l’envoi d’un message et le premier mot de la réponse, sur la dernière semaine. Chaque durée est la réponse médiane : la moitié ont été plus rapides.",
+    "app": "App",
+    "warm": "Modèle prêt",
+    "cold": "Modèle chargé d’abord",
+    "answers_one": "{{count}} réponse",
+    "answers_many": "{{count}} réponses",
+    "answers_other": "{{count}} réponses",
+    "coldDetail_one": "{{count}} réponse · chargement {{load}}",
+    "coldDetail_many": "{{count}} réponses · chargement {{load}}",
+    "coldDetail_other": "{{count}} réponses · chargement {{load}}",
+    "clients": {
+      "phone": "Téléphone",
+      "tablet": "Tablette",
+      "watch": "Montre",
+      "tv": "TV",
+      "desktop": "App de bureau",
+      "web": "Navigateur",
+      "other": "Autre app",
+      "unnamed": "Anciennes apps et API"
+    }
   }
 }

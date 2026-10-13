@@ -1,5 +1,5 @@
 {
-  "version": "1.29",
+  "version": "1.30",
   "types": {
     "ActivityStep": [
       "kind",
@@ -105,6 +105,19 @@
       "producer",
       "size_bytes"
     ],
+    "FirstAnswers": [
+      "groups",
+      "since"
+    ],
+    "FirstAnswersGroup": [
+      "client",
+      "cold",
+      "first_word_ms",
+      "first_word_p90_ms",
+      "load_ms",
+      "remote",
+      "runs"
+    ],
     "Message": [
       "content",
       "conversation_id",
@@ -170,6 +183,7 @@
     ],
     "Run": [
       "cache_hits",
+      "client",
       "completed_at",
       "context_limit",
       "context_tokens",
@@ -186,6 +200,7 @@
       "parallel",
       "pipeline_ms",
       "profile_id",
+      "remote",
       "retries",
       "source",
       "started_at",

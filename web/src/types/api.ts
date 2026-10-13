@@ -828,6 +828,8 @@ export interface ChatRequest {
   retry_of?: string
   /** Send message in place of this one, as a new version of it. */
   edit_of?: string
+  /** The app asking; set by the api client (#498). */
+  client?: 'phone' | 'tablet' | 'watch' | 'tv' | 'desktop' | 'web'
 }
 
 export interface StopChatResponse {
@@ -2415,4 +2417,22 @@ export interface PortalUsage {
   visitors_30: number
   conversations_30: number
   messages_30: number
+}
+
+/** How long answers took to start, by app, cold or warm (#498). */
+export interface FirstAnswers {
+  since: string
+  groups: FirstAnswersGroup[]
+}
+
+export interface FirstAnswersGroup {
+  /** phone, tablet, watch, tv, desktop, web, or other; '' when the request didn't say. */
+  client: string
+  /** A model loaded before the answer started. */
+  cold: boolean
+  runs: number
+  remote?: number
+  first_word_ms: number
+  first_word_p90_ms: number
+  load_ms?: number
 }
