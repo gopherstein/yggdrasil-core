@@ -101,9 +101,15 @@
     "description": "En automatique, les modèles restent chargés après une discussion. En manuel, Démarrer et Arrêter sont à votre charge.",
     "automatic": "Automatique",
     "manual": "Manuel",
-    "idleUnload": "Décharger les modèles inactifs après",
-    "idleUnloadHint": "Libère de la mémoire lorsqu'un modèle n'a pas été utilisé depuis un moment. Indiquez 0 pour garder les modèles chargés.",
-    "minutes": "minutes"
+    "keepReady": "Garder les modèles prêts",
+    "keepReadyHint": "Combien de temps un modèle reste chargé après sa dernière réponse, pour que la question suivante commence aussitôt. Un modèle utilisé par un téléphone, une tablette, une montre ou une TV reste chargé au moins une heure.",
+    "keepMinutes_one": "{{count}} minute",
+    "keepMinutes_many": "{{count}} minutes",
+    "keepMinutes_other": "{{count}} minutes",
+    "keepHours_one": "1 heure",
+    "keepHours_many": "{{count}} heures",
+    "keepHours_other": "{{count}} heures",
+    "keepAlways": "Jusqu’à ce que je les arrête"
   },
   "downloads": {
     "title": "Télécharger les modèles",

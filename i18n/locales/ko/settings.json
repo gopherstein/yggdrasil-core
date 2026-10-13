@@ -101,9 +101,11 @@
     "description": "자동은 채팅 후에도 모델을 준비 상태로 유지해요. 수동은 시작과 중지를 직접 하게 해요.",
     "automatic": "자동",
     "manual": "수동",
-    "idleUnload": "사용하지 않는 모델 내리기",
-    "idleUnloadHint": "한동안 사용하지 않은 모델을 내려 메모리를 확보해요. 모델을 계속 불러와 두려면 0을 입력하세요.",
-    "minutes": "분 후"
+    "keepReady": "모델 준비 상태 유지",
+    "keepReadyHint": "마지막 답변 후 모델을 불러온 상태로 두는 시간입니다. 다음 질문이 바로 시작됩니다. 휴대폰, 태블릿, 워치, TV가 사용한 모델은 최소 1시간 동안 불러온 상태로 유지됩니다.",
+    "keepMinutes_other": "{{count}}분",
+    "keepHours_other": "{{count}}시간",
+    "keepAlways": "직접 중지할 때까지"
   },
   "downloads": {
     "title": "모델 다운로드",

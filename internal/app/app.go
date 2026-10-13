@@ -181,6 +181,11 @@ type App struct {
 	memTotal atomic.Uint64
 	// failedModels maps a model id to when it last could not answer.
 	failedModels sync.Map
+	// deviceUse maps a model id to when another device last used or warmed
+	// it up, so the idle sweeper keeps it loaded (#498); deviceClock is the
+	// time for it, time.Now when nil.
+	deviceUse   sync.Map
+	deviceClock func() time.Time
 	// warming holds the model ids a warm-up is loading now (#498), and
 	// warmWait its loads, so a shutdown or a test can wait for them.
 	warming  sync.Map
@@ -725,6 +730,9 @@ func New(opts Options) (*App, error) {
 		},
 		Stop: func(ctx context.Context, instanceID string) error {
 			return a.stopModelLocal(ctx, instanceID)
+		},
+		Keep: func(_ context.Context, inst lifecycle.Instance) bool {
+			return a.keptForDevices(inst.ModelID)
 		},
 		Settings: func(ctx context.Context) (string, int, error) {
 			mode, _ := a.Settings.GetString(ctx, "model_lifecycle", "automatic")

@@ -293,7 +293,6 @@
     "settings:about.build",
     "settings:about.service",
     "settings:groups.notifications",
-    "settings:lifecycle.minutes",
     "settings:notifications.title",
     "settings:personalization.format.label",
     "settings:personalization.tone.direct",

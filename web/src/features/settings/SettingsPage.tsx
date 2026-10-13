@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
+import i18n from '@/i18n'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { api } from '@/lib/api'
 import { displayVersion } from '@/lib/appVersion'
@@ -28,6 +29,21 @@ import { Personalization } from './Personalization'
 import { YggdrasilMark } from '@/components/ui/YggdrasilMark'
 import { formatGigabytes } from '@/i18n/format'
 import { AutomationDigestSetting } from './AutomationDigest'
+
+/** How long models stay loaded, in minutes; 0 keeps them until stopped (#498). */
+const KEEP_READY = [15, 60, 240, 0]
+
+/** The choices, with a value set some other way (such as in an older version) kept as its own. */
+function keepReadyOptions(current: number): number[] {
+  if (KEEP_READY.includes(current)) return KEEP_READY
+  return [...KEEP_READY.filter((m) => m !== 0), current].sort((a, b) => a - b).concat(0)
+}
+
+function keepReadyLabel(minutes: number): string {
+  if (minutes === 0) return i18n.t('settings:lifecycle.keepAlways')
+  if (minutes % 60 === 0) return i18n.t('settings:lifecycle.keepHours', { count: minutes / 60 })
+  return i18n.t('settings:lifecycle.keepMinutes', { count: minutes })
+}
 
 function ChoiceGroup<T extends string>({
   value,
@@ -365,27 +381,20 @@ export function SettingsPage() {
                 ]}
               />
               {(settings?.model_lifecycle ?? 'automatic') === 'automatic' && (
-                <label className="block text-sm text-ink-muted">
-                  {t('lifecycle.idleUnload')}
-                  <p className="mt-0.5 text-xs text-ink-faint">{t('lifecycle.idleUnloadHint')}</p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <input
-                      type="number"
-                      min={0}
-                      max={240}
-                      className="field max-w-[8rem]"
-                      defaultValue={settings?.idle_unload_minutes ?? 15}
-                      key={settings?.idle_unload_minutes ?? 15}
-                      onBlur={(e) => {
-                        const n = Number(e.target.value)
-                        if (Number.isFinite(n) && n >= 0) {
-                          patch({ idle_unload_minutes: Math.round(n) })
-                        }
-                      }}
-                    />
-                    <span className="text-xs text-ink-faint">{t('lifecycle.minutes')}</span>
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-sm font-medium text-ink">{t('lifecycle.keepReady')}</p>
+                    <p className="mt-0.5 text-xs text-ink-faint">{t('lifecycle.keepReadyHint')}</p>
                   </div>
-                </label>
+                  <ChoiceGroup
+                    value={String(settings?.idle_unload_minutes ?? 15)}
+                    onChange={(id) => patch({ idle_unload_minutes: Number(id) })}
+                    options={keepReadyOptions(settings?.idle_unload_minutes ?? 15).map((minutes) => ({
+                      id: String(minutes),
+                      label: keepReadyLabel(minutes),
+                    }))}
+                  />
+                </div>
               )}
             </section>
 

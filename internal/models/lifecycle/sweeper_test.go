@@ -57,3 +57,27 @@ func TestSweeperSkipsManual(t *testing.T) {
 		t.Fatal("should not unload in manual mode")
 	}
 }
+
+// A model Keep holds stays loaded however long it was idle (#498).
+func TestSweeperLeavesKeptModels(t *testing.T) {
+	var stopped []string
+	now := time.Date(2026, 1, 1, 12, 0, 0, 0, time.UTC)
+	s := &lifecycle.Sweeper{
+		List: func(ctx context.Context) ([]lifecycle.Instance, error) {
+			return []lifecycle.Instance{
+				{InstanceID: "chat", ModelID: "chat-model", LastUsed: now.Add(-40 * time.Minute)},
+				{InstanceID: "other", ModelID: "other-model", LastUsed: now.Add(-40 * time.Minute)},
+			}, nil
+		},
+		Stop: func(ctx context.Context, instanceID string) error {
+			stopped = append(stopped, instanceID)
+			return nil
+		},
+		Settings: func(ctx context.Context) (string, int, error) { return "automatic", 15, nil },
+		Keep:     func(_ context.Context, inst lifecycle.Instance) bool { return inst.ModelID == "chat-model" },
+	}
+	s.TickOnce(context.Background(), now)
+	if len(stopped) != 1 || stopped[0] != "other" {
+		t.Fatalf("stopped = %v", stopped)
+	}
+}
