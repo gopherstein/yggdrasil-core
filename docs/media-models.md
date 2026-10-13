@@ -45,9 +45,9 @@ The files come straight from the vendor's own repository, never a mirror. These 
 
 | Model | Does | Download | Comfortable with | Tested |
 | --- | --- | --- | --- | --- |
-| Wan 2.2 TI2V 5B | Clips from a description or a picture | 8.5 GB | 16 GB | Yes: about 1 minute for 2 seconds on an RX 7900 XTX, 3½ minutes on an M5 Pro with 24 GB |
+| Wan 2.2 TI2V 5B | Clips from a description or a picture | 8.5 GB | 16 GB | Yes: about 1 minute for 2 seconds on an RX 7900 XTX (peak 5 GB of graphics memory), 3½ minutes on an M5 Pro with 24 GB |
 | Wan 2.2 T2V A14B | Higher-quality clips from a description, much more slowly | 23 GB | 48 GB | Yes: RX 7900 XTX, about 13 minutes for 2 seconds, peak 46 GB of memory |
-| Wan 2.1 T2V 1.3B | Short clips from a description, on smaller computers | 6.8 GB | 10 GB (estimate) | Not yet |
+| Wan 2.1 T2V 1.3B | Short clips from a description, on smaller computers | 6.8 GB | 10 GB (estimate) | Yes: RX 7900 XTX, about 3 minutes for 2 seconds, peak 11 GB of graphics memory |
 
 - **Recommended:** Wan 2.2 TI2V 5B, which also brings pictures to life. The A14B and 1.3B models take no picture, so clips from a picture use the 5B model when it's set up.
 - **Length and size:** clips are 2 seconds unless you ask for more, up to 5 seconds, at up to about 832×480. Asking for longer or larger makes the most the model allows, and the answer says so.
