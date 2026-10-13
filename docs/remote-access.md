@@ -69,14 +69,18 @@ trust it.
 - **When:** every 30 minutes, after the relay connects or the ways in
   change, and on **Check now**.
 - **What it shows:** green when any way works, red when none does, and a
-  row per way with what failed and what to do.
+  row per way with what failed and what to do. A second **Check now**
+  within the relay's minute keeps the result and says it's the latest.
+  Settings also shows the start of this computer's route ID, as the
+  relay's dashboard lists it.
 
 | Result | What it means | What to do |
 |---|---|---|
 | `timeout` | Nothing answered from the internet | Another router in front (double NAT) or a firewall blocks it; use the relay, or forward the port on the outer router too |
 | `refused` | The address answered, but nothing listens on the port | Forward the port to this computer |
-| `wrong_computer` | Another device answered on the port | Point the forward at this computer |
-| `tls`, `http` | Something other than Toskar answered | Free the port, or choose another one |
+| `wrong_computer` | Another device answered on the port: another Toskar, named by its certificate ("Toskar on linix-rig"), or a web server that isn't Toskar | Point the forward at this computer |
+| `http` | This computer answered, but not as expected, with the HTTP status (such as 502 from a proxy in front of it) | Check what sits in front of Toskar on that port |
+| `tls` | Something answered without the secure connection Toskar uses | Free the port, or choose another one |
 | `not_public` | The address isn't on the internet | Use a public address, or the relay |
 | `no_tunnel` | This computer isn't connected to the relay | See the relay's state on the same card |
 

@@ -166,6 +166,7 @@
       "now": "Verificar agora",
       "checking": "Verificando…",
       "viaRelay": "Pelo {{relay}}",
+      "route": "Rota deste computador no relay: {{route}}",
       "ok": "alcançado em {{ms}} ms",
       "reason": {
         "no_tunnel": "Este computador não está conectado ao relay agora.",
@@ -175,8 +176,10 @@
         "timeout": "Nada respondeu pela internet. Outro roteador na frente do seu (NAT duplo) ou um firewall pode estar bloqueando.",
         "unreachable": "A internet não consegue chegar a este endereço.",
         "tls": "Algo que não é o Toskar respondeu nesta porta.",
-        "http": "Algo que não é o Toskar respondeu nesta porta.",
-        "wrong_computer": "Outro computador respondeu nesta porta. Redirecione a porta para este."
+        "http": "Este computador respondeu, mas não como esperado.",
+        "httpStatus": "Este computador respondeu, mas não como esperado (HTTP {{status}}).",
+        "wrong_computer": "Um servidor web que não é o Toskar respondeu nesta porta. Encaminhe a porta para este computador.",
+        "wrongToskar": "{{name}} respondeu nesta porta em vez deste computador. Encaminhe a porta para este."
       },
       "relayState": {
         "connecting": "Conectando a {{relay}}…",
@@ -185,7 +188,7 @@
       },
       "error": {
         "CHECK_UNSUPPORTED": "Este relay ainda não consegue verificar de fora.",
-        "CHECK_TOO_SOON": "Verificado há pouco. Tente de novo em um minuto.",
+        "CHECK_TOO_SOON": "Verificado há menos de um minuto, então este é o resultado mais recente. Você pode verificar de novo em um minuto.",
         "NO_TOKEN": "Ainda não há um token do relay para verificar.",
         "RELAY_UNREACHABLE": "Não foi possível alcançar o relay para verificar.",
         "other": "A verificação não pôde ser feita ({{code}})."

@@ -166,6 +166,7 @@
       "now": "Comprobar ahora",
       "checking": "Comprobando…",
       "viaRelay": "A través de {{relay}}",
+      "route": "Ruta de este equipo en el relay: {{route}}",
       "ok": "alcanzado en {{ms}} ms",
       "reason": {
         "no_tunnel": "Esta computadora no está conectada al relé ahora mismo.",
@@ -175,8 +176,10 @@
         "timeout": "Nada respondió desde internet. Otro router delante del tuyo (doble NAT) o un firewall puede estar bloqueándolo.",
         "unreachable": "Internet no puede llegar a esta dirección.",
         "tls": "En este puerto respondió algo que no es Toskar.",
-        "http": "En este puerto respondió algo que no es Toskar.",
-        "wrong_computer": "En este puerto respondió otra computadora. Redirige el puerto a esta."
+        "http": "Este equipo respondió, pero no como se esperaba.",
+        "httpStatus": "Este equipo respondió, pero no como se esperaba (HTTP {{status}}).",
+        "wrong_computer": "En este puerto respondió un servidor web que no es Toskar. Redirige el puerto a este equipo.",
+        "wrongToskar": "En este puerto respondió {{name}} en lugar de este equipo. Redirige el puerto a este."
       },
       "relayState": {
         "connecting": "Conectando con {{relay}}…",
@@ -185,7 +188,7 @@
       },
       "error": {
         "CHECK_UNSUPPORTED": "Este relé todavía no puede comprobar desde fuera.",
-        "CHECK_TOO_SOON": "Se comprobó hace un momento. Inténtalo de nuevo en un minuto.",
+        "CHECK_TOO_SOON": "Se comprobó hace menos de un minuto, así que este es el resultado más reciente. Puedes volver a comprobar en un minuto.",
         "NO_TOKEN": "Aún no hay un token del relé para comprobar.",
         "RELAY_UNREACHABLE": "No se pudo llegar al relé para comprobar.",
         "other": "La comprobación no pudo ejecutarse ({{code}})."

@@ -96,4 +96,34 @@ describe('RemoteAccessCard (#456)', () => {
     expect(screen.getByText(/reached in 84 ms/)).toBeInTheDocument()
     expect(screen.getByText('Through relay.toskar.ai')).toBeInTheDocument()
   })
+
+  it('names what answered, shows the route, and keeps "checked moments ago" a note (#602)', async () => {
+    vi.mocked(api.getSettings).mockResolvedValue({ remote_access_enabled: true, remote_access_port: 7333 } as never)
+    vi.mocked(api.getRemoteAccess).mockResolvedValue({
+      enabled: true,
+      port: 7333,
+      listening: '[::]:7333',
+      relay: { name: 'relay.toskar.ai:4443', state: 'connected', route: 'bk2a5ci2' },
+      check: {
+        at: new Date().toISOString(),
+        relay: { ok: true, ms: 562 },
+        direct: [
+          { address: '198.51.100.9:7333', ok: false, reason: 'wrong_computer', answered: 'Toskar on linix-rig' },
+          { address: '[2001:db8::9]:7333', ok: false, reason: 'http', status: 502 },
+          { address: '203.0.113.4:7333', ok: false, reason: 'wrong_computer' },
+        ],
+        error: 'CHECK_TOO_SOON',
+      },
+    })
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <RemoteAccessCard />
+      </QueryClientProvider>,
+    )
+    expect(await screen.findByText(/Toskar on linix-rig answered on this port instead of this computer/)).toBeInTheDocument()
+    expect(screen.getByText(/not as expected \(HTTP 502\)/)).toBeInTheDocument()
+    expect(screen.getByText(/A web server that isn't Toskar answered/)).toBeInTheDocument()
+    expect(screen.getByText("This computer's route on the relay: bk2a5ci2")).toBeInTheDocument()
+    expect(screen.getByText(/so this is the latest result/)).toHaveClass('text-ink-muted')
+  })
 })

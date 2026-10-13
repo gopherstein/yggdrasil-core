@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { api, type ReachCheck, type ReachWay } from '@/lib/api'
 import { formatRelativeTime } from '@/i18n/format'
 import { Toggle } from './Toggle'
@@ -266,10 +267,20 @@ function OutsideCheck({ status }: { status: Status }) {
         <ReachLine status={status} />
       )}
       {status.relay && status.relay.state !== 'connected' ? <ToskarRelayLine relay={status.relay} /> : null}
+      {status.relay?.route ? (
+        <p className="text-xs text-ink-faint">{t('remote.check.route', { route: status.relay.route })}</p>
+      ) : null}
       <CheckProblem result={result} failed={check.error} />
       {result?.at && !reachable ? <p className="text-xs text-ink-muted">{t('remote.check.nextSteps')}</p> : null}
     </div>
   )
+}
+
+/** Why a way in failed, naming what answered when the relay says (#602). */
+function wayReason(way: ReachWay): string {
+  if (way.reason === 'http' && way.status) return i18n.t('apiAccess:remote.check.reason.httpStatus', { status: way.status })
+  if (way.reason === 'wrong_computer' && way.answered) return i18n.t('apiAccess:remote.check.reason.wrongToskar', { name: way.answered })
+  return i18n.t(`apiAccess:remote.check.reason.${way.reason ?? 'unreachable'}`)
 }
 
 /** One way in: what it is, and whether the internet reached it. */
@@ -284,7 +295,7 @@ function WayRow({ way, label }: { way: ReachWay; label: string }) {
         <span className="font-medium">{label}</span>
         <span className="text-ink-muted">
           {' — '}
-          {way.ok ? t('remote.check.ok', { ms: way.ms ?? 0 }) : t(`remote.check.reason.${way.reason ?? 'unreachable'}`)}
+          {way.ok ? t('remote.check.ok', { ms: way.ms ?? 0 }) : wayReason(way)}
         </span>
       </span>
     </li>
@@ -313,7 +324,8 @@ function CheckProblem({ result, failed }: { result?: ReachCheck; failed: Error |
     : known.includes(code)
       ? t(`remote.check.error.${code}`)
       : t('remote.check.error.other', { code })
-  return <p className="text-xs text-warning">{text}</p>
+  // Checked moments ago is a note about the result above, not a failure (#602).
+  return <p className={`text-xs ${code === 'CHECK_TOO_SOON' ? 'text-ink-muted' : 'text-warning'}`}>{text}</p>
 }
 
 /** How the internet reaches this computer, in a line. */

@@ -264,6 +264,9 @@ func (s *Server) handleRemoteAccess(w http.ResponseWriter, r *http.Request) {
 			if reach.RelayError != "" {
 				relay["error"] = reach.RelayError
 			}
+			if reach.Route != "" {
+				relay["route"] = reach.Route
+			}
 			out["relay"] = relay
 		}
 		if reach.Check != nil {
@@ -297,6 +300,9 @@ type RemoteReach struct {
 	// Relay is the relay used, and RelayState how it's doing: no_token,
 	// connecting, connected, or error, with RelayError its code.
 	Relay, RelayState, RelayError string
+	// Route is the start of this computer's route ID, as the relay's
+	// dashboard shows it (#602).
+	Route string
 	// Check is the last outside check (#546), nil before the first.
 	Check *ReachCheck
 }
@@ -323,6 +329,11 @@ type ReachWay struct {
 	// unreachable, tls, wrong_computer, or http.
 	Reason string `json:"reason,omitempty"`
 	MS     int64  `json:"ms,omitempty"`
+	// Status is the HTTP status that answered, for http; Answered names
+	// the other Toskar that answered, for wrong_computer, such as "Toskar
+	// on linix-rig" (#602). Both come from relays from 0.3.4.
+	Status   int    `json:"status,omitempty"`
+	Answered string `json:"answered,omitempty"`
 }
 
 // handleRemoteCheck runs the outside check now and answers what

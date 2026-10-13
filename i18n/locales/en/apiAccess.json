@@ -166,6 +166,7 @@
       "now": "Check now",
       "checking": "Checking…",
       "viaRelay": "Through {{relay}}",
+      "route": "This computer's route on the relay: {{route}}",
       "ok": "reached in {{ms}} ms",
       "reason": {
         "no_tunnel": "This computer isn't connected to the relay right now.",
@@ -175,8 +176,10 @@
         "timeout": "Nothing answered from the internet. Another router in front of yours (double NAT) or a firewall may be blocking it.",
         "unreachable": "The internet can't reach this address.",
         "tls": "Something other than Toskar answered on this port.",
-        "http": "Something other than Toskar answered on this port.",
-        "wrong_computer": "Another computer answered on this port. Forward the port to this one."
+        "http": "This computer answered, but not as expected.",
+        "httpStatus": "This computer answered, but not as expected (HTTP {{status}}).",
+        "wrong_computer": "A web server that isn't Toskar answered on this port. Forward the port to this computer.",
+        "wrongToskar": "{{name}} answered on this port instead of this computer. Forward the port to this one."
       },
       "relayState": {
         "connecting": "Connecting to {{relay}}…",
@@ -185,7 +188,7 @@
       },
       "error": {
         "CHECK_UNSUPPORTED": "This relay can't check from outside yet.",
-        "CHECK_TOO_SOON": "Checked moments ago. Try again in a minute.",
+        "CHECK_TOO_SOON": "Checked less than a minute ago, so this is the latest result. You can check again in a minute.",
         "NO_TOKEN": "There's no relay token to check with yet.",
         "RELAY_UNREACHABLE": "The relay couldn't be reached to run the check.",
         "other": "The check couldn't run ({{code}})."

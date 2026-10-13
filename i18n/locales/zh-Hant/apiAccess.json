@@ -166,6 +166,7 @@
       "now": "立即檢查",
       "checking": "正在檢查…",
       "viaRelay": "透過 {{relay}}",
+      "route": "這台電腦在中繼上的路由：{{route}}",
       "ok": "{{ms}} 毫秒到達",
       "reason": {
         "no_tunnel": "這台電腦現在沒有連線到中繼。",
@@ -175,8 +176,10 @@
         "timeout": "網際網路上沒有任何回應。你的路由器前面可能還有一台路由器（雙重 NAT），或者防火牆擋住了它。",
         "unreachable": "網際網路無法到達這個位址。",
         "tls": "這個連接埠上回應的不是 Toskar。",
-        "http": "這個連接埠上回應的不是 Toskar。",
-        "wrong_computer": "這個連接埠上回應的是另一台電腦。請把連接埠轉送到這台電腦。"
+        "http": "這台電腦有回應，但不符合預期。",
+        "httpStatus": "這台電腦有回應，但不符合預期（HTTP {{status}}）。",
+        "wrong_computer": "此連接埠上回應的是一個不是 Toskar 的網頁伺服器。請將連接埠轉送到這台電腦。",
+        "wrongToskar": "此連接埠上回應的是 {{name}}，而不是這台電腦。請將連接埠轉送到這台電腦。"
       },
       "relayState": {
         "connecting": "正在連線到 {{relay}}…",
@@ -185,7 +188,7 @@
       },
       "error": {
         "CHECK_UNSUPPORTED": "這個中繼還不能從外部檢查。",
-        "CHECK_TOO_SOON": "剛剛檢查過。請一分鐘後再試。",
+        "CHECK_TOO_SOON": "不到一分鐘前剛檢查過，這就是最新結果。一分鐘後可以再次檢查。",
         "NO_TOKEN": "還沒有可用於檢查的中繼權杖。",
         "RELAY_UNREACHABLE": "無法連線到中繼來進行檢查。",
         "other": "檢查無法執行（{{code}}）。"

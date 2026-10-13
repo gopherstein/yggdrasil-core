@@ -580,6 +580,10 @@ export type ReachWay = {
   ok: boolean
   reason?: 'no_tunnel' | 'not_public' | 'unresolved' | 'refused' | 'timeout' | 'unreachable' | 'tls' | 'wrong_computer' | 'http'
   ms?: number
+  /** The HTTP status that answered, for http (#602). */
+  status?: number
+  /** The other Toskar that answered, for wrong_computer, such as "Toskar on linix-rig". */
+  answered?: string
 }
 
 /** The last outside check (#546): through the relay, and each direct way in. */
@@ -608,7 +612,7 @@ export const api = {
       ipv6?: string[]
       reachable?: 'direct' | 'ipv6' | 'manual' | 'relay' | 'none'
       reason?: 'off' | 'not_listening' | 'carrier_nat' | 'no_port'
-      relay?: { name: string; state: 'no_token' | 'connecting' | 'connected' | 'error'; error?: string }
+      relay?: { name: string; state: 'no_token' | 'connecting' | 'connected' | 'error'; error?: string; route?: string }
       check?: ReachCheck
     }>('/api/v1/remote-access'),
 

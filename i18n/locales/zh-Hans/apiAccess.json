@@ -166,6 +166,7 @@
       "now": "立即检查",
       "checking": "正在检查…",
       "viaRelay": "通过 {{relay}}",
+      "route": "这台电脑在中继上的路由：{{route}}",
       "ok": "{{ms}} 毫秒到达",
       "reason": {
         "no_tunnel": "这台电脑现在没有连接到中继。",
@@ -175,8 +176,10 @@
         "timeout": "互联网上没有任何响应。你的路由器前面可能还有一台路由器（双重 NAT），或者防火墙拦截了它。",
         "unreachable": "互联网无法到达这个地址。",
         "tls": "这个端口上响应的不是 Toskar。",
-        "http": "这个端口上响应的不是 Toskar。",
-        "wrong_computer": "这个端口上响应的是另一台电脑。请把端口转发到这台电脑。"
+        "http": "这台电脑有响应，但不符合预期。",
+        "httpStatus": "这台电脑有响应，但不符合预期（HTTP {{status}}）。",
+        "wrong_computer": "此端口上响应的是一个不是 Toskar 的 Web 服务器。请将端口转发到这台电脑。",
+        "wrongToskar": "此端口上响应的是 {{name}}，而不是这台电脑。请将端口转发到这台电脑。"
       },
       "relayState": {
         "connecting": "正在连接 {{relay}}…",
@@ -185,7 +188,7 @@
       },
       "error": {
         "CHECK_UNSUPPORTED": "这个中继还不能从外部检查。",
-        "CHECK_TOO_SOON": "刚刚检查过。请一分钟后再试。",
+        "CHECK_TOO_SOON": "不到一分钟前刚检查过，这就是最新结果。一分钟后可以再次检查。",
         "NO_TOKEN": "还没有可用于检查的中继令牌。",
         "RELAY_UNREACHABLE": "无法连接到中继来进行检查。",
         "other": "检查无法运行（{{code}}）。"
