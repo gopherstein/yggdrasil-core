@@ -25,7 +25,8 @@
   },
   "units": {
     "megabytes": "{{value}} MB",
-    "gigabytes": "{{value}} GB"
+    "gigabytes": "{{value}} GB",
+    "seconds": "{{value}} s"
   },
   "connection": {
     "enterAddress": "Digite o endereço do computador que executa o Toskar Pro.",
@@ -451,6 +452,8 @@
     "writingNamed": "Escrevendo {{name}}…",
     "loadingModel": "Carregando o modelo…",
     "loadingModelOn": "Carregando o modelo em {{node}}…",
+    "loadingNamedOn": "Carregando {{model}} em {{node}}…",
+    "loadingNamedOnAbout": "Carregando {{model}} em {{node}}, cerca de {{time}}…",
     "generating": "Gerando resposta…",
     "generatingOn": "Gerando em {{node}}…"
   },

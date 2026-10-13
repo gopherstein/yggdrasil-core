@@ -25,7 +25,8 @@
   },
   "units": {
     "megabytes": "{{value}}MB",
-    "gigabytes": "{{value}}GB"
+    "gigabytes": "{{value}}GB",
+    "seconds": "{{value}}초"
   },
   "connection": {
     "enterAddress": "Toskar Pro를 실행 중인 컴퓨터의 주소를 입력하세요.",
@@ -437,6 +438,8 @@
     "writingNamed": "{{name}} 작성하는 중…",
     "loadingModel": "모델을 불러오는 중…",
     "loadingModelOn": "{{node}}에서 모델을 불러오는 중…",
+    "loadingNamedOn": "{{node}}에서 {{model}}을(를) 불러오는 중…",
+    "loadingNamedOnAbout": "{{node}}에서 {{model}}을(를) 불러오는 중, 약 {{time}}…",
     "generating": "응답을 생성하는 중…",
     "generatingOn": "{{node}}에서 생성하는 중…"
   },
