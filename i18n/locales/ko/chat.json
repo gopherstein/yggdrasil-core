@@ -157,6 +157,8 @@
     "searchingWeb": "웹을 검색하는 중…",
     "loadingRoleOn": "{{computer}}에서 {{role}} 불러오는 중…",
     "loadingModelOn": "{{computer}}에서 모델을 불러오는 중…",
+    "loadingNamedOn": "{{computer}}에서 {{model}}을(를) 불러오는 중…",
+    "loadingNamedOnAbout": "{{computer}}에서 {{model}}을(를) 불러오는 중, 약 {{time}}…",
     "loadingModel": "모델을 불러오는 중…",
     "roleGeneratingOn": "{{computer}}에서 {{role}} 생성하는 중…",
     "generatingOn": "{{computer}}에서 생성하는 중…",

@@ -25,7 +25,8 @@
   },
   "units": {
     "megabytes": "{{value}} MB",
-    "gigabytes": "{{value}} GB"
+    "gigabytes": "{{value}} GB",
+    "seconds": "{{value}} 秒"
   },
   "connection": {
     "enterAddress": "請輸入執行 Toskar Pro 的電腦位址。",
@@ -437,6 +438,8 @@
     "writingNamed": "正在撰寫 {{name}}…",
     "loadingModel": "正在載入模型…",
     "loadingModelOn": "正在 {{node}} 上載入模型…",
+    "loadingNamedOn": "正在 {{node}} 上載入 {{model}}…",
+    "loadingNamedOnAbout": "正在 {{node}} 上載入 {{model}}，約 {{time}}…",
     "generating": "正在產生回應…",
     "generatingOn": "正在 {{node}} 上生成…"
   },

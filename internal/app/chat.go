@@ -1261,10 +1261,7 @@ func (e *chatExecEnv) Generate(ctx context.Context, role string, messages []plug
 	if local := nodeID == "" || nodeID == e.app.Config.Get().NodeID; !local || !e.app.seesImages(modelID) {
 		messages = withoutImages(messages)
 	}
-	e.app.Bus.Publish(events.New(events.ModelLoadStarted, map[string]any{
-		"model_id": modelID, "node_id": nodeID, "role": role,
-		"node_name": e.app.nodeDisplayName(nodeID),
-	}))
+	e.app.Bus.Publish(events.New(events.ModelLoadStarted, e.app.loadStartedPayload(ctx, e.conversationID, modelID, nodeID, role)))
 	started := time.Now()
 	ch, err := e.app.generateOnNode(ctx, nodeID, modelID, role, e.adapter, messages)
 	if err != nil {

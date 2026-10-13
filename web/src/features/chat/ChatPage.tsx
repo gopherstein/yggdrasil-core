@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } fr
 import { Trans, useTranslation } from 'react-i18next'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import i18n from '@/i18n'
+import { formatNumber } from '@/i18n/format'
 import { RealmKicker } from '@/components/ui/Realm'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
 import { useMascotState } from '@/lib/ratatoskr/useMascotState'
@@ -106,6 +107,11 @@ function sortProfiles(profiles: AIProfile[]): AIProfile[] {
     if (ax !== bx) return ax - bx
     return a.name.localeCompare(b.name)
   })
+}
+
+/** About how long a load takes, in whole seconds: "about 20 s" (#498). */
+function aboutSeconds(ms: number): string {
+  return i18n.t('common:units.seconds', { value: formatNumber(Math.max(1, Math.round(ms / 1000))) })
 }
 
 function formatRoleLabel(role: string): string {
@@ -844,17 +850,30 @@ export function ChatPage() {
           setStatusMessage(query ? t('status.searchingWebFor', { query }) : t('status.searchingWeb'))
         }
         if (event.type === 'model.load.started') {
+          const conversationId = event.payload?.conversation_id as string | undefined
+          if (conversationId && conversationId !== selectedId && conversationId !== streamingConvRef.current) return
           const nodeId = event.payload?.node_id as string | undefined
           const role = event.payload?.role as string | undefined
           const nodeName =
             (event.payload?.node_name as string | undefined) ||
             modelLocations.find((n) => n.node_id === nodeId)?.node_name
+          // A model already loaded starts answering at once (#498).
+          if (event.payload?.cold === false) {
+            setStatusMessage(nodeName ? t('status.generatingOn', { computer: nodeName }) : t('status.generating'))
+            return
+          }
+          const model = event.payload?.model_name as string | undefined
+          const expected = Number(event.payload?.expected_ms) || 0
           setStatusMessage(
-            role && nodeName
-              ? t('status.loadingRoleOn', { role: formatRoleLabel(role), computer: nodeName })
-              : nodeName
-                ? t('status.loadingModelOn', { computer: nodeName })
-                : t('status.loadingModel'),
+            model && nodeName && expected > 0
+              ? t('status.loadingNamedOnAbout', { model, computer: nodeName, time: aboutSeconds(expected) })
+              : model && nodeName
+                ? t('status.loadingNamedOn', { model, computer: nodeName })
+                : role && nodeName
+                  ? t('status.loadingRoleOn', { role: formatRoleLabel(role), computer: nodeName })
+                  : nodeName
+                    ? t('status.loadingModelOn', { computer: nodeName })
+                    : t('status.loadingModel'),
           )
         }
         if (event.type === 'model.load.completed') {
