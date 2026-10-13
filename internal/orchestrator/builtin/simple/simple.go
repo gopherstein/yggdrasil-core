@@ -286,6 +286,11 @@ func (o *Orchestrator) Run(
 		retriedLookup := false
 		retriedFile := false
 		triedMedia := false
+		// retriedHandover records that an answer handing over a destructive
+		// command was asked for again; declined, that the person said no to
+		// a tool (#557).
+		retriedHandover := false
+		declined := false
 
 		for {
 			content, m, err := generateText(answerCtx, env, role, messages)
@@ -356,6 +361,7 @@ func (o *Orchestrator) Run(
 					payload, _ := json.Marshal(map[string]any{"ok": false, "error": publicToolError(err)})
 					resultNote = "The tool failed. Details for you, not for the user:\n" + string(payload)
 					if declinedByPerson(err) {
+						declined = true
 						resultNote += "\n" + declinedNote
 					}
 				} else {
@@ -450,6 +456,37 @@ func (o *Orchestrator) Run(
 					messages = append(rewrite, pluginapi.ChatMessage{Role: "user", Content: withReference(task.Prompt, reference), Images: images})
 					continue
 				}
+			}
+			// Asked to do something destructive, a model that hands the
+			// person the command to run themselves sidesteps the approval
+			// step (#557). It's asked once more: to use the terminal, so
+			// the person is asked to approve, or, with no tool that could
+			// do it or after the person said no, to say it wasn't done.
+			// A command still in the answer after that is taken out. A
+			// question about how to do it keeps its command.
+			if !jsonOnly && !changed && huginn.AsksToDo(task.Prompt) && huginn.DestructiveCommand(parsed.Text) != "" {
+				if !retriedHandover {
+					retriedHandover = true
+					env.Emit(events.ToolFailed, map[string]any{"handed_over": true, "error": "gave the person a destructive command to run instead of asking to run it"})
+					note := notDoneHere
+					if !declined && !profile.ModelCallsNoTools && calls < budget.MaxToolCalls && toolEnabled(webProfile, "terminal") {
+						if !toolEnabled(profile, "terminal") {
+							offered = append(offered, "terminal")
+							profile = offerOnly(webProfile, offered)
+							toolPrompt = tools.PromptFor(profile)
+							messages[0] = pluginapi.ChatMessage{Role: "system", Content: plainSys + "\n" + toolPrompt}
+						}
+						toolsOn = true
+						note = useTheTerminal
+					}
+					messages = append(messages,
+						pluginapi.ChatMessage{Role: "assistant", Content: content},
+						pluginapi.ChatMessage{Role: "user", Content: note},
+					)
+					continue
+				}
+				parsed.Text = huginn.WithoutDestructive(parsed.Text)
+				env.Emit(EventCommandRemoved, map[string]any{})
 			}
 			// A reply that is only a call that can't run here is not an
 			// answer; it's asked for once more in plain text, and never sent
