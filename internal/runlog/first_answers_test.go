@@ -24,6 +24,12 @@ func TestOriginIsKeptAndNamed(t *testing.T) {
 	if (OriginFrom(context.Background()) != Origin{}) {
 		t.Fatal("no origin should be the zero Origin")
 	}
+	if _, asked := OriginOf(context.Background()); asked {
+		t.Fatal("work no one asked for in a chat has no origin")
+	}
+	if _, asked := OriginOf(WithOrigin(context.Background(), Origin{})); !asked {
+		t.Fatal("a chat request without a client still has an origin")
+	}
 }
 
 func run(id, client string, start time.Time, pipeline, firstToken, load float64) Run {

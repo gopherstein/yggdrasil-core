@@ -1,6 +1,7 @@
 package huginn
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/yeixio/toskar-core/pkg/contracts"
@@ -77,5 +78,61 @@ func TestAutoSaysWhyRatingsOrLoadDecided(t *testing.T) {
 	busy := Choice{Model: mid, Kind: Research, AvoidedBusy: true, Busy: big}
 	if got := busy.Reason("en"); got != "Auto chose qwen-7b for "+Research.Describe("en")+", since qwen-14b was busy" {
 		t.Fatalf("busy reason = %q", got)
+	}
+}
+
+func TestBriefRequestsAnswerWithWhatIsLoaded(t *testing.T) {
+	const ram = 24 * gb
+	loadedMid := mid
+	loadedMid.Status = "running"
+	models := []contracts.Model{tiny, loadedMid, coder, big, gemma}
+
+	// A question that needs the web goes to the best tool model, loaded or not...
+	if got, _ := ChooseWith(Current, EffortAuto, "", models, ram, Signals{}); got.Model.ID != "qwen-14b" || got.Loaded {
+		t.Fatalf("not brief: %s loaded=%v", got.Model.ID, got.Loaded)
+	}
+	// ...unless it is brief: then the loaded one answers, and says why.
+	got, _ := ChooseWith(Current, EffortAuto, "", models, ram, Signals{Brief: true})
+	if got.Model.ID != "qwen-7b" || !got.Loaded || got.Skipped.ID != "qwen-14b" {
+		t.Fatalf("brief: %s loaded=%v skipped=%s", got.Model.ID, got.Loaded, got.Skipped.ID)
+	}
+	if r := got.Reason("en"); !strings.HasSuffix(r, ", since it was already loaded and qwen-14b wasn't") {
+		t.Fatalf("reason = %q", r)
+	}
+	// Thorough keeps the best model.
+	if got, _ := ChooseWith(Current, EffortThorough, "", models, ram, Signals{Brief: true}); got.Model.ID != "qwen-14b" {
+		t.Fatalf("thorough: %s", got.Model.ID)
+	}
+	// A loaded model that can't do the job is not used: gemma has no tools.
+	loadedGemma := gemma
+	loadedGemma.Status = "running"
+	if got, _ := ChooseWith(Current, EffortAuto, "", []contracts.Model{tiny, mid, big, loadedGemma}, ram, Signals{Brief: true}); got.Model.ID == "gemma-9b" {
+		t.Fatal("brief chose a loaded model without tools")
+	}
+	// Nothing loaded: a brief request gets a model that loads quickly.
+	if got, _ := ChooseWith(Research, EffortAuto, "", []contracts.Model{tiny, mid, big}, ram, Signals{Brief: true}); got.Model.ID != "qwen-7b" || got.Loaded {
+		t.Fatalf("brief, nothing loaded: %s", got.Model.ID)
+	}
+}
+
+func TestBrief(t *testing.T) {
+	cases := []struct {
+		kind    Kind
+		message string
+		client  string
+		want    bool
+	}{
+		{Current, "weather in Juneau tomorrow?", "", true},
+		{Local, "git status", "phone", true},
+		{Current, strings.Repeat("what is the latest news about this ", 5), "", false},
+		{Research, "compare these two plans", "", false},
+		{Research, "compare these two plans", "watch", true},
+		{Coding, "write a python script", "watch", true},
+		{Chat, "hi", "", false}, // already quick
+	}
+	for _, c := range cases {
+		if got := Brief(c.kind, c.message, c.client); got != c.want {
+			t.Errorf("Brief(%s, %q, %q) = %v", c.kind, c.message, c.client, got)
+		}
 	}
 }
