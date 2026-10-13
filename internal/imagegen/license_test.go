@@ -11,7 +11,7 @@ import (
 // token, and a refused download says to accept the license (#551).
 func TestModelBehindALicense(t *testing.T) {
 	k, ok := Lookup("flux2-klein-9b")
-	if !ok || !k.NeedsLicense || k.LicenseURL == "" || k.Tier != "" || !k.Files[0].Gated {
+	if !ok || !k.NeedsLicense || k.Untested || k.LicenseURL == "" || k.Tier != "" || !k.Files[0].Gated {
 		t.Fatalf("flux2-klein-9b = %+v", k)
 	}
 	for _, mem := range []int64{16 << 30, 64 << 30, 256 << 30} {
