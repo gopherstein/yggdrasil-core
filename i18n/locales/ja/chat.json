@@ -515,6 +515,7 @@
     "autoWhy": "{{choice}}（{{why}}）",
     "autoRated": "同じようなコンピュータでの評価が高いため",
     "autoBusy": "{{model}}が処理中だったため",
+    "autoLoaded": "すでに読み込まれていて、{{model}}は読み込まれていなかったため",
     "kinds": {
       "chat": "簡単な質問",
       "current": "最新情報に関する質問",

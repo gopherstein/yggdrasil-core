@@ -535,6 +535,7 @@
     "autoWhy": "{{choice}}, {{why}}",
     "autoRated": "auf Computern wie deinem besser bewertet",
     "autoBusy": "da {{model}} beschäftigt war",
+    "autoLoaded": "da es schon geladen war und {{model}} nicht",
     "kinds": {
       "chat": "eine kurze Frage",
       "current": "eine Frage zu aktuellen Informationen",

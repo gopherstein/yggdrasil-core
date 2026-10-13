@@ -515,6 +515,7 @@
     "autoWhy": "{{choice}}（{{why}}）",
     "autoRated": "在类似电脑上评分更高",
     "autoBusy": "因为 {{model}} 正忙",
+    "autoLoaded": "因为它已加载，而 {{model}} 尚未加载",
     "kinds": {
       "chat": "简单问题",
       "current": "涉及最新信息的问题",

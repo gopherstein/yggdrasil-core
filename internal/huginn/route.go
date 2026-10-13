@@ -40,6 +40,10 @@ type Choice struct {
 	// else, so a similar idle one was chosen; Busy is that model.
 	AvoidedBusy bool
 	Busy        contracts.Model
+	// Loaded is set when a quick request went to a model already loaded
+	// instead of loading a better one, Skipped (#498).
+	Loaded  bool
+	Skipped contracts.Model
 }
 
 // Signals are what Auto weighs beyond the request itself (spec §13).
@@ -49,6 +53,11 @@ type Signals struct {
 	Rating map[string]float64
 	// Busy are the models loaded here that are already answering something.
 	Busy map[string]bool
+	// Brief is set when the request wants a short answer soon whatever its
+	// kind: a short question that needs the web or this computer, or any
+	// question from a watch (#498). It is quick, unless the effort is
+	// Thorough.
+	Brief bool
 }
 
 // ratingLead is how much better rated a model must be to be chosen over a
@@ -73,6 +82,9 @@ func (c Choice) Reason(app string) string {
 	case c.AvoidedBusy:
 		reason = locale.T(app, "chat:steps.autoWhy", map[string]any{"choice": reason,
 			"why": locale.T(app, "chat:steps.autoBusy", map[string]any{"model": Name(c.Busy)})})
+	case c.Loaded:
+		reason = locale.T(app, "chat:steps.autoWhy", map[string]any{"choice": reason,
+			"why": locale.T(app, "chat:steps.autoLoaded", map[string]any{"model": Name(c.Skipped)})})
 	case c.Rated:
 		reason = locale.T(app, "chat:steps.autoWhy", map[string]any{"choice": reason, "why": locale.T(app, "chat:steps.autoRated", nil)})
 	}
@@ -182,8 +194,17 @@ func ChooseIn(k Kind, e Effort, lang string, installed []contracts.Model, memTot
 func ChooseWith(k Kind, e Effort, lang string, installed []contracts.Model, memTotal uint64, sig Signals) (Choice, bool) {
 	c, ok := choose(k, e, lang, installed, memTotal, sig)
 	if ok && len(sig.Rating) > 0 {
-		plain, _ := choose(k, e, lang, installed, memTotal, Signals{Busy: sig.Busy})
+		plain, _ := choose(k, e, lang, installed, memTotal, Signals{Busy: sig.Busy, Brief: sig.Brief})
 		c.Rated = plain.Model.ID != c.Model.ID
+	}
+	// A brief request answered by a loaded model instead of loading the one
+	// Auto would otherwise pick says so (#498).
+	if ok && sig.Brief && !c.Loaded && !c.AvoidedBusy && running(c.Model) {
+		full := sig
+		full.Brief = false
+		if plain, _ := choose(k, e, lang, installed, memTotal, full); plain.Model.ID != c.Model.ID && !running(plain.Model) {
+			c.Loaded, c.Skipped, c.Rated = true, plain.Model, false
+		}
 	}
 	return c, ok
 }
@@ -198,7 +219,7 @@ func choose(k Kind, e Effort, lang string, installed []contracts.Model, memTotal
 	if len(models) == 0 {
 		return Choice{}, false
 	}
-	quick := (k == Chat && e != EffortThorough) || e == EffortFast
+	quick := ((k == Chat || sig.Brief) && e != EffortThorough) || e == EffortFast
 	share := fullShare
 	if quick {
 		share = quickShare
@@ -243,7 +264,11 @@ func choose(k Kind, e Effort, lang string, installed []contracts.Model, memTotal
 		if ok {
 			top, _ := best(models, func(m contracts.Model) bool { return suits(k, m) && fits(m, memTotal, share) }, better)
 			if top.ID == "" || languageRank(m, lang) >= languageRank(top, lang) {
-				return pick(m)
+				c, _ := pick(m)
+				if top.ID != "" && top.ID != m.ID && !running(top) {
+					c.Loaded, c.Skipped = true, top
+				}
+				return c, true
 			}
 		}
 	}

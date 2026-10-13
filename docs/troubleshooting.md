@@ -36,7 +36,7 @@ Remove API keys, tokens, personal data, private URLs, and credentials before you
 
 ## Auto chose a model I did not expect
 
-The first line of **What I did** says which model answered and why: a quick question stays on a model that is already loaded, coding goes to a coding model, current information needs a model that can use tools, and a question about your files or knowledge prefers a larger model. A question about what a specialized AI was trained for goes to that AI. Choose a model in the composer instead of Auto to keep one model for the chat.
+The first line of **What I did** says which model answered and why: a quick question, a short one that needs the web, and anything asked from the watch stay on a model that is already loaded, coding goes to a coding model, current information needs a model that can use tools, and a question about your files or knowledge prefers a larger model. A question about what a specialized AI was trained for goes to that AI. Choose a model in the composer instead of Auto to keep one model for the chat.
 
 Embedding and reranker models never answer chats. They help Knowledge search.
 

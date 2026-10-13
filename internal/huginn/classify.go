@@ -45,6 +45,24 @@ var (
 	researchRe = regexp.MustCompile(`(?i)\b(compare|comparison|versus|vs\.?|pros and cons|trade-?offs?|analy[sz]e|analysis|in detail|detailed|step[- ]by[- ]step|plan for|make a plan|write an? (essay|report|proposal|memo|article)|research|evaluate|recommend(ation)?s? for|strategy|outline)\b`)
 )
 
+// briefLength is the message length, in runes, up to which a question that
+// needs the web or this computer is short enough to answer with a model
+// already loaded (#498), such as "weather in Juneau tomorrow?".
+const briefLength = 120
+
+// Brief reports whether a request wants a short answer soon, whatever model
+// would answer it best: a short question that needs the web or this
+// computer, or any question from a watch, where every second of loading
+// shows (#498). client is the app that asked, as in runlog.Origin. A quick
+// chat question is already quick, and coding and research are never brief
+// but from a watch.
+func Brief(k Kind, message, client string) bool {
+	if client == "watch" {
+		return true
+	}
+	return (k == Current || k == Local) && utf8.RuneCountInString(strings.TrimSpace(message)) <= briefLength
+}
+
 // researchLength is the message length, in runes, past which a request is
 // treated as needing a careful answer.
 const researchLength = 600

@@ -156,11 +156,18 @@ func WithOrigin(ctx context.Context, o Origin) context.Context {
 
 // OriginFrom is where ctx's request came from, or the zero Origin.
 func OriginFrom(ctx context.Context) Origin {
-	if ctx == nil {
-		return Origin{}
-	}
-	o, _ := ctx.Value(originKey{}).(Origin)
+	o, _ := OriginOf(ctx)
 	return o
+}
+
+// OriginOf is where ctx's request came from, and whether a person asked it
+// in a chat request at all; automations and other work have none.
+func OriginOf(ctx context.Context) (Origin, bool) {
+	if ctx == nil {
+		return Origin{}, false
+	}
+	o, ok := ctx.Value(originKey{}).(Origin)
+	return o, ok
 }
 
 // With carries a collector in ctx.

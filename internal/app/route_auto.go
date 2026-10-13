@@ -12,6 +12,7 @@ import (
 	modelhealth "github.com/yeixio/toskar-core/internal/models/health"
 	"github.com/yeixio/toskar-core/internal/profiles"
 	"github.com/yeixio/toskar-core/internal/ratings"
+	"github.com/yeixio/toskar-core/internal/runlog"
 	"github.com/yeixio/toskar-core/pkg/contracts"
 )
 
@@ -86,7 +87,13 @@ func (a *App) chooseAuto(ctx context.Context, message string, data bool, lang st
 	if data && kind == huginn.Chat {
 		kind = huginn.Research
 	}
-	choice, ok := huginn.ChooseWith(kind, huginn.EffortFrom(ctx), lang, usable, a.memoryTotal(ctx), a.autoSignals(ctx))
+	sig := a.autoSignals(ctx)
+	// Someone waiting in a chat gets a brief question answered by a model
+	// already loaded; an automation, with no one waiting, never does.
+	if origin, asked := runlog.OriginOf(ctx); asked {
+		sig.Brief = huginn.Brief(kind, message, origin.Client)
+	}
+	choice, ok := huginn.ChooseWith(kind, huginn.EffortFrom(ctx), lang, usable, a.memoryTotal(ctx), sig)
 	if !ok {
 		return huginn.Choice{}, errNoModel
 	}
