@@ -39,7 +39,7 @@ The files come straight from the vendor's own repository, never a mirror. These 
 
 | Model | Does | Download | Comfortable with | License |
 | --- | --- | --- | --- | --- |
-| FLUX.2 [klein] 9B | Makes and edits, with more detail than the 4B | 23.4 GB | 32 GB (estimate; not yet tested) | [FLUX Non-Commercial](https://huggingface.co/black-forest-labs/FLUX.2-klein-9B): non-commercial use, or a commercial license from Black Forest Labs |
+| FLUX.2 [klein] 9B | Makes and edits, with more detail than the 4B | 23.4 GB | 32 GB (tested: about 36 s a picture, peak 26 GB of memory and 20 GB of graphics memory, on an RX 7900 XTX) | [FLUX Non-Commercial](https://huggingface.co/black-forest-labs/FLUX.2-klein-9B): non-commercial use, or a commercial license from Black Forest Labs |
 
 ## Clips
 
