@@ -209,5 +209,26 @@
     "chartLabel_other": "Speicher in den letzten {{count}} Stunden",
     "growing_one": "Der Speicher wächst seit {{count}} Stunde stetig. Exportiere die Diagnose und hänge das Paket an ein Issue an.",
     "growing_other": "Der Speicher wächst seit {{count}} Stunden stetig. Exportiere die Diagnose und hänge das Paket an ein Issue an."
+  },
+  "firstAnswers": {
+    "title": "Wie schnell Antworten beginnen",
+    "description": "Die Wartezeit vom Senden einer Nachricht bis zum ersten Wort der Antwort, in der letzten Woche. Jede Zeit ist die mittlere Antwort: Die Hälfte war schneller.",
+    "app": "App",
+    "warm": "Modell bereit",
+    "cold": "Modell erst geladen",
+    "answers_one": "{{count}} Antwort",
+    "answers_other": "{{count}} Antworten",
+    "coldDetail_one": "{{count}} Antwort · Laden {{load}}",
+    "coldDetail_other": "{{count}} Antworten · Laden {{load}}",
+    "clients": {
+      "phone": "Telefon",
+      "tablet": "Tablet",
+      "watch": "Uhr",
+      "tv": "TV",
+      "desktop": "Desktop-App",
+      "web": "Browser",
+      "other": "Andere App",
+      "unnamed": "Ältere Apps und API"
+    }
   }
 }

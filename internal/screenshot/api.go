@@ -141,6 +141,15 @@ func screenshotGET(path string) (string, bool) {
 		return `{"gpu":"Apple M4 Pro","problems":[]}`, true
 	case path == "/api/v1/diagnostics/runtime":
 		return screenshotRuntimeHistory(), true
+	// A week of first answers: quick when a model is running, slow when one loads.
+	case path == "/api/v1/diagnostics/first-answers":
+		return `{"since":"2026-10-01T00:00:00Z","groups":[` +
+			`{"client":"phone","cold":false,"runs":41,"remote":6,"first_word_ms":620,"first_word_p90_ms":1400},` +
+			`{"client":"phone","cold":true,"runs":5,"first_word_ms":7400,"first_word_p90_ms":11200,"load_ms":6300},` +
+			`{"client":"watch","cold":false,"runs":9,"first_word_ms":880,"first_word_p90_ms":1700},` +
+			`{"client":"web","cold":false,"runs":63,"first_word_ms":410,"first_word_p90_ms":900},` +
+			`{"client":"web","cold":true,"runs":3,"first_word_ms":6900,"first_word_p90_ms":8100,"load_ms":5800},` +
+			`{"client":"","cold":false,"runs":12,"first_word_ms":530,"first_word_p90_ms":1100}]}`, true
 	// Setup status is an object, never a list: the Tools page reads its models.
 	// Images are set up, so the Tools page shows a working setup; video isn't.
 	case path == "/api/v1/images/setup":

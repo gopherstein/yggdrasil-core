@@ -57,13 +57,18 @@ type ToolUse struct {
 type Run struct {
 	ID string `json:"id"`
 	// Contract is the client contract the trace is written in (§68).
-	Contract       string   `json:"contract"`
-	ConversationID string   `json:"conversation_id,omitempty"`
-	ProfileID      string   `json:"profile_id,omitempty"`
-	Source         string   `json:"source,omitempty"`
-	Strategy       []string `json:"strategy"`
-	Effort         string   `json:"effort,omitempty"`
-	Status         string   `json:"status"`
+	Contract       string `json:"contract"`
+	ConversationID string `json:"conversation_id,omitempty"`
+	ProfileID      string `json:"profile_id,omitempty"`
+	Source         string `json:"source,omitempty"`
+	// Client is the app that asked: phone, tablet, watch, tv, desktop, or
+	// web, or other; empty when it didn't say, such as an API call (#498).
+	Client string `json:"client,omitempty"`
+	// Remote is set when the request came from outside the home network.
+	Remote   bool     `json:"remote,omitempty"`
+	Strategy []string `json:"strategy"`
+	Effort   string   `json:"effort,omitempty"`
+	Status   string   `json:"status"`
 	// Error is the English text; ErrorCode and ErrorDetails let clients
 	// show it in the App language (multilingual spec §10).
 	Error        string         `json:"error,omitempty"`
@@ -118,6 +123,46 @@ func New(id, conversationID, profileID, source string) *Collector {
 
 type key struct{}
 
+type originKey struct{}
+
+// Origin is where a request came from: the app that asked and whether it
+// came from outside the home network.
+type Origin struct {
+	Client string
+	Remote bool
+}
+
+// Clients are the apps a request can name.
+var Clients = []string{"phone", "tablet", "watch", "tv", "desktop", "web"}
+
+// ClientName is client when it is one of Clients, "" when empty, and
+// "other" otherwise, so a trace never keeps text a client made up.
+func ClientName(client string) string {
+	if client == "" {
+		return ""
+	}
+	for _, c := range Clients {
+		if c == client {
+			return c
+		}
+	}
+	return "other"
+}
+
+// WithOrigin carries where a request came from in ctx.
+func WithOrigin(ctx context.Context, o Origin) context.Context {
+	return context.WithValue(ctx, originKey{}, o)
+}
+
+// OriginFrom is where ctx's request came from, or the zero Origin.
+func OriginFrom(ctx context.Context) Origin {
+	if ctx == nil {
+		return Origin{}
+	}
+	o, _ := ctx.Value(originKey{}).(Origin)
+	return o
+}
+
 // With carries a collector in ctx.
 func With(ctx context.Context, c *Collector) context.Context { return context.WithValue(ctx, key{}, c) }
 
@@ -138,6 +183,16 @@ func (c *Collector) model(modelID, role, node string) *ModelUse {
 		c.models[k] = m
 	}
 	return m
+}
+
+// SetOrigin records where the run's request came from.
+func (c *Collector) SetOrigin(o Origin) {
+	if c == nil {
+		return
+	}
+	c.mu.Lock()
+	c.run.Client, c.run.Remote = ClientName(o.Client), o.Remote
+	c.mu.Unlock()
 }
 
 // Strategy notes how the request was handled, such as "Looked up the web

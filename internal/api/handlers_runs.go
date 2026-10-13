@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/yeixio/toskar-core/internal/runlog"
@@ -14,6 +15,7 @@ import (
 type RunStore interface {
 	Get(ctx context.Context, id string) (runlog.Run, error)
 	List(ctx context.Context, conversationID string, limit int) ([]runlog.Run, error)
+	Since(ctx context.Context, t time.Time) ([]runlog.Run, error)
 }
 
 // BindRuns attaches the run trace routes.
@@ -22,6 +24,28 @@ func (s *Server) BindRuns(r RunStore) { s.runs = r }
 func (s *Server) runRoutes(api *mux.Router) {
 	api.HandleFunc("/runs", s.handleListRuns).Methods(http.MethodGet)
 	api.HandleFunc("/runs/{id}", s.handleGetRun).Methods(http.MethodGet)
+	api.HandleFunc("/diagnostics/first-answers", s.handleFirstAnswers).Methods(http.MethodGet, http.MethodOptions)
+}
+
+// handleFirstAnswers summarizes how long answers took to start (#498), by
+// app and cold or warm, over the last ?days= days (7 by default, 90 at most).
+func (s *Server) handleFirstAnswers(w http.ResponseWriter, r *http.Request) {
+	if s.runs == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Run traces are not available.", nil)
+		return
+	}
+	days, _ := strconv.Atoi(r.URL.Query().Get("days"))
+	if days <= 0 {
+		days = 7
+	}
+	days = min(days, 90)
+	since := time.Now().Add(-time.Duration(days) * 24 * time.Hour)
+	runs, err := s.runs.Since(r.Context(), since)
+	if err != nil {
+		writeErrFrom(w, http.StatusInternalServerError, "RUNS_FAILED", err)
+		return
+	}
+	writeJSON(w, http.StatusOK, runlog.SummarizeFirstAnswers(since, runs))
 }
 
 // handleListRuns lists recent runs, newest first. ?conversation_id= narrows

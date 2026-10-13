@@ -193,5 +193,24 @@
     "since": "运行始于",
     "chartLabel_other": "过去 {{count}} 小时的内存",
     "growing_other": "内存已持续增长 {{count}} 小时。请导出诊断并将诊断包附加到 Issue。"
+  },
+  "firstAnswers": {
+    "title": "回答开始的速度",
+    "description": "过去一周里，从发送消息到回答出现第一个字的等待时间。每个时间都是中位数：一半的回答更快。",
+    "app": "应用",
+    "warm": "模型已就绪",
+    "cold": "先加载模型",
+    "answers_other": "{{count}} 个回答",
+    "coldDetail_other": "{{count}} 个回答 · 加载 {{load}}",
+    "clients": {
+      "phone": "手机",
+      "tablet": "平板",
+      "watch": "手表",
+      "tv": "电视",
+      "desktop": "桌面应用",
+      "web": "浏览器",
+      "other": "其他应用",
+      "unnamed": "旧版应用和 API"
+    }
   }
 }

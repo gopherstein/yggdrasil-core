@@ -225,5 +225,28 @@
     "growing_one": "La memoria cresce costantemente da {{count}} ora. Esporta la diagnostica e allega il pacchetto a una segnalazione.",
     "growing_many": "La memoria cresce costantemente da {{count}} ore. Esporta la diagnostica e allega il pacchetto a una segnalazione.",
     "growing_other": "La memoria cresce costantemente da {{count}} ore. Esporta la diagnostica e allega il pacchetto a una segnalazione."
+  },
+  "firstAnswers": {
+    "title": "Quanto velocemente iniziano le risposte",
+    "description": "L’attesa dall’invio di un messaggio alla prima parola della risposta, nell’ultima settimana. Ogni tempo è la risposta mediana: metà sono state più veloci.",
+    "app": "App",
+    "warm": "Modello pronto",
+    "cold": "Modello caricato prima",
+    "answers_one": "{{count}} risposta",
+    "answers_many": "{{count}} risposte",
+    "answers_other": "{{count}} risposte",
+    "coldDetail_one": "{{count}} risposta · caricamento {{load}}",
+    "coldDetail_many": "{{count}} risposte · caricamento {{load}}",
+    "coldDetail_other": "{{count}} risposte · caricamento {{load}}",
+    "clients": {
+      "phone": "Telefono",
+      "tablet": "Tablet",
+      "watch": "Orologio",
+      "tv": "TV",
+      "desktop": "App desktop",
+      "web": "Browser",
+      "other": "Altra app",
+      "unnamed": "App meno recenti e API"
+    }
   }
 }

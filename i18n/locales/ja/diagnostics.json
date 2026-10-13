@@ -193,5 +193,24 @@
     "since": "起動日時",
     "chartLabel_other": "過去 {{count}} 時間のメモリ",
     "growing_other": "メモリが {{count}} 時間増え続けています。診断をエクスポートし、バンドルを Issue に添付してください。"
+  },
+  "firstAnswers": {
+    "title": "回答が始まるまでの速さ",
+    "description": "過去 1 週間に、メッセージを送ってから回答の最初の言葉が出るまでの待ち時間です。各時間は中央値で、半数はそれより速く始まりました。",
+    "app": "アプリ",
+    "warm": "モデル準備済み",
+    "cold": "先にモデルを読み込み",
+    "answers_other": "{{count}} 件の回答",
+    "coldDetail_other": "{{count}} 件の回答 · 読み込み {{load}}",
+    "clients": {
+      "phone": "スマートフォン",
+      "tablet": "タブレット",
+      "watch": "ウォッチ",
+      "tv": "テレビ",
+      "desktop": "デスクトップアプリ",
+      "web": "ブラウザ",
+      "other": "その他のアプリ",
+      "unnamed": "以前のアプリと API"
+    }
   }
 }

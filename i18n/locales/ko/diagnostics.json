@@ -193,5 +193,24 @@
     "since": "실행 시작",
     "chartLabel_other": "지난 {{count}}시간 동안의 메모리",
     "growing_other": "메모리가 {{count}}시간 동안 계속 늘었어요. 진단을 내보내고 번들을 이슈에 첨부하세요."
+  },
+  "firstAnswers": {
+    "title": "답변이 시작되는 속도",
+    "description": "지난 1주 동안 메시지를 보낸 뒤 답변의 첫 단어가 나올 때까지 기다린 시간입니다. 각 시간은 중간값이며, 절반은 이보다 빨랐습니다.",
+    "app": "앱",
+    "warm": "모델 준비됨",
+    "cold": "모델을 먼저 불러옴",
+    "answers_other": "답변 {{count}}개",
+    "coldDetail_other": "답변 {{count}}개 · 불러오기 {{load}}",
+    "clients": {
+      "phone": "휴대폰",
+      "tablet": "태블릿",
+      "watch": "워치",
+      "tv": "TV",
+      "desktop": "데스크톱 앱",
+      "web": "브라우저",
+      "other": "기타 앱",
+      "unnamed": "이전 앱 및 API"
+    }
   }
 }

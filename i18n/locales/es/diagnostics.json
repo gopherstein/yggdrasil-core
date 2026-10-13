@@ -225,5 +225,28 @@
     "growing_one": "La memoria lleva {{count}} hora creciendo sin parar. Exporta el diagnóstico y adjunta el paquete a un issue.",
     "growing_many": "La memoria lleva {{count}} horas creciendo sin parar. Exporta el diagnóstico y adjunta el paquete a un issue.",
     "growing_other": "La memoria lleva {{count}} horas creciendo sin parar. Exporta el diagnóstico y adjunta el paquete a un issue."
+  },
+  "firstAnswers": {
+    "title": "Qué tan rápido empiezan las respuestas",
+    "description": "La espera desde que envías un mensaje hasta la primera palabra de la respuesta, en la última semana. Cada tiempo es la respuesta del medio: la mitad fueron más rápidas.",
+    "app": "App",
+    "warm": "Modelo listo",
+    "cold": "Modelo cargado antes",
+    "answers_one": "{{count}} respuesta",
+    "answers_many": "{{count}} respuestas",
+    "answers_other": "{{count}} respuestas",
+    "coldDetail_one": "{{count}} respuesta · carga {{load}}",
+    "coldDetail_many": "{{count}} respuestas · carga {{load}}",
+    "coldDetail_other": "{{count}} respuestas · carga {{load}}",
+    "clients": {
+      "phone": "Teléfono",
+      "tablet": "Tableta",
+      "watch": "Reloj",
+      "tv": "TV",
+      "desktop": "App de escritorio",
+      "web": "Navegador",
+      "other": "Otra app",
+      "unnamed": "Apps antiguas y API"
+    }
   }
 }

@@ -2142,6 +2142,54 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/RuntimeSample"
+  /api/v1/diagnostics/first-answers:
+    get:
+      summary: How long answers took to start, by app, cold or warm
+      description: >-
+        Chat runs that reached a first token, grouped by the app that asked (the chat request's client)
+        and by whether a model had to load first. Automations are left out.
+      operationId: getFirstAnswers
+      parameters:
+        - name: days
+          in: query
+          description: How many days back to look; 7 by default, 90 at most.
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: First-answer times
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  since:
+                    type: string
+                    format: date-time
+                  groups:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        client:
+                          type: string
+                          description: phone, tablet, watch, tv, desktop, web, or other; empty when the request didn't say.
+                        cold:
+                          type: boolean
+                          description: A model loaded before the answer started.
+                        runs:
+                          type: integer
+                        remote:
+                          type: integer
+                          description: Runs from outside the home network.
+                        first_word_ms:
+                          type: number
+                          description: Median wait from the request to the first token.
+                        first_word_p90_ms:
+                          type: number
+                        load_ms:
+                          type: number
+                          description: Median time spent loading models.
   /v1/models:
     get:
       summary: OpenAI-compatible model list
@@ -3251,6 +3299,10 @@ paths:
                 edit_of:
                   type: string
                   description: Send message in place of this one, as a new version of it
+                client:
+                  type: string
+                  enum: [phone, tablet, watch, tv, desktop, web]
+                  description: The app asking; its run is traced with it, to measure how long answers take to start
                 attachments:
                   type: array
                   items:

@@ -16,6 +16,7 @@ import { CachePanel } from './CachePanel'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
 import { formatRelativeTime } from '@/i18n/format'
 import { MemoryPanel } from './MemoryPanel'
+import { FirstAnswersPanel } from './FirstAnswersPanel'
 import { GPUSetupList } from './GPUSetupList'
 
 function kindLabel(kind: string, advanced: boolean): string {
@@ -553,6 +554,7 @@ export function DiagnosticsPage() {
 
       <CapabilityPanel />
       <ToolProvidersPanel />
+      <FirstAnswersPanel />
       <MemoryPanel />
 
       {advancedMode && <ToolActivityPanel />}

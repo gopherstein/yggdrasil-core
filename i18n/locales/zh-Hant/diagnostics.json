@@ -193,5 +193,24 @@
     "since": "執行起始",
     "chartLabel_other": "過去 {{count}} 小時的記憶體",
     "growing_other": "記憶體已持續增加 {{count}} 小時。請匯出診斷並將診斷套件附加到 Issue。"
+  },
+  "firstAnswers": {
+    "title": "回答開始的速度",
+    "description": "過去一週內，從傳送訊息到回答出現第一個字的等待時間。每個時間都是中位數：一半的回答更快。",
+    "app": "應用程式",
+    "warm": "模型已就緒",
+    "cold": "先載入模型",
+    "answers_other": "{{count}} 個回答",
+    "coldDetail_other": "{{count}} 個回答 · 載入 {{load}}",
+    "clients": {
+      "phone": "手機",
+      "tablet": "平板",
+      "watch": "手錶",
+      "tv": "電視",
+      "desktop": "桌面應用程式",
+      "web": "瀏覽器",
+      "other": "其他應用程式",
+      "unnamed": "舊版應用程式和 API"
+    }
   }
 }
