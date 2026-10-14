@@ -51,6 +51,13 @@ func (a Attachment) Bytes() ([]byte, error) {
 		return pptx(strings.Split(a.Content, "\n---\n"))
 	case "png":
 		return shapesPNG(a.Content)
+	// Text, a chart, and a dialog, drawn for the vision cases (#449).
+	case "text":
+		return textPNG(a.Content)
+	case "bars":
+		return barsPNG(a.Content)
+	case "dialog":
+		return dialogPNG(a.Content)
 	case "file":
 		// A file kept in the repository, by its path from tests/quality.
 		return os.ReadFile(filepath.FromSlash(a.Content))

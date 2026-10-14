@@ -463,11 +463,18 @@ func TestMediaQuality(t *testing.T) {
 		}
 	}
 	t.Logf("media: %d of %d cases passed (%.0f%%) with the %s model", passed, len(report), rate*100, d.Name())
+	seen, sees := visionScore(report)
+	if sees > 0 {
+		t.Logf("sees: %d of %d", seen, sees)
+	}
 	if path := config.Env("QUALITY_MEDIA_REPORT"); path != "" {
 		md := strings.Replace(markdownReport(d.Name(), report, rate, min), "# Chat quality:", "# Media quality:", 1)
 		models := ""
 		if isReal {
 			models = fmt.Sprintf("Picture model: %s. Clip model: %s.", orDefault(config.Env("QUALITY_MEDIA_IMAGE_MODEL"), "flux2-klein-4b"), orDefault(config.Env("QUALITY_MEDIA_VIDEO_MODEL"), "wan2.2-ti2v-5b"))
+		}
+		if sees > 0 {
+			md += fmt.Sprintf("\n**Sees: %d of %d.** The cases that show the model a picture or a video and check what it says about it (#449).\n", seen, sees)
 		}
 		md += memoryTable(models, peaks)
 		writeReport(t, d, build, path, md)
@@ -475,6 +482,38 @@ func TestMediaQuality(t *testing.T) {
 	if rate < min {
 		t.Errorf("%.0f%% of cases passed; at least %.0f%% must", rate*100, min*100)
 	}
+}
+
+// visionScore counts the cases that show the model a picture or a video and
+// judge its answer, and how many passed, for the report's "sees" line
+// (#449).
+func visionScore(report []reportRow) (passed, total int) {
+	for _, row := range report {
+		if !shows(row.Case) {
+			continue
+		}
+		total++
+		if len(row.Failures) == 0 {
+			passed++
+		}
+	}
+	return passed, total
+}
+
+// shows reports a case about what the model sees: one that checks a
+// picture reached it, or that shows it a video. An edit attaches a picture
+// too, but is judged by the picture it makes.
+func shows(c Case) bool {
+	if c.Expect.ImageSent {
+		return true
+	}
+	for _, a := range c.Attach {
+		switch strings.ToLower(filepath.Ext(a.Name)) {
+		case ".mp4", ".mov", ".webm":
+			return true
+		}
+	}
+	return false
 }
 
 func orDefault(s, def string) string {

@@ -114,6 +114,17 @@ word error rate (`max_wer`, 25% by default). `make: png` draws an
 attachment from a description, such as `size=512 bg=white shape=square
 color=blue count=3`, for edits and for the reading cases, whose
 `image_sent` checks (stub only) that the picture reached the model.
+Pictures for the vision cases (#449) are drawn too, so they're our own and
+the same every run (`pictures_test.go`): `make: text` writes lines split by
+`|` in a pixel font (`w=640 h=360 bg=green color=white text=MAIN ST|EXIT
+12`), `make: bars` a bar chart (`labels=MON,TUE values=4,9`), and `make:
+dialog` an error dialog (`title=ERROR text=DISK IS FULL`). `make: file`
+attaches a file kept in the repository, such as the clip in `fixtures/`,
+which `fixtures/make-fixtures.sh` draws with ffmpeg. `follow_up` is a
+second message in the same chat with nothing attached; the case checks its
+answer, and `image_sent` checks the picture still reached the model then.
+The report counts the cases about what the model sees, the ones that check
+`image_sent` or show a video, in a **Sees: N of M** line.
 `real_only` cases need tools the stub has no stand-in for, and `recording`
 attaches text read by Toskar's own voice. The stub must pass every case it
 runs; a real daemon at least 75% (`TOSKAR_QUALITY_MEDIA_MIN_PASS`), since

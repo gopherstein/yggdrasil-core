@@ -203,6 +203,25 @@ func (d stubDriver) Run(t *testing.T, c Case) Result {
 		}
 		answer.WriteString(chunk.Content)
 	}
+	// A follow-up in the same chat, with nothing attached: what the case
+	// checks is its answer and the prompts the model got for it.
+	followFrom := 0
+	if c.FollowUp != "" {
+		mu.Lock()
+		followFrom = len(prompts)
+		mu.Unlock()
+		stream, err := a.RunChat(ctx, profileID, conv.ID, c.FollowUp, false, "auto", "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		answer.Reset()
+		for chunk := range stream {
+			if chunk.Error != "" {
+				t.Fatalf("follow-up failed: %s", chunk.Error)
+			}
+			answer.WriteString(chunk.Content)
+		}
+	}
 	time.Sleep(50 * time.Millisecond) // let the last events arrive
 	if d.model != "" {
 		t.Logf("answer: %.300s", answer.String())
@@ -210,7 +229,9 @@ func (d stubDriver) Run(t *testing.T, c Case) Result {
 	a.Bus.Unsubscribe(subID)
 	<-done
 
-	r := Result{Answer: answer.String(), Prompts: prompts}
+	mu.Lock()
+	r := Result{Answer: answer.String(), Prompts: prompts[followFrom:]}
+	mu.Unlock()
 	evMu.Lock()
 	r.Events = got
 	evMu.Unlock()

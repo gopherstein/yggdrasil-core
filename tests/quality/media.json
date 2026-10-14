@@ -177,6 +177,119 @@
         "image_sent": true,
         "answer_matches": "(?is)green.*(circle|round)|(circle|round).*green"
       }
+    },
+    {
+      "id": "read_receipt_total",
+      "what": "Text in a picture is read: a receipt's total (#449).",
+      "message": "What's the total on this receipt?",
+      "attach": [
+        {
+          "name": "receipt.png",
+          "make": "text",
+          "content": "w=640 h=360 text=CORNER CAFE|COFFEE 4.50|MUFFIN 3.25|TOTAL $7.75"
+        }
+      ],
+      "stub": [
+        "The total is $7.75."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "7\\.75"
+      }
+    },
+    {
+      "id": "read_sign",
+      "what": "Text in a picture is read: a road sign (#449).",
+      "message": "What does this sign say?",
+      "attach": [
+        {
+          "name": "sign.png",
+          "make": "text",
+          "content": "w=640 h=240 bg=green color=white text=MAIN ST|EXIT 12"
+        }
+      ],
+      "stub": [
+        "It says Main St, Exit 12."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?is)main.*exit\\s*12|exit\\s*12.*main"
+      }
+    },
+    {
+      "id": "read_chart_tallest",
+      "what": "A bar chart is read: which bar is tallest, and its value (#449).",
+      "message": "Which day has the tallest bar in this chart, and what is its value?",
+      "attach": [
+        {
+          "name": "visits.png",
+          "make": "bars",
+          "content": "labels=MON,TUE,WED,THU values=4,9,6,3 color=blue"
+        }
+      ],
+      "stub": [
+        "Tuesday has the tallest bar, at 9."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?is)(tue).*\\b9\\b|\\b9\\b.*(tue)"
+      }
+    },
+    {
+      "id": "read_dialog",
+      "what": "A screenshot is read: what an error dialog says (#449).",
+      "message": "I got this error. What does it say, and what should I do?",
+      "attach": [
+        {
+          "name": "error.png",
+          "make": "dialog",
+          "content": "title=ERROR text=DISK IS FULL|FREE UP SPACE AND|TRY AGAIN"
+        }
+      ],
+      "stub": [
+        "It says the disk is full: free up some space, then try again."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?is)disk.*full"
+      }
+    },
+    {
+      "id": "follow_up_picture",
+      "what": "A follow-up about a picture still sees it, without attaching it again (#449).",
+      "message": "How many squares are in this picture?",
+      "follow_up": "And what color are they?",
+      "attach": [
+        {
+          "name": "squares.png",
+          "make": "png",
+          "content": "size=512 bg=white shape=square color=yellow count=4"
+        }
+      ],
+      "stub": [
+        "There are four squares.",
+        "They're yellow."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?i)yellow"
+      }
+    },
+    {
+      "id": "read_video_motion",
+      "what": "A video is watched through its frames: what happens in it (#449, #191).",
+      "message": "What happens in this video?",
+      "real_only": true,
+      "attach": [
+        {
+          "name": "clip.mp4",
+          "make": "file",
+          "content": "fixtures/red-square-moving.mp4"
+        }
+      ],
+      "expect": {
+        "answer_matches": "(?is)red.*(mov|slid|travel|across|left.*right)|(mov|slid|travel|across).*red"
+      }
     }
   ]
 }
