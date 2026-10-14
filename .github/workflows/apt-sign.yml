@@ -36,7 +36,7 @@ jobs:
           set -euo pipefail
           git fetch --depth 1 origin apt
           mkdir -p "$RUNNER_TEMP/published"
-          git archive origin/apt | tar -x -C "$RUNNER_TEMP/published"
+          git archive FETCH_HEAD | tar -x -C "$RUNNER_TEMP/published"
           ls "$RUNNER_TEMP/published/pool/main"
           APT_DEBS="$RUNNER_TEMP/published/pool/main" ./scripts/build/apt-index.sh dist/apt
       - name: Test the apt repository
