@@ -181,6 +181,7 @@
     "lastUsed": "Zuletzt genutzt {{when}}",
     "chat": "Chat",
     "start": "Starten",
+    "starting": "Wird gestartet …",
     "installElsewhere": "Auf anderen Computern installieren",
     "installing": "Wird installiert …",
     "moreActions": "Weitere Aktionen für {{model}}",

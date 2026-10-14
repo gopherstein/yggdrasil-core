@@ -2,6 +2,7 @@ package llamacpp
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -35,5 +36,22 @@ func TestHealthReportsMissingLlamaServerLocation(t *testing.T) {
 	}
 	if !strings.Contains(err.Error(), detection.Message) {
 		t.Fatalf("StartModel error %q does not include detection message %q", err, detection.Message)
+	}
+}
+
+// Installed is the cheap check made before every model start (#610).
+func TestInstalledIsTheBinaryInPlace(t *testing.T) {
+	r := New(t.TempDir(), t.TempDir())
+	if r.Installed() {
+		t.Fatal("installed with nothing there")
+	}
+	if err := os.MkdirAll(filepath.Dir(r.binaryPath()), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(r.binaryPath(), []byte("#!/bin/sh\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if !r.Installed() {
+		t.Fatal("not installed with llama-server in place")
 	}
 }

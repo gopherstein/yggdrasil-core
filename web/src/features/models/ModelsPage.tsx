@@ -157,9 +157,14 @@ export function ModelsPage() {
     mutationFn: (id: string) => api.deleteModel(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['models'] }),
   })
+  // A start says it's working, and why it failed: it used to do nothing
+  // on screen when llama.cpp wasn't set up (#610).
+  const [startError, setStartError] = useState<{ id: string; message: string } | null>(null)
   const startMutation = useMutation({
     mutationFn: (id: string) => api.startModel(id),
+    onMutate: () => setStartError(null),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['models-running'] }),
+    onError: (err, id) => setStartError({ id, message: err instanceof Error ? err.message : String(err) }),
   })
   const stopMutation = useMutation({
     mutationFn: ({
@@ -360,6 +365,8 @@ export function ModelsPage() {
           onInstall={installForPageTarget}
           onInstallElsewhere={(id) => installMutation.mutate({ id, nodeId: 'all' })}
           onStart={(id) => startMutation.mutate(id)}
+          startingId={startMutation.isPending ? startMutation.variables : null}
+          startError={startError}
           onStop={(id, instanceId) => {
             const live = running.find((r) => r.model_id === id)
             stopMutation.mutate({ id, instanceId, nodeId: live?.node_id })

@@ -180,6 +180,7 @@
     "lastUsed": "마지막 사용: {{when}}",
     "chat": "채팅",
     "start": "시작",
+    "starting": "시작하는 중…",
     "installElsewhere": "다른 컴퓨터에 설치",
     "installing": "설치하는 중…",
     "moreActions": "{{model}}에 대한 추가 작업",

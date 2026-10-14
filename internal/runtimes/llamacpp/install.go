@@ -167,6 +167,13 @@ func bundledLlamaServerBeside(exe string) string {
 	return candidate
 }
 
+// Installed reports whether llama-server is in place: one stat, cheap
+// enough to check before every model start (#610), unlike Detect.
+func (r *Runtime) Installed() bool {
+	st, err := os.Stat(r.binaryPath())
+	return err == nil && !st.IsDir()
+}
+
 func (r *Runtime) Detect(ctx context.Context) (pluginapi.RuntimeDetection, error) {
 	path := r.binaryPath()
 	if st, err := os.Stat(path); err == nil && !st.IsDir() {

@@ -180,6 +180,7 @@
     "lastUsed": "上次使用：{{when}}",
     "chat": "聊天",
     "start": "啟動",
+    "starting": "正在啟動…",
     "installElsewhere": "安裝到其他電腦",
     "installing": "正在安裝…",
     "moreActions": "{{model}} 的更多動作",
