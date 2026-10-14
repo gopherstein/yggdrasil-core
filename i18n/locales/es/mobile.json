@@ -782,5 +782,28 @@
     "pageFailed": "No se pudo leer esta página. Vuelve a compartirla o guárdala primero como PDF.",
     "nothing": "No había nada que guardar.",
     "updatePro": "Toskar Pro en tu computadora necesita una actualización para poder guardar en su Conocimiento. Actualízalo y vuelve a compartir esto."
+  },
+  "outside": {
+    "title": "Acceso desde cualquier lugar",
+    "reachable": "Accesible desde fuera de tu red",
+    "reachableViaRelay": "Accesible desde fuera de tu red, a través del relay",
+    "unreachable": "No accesible desde fuera de tu red",
+    "unchecked": "Aún no se ha comprobado desde fuera",
+    "off": "El acceso desde cualquier lugar está desactivado en este equipo. Actívalo en Toskar en el equipo, en Acceso a la API.",
+    "checkedNow": "Comprobado hace un momento",
+    "checkNow": "Comprobar ahora",
+    "checking": "Comprobando…",
+    "tooSoon": "Se comprobó hace menos de un minuto, así que este es el resultado más reciente.",
+    "details": "Cada vía de acceso, y qué arreglar, está en Acceso a la API en Toskar en el equipo.",
+    "failed": "No se pudo hacer la comprobación ({{code}}).",
+    "checkedMinutes_one": "Comprobado hace {{count}} minuto",
+    "checkedMinutes_many": "Comprobado hace {{count}} minutos",
+    "checkedMinutes_other": "Comprobado hace {{count}} minutos",
+    "checkedHours_one": "Comprobado hace {{count}} hora",
+    "checkedHours_many": "Comprobado hace {{count}} horas",
+    "checkedHours_other": "Comprobado hace {{count}} horas",
+    "checkedDays_one": "Comprobado hace {{count}} día",
+    "checkedDays_many": "Comprobado hace {{count}} días",
+    "checkedDays_other": "Comprobado hace {{count}} días"
   }
 }

@@ -758,5 +758,22 @@
     "pageFailed": "無法讀取此頁面。請重新分享，或先存成 PDF。",
     "nothing": "沒有可儲存的內容。",
     "updatePro": "電腦上的 Toskar Pro 需要更新後才能儲存到它的知識。請更新後再分享一次。"
+  },
+  "outside": {
+    "title": "隨處存取",
+    "reachable": "可從你的網路外部存取",
+    "reachableViaRelay": "可透過中繼從你的網路外部存取",
+    "unreachable": "無法從你的網路外部存取",
+    "unchecked": "尚未從外部檢查",
+    "off": "這台電腦的隨處存取已關閉。請在電腦上的 Toskar 中，於「API 存取」裡開啟。",
+    "checkedNow": "剛剛檢查過",
+    "checkNow": "立即檢查",
+    "checking": "正在檢查…",
+    "tooSoon": "不到一分鐘前剛檢查過，這就是最新結果。",
+    "details": "每條存取路徑以及需要修正的地方，都在電腦上 Toskar 的「API 存取」中。",
+    "failed": "無法執行檢查（{{code}}）。",
+    "checkedMinutes_other": "{{count}} 分鐘前檢查過",
+    "checkedHours_other": "{{count}} 小時前檢查過",
+    "checkedDays_other": "{{count}} 天前檢查過"
   }
 }

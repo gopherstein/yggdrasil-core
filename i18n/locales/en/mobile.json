@@ -846,5 +846,25 @@
     "pageFailed": "This page couldn't be read. Try sharing it again, or save it as a PDF first.",
     "nothing": "There was nothing to save.",
     "updatePro": "Toskar Pro on your computer needs an update before it can save to its Knowledge. Update it, then share this again."
+  },
+  "outside": {
+    "title": "Access from anywhere",
+    "reachable": "Reachable from outside your network",
+    "reachableViaRelay": "Reachable from outside your network, through the relay",
+    "unreachable": "Not reachable from outside your network",
+    "unchecked": "Not checked from outside yet",
+    "off": "Access from anywhere is off on this computer. Turn it on in Toskar on the computer, under API Access.",
+    "checkedNow": "Checked just now",
+    "checkNow": "Check now",
+    "checking": "Checking…",
+    "tooSoon": "Checked less than a minute ago, so this is the latest result.",
+    "details": "Each way in, and what to fix, is under API Access in Toskar on the computer.",
+    "failed": "The check couldn't run ({{code}}).",
+    "checkedMinutes_one": "Checked {{count}} minute ago",
+    "checkedMinutes_other": "Checked {{count}} minutes ago",
+    "checkedHours_one": "Checked {{count}} hour ago",
+    "checkedHours_other": "Checked {{count}} hours ago",
+    "checkedDays_one": "Checked {{count}} day ago",
+    "checkedDays_other": "Checked {{count}} days ago"
   }
 }

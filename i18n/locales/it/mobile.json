@@ -782,5 +782,28 @@
     "pageFailed": "Impossibile leggere questa pagina. Condividila di nuovo o salvala prima come PDF.",
     "nothing": "Non c'era nulla da salvare.",
     "updatePro": "Toskar Pro sul tuo computer deve essere aggiornato prima di poter salvare nella sua Conoscenza. Aggiornalo, poi condividi di nuovo."
+  },
+  "outside": {
+    "title": "Accesso da ovunque",
+    "reachable": "Raggiungibile dall’esterno della tua rete",
+    "reachableViaRelay": "Raggiungibile dall’esterno della tua rete, tramite il relay",
+    "unreachable": "Non raggiungibile dall’esterno della tua rete",
+    "unchecked": "Non ancora verificato dall’esterno",
+    "off": "L’accesso da ovunque è disattivato su questo computer. Attivalo in Toskar sul computer, in Accesso API.",
+    "checkedNow": "Verificato poco fa",
+    "checkNow": "Verifica ora",
+    "checking": "Verifica…",
+    "tooSoon": "Verificato meno di un minuto fa, quindi questo è il risultato più recente.",
+    "details": "Ogni accesso, e cosa sistemare, è in Accesso API in Toskar sul computer.",
+    "failed": "Non è stato possibile eseguire la verifica ({{code}}).",
+    "checkedMinutes_one": "Verificato {{count}} minuto fa",
+    "checkedMinutes_many": "Verificato {{count}} minuti fa",
+    "checkedMinutes_other": "Verificato {{count}} minuti fa",
+    "checkedHours_one": "Verificato {{count}} ora fa",
+    "checkedHours_many": "Verificato {{count}} ore fa",
+    "checkedHours_other": "Verificato {{count}} ore fa",
+    "checkedDays_one": "Verificato {{count}} giorno fa",
+    "checkedDays_many": "Verificato {{count}} giorni fa",
+    "checkedDays_other": "Verificato {{count}} giorni fa"
   }
 }

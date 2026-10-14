@@ -782,5 +782,28 @@
     "pageFailed": "Impossible de lire cette page. Partagez-la à nouveau, ou enregistrez-la d’abord en PDF.",
     "nothing": "Il n’y avait rien à enregistrer.",
     "updatePro": "Toskar Pro sur votre ordinateur doit être mis à jour pour pouvoir enregistrer dans ses Connaissances. Mettez-le à jour, puis partagez ceci à nouveau."
+  },
+  "outside": {
+    "title": "Accès de partout",
+    "reachable": "Accessible depuis l’extérieur de ton réseau",
+    "reachableViaRelay": "Accessible depuis l’extérieur de ton réseau, via le relais",
+    "unreachable": "Inaccessible depuis l’extérieur de ton réseau",
+    "unchecked": "Pas encore vérifié depuis l’extérieur",
+    "off": "L’accès de partout est désactivé sur cet ordinateur. Active-le dans Toskar sur l’ordinateur, dans Accès à l’API.",
+    "checkedNow": "Vérifié à l’instant",
+    "checkNow": "Vérifier maintenant",
+    "checking": "Vérification…",
+    "tooSoon": "Vérifié il y a moins d’une minute : c’est le résultat le plus récent.",
+    "details": "Chaque accès, et ce qu’il faut corriger, est dans Accès à l’API dans Toskar sur l’ordinateur.",
+    "failed": "La vérification n’a pas pu se faire ({{code}}).",
+    "checkedMinutes_one": "Vérifié il y a {{count}} minute",
+    "checkedMinutes_many": "Vérifié il y a {{count}} minutes",
+    "checkedMinutes_other": "Vérifié il y a {{count}} minutes",
+    "checkedHours_one": "Vérifié il y a {{count}} heure",
+    "checkedHours_many": "Vérifié il y a {{count}} heures",
+    "checkedHours_other": "Vérifié il y a {{count}} heures",
+    "checkedDays_one": "Vérifié il y a {{count}} jour",
+    "checkedDays_many": "Vérifié il y a {{count}} jours",
+    "checkedDays_other": "Vérifié il y a {{count}} jours"
   }
 }

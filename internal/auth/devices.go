@@ -273,8 +273,12 @@ var cgnat = netip.MustParsePrefix("100.64.0.0/10")
 // else, such as API keys, settings changes, models, computers, editing
 // automations, and files on disk, needs a key made in API Access.
 var deviceRoutes = map[string]bool{
-	"GET /api/v1/remote-access/route":         true,
-	"PUT /api/v1/remote-access/relay-token":   true,
+	"GET /api/v1/remote-access/route":       true,
+	"PUT /api/v1/remote-access/relay-token": true,
+	// Whether devices away from home reach the computer, and Check now,
+	// for an Admin's phone (#546); a Member's gets ROLE_REQUIRED.
+	"GET /api/v1/remote-access":               true,
+	"POST /api/v1/remote-access/check":        true,
 	"GET /api/v1/health":                      true,
 	"GET /api/v1/version":                     true,
 	"GET /api/v1/settings":                    true,

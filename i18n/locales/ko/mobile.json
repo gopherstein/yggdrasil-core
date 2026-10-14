@@ -758,5 +758,22 @@
     "pageFailed": "이 페이지를 읽을 수 없습니다. 다시 공유하거나 먼저 PDF로 저장해 보세요.",
     "nothing": "저장할 내용이 없었습니다.",
     "updatePro": "지식에 저장하려면 컴퓨터의 Toskar Pro를 업데이트해야 합니다. 업데이트한 다음 다시 공유하세요."
+  },
+  "outside": {
+    "title": "어디서나 접속",
+    "reachable": "네트워크 밖에서 연결할 수 있습니다",
+    "reachableViaRelay": "릴레이를 통해 네트워크 밖에서 연결할 수 있습니다",
+    "unreachable": "네트워크 밖에서 연결할 수 없습니다",
+    "unchecked": "아직 외부에서 확인하지 않았습니다",
+    "off": "이 컴퓨터에서 어디서나 접속이 꺼져 있습니다. 컴퓨터의 Toskar에서 API 접근에서 켜세요.",
+    "checkedNow": "방금 확인함",
+    "checkNow": "지금 확인",
+    "checking": "확인하는 중…",
+    "tooSoon": "1분 이내에 확인했으므로 이것이 최신 결과입니다.",
+    "details": "각 연결 경로와 고칠 점은 컴퓨터의 Toskar에서 API 접근에 있습니다.",
+    "failed": "확인을 실행하지 못했습니다({{code}}).",
+    "checkedMinutes_other": "{{count}}분 전에 확인함",
+    "checkedHours_other": "{{count}}시간 전에 확인함",
+    "checkedDays_other": "{{count}}일 전에 확인함"
   }
 }
