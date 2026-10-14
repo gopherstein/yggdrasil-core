@@ -368,6 +368,27 @@
       "confirm_other": "¿Eliminar {{count}} chats?",
       "confirm_many": "¿Eliminar {{count}} chats?",
       "confirmBody": "Se eliminan sus mensajes, adjuntos y archivos generados. Los chats de tu equipo también se eliminan allí."
+    },
+    "setupOffer": {
+      "details": "{{name}} · descarga de {{size}} · en {{node}}",
+      "detailsFree": "{{name}} · descarga de {{size}} · en {{node}} · {{free}} libres",
+      "theComputer": "la computadora",
+      "tightMemory": "La computadora tiene menos memoria de la recomendada, así que puede ir lento o fallar.",
+      "tightMemoryOn": "{{node}} tiene menos memoria de la recomendada, así que puede ir lento o fallar.",
+      "slowImage": "La computadora no tiene aceleración por GPU para esto, así que cada imagen tarda unos minutos.",
+      "slowImageOn": "{{node}} no tiene aceleración por GPU para esto, así que cada imagen tarda unos minutos.",
+      "slowVideo": "La computadora no tiene aceleración por GPU para esto, así que un clip puede tardar casi una hora.",
+      "slowVideoOn": "{{node}} no tiene aceleración por GPU para esto, así que un clip puede tardar casi una hora.",
+      "install": "Configurar",
+      "installing": "Instalando…",
+      "downloading": "Descargando… {{done}} de {{total}}",
+      "progress": "Progreso de la configuración",
+      "stop": "Detener",
+      "ready": "{{label}} está configurado.",
+      "continue": "Continuar",
+      "continuing": "Configurado. Terminando tu solicitud…",
+      "askAdmin": "Pide a un administrador de {{node}} que lo configure.",
+      "downloadFailed": "La descarga no terminó. Toca Configurar para intentarlo de nuevo."
     }
   },
   "effort": {

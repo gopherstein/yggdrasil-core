@@ -362,6 +362,27 @@
       "delete_other": "删除 {{count}} 个",
       "confirm_other": "删除 {{count}} 个聊天？",
       "confirmBody": "它们的消息、附件和生成的文件都会被删除。电脑上的聊天也会从电脑上删除。"
+    },
+    "setupOffer": {
+      "details": "{{name}} · 下载 {{size}} · 在 {{node}} 上",
+      "detailsFree": "{{name}} · 下载 {{size}} · 在 {{node}} 上 · 可用 {{free}}",
+      "theComputer": "电脑",
+      "tightMemory": "电脑的内存低于建议值，可能会很慢或失败。",
+      "tightMemoryOn": "{{node}} 的内存低于建议值，可能会很慢或失败。",
+      "slowImage": "电脑没有 GPU 加速，每张图片需要几分钟。",
+      "slowImageOn": "{{node}} 没有 GPU 加速，每张图片需要几分钟。",
+      "slowVideo": "电脑没有 GPU 加速，一段短片可能需要将近一小时。",
+      "slowVideoOn": "{{node}} 没有 GPU 加速，一段短片可能需要将近一小时。",
+      "install": "设置",
+      "installing": "正在安装…",
+      "downloading": "正在下载… {{done}}/{{total}}",
+      "progress": "设置进度",
+      "stop": "停止",
+      "ready": "{{label}} 已设置好。",
+      "continue": "继续",
+      "continuing": "已设置好。正在完成你的请求…",
+      "askAdmin": "请 {{node}} 上的管理员来设置。",
+      "downloadFailed": "下载没有完成。轻点“设置”再试一次。"
     }
   },
   "effort": {

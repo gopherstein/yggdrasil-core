@@ -362,6 +362,27 @@
       "delete_other": "刪除 {{count}} 個",
       "confirm_other": "刪除 {{count}} 個聊天？",
       "confirmBody": "它們的訊息、附件和產生的檔案都會被刪除。電腦上的聊天也會從電腦上刪除。"
+    },
+    "setupOffer": {
+      "details": "{{name}} · 下載大小 {{size}} · 在 {{node}} 上",
+      "detailsFree": "{{name}} · 下載大小 {{size}} · 在 {{node}} 上 · 可用 {{free}}",
+      "theComputer": "電腦",
+      "tightMemory": "電腦的記憶體低於建議值，可能會很慢或失敗。",
+      "tightMemoryOn": "{{node}} 的記憶體低於建議值，可能會很慢或失敗。",
+      "slowImage": "電腦沒有 GPU 加速，每張圖片需要幾分鐘。",
+      "slowImageOn": "{{node}} 沒有 GPU 加速，每張圖片需要幾分鐘。",
+      "slowVideo": "電腦沒有 GPU 加速，一段短片可能需要將近一小時。",
+      "slowVideoOn": "{{node}} 沒有 GPU 加速，一段短片可能需要將近一小時。",
+      "install": "設定",
+      "installing": "正在安裝…",
+      "downloading": "正在下載… {{done}} / {{total}}",
+      "progress": "設定進度",
+      "stop": "停止",
+      "ready": "{{label}} 已設定完成。",
+      "continue": "繼續",
+      "continuing": "已設定完成。正在完成你的請求…",
+      "askAdmin": "請 {{node}} 上的管理員來設定。",
+      "downloadFailed": "下載沒有完成。輕點「設定」再試一次。"
     }
   },
   "effort": {

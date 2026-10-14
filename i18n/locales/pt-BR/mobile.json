@@ -368,6 +368,27 @@
       "confirm_other": "Excluir {{count}} conversas?",
       "confirm_many": "Excluir {{count}} conversas?",
       "confirmBody": "As mensagens, anexos e arquivos gerados delas são removidos. Conversas no seu computador também são removidas de lá."
+    },
+    "setupOffer": {
+      "details": "{{name}} · download de {{size}} · em {{node}}",
+      "detailsFree": "{{name}} · download de {{size}} · em {{node}} · {{free}} livres",
+      "theComputer": "o computador",
+      "tightMemory": "O computador tem menos memória do que o ideal, então pode ficar lento ou falhar.",
+      "tightMemoryOn": "{{node}} tem menos memória do que o ideal, então pode ficar lento ou falhar.",
+      "slowImage": "O computador não tem aceleração por GPU para isso, então cada imagem leva alguns minutos.",
+      "slowImageOn": "{{node}} não tem aceleração por GPU para isso, então cada imagem leva alguns minutos.",
+      "slowVideo": "O computador não tem aceleração por GPU para isso, então um clipe pode levar quase uma hora.",
+      "slowVideoOn": "{{node}} não tem aceleração por GPU para isso, então um clipe pode levar quase uma hora.",
+      "install": "Configurar",
+      "installing": "Instalando…",
+      "downloading": "Baixando… {{done}} de {{total}}",
+      "progress": "Progresso da configuração",
+      "stop": "Parar",
+      "ready": "{{label}} está configurado.",
+      "continue": "Continuar",
+      "continuing": "Configurado. Concluindo sua solicitação…",
+      "askAdmin": "Peça a um administrador de {{node}} para configurar isso.",
+      "downloadFailed": "O download não terminou. Toque em Configurar para tentar de novo."
     }
   },
   "effort": {
