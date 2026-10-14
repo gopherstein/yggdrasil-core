@@ -2435,6 +2435,20 @@ export interface PortalUsage {
   messages_30: number
 }
 
+/** What a "Report this" sends with a problem, scrubbed by Core (#588). */
+export interface DiagnosticsReport {
+  version: string
+  commit?: string
+  contract: string
+  os: string
+  arch: string
+  cpu?: string
+  memory_gb?: number
+  gpus?: string[]
+  /** Core's last warnings and errors, for an Admin only. */
+  log?: string[]
+}
+
 /** How long answers took to start, by app, cold or warm (#498). */
 export interface FirstAnswers {
   since: string

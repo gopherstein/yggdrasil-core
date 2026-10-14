@@ -69,6 +69,19 @@
     "reload": "重新加载",
     "details": "详细信息"
   },
+  "report": {
+    "open": "报告",
+    "title": "报告此问题",
+    "body": "这会发送给 Toskar 团队（{{address}}）。名称、地址和密钥会先被移除，发送前你可以看到全部内容。",
+    "noteLabel": "你当时在做什么？（可选）",
+    "notePlaceholder": "例如：我问了明天的天气",
+    "whatSends": "发送的内容",
+    "gathering": "正在收集详细信息…",
+    "cancel": "取消",
+    "copy": "复制",
+    "copied": "已复制",
+    "send": "通过电子邮件发送"
+  },
   "loadError": {
     "title": "Toskar 无法加载此内容",
     "body": "它没有响应，或返回了错误。你的数据仍然在。请重试；如果反复出现，请查看诊断。",

@@ -70,6 +70,19 @@
     "reload": "Reload",
     "details": "Details"
   },
+  "report": {
+    "open": "Report this",
+    "title": "Report this problem",
+    "body": "This goes to the Toskar team at {{address}}. Names, addresses, and keys are taken out first, and you'll see everything before it goes.",
+    "noteLabel": "What were you doing? (optional)",
+    "notePlaceholder": "For example: I asked about tomorrow's weather",
+    "whatSends": "What it sends",
+    "gathering": "Gathering details…",
+    "cancel": "Cancel",
+    "copy": "Copy",
+    "copied": "Copied",
+    "send": "Send by email"
+  },
   "loadError": {
     "title": "Toskar couldn't load this",
     "body": "It didn't answer, or answered with an error. Your data is still there. Try again, or see Diagnostics if it keeps happening.",

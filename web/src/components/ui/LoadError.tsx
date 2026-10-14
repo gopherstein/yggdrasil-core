@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { ReportProblem } from './ReportProblem'
 
 interface LoadErrorProps {
   /** The failed query's error; its message shows under Details. */
@@ -26,6 +27,7 @@ export function LoadError({ error, onRetry, retrying }: LoadErrorProps) {
         <Link to="/diagnostics" className="text-sm font-medium text-primary hover:underline">
           {t('loadError.diagnostics')}
         </Link>
+        <ReportProblem error={detail} code={errorCode(error)} className="text-sm font-medium text-primary hover:underline" />
       </div>
       {detail ? (
         <details className="pt-2 text-xs text-ink-faint">
@@ -35,4 +37,10 @@ export function LoadError({ error, onRetry, retrying }: LoadErrorProps) {
       ) : null}
     </div>
   )
+}
+
+/** The service's stable code on an ApiError, read without importing it so a page's mocked api still works. */
+function errorCode(error: unknown): string | undefined {
+  const code = (error as { code?: unknown } | null)?.code
+  return typeof code === 'string' ? code : undefined
 }

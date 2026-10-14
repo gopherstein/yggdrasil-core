@@ -69,6 +69,19 @@
     "reload": "重新載入",
     "details": "詳細資訊"
   },
+  "report": {
+    "open": "回報",
+    "title": "回報此問題",
+    "body": "這會傳送給 Toskar 團隊（{{address}}）。名稱、位址和金鑰會先被移除，傳送前你可以看到全部內容。",
+    "noteLabel": "你當時在做什麼？（選填）",
+    "notePlaceholder": "例如：我問了明天的天氣",
+    "whatSends": "傳送的內容",
+    "gathering": "正在收集詳細資訊…",
+    "cancel": "取消",
+    "copy": "複製",
+    "copied": "已複製",
+    "send": "透過電子郵件傳送"
+  },
   "loadError": {
     "title": "Toskar 無法載入此內容",
     "body": "它沒有回應，或回傳了錯誤。你的資料仍然在。請重試；如果反覆發生，請查看診斷。",

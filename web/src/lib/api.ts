@@ -1,6 +1,7 @@
 import type {
   ModelURLPreview,
   FirstAnswers,
+  DiagnosticsReport,
   RuntimeHistory,
   AIProfile,
   APIKeyPermissions,
@@ -1460,6 +1461,8 @@ export const api = {
     `${getApiBase()}/api/v1/training/ais/${id}/revisions/${revision}/export/file`,
 
   getRuntimeHistory: () => request<RuntimeHistory>('/api/v1/diagnostics/runtime'),
+  /** What a problem report sends, scrubbed (#588). */
+  getReport: () => request<DiagnosticsReport>('/api/v1/diagnostics/report'),
   getFirstAnswers: (days = 7) => request<FirstAnswers>(`/api/v1/diagnostics/first-answers?days=${days}`),
   /** Each computer's live CPU, memory, and GPU figures, this one first (#317). */
   getLiveFigures: () => request<LiveFigures[]>('/api/v1/performance/live'),

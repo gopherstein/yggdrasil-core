@@ -16,6 +16,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { AutomationsIntro, IdeaGallery } from './Intro'
 import type { IdeaId } from './ideas'
 import { WebhookLink } from './WebhookLink'
+import { ReportProblem } from '@/components/ui/ReportProblem'
 import { matchesSearch } from '@/lib/search'
 
 const screenshotSentence =
@@ -372,7 +373,12 @@ function Detail({
             <p className="text-ink-muted">{detail.notification.mode === 'none' ? t('detail.storedHere') : t('detail.onThisComputer')}</p>
           </div>
         </div>
-        {detail.last_error && <p className="mt-3 text-sm text-danger">{detail.last_error}</p>}
+        {detail.last_error && (
+          <p className="mt-3 text-sm text-danger">
+            {detail.last_error}
+            <ReportProblem error={detail.last_error} className="ms-2 text-xs text-ink-faint underline hover:text-ink" />
+          </p>
+        )}
       </div>
       <div className="flex flex-wrap gap-2">
         <button type="button" className="btn-primary btn-sm" disabled={running} onClick={onRun}>
@@ -388,7 +394,12 @@ function Detail({
           {t('detail.delete')}
         </button>
       </div>
-      {runError && <p className="text-sm text-danger">{runError}</p>}
+      {runError && (
+        <p className="text-sm text-danger">
+          {runError}
+          <ReportProblem error={runError} className="ms-2 text-xs text-ink-faint underline hover:text-ink" />
+        </p>
+      )}
       <div>
         <h3 className="label-caps">{t('detail.history')}</h3>
         {history.length === 0 ? (
@@ -445,7 +456,12 @@ function HistoryRow({
       <p className="mt-1 text-xs text-ink-faint">{runTiming(run, zone)}</p>
       {prose && <p className="mt-2 whitespace-pre-wrap text-sm text-ink-muted">{prose}</p>}
       {notice.detail && <p className="mt-1 text-sm text-ink-muted">{notice.detail}</p>}
-      {run.error && <p className="mt-2 text-sm text-danger">{run.error}</p>}
+      {run.error && (
+        <p className="mt-2 text-sm text-danger">
+          {run.error}
+          <ReportProblem error={run.error} className="ms-2 text-xs text-ink-faint underline hover:text-ink" />
+        </p>
+      )}
       {run.saved_file ? (
         <p className="mt-1 break-all text-xs text-ink-faint">{t('run.savedTo', { path: run.saved_file })}</p>
       ) : null}
