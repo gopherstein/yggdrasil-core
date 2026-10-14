@@ -615,6 +615,7 @@ func New(opts Options) (*App, error) {
 		ModelUploadPath:       a.Models.UploadPath,
 		AdoptModelUpload:      a.Models.AdoptUpload,
 		FindModelsInOtherApps: a.Models.FindOtherApps,
+		PreviewModelURL:       a.Models.PreviewURL,
 		UpdateAddedModel:      a.Models.UpdateAdded,
 		SetModelProjector:     a.Models.SetProjector,
 		ListRunningModels:     a.listRunningAll,
@@ -703,6 +704,8 @@ func New(opts Options) (*App, error) {
 	a.HF = hfclient.New()
 	// A model installed from Hugging Face gets its checksum and, for a
 	// vision model, its projector from the repository (#191).
+	// A download's preview says how much space is left (#611).
+	modelMgr.FreeDisk = hardware.FreeDisk
 	modelMgr.Resolve = func(ctx context.Context, sourceURL string) (models.ModelFile, *models.ModelFile, error) {
 		repo, err := a.HF.Resolve(ctx, sourceURL)
 		if err != nil {

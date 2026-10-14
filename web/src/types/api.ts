@@ -450,6 +450,22 @@ export interface ModelImportResult {
 }
 
 /** A model another local AI app keeps on this computer (#467). */
+/** What a download from a link would bring, before it starts (#611). */
+export interface ModelURLPreview {
+  model_id: string
+  filename: string
+  /** From the repository; missing when it didn't say. */
+  size_bytes?: number
+  projector_bytes?: number
+  /** Space left where models are kept; missing when unknown. */
+  free_bytes?: number
+  /** Already a model here, as installed_as. */
+  installed?: boolean
+  installed_as?: string
+  /** The same file in other apps, to use where it is. */
+  elsewhere?: FoundModel[]
+}
+
 export interface FoundModel {
   app: 'lmstudio' | 'ollama' | 'llamacpp' | 'gpt4all' | string
   path: string

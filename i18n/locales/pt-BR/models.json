@@ -352,7 +352,20 @@
     "link": {
       "description": "Um link direto para um arquivo .gguf. Um link do Hugging Face é conferido com o checksum do arquivo, e o suporte a imagens de um modelo de visão vem junto.",
       "url": "Link",
-      "name": "Nome (opcional)"
+      "name": "Nome (opcional)",
+      "check": "Verificar o link",
+      "checking": "Verificando…",
+      "installed": "Este modelo já está aqui, como {{id}}.",
+      "haveIt": "Você já tem este arquivo no {{app}} ({{size}}). Use-o onde está: sem download e sem espaço extra.",
+      "useCopy": "Usar onde está",
+      "downloadSize": "Um download direto de {{host}}: {{size}}, salvo neste computador. O Toskar não cobra por ele.",
+      "downloadSizeVision": "Um download direto de {{host}}: {{size}} com suporte a imagens, salvo neste computador. O Toskar não cobra por ele.",
+      "downloadUnknown": "Um download direto de {{host}}, salvo neste computador. O site não informou o tamanho. O Toskar não cobra por ele.",
+      "free": "{{free}} livres neste computador.",
+      "noRoom": "Não há espaço suficiente: são necessários {{size}} e há {{free}} livres.",
+      "downloadAnyway": "Baixar uma cópia mesmo assim",
+      "download": "Baixar {{size}}",
+      "downloadPlain": "Baixar"
     },
     "check": {
       "prompt": "Confira se ele carrega e responde.",

@@ -345,7 +345,20 @@
     "link": {
       "description": "A direct link to a .gguf file. A Hugging Face link is checked against the file's checksum, and a vision model's image support comes with it.",
       "url": "Link",
-      "name": "Name (optional)"
+      "name": "Name (optional)",
+      "check": "Check the link",
+      "checking": "Checking…",
+      "installed": "This model is already here, as {{id}}.",
+      "haveIt": "You already have this file in {{app}} ({{size}}). Use it where it is: no download and no extra space.",
+      "useCopy": "Use it where it is",
+      "downloadSize": "A direct download from {{host}}: {{size}}, saved on this computer. Toskar doesn't charge for it.",
+      "downloadSizeVision": "A direct download from {{host}}: {{size}} with image support, saved on this computer. Toskar doesn't charge for it.",
+      "downloadUnknown": "A direct download from {{host}}, saved on this computer. The site didn't say how big it is. Toskar doesn't charge for it.",
+      "free": "{{free}} free on this computer.",
+      "noRoom": "Not enough space: it needs {{size}}, and {{free}} is free.",
+      "downloadAnyway": "Download a copy anyway",
+      "download": "Download {{size}}",
+      "downloadPlain": "Download"
     },
     "check": {
       "prompt": "Check that it loads and answers.",

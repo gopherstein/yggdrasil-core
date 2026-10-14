@@ -338,7 +338,20 @@
     "link": {
       "description": "指向 .gguf 檔案的直接連結。Hugging Face 連結會以檔案檢查碼核對，視覺模型的圖片支援也會一併加入。",
       "url": "連結",
-      "name": "名稱（選填）"
+      "name": "名稱（選填）",
+      "check": "檢查連結",
+      "checking": "正在檢查…",
+      "installed": "此模型已在這裡，名稱為 {{id}}。",
+      "haveIt": "你已在 {{app}} 中有這個檔案（{{size}}）。直接就地使用：無需下載，也不占用額外空間。",
+      "useCopy": "就地使用",
+      "downloadSize": "從 {{host}} 直接下載：{{size}}，儲存在這台電腦上。Toskar 不收取費用。",
+      "downloadSizeVision": "從 {{host}} 直接下載：含圖片支援共 {{size}}，儲存在這台電腦上。Toskar 不收取費用。",
+      "downloadUnknown": "從 {{host}} 直接下載，儲存在這台電腦上。網站沒有說明檔案大小。Toskar 不收取費用。",
+      "free": "這台電腦還有 {{free}} 可用空間。",
+      "noRoom": "空間不足：需要 {{size}}，可用空間為 {{free}}。",
+      "downloadAnyway": "仍然下載一份副本",
+      "download": "下載 {{size}}",
+      "downloadPlain": "下載"
     },
     "check": {
       "prompt": "檢查它能否載入並回答。",

@@ -345,7 +345,20 @@
     "link": {
       "description": "Ein direkter Link zu einer .gguf-Datei. Ein Hugging-Face-Link wird mit der Prüfsumme der Datei abgeglichen, und die Bildunterstützung eines Bildmodells kommt mit.",
       "url": "Link",
-      "name": "Name (optional)"
+      "name": "Name (optional)",
+      "check": "Link prüfen",
+      "checking": "Wird geprüft …",
+      "installed": "Dieses Modell ist schon da, als {{id}}.",
+      "haveIt": "Du hast diese Datei schon in {{app}} ({{size}}). Nutze sie dort, wo sie ist: kein Download und kein zusätzlicher Platz.",
+      "useCopy": "Dort nutzen, wo sie ist",
+      "downloadSize": "Ein direkter Download von {{host}}: {{size}}, gespeichert auf diesem Computer. Toskar verlangt nichts dafür.",
+      "downloadSizeVision": "Ein direkter Download von {{host}}: {{size}} mit Bildunterstützung, gespeichert auf diesem Computer. Toskar verlangt nichts dafür.",
+      "downloadUnknown": "Ein direkter Download von {{host}}, gespeichert auf diesem Computer. Die Seite hat nicht gesagt, wie groß er ist. Toskar verlangt nichts dafür.",
+      "free": "{{free}} frei auf diesem Computer.",
+      "noRoom": "Nicht genug Platz: Er braucht {{size}}, und {{free}} sind frei.",
+      "downloadAnyway": "Trotzdem eine Kopie herunterladen",
+      "download": "{{size}} herunterladen",
+      "downloadPlain": "Herunterladen"
     },
     "check": {
       "prompt": "Prüfe, ob es lädt und antwortet.",
