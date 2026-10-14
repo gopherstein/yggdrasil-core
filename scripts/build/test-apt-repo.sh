@@ -16,7 +16,9 @@ IMAGE="${APT_TEST_IMAGE:-ubuntu:24.04}"
 work="$(mktemp -d)"
 server=""
 cleanup() {
-  [ -n "$server" ] && kill "$server" 2>/dev/null || true
+  if [ -n "$server" ]; then
+    kill "$server" 2>/dev/null || true
+  fi
   rm -rf "$work"
 }
 trap cleanup EXIT
