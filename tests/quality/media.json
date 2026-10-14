@@ -290,6 +290,122 @@
       "expect": {
         "answer_matches": "(?is)red.*(mov|slid|travel|across|left.*right)|(mov|slid|travel|across).*red"
       }
+    },
+    {
+      "id": "photo_dog",
+      "what": "A photo is seen: the animal in it (#449).",
+      "message": "What animal is this?",
+      "attach": [
+        {
+          "name": "dog.jpg",
+          "make": "file",
+          "content": "fixtures/photos/dog.jpg"
+        }
+      ],
+      "stub": [
+        "It's a dog lying on the grass."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?i)\\b(dog|puppy|heeler|cattle dog)\\b"
+      }
+    },
+    {
+      "id": "photo_dog_breed",
+      "what": "A follow-up about a photo: what breed the dog might be, without attaching it again (#449).",
+      "message": "What animal is this?",
+      "follow_up": "What breed might it be?",
+      "attach": [
+        {
+          "name": "dog.jpg",
+          "make": "file",
+          "content": "fixtures/photos/dog.jpg"
+        }
+      ],
+      "stub": [
+        "It's a dog.",
+        "It looks like an Australian Cattle Dog, also called a Blue Heeler."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?i)cattle dog|heeler"
+      }
+    },
+    {
+      "id": "photo_cat",
+      "what": "A photo is seen: the animal in it (#449).",
+      "message": "What animal is in this photo?",
+      "attach": [
+        {
+          "name": "cat.jpg",
+          "make": "file",
+          "content": "fixtures/photos/cat.jpg"
+        }
+      ],
+      "stub": [
+        "A gray cat."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?i)\\b(cat|kitten)\\b"
+      }
+    },
+    {
+      "id": "photo_sunflower",
+      "what": "A photo is seen: the flower in it (#449).",
+      "message": "What flower is this?",
+      "attach": [
+        {
+          "name": "sunflower.jpg",
+          "make": "file",
+          "content": "fixtures/photos/sunflower.jpg"
+        }
+      ],
+      "stub": [
+        "It's a sunflower, with a bumblebee on it."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?i)sunflower"
+      }
+    },
+    {
+      "id": "photo_coffee",
+      "what": "A photo is seen: what's in the cup (#449).",
+      "message": "What's in the cup?",
+      "attach": [
+        {
+          "name": "coffee.jpg",
+          "make": "file",
+          "content": "fixtures/photos/coffee.jpg"
+        }
+      ],
+      "stub": [
+        "Black coffee, with coffee beans around the cup."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?i)coffee"
+      }
+    },
+    {
+      "id": "photo_apples_count",
+      "what": "A photo is seen in detail: how many apples, and their color (#449).",
+      "message": "How many apples are in this photo, and what color are they?",
+      "attach": [
+        {
+          "name": "apple.jpg",
+          "make": "file",
+          "content": "fixtures/photos/apple.jpg"
+        }
+      ],
+      "stub": [
+        "There are three red apples."
+      ],
+      "expect": {
+        "image_sent": true,
+        "answer_matches": "(?is)(three|\\b3\\b).*red|red.*(three|\\b3\\b)"
+      }
     }
   ]
 }
