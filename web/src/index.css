@@ -222,6 +222,12 @@
     @apply inline-flex items-center justify-center rounded-lg bg-raised/80 px-4 py-2.5 text-sm font-semibold text-ink transition duration-150 hover:bg-raised disabled:cursor-not-allowed disabled:opacity-50;
   }
 
+  /* A header button that opens a panel, while that panel is open (aria-pressed). */
+  .btn-secondary[aria-pressed='true'] {
+    @apply bg-primary/15 text-primary hover:bg-primary/20;
+    box-shadow: inset 0 0 0 1px rgb(var(--rgb-primary) / 0.45);
+  }
+
   .btn-danger {
     @apply inline-flex items-center justify-center rounded-lg bg-danger/10 px-4 py-2.5 text-sm font-semibold text-danger transition duration-150 hover:bg-danger/20 disabled:cursor-not-allowed disabled:opacity-50;
   }

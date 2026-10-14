@@ -18,6 +18,8 @@ vi.mock('@/lib/api', async () => {
       getModels: vi.fn(),
       revokeNode: vi.fn(),
       getSettings: vi.fn(),
+      getDevicePairing: vi.fn(),
+      listJoinTokens: vi.fn(),
     },
   }
 })
@@ -44,6 +46,8 @@ describe('NodesPage', () => {
     vi.mocked(api.getModels).mockResolvedValue([])
     vi.mocked(api.getSettings).mockResolvedValue({} as never)
     vi.mocked(api.revokeNode).mockResolvedValue(null as never)
+    vi.mocked(api.getDevicePairing).mockResolvedValue(null as never)
+    vi.mocked(api.listJoinTokens).mockResolvedValue([] as never)
   })
   afterEach(() => vi.restoreAllMocks())
 
@@ -72,5 +76,39 @@ describe('NodesPage', () => {
     fireEvent.click(more)
     fireEvent.click(screen.getByRole('menuitem', { name: 'Remove from team' }))
     await waitFor(() => expect(api.revokeNode).toHaveBeenCalledWith('studio'))
+  })
+
+  it('highlights the header button for the open panel, one panel at a time', async () => {
+    renderPage()
+    await screen.findByRole('heading', { name: 'Studio' })
+    const join = screen.getByRole('button', { name: 'Add by command' })
+    const phone = screen.getByRole('button', { name: 'Connect a device' })
+    const find = screen.getByRole('button', { name: 'Find computers' })
+
+    // No panel open: Find computers is the one primary action.
+    expect(join).toHaveAttribute('aria-pressed', 'false')
+    expect(phone).toHaveAttribute('aria-pressed', 'false')
+    expect(find).toHaveClass('btn-primary')
+
+    fireEvent.click(phone)
+    expect(phone).toHaveAttribute('aria-pressed', 'true')
+    expect(phone).toHaveAttribute('aria-controls', 'computers-panel')
+    expect(join).toHaveAttribute('aria-pressed', 'false')
+    expect(find).toHaveClass('btn-secondary')
+    expect(find).not.toHaveClass('btn-primary')
+    expect(screen.getByRole('heading', { name: 'Connect a device' })).toBeInTheDocument()
+
+    // Picking the other panel moves the highlight and closes the first.
+    fireEvent.click(join)
+    expect(join).toHaveAttribute('aria-pressed', 'true')
+    expect(phone).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.queryByRole('heading', { name: 'Connect a device' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Add a computer by command' })).toBeInTheDocument()
+
+    // Clicking the open one again closes it and Find computers is primary again.
+    fireEvent.click(join)
+    expect(join).toHaveAttribute('aria-pressed', 'false')
+    expect(join).not.toHaveAttribute('aria-controls')
+    expect(find).toHaveClass('btn-primary')
   })
 })
