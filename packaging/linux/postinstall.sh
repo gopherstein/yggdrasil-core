@@ -16,6 +16,11 @@ if command -v systemctl >/dev/null 2>&1; then
   systemctl enable toskar.service || true
   systemctl restart toskar.service || true
 fi
+# An apt source added with [trusted=yes] moves to the signed form, once the
+# package ships the repository's key (#599).
+if [ -x /usr/lib/toskar/apt-signed-source.sh ]; then
+  /usr/lib/toskar/apt-signed-source.sh || true
+fi
 # Another Toskar running outside the service, such as a copy started by
 # hand, keeps its own data and connects to the relay as a second computer,
 # and can hold the port the service needs (#602). Say so; never stop it.

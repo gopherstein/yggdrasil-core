@@ -26,6 +26,10 @@ The API defaults to `7331` and Bifrost to `7332`. Stop the other process, or cha
 
 Remove API keys, tokens, personal data, private URLs, and credentials before you paste a log into an issue.
 
+## apt-get install toskar doesn't run
+
+If `sudo apt-get update && sudo apt-get install toskar` stops after the update, look for a line starting with `E:` that names another repository, such as a PPA with no build for your Ubuntu release (`does not have a Release file`). apt stops when any repository fails, so the install never runs. Remove or fix that repository's file in `/etc/apt/sources.list.d/`, then run both commands again.
+
 ## A model will not start
 
 - The file must be a GGUF. `POST /api/v1/models/install-from-url` rejects other URLs.

@@ -46,6 +46,15 @@ build_binaries() {
   cp cmd/devctl/completions/* "$dest/completions/"
 }
 
+# The apt repository's public key, armored in the repository and binary in
+# the package (#599). Empty until the repository has one.
+KEYRING=""
+if [ -f packaging/linux/toskar-archive-keyring.asc ]; then
+  mkdir -p dist
+  KEYRING="${ROOT}/dist/toskar-archive-keyring.gpg"
+  gpg --batch --yes --dearmor -o "$KEYRING" packaging/linux/toskar-archive-keyring.asc
+fi
+
 package_linux() {
   local goarch="$1" debarch="$2" rpmarch="$3"
   local stage="dist/stage-${debarch}"
@@ -115,6 +124,23 @@ contents:
     packager: rpm
   - src: ${ROOT}/packaging/linux/toskar.service
     dst: /usr/lib/systemd/system/toskar.service
+  # Moves an apt source added with [trusted=yes] to the signed form (#599).
+  - src: ${ROOT}/packaging/linux/apt-signed-source.sh
+    dst: /usr/lib/toskar/apt-signed-source.sh
+    packager: deb
+    file_info:
+      mode: 0755
+EOF
+    # The apt repository's public key, once it has one (#599): apt checks
+    # the repository against it, and the package keeps it current.
+    if [ -n "$KEYRING" ]; then
+      cat >> "$cfg" <<EOF
+  - src: ${KEYRING}
+    dst: /usr/share/keyrings/toskar-archive-keyring.gpg
+    packager: deb
+EOF
+    fi
+    cat >> "$cfg" <<EOF
 scripts:
   postinstall: ${ROOT}/packaging/linux/postinstall.sh
   preremove: ${ROOT}/packaging/linux/preremove.sh
