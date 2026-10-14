@@ -1,4 +1,5 @@
 import type {
+  ModelURLPreview,
   FirstAnswers,
   RuntimeHistory,
   AIProfile,
@@ -792,6 +793,13 @@ export const api = {
 
   /** Models other local AI apps already downloaded on this computer (#467). */
   findModelsInOtherApps: () => request<{ models: FoundModel[] }>('/api/v1/models/import/found'),
+
+  /** What a download from a link would bring, without downloading it (#611). */
+  previewModelURL: (sourceURL: string) =>
+    request<ModelURLPreview>('/api/v1/models/install-from-url/preview', {
+      method: 'POST',
+      body: JSON.stringify({ source_url: sourceURL }),
+    }),
 
   startModel: (id: string, nodeId?: string) =>
     request<RunningModelView>(`/api/v1/models/${id}/start`, {

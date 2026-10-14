@@ -29,6 +29,9 @@ type Manager struct {
 	// the model file's size and SHA-256, and a vision model's projector, or
 	// nil (#191). An error leaves the install as it was asked for.
 	Resolve func(ctx context.Context, sourceURL string) (ModelFile, *ModelFile, error)
+	// FreeDisk is the space left on a folder's volume, for a download's
+	// preview (#611); nil leaves it unknown.
+	FreeDisk func(path string) (uint64, error)
 	// Home is the folder FindOtherApps looks in; empty is the user's.
 	Home string
 

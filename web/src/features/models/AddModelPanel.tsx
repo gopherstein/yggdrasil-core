@@ -4,6 +4,7 @@ import { useRef, useState, type DragEvent } from 'react'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import { api, uploadModel } from '@/lib/api'
 import { formatBytes } from '@/lib/format'
+import { formatSize } from '@/i18n/format'
 import { rovingKeyDown } from '@/lib/roving'
 import type { BenchmarkJob, FoundModel, ModelImportResult } from '@/types/api'
 
@@ -24,7 +25,15 @@ function errorText(error: unknown, fallback: string): string {
  */
 export function AddModelPanel({ onClose, onAdded }: { onClose: () => void; onAdded: (modelId: string) => void }) {
   const { t } = useTranslation('models')
-  const [way, setWay] = useState<Way>('file')
+  // Models other apps already have come first when there are any (#611):
+  // they take no download and no extra space.
+  const found = useQuery({ queryKey: ['models-found'], queryFn: () => api.findModelsInOtherApps(), retry: false })
+  // While the scan runs, its own "Looking for models…" shows, so nothing
+  // jumps away from a field someone is typing in.
+  const appsFirst = found.isPending || (found.data?.models ?? []).some((m) => !m.model_id)
+  const [chosen, setWay] = useState<Way | null>(null)
+  const way: Way = chosen ?? (appsFirst ? 'apps' : 'file')
+  const ways: Way[] = appsFirst ? ['apps', 'file', 'link'] : ['file', 'apps', 'link']
   const [done, setDone] = useState<string | null>(null)
   // The model just added: its name, and a vision projector to offer.
   const [lastAdded, setLastAdded] = useState<{ id: string; name: string; projector?: string } | null>(null)
@@ -52,7 +61,7 @@ export function AddModelPanel({ onClose, onAdded }: { onClose: () => void; onAdd
       </div>
 
       <div role="tablist" aria-label={t('add.title')} className="segmented" onKeyDown={rovingKeyDown}>
-        {(['file', 'apps', 'link'] as const).map((id) => (
+        {ways.map((id) => (
           <button
             key={id}
             type="button"
@@ -410,20 +419,45 @@ function FromApps({ onAdded }: { onAdded: (r: ModelImportResult | null, name?: s
   )
 }
 
-function FromLink({ onAdded }: { onAdded: (r: ModelImportResult | null, name?: string) => void }) {
+/**
+ * A model from a link (#611): first what it would download, then the
+ * download. It says the size, the space left, and that it's a free
+ * download saved on this computer, and offers a copy another app already
+ * has, used where it is, before downloading a second one.
+ */
+function FromLink({ onAdded }: { onAdded: (r: ModelImportResult | null, name?: string, projector?: string) => void }) {
   const { t } = useTranslation('models')
   const [url, setUrl] = useState('')
   const [name, setName] = useState('')
+  const preview = useMutation({ mutationFn: () => api.previewModelURL(url.trim()) })
   const install = useMutation({
     mutationFn: () => api.installModelFromURL({ source_url: url.trim(), display_name: name.trim() || undefined }),
     onSuccess: (r) => r && onAdded({ model_id: r.model_id, status: 'copying', details: {} }, name.trim() || undefined),
   })
+  const useCopy = useMutation({
+    mutationFn: (m: FoundModel) => api.importModelPath({ path: m.path, in_place: true, display_name: name.trim() || m.name }),
+    onSuccess: (r, m) => onAdded(r, name.trim() || m.name, m.projector),
+  })
+  const p = preview.data
+  // In the units the repository and the file browser show (decimal), so
+  // the size matches what the person sees on the download page.
+  const size = (n: number) => formatSize(n, { base: 1000 })
+  const total = (p?.size_bytes ?? 0) + (p?.projector_bytes ?? 0)
+  const tooBig = Boolean(p?.free_bytes && total > p.free_bytes)
+  const copy = p?.elsewhere?.[0]
+  const host = (() => {
+    try {
+      return new URL(url.trim()).host
+    } catch {
+      return ''
+    }
+  })()
   return (
     <form
-      className="space-y-2"
+      className="space-y-3"
       onSubmit={(e) => {
         e.preventDefault()
-        if (url.trim()) install.mutate()
+        if (url.trim()) preview.mutate()
       }}
     >
       <p className="text-sm text-ink-muted">{t('add.link.description')}</p>
@@ -434,7 +468,10 @@ function FromLink({ onAdded }: { onAdded: (r: ModelImportResult | null, name?: s
           type="url"
           value={url}
           placeholder="https://huggingface.co/…/resolve/main/model-Q4_K_M.gguf"
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={(e) => {
+            setUrl(e.target.value)
+            preview.reset()
+          }}
           spellCheck={false}
         />
       </label>
@@ -442,10 +479,59 @@ function FromLink({ onAdded }: { onAdded: (r: ModelImportResult | null, name?: s
         {t('add.link.name')}
         <input className="field mt-1 w-full" value={name} onChange={(e) => setName(e.target.value)} />
       </label>
-      <button type="submit" className="btn-secondary btn-sm" disabled={!url.trim() || install.isPending}>
-        {install.isPending ? t('add.adding') : t('add.add')}
-      </button>
+      {!p ? (
+        <button type="submit" className="btn-secondary btn-sm" disabled={!url.trim() || preview.isPending}>
+          {preview.isPending ? t('add.link.checking') : t('add.link.check')}
+        </button>
+      ) : (
+        <div className="space-y-3 rounded-xl border border-line p-3">
+          {p.installed ? <p className="text-sm text-ink">{t('add.link.installed', { id: p.installed_as })}</p> : null}
+          {copy ? (
+            <div className="space-y-2 rounded-lg bg-primary-soft/40 p-3">
+              <p className="text-sm text-ink">
+                {t('add.link.haveIt', { app: APP_NAMES[copy.app] ?? copy.app, size: size(copy.size_bytes) })}
+              </p>
+              <p className="truncate text-xs text-ink-muted" title={copy.path}>
+                {copy.path}
+              </p>
+              <button type="button" className="btn-primary btn-sm" disabled={useCopy.isPending} onClick={() => useCopy.mutate(copy)}>
+                {useCopy.isPending ? t('add.adding') : t('add.link.useCopy')}
+              </button>
+            </div>
+          ) : null}
+          <p className="text-sm text-ink-muted">
+            {total > 0
+              ? t(p.projector_bytes ? 'add.link.downloadSizeVision' : 'add.link.downloadSize', {
+                  size: size(total),
+                  host,
+                })
+              : t('add.link.downloadUnknown', { host })}
+            {p.free_bytes ? ` ${t('add.link.free', { free: size(p.free_bytes) })}` : ''}
+          </p>
+          {tooBig ? (
+            <p className="text-sm text-danger" role="alert">
+              {t('add.link.noRoom', { size: size(total), free: size(p.free_bytes ?? 0) })}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            className={copy || p.installed ? 'btn-secondary btn-sm' : 'btn-primary btn-sm'}
+            disabled={tooBig || install.isPending}
+            onClick={() => install.mutate()}
+          >
+            {install.isPending
+              ? t('add.adding')
+              : copy || p.installed
+                ? t('add.link.downloadAnyway')
+                : total > 0
+                  ? t('add.link.download', { size: size(total) })
+                  : t('add.link.downloadPlain')}
+          </button>
+        </div>
+      )}
+      {preview.isError ? <p className="text-sm text-danger">{errorText(preview.error, t('add.failed'))}</p> : null}
       {install.isError ? <p className="text-sm text-danger">{errorText(install.error, t('add.failed'))}</p> : null}
+      {useCopy.isError ? <p className="text-sm text-danger">{errorText(useCopy.error, t('add.failed'))}</p> : null}
     </form>
   )
 }

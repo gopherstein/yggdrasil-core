@@ -66,6 +66,9 @@ type Dependencies struct {
 	// FindModelsInOtherApps lists models LM Studio, Ollama, llama.cpp, and
 	// GPT4All keep on this computer.
 	FindModelsInOtherApps func(ctx context.Context) []models.FoundModel
+	// PreviewModelURL says what a download from a link would bring, before
+	// it starts (#611).
+	PreviewModelURL func(ctx context.Context, sourceURL string) (models.URLPreview, error)
 	// UpdateAddedModel renames or retags a model added from a file or a
 	// link; SetModelProjector gives it a vision projector (#467).
 	UpdateAddedModel  func(ctx context.Context, id string, displayName *string, tags []string) (models.CatalogEntry, error)
@@ -300,6 +303,7 @@ func (s *Server) routes() {
 	api.HandleFunc("/models/running", s.handleListRunningModels).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/models/warm", s.handleWarmModel).Methods(http.MethodPost, http.MethodOptions)
 	api.HandleFunc("/models/install-from-url", s.handleInstallFromURL).Methods(http.MethodPost)
+	api.HandleFunc("/models/install-from-url/preview", s.handlePreviewFromURL).Methods(http.MethodPost)
 	api.HandleFunc("/models/import", s.handleImportModel).Methods(http.MethodPost)
 	api.HandleFunc("/models/import/found", s.handleFoundModels).Methods(http.MethodGet, http.MethodOptions)
 	api.HandleFunc("/models/{id}/install", s.handleInstallModel).Methods(http.MethodPost)

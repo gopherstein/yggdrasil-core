@@ -100,6 +100,27 @@ func (s *Server) handleInstallFromURL(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{"status": "started", "model_id": id})
 }
 
+// handlePreviewFromURL answers what installing from a link would download,
+// without downloading it (#611): the size, the free space, and a copy of
+// the same file another app already has.
+func (s *Server) handlePreviewFromURL(w http.ResponseWriter, r *http.Request) {
+	if s.deps.PreviewModelURL == nil {
+		writeErr(w, http.StatusNotImplemented, "NOT_IMPLEMENTED", "Previewing a download isn't available.", nil)
+		return
+	}
+	var req contracts.InstallFromURLRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeErr(w, http.StatusBadRequest, "INVALID_JSON", "invalid body", nil)
+		return
+	}
+	p, err := s.deps.PreviewModelURL(r.Context(), req.SourceURL)
+	if err != nil {
+		writeErrFrom(w, http.StatusBadRequest, "INSTALL_FAILED", err)
+		return
+	}
+	writeJSON(w, http.StatusOK, p)
+}
+
 func (s *Server) handleInstallModel(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	if s.deps.InstallModel == nil {

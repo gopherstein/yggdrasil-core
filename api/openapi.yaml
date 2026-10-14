@@ -2580,6 +2580,59 @@ paths:
                         projector:
                           type: string
                           description: Its vision projector, when the app keeps one with it
+  /api/v1/models/install-from-url/preview:
+    post:
+      summary: What a download from a URL would bring, without downloading it
+      description: >-
+        The file and its size (and its vision projector's) from the repository, the free space where models are kept,
+        whether it's already a model here, and copies of the same file other apps have (by name, Ollama's SHA-256 blob,
+        or a large file's exact size), which can be added where they are instead (#611).
+      operationId: previewModelFromURL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InstallFromURLRequest"
+      responses:
+        "200":
+          description: The preview
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  model_id:
+                    type: string
+                  filename:
+                    type: string
+                  size_bytes:
+                    type: integer
+                  projector_bytes:
+                    type: integer
+                  free_bytes:
+                    type: integer
+                  installed:
+                    type: boolean
+                  installed_as:
+                    type: string
+                  elsewhere:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        app:
+                          type: string
+                        path:
+                          type: string
+                        name:
+                          type: string
+                        size_bytes:
+                          type: integer
+                        projector:
+                          type: string
+        "400":
+          description: Not a GGUF URL
   /api/v1/models/install-from-url:
     post:
       summary: Download a GGUF from a URL
