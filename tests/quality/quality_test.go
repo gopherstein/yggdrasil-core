@@ -17,6 +17,7 @@ package quality
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -82,6 +83,10 @@ type Setup struct {
 	// Deliberate is the profile's orchestration.deliberate (#459), for
 	// measuring a mode; empty leaves the profile's own.
 	Deliberate string `json:"deliberate"`
+	// NoVision runs the case with no model that can see pictures (#449):
+	// the stub gets no seeing stand-in, and a daemon with a vision model
+	// installed skips the case.
+	NoVision bool `json:"no_vision"`
 }
 
 // Expect is the behavior a case checks. Empty fields are not checked.
@@ -131,6 +136,10 @@ type Expect struct {
 	// ImageSent requires an attached picture to reach the model with the
 	// message (stub only: the request it got is checked).
 	ImageSent bool `json:"image_sent"`
+	// CantSee requires a picture sent with no model that can see it to be
+	// answered honestly (#449): an offer to set up a model that sees, or
+	// the notice that the answer didn't look at it.
+	CantSee bool `json:"cant_see"`
 	// TopicHeld is whether the profile's topic controls held the message
 	// or replaced its answer with the set reply (#345), by the run trace.
 	TopicHeld *bool `json:"topic_held"`
@@ -195,6 +204,33 @@ func minPass(driver string) float64 {
 	return 0.9
 }
 
+// cantSeeNotice is the notice an answer gets when no model could see its
+// pictures (chat:notices.noVision, in English).
+var cantSeeNotice = regexp.MustCompile(`(?i)no installed model can see pictures`)
+
+// seesPictures reports a daemon with a model installed that can see, where
+// a case about having none can't run (#449). The stub has none until a case
+// installs one.
+func seesPictures(t *testing.T, d Driver) bool {
+	real, ok := d.(realDriver)
+	if !ok {
+		return false
+	}
+	var list []struct {
+		Installed    bool `json:"installed"`
+		Capabilities struct {
+			Vision bool `json:"vision"`
+		} `json:"capabilities"`
+	}
+	real.do(t, http.MethodGet, "/api/v1/models", nil, &list)
+	for _, m := range list {
+		if m.Installed && m.Capabilities.Vision {
+			return true
+		}
+	}
+	return false
+}
+
 func TestQualitySet(t *testing.T) {
 	d, build := qualityDriver(t)
 	file := loadCases(t)
@@ -208,6 +244,10 @@ func TestQualitySet(t *testing.T) {
 		// stops with that reason instead of failing every case left.
 		if stopped(t, d, c) {
 			break
+		}
+		if c.Setup.NoVision && seesPictures(t, d) {
+			t.Logf("%s: skipped, since a model that sees is installed", c.ID)
+			continue
 		}
 		if row, ok := runCase(t, d, c, deflection); ok {
 			report = append(report, row)
@@ -431,6 +471,13 @@ func check(driver string, c Case, r Result, deflection *regexp.Regexp) []string 
 	}
 	if x.Verified && !r.has("verify.done") && (r.Run == nil || r.Run.VerificationPasses == 0) {
 		fail("answer was not checked")
+	}
+	if x.CantSee {
+		offered := r.Meta != nil && r.Meta.Setup != nil && r.Meta.Setup.Ability == "vision"
+		noticed := r.Meta != nil && cantSeeNotice.MatchString(r.Meta.Notice)
+		if !offered && !noticed {
+			fail("a picture no model can see got neither an offer to set one up nor the notice; answer %q", r.Answer)
+		}
 	}
 	if x.NoticeMatches != "" && (r.Meta == nil || !regexp.MustCompile(x.NoticeMatches).MatchString(r.Meta.Notice)) {
 		fail("notice = %q", metaNotice(r))

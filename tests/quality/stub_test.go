@@ -106,7 +106,7 @@ func (d stubDriver) Run(t *testing.T, c Case) Result {
 	// A picture attached needs a model that sees: the stub, with a
 	// projector, so the picture is sent with the message (#510).
 	for _, f := range c.Attach {
-		if imagegen.IsEditable(f.Name) {
+		if imagegen.IsEditable(f.Name) && !c.Setup.NoVision {
 			installSeeingStub(t, ctx, a)
 			break
 		}

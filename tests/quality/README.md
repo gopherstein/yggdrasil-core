@@ -123,6 +123,12 @@ attaches a file kept in the repository, such as the clip in `fixtures/`,
 which `fixtures/make-fixtures.sh` draws with ffmpeg. `follow_up` is a
 second message in the same chat with nothing attached; the case checks its
 answer, and `image_sent` checks the picture still reached the model then.
+`setup.no_vision` runs a case with no model that can see pictures: the stub
+gets no seeing stand-in, and a daemon with a vision model installed skips
+it. Its `cant_see` checks the picture was answered honestly, with an offer
+to set up a model that sees or the notice that the answer didn't look at
+it (`picture_without_a_model_that_sees` in `cases.json`, which the CPU run
+on Llama 3.2 1B covers).
 The report counts the cases about what the model sees, the ones that check
 `image_sent` or show a video, in a **Sees: N of M** line.
 `real_only` cases need tools the stub has no stand-in for, and `recording`
