@@ -130,4 +130,24 @@ describe('RemoteAccessCard (#456)', () => {
     expect(screen.getByText("This computer's route on the relay: bk2a5ci2")).toBeInTheDocument()
     expect(screen.getByText(/so this is the latest result/)).toHaveClass('text-ink-muted')
   })
+
+  it('says how the router opened the port, or why it could not, quietly when the relay works (#602)', async () => {
+    vi.mocked(api.getSettings).mockResolvedValue({ remote_access_enabled: true, remote_access_port: 7333 } as never)
+    vi.mocked(api.getRemoteAccess).mockResolvedValue({
+      enabled: true,
+      port: 7333,
+      listening: '[::]:7333',
+      port_mapping: true,
+      map_reason: 'port_taken',
+      relay: { name: 'relay.toskar.ai:4443', state: 'connected' },
+      check: { at: new Date().toISOString(), relay: { ok: true, ms: 90 }, direct: [] },
+    })
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <RemoteAccessCard />
+      </QueryClientProvider>,
+    )
+    const line = await screen.findByText(/Port 7333 is already forwarded to another device on your router/)
+    expect(line).toHaveClass('text-ink-muted')
+  })
 })

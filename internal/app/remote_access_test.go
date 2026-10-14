@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/netip"
@@ -244,5 +245,34 @@ func TestSetRelayToken(t *testing.T) {
 	// An organization's relay gives each device its own way in.
 	if got := a.relayToken(); got != "" {
 		t.Fatalf("with the organization's relay, devices get %q", got)
+	}
+}
+
+// Why the router's port doesn't reach the internet, in a word (#602).
+func TestMapReason(t *testing.T) {
+	on := config.Config{RemoteAccess: config.RemoteAccess{Enabled: true}}
+	noMapping := on
+	noMapping.RemoteAccess.NoPortMapping = true
+	upnp := func(addr string) portmap.Mapping {
+		return portmap.Mapping{Method: portmap.MethodUPnP, External: netip.MustParseAddrPort(addr)}
+	}
+	for name, c := range map[string]struct {
+		cfg  config.Config
+		m    portmap.Mapping
+		err  error
+		want string
+	}{
+		"opened":       {on, upnp("203.0.113.9:7333"), nil, ""},
+		"still asking": {on, portmap.Mapping{}, nil, ""},
+		"off":          {noMapping, portmap.Mapping{}, nil, "off"},
+		"double NAT":   {on, upnp("192.168.0.4:7333"), nil, "double_nat"},
+		"carrier NAT":  {on, upnp("100.70.1.2:7333"), nil, "carrier_nat"},
+		"refused":      {on, portmap.Mapping{}, fmt.Errorf("pcp: %w", portmap.ErrRefused), "refused"},
+		"taken":        {on, portmap.Mapping{}, fmt.Errorf("upnp: %w", portmap.ErrPortTaken), "port_taken"},
+		"no answer":    {on, portmap.Mapping{}, errors.New("upnp: no router answered"), "no_answer"},
+	} {
+		if got := mapReason(c.cfg, c.m, c.err); got != c.want {
+			t.Errorf("%s: %q, want %q", name, got, c.want)
+		}
 	}
 }

@@ -68,6 +68,7 @@ func (a *App) remoteReach() api.RemoteReach {
 	if err != nil {
 		out.MapError = err.Error()
 	}
+	out.MapReason = mapReason(cfg, m, err)
 	listening := a.API != nil && a.API.RemoteListening().Listening != ""
 	relayed := false
 	if name, st := a.relayStatus(); st != nil {
@@ -102,6 +103,22 @@ func reachOf(cfg config.Config, listening bool, m portmap.Mapping, ipv6, relayed
 		return "none", "carrier_nat"
 	}
 	return "none", "no_port"
+}
+
+// mapReason is why the router's port doesn't reach the internet, in a
+// word for Settings (#602), or "" when it does or the answer isn't in yet.
+func mapReason(cfg config.Config, m portmap.Mapping, err error) string {
+	switch {
+	case !mapsPort(cfg):
+		return "off"
+	case m.Method != "" && portmap.DoubleNAT(m.External.Addr()):
+		return "double_nat"
+	case m.Method != "" && portmap.CarrierNAT(m.External.Addr()):
+		return "carrier_nat"
+	case m.Method != "":
+		return ""
+	}
+	return portmap.Why(err)
 }
 
 // Errors from the remote access settings.

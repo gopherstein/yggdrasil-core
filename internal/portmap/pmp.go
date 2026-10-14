@@ -21,6 +21,10 @@ const pmpPort = 5351
 // errUnsupportedVersion is a router that doesn't speak the version asked.
 var errUnsupportedVersion = errors.New("unsupported version")
 
+// pcpCannotProvideExternal is PCP's answer when the outside port asked for
+// is taken (RFC 6887 §7.4).
+const pcpCannotProvideExternal = 11
+
 // exchange sends req to the router and returns the first answer, trying
 // again after 250 ms, 500 ms, and 1 s, as both RFCs suggest.
 func exchange(ctx context.Context, gw netip.AddrPort, req []byte) ([]byte, netip.Addr, error) {
@@ -92,7 +96,10 @@ func pcpMap(ctx context.Context, gw netip.AddrPort, internal, external uint16, l
 		if code == 1 {
 			return Mapping{}, errUnsupportedVersion
 		}
-		return Mapping{}, fmt.Errorf("pcp: the router refused (result %d)", code)
+		if code == pcpCannotProvideExternal {
+			return Mapping{}, fmt.Errorf("pcp: %w (result %d)", ErrPortTaken, code)
+		}
+		return Mapping{}, fmt.Errorf("pcp: %w (result %d)", ErrRefused, code)
 	}
 	if [12]byte(resp[24:36]) != nonce {
 		return Mapping{}, fmt.Errorf("pcp: an answer to another request")
@@ -123,7 +130,7 @@ func natpmpMap(ctx context.Context, gw netip.AddrPort, internal, external uint16
 		return Mapping{}, fmt.Errorf("nat-pmp: unexpected answer")
 	}
 	if code := binary.BigEndian.Uint16(resp[2:4]); code != 0 {
-		return Mapping{}, fmt.Errorf("nat-pmp: the router refused (result %d)", code)
+		return Mapping{}, fmt.Errorf("nat-pmp: %w (result %d)", ErrRefused, code)
 	}
 	m := Mapping{
 		Method:       MethodNATPMP,

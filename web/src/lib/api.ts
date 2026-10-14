@@ -609,6 +609,8 @@ export const api = {
       mapped?: string
       mapped_by?: 'pcp' | 'nat-pmp' | 'upnp'
       map_error?: string
+      /** Why the router's port doesn't reach the internet (#602); missing when it does or while still asking. */
+      map_reason?: 'off' | 'no_gateway' | 'no_answer' | 'refused' | 'port_taken' | 'double_nat' | 'carrier_nat'
       ipv6?: string[]
       reachable?: 'direct' | 'ipv6' | 'manual' | 'relay' | 'none'
       reason?: 'off' | 'not_listening' | 'carrier_nat' | 'no_port'

@@ -252,6 +252,9 @@ func (s *Server) handleRemoteAccess(w http.ResponseWriter, r *http.Request) {
 		if reach.MapError != "" {
 			out["map_error"] = reach.MapError
 		}
+		if reach.MapReason != "" {
+			out["map_reason"] = reach.MapReason
+		}
 		if len(reach.IPv6) > 0 {
 			out["ipv6"] = reach.IPv6
 		}
@@ -292,7 +295,12 @@ type RemoteReach struct {
 	// was opened: pcp, nat-pmp, or upnp.
 	Mapped, Method string
 	MapError       string
-	IPv6           []string
+	// MapReason is why the router's port doesn't reach the internet, in a
+	// word (#602): off (not asked), no_gateway, no_answer, refused,
+	// port_taken, or, though a port was opened, double_nat or carrier_nat.
+	// Empty when the port reaches the internet, or while still asking.
+	MapReason string
+	IPv6      []string
 	// Reachable is direct (a router port at a public address), ipv6,
 	// manual (a port forwarded by hand), relay, or none, with Reason: off,
 	// not_listening, carrier_nat, or no_port.
