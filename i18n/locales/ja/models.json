@@ -180,6 +180,7 @@
     "lastUsed": "最終使用：{{when}}",
     "chat": "チャット",
     "start": "開始",
+    "starting": "開始しています…",
     "installElsewhere": "他のコンピュータにインストール",
     "installing": "インストール中…",
     "moreActions": "{{model}}のその他の操作",

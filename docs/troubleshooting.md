@@ -29,7 +29,7 @@ Remove API keys, tokens, personal data, private URLs, and credentials before you
 ## A model will not start
 
 - The file must be a GGUF. `POST /api/v1/models/install-from-url` rejects other URLs.
-- llama.cpp must be installed (Models offers it, or `POST /api/v1/runtimes/llamacpp/install`). Installing needs a network path to GitHub.
+- llama.cpp must be installed. Onboarding installs it, and **Start** sets it up when it's missing, such as for a model added From a link (#610); so does the first chat that needs the model. `POST /api/v1/runtimes/llamacpp/install` does it too. Setting it up needs a network path to GitHub, and a failure says why (`RUNTIME_SETUP_FAILED`). Every start, and how it ended, is in the daemon log (`starting model`, `model started`, or `model did not start` with the error).
 - A model whose `llama-server` exits while loading, for example a damaged file or one that does not fit, fails at once with the reason.
 - On Windows the installer uses the CPU llama.cpp build (`bin-win-cpu-x64`). A GPU listed in hardware detection does not by itself select a GPU build.
 - Out of memory: close other apps or choose a smaller model. While training uses the computer, the error says so, with about how long training has left.

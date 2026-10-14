@@ -182,6 +182,7 @@
     "lastUsed": "Último uso: {{when}}",
     "chat": "Chat",
     "start": "Iniciar",
+    "starting": "Iniciando…",
     "installElsewhere": "Instalar en otras computadoras",
     "installing": "Instalando…",
     "moreActions": "Más acciones para {{model}}",

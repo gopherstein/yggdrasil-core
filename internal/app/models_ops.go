@@ -162,19 +162,35 @@ func (a *App) startModelLocal(ctx context.Context, modelID string) (contracts.Ru
 			Endpoint:    "stub://" + cfg.NodeID,
 		}, nil
 	}
-	path, err := a.Models.Path(ctx, modelID)
-	if err != nil {
+	// Every start is logged, with how it ended (#610).
+	if a.Logger != nil {
+		a.Logger.Info("starting model", "model", modelID)
+	}
+	fail := func(err error) (contracts.RunningModelView, error) {
+		if a.Logger != nil {
+			a.Logger.Warn("model did not start", "model", modelID, "error", err)
+		}
 		return contracts.RunningModelView{}, err
 	}
+	path, err := a.Models.Path(ctx, modelID)
+	if err != nil {
+		return fail(err)
+	}
 	if err := a.waitForMedia(ctx, modelID); err != nil {
-		return contracts.RunningModelView{}, err
+		return fail(err)
+	}
+	if err := a.ensureRuntime(ctx, modelID); err != nil {
+		return fail(err)
 	}
 	running, err := a.Runtimes.StartModel(ctx, "llamacpp", pluginapi.ModelStartConfig{
 		ModelID: modelID, ModelPath: path, Adapters: a.localAdapters(ctx, modelID),
 		Projector: a.Models.ProjectorPath(modelID),
 	})
 	if err != nil {
-		return contracts.RunningModelView{}, err
+		return fail(err)
+	}
+	if a.Logger != nil {
+		a.Logger.Info("model started", "model", modelID, "instance", running.ID)
 	}
 	a.trackRunning(running)
 	a.markModelUsed(modelID)

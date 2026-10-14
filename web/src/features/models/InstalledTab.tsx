@@ -32,6 +32,8 @@ export function InstalledTab({
   onDelete,
   onInstallElsewhere,
   installingId,
+  startingId,
+  startError,
 }: {
   models: Model[]
   running: RunningModelView[]
@@ -49,6 +51,10 @@ export function InstalledTab({
   onDelete: (id: string) => void
   onInstallElsewhere?: (id: string) => void
   installingId?: string | null
+  /** The model starting now, which may first set up llama.cpp (#610). */
+  startingId?: string | null
+  /** Why the last start failed, for its model. */
+  startError?: { id: string; message: string } | null
 }) {
   const { t } = useTranslation('models')
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null)
@@ -146,9 +152,10 @@ export function InstalledTab({
                     <button
                       type="button"
                       className="btn-primary btn-sm"
+                      disabled={startingId === model.id}
                       onClick={() => onStart(model.id)}
                     >
-                      {t('installedTab.start')}
+                      {startingId === model.id ? t('installedTab.starting') : t('installedTab.start')}
                     </button>
                   )
                 )}
@@ -217,6 +224,11 @@ export function InstalledTab({
                 </div>
               </div>
             </div>
+            {startError?.id === model.id ? (
+              <p className="mt-2 text-sm text-danger" role="alert">
+                {startError.message}
+              </p>
+            ) : null}
           </li>
         )
       })}

@@ -22,6 +22,7 @@ type Explained = { key: ErrorKey; actions: ErrorAction[] }
 const byCode: Record<string, Explained> = {
   SERVICE_UNREACHABLE: { key: 'notResponding', actions: ['retry'] },
   RUNTIME_NOT_INSTALLED: { key: 'engineMissing', actions: ['models'] },
+  RUNTIME_SETUP_FAILED: { key: 'engineMissing', actions: ['models'] },
   NO_MODEL_INSTALLED: { key: 'noModel', actions: ['models'] },
   NO_MODEL_ASSIGNED: { key: 'noModel', actions: ['models'] },
   MODEL_NOT_INSTALLED: { key: 'noModel', actions: ['models'] },

@@ -182,6 +182,7 @@
     "lastUsed": "Dernière utilisation {{when}}",
     "chat": "Discuter",
     "start": "Démarrer",
+    "starting": "Démarrage…",
     "installElsewhere": "Installer sur d'autres ordinateurs",
     "installing": "Installation…",
     "moreActions": "Autres actions pour {{model}}",

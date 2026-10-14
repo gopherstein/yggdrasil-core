@@ -185,8 +185,10 @@ type App struct {
 	// deviceUse maps a model id to when another device last used or warmed
 	// it up, so the idle sweeper keeps it loaded (#498); deviceClock is the
 	// time for it, time.Now when nil.
-	deviceUse   sync.Map
-	deviceClock func() time.Time
+	// runtimeSetup lets one llama.cpp setup run at a time (#610).
+	runtimeSetup sync.Mutex
+	deviceUse    sync.Map
+	deviceClock  func() time.Time
 	// instances is where Toskars on this machine announce themselves
 	// (#602); nil announces nothing.
 	instances *instances.Registry
