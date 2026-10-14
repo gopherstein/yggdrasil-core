@@ -265,3 +265,44 @@ func TestIntentionalStopIsNotAFailure(t *testing.T) {
 		t.Fatal("monitor must not stop an intentional unload")
 	}
 }
+
+// Health events say why the process died: its exit code and the end of
+// what it wrote, or the last probe's error (#9).
+func TestHealthEventsCarryStderrAndProbe(t *testing.T) {
+	var mu sync.Mutex
+	var events []Event
+	record := func(e Event) {
+		mu.Lock()
+		events = append(events, e)
+		mu.Unlock()
+	}
+	last := func(kind string) map[string]any {
+		mu.Lock()
+		defer mu.Unlock()
+		for i := len(events) - 1; i >= 0; i-- {
+			if events[i].Type == kind {
+				return events[i].Payload
+			}
+		}
+		return nil
+	}
+
+	exited := testMonitor(&fakeStop{alive: true}, func(context.Context, string) error { return nil })
+	exited.Publish = record
+	exited.Register(inst())
+	exited.ReportProcessExit("run-1", 1, "error: failed to load model '/m/qwen.gguf'")
+	p := last(EventCleanupStarted)
+	if p == nil || p["exit_code"] != 1 || p["stderr_tail"] != "error: failed to load model '/m/qwen.gguf'" || p["reason"] != ReasonProcessExit {
+		t.Fatalf("process exit payload = %v", p)
+	}
+
+	probed := testMonitor(&fakeStop{alive: true}, func(context.Context, string) error { return errors.New("dial tcp 127.0.0.1:9: connection refused") })
+	probed.Publish = record
+	probed.Register(inst())
+	probed.ProbeOnce("run-1")
+	probed.ProbeOnce("run-1")
+	p = last(EventDegraded)
+	if p == nil || p["last_probe"] != "dial tcp 127.0.0.1:9: connection refused" || p["reason"] != ReasonHealthProbeFailed {
+		t.Fatalf("probe payload = %v", p)
+	}
+}

@@ -71,9 +71,18 @@ func (r *Runtime) wantBuilds(ctx context.Context) []string {
 func (r *Runtime) chooseAsset(ctx context.Context) (assetInfo, error) {
 	rels, err := r.releases(ctx)
 	if err != nil {
-		return assetInfo{}, err
+		return assetInfo{}, fmt.Errorf("%w. %s", err, r.byHand())
 	}
-	return pickAsset(rels, r.wantBuilds(ctx))
+	a, err := pickAsset(rels, r.wantBuilds(ctx))
+	if err != nil {
+		return assetInfo{}, fmt.Errorf("%w. %s", err, r.byHand())
+	}
+	return a, nil
+}
+
+// byHand says what to do when llama.cpp can't be installed for you (#64).
+func (r *Runtime) byHand() string {
+	return "Install llama-server by hand and put it in " + r.installDir() + " (docs/runtimes.md)"
 }
 
 // installDir is where Install puts llama-server and its libraries.
@@ -223,11 +232,11 @@ func (r *Runtime) install(ctx context.Context, idleOnly bool) (bool, error) {
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return false, fmt.Errorf("download llama.cpp: %w", err)
+		return false, fmt.Errorf("download llama.cpp %s: %w", asset.Name, err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return false, fmt.Errorf("download failed: HTTP %d", resp.StatusCode)
+		return false, fmt.Errorf("download llama.cpp %s: HTTP %d %s. %s", asset.Name, resp.StatusCode, http.StatusText(resp.StatusCode), r.byHand())
 	}
 	if _, err := io.Copy(tmp, resp.Body); err != nil {
 		_ = tmp.Close()
@@ -310,6 +319,8 @@ func (r *Runtime) Capabilities(ctx context.Context) (pluginapi.RuntimeCapabiliti
 }
 
 type ghRelease struct {
+	// Tag is the release's tag, such as b6500.
+	Tag    string `json:"tag_name"`
 	Assets []struct {
 		Name               string `json:"name"`
 		BrowserDownloadURL string `json:"browser_download_url"`
@@ -323,8 +334,11 @@ type assetInfo struct {
 	Build string
 }
 
+// releasesURL lists llama.cpp's newest releases; tests point it elsewhere.
+var releasesURL = "https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=20"
+
 func githubReleases(ctx context.Context) ([]ghRelease, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://api.github.com/repos/ggml-org/llama.cpp/releases?per_page=20", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, releasesURL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -332,11 +346,16 @@ func githubReleases(ctx context.Context) ([]ghRelease, error) {
 	req.Header.Set("User-Agent", "toskar-daemon")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list llama.cpp releases on GitHub: %w", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("GitHub API HTTP %d", resp.StatusCode)
+		why := ""
+		if resp.StatusCode == http.StatusForbidden || resp.StatusCode == http.StatusTooManyRequests {
+			// GitHub limits how often an address may ask without signing in.
+			why = " (GitHub's rate limit; try again in an hour)"
+		}
+		return nil, fmt.Errorf("list llama.cpp releases on GitHub: HTTP %d %s%s", resp.StatusCode, http.StatusText(resp.StatusCode), why)
 	}
 	var rels []ghRelease
 	if err := json.NewDecoder(resp.Body).Decode(&rels); err != nil {

@@ -26,6 +26,15 @@ The binary is stored under the data directory `runtimes/llamacpp/` unless a macO
 
 On a Mac App Store build, the sandbox cannot `fork` a binary downloaded into the container. Those builds are expected to ship a signed `llama-server` next to the daemon. That packaging is outside this repository.
 
+### Installing llama-server by hand
+
+When the install can't find a build for this computer, or can't reach GitHub, the error says which build it looked for, which releases it checked, and the HTTP status GitHub answered (#64). A `403` or `429` from GitHub is its rate limit for asking without signing in: try again in an hour. Otherwise, install llama-server yourself:
+
+1. Get `llama-server` for this computer: build llama.cpp from source (`cmake -B build && cmake --build build --config Release -t llama-server`), or download the release archive for your system from github.com/ggml-org/llama.cpp/releases.
+2. Put `llama-server` (`llama-server.exe` on Windows) and the libraries that came with it in the data directory's `runtimes/llamacpp/` folder. The error names the exact folder.
+3. On macOS and Linux, make it runnable: `chmod +x runtimes/llamacpp/llama-server`.
+4. Start a model. Toskar finds it there and doesn't download another.
+
 ## Python environments in sandboxed builds
 
 Training (MLX on Apple Silicon, PyTorch on NVIDIA GPUs) and text recognition for scanned PDFs run in Python environments. The daemon normally installs them under `runtimes/python` on first use: it downloads `uv`, a private Python, and pinned packages. A sandboxed app cannot run any of that.
