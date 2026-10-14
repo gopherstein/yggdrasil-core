@@ -171,6 +171,9 @@ func TestDeviceMayReach(t *testing.T) {
 		"PUT /api/v1/privacy":                     false,
 		"POST /api/v1/privacy/delete-runs":        false,
 		"POST /api/v1/knowledge/sources":          true,
+		"GET /api/v1/remote-access":               true,
+		"POST /api/v1/remote-access/check":        true,
+		"PUT /api/v1/remote-access":               false,
 		"DELETE /api/v1/knowledge/sources/{id}":   false,
 	} {
 		method, path, _ := strings.Cut(route, " ")
