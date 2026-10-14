@@ -365,6 +365,27 @@
       "confirm_one": "{{count}} Chat löschen?",
       "confirm_other": "{{count}} Chats löschen?",
       "confirmBody": "Ihre Nachrichten, Anhänge und erzeugten Dateien werden entfernt. Chats auf deinem Computer werden auch dort entfernt."
+    },
+    "setupOffer": {
+      "details": "{{name}} · {{size}} Download · auf {{node}}",
+      "detailsFree": "{{name}} · {{size}} Download · auf {{node}} · {{free}} frei",
+      "theComputer": "dem Computer",
+      "tightMemory": "Der Computer hat weniger Arbeitsspeicher, als ideal wäre, daher kann es langsam sein oder fehlschlagen.",
+      "tightMemoryOn": "{{node}} hat weniger Arbeitsspeicher, als ideal wäre, daher kann es langsam sein oder fehlschlagen.",
+      "slowImage": "Der Computer hat dafür keine GPU-Beschleunigung, daher dauert jedes Bild ein paar Minuten.",
+      "slowImageOn": "{{node}} hat dafür keine GPU-Beschleunigung, daher dauert jedes Bild ein paar Minuten.",
+      "slowVideo": "Der Computer hat dafür keine GPU-Beschleunigung, daher kann ein Clip fast eine Stunde dauern.",
+      "slowVideoOn": "{{node}} hat dafür keine GPU-Beschleunigung, daher kann ein Clip fast eine Stunde dauern.",
+      "install": "Einrichten",
+      "installing": "Wird installiert …",
+      "downloading": "Wird geladen … {{done}} von {{total}}",
+      "progress": "Fortschritt der Einrichtung",
+      "stop": "Stoppen",
+      "ready": "{{label}} ist eingerichtet.",
+      "continue": "Weiter",
+      "continuing": "Eingerichtet. Deine Anfrage wird fertiggestellt …",
+      "askAdmin": "Bitte einen Admin auf {{node}}, das einzurichten.",
+      "downloadFailed": "Der Download wurde nicht abgeschlossen. Tippe auf Einrichten, um es erneut zu versuchen."
     }
   },
   "effort": {

@@ -376,6 +376,27 @@
       "confirm_one": "Delete {{count}} chat?",
       "confirm_other": "Delete {{count}} chats?",
       "confirmBody": "Their messages, attachments, and generated files are removed. Chats on your computer are removed there too."
+    },
+    "setupOffer": {
+      "details": "{{name}} · {{size}} download · on {{node}}",
+      "detailsFree": "{{name}} · {{size}} download · on {{node}} · {{free}} free",
+      "theComputer": "the computer",
+      "tightMemory": "The computer has less memory than it's comfortable with, so it may be slow or fail.",
+      "tightMemoryOn": "{{node}} has less memory than it's comfortable with, so it may be slow or fail.",
+      "slowImage": "The computer has no GPU acceleration for it, so each picture takes a few minutes.",
+      "slowImageOn": "{{node}} has no GPU acceleration for it, so each picture takes a few minutes.",
+      "slowVideo": "The computer has no GPU acceleration for it, so a clip can take most of an hour.",
+      "slowVideoOn": "{{node}} has no GPU acceleration for it, so a clip can take most of an hour.",
+      "install": "Set up",
+      "installing": "Installing…",
+      "downloading": "Downloading… {{done}} of {{total}}",
+      "progress": "Setup progress",
+      "stop": "Stop",
+      "ready": "{{label}} is set up.",
+      "continue": "Continue",
+      "continuing": "Set up. Finishing your request…",
+      "askAdmin": "Ask an Admin on {{node}} to set this up.",
+      "downloadFailed": "The download didn't finish. Tap Set up to try again."
     }
   },
   "effort": {
