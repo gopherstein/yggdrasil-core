@@ -41,7 +41,11 @@ type Case struct {
 	// Attach are files sent with the message (#510).
 	Attach  []Attachment `json:"attach"`
 	Message string       `json:"message"`
-	Stub    []string     `json:"stub"`
+	// FollowUp is a second message in the same chat, sent after the answer
+	// to Message, with nothing attached; the case checks its answer, as
+	// "what breed might it be?" checks a picture stays in context (#449).
+	FollowUp string   `json:"follow_up"`
+	Stub     []string `json:"stub"`
 	// StubQuery is what the stub writes when asked for a follow-up's web
 	// search; without it, the message itself.
 	StubQuery string `json:"stub_query"`

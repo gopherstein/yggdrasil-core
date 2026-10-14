@@ -286,6 +286,10 @@ func (d realDriver) Run(t *testing.T, c Case) Result {
 	ctx, cancel := context.WithCancel(context.Background())
 	events := d.watch(t, ctx, conv.ID)
 	chat(c.Message, attached...)
+	// A follow-up in the same chat, with nothing attached (#449).
+	if c.FollowUp != "" {
+		chat(c.FollowUp)
+	}
 	r := Result{Events: events()}
 	cancel()
 
