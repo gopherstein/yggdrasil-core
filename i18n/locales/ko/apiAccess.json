@@ -163,6 +163,11 @@
       "tryAnotherPort": "다른 포트 시도",
       "useRelayOnly": "릴레이만 사용"
     },
+    "copyDetails": {
+      "label": "보고용 세부 정보 복사",
+      "copied": "복사됨",
+      "failed": "복사하지 못했습니다"
+    },
     "reach": {
       "direct": "{{address}}에서 어디서나 접속할 수 있어요. 공유기가 포트를 열었어요({{method}}).",
       "ipv6": "공유기가 허용하면 IPv6 [{{address}}]:{{port}}에서 어디서나 접속할 수 있어요.",

@@ -5,7 +5,7 @@ import { api } from '@/lib/api'
 import { RemoteAccessCard } from './RemoteAccessCard'
 
 vi.mock('@/lib/api', () => ({
-  api: { getSettings: vi.fn(), getRemoteAccess: vi.fn(), updateSettings: vi.fn(), checkRemoteAccess: vi.fn() },
+  api: { getSettings: vi.fn(), getRemoteAccess: vi.fn(), updateSettings: vi.fn(), checkRemoteAccess: vi.fn(), getVersion: vi.fn() },
 }))
 
 describe('RemoteAccessCard (#456)', () => {
@@ -178,5 +178,33 @@ describe('RemoteAccessCard (#456)', () => {
     )
     expect(await screen.findByText(/Using the relay only/)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Use the relay only' })).not.toBeInTheDocument()
+  })
+
+  it('copies the details for a report, without internet addresses (#602)', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.assign(navigator, { clipboard: { writeText } })
+    vi.mocked(api.getVersion).mockResolvedValue({ version: '1.8.3' } as never)
+    vi.mocked(api.getSettings).mockResolvedValue({ remote_access_enabled: true, remote_access_port: 7333 } as never)
+    vi.mocked(api.getRemoteAccess).mockResolvedValue({
+      enabled: true,
+      port: 7333,
+      listening: '[::]:7333',
+      mapped: '198.51.100.9:7333',
+      mapped_by: 'upnp',
+      relay: { name: 'relay.toskar.ai:4443', state: 'connected', route: 'bk2a5ci2' },
+      check: { at: new Date().toISOString(), relay: { ok: true, ms: 90 }, direct: [] },
+    })
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <RemoteAccessCard />
+      </QueryClientProvider>,
+    )
+    await waitFor(() => expect(api.getVersion).toHaveBeenCalled())
+    fireEvent.click(await screen.findByRole('button', { name: 'Copy details for a report' }))
+    expect(await screen.findByRole('button', { name: 'Copied' })).toBeInTheDocument()
+    const text = writeText.mock.calls[0][0] as string
+    expect(text).toContain('Version: 1.8.3')
+    expect(text).toContain('<public IPv4>:7333')
+    expect(text).not.toContain('198.51.100.9')
   })
 })

@@ -163,6 +163,11 @@
       "tryAnotherPort": "別のポートを試す",
       "useRelayOnly": "リレーのみを使う"
     },
+    "copyDetails": {
+      "label": "報告用に詳細をコピー",
+      "copied": "コピーしました",
+      "failed": "コピーできませんでした"
+    },
     "reach": {
       "direct": "{{address}} でどこからでも接続できます。ルーターがポートを開きました（{{method}}）。",
       "ipv6": "ルーターが許可していれば、IPv6 の [{{address}}]:{{port}} でどこからでも接続できます。",

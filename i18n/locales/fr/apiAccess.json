@@ -163,6 +163,11 @@
       "tryAnotherPort": "Essayer un autre port",
       "useRelayOnly": "Utiliser seulement le relais"
     },
+    "copyDetails": {
+      "label": "Copier les détails pour un signalement",
+      "copied": "Copié",
+      "failed": "Copie impossible"
+    },
     "reach": {
       "direct": "Joignable de partout à {{address}}. Votre box a ouvert le port ({{method}}).",
       "ipv6": "Joignable de partout en IPv6 à [{{address}}]:{{port}}, si votre box le laisse passer.",

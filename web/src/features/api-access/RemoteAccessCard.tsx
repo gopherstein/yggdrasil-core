@@ -5,6 +5,7 @@ import i18n from '@/i18n'
 import { api, type ReachCheck, type ReachWay } from '@/lib/api'
 import { formatRelativeTime } from '@/i18n/format'
 import { Toggle } from './Toggle'
+import { remoteDetails } from './remoteDetails'
 
 /**
  * Access from anywhere (#456, docs/remote-access.md): a listener for the
@@ -280,9 +281,10 @@ function OutsideCheck({ status, saving, onSave }: { status: Status; saving: bool
       )}
       {status.relay && status.relay.state !== 'connected' ? <ToskarRelayLine relay={status.relay} /> : null}
       {result?.at ? <RouterLine status={status} quiet={onlyRelay} saving={saving} onSave={onSave} /> : null}
-      {status.relay?.route ? (
-        <p className="text-xs text-ink-faint">{t('remote.check.route', { route: status.relay.route })}</p>
-      ) : null}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {status.relay?.route ? <p className="text-xs text-ink-faint">{t('remote.check.route', { route: status.relay.route })}</p> : <span />}
+        <CopyDetails status={status} />
+      </div>
       <CheckProblem result={result} failed={check.error} />
       {result?.at && !reachable ? <p className="text-xs text-ink-muted">{t('remote.check.nextSteps')}</p> : null}
       {onlyRelay && (result?.direct ?? []).length > 0 ? <p className="text-xs text-ink-muted">{t('remote.check.directOptional')}</p> : null}
@@ -347,6 +349,36 @@ function RouterLine({
         </div>
       ) : null}
     </div>
+  )
+}
+
+/**
+ * Copies what access from anywhere is doing, as text for a bug report or a
+ * support question (#602): no tokens or secrets, and internet addresses
+ * replaced by their kind.
+ */
+function CopyDetails({ status }: { status: Status }) {
+  const { t } = useTranslation('apiAccess')
+  const version = useQuery({ queryKey: ['version'], queryFn: () => api.getVersion(), staleTime: Infinity })
+  const [copied, setCopied] = useState<'idle' | 'copied' | 'failed'>('idle')
+  useEffect(() => {
+    if (copied === 'idle') return
+    const id = window.setTimeout(() => setCopied('idle'), 2500)
+    return () => window.clearTimeout(id)
+  }, [copied])
+  return (
+    <button
+      type="button"
+      className="text-xs text-ink-muted underline hover:text-ink"
+      onClick={() =>
+        void navigator.clipboard.writeText(remoteDetails(status, version.data?.version)).then(
+          () => setCopied('copied'),
+          () => setCopied('failed'),
+        )
+      }
+    >
+      {copied === 'copied' ? t('remote.copyDetails.copied') : copied === 'failed' ? t('remote.copyDetails.failed') : t('remote.copyDetails.label')}
+    </button>
   )
 }
 

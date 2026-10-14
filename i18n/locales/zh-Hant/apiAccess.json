@@ -163,6 +163,11 @@
       "tryAnotherPort": "嘗試其他連接埠",
       "useRelayOnly": "僅使用中繼"
     },
+    "copyDetails": {
+      "label": "複製詳細資訊以便回報",
+      "copied": "已複製",
+      "failed": "無法複製"
+    },
     "reach": {
       "direct": "可在 {{address}} 隨處存取。路由器已開啟連接埠（{{method}}）。",
       "ipv6": "如果路由器允許，可透過 IPv6 在 [{{address}}]:{{port}} 隨處存取。",
