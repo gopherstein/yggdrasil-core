@@ -1,0 +1,58 @@
+name: Sign the apt repository
+
+# Signs the apt repository as it stands, without a release (#599): the
+# index is rebuilt from the packages already on the apt branch, signed with
+# the repository's key, tested in a fresh Ubuntu the way people add it, and
+# published. A release does the same for new packages; this is for when the
+# repository needs signing between releases, such as the first time, or
+# after the key changes.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apt-publish
+  cancel-in-progress: false
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y dpkg-dev apt-utils
+      - name: Rebuild and sign the index from the published packages
+        env:
+          APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+          APT_SIGNING_PASSPHRASE: ${{ secrets.APT_SIGNING_PASSPHRASE }}
+          APT_REQUIRE_SIGNING: "1"
+        run: |
+          set -euo pipefail
+          git fetch --depth 1 origin apt
+          mkdir -p "$RUNNER_TEMP/published"
+          git archive origin/apt | tar -x -C "$RUNNER_TEMP/published"
+          ls "$RUNNER_TEMP/published/pool/main"
+          APT_DEBS="$RUNNER_TEMP/published/pool/main" ./scripts/build/apt-index.sh dist/apt
+      - name: Test the apt repository
+        run: ./scripts/build/test-apt-repo.sh dist/apt
+      - name: Publish the apt repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          remote="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          workdir="$(mktemp -d)"
+          git clone --branch apt --single-branch "$remote" "$workdir"
+          git -C "$workdir" rm -rf --quiet .
+          cp -a dist/apt/. "$workdir/"
+          git -C "$workdir" config user.name 'github-actions[bot]'
+          git -C "$workdir" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git -C "$workdir" add dists pool toskar.asc
+          git -C "$workdir" commit -m "Sign the apt repository."
+          git -C "$workdir" push origin HEAD:apt
