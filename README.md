@@ -94,15 +94,17 @@ A tagged release writes `Formula/toskar.rb` and merges it to `main`. An install 
 
 ### Linux
 
-Debian and Ubuntu use the apt repository on the `apt` branch. That repository is unsigned.
+Debian and Ubuntu use the apt repository on the `apt` branch. It's signed, and apt checks every update against its key (fingerprint `7124 28C8 E821 E64C D418 32F5 2D28 4623 90D0 C604`).
 
 ```bash
-echo "deb [trusted=yes] https://raw.githubusercontent.com/yeixio/toskar-core/apt stable main" | sudo tee /etc/apt/sources.list.d/yggdrasil.list
+sudo install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://toskar.ai/apt/toskar.asc | sudo tee /etc/apt/keyrings/toskar.asc > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/toskar.asc] https://raw.githubusercontent.com/yeixio/toskar-core/apt stable main" | sudo tee /etc/apt/sources.list.d/toskar.list
 sudo apt-get update
 sudo apt-get install toskar
 ```
 
-The package installs `toskar`, `toskarctl`, the web UI, and `toskar.service`, which also answers to `yggdrasil.service`. An install from before the rename moves to the `toskar` package with `sudo apt-get upgrade`. RPM packages for x86_64 and aarch64 are on the GitHub Release. Install one with `sudo rpm -i` or `sudo dnf install`. Details are in [packaging/linux/README.md](packaging/linux/README.md).
+Added before 1.8.3 with `[trusted=yes]`, which turns off apt's signature check? Upgrading moves it to the signed form for you; or delete `/etc/apt/sources.list.d/yggdrasil.list` and run the commands above. The package installs `toskar`, `toskarctl`, the web UI, and `toskar.service`, which also answers to `yggdrasil.service`. An install from before the rename moves to the `toskar` package with `sudo apt-get upgrade`. RPM packages for x86_64 and aarch64 are on the GitHub Release. Install one with `sudo rpm -i` or `sudo dnf install`. Details are in [packaging/linux/README.md](packaging/linux/README.md).
 
 ### Windows
 
