@@ -163,6 +163,11 @@
       "tryAnotherPort": "Prova un’altra porta",
       "useRelayOnly": "Usa solo il relay"
     },
+    "copyDetails": {
+      "label": "Copia i dettagli per una segnalazione",
+      "copied": "Copiato",
+      "failed": "Impossibile copiare"
+    },
     "reach": {
       "direct": "Raggiungibile ovunque su {{address}}. Il router ha aperto la porta ({{method}}).",
       "ipv6": "Raggiungibile ovunque via IPv6 su [{{address}}]:{{port}}, se il router lo consente.",
