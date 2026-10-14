@@ -120,7 +120,15 @@ func pickAsset(rels []ghRelease, builds []string) (assetInfo, error) {
 			}
 		}
 	}
-	return assetInfo{}, fmt.Errorf("no release asset for %s found; install llama-server manually", strings.Join(builds, " or "))
+	// Which builds were looked for, and in which releases (#64).
+	checked := "no releases"
+	switch n := len(rels); {
+	case n == 1:
+		checked = "release " + rels[0].Tag
+	case n > 1:
+		checked = fmt.Sprintf("the %d newest releases, %s to %s", n, rels[n-1].Tag, rels[0].Tag)
+	}
+	return assetInfo{}, fmt.Errorf("no llama.cpp build for this computer (looked for %s in %s)", strings.Join(builds, " or "), checked)
 }
 
 // vulkanProbe decides whether llama.cpp's Vulkan build would use a GPU here.

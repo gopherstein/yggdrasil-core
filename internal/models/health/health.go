@@ -699,6 +699,14 @@ func (m *Monitor) payloadLocked(t *tracked, reason string) map[string]any {
 	if t.exitCode != nil {
 		payload["exit_code"] = *t.exitCode
 	}
+	// Why it died, for a diagnostics subscriber (#9): the end of what the
+	// process wrote, and the last health probe's error.
+	if t.stderrTail != "" {
+		payload["stderr_tail"] = clip(t.stderrTail, 800)
+	}
+	if t.lastProbeErr != "" {
+		payload["last_probe"] = t.lastProbeErr
+	}
 	return payload
 }
 
