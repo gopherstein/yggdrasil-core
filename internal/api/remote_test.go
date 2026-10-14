@@ -376,8 +376,9 @@ func TestRemoteCheck(t *testing.T) {
 	if status, out := call(); status != http.StatusConflict || out["error"].(map[string]any)["code"] != "REMOTE_ACCESS_OFF" {
 		t.Fatalf("off: %d %v", status, out)
 	}
-	// Admins only: it isn't a Member's or a device's to run.
-	if auth.DeviceMayReach(http.MethodPost, "/api/v1/remote-access/check") {
-		t.Fatal("a device may run the check")
+	// Admins only, from the web or an Admin's phone (#546): a device key
+	// may ask, and its person's role still has to be Admin.
+	if !auth.DeviceMayReach(http.MethodPost, "/api/v1/remote-access/check") || auth.RoleNeeded(http.MethodPost, "/api/v1/remote-access/check") != auth.RoleAdmin {
+		t.Fatal("the check is for Admins, from any of their devices")
 	}
 }
