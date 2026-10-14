@@ -149,5 +149,34 @@ describe('RemoteAccessCard (#456)', () => {
     )
     const line = await screen.findByText(/Port 7333 is already forwarded to another device on your router/)
     expect(line).toHaveClass('text-ink-muted')
+    // One action a reason: another port, or the relay alone, since it works.
+    vi.mocked(api.updateSettings).mockResolvedValue({} as never)
+    fireEvent.click(screen.getByRole('button', { name: 'Try another port' }))
+    await waitFor(() => expect(api.updateSettings).toHaveBeenCalled())
+    const port = (vi.mocked(api.updateSettings).mock.calls.at(-1)?.[0] as { remote_access_port: number }).remote_access_port
+    expect(port).toBeGreaterThanOrEqual(20000)
+    expect(port).toBeLessThan(40000)
+    fireEvent.click(screen.getByRole('button', { name: 'Use the relay only' }))
+    await waitFor(() => expect(api.updateSettings).toHaveBeenLastCalledWith({ remote_access_port_mapping: false }))
+  })
+
+  it('says the relay alone is in use when port opening is off and the relay works', async () => {
+    vi.mocked(api.getSettings).mockResolvedValue({ remote_access_enabled: true, remote_access_port: 7333, remote_access_port_mapping: false } as never)
+    vi.mocked(api.getRemoteAccess).mockResolvedValue({
+      enabled: true,
+      port: 7333,
+      listening: '[::]:7333',
+      port_mapping: false,
+      map_reason: 'off',
+      relay: { name: 'relay.toskar.ai:4443', state: 'connected' },
+      check: { at: new Date().toISOString(), relay: { ok: true, ms: 90 }, direct: [] },
+    })
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <RemoteAccessCard />
+      </QueryClientProvider>,
+    )
+    expect(await screen.findByText(/Using the relay only/)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Use the relay only' })).not.toBeInTheDocument()
   })
 })
