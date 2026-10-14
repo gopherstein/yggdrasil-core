@@ -1646,6 +1646,28 @@
         ],
         "answer_lacks": "(?i)let me check"
       }
+    },
+    {
+      "id": "picture_without_a_model_that_sees",
+      "what": "A picture sent with no model that can see it is answered honestly: an offer to set one up, or a notice that the answer didn't look at it, never a made-up description (#449).",
+      "setup": {
+        "no_vision": true
+      },
+      "message": "What animal is in this photo?",
+      "attach": [
+        {
+          "name": "dog.jpg",
+          "make": "file",
+          "content": "fixtures/photos/dog.jpg"
+        }
+      ],
+      "stub": [
+        "I can't see pictures, so I can't tell what animal it is."
+      ],
+      "expect": {
+        "cant_see": true,
+        "answer_lacks": "(?i)heeler|cattle dog"
+      }
     }
   ]
 }
