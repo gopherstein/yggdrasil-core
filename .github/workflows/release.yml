@@ -81,12 +81,22 @@ jobs:
       - name: Build packages
         env:
           VERSION: ${{ github.ref_name }}
+          # The apt repository is signed (#599); a stable release, which
+          # publishes it, fails without the key rather than going unsigned.
+          APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
+          APT_SIGNING_PASSPHRASE: ${{ secrets.APT_SIGNING_PASSPHRASE }}
+          APT_REQUIRE_SIGNING: ${{ !contains(github.ref_name, '-') && '1' || '' }}
         run: |
           VERSION="${VERSION#v}"
-          chmod +x scripts/build/package-core-release.sh scripts/build/write-brew-formula.sh scripts/build/apt-index.sh
+          chmod +x scripts/build/package-core-release.sh scripts/build/write-brew-formula.sh scripts/build/apt-index.sh scripts/build/test-apt-repo.sh
           VERSION="$VERSION" ./scripts/build/package-core-release.sh
           VERSION="$VERSION" ./scripts/build/write-brew-formula.sh
           ./scripts/build/apt-index.sh
+      # A fresh Ubuntu adds the signed repository the documented way and
+      # installs toskar from it, before anything is published (#599).
+      - name: Test the apt repository
+        if: ${{ !contains(github.ref_name, '-') }}
+        run: ./scripts/build/test-apt-repo.sh dist/apt
       - name: Write the release body
         env:
           PRERELEASE: ${{ contains(github.ref_name, '-') }}
@@ -179,7 +189,7 @@ jobs:
           cp -a dist/apt/. "$workdir/"
           git -C "$workdir" config user.name 'github-actions[bot]'
           git -C "$workdir" config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git -C "$workdir" add dists pool
+          git -C "$workdir" add dists pool toskar.asc
           git -C "$workdir" commit -m "Update the apt repository."
           git -C "$workdir" push origin HEAD:apt
       - name: Publish versioned documentation

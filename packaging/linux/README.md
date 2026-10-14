@@ -20,4 +20,8 @@ The package was called `yggdrasil` before the rename. Each release also publishe
 
 Open `http://127.0.0.1:7331` after the service starts.
 
+**Signing (#599).** A release signs the apt repository (`InRelease`, `Release.gpg`) when the `APT_SIGNING_KEY` and `APT_SIGNING_PASSPHRASE` secrets are set, and publishes the public key beside it as `toskar.asc`. A stable release fails without them, so the repository is never published unsigned by mistake. Once `packaging/linux/toskar-archive-keyring.asc` is in the repository, the deb also ships the key as `/usr/share/keyrings/toskar-archive-keyring.gpg`, and installing or upgrading it moves an apt source added with `[trusted=yes]` to the signed form (`/usr/lib/toskar/apt-signed-source.sh`). CI installs from a signed repository in a fresh Ubuntu container (`scripts/build/test-apt-repo.sh`), and the release runs the same test on what it's about to publish.
+
+**When `apt-get update` fails.** If another repository on the computer is broken, such as a PPA with no build for a new Ubuntu release, `apt-get update` exits with an error and `&& apt-get install toskar` never runs. The error names that repository (`E: The repository '…' does not have a Release file`). Remove or fix its file in `/etc/apt/sources.list.d/`, then run the commands again.
+
 Build the packages locally with `VERSION=1.1.0 ./scripts/build/package-core-release.sh`. That also writes the macOS archives used by the Homebrew formula.
