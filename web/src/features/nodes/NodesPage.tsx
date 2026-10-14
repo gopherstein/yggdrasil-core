@@ -372,10 +372,13 @@ export function NodesPage() {
   const [pairingSession, setPairingSession] = useState<PairingSession | null>(null)
   const [claimCodes, setClaimCodes] = useState<Record<string, string>>({})
   const [removingKey, setRemovingKey] = useState<string | null>(null)
-  const [joinOpen, setJoinOpen] = useState(false)
-  // ?connect=phone opens Connect a device, as API Access links it.
+  // The header's Add by command and Connect a device pick one panel at a
+  // time; ?connect=phone opens Connect a device, as API Access links it.
   const [searchParams] = useSearchParams()
-  const [phoneOpen, setPhoneOpen] = useState(() => searchParams.get('connect') === 'phone')
+  const [panel, setPanel] = useState<'join' | 'phone' | null>(() =>
+    searchParams.get('connect') === 'phone' ? 'phone' : null,
+  )
+  const togglePanel = (next: 'join' | 'phone') => setPanel((cur) => (cur === next ? null : next))
 
   const nodesQuery = useQuery({
     queryKey: ['nodes'],
@@ -560,15 +563,29 @@ export function NodesPage() {
               {showIntro ? t('page.hideHowItWorks') : t('page.howItWorks')}
             </button>
           )}
-          <button type="button" className="btn-secondary" aria-expanded={joinOpen} onClick={() => setJoinOpen((v) => !v)}>
+          <button
+            type="button"
+            className="btn-secondary"
+            aria-pressed={panel === 'join'}
+            aria-controls={panel === 'join' ? 'computers-panel' : undefined}
+            onClick={() => togglePanel('join')}
+          >
             {t('join.open')}
-          </button>
-          <button type="button" className="btn-secondary" aria-expanded={phoneOpen} onClick={() => setPhoneOpen((v) => !v)}>
-            {t('phone.open')}
           </button>
           <button
             type="button"
-            className="btn-primary"
+            className="btn-secondary"
+            aria-pressed={panel === 'phone'}
+            aria-controls={panel === 'phone' ? 'computers-panel' : undefined}
+            onClick={() => togglePanel('phone')}
+          >
+            {t('phone.open')}
+          </button>
+          {/* The one primary action while no panel is open; with one open,
+              that panel's button is the highlighted one. */}
+          <button
+            type="button"
+            className={panel ? 'btn-secondary' : 'btn-primary'}
             disabled={refreshMutation.isPending}
             onClick={() => refreshMutation.mutate()}
           >
@@ -619,8 +636,11 @@ export function NodesPage() {
         />
       ) : null}
 
-      {joinOpen ? <JoinByCommand onClose={() => setJoinOpen(false)} /> : null}
-      {phoneOpen ? <ConnectPhone onClose={() => setPhoneOpen(false)} /> : null}
+      {panel ? (
+        <div id="computers-panel">
+          {panel === 'join' ? <JoinByCommand onClose={() => setPanel(null)} /> : <ConnectPhone onClose={() => setPanel(null)} />}
+        </div>
+      ) : null}
 
       {actionError && (
         <div className="rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">
