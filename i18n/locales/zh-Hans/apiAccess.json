@@ -168,6 +168,11 @@
       "copied": "已复制",
       "failed": "无法复制"
     },
+    "others": {
+      "one": "这台电脑上还在运行另一个 Toskar：{{name}}，版本 {{version}}，端口 {{port}}，数据位于 {{folder}}（进程 {{pid}}）。",
+      "oneRemote": "这台电脑上还在运行另一个 Toskar，它也开启了随处访问：{{name}}，版本 {{version}}，端口 {{port}}，数据位于 {{folder}}（进程 {{pid}}）。两者会作为不同的电脑连接到中继。",
+      "advice": "每个副本都有自己的聊天、模型和设备。如果你并不想同时运行两个，请停止另一个，例如在已安装服务运行时手动启动的副本。"
+    },
     "reach": {
       "direct": "可在 {{address}} 随处访问。路由器已打开端口（{{method}}）。",
       "ipv6": "如果路由器允许，可通过 IPv6 在 [{{address}}]:{{port}} 随处访问。",

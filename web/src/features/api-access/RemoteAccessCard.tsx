@@ -57,6 +57,7 @@ export function RemoteAccessCard() {
           onChange={() => save.mutate({ remote_access_enabled: !enabled })}
         />
       </div>
+      {st?.others?.length ? <OtherToskars others={st.others} /> : null}
       {enabled && st ? <OutsideCheck status={st} saving={save.isPending} onSave={(patch) => save.mutate(patch)} /> : null}
       <label className="flex items-center gap-2 text-sm">
         <input
@@ -379,6 +380,25 @@ function CopyDetails({ status }: { status: Status }) {
     >
       {copied === 'copied' ? t('remote.copyDetails.copied') : copied === 'failed' ? t('remote.copyDetails.failed') : t('remote.copyDetails.label')}
     </button>
+  )
+}
+
+/**
+ * Another Toskar running on this computer (#602), such as the apt service
+ * and a copy started by hand. Each has its own data folder, and each
+ * enrolls on the relay under its own route, so it's usually a mistake.
+ */
+function OtherToskars({ others }: { others: NonNullable<Status['others']> }) {
+  const { t } = useTranslation('apiAccess')
+  return (
+    <div className="space-y-1 rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm text-warning" role="status">
+      {others.map((o) => (
+        <p key={o.pid}>
+          {t(o.remote ? 'remote.others.oneRemote' : 'remote.others.one', { name: o.name, port: o.api_port, folder: o.data_dir, version: o.version, pid: o.pid })}
+        </p>
+      ))}
+      <p className="text-xs text-ink-muted">{t('remote.others.advice')}</p>
+    </div>
   )
 }
 

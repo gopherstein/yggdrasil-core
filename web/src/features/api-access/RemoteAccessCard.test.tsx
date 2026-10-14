@@ -180,6 +180,23 @@ describe('RemoteAccessCard (#456)', () => {
     expect(screen.queryByRole('button', { name: 'Use the relay only' })).not.toBeInTheDocument()
   })
 
+  it('warns about another Toskar running on this computer (#602)', async () => {
+    vi.mocked(api.getSettings).mockResolvedValue({ remote_access_enabled: true, remote_access_port: 7333 } as never)
+    vi.mocked(api.getRemoteAccess).mockResolvedValue({
+      enabled: true,
+      port: 7333,
+      listening: '[::]:7333',
+      others: [{ name: 'linix-rig', pid: 4242, api_port: 7341, data_dir: '/home/mike/.local/share/Toskar', version: '1.8.2', remote: true }],
+    })
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <RemoteAccessCard />
+      </QueryClientProvider>,
+    )
+    expect(await screen.findByText(/Another Toskar is running on this computer, with access from anywhere on too: linix-rig, version 1\.8\.2, on port 7341/)).toBeInTheDocument()
+    expect(screen.getByText(/If you didn't mean to run both, stop the other one/)).toBeInTheDocument()
+  })
+
   it('copies the details for a report, without internet addresses (#602)', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
     Object.assign(navigator, { clipboard: { writeText } })

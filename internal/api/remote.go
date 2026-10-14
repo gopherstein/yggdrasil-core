@@ -275,6 +275,9 @@ func (s *Server) handleRemoteAccess(w http.ResponseWriter, r *http.Request) {
 		if reach.Check != nil {
 			out["check"] = reach.Check
 		}
+		if len(reach.Others) > 0 {
+			out["others"] = reach.Others
+		}
 	}
 	st := s.RemoteListening()
 	if st.Listening != "" {
@@ -313,6 +316,20 @@ type RemoteReach struct {
 	Route string
 	// Check is the last outside check (#546), nil before the first.
 	Check *ReachCheck
+	// Others are other Toskars running on this computer (#602): two copies
+	// each enroll on the relay, under their own routes.
+	Others []OtherToskar
+}
+
+// OtherToskar is another Toskar running on this computer.
+type OtherToskar struct {
+	Name    string `json:"name"`
+	PID     int    `json:"pid"`
+	APIPort int    `json:"api_port"`
+	DataDir string `json:"data_dir"`
+	Version string `json:"version"`
+	// Remote is set when it has access from anywhere on too.
+	Remote bool `json:"remote,omitempty"`
 }
 
 // ReachCheck is the relay reaching this computer from the internet (#546):

@@ -36,6 +36,7 @@ import (
 	"github.com/yeixio/toskar-core/internal/gjallarhorn"
 	"github.com/yeixio/toskar-core/internal/hardware"
 	"github.com/yeixio/toskar-core/internal/imagegen"
+	"github.com/yeixio/toskar-core/internal/instances"
 	"github.com/yeixio/toskar-core/internal/inventory"
 	"github.com/yeixio/toskar-core/internal/join"
 	"github.com/yeixio/toskar-core/internal/logs"
@@ -186,6 +187,12 @@ type App struct {
 	// time for it, time.Now when nil.
 	deviceUse   sync.Map
 	deviceClock func() time.Time
+	// instances is where Toskars on this machine announce themselves
+	// (#602); nil announces nothing.
+	instances *instances.Registry
+	// started is when this Toskar first announced itself.
+	started     time.Time
+	startedOnce sync.Once
 	// warming holds the model ids a warm-up is loading now (#498), and
 	// warmWait its loads, so a shutdown or a test can wait for them.
 	warming  sync.Map
@@ -245,6 +252,9 @@ type Options struct {
 	DataDir string
 	WebRoot fs.FS
 	Logger  *slog.Logger
+	// Instances is the folder Toskars on this machine announce themselves
+	// in (#602); nil, as in tests, neither announces nor looks.
+	Instances *instances.Registry
 }
 
 // New constructs and wires the application.
@@ -374,6 +384,7 @@ func New(opts Options) (*App, error) {
 		extRuntime.SetConfig(c)
 	}
 	a := &App{
+		instances:     opts.Instances,
 		People:        people,
 		External:      extRuntime,
 		secrets:       secrets,
@@ -1238,6 +1249,14 @@ func (a *App) Start(ctx context.Context) error {
 		}
 	}()
 
+	// Say this Toskar runs, and notice another on the same machine (#602).
+	a.announce()
+	if others := a.otherInstances(); len(others) > 0 && a.Logger != nil {
+		for _, o := range others {
+			a.Logger.Warn("another Toskar is running on this computer", "pid", o.PID, "name", o.Name, "data_dir", o.DataDir, "api_port", o.API, "version", o.Version)
+		}
+	}
+
 	errCh := make(chan error, 1)
 	a.wg.Add(1)
 	go func() {
@@ -1265,6 +1284,9 @@ func (a *App) Start(ctx context.Context) error {
 func (a *App) Shutdown(ctx context.Context) error {
 	if a.cancel != nil {
 		a.cancel()
+	}
+	if a.instances != nil {
+		a.instances.Withdraw(os.Getpid())
 	}
 	a.discoveryMu.Lock()
 	if a.advertiser != nil {

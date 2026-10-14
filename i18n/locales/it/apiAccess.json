@@ -168,6 +168,11 @@
       "copied": "Copiato",
       "failed": "Impossibile copiare"
     },
+    "others": {
+      "one": "Su questo computer è in esecuzione un altro Toskar: {{name}}, versione {{version}}, sulla porta {{port}}, con i dati in {{folder}} (processo {{pid}}).",
+      "oneRemote": "Su questo computer è in esecuzione un altro Toskar, anch’esso con l’accesso da ovunque attivo: {{name}}, versione {{version}}, sulla porta {{port}}, con i dati in {{folder}} (processo {{pid}}). Entrambi si collegano al relay come computer diversi.",
+      "advice": "Ogni copia ha chat, modelli e dispositivi propri. Se non volevi eseguirle entrambe, ferma l’altra, per esempio una copia avviata a mano mentre è in esecuzione il servizio installato."
+    },
     "reach": {
       "direct": "Raggiungibile ovunque su {{address}}. Il router ha aperto la porta ({{method}}).",
       "ipv6": "Raggiungibile ovunque via IPv6 su [{{address}}]:{{port}}, se il router lo consente.",

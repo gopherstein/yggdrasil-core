@@ -14,6 +14,7 @@ import (
 
 	"github.com/yeixio/toskar-core/internal/app"
 	"github.com/yeixio/toskar-core/internal/config"
+	"github.com/yeixio/toskar-core/internal/instances"
 	"github.com/yeixio/toskar-core/internal/ocr"
 	"github.com/yeixio/toskar-core/internal/pyenv"
 	"github.com/yeixio/toskar-core/internal/training"
@@ -53,7 +54,7 @@ func main() {
 		defer logCloser.Close()
 	}
 
-	application, err := app.New(app.Options{DataDir: *dataDir, Logger: logger})
+	application, err := app.New(app.Options{DataDir: *dataDir, Logger: logger, Instances: instances.Default()})
 	if err != nil {
 		logger.Error("failed to initialize", "error", err)
 		os.Exit(1)

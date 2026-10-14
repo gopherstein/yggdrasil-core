@@ -135,7 +135,7 @@ Start at **API Access → Access from anywhere**. Choose **Check now** for a fre
 - **Is the subscription on that device's app?** Every paired device gets the computer's relay token on its own, but only from a computer that has one. "Ready away from home" in the app says it's set.
 - **Did this computer's certificate change** (a new one set in Settings, or the data folder replaced)? The app refuses a certificate it didn't pair with, by design. Pair the device again with Connect a device.
 
-**The relay's dashboard lists this computer twice.** Toskar before 1.8.3 could, at first start, make two route secrets at once and enroll under both. The stale entry is the one that isn't connected. The relay's operator can **Remove** it, and it drops off by itself after 30 days. A second Toskar running on the same machine with its own data folder shows up the same way; stop one of them.
+**The relay's dashboard lists this computer twice.** Toskar before 1.8.3 could, at first start, make two route secrets at once and enroll under both. The stale entry is the one that isn't connected. The relay's operator can **Remove** it, and it drops off by itself after 30 days. A second Toskar running on the same machine with its own data folder shows up the same way. Access from anywhere names it at the top of the card ("Another Toskar is running on this computer: …", with its port, data folder, and process), and installing or upgrading the Linux package says so too. Stop the one you didn't mean to run.
 
 ## The rendezvous
 
