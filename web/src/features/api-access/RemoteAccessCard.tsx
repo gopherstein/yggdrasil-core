@@ -270,6 +270,7 @@ function OutsideCheck({ status }: { status: Status }) {
         <ReachLine status={status} />
       )}
       {status.relay && status.relay.state !== 'connected' ? <ToskarRelayLine relay={status.relay} /> : null}
+      {result?.at ? <RouterLine status={status} quiet={onlyRelay} /> : null}
       {status.relay?.route ? (
         <p className="text-xs text-ink-faint">{t('remote.check.route', { route: status.relay.route })}</p>
       ) : null}
@@ -285,6 +286,24 @@ function wayReason(way: ReachWay): string {
   if (way.reason === 'http' && way.status) return i18n.t('apiAccess:remote.check.reason.httpStatus', { status: way.status })
   if (way.reason === 'wrong_computer' && way.answered) return i18n.t('apiAccess:remote.check.reason.wrongToskar', { name: way.answered })
   return i18n.t(`apiAccess:remote.check.reason.${way.reason ?? 'unreachable'}`)
+}
+
+/**
+ * How the router's port was opened, or why it couldn't be, with the next
+ * step (#602). Quiet when the relay already works, since the port is then
+ * only a speed-up. Nothing when a forwarded address was entered.
+ */
+function RouterLine({ status, quiet }: { status: Status; quiet: boolean }) {
+  const { t } = useTranslation('apiAccess')
+  if (status.address || !status.enabled) return null
+  const port = status.port ?? 0
+  if (!status.map_reason) {
+    if (!status.mapped_by) return null
+    return <p className="text-xs text-ink-muted">{t('remote.router.opened', { port, method: t(`remote.method.${status.mapped_by}`) })}</p>
+  }
+  const text = t(`remote.router.${status.map_reason}`, { port })
+  const tone = quiet || status.map_reason === 'off' ? 'text-ink-muted' : 'text-warning'
+  return <p className={`text-xs ${tone}`}>{text}</p>
 }
 
 /** One way in: what it is, and whether the internet reached it. */

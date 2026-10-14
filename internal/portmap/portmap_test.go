@@ -18,8 +18,12 @@ import (
 
 // fakeRouter answers PCP, or only NAT-PMP, on a UDP port on this computer.
 type fakeRouter struct {
-	conn    *net.UDPConn
-	pcp     bool
+	conn *net.UDPConn
+	pcp  bool
+	// pcpCode and pmpCode, when set, are the result codes a mapping
+	// request gets: a router that refuses.
+	pcpCode byte
+	pmpCode uint16
 	mu      sync.Mutex
 	removed int // mappings asked away (lifetime 0)
 }
@@ -60,6 +64,7 @@ func (f *fakeRouter) answer(req []byte) []byte {
 		}
 		resp := make([]byte, 60)
 		resp[0], resp[1] = 2, 0x81
+		resp[3] = f.pcpCode
 		copy(resp[4:8], req[4:8]) // the lifetime asked
 		copy(resp[24:44], req[24:44])
 		ext := mapped4(netip.MustParseAddr("203.0.113.9"))
@@ -75,6 +80,7 @@ func (f *fakeRouter) answer(req []byte) []byte {
 	case len(req) == 12 && req[0] == 0 && req[1] == 2:
 		resp := make([]byte, 16)
 		resp[1] = 130
+		binary.BigEndian.PutUint16(resp[2:4], f.pmpCode)
 		copy(resp[8:10], req[4:6])
 		copy(resp[10:12], req[6:8])
 		copy(resp[12:16], req[8:12])
@@ -273,5 +279,37 @@ func TestPublicAndCarrierNAT(t *testing.T) {
 	}
 	if !CarrierNAT(netip.MustParseAddr("100.64.3.4")) || CarrierNAT(netip.MustParseAddr("203.0.113.9")) {
 		t.Fatal("carrier NAT")
+	}
+}
+
+// A router that answers and won't open the port is told apart from one
+// that's taken the port for another device, and from no router at all
+// (#602).
+func TestWhyAMappingFailed(t *testing.T) {
+	map7333 := func(f *fakeRouter) error {
+		_, err := Router{Gateway: f.addr(), SkipUPnP: true}.Map(context.Background(), 7333, 0)
+		return err
+	}
+	refusing := newFakeRouter(t, true)
+	refusing.pcpCode, refusing.pmpCode = 2, 2
+	if got := Why(map7333(refusing)); got != WhyRefused {
+		t.Errorf("refused: %q", got)
+	}
+	taken := newFakeRouter(t, true)
+	taken.pcpCode, taken.pmpCode = pcpCannotProvideExternal, 2
+	if got := Why(map7333(taken)); got != WhyPortTaken {
+		t.Errorf("taken: %q", got)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_, err := Router{Gateway: closedPort(t), SkipUPnP: true}.Map(ctx, 7333, 0)
+	if got := Why(err); got != WhyNoAnswer {
+		t.Errorf("no answer: %q (%v)", got, err)
+	}
+	if Why(fmt.Errorf("x: %w", ErrNoGateway)) != WhyNoGateway || Why(nil) != "" {
+		t.Error("no gateway, or no error")
+	}
+	if !DoubleNAT(netip.MustParseAddr("192.168.1.20")) || DoubleNAT(netip.MustParseAddr("203.0.113.9")) || DoubleNAT(netip.MustParseAddr("100.64.3.1")) {
+		t.Error("double NAT")
 	}
 }

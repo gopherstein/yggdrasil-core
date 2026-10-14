@@ -150,6 +150,16 @@
       "nat-pmp": "NAT-PMP",
       "upnp": "UPnP"
     },
+    "router": {
+      "opened": "Your router opened port {{port}} for this computer ({{method}}).",
+      "off": "Toskar doesn't ask your router to open a port. Turn on “Open a port on the router automatically”, or forward port {{port}} by hand.",
+      "no_gateway": "This computer couldn't find its router. Check its network connection.",
+      "no_answer": "Your router didn't answer requests to open a port. Turn on UPnP or NAT-PMP in its settings, or forward port {{port}} to this computer by hand.",
+      "refused": "Your router refused to open port {{port}}. Check its UPnP settings, or forward the port to this computer by hand.",
+      "port_taken": "Port {{port}} is already forwarded to another device on your router. Choose another port below, or remove that forward on the router.",
+      "double_nat": "Your router opened port {{port}}, but it sits behind another router (double NAT), so the port doesn't reach the internet. Forward the port on the outer router too, or use the relay.",
+      "carrier_nat": "Your router opened port {{port}}, but your internet provider shares one address among many homes (carrier-grade NAT), so the port can't reach the internet. Use the relay."
+    },
     "reach": {
       "direct": "Reachable from anywhere at {{address}}. Your router opened the port ({{method}}).",
       "ipv6": "Reachable from anywhere over IPv6 at [{{address}}]:{{port}}, if your router lets it in.",

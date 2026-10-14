@@ -37,6 +37,10 @@ type igd struct {
 	local   netip.Addr
 }
 
+// upnpConflict is UPnP's ConflictInMappingEntry: the outside port is
+// already forwarded to another device.
+const upnpConflict = "718"
+
 // discoverIGD finds a router's WAN connection service.
 func discoverIGD(ctx context.Context) (*igd, error) {
 	conn, err := net.ListenUDP("udp4", nil)
@@ -185,7 +189,11 @@ func (g *igd) soap(ctx context.Context, action string, args [][2]string) ([]byte
 	if res.StatusCode != http.StatusOK {
 		code := between(string(out), "<errorCode>", "</errorCode>")
 		desc := between(string(out), "<errorDescription>", "</errorDescription>")
-		return nil, fmt.Errorf("upnp: %s refused (%s %s)", action, code, desc)
+		why := ErrRefused
+		if code == upnpConflict {
+			why = ErrPortTaken
+		}
+		return nil, fmt.Errorf("upnp: %s %w (%s %s)", action, why, code, desc)
 	}
 	return out, nil
 }

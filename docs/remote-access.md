@@ -87,6 +87,20 @@ trust it.
 | `not_public` | The address isn't on the internet | Use a public address, or the relay |
 | `no_tunnel` | This computer isn't connected to the relay | See the relay's state on the same card |
 
+Under the ways in, a line says how the router's port was opened ("Your router opened port 7333 for this computer (UPnP)") or why it couldn't be, with the next step (#602):
+
+| Router | What it means | What to do |
+|---|---|---|
+| `no_answer` | No router answered PCP, NAT-PMP, or UPnP | Turn on UPnP or NAT-PMP in the router's settings, or forward the port by hand |
+| `refused` | The router answered and wouldn't open the port | Check its UPnP settings, or forward the port by hand |
+| `port_taken` | The outside port is forwarded to another device | Choose another port, or remove that forward on the router |
+| `double_nat` | The router opened the port, but sits behind another router | Forward the port on the outer router too, or use the relay |
+| `carrier_nat` | The provider shares one address among many homes | Use the relay |
+| `no_gateway` | This computer couldn't find its router | Check its network connection |
+| `off` | Toskar doesn't ask the router | Turn the setting on, or forward the port by hand |
+
+When the relay already works, the line is shown quietly, since the port is only a speed-up.
+
 The relay dials only public addresses, checks only this computer's
 certificate and health path, answers pass or fail, and takes one check a
 minute per computer, so the check can't be used to look at anything else.

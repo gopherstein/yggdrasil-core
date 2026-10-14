@@ -38,6 +38,48 @@ type Mapping struct {
 	upnp    *igd
 }
 
+// Errors a router's answer is sorted by.
+var (
+	// ErrRefused is a router that answered and wouldn't open the port.
+	ErrRefused = errors.New("the router refused")
+	// ErrPortTaken is an outside port already forwarded to another device.
+	ErrPortTaken = errors.New("the port is already forwarded to another device")
+)
+
+// Why a mapping didn't work, for Settings (#602).
+const (
+	WhyNoGateway = "no_gateway"
+	// WhyNoAnswer is no router answering PCP, NAT-PMP, or UPnP: it offers
+	// none of them, or they're turned off in its settings.
+	WhyNoAnswer  = "no_answer"
+	WhyRefused   = "refused"
+	WhyPortTaken = "port_taken"
+)
+
+// Why sorts the error Map ended with: the port is taken, the router
+// refused, there's no router, or no router answered. "" for no error.
+func Why(err error) string {
+	switch {
+	case err == nil:
+		return ""
+	case errors.Is(err, ErrPortTaken):
+		return WhyPortTaken
+	case errors.Is(err, ErrRefused):
+		return WhyRefused
+	case errors.Is(err, ErrNoGateway):
+		return WhyNoGateway
+	}
+	return WhyNoAnswer
+}
+
+// DoubleNAT reports a router whose own outside address is on a private
+// network: it sits behind another router, so a port it opens doesn't reach
+// the internet.
+func DoubleNAT(external netip.Addr) bool {
+	external = external.Unmap()
+	return external.IsValid() && external.IsPrivate()
+}
+
 // Router is how a mapping is made. The defaults find the router; tests
 // point them at a fake one.
 type Router struct {
