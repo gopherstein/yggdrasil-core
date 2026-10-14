@@ -15,6 +15,7 @@ import { SmallModelNote } from './SmallModelNote'
 import { CommunityScore, RateButton } from './ratings'
 import { formatPercent } from '@/i18n/format'
 import { rovingKeyDown, useMenu } from '@/lib/roving'
+import { ReportProblem } from '@/components/ui/ReportProblem'
 import { searchItems } from '@/lib/search'
 
 export function InstalledTab({
@@ -223,6 +224,7 @@ export function InstalledTab({
             {startError?.id === model.id ? (
               <p className="mt-2 text-sm text-danger" role="alert">
                 {startError.message}
+                <ReportProblem error={startError.message} className="ms-2 text-xs text-ink-faint underline hover:text-ink" />
               </p>
             ) : null}
           </li>

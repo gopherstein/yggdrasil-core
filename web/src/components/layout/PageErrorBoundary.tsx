@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ReportProblem } from '@/components/ui/ReportProblem'
 
 function PageError({ error, onRetry }: { error: Error; onRetry: () => void }) {
   const { t } = useTranslation()
@@ -14,6 +15,7 @@ function PageError({ error, onRetry }: { error: Error; onRetry: () => void }) {
         <button type="button" className="btn-secondary" onClick={() => window.location.reload()}>
           {t('pageError.reload')}
         </button>
+        <ReportProblem error={error.message} className="btn-secondary" />
       </div>
       <details className="pt-2 text-xs text-ink-faint">
         <summary className="cursor-pointer">{t('pageError.details')}</summary>

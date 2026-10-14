@@ -71,6 +71,19 @@
     "reload": "Recarregar",
     "details": "Detalhes"
   },
+  "report": {
+    "open": "Relatar",
+    "title": "Relatar este problema",
+    "body": "Isto vai para a equipe do Toskar em {{address}}. Nomes, endereços e chaves são removidos antes, e você vê tudo antes do envio.",
+    "noteLabel": "O que você estava fazendo? (opcional)",
+    "notePlaceholder": "Por exemplo: perguntei a previsão do tempo de amanhã",
+    "whatSends": "O que é enviado",
+    "gathering": "Reunindo detalhes…",
+    "cancel": "Cancelar",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "send": "Enviar por e-mail"
+  },
   "loadError": {
     "title": "O Toskar não conseguiu carregar isto",
     "body": "Ele não respondeu, ou respondeu com um erro. Seus dados continuam lá. Tente de novo, ou veja o Diagnóstico se continuar acontecendo.",

@@ -16,6 +16,7 @@ import {
 } from '@/lib/profilePresets'
 import { useUIStore } from '@/stores/uiStore'
 import type { ModelDownloadProgressPayload, Purpose, Recommendation } from '@/types/api'
+import { ReportProblem } from '@/components/ui/ReportProblem'
 import { formatPercent } from '@/i18n/format'
 
 type OnboardingStep = 'setup' | 'recommend' | 'installing' | 'ready'
@@ -295,6 +296,7 @@ export function OnboardingPage() {
           {installError && (
             <p className="mb-4 rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">
               {installError}
+              <ReportProblem error={installError} className="ms-2 text-xs text-ink-faint underline hover:text-ink" />
             </p>
           )}
 
@@ -373,6 +375,7 @@ export function OnboardingPage() {
           {installError && (
             <p className="mb-4 rounded-lg bg-danger/10 px-4 py-3 text-sm text-danger">
               {installError}
+              <ReportProblem error={installError} className="ms-2 text-xs text-ink-faint underline hover:text-ink" />
             </p>
           )}
 

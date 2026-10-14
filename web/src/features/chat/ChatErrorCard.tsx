@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Ratatoskr } from '@/components/ui/Ratatoskr'
+import { ReportProblem } from '@/components/ui/ReportProblem'
 import { explainError } from './friendlyError'
 
 /** A chat error in plain language, with the next step and the details on request. */
@@ -50,8 +51,9 @@ export function ChatErrorCard({
               {t('errors.openComputers')}
             </Link>
           ) : null}
+          <ReportProblem error={raw} code={code} className="ms-auto text-xs text-ink-faint hover:text-ink" />
           {e.detail ? (
-            <button type="button" className="ms-auto text-xs text-ink-faint hover:text-ink" onClick={() => setShowDetail((v) => !v)}>
+            <button type="button" className="text-xs text-ink-faint hover:text-ink" onClick={() => setShowDetail((v) => !v)}>
               {showDetail ? t('errors.hideDetails') : t('errors.details')}
             </button>
           ) : null}

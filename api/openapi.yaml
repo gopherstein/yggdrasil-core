@@ -2142,6 +2142,45 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/RuntimeSample"
+  /api/v1/diagnostics/report:
+    get:
+      summary: What a problem report sends, scrubbed
+      description: >-
+        Versions and the kind of computer, and for an Admin Core's last 40 warnings and errors.
+        Email addresses, keys, tokens, home folder names, the computer's name, and internet
+        addresses are taken out first. Members may call it.
+      operationId: getReport
+      responses:
+        "200":
+          description: The report
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                  commit:
+                    type: string
+                  contract:
+                    type: string
+                  os:
+                    type: string
+                  arch:
+                    type: string
+                  cpu:
+                    type: string
+                  memory_gb:
+                    type: integer
+                  gpus:
+                    type: array
+                    items:
+                      type: string
+                  log:
+                    type: array
+                    description: For an Admin only.
+                    items:
+                      type: string
   /api/v1/diagnostics/first-answers:
     get:
       summary: How long answers took to start, by app, cold or warm

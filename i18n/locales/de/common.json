@@ -70,6 +70,19 @@
     "reload": "Neu laden",
     "details": "Details"
   },
+  "report": {
+    "open": "Melden",
+    "title": "Dieses Problem melden",
+    "body": "Das geht an das Toskar-Team unter {{address}}. Namen, Adressen und Schlüssel werden vorher entfernt, und du siehst alles, bevor es gesendet wird.",
+    "noteLabel": "Was hast du gerade gemacht? (optional)",
+    "notePlaceholder": "Zum Beispiel: Ich habe nach dem Wetter für morgen gefragt",
+    "whatSends": "Was gesendet wird",
+    "gathering": "Details werden gesammelt…",
+    "cancel": "Abbrechen",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "send": "Per E-Mail senden"
+  },
   "loadError": {
     "title": "Toskar konnte das nicht laden",
     "body": "Es hat nicht geantwortet oder mit einem Fehler geantwortet. Deine Daten sind noch da. Versuche es erneut oder sieh in der Diagnose nach, falls es wieder passiert.",
