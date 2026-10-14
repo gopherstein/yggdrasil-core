@@ -758,5 +758,22 @@
     "pageFailed": "无法读取此页面。请重新分享，或先存为 PDF。",
     "nothing": "没有可保存的内容。",
     "updatePro": "电脑上的 Toskar Pro 需要更新后才能保存到它的知识库。请更新后再分享一次。"
+  },
+  "outside": {
+    "title": "随处访问",
+    "reachable": "可从你的网络外部访问",
+    "reachableViaRelay": "可通过中继从你的网络外部访问",
+    "unreachable": "无法从你的网络外部访问",
+    "unchecked": "尚未从外部检查",
+    "off": "这台电脑的随处访问已关闭。请在电脑上的 Toskar 中，于“API 访问”里打开。",
+    "checkedNow": "刚刚检查过",
+    "checkNow": "立即检查",
+    "checking": "正在检查…",
+    "tooSoon": "不到一分钟前刚检查过，这就是最新结果。",
+    "details": "每条访问路径以及需要修复的地方，都在电脑上 Toskar 的“API 访问”中。",
+    "failed": "无法运行检查（{{code}}）。",
+    "checkedMinutes_other": "{{count}} 分钟前检查过",
+    "checkedHours_other": "{{count}} 小时前检查过",
+    "checkedDays_other": "{{count}} 天前检查过"
   }
 }

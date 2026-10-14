@@ -770,5 +770,25 @@
     "pageFailed": "Diese Seite konnte nicht gelesen werden. Teile sie erneut oder speichere sie zuerst als PDF.",
     "nothing": "Es gab nichts zu speichern.",
     "updatePro": "Toskar Pro auf deinem Computer braucht ein Update, bevor es in seinem Wissen speichern kann. Aktualisiere es und teile das dann erneut."
+  },
+  "outside": {
+    "title": "Zugriff von überall",
+    "reachable": "Von außerhalb deines Netzwerks erreichbar",
+    "reachableViaRelay": "Von außerhalb deines Netzwerks erreichbar, über das Relay",
+    "unreachable": "Von außerhalb deines Netzwerks nicht erreichbar",
+    "unchecked": "Noch nicht von außen geprüft",
+    "off": "Zugriff von überall ist auf diesem Computer aus. Schalte ihn in Toskar auf dem Computer unter „API-Zugriff“ ein.",
+    "checkedNow": "Gerade eben geprüft",
+    "checkNow": "Jetzt prüfen",
+    "checking": "Wird geprüft …",
+    "tooSoon": "Vor weniger als einer Minute geprüft, das ist also das neueste Ergebnis.",
+    "details": "Jeder Weg hinein und was zu beheben ist, steht unter „API-Zugriff“ in Toskar auf dem Computer.",
+    "failed": "Die Prüfung konnte nicht laufen ({{code}}).",
+    "checkedMinutes_one": "Vor {{count}} Minute geprüft",
+    "checkedMinutes_other": "Vor {{count}} Minuten geprüft",
+    "checkedHours_one": "Vor {{count}} Stunde geprüft",
+    "checkedHours_other": "Vor {{count}} Stunden geprüft",
+    "checkedDays_one": "Vor {{count}} Tag geprüft",
+    "checkedDays_other": "Vor {{count}} Tagen geprüft"
   }
 }

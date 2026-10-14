@@ -782,5 +782,28 @@
     "pageFailed": "Não foi possível ler esta página. Compartilhe de novo ou salve-a primeiro como PDF.",
     "nothing": "Não havia nada para salvar.",
     "updatePro": "O Toskar Pro no seu computador precisa de uma atualização para salvar no Conhecimento dele. Atualize-o e compartilhe isto de novo."
+  },
+  "outside": {
+    "title": "Acesso de qualquer lugar",
+    "reachable": "Acessível de fora da sua rede",
+    "reachableViaRelay": "Acessível de fora da sua rede, pelo relay",
+    "unreachable": "Não acessível de fora da sua rede",
+    "unchecked": "Ainda não verificado de fora",
+    "off": "O acesso de qualquer lugar está desativado neste computador. Ative-o no Toskar no computador, em Acesso à API.",
+    "checkedNow": "Verificado agora mesmo",
+    "checkNow": "Verificar agora",
+    "checking": "Verificando…",
+    "tooSoon": "Verificado há menos de um minuto, então este é o resultado mais recente.",
+    "details": "Cada acesso, e o que corrigir, está em Acesso à API no Toskar no computador.",
+    "failed": "Não foi possível fazer a verificação ({{code}}).",
+    "checkedMinutes_one": "Verificado há {{count}} minuto",
+    "checkedMinutes_many": "Verificado há {{count}} minutos",
+    "checkedMinutes_other": "Verificado há {{count}} minutos",
+    "checkedHours_one": "Verificado há {{count}} hora",
+    "checkedHours_many": "Verificado há {{count}} horas",
+    "checkedHours_other": "Verificado há {{count}} horas",
+    "checkedDays_one": "Verificado há {{count}} dia",
+    "checkedDays_many": "Verificado há {{count}} dias",
+    "checkedDays_other": "Verificado há {{count}} dias"
   }
 }

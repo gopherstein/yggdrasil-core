@@ -758,5 +758,22 @@
     "pageFailed": "このページを読み込めませんでした。もう一度共有するか、先に PDF として保存してください。",
     "nothing": "保存するものがありませんでした。",
     "updatePro": "ナレッジに保存するには、コンピュータの Toskar Pro をアップデートする必要があります。アップデートしてから、もう一度共有してください。"
+  },
+  "outside": {
+    "title": "どこからでもアクセス",
+    "reachable": "ネットワークの外から接続できます",
+    "reachableViaRelay": "リレー経由でネットワークの外から接続できます",
+    "unreachable": "ネットワークの外から接続できません",
+    "unchecked": "まだ外部から確認していません",
+    "off": "このコンピュータではどこからでもアクセスがオフです。コンピュータの Toskar の「API アクセス」でオンにしてください。",
+    "checkedNow": "たった今確認しました",
+    "checkNow": "今すぐ確認",
+    "checking": "確認しています…",
+    "tooSoon": "1 分以内に確認済みのため、これが最新の結果です。",
+    "details": "各接続経路と修正方法は、コンピュータの Toskar の「API アクセス」にあります。",
+    "failed": "確認を実行できませんでした（{{code}}）。",
+    "checkedMinutes_other": "{{count}} 分前に確認",
+    "checkedHours_other": "{{count}} 時間前に確認",
+    "checkedDays_other": "{{count}} 日前に確認"
   }
 }
