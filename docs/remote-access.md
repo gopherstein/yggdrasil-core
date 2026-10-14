@@ -105,6 +105,38 @@ The relay dials only public addresses, checks only this computer's
 certificate and health path, answers pass or fail, and takes one check a
 minute per computer, so the check can't be used to look at anything else.
 
+## Troubleshooting
+
+Start at **API Access → Access from anywhere**. Choose **Check now** for a fresh result: the relay reaches this computer from the internet, as a device away from home does. Then find what the card says below. If you report a problem, attach **Copy details for a report**. It has no tokens or secrets, and your internet addresses are replaced by their kind.
+
+**"Not listening on port 7333: …"** Access from anywhere couldn't take its port, usually because another program has it. Pick another port in the card and **Save**. On Linux, `ss -ltnp 'sport = :7333'` shows who has it; on macOS, `lsof -nP -iTCP:7333 -sTCP:LISTEN`.
+
+**"Reachable from outside your network, through the relay"** (green). It works. Devices away from home get in through the relay, and nothing needs fixing. A direct way in is an optional speed-up; the router line under the check says why there isn't one, and **Use the relay only** stops trying.
+
+**"Not reachable from outside your network"** (red). Read the relay's row first:
+- **"This computer isn't connected to the relay right now"**, with the relay's state beside it:
+  - *No relay yet:* subscribe to access from anywhere in the Toskar app on a phone or tablet paired with this computer. The app hands the subscription over by itself.
+  - *Connecting:* it's on its way. If it stays this way for minutes, check that this computer can reach `relay.toskar.ai` on port 4443 (a firewall that only allows 443 blocks it).
+  - *`TOKEN_EXPIRED` or `TOKEN_REVOKED`:* the subscription ended or was refunded. Renew it in the app.
+  - *`RELAY_UNREACHABLE`:* the relay couldn't be reached at all. Check this computer's internet connection.
+  - *An organization's relay:* check its name and the enrollment secret your IT team gave you.
+- **Then the direct rows**, if you want the faster path or have no relay. Each row says what failed and what to do (the table above), and the router line says what the router answered (the second table).
+
+**"Toskar on another-computer answered on this port instead of this computer."** Two computers with Toskar share one router, and its port forward points at the other one. Give each computer its own port (**Try another port** on one), or point the forward at this computer.
+
+**"A web server that isn't Toskar answered on this port."** Something else on your network has that outside port: a NAS, a camera, another server. Choose another port, or remove that forward on the router.
+
+**"This computer answered, but not as expected (HTTP 502)."** Something in front of Toskar on that port answered, such as a reverse proxy or a router's own web page. Point it at Toskar's port directly, or choose another port.
+
+**"Checked less than a minute ago, so this is the latest result."** The relay checks a computer at most once a minute. Wait a minute and choose **Check now** again.
+
+**The card is green, but a device away from home can't connect.**
+- **Paired before access from anywhere?** The device needs to connect at home once, so it gets this computer's route secret. Open the app on the home Wi-Fi, then try away again.
+- **Is the subscription on that device's app?** Every paired device gets the computer's relay token on its own, but only from a computer that has one. "Ready away from home" in the app says it's set.
+- **Did this computer's certificate change** (a new one set in Settings, or the data folder replaced)? The app refuses a certificate it didn't pair with, by design. Pair the device again with Connect a device.
+
+**The relay's dashboard lists this computer twice.** Toskar before 1.8.3 could, at first start, make two route secrets at once and enroll under both. The stale entry is the one that isn't connected. The relay's operator can **Remove** it, and it drops off by itself after 30 days. A second Toskar running on the same machine with its own data folder shows up the same way; stop one of them.
+
 ## The rendezvous
 
 A small stateless service with a key-value store. It holds no traffic.

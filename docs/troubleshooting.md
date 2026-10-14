@@ -97,6 +97,10 @@ Approve the offer on the second computer. Protected Bifrost routes answer `401` 
 - **Connected services:** Tools → Connected services → **Check** tests the stored credential. A blank secret field keeps the stored one when you change other values.
 - **MCP tool sources:** a source that signs in with a browser says "needs you to sign in again" when its sign-in expires. Open Tools and choose **Sign in**. Tools also shows each source's log.
 
+## A device can't reach this computer away from home
+
+See [Access from anywhere: Troubleshooting](remote-access.md#troubleshooting). It goes by what API Access → Access from anywhere says after **Check now**: not listening, reachable through the relay, a relay that isn't connected, another computer or web server answering on the port, or a device that can't connect though the card is green.
+
 ## API calls return 401 or 403
 
 - **401:** the daemon is not bound to loopback, and the request has no `Authorization: Bearer YOUR_API_KEY` header. `/api/v1`, `/v1`, and `/mcp` all use that check. On the default loopback bind, none requires a key.
