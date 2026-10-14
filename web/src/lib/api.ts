@@ -616,6 +616,8 @@ export const api = {
       reason?: 'off' | 'not_listening' | 'carrier_nat' | 'no_port'
       relay?: { name: string; state: 'no_token' | 'connecting' | 'connected' | 'error'; error?: string; route?: string }
       check?: ReachCheck
+      /** Other Toskars running on this computer (#602). */
+      others?: { name: string; pid: number; api_port: number; data_dir: string; version: string; remote?: boolean }[]
     }>('/api/v1/remote-access'),
 
   /** Has the relay reach this computer from the internet now (#546); answers what getRemoteAccess does. */

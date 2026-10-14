@@ -79,5 +79,8 @@ export function remoteDetails(status: Status, version?: string, now: Date = new 
     lines.push('Outside check: not run yet')
   }
   if (check?.error) lines.push(`Last check attempt: ${check.error}`)
+  for (const o of status.others ?? []) {
+    lines.push(`Another Toskar on this computer: version ${o.version}, port ${o.api_port}${o.remote ? ', access from anywhere on' : ''}`)
+  }
   return redactAddresses(lines.join('\n'))
 }

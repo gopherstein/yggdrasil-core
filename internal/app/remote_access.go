@@ -25,6 +25,8 @@ func (a *App) applyRemoteAccess() error {
 		return nil
 	}
 	cfg := a.Config.Get()
+	// Others on this computer see whether this one uses the relay (#602).
+	defer a.announce()
 	if !cfg.RemoteAccess.Enabled {
 		a.stopRelay()
 		a.portKeeper.Stop()
@@ -80,6 +82,9 @@ func (a *App) remoteReach() api.RemoteReach {
 	}
 	out.Reachable, out.Reason = reachOf(cfg, listening, m, len(out.IPv6) > 0, relayed)
 	out.Check = a.reachCheck()
+	for _, o := range a.otherInstances() {
+		out.Others = append(out.Others, api.OtherToskar{Name: o.Name, PID: o.PID, APIPort: o.API, DataDir: o.DataDir, Version: o.Version, Remote: o.Remote})
+	}
 	return out
 }
 
