@@ -158,7 +158,10 @@
       "refused": "Il tuo router ha rifiutato di aprire la porta {{port}}. Controlla le sue impostazioni UPnP, oppure inoltra la porta a questo computer a mano.",
       "port_taken": "La porta {{port}} è già inoltrata a un altro dispositivo sul router. Scegli un’altra porta qui sotto, oppure rimuovi quell’inoltro sul router.",
       "double_nat": "Il tuo router ha aperto la porta {{port}}, ma si trova dietro un altro router (doppio NAT), quindi la porta non raggiunge internet. Inoltra la porta anche sul router esterno, oppure usa il relay.",
-      "carrier_nat": "Il tuo router ha aperto la porta {{port}}, ma il tuo provider condivide un indirizzo tra molte case (CGNAT), quindi la porta non raggiunge internet. Usa il relay."
+      "carrier_nat": "Il tuo router ha aperto la porta {{port}}, ma il tuo provider condivide un indirizzo tra molte case (CGNAT), quindi la porta non raggiunge internet. Usa il relay.",
+      "relayOnly": "Si usa solo il relay: Toskar non chiede al router di aprire una porta.",
+      "tryAnotherPort": "Prova un’altra porta",
+      "useRelayOnly": "Usa solo il relay"
     },
     "reach": {
       "direct": "Raggiungibile ovunque su {{address}}. Il router ha aperto la porta ({{method}}).",

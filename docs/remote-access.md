@@ -99,7 +99,7 @@ Under the ways in, a line says how the router's port was opened ("Your router op
 | `no_gateway` | This computer couldn't find its router | Check its network connection |
 | `off` | Toskar doesn't ask the router | Turn the setting on, or forward the port by hand |
 
-When the relay already works, the line is shown quietly, since the port is only a speed-up.
+When the relay already works, the line is shown quietly, since the port is only a speed-up. Two buttons do the next step where Toskar can: **Try another port** (when the port is taken or refused) picks a port from 20000 to 39999 and asks the router again, and **Use the relay only** (when the relay works) stops asking the router, after which the line says the relay alone is in use.
 
 The relay dials only public addresses, checks only this computer's
 certificate and health path, answers pass or fail, and takes one check a

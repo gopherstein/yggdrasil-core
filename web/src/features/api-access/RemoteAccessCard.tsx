@@ -56,7 +56,7 @@ export function RemoteAccessCard() {
           onChange={() => save.mutate({ remote_access_enabled: !enabled })}
         />
       </div>
-      {enabled && st ? <OutsideCheck status={st} /> : null}
+      {enabled && st ? <OutsideCheck status={st} saving={save.isPending} onSave={(patch) => save.mutate(patch)} /> : null}
       <label className="flex items-center gap-2 text-sm">
         <input
           type="checkbox"
@@ -220,6 +220,15 @@ function RelayLine({ status }: { status: NonNullable<RelayStatus> }) {
 }
 
 type Status = NonNullable<Awaited<ReturnType<typeof api.getRemoteAccess>>>
+type SettingsPatch = Parameters<typeof api.updateSettings>[0]
+
+/** A port to try instead of one the router won't give: 20000 to 39999, not the current one. */
+export function anotherPort(current: number, random: () => number = Math.random): number {
+  for (;;) {
+    const port = 20000 + Math.floor(random() * 20000)
+    if (port !== current) return port
+  }
+}
 
 /**
  * Whether access from anywhere works, as the relay found it from the
@@ -228,7 +237,7 @@ type Status = NonNullable<Awaited<ReturnType<typeof api.getRemoteAccess>>>
  * way in with what to do when it fails. Before the first check, the line
  * says how Toskar set it up, as before.
  */
-function OutsideCheck({ status }: { status: Status }) {
+function OutsideCheck({ status, saving, onSave }: { status: Status; saving: boolean; onSave: (patch: SettingsPatch) => void }) {
   const { t } = useTranslation('apiAccess')
   const queryClient = useQueryClient()
   const check = useMutation({
@@ -270,7 +279,7 @@ function OutsideCheck({ status }: { status: Status }) {
         <ReachLine status={status} />
       )}
       {status.relay && status.relay.state !== 'connected' ? <ToskarRelayLine relay={status.relay} /> : null}
-      {result?.at ? <RouterLine status={status} quiet={onlyRelay} /> : null}
+      {result?.at ? <RouterLine status={status} quiet={onlyRelay} saving={saving} onSave={onSave} /> : null}
       {status.relay?.route ? (
         <p className="text-xs text-ink-faint">{t('remote.check.route', { route: status.relay.route })}</p>
       ) : null}
@@ -293,17 +302,52 @@ function wayReason(way: ReachWay): string {
  * step (#602). Quiet when the relay already works, since the port is then
  * only a speed-up. Nothing when a forwarded address was entered.
  */
-function RouterLine({ status, quiet }: { status: Status; quiet: boolean }) {
+function RouterLine({
+  status,
+  quiet,
+  saving,
+  onSave,
+}: {
+  status: Status
+  quiet: boolean
+  saving: boolean
+  onSave: (patch: SettingsPatch) => void
+}) {
   const { t } = useTranslation('apiAccess')
   if (status.address || !status.enabled) return null
   const port = status.port ?? 0
-  if (!status.map_reason) {
+  const reason = status.map_reason
+  if (!reason) {
     if (!status.mapped_by) return null
     return <p className="text-xs text-ink-muted">{t('remote.router.opened', { port, method: t(`remote.method.${status.mapped_by}`) })}</p>
   }
-  const text = t(`remote.router.${status.map_reason}`, { port })
-  const tone = quiet || status.map_reason === 'off' ? 'text-ink-muted' : 'text-warning'
-  return <p className={`text-xs ${tone}`}>{text}</p>
+  const relayUp = status.relay?.state === 'connected'
+  // Turned off on purpose while the relay works: nothing to fix.
+  const key = reason === 'off' && relayUp ? 'relayOnly' : reason
+  const tone = quiet || reason === 'off' ? 'text-ink-muted' : 'text-warning'
+  // One action a reason, where Toskar can do it (#602): another port when
+  // the router won't give this one, or the relay alone when it's enough.
+  const otherPort = reason === 'port_taken' || reason === 'refused'
+  const relayOnly = relayUp && reason !== 'off' && reason !== 'no_gateway'
+  return (
+    <div className="space-y-2">
+      <p className={`text-xs ${tone}`}>{t(`remote.router.${key}`, { port })}</p>
+      {otherPort || relayOnly ? (
+        <div className="flex flex-wrap gap-2">
+          {otherPort ? (
+            <button type="button" className="btn-secondary btn-sm" disabled={saving} onClick={() => onSave({ remote_access_port: anotherPort(port) })}>
+              {t('remote.router.tryAnotherPort')}
+            </button>
+          ) : null}
+          {relayOnly ? (
+            <button type="button" className="btn-secondary btn-sm" disabled={saving} onClick={() => onSave({ remote_access_port_mapping: false })}>
+              {t('remote.router.useRelayOnly')}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  )
 }
 
 /** One way in: what it is, and whether the internet reached it. */

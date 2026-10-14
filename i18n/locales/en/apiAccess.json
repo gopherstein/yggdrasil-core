@@ -158,7 +158,10 @@
       "refused": "Your router refused to open port {{port}}. Check its UPnP settings, or forward the port to this computer by hand.",
       "port_taken": "Port {{port}} is already forwarded to another device on your router. Choose another port below, or remove that forward on the router.",
       "double_nat": "Your router opened port {{port}}, but it sits behind another router (double NAT), so the port doesn't reach the internet. Forward the port on the outer router too, or use the relay.",
-      "carrier_nat": "Your router opened port {{port}}, but your internet provider shares one address among many homes (carrier-grade NAT), so the port can't reach the internet. Use the relay."
+      "carrier_nat": "Your router opened port {{port}}, but your internet provider shares one address among many homes (carrier-grade NAT), so the port can't reach the internet. Use the relay.",
+      "relayOnly": "Using the relay only: Toskar doesn't ask your router to open a port.",
+      "tryAnotherPort": "Try another port",
+      "useRelayOnly": "Use the relay only"
     },
     "reach": {
       "direct": "Reachable from anywhere at {{address}}. Your router opened the port ({{method}}).",

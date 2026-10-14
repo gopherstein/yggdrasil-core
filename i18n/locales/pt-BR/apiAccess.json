@@ -158,7 +158,10 @@
       "refused": "Seu roteador se recusou a abrir a porta {{port}}. Verifique as configurações de UPnP dele ou encaminhe a porta para este computador manualmente.",
       "port_taken": "A porta {{port}} já está encaminhada para outro dispositivo no seu roteador. Escolha outra porta abaixo ou remova esse encaminhamento no roteador.",
       "double_nat": "Seu roteador abriu a porta {{port}}, mas ele fica atrás de outro roteador (NAT duplo), então a porta não chega à internet. Encaminhe a porta também no roteador externo ou use o relay.",
-      "carrier_nat": "Seu roteador abriu a porta {{port}}, mas seu provedor compartilha um endereço entre muitas casas (CGNAT), então a porta não chega à internet. Use o relay."
+      "carrier_nat": "Seu roteador abriu a porta {{port}}, mas seu provedor compartilha um endereço entre muitas casas (CGNAT), então a porta não chega à internet. Use o relay.",
+      "relayOnly": "Usando só o relay: o Toskar não pede ao roteador para abrir uma porta.",
+      "tryAnotherPort": "Tentar outra porta",
+      "useRelayOnly": "Usar só o relay"
     },
     "reach": {
       "direct": "Acessível de qualquer lugar em {{address}}. O roteador abriu a porta ({{method}}).",
