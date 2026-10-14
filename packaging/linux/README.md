@@ -1,9 +1,11 @@
 # Linux packages
 
-Release CI builds a `.deb` and `.rpm` for amd64 and arm64, and publishes an unsigned apt repository on the `apt` branch.
+Release CI builds a `.deb` and `.rpm` for amd64 and arm64, and publishes a signed apt repository on the `apt` branch. Its key, `toskar-archive-keyring.asc` here, is also at `https://toskar.ai/apt/toskar.asc` and on the `apt` branch as `toskar.asc`: "Toskar apt repository <hello@yeix.io>", Ed25519, fingerprint `7124 28C8 E821 E64C D418 32F5 2D28 4623 90D0 C604`, until 2031-10-13.
 
 ```bash
-echo "deb [trusted=yes] https://raw.githubusercontent.com/yeixio/toskar-core/apt stable main" | sudo tee /etc/apt/sources.list.d/yggdrasil.list
+sudo install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://toskar.ai/apt/toskar.asc | sudo tee /etc/apt/keyrings/toskar.asc > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/toskar.asc] https://raw.githubusercontent.com/yeixio/toskar-core/apt stable main" | sudo tee /etc/apt/sources.list.d/toskar.list
 sudo apt-get update
 sudo apt-get install toskar
 ```

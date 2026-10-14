@@ -29,7 +29,9 @@ Open `http://127.0.0.1:7331`.
 Debian and Ubuntu:
 
 ```bash
-echo "deb [trusted=yes] https://raw.githubusercontent.com/yeixio/toskar-core/apt stable main" | sudo tee /etc/apt/sources.list.d/yggdrasil.list
+sudo install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://toskar.ai/apt/toskar.asc | sudo tee /etc/apt/keyrings/toskar.asc > /dev/null
+echo "deb [signed-by=/etc/apt/keyrings/toskar.asc] https://raw.githubusercontent.com/yeixio/toskar-core/apt stable main" | sudo tee /etc/apt/sources.list.d/toskar.list
 sudo apt-get update
 sudo apt-get install toskar
 ```
@@ -48,4 +50,4 @@ Open `http://127.0.0.1:7331`.
 
 ## Known limits
 
-Binaries are not code-signed. The apt repository is unsigned (`trusted=yes`). A bearer token on plain HTTP does not encrypt traffic. A clean install of this Windows archive, and of the Intel Mac archive, has not been recorded in the repository.
+Binaries are not code-signed. The apt repository is signed (key fingerprint `7124 28C8 E821 E64C D418 32F5 2D28 4623 90D0 C604`); a source added before 1.8.3 with `[trusted=yes]` moves to the signed form when the package upgrades. A bearer token on plain HTTP does not encrypt traffic. A clean install of this Windows archive, and of the Intel Mac archive, has not been recorded in the repository.
