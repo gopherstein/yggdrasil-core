@@ -54,6 +54,7 @@ import (
 	"github.com/yeixio/toskar-core/internal/portals"
 	"github.com/yeixio/toskar-core/internal/portmap"
 	"github.com/yeixio/toskar-core/internal/profiles"
+	"github.com/yeixio/toskar-core/internal/push"
 	"github.com/yeixio/toskar-core/internal/pyenv"
 	"github.com/yeixio/toskar-core/internal/ratings"
 	"github.com/yeixio/toskar-core/internal/relayclient"
@@ -127,6 +128,8 @@ type App struct {
 	TopicLog *topiclog.Store
 	// Notifications is Gjallarhorn's notification center and delivery.
 	Notifications *gjallarhorn.Hub
+	// Push is the paired devices' push registrations (#460).
+	Push *push.Store
 	// Share admits chat, automations, benchmarks, and training by priority (§60).
 	Share *share.Gate
 	// Connectors are the connected services, such as GitHub (§32).
@@ -775,6 +778,8 @@ func New(opts Options) (*App, error) {
 	a.Notifications.SetSecrets(secrets)
 	a.Notifications.SetSettings(settingsRepo)
 	a.Notifications.SetEgress(a.Egress)
+	// The Toskar apps, through the push relay (#460).
+	a.Push = push.NewStore(db.SQL)
 	a.API.BindNotifications(a.Notifications)
 	a.API.BindConnectors(a.Connectors)
 	a.API.BindMCP(a.MCP, mcp.NewServer(a.mcpBackend()), ctlPath)
@@ -796,6 +801,10 @@ func New(opts Options) (*App, error) {
 	ratingsRef.Store(a.Ratings)
 	a.API.BindRatings(a.Ratings)
 	a.identity = identity
+	if client := newPushClient(a); client != nil {
+		a.Notifications.SetPush(&pushSender{store: a.Push, client: client})
+		a.API.BindPush(a.Push, client)
+	}
 	a.joinTokens = &join.Tokens{DB: db.SQL}
 	a.API.BindNetwork(a)
 	a.API.BindExternal(a)
